@@ -71,7 +71,7 @@ message IdempotencyKey {
   // only writer -- so the rule's premise does not hold while its cost is a
   // broken idempotency mechanism. Revisit if orm gains a writable override.
   IdempotencyState state = 4 [
-    (google.api.field_behavior) = REQUIRED,
+    (google.api.field_behavior) = OUTPUT_ONLY,
     (store.v1.column) = {default_value: "IN_FLIGHT"}
   ];
 
