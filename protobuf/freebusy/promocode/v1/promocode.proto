@@ -235,7 +235,8 @@ message Scope {
 // listed with paging (ListRedemptions). The {promo_code} parent segment
 // generates the promo_code_id FK back to the owning code (1:n into
 // promocode.redemptions); amount_applied is the shared google.type.Money in
-// common.moneys. Redemptions are created during CreateBooking, never directly.
+// common.moneys. Redemptions are recorded when a booking's payment settles, never
+// created directly.
 message Redemption {
   option (google.api.resource) = {
     type: "freebusy.promocode.v1/Redemption"
@@ -260,11 +261,11 @@ message Redemption {
     (google.api.resource_reference) = {type: "protobufrfc.dev/User"}
   ];
 
-  // The booking the code was applied to.
-  // Format: bookings/{booking}
-  string booking = 3 [
+  // The reservation the code was applied to.
+  // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  string reservation = 3 [
     (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference) = {type: "freebusy.scheduling.v1/Booking"}
+    (google.api.resource_reference) = {type: "freebusy.reservation.v1/Reservation"}
   ];
 
   // When the code was redeemed.

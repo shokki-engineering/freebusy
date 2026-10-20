@@ -96,18 +96,6 @@ static_resources:
                             cluster: freebusy_backend
                             timeout: 60s
 
-                        - match:
-                            prefix: "/freebusy.schedule.v1.ScheduleService/"
-                          route:
-                            cluster: freebusy_backend
-                            timeout: 60s
-
-                        - match:
-                            prefix: "/freebusy.scheduling.v1.SchedulingService/"
-                          route:
-                            cluster: freebusy_backend
-                            timeout: 60s
-
                       cors:
                         allow_origin_string_match:
                           - prefix: "*"

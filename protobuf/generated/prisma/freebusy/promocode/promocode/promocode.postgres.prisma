@@ -91,9 +91,6 @@ model PromoCode {
   /// Back-relation: Redemption records that reference this model via promo_code_id.
   redemptions Redemption[]
 
-  /// Back-relation: Booking records that reference this model via promo_code.
-  bookings Booking[]
-
   /// Index on [discount_id].
   @@index([discountID])
   /// Index on [window_id].
@@ -112,7 +109,7 @@ model PromoCode {
   @@schema("promocode")
 }
 
-/// Redemption is a single use of a promo code, modeled as a sub-resource of PromoCode rather than an inline list — so it has its own name/lifecycle and is listed with paging (ListRedemptions). The {promo_code} parent segment generates the promo_code_id FK back to the owning code (1:n into promocode.redemptions); amount_applied is the shared google.type.Money in common.moneys. Redemptions are created during CreateBooking, never directly.
+/// Redemption is a single use of a promo code, modeled as a sub-resource of PromoCode rather than an inline list — so it has its own name/lifecycle and is listed with paging (ListRedemptions). The {promo_code} parent segment generates the promo_code_id FK back to the owning code (1:n into promocode.redemptions); amount_applied is the shared google.type.Money in common.moneys. Redemptions are recorded when a booking's payment settles, never created directly.
 model Redemption {
   /// Unique identifier for the record.
   id String @id @default(ulid()) @map("id")
@@ -123,11 +120,11 @@ model Redemption {
   /// The customer who redeemed the code. Format: users/{user} TODO: unresolved reference to User (not in this generation set); kept as a plain indexed column.
   customer String @map("customer")
 
-  /// The booking the code was applied to. Format: bookings/{booking}
-  bookingID String @map("booking")
+  /// The reservation the code was applied to. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  reservationID String @map("reservation")
 
-  /// Relation to Booking via booking.
-  booking Booking @relation(fields: [bookingID], references: [id])
+  /// Relation to Reservation via reservation.
+  reservation Reservation @relation(fields: [reservationID], references: [id])
 
   /// When the code was redeemed.
   redeemedTime DateTime? @freebusy.Timestamptz(6) @map("redeemed_time")
@@ -146,8 +143,8 @@ model Redemption {
 
   /// Index on [customer].
   @@index([customer])
-  /// Index on [booking].
-  @@index([bookingID])
+  /// Index on [reservation].
+  @@index([reservationID])
   /// Index on [promo_code_id].
   @@index([promoCodeID])
   /// Index on [amount_applied_id].

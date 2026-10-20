@@ -325,9 +325,6 @@ func (r *GormRedemptionRepository) Create(ctx context.Context, parent string, in
 	m.ID = id
 	m.Name = in.GetName()
 	m.PromoCodeID = parentIDs[0]
-	if v := in.GetBooking(); v != "" {
-		m.BookingID = repox.LastSegment(v)
-	}
 	if err := r.DB.Transaction(func(tx *gorm.DB) error {
 		if v := in.GetAmountApplied(); v != nil {
 			vo := common.MoneyFromProto(v)
@@ -367,9 +364,6 @@ func (r *GormRedemptionRepository) get(ctx context.Context, id string) (*promoco
 // AfterRead hook.
 func (r *GormRedemptionRepository) toProto(ctx context.Context, m *promocode.Redemption) (*promocodepbv1.Redemption, error) {
 	out := promocode.RedemptionToProto(m)
-	if m.BookingID != "" {
-		out.Booking = "bookings/" + m.BookingID
-	}
 	if h := r.Hooks.AfterRead; h != nil {
 		if err := h(ctx, out); err != nil {
 			return nil, err
@@ -432,12 +426,6 @@ func (r *GormRedemptionRepository) Update(ctx context.Context, in *promocodepbv1
 		}
 		var staleAmountApplied string
 		existingPB := promocode.RedemptionToProto(&existing)
-		{
-			m, out := &existing, existingPB
-			if m.BookingID != "" {
-				out.Booking = "bookings/" + m.BookingID
-			}
-		}
 		merged := proto.Clone(existingPB).(*promocodepbv1.Redemption)
 		applyRedemptionMask(merged, in, paths)
 		if h := r.Hooks.BeforeUpdate; h != nil {
@@ -449,7 +437,6 @@ func (r *GormRedemptionRepository) Update(ctx context.Context, in *promocodepbv1
 		_ = next
 		existing.Name = next.Name
 		existing.Customer = next.Customer
-		existing.BookingID = repox.LastSegment(merged.GetBooking())
 		if repox.GroupTouched(paths, "amount_applied") {
 			if existing.AmountAppliedID != nil {
 				staleAmountApplied = *existing.AmountAppliedID

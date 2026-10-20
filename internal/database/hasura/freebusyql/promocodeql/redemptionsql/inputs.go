@@ -21,8 +21,6 @@ import (
 type CreateInput struct {
 	// AmountAppliedId sets the "amountAppliedId" column; the zero value is omitted (column default / NULL).
 	AmountAppliedId string `json:"amountAppliedId,omitzero"`
-	// Booking sets the "booking" column (required).
-	Booking string `json:"booking"`
 	// Customer sets the "customer" column (required).
 	Customer string `json:"customer"`
 	// Id sets the "id" column (required).
@@ -33,14 +31,14 @@ type CreateInput struct {
 	PromoCodeId string `json:"promoCodeId"`
 	// RedeemedTime sets the "redeemedTime" column; the zero value is omitted (column default / NULL).
 	RedeemedTime string `json:"redeemedTime,omitzero"`
+	// Reservation sets the "reservation" column (required).
+	Reservation string `json:"reservation"`
 }
 
 // UpdateInput holds the fields to change on a PromocodeRedemptions row; each set field becomes a column update.
 type UpdateInput struct {
 	// Update the 'amount_applied_id' column in the 'promocode_redemptions' collection.
 	AmountAppliedId graphql.Nullable[string] `json:"amountAppliedId"`
-	// Update the 'booking' column in the 'promocode_redemptions' collection.
-	Booking graphql.Nullable[string] `json:"booking"`
 	// Update the 'customer' column in the 'promocode_redemptions' collection.
 	Customer graphql.Nullable[string] `json:"customer"`
 	// Update the 'id' column in the 'promocode_redemptions' collection.
@@ -51,4 +49,6 @@ type UpdateInput struct {
 	PromoCodeId graphql.Nullable[string] `json:"promoCodeId"`
 	// Update the 'redeemed_time' column in the 'promocode_redemptions' collection.
 	RedeemedTime graphql.Nullable[string] `json:"redeemedTime"`
+	// Update the 'reservation' column in the 'promocode_redemptions' collection.
+	Reservation graphql.Nullable[string] `json:"reservation"`
 }

@@ -119,9 +119,6 @@ func redemptionToCreateInput(in *promocodepbv1.Redemption) redemptionsql.CreateI
 	var ci redemptionsql.CreateInput
 	ci.Name = in.GetName()
 	ci.Customer = in.GetCustomer()
-	if v := in.GetBooking(); v != "" {
-		ci.Booking = repox.LastSegment(v)
-	}
 	return ci
 }
 
@@ -132,7 +129,6 @@ func redemptionToUpdatePatch(merged *promocodepbv1.Redemption) redemptionsql.Upd
 	var patch redemptionsql.UpdateInput
 	patch.Name = graphql.Value(merged.GetName())
 	patch.Customer = graphql.Value(merged.GetCustomer())
-	patch.Booking = graphql.Value(repox.LastSegment(merged.GetBooking()))
 	return patch
 }
 
@@ -145,9 +141,6 @@ func redemptionFromRow(row *redemptionsql.PromocodeRedemptions) *promocodepbv1.R
 	out := &promocodepbv1.Redemption{}
 	out.Name = row.Name
 	out.Customer = row.Customer
-	if row.Booking != "" {
-		out.Booking = "bookings/" + row.Booking
-	}
 	return out
 }
 

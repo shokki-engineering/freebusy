@@ -26,7 +26,7 @@ erDiagram
     }
     Redemption {
         string id PK
-        string booking FK
+        string reservation FK
         string promo_code_id FK
         string amount_applied_id FK
     }
@@ -40,10 +40,10 @@ erDiagram
     UsageLimits {
         string id PK
     }
-    Booking {
+    Money {
         string externalStub PK
     }
-    Money {
+    Reservation {
         string externalStub PK
     }
     Discount }o--|| Money : "amount_off_id"
@@ -51,7 +51,7 @@ erDiagram
     PromoCode }o--|| RedemptionWindow : "window_id"
     PromoCode }o--|| UsageLimits : "limits_id"
     PromoCode }o--|| Scope : "scope_id"
-    Redemption }o--|| Booking : "booking"
+    Redemption }o--|| Reservation : "reservation"
     Redemption }o--|| PromoCode : "promo_code_id"
     Redemption }o--|| Money : "amount_applied_id"
     Scope }o--|| Money : "min_subtotal_id"
@@ -84,14 +84,14 @@ A redeemable discount applied to a booking's subtotal. Scoped by a redemption wi
 
 ### `Redemption` → `redemptions`
 
-Redemption is a single use of a promo code, modeled as a sub-resource of PromoCode rather than an inline list — so it has its own name/lifecycle and is listed with paging (ListRedemptions). The {promo_code} parent segment generates the promo_code_id FK back to the owning code (1:n into promocode.redemptions); amount_applied is the shared google.type.Money in common.moneys. Redemptions are created during CreateBooking, never directly.
+Redemption is a single use of a promo code, modeled as a sub-resource of PromoCode rather than an inline list — so it has its own name/lifecycle and is listed with paging (ListRedemptions). The {promo_code} parent segment generates the promo_code_id FK back to the owning code (1:n into promocode.redemptions); amount_applied is the shared google.type.Money in common.moneys. Redemptions are recorded when a booking's payment settles, never created directly.
 
 | Column | Type | Null |
 | --- | --- | --- |
 | `id` | `CHAR(26)` | not null |
 | `name` | `VARCHAR(255)` | not null |
 | `customer` | `VARCHAR(255)` | not null |
-| `booking` | `CHAR(26)` | not null |
+| `reservation` | `CHAR(26)` | not null |
 | `redeemed_time` | `TIMESTAMPTZ` | nullable |
 | `promo_code_id` | `CHAR(26)` | not null |
 | `amount_applied_id` | `CHAR(26)` | nullable |

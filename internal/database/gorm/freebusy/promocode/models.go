@@ -100,7 +100,7 @@ type PromoCode struct {
 
 func (*PromoCode) TableName() string { return "promocode.resource" }
 
-// Redemption is a single use of a promo code, modeled as a sub-resource of PromoCode rather than an inline list — so it has its own name/lifecycle and is listed with paging (ListRedemptions). The {promo_code} parent segment generates the promo_code_id FK back to the owning code (1:n into promocode.redemptions); amount_applied is the shared google.type.Money in common.moneys. Redemptions are created during CreateBooking, never directly.
+// Redemption is a single use of a promo code, modeled as a sub-resource of PromoCode rather than an inline list — so it has its own name/lifecycle and is listed with paging (ListRedemptions). The {promo_code} parent segment generates the promo_code_id FK back to the owning code (1:n into promocode.redemptions); amount_applied is the shared google.type.Money in common.moneys. Redemptions are recorded when a booking's payment settles, never created directly.
 type Redemption struct {
 	// Unique identifier for the record.
 	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
@@ -108,8 +108,8 @@ type Redemption struct {
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// The customer who redeemed the code. Format: users/{user} TODO: unresolved reference to User (not in this generation set); kept as a plain indexed column.
 	Customer string `gorm:"column:customer;not null;index:idx_redemptions_customer" json:"customer" validate:"required"`
-	// The booking the code was applied to. Format: bookings/{booking}
-	BookingID string `gorm:"column:booking;not null;index:idx_redemptions_booking" json:"booking" validate:"required"`
+	// The reservation the code was applied to. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+	ReservationID string `gorm:"column:reservation;not null;index:idx_redemptions_reservation" json:"reservation" validate:"required"`
 	// When the code was redeemed.
 	RedeemedTime *time.Time `gorm:"column:redeemed_time;type:timestamptz" json:"redeemed_time,omitempty"`
 	// Parent reference to PromoCode (from the AIP resource pattern).

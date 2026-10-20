@@ -456,8 +456,8 @@ components:
               own name/lifecycle and is listed with paging (ListRedemptions). The
               {promo_code} parent segment generates the promo_code_id FK back to the
               owning code (1:n into promocode.redemptions); amount_applied is the
-              shared google.type.Money in common.moneys. Redemptions are created during
-              CreateBooking, never directly.
+              shared google.type.Money in common.moneys. Redemptions are recorded
+              when a booking's payment settles, never created directly.
             properties:
               amountApplied:
                 description: The discount actually applied at redemption.
@@ -481,9 +481,6 @@ components:
                     type: integer
                     x-kubernetes-int-or-string: true
                 type: object
-              booking:
-                description: 'The booking the code was applied to. Format: bookings/{booking}'
-                type: string
               customer:
                 description: 'The customer who redeemed the code. Format: users/{user}'
                 type: string
@@ -493,6 +490,9 @@ components:
               redeemedTime:
                 description: When the code was redeemed.
                 format: date-time
+                type: string
+              reservation:
+                description: 'The reservation the code was applied to. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
                 type: string
             type: object
           type: array

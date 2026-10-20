@@ -6,7 +6,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 42 | 22 |
+| 23 | 12 |
 
 ## Entity relationships
 
@@ -24,29 +24,7 @@ erDiagram
     Attachment {
         string id PK
     }
-    AvailabilityException {
-        string id PK
-        string window_id FK
-        string date_range_id FK
-    }
-    Booking {
-        string id PK
-        string promo_code FK
-        string contact_id FK
-        string occupancy_id FK
-        string window_id FK
-        string price_id FK
-        string discount_id FK
-        string total_id FK
-        string refund_amount_id FK
-    }
-    BufferSettings {
-        string id PK
-    }
-    CancellationPolicy {
-        string id PK
-    }
-    Contact {
+    DateRange {
         string id PK
     }
     Discount {
@@ -67,27 +45,8 @@ erDiagram
         string rate_plan_id FK
         string amount_id FK
     }
-    ForeignerDetails {
-        string id PK
-    }
-    Guest {
-        string id PK
-        string booking_id FK
-        string id_document_id FK
-        string permanent_address_id FK
-        string local_address_id FK
-        string foreigner_id FK
-        string preferences_id FK
-    }
-    GuestPreferences {
-        string id PK
-    }
     Hold {
         string id PK
-    }
-    IdDocument {
-        string id PK
-        string attachment_id FK
     }
     IdempotencyKey {
         string id PK
@@ -104,24 +63,10 @@ erDiagram
     Money {
         string id PK
     }
-    Occupancy {
-        string id PK
-    }
-    PostalAddress {
-        string id PK
-    }
     PriceBounds {
         string id PK
         string floor_id FK
         string ceiling_id FK
-    }
-    PriceComponent {
-        string id PK
-        string booking_id FK
-        string amount_id FK
-    }
-    PricingDateRange {
-        string id PK
     }
     PromoCode {
         string id PK
@@ -141,110 +86,56 @@ erDiagram
         string price_id FK
         string bounds_id FK
     }
-    RecurringRule {
-        string id PK
-        string schedule_id FK
-    }
     Redemption {
         string id PK
-        string booking FK
+        string reservation FK
         string promo_code_id FK
         string amount_applied_id FK
     }
     RedemptionWindow {
         string id PK
     }
-    RefundTier {
-        string id PK
-        string cancellation_policy_id FK
-    }
     Reservation {
         string id PK
         string hold FK
-    }
-    Schedule {
-        string id PK
-        string buffers_id FK
-        string stay_constraints_id FK
-        string cancellation_policy_id FK
-    }
-    ScheduleExceptions {
-        string id PK
-        string schedule_id FK
-        string availability_exception_id FK
     }
     Scope {
         string id PK
         string min_subtotal_id FK
     }
-    SharedDateRange {
-        string id PK
-    }
-    StayConstraints {
-        string id PK
-    }
     Tax {
         string id PK
         string rate_plan_id FK
-    }
-    TimeWindow {
-        string id PK
     }
     UsageLimits {
         string id PK
     }
     Adjustment }o--|| Money : "amount_delta_id"
     Allocation }o--|| Hold : "hold"
-    AvailabilityException }o--|| TimeWindow : "window_id"
-    AvailabilityException }o--|| SharedDateRange : "date_range_id"
-    Booking }o--|| PromoCode : "promo_code"
-    Booking }o--|| Contact : "contact_id"
-    Booking }o--|| Occupancy : "occupancy_id"
-    Booking }o--|| TimeWindow : "window_id"
-    Booking }o--|| Money : "price_id"
-    Booking }o--|| Money : "discount_id"
-    Booking }o--|| Money : "total_id"
-    Booking }o--|| Money : "refund_amount_id"
     Discount }o--|| Money : "amount_off_id"
     DynamicBand }o--|| DynamicRule : "dynamic_rule_id"
     DynamicBand }o--|| Adjustment : "adjustment_id"
     DynamicRule }o--|| RatePlan : "rate_plan_id"
     Fee }o--|| RatePlan : "rate_plan_id"
     Fee }o--|| Money : "amount_id"
-    Guest }o--|| Booking : "booking_id"
-    Guest }o--|| IdDocument : "id_document_id"
-    Guest }o--|| PostalAddress : "permanent_address_id"
-    Guest }o--|| PostalAddress : "local_address_id"
-    Guest }o--|| ForeignerDetails : "foreigner_id"
-    Guest }o--|| GuestPreferences : "preferences_id"
-    IdDocument }o--|| Attachment : "attachment_id"
     Licence }o--|| Attachment : "attachment_id"
     LosDiscount }o--|| RatePlan : "rate_plan_id"
     LosDiscount }o--|| Money : "amount_off_id"
     PriceBounds }o--|| Money : "floor_id"
     PriceBounds }o--|| Money : "ceiling_id"
-    PriceComponent }o--|| Booking : "booking_id"
-    PriceComponent }o--|| Money : "amount_id"
     PromoCode }o--|| Discount : "discount_id"
     PromoCode }o--|| RedemptionWindow : "window_id"
     PromoCode }o--|| UsageLimits : "limits_id"
     PromoCode }o--|| Scope : "scope_id"
     RateOverride }o--|| RatePlan : "rate_plan_id"
-    RateOverride }o--|| PricingDateRange : "date_range_id"
+    RateOverride }o--|| DateRange : "date_range_id"
     RateOverride }o--|| Money : "price_id"
     RatePlan }o--|| Money : "price_id"
     RatePlan }o--|| PriceBounds : "bounds_id"
-    RecurringRule }o--|| Schedule : "schedule_id"
-    Redemption }o--|| Booking : "booking"
+    Redemption }o--|| Reservation : "reservation"
     Redemption }o--|| PromoCode : "promo_code_id"
     Redemption }o--|| Money : "amount_applied_id"
-    RefundTier }o--|| CancellationPolicy : "cancellation_policy_id"
     Reservation }o--|| Hold : "hold"
-    Schedule }o--|| BufferSettings : "buffers_id"
-    Schedule }o--|| StayConstraints : "stay_constraints_id"
-    Schedule }o--|| CancellationPolicy : "cancellation_policy_id"
-    ScheduleExceptions }o--|| Schedule : "schedule_id"
-    ScheduleExceptions }o--|| AvailabilityException : "availability_exception_id"
     Scope }o--|| Money : "min_subtotal_id"
     Tax }o--|| RatePlan : "rate_plan_id"
 ```
@@ -252,12 +143,9 @@ erDiagram
 ## Subfolders
 
 - [`allocation/`](./allocation/README.md)
-- [`guest/`](./guest/README.md)
 - [`pricing/`](./pricing/README.md)
 - [`promocode/`](./promocode/README.md)
 - [`property/`](./property/README.md)
 - [`reservation/`](./reservation/README.md)
-- [`schedule/`](./schedule/README.md)
-- [`scheduling/`](./scheduling/README.md)
 - [`shared/`](./shared/README.md)
 - [`type/`](./type/README.md)

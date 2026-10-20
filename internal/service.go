@@ -7,29 +7,23 @@ package internal
 import (
 	"context"
 
+	"github.com/oh-tarnished/freebusy/internal/database"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
 	"github.com/oh-tarnished/freebusy/internal/service/pricing"
 	"github.com/oh-tarnished/freebusy/internal/service/reservation"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/pricing/v1/pricingpbv1"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/promocode/v1/promocodepbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"github.com/oh-tarnished/freebusy/shared"
-
-	"github.com/oh-tarnished/freebusy/internal/database"
-	"github.com/oh-tarnished/freebusy/internal/service/scheduling"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/promocode/v1/promocodepbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/schedule/v1/schedulepbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/scheduling/v1/schedulingpbv1"
 )
 
 // Service is the registered gRPC adapter. It embeds the assembled service
 // implementations, so it satisfies each of their gRPC server interfaces
-// (promocode, pricing, schedule, scheduling, and any future service
-// interfaces composed in here).
+// (promocode, pricing, the availability engine's allocation and hold services,
+// reservations, and any future service interfaces composed in here).
 type Service struct {
 	promocodepbv1.PromoCodeServiceServer
-	schedulepbv1.ScheduleServiceServer
-	schedulingpbv1.SchedulingServiceServer
 	pricingpbv1.RatePlanServiceServer
 	allocationpbv1.AllocationServiceServer
 	allocationpbv1.HoldServiceServer
@@ -41,35 +35,26 @@ type Service struct {
 	// reservations is retained so its reconciler can be started in
 	// StartBackground.
 	reservations *reservation.Server
-	// scheduling is the concrete scheduling server, retained so background tasks (the
-	// hold sweeper) can be started against it in StartBackground.
-	scheduling *scheduling.Server
 	// conn is the shared database connection every domain runs on, retained so
 	// StartBackground can publish its pool health.
 	conn *database.Connection
 }
 
-// NewService wraps the assembled service servers as the registered Service. The
-// scheduling server is passed as its concrete type so its background hold sweeper can
-// be started; it still satisfies schedulingpbv1.SchedulingServiceServer for embedding.
-// The property server is concrete for the same kind of reason: it implements
-// both the PropertyService and the LicenceService.
+// NewService wraps the assembled service servers as the registered Service.
+// The engine and reservation servers are passed as concrete types so their
+// background work can be started; the engine serves both AllocationService and
+// HoldService.
 func NewService(
 	promoCode promocodepbv1.PromoCodeServiceServer,
-	schedule schedulepbv1.ScheduleServiceServer,
-	scheduling *scheduling.Server,
 	ratePlans *pricing.Server,
 	engine *allocation.Server,
 	reservations *reservation.Server,
 ) *Service {
 	return &Service{
 		PromoCodeServiceServer:   promoCode,
-		ScheduleServiceServer:    schedule,
-		SchedulingServiceServer:  scheduling,
 		RatePlanServiceServer:    ratePlans,
 		AllocationServiceServer:  engine,
 		HoldServiceServer:        engine,
-		scheduling:               scheduling,
 		ReservationServiceServer: reservations,
 		allocation:               engine,
 		reservations:             reservations,
@@ -77,13 +62,11 @@ func NewService(
 }
 
 // StartBackground launches the service's background tasks, tied to ctx: the
-// scheduling and allocation hold sweepers, the reservation reconciler, which converges lapsed holds' stored state, and the
+// hold sweeper, which converges lapsed holds' stored state; the reservation
+// reconciler, which finishes reservations left mid-transition; and the
 // database pool monitor, which publishes the shared connection pool's health.
 // The goroutines exit when ctx is cancelled (on server Stop/Restart).
 func (s *Service) StartBackground(ctx context.Context) {
-	if s.scheduling != nil {
-		s.scheduling.StartHoldSweeper(ctx, 0)
-	}
 	if s.reservations != nil {
 		s.reservations.StartReconciler(ctx, 0, func(err error) {
 			_ = shared.Telemetry.Logger.Error("reservation reconciler failed", map[string]any{"error": err.Error()})

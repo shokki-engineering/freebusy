@@ -2,11 +2,8 @@ package internal
 
 import (
 	"context"
-	"github.com/oh-tarnished/freebusy/config"
-	"github.com/oh-tarnished/freebusy/internal/rfc"
 	"github.com/oh-tarnished/freebusy/internal/service/pricing"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/pricing/v1/pricingpbv1"
-	"github.com/oh-tarnished/freebusy/shared"
 
 	"github.com/oh-tarnished/freebusy/internal/database"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
@@ -14,13 +11,9 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/service/promocode"
 	"github.com/oh-tarnished/freebusy/internal/service/reservation"
 	reservationdb "github.com/oh-tarnished/freebusy/internal/service/reservation/db"
-	"github.com/oh-tarnished/freebusy/internal/service/schedule"
-	"github.com/oh-tarnished/freebusy/internal/service/scheduling"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/promocode/v1/promocodepbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/schedule/v1/schedulepbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/scheduling/v1/schedulingpbv1"
 	"github.com/the-protobuf-project/runtime-go/grpc"
 )
 
@@ -36,24 +29,9 @@ func newServiceInstance(conn *database.Connection) (*Service, error) {
 		}
 		conn = opened
 	}
-	// The RFC catalogue is optional: a dial failure is logged and the booking
-	// path runs on its defaults rather than the process refusing to start over a
-	// service that only enriches bookings.
-	var catalogue *rfc.Client
-	if cc := config.Get().Catalogue; cc.Enabled && cc.Endpoint != "" {
-		c, derr := rfc.Dial(context.Background(), cc.Endpoint)
-		if derr != nil {
-			_ = shared.Telemetry.Logger.Error("catalogue: dial failed, using defaults", "endpoint", cc.Endpoint, "error", derr)
-		} else {
-			catalogue = c
-		}
-	}
-
 	engine := allocation.NewServer(allocationdb.New(conn))
 	svc := NewService(
 		promocode.New(conn),
-		schedule.New(conn),
-		scheduling.New(conn, catalogue),
 		pricing.New(conn),
 		engine,
 		reservation.NewServer(reservationdb.New(conn), engine),
@@ -75,8 +53,6 @@ func registerGRPCServers(svc *Service) grpc.Option {
 // suites.
 func registerServices(s *grpc.GRPCServer, svc *Service) {
 	promocodepbv1.RegisterPromoCodeServiceServer(s, svc)
-	schedulepbv1.RegisterScheduleServiceServer(s, svc)
-	schedulingpbv1.RegisterSchedulingServiceServer(s, svc)
 	pricingpbv1.RegisterRatePlanServiceServer(s, svc)
 	allocationpbv1.RegisterAllocationServiceServer(s, svc)
 	allocationpbv1.RegisterHoldServiceServer(s, svc)
@@ -107,12 +83,6 @@ func registerHTTPGateways() grpc.Option {
 		if err := promocodepbv1.RegisterPromoCodeServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
 			return err
 		}
-		if err := schedulepbv1.RegisterScheduleServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
-			return err
-		}
-		if err := schedulingpbv1.RegisterSchedulingServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
-			return err
-		}
 		if err := pricingpbv1.RegisterRatePlanServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
 			return err
 		}
@@ -136,12 +106,6 @@ func registerMCPServices(svc *Service) grpc.Option {
 	return grpc.WithMCPServices(
 		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
 			return promocodepbv1.ServePromoCodeServiceMCP(ctx, svc, cfg)
-		},
-		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
-			return schedulepbv1.ServeScheduleServiceMCP(ctx, svc, cfg)
-		},
-		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
-			return schedulingpbv1.ServeSchedulingServiceMCP(ctx, svc, cfg)
 		},
 		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
 			return allocationpbv1.ServeAllocationServiceMCP(ctx, svc, cfg)

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: google/type/money.proto, google/type/postal_address.proto
+// source: google/type/money.proto
 //
 // database: freebusy
 // schema:   common
@@ -32,37 +32,6 @@ var MoneyFilterSpec = filterx.Spec{
 		"currency_code": {Column: "currency_code", Kind: filterx.KindText},
 		"nanos":         {Column: "nanos", Kind: filterx.KindInt},
 		"units":         {Column: "units", Kind: filterx.KindInt},
-	},
-	PK: []filterx.SortSpec{{Column: "id", Kind: filterx.KindText, NotNull: true}},
-}
-
-// PostalAddressFilterSpec is PostalAddress's AIP-160 filter / AIP-132 order_by surface,
-// consumed by the filterx.Gorm and filterx.Hasura engines.
-var PostalAddressFilterSpec = filterx.Spec{
-	Table: `"common"."postal_address"`,
-	Fields: map[string]filterx.FieldSpec{
-		"address_lines":       {Column: "address_lines", Kind: filterx.KindTags},
-		"administrative_area": {Column: "administrative_area", Kind: filterx.KindText},
-		"language_code":       {Column: "language_code", Kind: filterx.KindText},
-		"locality":            {Column: "locality", Kind: filterx.KindText},
-		"organization":        {Column: "organization", Kind: filterx.KindText},
-		"postal_code":         {Column: "postal_code", Kind: filterx.KindText},
-		"recipients":          {Column: "recipients", Kind: filterx.KindTags},
-		"region_code":         {Column: "region_code", Kind: filterx.KindText},
-		"revision":            {Column: "revision", Kind: filterx.KindInt},
-		"sorting_code":        {Column: "sorting_code", Kind: filterx.KindText},
-		"sublocality":         {Column: "sublocality", Kind: filterx.KindText},
-	},
-	Sort: map[string]filterx.SortSpec{
-		"administrative_area": {Column: "administrative_area", Kind: filterx.KindText},
-		"language_code":       {Column: "language_code", Kind: filterx.KindText},
-		"locality":            {Column: "locality", Kind: filterx.KindText},
-		"organization":        {Column: "organization", Kind: filterx.KindText},
-		"postal_code":         {Column: "postal_code", Kind: filterx.KindText},
-		"region_code":         {Column: "region_code", Kind: filterx.KindText},
-		"revision":            {Column: "revision", Kind: filterx.KindInt},
-		"sorting_code":        {Column: "sorting_code", Kind: filterx.KindText},
-		"sublocality":         {Column: "sublocality", Kind: filterx.KindText},
 	},
 	PK: []filterx.SortSpec{{Column: "id", Kind: filterx.KindText, NotNull: true}},
 }

@@ -35,7 +35,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // PromoCodeService manages redeemable discount codes and validates them against
-// a prospective booking. Redemption itself happens inside CreateBooking.
+// a prospective booking. Redemption itself is recorded by whatever settles the
+// booking's payment, never by a caller of this service.
 type PromoCodeServiceClient interface {
 	// Lists promo codes.
 	ListPromoCodes(ctx context.Context, in *ListPromoCodesRequest, opts ...grpc.CallOption) (*ListPromoCodesResponse, error)
@@ -49,8 +50,8 @@ type PromoCodeServiceClient interface {
 	DeletePromoCode(ctx context.Context, in *DeletePromoCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Validates a code against a prospective booking and returns the discount.
 	ValidatePromoCode(ctx context.Context, in *ValidatePromoCodeRequest, opts ...grpc.CallOption) (*ValidatePromoCodeResponse, error)
-	// Lists redemptions of a promo code (paged). Redemptions are created during
-	// CreateBooking, so this service exposes read-only access to them.
+	// Lists redemptions of a promo code (paged). Redemptions are recorded when a
+	// booking's payment settles, so this service exposes read-only access to them.
 	ListRedemptions(ctx context.Context, in *ListRedemptionsRequest, opts ...grpc.CallOption) (*ListRedemptionsResponse, error)
 	// Gets a single redemption by resource name.
 	GetRedemption(ctx context.Context, in *GetRedemptionRequest, opts ...grpc.CallOption) (*Redemption, error)
@@ -149,7 +150,8 @@ func (c *promoCodeServiceClient) GetRedemption(ctx context.Context, in *GetRedem
 // for forward compatibility.
 //
 // PromoCodeService manages redeemable discount codes and validates them against
-// a prospective booking. Redemption itself happens inside CreateBooking.
+// a prospective booking. Redemption itself is recorded by whatever settles the
+// booking's payment, never by a caller of this service.
 type PromoCodeServiceServer interface {
 	// Lists promo codes.
 	ListPromoCodes(context.Context, *ListPromoCodesRequest) (*ListPromoCodesResponse, error)
@@ -163,8 +165,8 @@ type PromoCodeServiceServer interface {
 	DeletePromoCode(context.Context, *DeletePromoCodeRequest) (*emptypb.Empty, error)
 	// Validates a code against a prospective booking and returns the discount.
 	ValidatePromoCode(context.Context, *ValidatePromoCodeRequest) (*ValidatePromoCodeResponse, error)
-	// Lists redemptions of a promo code (paged). Redemptions are created during
-	// CreateBooking, so this service exposes read-only access to them.
+	// Lists redemptions of a promo code (paged). Redemptions are recorded when a
+	// booking's payment settles, so this service exposes read-only access to them.
 	ListRedemptions(context.Context, *ListRedemptionsRequest) (*ListRedemptionsResponse, error)
 	// Gets a single redemption by resource name.
 	GetRedemption(context.Context, *GetRedemptionRequest) (*Redemption, error)

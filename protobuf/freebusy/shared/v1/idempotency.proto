@@ -50,7 +50,7 @@ message IdempotencyKey {
   string name = 1 [(google.api.field_behavior) = IDENTIFIER];
 
   // Fully-qualified RPC that was called, e.g.
-  // "/freebusy.scheduling.v1.SchedulingService/CreateBooking". Part of the key: the
+  // "/freebusy.allocation.v1.HoldService/CreateHold". Part of the key: the
   // same request_id replayed against a different method is a different request.
   string method = 2 [(google.api.field_behavior) = REQUIRED];
 

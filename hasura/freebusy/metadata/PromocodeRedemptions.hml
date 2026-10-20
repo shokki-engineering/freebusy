@@ -6,8 +6,6 @@ definition:
   fields:
     - name: amountAppliedId
       type: String_1
-    - name: booking
-      type: String_1!
     - name: customer
       type: String_1!
     - name: id
@@ -18,6 +16,8 @@ definition:
       type: String_1!
     - name: redeemedTime
       type: Timestamptz
+    - name: reservation
+      type: String_1!
   graphql:
     typeName: PromocodeRedemptions
     inputTypeName: PromocodeRedemptionsInput
@@ -28,9 +28,6 @@ definition:
         amountAppliedId:
           column:
             name: amount_applied_id
-        booking:
-          column:
-            name: booking
         customer:
           column:
             name: customer
@@ -46,6 +43,9 @@ definition:
         redeemedTime:
           column:
             name: redeemed_time
+        reservation:
+          column:
+            name: reservation
 
 ---
 kind: TypePermissions
@@ -57,12 +57,12 @@ definition:
       output:
         allowedFields:
           - amountAppliedId
-          - booking
           - customer
           - id
           - name
           - promoCodeId
           - redeemedTime
+          - reservation
 
 ---
 kind: BooleanExpressionType
@@ -75,8 +75,6 @@ definition:
       comparableFields:
         - fieldName: amountAppliedId
           booleanExpressionType: TextBoolExp
-        - fieldName: booking
-          booleanExpressionType: TextBoolExp
         - fieldName: customer
           booleanExpressionType: TextBoolExp
         - fieldName: id
@@ -87,6 +85,8 @@ definition:
           booleanExpressionType: TextBoolExp
         - fieldName: redeemedTime
           booleanExpressionType: TimestamptzBoolExp
+        - fieldName: reservation
+          booleanExpressionType: TextBoolExp
       comparableRelationships: []
   logicalOperators:
     enable: true
@@ -106,8 +106,6 @@ definition:
       aggregatableFields:
         - fieldName: amountAppliedId
           aggregateExpression: TextAggExp
-        - fieldName: booking
-          aggregateExpression: TextAggExp
         - fieldName: customer
           aggregateExpression: TextAggExp
         - fieldName: id
@@ -118,6 +116,8 @@ definition:
           aggregateExpression: TextAggExp
         - fieldName: redeemedTime
           aggregateExpression: TimestamptzAggExp
+        - fieldName: reservation
+          aggregateExpression: TextAggExp
   count:
     enable: true
     returnType: Int64
@@ -135,8 +135,6 @@ definition:
       orderableFields:
         - fieldName: amountAppliedId
           orderByExpression: String1OrderByExp
-        - fieldName: booking
-          orderByExpression: String1OrderByExp
         - fieldName: customer
           orderByExpression: String1OrderByExp
         - fieldName: id
@@ -147,6 +145,8 @@ definition:
           orderByExpression: String1OrderByExp
         - fieldName: redeemedTime
           orderByExpression: TimestamptzOrderByExp
+        - fieldName: reservation
+          orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
     expressionTypeName: PromocodeRedemptionsOrderByExp

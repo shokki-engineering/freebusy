@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/promocode/v1/promocodepbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/schedule/v1/schedulepbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/scheduling/v1/schedulingpbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/shared/v1/sharedpbv1"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"github.com/the-protobuf-project/runtime-go/grpc"
+	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/genproto/googleapis/type/money"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -16,9 +16,9 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-// The interceptor enforces the buf.validate rules annotated on the protos:
-// the BookingGuests singleton name must match ^bookings/[^/]+/guests$ and
-// occupancy counts are >= 0. Valid requests pass through to the handler
+// The interceptor enforces the buf.validate rules annotated on the protos: a
+// hold's parent must match ^organizationalUnits/[^/]+$ and its quantity is
+// >= 0. Valid requests pass through to the handler
 // untouched. The interceptor itself lives in runtime-go (grpc.WithValidation /
 // grpc.NewValidationInterceptor); these tests pin its behavior against
 // freebusy's protos.
@@ -34,9 +34,12 @@ func TestValidationInterceptor(t *testing.T) {
 		return "ok", nil
 	}
 
-	// Bad resource name → InvalidArgument before the handler runs.
-	bad := &schedulingpbv1.UpdateBookingGuestsRequest{
-		BookingGuests: &schedulingpbv1.BookingGuests{Name: "rooms/nope"},
+	window := &interval.Interval{StartTime: timestamppb.Now(), EndTime: timestamppb.Now()}
+
+	// Bad parent name → InvalidArgument before the handler runs.
+	bad := &allocationpbv1.CreateHoldRequest{
+		Parent: "rooms/nope",
+		Hold:   &allocationpbv1.Hold{Window: window},
 	}
 	if _, err := intercept(context.Background(), bad, nil, handler); status.Code(err) != codes.InvalidArgument {
 		t.Fatalf("bad name: got err %v, want InvalidArgument", err)
@@ -45,23 +48,19 @@ func TestValidationInterceptor(t *testing.T) {
 		t.Fatal("handler must not run on a validation failure")
 	}
 
-	// Negative occupancy → InvalidArgument.
-	neg := &schedulingpbv1.UpdateBookingGuestsRequest{
-		BookingGuests: &schedulingpbv1.BookingGuests{
-			Name:      "bookings/b1/guests",
-			Occupancy: &schedulingpbv1.Occupancy{Adults: -1},
-		},
+	// Negative quantity → InvalidArgument.
+	neg := &allocationpbv1.CreateHoldRequest{
+		Parent: "organizationalUnits/club",
+		Hold:   &allocationpbv1.Hold{Window: window, Quantity: -1},
 	}
 	if _, err := intercept(context.Background(), neg, nil, handler); status.Code(err) != codes.InvalidArgument {
-		t.Fatalf("negative occupancy: got err %v, want InvalidArgument", err)
+		t.Fatalf("negative quantity: got err %v, want InvalidArgument", err)
 	}
 
 	// Valid request → handler runs.
-	good := &schedulingpbv1.UpdateBookingGuestsRequest{
-		BookingGuests: &schedulingpbv1.BookingGuests{
-			Name:      "bookings/b1/guests",
-			Occupancy: &schedulingpbv1.Occupancy{Adults: 2, Children: 1},
-		},
+	good := &allocationpbv1.CreateHoldRequest{
+		Parent: "organizationalUnits/club",
+		Hold:   &allocationpbv1.Hold{Window: window, Quantity: 2},
 	}
 	out, err := intercept(context.Background(), good, nil, handler)
 	if err != nil || out != "ok" || !handlerCalled {
@@ -80,10 +79,7 @@ func TestValidationInterceptor_Services(t *testing.T) {
 	}
 	handler := func(ctx context.Context, req any) (any, error) { return "ok", nil }
 
-	window := &sharedpbv1.TimeWindow{
-		StartTime: timestamppb.Now(),
-		EndTime:   timestamppb.Now(),
-	}
+	window := &interval.Interval{StartTime: timestamppb.Now(), EndTime: timestamppb.Now()}
 
 	cases := []struct {
 		name    string
@@ -98,10 +94,12 @@ func TestValidationInterceptor_Services(t *testing.T) {
 
 		// property
 
-		// schedule
-		{"schedule get bad name", &schedulepbv1.GetScheduleRequest{Name: "properties/p1/units/u1"}, true},
-		{"exception create no span", &schedulepbv1.CreateAvailabilityExceptionRequest{Parent: "resources/r1", AvailabilityException: &schedulepbv1.AvailabilityException{Kind: schedulepbv1.ExceptionKind_EXCEPTION_KIND_CLOSURE}}, true},
-		{"exception create ok", &schedulepbv1.CreateAvailabilityExceptionRequest{Parent: "resources/r1", AvailabilityException: &schedulepbv1.AvailabilityException{Kind: schedulepbv1.ExceptionKind_EXCEPTION_KIND_CLOSURE, Span: &schedulepbv1.AvailabilityException_Window{Window: window}}}, false},
+		// allocation
+		{"check availability missing window", &allocationpbv1.CheckAvailabilityRequest{Parent: "organizationalUnits/club"}, true},
+		{"check availability bad parent", &allocationpbv1.CheckAvailabilityRequest{Parent: "properties/p1", Window: window}, true},
+		{"check availability ok", &allocationpbv1.CheckAvailabilityRequest{Parent: "organizationalUnits/club", Window: window}, false},
+		{"batch compute empty", &allocationpbv1.BatchComputeAvailabilityRequest{}, true},
+		{"hold get bad name", &allocationpbv1.GetHoldRequest{Name: "holds/h1"}, true},
 
 		// promocode
 		{"promocode create no discount", &promocodepbv1.CreatePromoCodeRequest{PromoCode: &promocodepbv1.PromoCode{Code: "X"}}, true},
@@ -110,11 +108,12 @@ func TestValidationInterceptor_Services(t *testing.T) {
 		{"promocode validate missing subtotal", &promocodepbv1.ValidatePromoCodeRequest{Code: "X"}, true},
 		{"promocode validate ok", &promocodepbv1.ValidatePromoCodeRequest{Code: "X", Subtotal: &money.Money{CurrencyCode: "USD", Units: 100}}, false},
 
-		// booking
-		{"booking create missing window", &schedulingpbv1.CreateBookingRequest{Booking: &schedulingpbv1.Booking{Unit: "resources/r1"}}, true},
-		{"booking create ok", &schedulingpbv1.CreateBookingRequest{Booking: &schedulingpbv1.Booking{Unit: "resources/r1", Window: window}}, false},
-		{"booking reschedule missing window", &schedulingpbv1.RescheduleBookingRequest{Name: "bookings/b1"}, true},
-		{"booking window missing end", &schedulingpbv1.CreateBookingRequest{Booking: &schedulingpbv1.Booking{Unit: "resources/r1", Window: &sharedpbv1.TimeWindow{StartTime: timestamppb.Now()}}}, true},
+		// reservation
+		{"reservation create missing hold", &reservationpbv1.CreateReservationRequest{Parent: "organizationalUnits/club", Reservation: &reservationpbv1.Reservation{}}, true},
+		{"reservation create bad id", &reservationpbv1.CreateReservationRequest{Parent: "organizationalUnits/club", ReservationId: "Not_Valid", Reservation: &reservationpbv1.Reservation{Hold: "organizationalUnits/club/holds/h1"}}, true},
+		{"reservation create ok", &reservationpbv1.CreateReservationRequest{Parent: "organizationalUnits/club", Reservation: &reservationpbv1.Reservation{Hold: "organizationalUnits/club/holds/h1"}}, false},
+		{"reservation reschedule bad hold", &reservationpbv1.RescheduleReservationRequest{Name: "organizationalUnits/club/reservations/r1", Hold: "holds/h2"}, true},
+		{"reservation cancel ok", &reservationpbv1.CancelReservationRequest{Name: "organizationalUnits/club/reservations/r1"}, false},
 
 		// availability
 	}

@@ -82,13 +82,3 @@ pool_size = 0
 # Separates this deployment's keys from another sharing one server. Set it per
 # environment — it is config, not schema, which is why cache.v1 has no prefix.
 prefix = "freebusy"
-
-# RFC schema services (protobuf-rfc's Resources + Calendars) — the catalogue of
-# bookable things freebusy references by name.
-#
-# Off by default. With it off the booking path uses its defaults: capacity one
-# per resource (exact under the per-resource-calendar model), unbounded
-# occupancy, and UTC night boundaries.
-[catalogue]
-enabled = false
-endpoint = "127.0.0.1:50052"

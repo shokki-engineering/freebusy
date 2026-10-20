@@ -493,7 +493,8 @@ func (x *Scope) GetApplicableUnits() []string {
 // listed with paging (ListRedemptions). The {promo_code} parent segment
 // generates the promo_code_id FK back to the owning code (1:n into
 // promocode.redemptions); amount_applied is the shared google.type.Money in
-// common.moneys. Redemptions are created during CreateBooking, never directly.
+// common.moneys. Redemptions are recorded when a booking's payment settles, never
+// created directly.
 type Redemption struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The redemption resource name.
@@ -502,9 +503,9 @@ type Redemption struct {
 	// The customer who redeemed the code.
 	// Format: users/{user}
 	Customer string `protobuf:"bytes,2,opt,name=customer,proto3" json:"customer,omitempty"`
-	// The booking the code was applied to.
-	// Format: bookings/{booking}
-	Booking string `protobuf:"bytes,3,opt,name=booking,proto3" json:"booking,omitempty"`
+	// The reservation the code was applied to.
+	// Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+	Reservation string `protobuf:"bytes,3,opt,name=reservation,proto3" json:"reservation,omitempty"`
 	// When the code was redeemed.
 	RedeemedTime *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=redeemed_time,json=redeemedTime,proto3" json:"redeemed_time,omitempty"`
 	// The discount actually applied at redemption.
@@ -557,9 +558,9 @@ func (x *Redemption) GetCustomer() string {
 	return ""
 }
 
-func (x *Redemption) GetBooking() string {
+func (x *Redemption) GetReservation() string {
 	if x != nil {
-		return x.Booking
+		return x.Reservation
 	}
 	return ""
 }
@@ -626,14 +627,14 @@ const file_freebusy_promocode_v1_promocode_proto_rawDesc = "" +
 	"\x15applicable_properties\x18\x02 \x03(\tBQ\xe0A\x01\xfaA$\n" +
 	"\"protobufrfc.dev/OrganizationalUnit\xbaH$\x92\x01!\"\x1fr\x1d2\x1b^organizationalUnits/[^/]+$R\x14applicableProperties\x12h\n" +
 	"\x10applicable_units\x18\x03 \x03(\tB=\xe0A\x01\xfaA\x1a\n" +
-	"\x18protobufrfc.dev/Resource\xbaH\x1a\x92\x01\x17\"\x15r\x132\x11^resources/[^/]+$R\x0fapplicableUnits\"\xcd\x03\n" +
+	"\x18protobufrfc.dev/Resource\xbaH\x1a\x92\x01\x17\"\x15r\x132\x11^resources/[^/]+$R\x0fapplicableUnits\"\xda\x03\n" +
 	"\n" +
 	"Redemption\x12E\n" +
 	"\x04name\x18\x01 \x01(\tB1\xe0A\b\xbaH+\xd8\x01\x01r&2$^promoCodes/[^/]+/redemptions/[^/]+$R\x04name\x128\n" +
 	"\bcustomer\x18\x02 \x01(\tB\x1c\xe0A\x02\xfaA\x16\n" +
-	"\x14protobufrfc.dev/UserR\bcustomer\x12@\n" +
-	"\abooking\x18\x03 \x01(\tB&\xe0A\x02\xfaA \n" +
-	"\x1efreebusy.scheduling.v1/BookingR\abooking\x12D\n" +
+	"\x14protobufrfc.dev/UserR\bcustomer\x12M\n" +
+	"\vreservation\x18\x03 \x01(\tB+\xe0A\x02\xfaA%\n" +
+	"#freebusy.reservation.v1/ReservationR\vreservation\x12D\n" +
 	"\rredeemed_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\fredeemedTime\x12>\n" +
 	"\x0eamount_applied\x18\x05 \x01(\v2\x12.google.type.MoneyB\x03\xe0A\x03R\ramountApplied:v\xeaAm\n" +
 	" freebusy.promocode.v1/Redemption\x120promoCodes/{promo_code}/redemptions/{redemption}*\vredemptions2\n" +

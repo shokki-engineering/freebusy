@@ -20,7 +20,7 @@ AllocationService is the read-only half of the engine: it answers how much is fr
 
 ### HoldService
 
-HoldService takes and releases expiring claims on resources. It is the only thing in this API that mutates availability.  Two things are deliberately not RPCs, following the precedent SchedulingService set: the sweeper that expires lapsed holds is an internal job, not a call, and conversion to a confirmed booking is driven from the booking side, so a hold is never converted by a caller reaching in here.  There is no UpdateHold. A hold's window and resources are immutable by construction -- changing either is a different allocation -- so the only mutations are the two custom methods below.
+HoldService takes and releases expiring claims on resources. It is the only thing in this API that mutates availability.  Two things are deliberately not RPCs: the sweeper that expires lapsed holds is an internal job, not a call, and conversion to a confirmed booking is driven by ReservationService, so a hold is never converted by a caller reaching in here.  There is no UpdateHold. A hold's window and resources are immutable by construction -- changing either is a different allocation -- so the only mutations are the two custom methods below.
 
 | Method | Request | Response | Description |
 | --- | --- | --- | --- |

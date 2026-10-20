@@ -61,9 +61,6 @@ func applyRedemptionMask(merged, in *promocodepbv1.Redemption, paths []string) {
 	if repox.InMask(paths, "customer") {
 		merged.Customer = in.GetCustomer()
 	}
-	if repox.InMask(paths, "booking") {
-		merged.Booking = in.GetBooking()
-	}
 	if repox.GroupTouched(paths, "amount_applied") {
 		merged.AmountApplied = in.GetAmountApplied()
 	}

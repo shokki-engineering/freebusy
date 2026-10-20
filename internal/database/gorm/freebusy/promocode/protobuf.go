@@ -163,7 +163,7 @@ func RedemptionToProto(m *Redemption) *promocodepbv1.Redemption {
 		return nil
 	}
 	out := &promocodepbv1.Redemption{}
-	// not mapped here: booking (resource reference)
+	// not mapped here: reservation (resource reference)
 	out.Name = m.Name
 	out.Customer = m.Customer
 	out.RedeemedTime = goToTs(m.RedeemedTime)
@@ -179,7 +179,7 @@ func RedemptionFromProto(pb *promocodepbv1.Redemption) *Redemption {
 		return nil
 	}
 	m := &Redemption{}
-	// not mapped here: booking (resource reference), amount_applied (sub-row graph)
+	// not mapped here: reservation (resource reference), amount_applied (sub-row graph)
 	m.Name = pb.GetName()
 	m.Customer = pb.GetCustomer()
 	m.RedeemedTime = tsToGo(pb.GetRedeemedTime())

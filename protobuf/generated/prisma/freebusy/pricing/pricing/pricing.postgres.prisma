@@ -102,8 +102,8 @@ model RateOverride {
   /// Foreign key to DateRange.
   dateRangeID String? @map("date_range_id")
 
-  /// Relation to PricingDateRange via date_range_id.
-  dateRange PricingDateRange? @relation(fields: [dateRangeID], references: [id], onDelete: SetNull)
+  /// Relation to DateRange via date_range_id.
+  dateRange DateRange? @relation(fields: [dateRangeID], references: [id], onDelete: SetNull)
 
   /// Foreign key to Money.
   priceID String @map("price_id")
@@ -282,7 +282,7 @@ model PriceBounds {
 }
 
 /// An inclusive-start, exclusive-end span of calendar dates. Declared here rather than reused from freebusy.shared.v1: AIP-215 permits no cross-package message reference, and a shared types package was exactly what produced the foreign-type findings this package is written to avoid. The duplication is the documented cost of that rule.
-model PricingDateRange {
+model DateRange {
   /// Unique identifier for the record.
   id String @id @default(ulid()) @map("id")
 

@@ -15,10 +15,8 @@ Every protobuf module under `protobuf/`. Each row links to that module's generat
 | Promocode | `freebusy.promocode.v1` | 1 | 17 | 3 | [README](freebusy/promocode/README.md) |
 | Property | `freebusy.property.v1` | 1 | 7 | 3 | [README](freebusy/property/README.md) |
 | Reservation | `freebusy.reservation.v1` | 1 | 7 | 1 | [README](freebusy/reservation/README.md) |
-| Schedule | `freebusy.schedule.v1` | 1 | 14 | 1 | [README](freebusy/schedule/README.md) |
-| Scheduling | `freebusy.scheduling.v1` | 1 | 15 | 2 | [README](freebusy/scheduling/README.md) |
 | Shared | `freebusy.shared.v1` | 0 | 6 | 5 | [README](freebusy/shared/README.md) |
-| **Total** | _9 modules_ | 9 | 110 | 27 | |
+| **Total** | _7 modules_ | 7 | 81 | 24 | |
 
 ## Dependency graph
 
@@ -32,14 +30,9 @@ graph LR
     freebusy_promocode_v1["Promocode<br/>freebusy.promocode.v1"]
     freebusy_property_v1["Property<br/>freebusy.property.v1"]
     freebusy_reservation_v1["Reservation<br/>freebusy.reservation.v1"]
-    freebusy_schedule_v1["Schedule<br/>freebusy.schedule.v1"]
-    freebusy_scheduling_v1["Scheduling<br/>freebusy.scheduling.v1"]
     freebusy_shared_v1["Shared<br/>freebusy.shared.v1"]
     freebusy_guest_v1 --> freebusy_shared_v1
     freebusy_property_v1 --> freebusy_shared_v1
-    freebusy_schedule_v1 --> freebusy_shared_v1
-    freebusy_scheduling_v1 --> freebusy_guest_v1
-    freebusy_scheduling_v1 --> freebusy_shared_v1
 ```
 
 ---

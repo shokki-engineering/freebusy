@@ -21,12 +21,12 @@ import (
 // them with And/Or/Not.
 var (
 	AmountAppliedId = graphql.StringField{Col: "amountAppliedId"}
-	Booking         = graphql.StringField{Col: "booking"}
 	Customer        = graphql.StringField{Col: "customer"}
 	Id              = graphql.StringField{Col: "id"}
 	Name            = graphql.StringField{Col: "name"}
 	PromoCodeId     = graphql.StringField{Col: "promoCodeId"}
 	RedeemedTime    = graphql.StringField{Col: "redeemedTime"}
+	Reservation     = graphql.StringField{Col: "reservation"}
 )
 
 // And matches rows satisfying every predicate.

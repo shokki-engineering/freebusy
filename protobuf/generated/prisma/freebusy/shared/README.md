@@ -6,7 +6,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 6 | 2 |
+| 2 | 1 |
 
 ## Entity relationships
 
@@ -16,31 +16,9 @@ erDiagram
     Attachment {
         string id PK
     }
-    Contact {
-        string id PK
-    }
     IdempotencyKey {
         string id PK
     }
-    PriceComponent {
-        string id PK
-        string booking_id FK
-        string amount_id FK
-    }
-    SharedDateRange {
-        string id PK
-    }
-    TimeWindow {
-        string id PK
-    }
-    Booking {
-        string externalStub PK
-    }
-    Money {
-        string externalStub PK
-    }
-    PriceComponent }o--|| Booking : "booking_id"
-    PriceComponent }o--|| Money : "amount_id"
 ```
 
 ## Subfolders

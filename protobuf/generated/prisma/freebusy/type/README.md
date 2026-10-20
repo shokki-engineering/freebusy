@@ -6,7 +6,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 2 | 0 |
+| 1 | 0 |
 
 ## Entity relationships
 
@@ -16,12 +16,8 @@ erDiagram
     Money {
         string id PK
     }
-    PostalAddress {
-        string id PK
-    }
 ```
 
 ## Subfolders
 
 - [`money/`](./money/README.md)
-- [`postal_address/`](./postal_address/README.md)

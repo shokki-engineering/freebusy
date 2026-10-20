@@ -12,26 +12,6 @@
 //
 // store — https://github.com/the-protobuf-project/store
 
-/// What a price line represents.
-enum Type {
-  /// The base charge: nightly/slot subtotal before fees, taxes, and discounts.
-  BASE
-
-  /// A fee added on top of the base (e.g. cleaning, service, resort).
-  FEE
-
-  /// A tax on the taxable base (e.g. VAT, occupancy/lodging tax).
-  TAX
-
-  /// A discount (promo code, length-of-stay); `amount` is negative.
-  DISCOUNT
-
-  /// Maps the enum to the "type" type in the database.
-  @@map("type")
-  /// Maps the enum to the "shared" schema in the database.
-  @@schema("shared")
-}
-
 /// An uploaded file attached to a document- or licence-carrying record (e.g. a guest's IdDocument scan, or a property/unit licence certificate). The bytes are stored inline in `content` today; `uri` is populated once the file is migrated to object storage (S3 or any CDN-fronted host). At most one of the two is authoritative at a time — prefer `uri` when both are set.
 model Attachment {
   /// Unique identifier for the record.
@@ -58,113 +38,8 @@ model Attachment {
   /// Back-relation: Licence records that reference this model via attachment_id.
   licences Licence[]
 
-  /// Back-relation: IdDocument records that reference this model via attachment_id.
-  idDocuments IdDocument[]
-
   /// Maps the model to the "attachments" table in the database.
   @@map("attachments")
-  /// Maps the model to the "shared" schema in the database.
-  @@schema("shared")
-}
-
-/// A half-open time interval [start_time, end_time). Used for query windows and for a booking's reserved span in both TIME_SLOT and NIGHTLY modes.
-model TimeWindow {
-  /// Unique identifier for the record.
-  id String @id @default(ulid()) @map("id")
-
-  /// Inclusive start of the interval.
-  startTime DateTime @freebusy.Timestamptz(6) @map("start_time")
-
-  /// Exclusive end of the interval.
-  endTime DateTime @freebusy.Timestamptz(6) @map("end_time")
-
-  /// Back-relation: AvailabilityException records that reference this model via window_id.
-  availabilityExceptions AvailabilityException[]
-
-  /// Back-relation: Booking records that reference this model via window_id.
-  bookings Booking[]
-
-  /// Maps the model to the "time_windows" table in the database.
-  @@map("time_windows")
-  /// Maps the model to the "shared" schema in the database.
-  @@schema("shared")
-}
-
-/// A half-open range of calendar dates [start_date, end_date), evaluated in the resource's local timezone. The natural query and exception shape for NIGHTLY resources: end_date is the check-out date and is not itself included.
-model SharedDateRange {
-  /// Unique identifier for the record.
-  id String @id @default(ulid()) @map("id")
-
-  /// Inclusive first date of the range.
-  startDate DateTime @freebusy.Date @map("start_date")
-
-  /// Exclusive end date of the range.
-  endDate DateTime @freebusy.Date @map("end_date")
-
-  /// Back-relation: AvailabilityException records that reference this model via date_range_id.
-  availabilityExceptions AvailabilityException[]
-
-  /// Maps the model to the "date_ranges" table in the database.
-  @@map("date_ranges")
-  /// Maps the model to the "shared" schema in the database.
-  @@schema("shared")
-}
-
-/// Contact details for the person a booking is for. When a booking carries a `customer` (a users/{user} reference) these typically mirror the user's profile; for walk-in or email-only bookings made by someone who is not a registered user, this is the only contact information captured. The server requires at least one reachable channel (email or phone) when no customer is set.
-model Contact {
-  /// Unique identifier for the record.
-  id String @id @default(ulid()) @map("id")
-
-  /// Full name of the guest.
-  displayName String? @map("display_name")
-
-  /// Email address for the confirmation and any follow-ups.
-  email String? @map("email")
-
-  /// Phone number in E.164 form (e.g. "+14155552671").
-  phoneNumber String? @map("phone_number")
-
-  /// Back-relation: Booking records that reference this model via contact_id.
-  bookings Booking[]
-
-  /// Maps the model to the "contacts" table in the database.
-  @@map("contacts")
-  /// Maps the model to the "shared" schema in the database.
-  @@schema("shared")
-}
-
-/// One line in a price breakdown: a base charge, a fee, a tax, or a discount. Clients branch on `type` and `code`; the signed `amount` rolls up to the booking total (charges positive, discounts negative).
-model PriceComponent {
-  /// Unique identifier for the record.
-  id String @id @default(ulid()) @map("id")
-
-  /// Which kind of line this is.
-  type Type? @map("type")
-
-  /// Stable machine code for the line, e.g. "base", "cleaning_fee", "occupancy_tax", or a promo code. Clients key display and logic off this.
-  code String? @map("code")
-
-  /// Human-readable label suitable for display on an itemized receipt.
-  displayName String? @map("display_name")
-
-  /// Foreign key to Booking.
-  bookingID String @map("booking_id")
-
-  /// Relation to Booking via booking_id.
-  booking Booking @relation(fields: [bookingID], references: [id], onDelete: Cascade)
-
-  /// Foreign key to Money.
-  amountID String? @map("amount_id")
-
-  /// Relation to Money via amount_id.
-  amount Money? @relation(fields: [amountID], references: [id], onDelete: SetNull)
-
-  /// Index on [booking_id].
-  @@index([bookingID])
-  /// Index on [amount_id].
-  @@index([amountID])
-  /// Maps the model to the "price_components" table in the database.
-  @@map("price_components")
   /// Maps the model to the "shared" schema in the database.
   @@schema("shared")
 }

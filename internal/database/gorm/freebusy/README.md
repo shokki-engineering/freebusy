@@ -8,7 +8,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 42 | 22 |
+| 23 | 12 |
 
 ## Entity relationships
 
@@ -24,34 +24,6 @@ erDiagram
         string hold FK
     }
     Attachment {
-        string id PK
-    }
-    AvailabilityException {
-        string id PK
-        string window_id FK
-        string date_range_id FK
-    }
-    Booking {
-        string id PK
-        string promo_code FK
-        string contact_id FK
-        string occupancy_id FK
-        string window_id FK
-        string price_id FK
-        string discount_id FK
-        string total_id FK
-        string refund_amount_id FK
-    }
-    BufferSettings {
-        string id PK
-    }
-    CancellationPolicy {
-        string id PK
-    }
-    Contact {
-        string id PK
-    }
-    DateRange {
         string id PK
     }
     DateRange {
@@ -75,27 +47,8 @@ erDiagram
         string rate_plan_id FK
         string amount_id FK
     }
-    ForeignerDetails {
-        string id PK
-    }
-    Guest {
-        string id PK
-        string booking_id FK
-        string id_document_id FK
-        string permanent_address_id FK
-        string local_address_id FK
-        string foreigner_id FK
-        string preferences_id FK
-    }
-    GuestPreferences {
-        string id PK
-    }
     Hold {
         string id PK
-    }
-    IdDocument {
-        string id PK
-        string attachment_id FK
     }
     IdempotencyKey {
         string id PK
@@ -112,21 +65,10 @@ erDiagram
     Money {
         string id PK
     }
-    Occupancy {
-        string id PK
-    }
-    PostalAddress {
-        string id PK
-    }
     PriceBounds {
         string id PK
         string floor_id FK
         string ceiling_id FK
-    }
-    PriceComponent {
-        string id PK
-        string booking_id FK
-        string amount_id FK
     }
     PromoCode {
         string id PK
@@ -146,87 +88,43 @@ erDiagram
         string price_id FK
         string bounds_id FK
     }
-    RecurringRule {
-        string id PK
-        string schedule_id FK
-    }
     Redemption {
         string id PK
-        string booking FK
+        string reservation FK
         string promo_code_id FK
         string amount_applied_id FK
     }
     RedemptionWindow {
         string id PK
     }
-    RefundTier {
-        string id PK
-        string cancellation_policy_id FK
-    }
     Reservation {
         string id PK
         string hold FK
-    }
-    Schedule {
-        string id PK
-        string buffers_id FK
-        string stay_constraints_id FK
-        string cancellation_policy_id FK
-    }
-    ScheduleExceptions {
-        string id PK
-        string schedule_id FK
-        string availability_exception_id FK
     }
     Scope {
         string id PK
         string min_subtotal_id FK
     }
-    StayConstraints {
-        string id PK
-    }
     Tax {
         string id PK
         string rate_plan_id FK
-    }
-    TimeWindow {
-        string id PK
     }
     UsageLimits {
         string id PK
     }
     Adjustment }o--|| Money : "amount_delta_id"
     Allocation }o--|| Hold : "hold"
-    AvailabilityException }o--|| TimeWindow : "window_id"
-    AvailabilityException }o--|| DateRange : "date_range_id"
-    Booking }o--|| PromoCode : "promo_code"
-    Booking }o--|| Contact : "contact_id"
-    Booking }o--|| Occupancy : "occupancy_id"
-    Booking }o--|| TimeWindow : "window_id"
-    Booking }o--|| Money : "price_id"
-    Booking }o--|| Money : "discount_id"
-    Booking }o--|| Money : "total_id"
-    Booking }o--|| Money : "refund_amount_id"
     Discount }o--|| Money : "amount_off_id"
     DynamicBand }o--|| DynamicRule : "dynamic_rule_id"
     DynamicBand }o--|| Adjustment : "adjustment_id"
     DynamicRule }o--|| RatePlan : "rate_plan_id"
     Fee }o--|| RatePlan : "rate_plan_id"
     Fee }o--|| Money : "amount_id"
-    Guest }o--|| Booking : "booking_id"
-    Guest }o--|| IdDocument : "id_document_id"
-    Guest }o--|| PostalAddress : "permanent_address_id"
-    Guest }o--|| PostalAddress : "local_address_id"
-    Guest }o--|| ForeignerDetails : "foreigner_id"
-    Guest }o--|| GuestPreferences : "preferences_id"
-    IdDocument }o--|| Attachment : "attachment_id"
     Licence }o--|| Attachment : "attachment_id"
     LosDiscount }o--|| RatePlan : "rate_plan_id"
     LosDiscount }o--|| Money : "amount_off_id"
     PriceBounds }o--|| Money : "floor_id"
     PriceBounds }o--|| Money : "ceiling_id"
-    PriceComponent }o--|| Booking : "booking_id"
-    PriceComponent }o--|| Money : "amount_id"
     PromoCode }o--|| Discount : "discount_id"
     PromoCode }o--|| RedemptionWindow : "window_id"
     PromoCode }o--|| UsageLimits : "limits_id"
@@ -236,17 +134,10 @@ erDiagram
     RateOverride }o--|| Money : "price_id"
     RatePlan }o--|| Money : "price_id"
     RatePlan }o--|| PriceBounds : "bounds_id"
-    RecurringRule }o--|| Schedule : "schedule_id"
-    Redemption }o--|| Booking : "booking"
+    Redemption }o--|| Reservation : "reservation"
     Redemption }o--|| PromoCode : "promo_code_id"
     Redemption }o--|| Money : "amount_applied_id"
-    RefundTier }o--|| CancellationPolicy : "cancellation_policy_id"
     Reservation }o--|| Hold : "hold"
-    Schedule }o--|| BufferSettings : "buffers_id"
-    Schedule }o--|| StayConstraints : "stay_constraints_id"
-    Schedule }o--|| CancellationPolicy : "cancellation_policy_id"
-    ScheduleExceptions }o--|| Schedule : "schedule_id"
-    ScheduleExceptions }o--|| AvailabilityException : "availability_exception_id"
     Scope }o--|| Money : "min_subtotal_id"
     Tax }o--|| RatePlan : "rate_plan_id"
 ```
@@ -462,14 +353,14 @@ A redeemable discount applied to a booking's subtotal. Scoped by a redemption wi
 
 ### `Redemption` → `redemptions`
 
-Redemption is a single use of a promo code, modeled as a sub-resource of PromoCode rather than an inline list — so it has its own name/lifecycle and is listed with paging (ListRedemptions). The {promo_code} parent segment generates the promo_code_id FK back to the owning code (1:n into promocode.redemptions); amount_applied is the shared google.type.Money in common.moneys. Redemptions are created during CreateBooking, never directly.
+Redemption is a single use of a promo code, modeled as a sub-resource of PromoCode rather than an inline list — so it has its own name/lifecycle and is listed with paging (ListRedemptions). The {promo_code} parent segment generates the promo_code_id FK back to the owning code (1:n into promocode.redemptions); amount_applied is the shared google.type.Money in common.moneys. Redemptions are recorded when a booking's payment settles, never created directly.
 
 | Column | Type | Null |
 | --- | --- | --- |
 | `id` | `CHAR(26)` | not null |
 | `name` | `VARCHAR(255)` | not null |
 | `customer` | `VARCHAR(255)` | not null |
-| `booking` | `CHAR(26)` | not null |
+| `reservation` | `CHAR(26)` | not null |
 | `redeemed_time` | `TIMESTAMPTZ` | nullable |
 | `promo_code_id` | `CHAR(26)` | not null |
 | `amount_applied_id` | `CHAR(26)` | nullable |
@@ -584,162 +475,6 @@ A Reservation is a confirmed booking: a hold made permanent. It is the last step
 
 - `ReservationState`: PENDING, CONFIRMED, CANCELLING, CANCELLED, FAILED, RESCHEDULING, RESCHEDULED
 
-## Schema `schedule`
-
-### `AvailabilityException` → `availability_exceptions`
-
-An override of a unit's normal hours on a specific span: a blackout / holiday closure, or extra hours beyond the recurring rules.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `name` | `VARCHAR(255)` | not null |
-| `kind` | `ExceptionKind` | not null |
-| `reason` | `VARCHAR(255)` | nullable |
-| `create_time` | `TIMESTAMPTZ` | not null |
-| `span_case` | `AvailabilityExceptionSpanCase` | nullable |
-| `resource_id` | `CHAR(26)` | not null |
-| `window_id` | `CHAR(26)` | nullable |
-| `date_range_id` | `CHAR(26)` | nullable |
-
-### `Schedule` → `resource`
-
-Aggregate read view of a unit's availability configuration: the inputs the freebusy engine consumes. Modeled as a singleton resource, one per unit.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `name` | `VARCHAR(255)` | not null |
-| `etag` | `VARCHAR(255)` | nullable |
-| `buffers_id` | `CHAR(26)` | nullable |
-| `stay_constraints_id` | `CHAR(26)` | nullable |
-| `cancellation_policy_id` | `CHAR(26)` | nullable |
-
-### `RecurringRule` → `recurring_rules`
-
-A recurring availability window expressed as an RRULE plus a daily open span. The freebusy engine expands these against the unit's timezone.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `rrule` | `VARCHAR(255)` | not null |
-| `opens` | `VARCHAR(255)` | nullable |
-| `closes` | `VARCHAR(255)` | nullable |
-| `schedule_id` | `CHAR(26)` | not null |
-
-### `BufferSettings` → `buffer_settings`
-
-Buffer and notice settings applied around bookings.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `start_delta` | `INTERVAL` | nullable |
-| `end_delta` | `INTERVAL` | nullable |
-| `min_notice` | `INTERVAL` | nullable |
-| `max_advance` | `INTERVAL` | nullable |
-| `gap` | `INTERVAL` | nullable |
-
-### `StayConstraints` → `stay_constraints`
-
-Stay rules that affect bookability for NIGHTLY units.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `min_nights` | `INTEGER` | nullable |
-| `max_nights` | `INTEGER` | nullable |
-| `checkin_weekdays` | `` | nullable |
-| `checkout_weekdays` | `` | nullable |
-| `advance_min_days` | `INTEGER` | nullable |
-| `advance_max_days` | `INTEGER` | nullable |
-
-### `CancellationPolicy` → `cancellation_policies`
-
-Refund rules graded by how far ahead of a booking's start it is cancelled.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-
-### `RefundTier` → `refund_tiers`
-
-One tier of a CancellationPolicy: cancel at least `cutoff` before the booking start to receive `refund_percent` of the total back.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `cutoff` | `INTERVAL` | not null |
-| `refund_percent` | `INTEGER` | not null |
-| `cancellation_policy_id` | `CHAR(26)` | not null |
-
-### `ScheduleExceptions` → `exceptions`
-
-Join table for the many-to-many relation Schedule.exceptions ↔ AvailabilityException.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `schedule_id` | `CHAR(26)` | not null |
-| `availability_exception_id` | `CHAR(26)` | not null |
-| `availability_exception_name` | `TEXT` | not null |
-
-### Enums
-
-- `ExceptionKind`: CLOSURE, EXTRA_HOURS
-- `AvailabilityExceptionSpanCase`: WINDOW, DATE_RANGE
-
-## Schema `scheduling`
-
-### `Booking` → `bookings`
-
-A reservation against a unit. The hold lifecycle lives here as states rather than a separate service: CreateBooking places a PENDING_HOLD, confirmation flips it to CONFIRMED, and an internal sweeper expires holds that are never confirmed.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `name` | `VARCHAR(255)` | not null |
-| `unit` | `VARCHAR(255)` | not null |
-| `customer` | `VARCHAR(255)` | nullable |
-| `units` | `INTEGER` | nullable |
-| `assigned_unit` | `VARCHAR(255)` | nullable |
-| `state` | `BookingState` | nullable |
-| `hold_expire_time` | `TIMESTAMPTZ` | nullable |
-| `promo_code` | `CHAR(26)` | nullable |
-| `notes` | `VARCHAR(255)` | nullable |
-| `attributes` | `JSONB` | nullable |
-| `cancel_reason` | `CancelReason` | nullable |
-| `create_time` | `TIMESTAMPTZ` | not null |
-| `update_time` | `TIMESTAMPTZ` | not null |
-| `confirm_time` | `TIMESTAMPTZ` | nullable |
-| `cancel_time` | `TIMESTAMPTZ` | nullable |
-| `refund_percent` | `INTEGER` | nullable |
-| `hold_ttl` | `INTERVAL` | nullable |
-| `etag` | `VARCHAR(255)` | nullable |
-| `contact_id` | `CHAR(26)` | nullable |
-| `occupancy_id` | `CHAR(26)` | nullable |
-| `window_id` | `CHAR(26)` | not null |
-| `price_id` | `CHAR(26)` | nullable |
-| `discount_id` | `CHAR(26)` | nullable |
-| `total_id` | `CHAR(26)` | nullable |
-| `refund_amount_id` | `CHAR(26)` | nullable |
-
-### `Occupancy` → `occupancies`
-
-Occupancy is a party-size breakdown by age bracket. `adults + children` is the headcount charged against a unit's `max_occupancy`; infants are typically not counted. When a booking also lists `guests`, these counts must reconcile with that list.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `adults` | `INTEGER` | nullable |
-| `children` | `INTEGER` | nullable |
-| `infants` | `INTEGER` | nullable |
-
-### Enums
-
-- `BookingState`: PENDING_HOLD, CONFIRMED, CANCELLED, EXPIRED, COMPLETED, NO_SHOW
-- `CancelReason`: REQUESTED_BY_CUSTOMER, REQUESTED_BY_OPERATOR, PAYMENT_FAILED, NO_SHOW, OTHER
-
 ## Schema `shared`
 
 ### `IdempotencyKey` → `idempotency_keys`
@@ -771,54 +506,9 @@ An uploaded file attached to a document- or licence-carrying record (e.g. a gues
 | `uri` | `VARCHAR(255)` | nullable |
 | `upload_time` | `TIMESTAMPTZ` | nullable |
 
-### `TimeWindow` → `time_windows`
-
-A half-open time interval [start_time, end_time). Used for query windows and for a booking's reserved span in both TIME_SLOT and NIGHTLY modes.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `start_time` | `TIMESTAMPTZ` | not null |
-| `end_time` | `TIMESTAMPTZ` | not null |
-
-### `DateRange` → `date_ranges`
-
-A half-open range of calendar dates [start_date, end_date), evaluated in the resource's local timezone. The natural query and exception shape for NIGHTLY resources: end_date is the check-out date and is not itself included.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `start_date` | `DATE` | not null |
-| `end_date` | `DATE` | not null |
-
-### `Contact` → `contacts`
-
-Contact details for the person a booking is for. When a booking carries a `customer` (a users/{user} reference) these typically mirror the user's profile; for walk-in or email-only bookings made by someone who is not a registered user, this is the only contact information captured. The server requires at least one reachable channel (email or phone) when no customer is set.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `display_name` | `VARCHAR(255)` | nullable |
-| `email` | `VARCHAR(255)` | nullable |
-| `phone_number` | `VARCHAR(255)` | nullable |
-
-### `PriceComponent` → `price_components`
-
-One line in a price breakdown: a base charge, a fee, a tax, or a discount. Clients branch on `type` and `code`; the signed `amount` rolls up to the booking total (charges positive, discounts negative).
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `type` | `Type` | nullable |
-| `code` | `VARCHAR(255)` | nullable |
-| `display_name` | `VARCHAR(255)` | nullable |
-| `booking_id` | `CHAR(26)` | not null |
-| `amount_id` | `CHAR(26)` | nullable |
-
 ### Enums
 
 - `IdempotencyState`: IN_FLIGHT, DONE
-- `Type`: BASE, FEE, TAX, DISCOUNT
 
 ## Schema `common`
 
@@ -832,103 +522,3 @@ Represents an amount of money with its currency type.
 | `currency_code` | `VARCHAR(255)` | nullable |
 | `units` | `BIGINT` | nullable |
 | `nanos` | `INTEGER` | nullable |
-
-### `PostalAddress` → `postal_address`
-
-Represents a postal address, such as for postal delivery or payments addresses. With a postal address, a postal service can deliver items to a premise, P.O. box, or similar. A postal address is not intended to model geographical locations like roads, towns, or mountains. In typical usage, an address would be created by user input or from importing existing data, depending on the type of process. Advice on address input or editing: - Use an internationalization-ready address widget such as https://github.com/google/libaddressinput. - Users should not be presented with UI elements for input or editing of fields outside countries where that field is used. For more guidance on how to use this schema, see: https://support.google.com/business/answer/6397478.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `revision` | `INTEGER` | nullable |
-| `region_code` | `VARCHAR(255)` | nullable |
-| `language_code` | `VARCHAR(255)` | nullable |
-| `postal_code` | `VARCHAR(255)` | nullable |
-| `sorting_code` | `VARCHAR(255)` | nullable |
-| `administrative_area` | `VARCHAR(255)` | nullable |
-| `locality` | `VARCHAR(255)` | nullable |
-| `sublocality` | `VARCHAR(255)` | nullable |
-| `address_lines` | `VARCHAR(255)[]` | nullable |
-| `recipients` | `VARCHAR(255)[]` | nullable |
-| `organization` | `VARCHAR(255)` | nullable |
-
-## Schema `guest`
-
-### `Guest` → `resource`
-
-A guest is a person who stays under a booking. It is one of three distinct people the system models, all in the identity domain: - User   (identity.proto): the account that signs in and books online. - Guest  (this message):   a person actually staying — the party on a booking. - Member (organisation):   hotel staff who manage the chain/property. The booker (a User, or an anonymous contact) is not necessarily a guest, and a booking has one or more guests. This message captures what a hotel records on a Guest Registration Card at check-in — identity, nationality, and ID — plus the foreigner-registration details required for foreign nationals (e.g. India's Form C / FRRO), and the guest's own stay preferences. It is an embedded value on a booking, not an addressable account resource.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `display_name` | `VARCHAR(255)` | not null |
-| `primary` | `BOOLEAN` | nullable |
-| `gender` | `Gender` | nullable |
-| `birth_date` | `DATE` | nullable |
-| `age_group` | `AgeGroup` | nullable |
-| `nationality` | `VARCHAR(255)` | nullable |
-| `email` | `VARCHAR(255)` | nullable |
-| `phone_number` | `VARCHAR(255)` | nullable |
-| `booking_id` | `CHAR(26)` | not null |
-| `id_document_id` | `CHAR(26)` | nullable |
-| `permanent_address_id` | `CHAR(26)` | nullable |
-| `local_address_id` | `CHAR(26)` | nullable |
-| `foreigner_id` | `CHAR(26)` | nullable |
-| `preferences_id` | `CHAR(26)` | nullable |
-
-### `IdDocument` → `id_documents`
-
-A government identity document. Passport fields are required for foreign nationals; domestic guests may present any accepted document type.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `type` | `IdDocumentType` | not null |
-| `number` | `VARCHAR(255)` | not null |
-| `issuing_country` | `VARCHAR(255)` | nullable |
-| `issue_place` | `VARCHAR(255)` | nullable |
-| `issue_date` | `DATE` | nullable |
-| `expiry_date` | `DATE` | nullable |
-| `attachment_id` | `CHAR(26)` | nullable |
-
-### `ForeignerDetails` → `foreigner_details`
-
-Foreigner-registration details a hotel must capture for foreign nationals to file Form C with the FRRO within 24 hours of arrival (India). Nationals of exempt countries (e.g. Nepal, Bhutan) and diplomats may omit these.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `visa_number` | `VARCHAR(255)` | nullable |
-| `visa_type` | `VARCHAR(255)` | nullable |
-| `visa_issue_place` | `VARCHAR(255)` | nullable |
-| `visa_issue_date` | `DATE` | nullable |
-| `visa_expiry_date` | `DATE` | nullable |
-| `arrival_date` | `DATE` | nullable |
-| `entry_port` | `VARCHAR(255)` | nullable |
-| `origin` | `VARCHAR(255)` | nullable |
-| `next_destination` | `VARCHAR(255)` | nullable |
-| `visit_purpose` | `VARCHAR(255)` | nullable |
-
-### `GuestPreferences` → `preferences`
-
-A guest's stay preferences and special requests. All optional; used to guide unit assignment and to surface requests to housekeeping / front desk.
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `smoking` | `SmokingPreference` | nullable |
-| `bed` | `BedPreference` | nullable |
-| `dietary` | `VARCHAR(255)[]` | nullable |
-| `accessibility` | `VARCHAR(255)[]` | nullable |
-| `floor_preference` | `INTEGER` | nullable |
-| `loyalty_number` | `VARCHAR(255)` | nullable |
-| `special_requests` | `VARCHAR(255)[]` | nullable |
-| `notes` | `VARCHAR(255)` | nullable |
-
-### Enums
-
-- `Gender`: MALE, FEMALE, OTHER, UNDISCLOSED
-- `AgeGroup`: ADULT, CHILD, INFANT
-- `IdDocumentType`: PASSPORT, NATIONAL_ID, DRIVING_LICENSE, AADHAAR, VOTER_ID, OTHER
-- `SmokingPreference`: NON_SMOKING, SMOKING
-- `BedPreference`: NO_PREFERENCE, KING, QUEEN, TWIN, SINGLE

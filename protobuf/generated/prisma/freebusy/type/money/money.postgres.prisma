@@ -56,21 +56,6 @@ model Money {
   /// Back-relation: Scope records that reference this model via min_subtotal_id.
   scopes Scope[]
 
-  /// Back-relation: Booking records that reference this model via price_id.
-  bookings Booking[] @relation("BookingPrice")
-
-  /// Back-relation: Booking records that reference this model via discount_id.
-  bookings2 Booking[] @relation("BookingDiscount")
-
-  /// Back-relation: Booking records that reference this model via total_id.
-  bookings3 Booking[] @relation("BookingTotal")
-
-  /// Back-relation: Booking records that reference this model via refund_amount_id.
-  bookings4 Booking[] @relation("BookingRefundAmount")
-
-  /// Back-relation: PriceComponent records that reference this model via amount_id.
-  priceComponents PriceComponent[]
-
   /// Maps the model to the "moneys" table in the database.
   @@map("moneys")
   /// Maps the model to the "common" schema in the database.

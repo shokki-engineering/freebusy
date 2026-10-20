@@ -25,8 +25,6 @@ type DeletePromocodeRedemptionsByIdResponse struct {
 	Returning []struct {
 		// AmountAppliedId selects the "amountAppliedId" field; nil when the column is NULL.
 		AmountAppliedId *string `graphql:"amountAppliedId"`
-		// Booking selects the "booking" field.
-		Booking string `graphql:"booking"`
 		// Customer selects the "customer" field.
 		Customer string `graphql:"customer"`
 		// Id selects the "id" field.
@@ -37,6 +35,8 @@ type DeletePromocodeRedemptionsByIdResponse struct {
 		PromoCodeId string `graphql:"promoCodeId"`
 		// RedeemedTime selects the "redeemedTime" field; nil when the column is NULL.
 		RedeemedTime *string `graphql:"redeemedTime"`
+		// Reservation selects the "reservation" field.
+		Reservation string `graphql:"reservation"`
 	} `graphql:"returning"`
 }
 
@@ -48,8 +48,6 @@ type InsertPromocodeRedemptionsResponse struct {
 	Returning []struct {
 		// AmountAppliedId selects the "amountAppliedId" field; nil when the column is NULL.
 		AmountAppliedId *string `graphql:"amountAppliedId"`
-		// Booking selects the "booking" field.
-		Booking string `graphql:"booking"`
 		// Customer selects the "customer" field.
 		Customer string `graphql:"customer"`
 		// Id selects the "id" field.
@@ -60,6 +58,8 @@ type InsertPromocodeRedemptionsResponse struct {
 		PromoCodeId string `graphql:"promoCodeId"`
 		// RedeemedTime selects the "redeemedTime" field; nil when the column is NULL.
 		RedeemedTime *string `graphql:"redeemedTime"`
+		// Reservation selects the "reservation" field.
+		Reservation string `graphql:"reservation"`
 	} `graphql:"returning"`
 }
 
@@ -69,8 +69,6 @@ type InsertPromocodeRedemptionsResponse struct {
 type PromocodeRedemptions struct {
 	// AmountAppliedId selects the "amountAppliedId" field; nil when the column is NULL.
 	AmountAppliedId *string `graphql:"amountAppliedId"`
-	// Booking selects the "booking" field.
-	Booking string `graphql:"booking"`
 	// Customer selects the "customer" field.
 	Customer string `graphql:"customer"`
 	// Id selects the "id" field.
@@ -81,6 +79,8 @@ type PromocodeRedemptions struct {
 	PromoCodeId string `graphql:"promoCodeId"`
 	// RedeemedTime selects the "redeemedTime" field; nil when the column is NULL.
 	RedeemedTime *string `graphql:"redeemedTime"`
+	// Reservation selects the "reservation" field.
+	Reservation string `graphql:"reservation"`
 }
 
 // PromocodeRedemptionsAggExp aggregates the collection's rows: the row count plus
@@ -99,17 +99,6 @@ type PromocodeRedemptionsAggExp struct {
 		// Min selects the "min" field; nil when the column is NULL.
 		Min *string `graphql:"min"`
 	} `graphql:"amountAppliedId"`
-	// Booking selects the "booking" field.
-	Booking struct {
-		// Count selects the "_count" field.
-		Count graphql.Int64 `graphql:"_count"`
-		// CountDistinct selects the "_count_distinct" field.
-		CountDistinct graphql.Int64 `graphql:"_count_distinct"`
-		// Max selects the "max" field; nil when the column is NULL.
-		Max *string `graphql:"max"`
-		// Min selects the "min" field; nil when the column is NULL.
-		Min *string `graphql:"min"`
-	} `graphql:"booking"`
 	// Customer selects the "customer" field.
 	Customer struct {
 		// Count selects the "_count" field.
@@ -165,6 +154,17 @@ type PromocodeRedemptionsAggExp struct {
 		// Min selects the "min" field; nil when the column is NULL.
 		Min *string `graphql:"min"`
 	} `graphql:"redeemedTime"`
+	// Reservation selects the "reservation" field.
+	Reservation struct {
+		// Count selects the "_count" field.
+		Count graphql.Int64 `graphql:"_count"`
+		// CountDistinct selects the "_count_distinct" field.
+		CountDistinct graphql.Int64 `graphql:"_count_distinct"`
+		// Max selects the "max" field; nil when the column is NULL.
+		Max *string `graphql:"max"`
+		// Min selects the "min" field; nil when the column is NULL.
+		Min *string `graphql:"min"`
+	} `graphql:"reservation"`
 }
 
 // UpdatePromocodeRedemptionsByIdResponse — Responses from the 'update_promocode_redemptions_by_id' procedure
@@ -175,8 +175,6 @@ type UpdatePromocodeRedemptionsByIdResponse struct {
 	Returning []struct {
 		// AmountAppliedId selects the "amountAppliedId" field; nil when the column is NULL.
 		AmountAppliedId *string `graphql:"amountAppliedId"`
-		// Booking selects the "booking" field.
-		Booking string `graphql:"booking"`
 		// Customer selects the "customer" field.
 		Customer string `graphql:"customer"`
 		// Id selects the "id" field.
@@ -187,5 +185,7 @@ type UpdatePromocodeRedemptionsByIdResponse struct {
 		PromoCodeId string `graphql:"promoCodeId"`
 		// RedeemedTime selects the "redeemedTime" field; nil when the column is NULL.
 		RedeemedTime *string `graphql:"redeemedTime"`
+		// Reservation selects the "reservation" field.
+		Reservation string `graphql:"reservation"`
 	} `graphql:"returning"`
 }

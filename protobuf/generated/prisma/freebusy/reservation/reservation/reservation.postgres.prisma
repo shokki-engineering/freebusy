@@ -71,6 +71,9 @@ model Reservation {
   /// The resources taken, copied from the hold. Format: resources/{resource}
   resources String[] @map("resources")
 
+  /// Back-relation: Redemption records that reference this model via reservation.
+  redemptions Redemption[]
+
   /// Unique constraint on [hold].
   @@unique([holdID])
   /// Index on [organizational_unit_id].

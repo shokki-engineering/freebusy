@@ -35,9 +35,8 @@ const (
 // hold. The reservation records the outcome; the engine already holds the
 // resources.
 //
-// Deliberately thin. scheduling.v1's Booking carried price, discount, promo
-// code, refund, guests and occupancy, which made it a hotel booking. None of
-// that is here: money belongs to the payment service and people to the user
+// Deliberately thin. Price, discount, promo code, refund, guests and occupancy
+// are what would make it a hotel booking, and none of them is here: money belongs to the payment service and people to the user
 // service, both referenced by name (AIP-215), and anything else a vertical
 // needs to remember rides in `attributes`.
 type Reservation struct {

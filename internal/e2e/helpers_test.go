@@ -5,25 +5,22 @@ import (
 	"os"
 	"testing"
 
+	"github.com/oh-tarnished/freebusy/internal/database"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
 // openTestGorm gates on FREEBUSY_TEST_POSTGRES_DSN and opens the live Postgres
-// the way the suites need it: silent logging and sentinel translation
-// (ErrDuplicatedKey etc.) so repository error mapping behaves as in production.
+// exactly as the server does (database.OpenGorm), with silent logging, so
+// repository error mapping behaves as in production.
 func openTestGorm(t *testing.T) *gorm.DB {
 	t.Helper()
 	dsn := os.Getenv("FREEBUSY_TEST_POSTGRES_DSN")
 	if dsn == "" {
 		t.Skip("FREEBUSY_TEST_POSTGRES_DSN not set — live suite skipped")
 	}
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger:         logger.Default.LogMode(logger.Silent),
-		TranslateError: true,
-	})
+	db, err := database.OpenGorm(dsn, &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	if err != nil {
 		t.Fatalf("open postgres: %v", err)
 	}

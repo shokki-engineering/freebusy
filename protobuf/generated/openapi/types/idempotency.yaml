@@ -14,7 +14,7 @@ components:
           format: date-time
           type: string
         method:
-          description: 'Fully-qualified RPC that was called, e.g. "/freebusy.scheduling.v1.SchedulingService/CreateBooking".
+          description: 'Fully-qualified RPC that was called, e.g. "/freebusy.allocation.v1.HoldService/CreateHold".
             Part of the key: the same request_id replayed against a different method
             is a different request.'
           type: string

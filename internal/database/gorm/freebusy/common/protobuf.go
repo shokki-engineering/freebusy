@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: google/type/money.proto, google/type/postal_address.proto
+// source: google/type/money.proto
 //
 // database: freebusy
 // schema:   common
@@ -15,9 +15,7 @@
 package common
 
 import (
-	"github.com/lib/pq"
 	"google.golang.org/genproto/googleapis/type/money"
-	"google.golang.org/genproto/googleapis/type/postaladdress"
 )
 
 // MoneyToProto converts the stored row (with its belongs-to associations,
@@ -44,49 +42,6 @@ func MoneyFromProto(pb *money.Money) *Money {
 	m.CurrencyCode = toPtr(pb.GetCurrencyCode())
 	m.Units = toPtr(pb.GetUnits())
 	m.Nanos = toPtr(pb.GetNanos())
-	return m
-}
-
-// PostalAddressToProto converts the stored row (with its belongs-to associations,
-// when preloaded) to its proto message. Nil in, nil out.
-func PostalAddressToProto(m *PostalAddress) *postaladdress.PostalAddress {
-	if m == nil {
-		return nil
-	}
-	out := &postaladdress.PostalAddress{}
-	out.Revision = fromPtr(m.Revision)
-	out.RegionCode = fromPtr(m.RegionCode)
-	out.LanguageCode = fromPtr(m.LanguageCode)
-	out.PostalCode = fromPtr(m.PostalCode)
-	out.SortingCode = fromPtr(m.SortingCode)
-	out.AdministrativeArea = fromPtr(m.AdministrativeArea)
-	out.Locality = fromPtr(m.Locality)
-	out.Sublocality = fromPtr(m.Sublocality)
-	out.AddressLines = []string(m.AddressLines)
-	out.Recipients = []string(m.Recipients)
-	out.Organization = fromPtr(m.Organization)
-	return out
-}
-
-// PostalAddressFromProto maps the proto message's data fields onto a fresh row.
-// It never invents keys or relations: primary keys, resource references, and
-// sub-row graph wiring stay with the caller. Nil in, nil out.
-func PostalAddressFromProto(pb *postaladdress.PostalAddress) *PostalAddress {
-	if pb == nil {
-		return nil
-	}
-	m := &PostalAddress{}
-	m.Revision = toPtr(pb.GetRevision())
-	m.RegionCode = toPtr(pb.GetRegionCode())
-	m.LanguageCode = toPtr(pb.GetLanguageCode())
-	m.PostalCode = toPtr(pb.GetPostalCode())
-	m.SortingCode = toPtr(pb.GetSortingCode())
-	m.AdministrativeArea = toPtr(pb.GetAdministrativeArea())
-	m.Locality = toPtr(pb.GetLocality())
-	m.Sublocality = toPtr(pb.GetSublocality())
-	m.AddressLines = pq.StringArray(pb.GetAddressLines())
-	m.Recipients = pq.StringArray(pb.GetRecipients())
-	m.Organization = toPtr(pb.GetOrganization())
 	return m
 }
 

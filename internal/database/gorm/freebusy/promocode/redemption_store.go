@@ -49,13 +49,13 @@ type RedemptionStoreIface interface {
 	GetByID(ctx context.Context, id string) (*Redemption, error)
 	DeleteByID(ctx context.Context, id string) error
 	GetByName(ctx context.Context, v string) (*Redemption, error)
-	ListByBookingID(ctx context.Context, id string, opts gormx.ListOptions) ([]Redemption, error)
+	ListByReservationID(ctx context.Context, id string, opts gormx.ListOptions) ([]Redemption, error)
 	ListByPromoCodeID(ctx context.Context, id string, opts gormx.ListOptions) ([]Redemption, error)
 	ListByAmountAppliedID(ctx context.Context, id string, opts gormx.ListOptions) ([]Redemption, error)
 }
 
 // RedemptionStore provides typed CRUD access to Redemption records.
-// Redemption is a single use of a promo code, modeled as a sub-resource of PromoCode rather than an inline list — so it has its own name/lifecycle and is listed with paging (ListRedemptions). The {promo_code} parent segment generates the promo_code_id FK back to the owning code (1:n into promocode.redemptions); amount_applied is the shared google.type.Money in common.moneys. Redemptions are created during CreateBooking, never directly.
+// Redemption is a single use of a promo code, modeled as a sub-resource of PromoCode rather than an inline list — so it has its own name/lifecycle and is listed with paging (ListRedemptions). The {promo_code} parent segment generates the promo_code_id FK back to the owning code (1:n into promocode.redemptions); amount_applied is the shared google.type.Money in common.moneys. Redemptions are recorded when a booking's payment settles, never created directly.
 type RedemptionStore struct {
 	DB *gorm.DB
 	// Telemetry observes every operation; nil is a no-op. Wire the generated
@@ -179,15 +179,15 @@ func (s *RedemptionStore) GetByName(ctx context.Context, v string) (*Redemption,
 	return &m, nil
 }
 
-// ListByBookingID returns the Redemption records whose booking matches id, with opts applied.
-func (s *RedemptionStore) ListByBookingID(ctx context.Context, id string, opts gormx.ListOptions) ([]Redemption, error) {
+// ListByReservationID returns the Redemption records whose reservation matches id, with opts applied.
+func (s *RedemptionStore) ListByReservationID(ctx context.Context, id string, opts gormx.ListOptions) ([]Redemption, error) {
 	var out []Redemption
 	tel := gormx.OrNop(s.Telemetry)
 	start := time.Now()
-	err := tel.Span(ctx, "promocode.Redemption/ListByBookingID", nil, func(ctx context.Context) error {
-		return opts.Apply(s.DB.WithContext(ctx).Where("booking = ?", id)).Find(&out).Error
+	err := tel.Span(ctx, "promocode.Redemption/ListByReservationID", nil, func(ctx context.Context) error {
+		return opts.Apply(s.DB.WithContext(ctx).Where("reservation = ?", id)).Find(&out).Error
 	})
-	tel.RecordOp(ctx, "promocode.redemptions", "list_by_booking", time.Since(start), err)
+	tel.RecordOp(ctx, "promocode.redemptions", "list_by_reservation", time.Since(start), err)
 	if err != nil {
 		return nil, err
 	}

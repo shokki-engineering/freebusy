@@ -35,8 +35,6 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/propertyql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/reservationql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/resourceql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/scheduleql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/schedulingql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/sharedql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/todoql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql"
@@ -75,8 +73,6 @@ type QueryHandler struct {
 	Property     propertyql.QueryHandler
 	Reservation  reservationql.QueryHandler
 	Resource     resourceql.QueryHandler
-	Schedule     scheduleql.QueryHandler
-	Scheduling   schedulingql.QueryHandler
 	Shared       sharedql.QueryHandler
 	Todo         todoql.QueryHandler
 	User         userql.QueryHandler
@@ -119,8 +115,6 @@ type MutationHandler struct {
 	Property     propertyql.MutationHandler
 	Reservation  reservationql.MutationHandler
 	Resource     resourceql.MutationHandler
-	Schedule     scheduleql.MutationHandler
-	Scheduling   schedulingql.MutationHandler
 	Shared       sharedql.MutationHandler
 	Todo         todoql.MutationHandler
 	User         userql.MutationHandler
@@ -167,8 +161,6 @@ type SubscriptionHandler struct {
 	Property     propertyql.SubscriptionHandler
 	Reservation  reservationql.SubscriptionHandler
 	Resource     resourceql.SubscriptionHandler
-	Schedule     scheduleql.SubscriptionHandler
-	Scheduling   schedulingql.SubscriptionHandler
 	Shared       sharedql.SubscriptionHandler
 	Todo         todoql.SubscriptionHandler
 	User         userql.SubscriptionHandler
@@ -210,8 +202,6 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Property:     propertyql.NewQuery(gql),
 			Reservation:  reservationql.NewQuery(gql),
 			Resource:     resourceql.NewQuery(gql),
-			Schedule:     scheduleql.NewQuery(gql),
-			Scheduling:   schedulingql.NewQuery(gql),
 			Shared:       sharedql.NewQuery(gql),
 			Todo:         todoql.NewQuery(gql),
 			User:         userql.NewQuery(gql),
@@ -238,8 +228,6 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Property:     propertyql.NewMutation(gql),
 			Reservation:  reservationql.NewMutation(gql),
 			Resource:     resourceql.NewMutation(gql),
-			Schedule:     scheduleql.NewMutation(gql),
-			Scheduling:   schedulingql.NewMutation(gql),
 			Shared:       sharedql.NewMutation(gql),
 			Todo:         todoql.NewMutation(gql),
 			User:         userql.NewMutation(gql),
@@ -265,8 +253,6 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Property:     propertyql.NewSubscription(gql),
 			Reservation:  reservationql.NewSubscription(gql),
 			Resource:     resourceql.NewSubscription(gql),
-			Schedule:     scheduleql.NewSubscription(gql),
-			Scheduling:   schedulingql.NewSubscription(gql),
 			Shared:       sharedql.NewSubscription(gql),
 			Todo:         todoql.NewSubscription(gql),
 			User:         userql.NewSubscription(gql),

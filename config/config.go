@@ -35,26 +35,10 @@ type AppConfig struct {
 	// Seed holds dev-only startup seeding. Disabled in the release defaults; the
 	// dev overlay turns it on to plant a known organisation.
 	Seed SeedConfig `koanf:"seed"`
-	// Catalogue holds the RFC schema services freebusy reads bookable resources
-	// and their calendars from.
-	Catalogue CatalogueConfig `koanf:"catalogue"`
 	// Cache holds the read-through cache backend. Disabled by default: the
 	// service is correct without it, and a cache that is on before anyone has
 	// measured the read it serves is just another thing that can be stale.
 	Cache CacheConfig `koanf:"cache"`
-}
-
-// CatalogueConfig points at the RFC schema services — protobuf-rfc's Resources
-// and Calendars — which own the catalogue freebusy books against.
-//
-// Optional. With no endpoint the booking path falls back to its defaults
-// (capacity one, unbounded occupancy, UTC), which is a working configuration:
-// the catalogue enriches a booking, it does not authorise one.
-type CatalogueConfig struct {
-	// Enabled turns the catalogue lookup on.
-	Enabled bool `koanf:"enabled"`
-	// Endpoint is the gRPC host:port serving the RFC services.
-	Endpoint string `koanf:"endpoint"`
 }
 
 // CacheConfig is the backend behind protoc-gen-cache's generated decorators.

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: google/type/money.proto, google/type/postal_address.proto
+// source: google/type/money.proto
 //
 // database: freebusy
 // schema:   common

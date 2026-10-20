@@ -1,47 +1,50 @@
 components:
   schemas:
-    freebusy.shared.v1.BookingMode:
-      description: How a resource is booked, which decides the availability shape
-        it produces.
+    freebusy.guest.v1.AgeGroup:
+      description: Which age bracket a guest falls in. Drives occupancy counting and
+        child pricing; may be given explicitly or derived from date_of_birth.
       enum:
-      - BOOKING_MODE_UNSPECIFIED
-      - BOOKING_MODE_TIME_SLOT
-      - BOOKING_MODE_NIGHTLY
+      - AGE_GROUP_UNSPECIFIED
+      - AGE_GROUP_ADULT
+      - AGE_GROUP_CHILD
+      - AGE_GROUP_INFANT
       type: string
-    freebusy.shared.v1.MediaType:
-      description: Kind of media asset a Media reference points at. Documents (PDFs,
-        house rules, fact sheets) are just media with type DOCUMENT — they are not
-        a separate type.
+    freebusy.guest.v1.BedPreference:
+      description: A guest's bed-type preference for room assignment.
       enum:
-      - MEDIA_TYPE_UNSPECIFIED
-      - MEDIA_TYPE_IMAGE
-      - MEDIA_TYPE_VIDEO
-      - MEDIA_TYPE_DOCUMENT
-      - MEDIA_TYPE_FLOORPLAN
-      - MEDIA_TYPE_VIRTUAL_TOUR
+      - BED_PREFERENCE_UNSPECIFIED
+      - BED_PREFERENCE_NO_PREFERENCE
+      - BED_PREFERENCE_KING
+      - BED_PREFERENCE_QUEEN
+      - BED_PREFERENCE_TWIN
+      - BED_PREFERENCE_SINGLE
       type: string
-    freebusy.shared.v1.OrderDirection:
-      description: Enums shared across more than one freebusy resource. Resource-specific
-        enums live alongside their resource (e.g. BookingStatus in the booking package),
-        so only the genuinely cross-cutting ones are defined here. Sort direction
-        for list endpoints.
+    freebusy.guest.v1.Gender:
+      description: A guest's gender, as recorded on a registration card.
       enum:
-      - ORDER_DIRECTION_UNSPECIFIED
-      - ORDER_DIRECTION_ASC
-      - ORDER_DIRECTION_DESC
+      - GENDER_UNSPECIFIED
+      - GENDER_MALE
+      - GENDER_FEMALE
+      - GENDER_OTHER
+      - GENDER_UNDISCLOSED
       type: string
-    freebusy.shared.v1.Weekday:
-      description: Day of the week, numbered to match google.type.DayOfWeek (Monday
-        = 1).
+    freebusy.guest.v1.IdDocumentType:
+      description: The kind of government identity document a guest presents at check-in.
       enum:
-      - WEEKDAY_UNSPECIFIED
-      - WEEKDAY_MONDAY
-      - WEEKDAY_TUESDAY
-      - WEEKDAY_WEDNESDAY
-      - WEEKDAY_THURSDAY
-      - WEEKDAY_FRIDAY
-      - WEEKDAY_SATURDAY
-      - WEEKDAY_SUNDAY
+      - ID_DOCUMENT_TYPE_UNSPECIFIED
+      - ID_DOCUMENT_TYPE_PASSPORT
+      - ID_DOCUMENT_TYPE_NATIONAL_ID
+      - ID_DOCUMENT_TYPE_DRIVING_LICENSE
+      - ID_DOCUMENT_TYPE_AADHAAR
+      - ID_DOCUMENT_TYPE_VOTER_ID
+      - ID_DOCUMENT_TYPE_OTHER
+      type: string
+    freebusy.guest.v1.SmokingPreference:
+      description: A guest's smoking preference for room assignment.
+      enum:
+      - SMOKING_PREFERENCE_UNSPECIFIED
+      - SMOKING_PREFERENCE_NON_SMOKING
+      - SMOKING_PREFERENCE_SMOKING
       type: string
 info:
   title: OpenAPI Spec for Solo APIs.

@@ -9,7 +9,7 @@
 
 ### PromoCodeService
 
-PromoCodeService manages redeemable discount codes and validates them against a prospective booking. Redemption itself happens inside CreateBooking.
+PromoCodeService manages redeemable discount codes and validates them against a prospective booking. Redemption itself is recorded by whatever settles the booking's payment, never by a caller of this service.
 
 | Method | Request | Response | Description |
 | --- | --- | --- | --- |
@@ -18,7 +18,7 @@ PromoCodeService manages redeemable discount codes and validates them against a 
 | `CreatePromoCode` | `CreatePromoCodeRequest` | `PromoCode` | Creates a promo code. |
 | `UpdatePromoCode` | `UpdatePromoCodeRequest` | `PromoCode` | Updates a promo code. |
 | `ValidatePromoCode` | `ValidatePromoCodeRequest` | `ValidatePromoCodeResponse` | Validates a code against a prospective booking and returns the discount. |
-| `ListRedemptions` | `ListRedemptionsRequest` | `ListRedemptionsResponse` | Lists redemptions of a promo code (paged). Redemptions are created during CreateBooking, so this service exposes read-only access to them. |
+| `ListRedemptions` | `ListRedemptionsRequest` | `ListRedemptionsResponse` | Lists redemptions of a promo code (paged). Redemptions are recorded when a booking's payment settles, so this service exposes read-only access to them. |
 | `GetRedemption` | `GetRedemptionRequest` | `Redemption` | Gets a single redemption by resource name. |
 
 ## Messages
@@ -84,13 +84,13 @@ Scope restricts which bookings a code applies to. Nested value object → belong
 
 ### Redemption
 
-Redemption is a single use of a promo code, modeled as a sub-resource of PromoCode rather than an inline list — so it has its own name/lifecycle and is listed with paging (ListRedemptions). The {promo_code} parent segment generates the promo_code_id FK back to the owning code (1:n into promocode.redemptions); amount_applied is the shared google.type.Money in common.moneys. Redemptions are created during CreateBooking, never directly.
+Redemption is a single use of a promo code, modeled as a sub-resource of PromoCode rather than an inline list — so it has its own name/lifecycle and is listed with paging (ListRedemptions). The {promo_code} parent segment generates the promo_code_id FK back to the owning code (1:n into promocode.redemptions); amount_applied is the shared google.type.Money in common.moneys. Redemptions are recorded when a booking's payment settles, never created directly.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
 | `name` | `string` | `IDENTIFIER` | The redemption resource name. Format: promoCodes/{promo_code}/redemptions/{redemption} |
 | `customer` | `string` | `REQUIRED` | The customer who redeemed the code. Format: users/{user} |
-| `booking` | `string` | `REQUIRED` | The booking the code was applied to. Format: bookings/{booking} |
+| `reservation` | `string` | `REQUIRED` | The reservation the code was applied to. Format: organizationalUnits/{organizational_unit}/reservations/{reservation} |
 | `redeemed_time` | `Timestamp` | `OUTPUT_ONLY` | When the code was redeemed. |
 | `amount_applied` | `Money` | `OUTPUT_ONLY` | The discount actually applied at redemption. |
 

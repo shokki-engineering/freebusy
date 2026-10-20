@@ -6,8 +6,6 @@ definition:
   fields:
     - name: amountAppliedId
       type: String_1
-    - name: booking
-      type: String_1!
     - name: customer
       type: String_1!
     - name: id
@@ -18,6 +16,8 @@ definition:
       type: String_1!
     - name: redeemedTime
       type: Timestamptz
+    - name: reservation
+      type: String_1!
   graphql:
     typeName: InsertPromocodeRedemptionsObject
     inputTypeName: InsertPromocodeRedemptionsObjectInput
@@ -28,9 +28,6 @@ definition:
         amountAppliedId:
           column:
             name: amount_applied_id
-        booking:
-          column:
-            name: booking
         customer:
           column:
             name: customer
@@ -46,6 +43,9 @@ definition:
         redeemedTime:
           column:
             name: redeemed_time
+        reservation:
+          column:
+            name: reservation
 
 ---
 kind: TypePermissions
@@ -57,12 +57,12 @@ definition:
       output:
         allowedFields:
           - amountAppliedId
-          - booking
           - customer
           - id
           - name
           - promoCodeId
           - redeemedTime
+          - reservation
 
 ---
 kind: ObjectType

@@ -17,6 +17,9 @@ erDiagram
         string id PK
         string amount_delta_id FK
     }
+    DateRange {
+        string id PK
+    }
     DynamicBand {
         string id PK
         string dynamic_rule_id FK
@@ -40,9 +43,6 @@ erDiagram
         string id PK
         string floor_id FK
         string ceiling_id FK
-    }
-    PricingDateRange {
-        string id PK
     }
     RateOverride {
         string id PK
@@ -73,7 +73,7 @@ erDiagram
     PriceBounds }o--|| Money : "floor_id"
     PriceBounds }o--|| Money : "ceiling_id"
     RateOverride }o--|| RatePlan : "rate_plan_id"
-    RateOverride }o--|| PricingDateRange : "date_range_id"
+    RateOverride }o--|| DateRange : "date_range_id"
     RateOverride }o--|| Money : "price_id"
     RatePlan }o--|| Money : "price_id"
     RatePlan }o--|| PriceBounds : "bounds_id"
@@ -172,7 +172,7 @@ Hard limits on a computed price, applied last — after every override, discount
 | `floor_id` | `CHAR(26)` | nullable |
 | `ceiling_id` | `CHAR(26)` | nullable |
 
-### `PricingDateRange` → `date_ranges`
+### `DateRange` → `date_ranges`
 
 An inclusive-start, exclusive-end span of calendar dates. Declared here rather than reused from freebusy.shared.v1: AIP-215 permits no cross-package message reference, and a shared types package was exactly what produced the foreign-type findings this package is written to avoid. The duplication is the documented cost of that rule.
 
