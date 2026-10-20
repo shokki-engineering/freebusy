@@ -21,6 +21,7 @@ import (
 // them with And/Or/Not.
 var (
 	Code            = graphql.StringField{Col: "code"}
+	CodeGeneration  = graphql.StringField{Col: "codeGeneration"}
 	CreateTime      = graphql.StringField{Col: "createTime"}
 	Description     = graphql.StringField{Col: "description"}
 	Disabled        = graphql.BoolField{Col: "disabled"}

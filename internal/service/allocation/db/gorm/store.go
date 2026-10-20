@@ -306,13 +306,13 @@ func (s *Store) InsertHold(ctx context.Context, parent string, h *allocationpbv1
 			id := repox.NewULID()
 			row := &allocation.Allocation{
 				ID:                   id,
-				Name:                 h.GetName() + "/allocations/" + id,
+				Name:                 parent + "/allocations/" + id,
 				Resource:             r,
 				StartTime:            window.Start,
 				EndTime:              window.End,
 				ExpireTime:           m.ExpireTime,
 				OrganizationalUnitID: ouID,
-				HoldID:               holdID,
+				HoldID:               &holdID,
 			}
 			if err := tx.Create(row).Error; err != nil {
 				return err
@@ -409,7 +409,7 @@ func (s *Store) UpdateHold(ctx context.Context, name, etag string, state allocat
 		}).Error; err != nil {
 			return err
 		}
-		return tx.Model(&allocation.Allocation{}).Where("hold_id = ?", m.ID).
+		return tx.Model(&allocation.Allocation{}).Where("hold = ?", m.ID).
 			Update("expire_time", expire).Error
 	})
 	if errors.Is(err, types.ErrConflict) {
@@ -431,7 +431,7 @@ func (s *Store) DeleteHold(ctx context.Context, name, etag string) error {
 		if etag != "" && etag != repox.Deref(m.Etag) {
 			return types.ErrConflict
 		}
-		if err := tx.Where("hold_id = ?", m.ID).Delete(&allocation.Allocation{}).Error; err != nil {
+		if err := tx.Where("hold = ?", m.ID).Delete(&allocation.Allocation{}).Error; err != nil {
 			return err
 		}
 		return tx.Delete(&allocation.Hold{}, "id = ?", m.ID).Error

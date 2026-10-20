@@ -69,6 +69,47 @@ func PromoCodeStatePtrToProto(v *PromoCodeState) promocodepbv1.PromoCodeState {
 	return PromoCodeStateToProto(*v)
 }
 
+// CodeGenerationFromProto maps the proto enum onto its stored form ("" for
+// unspecified or unknown values, so the column is omitted / left to default).
+func CodeGenerationFromProto(v promocodepbv1.CodeGeneration) CodeGeneration {
+	switch v {
+	case promocodepbv1.CodeGeneration_CODE_GENERATION_MANUAL:
+		return CodeGenerationManual
+	case promocodepbv1.CodeGeneration_CODE_GENERATION_AUTO:
+		return CodeGenerationAuto
+	}
+	return ""
+}
+
+// CodeGenerationToProto maps the stored form back onto the proto enum
+// (unspecified for empty or unknown values).
+func CodeGenerationToProto(v CodeGeneration) promocodepbv1.CodeGeneration {
+	switch v {
+	case CodeGenerationManual:
+		return promocodepbv1.CodeGeneration_CODE_GENERATION_MANUAL
+	case CodeGenerationAuto:
+		return promocodepbv1.CodeGeneration_CODE_GENERATION_AUTO
+	}
+	return 0
+}
+
+// CodeGenerationPtrFromProto is CodeGenerationFromProto for nullable columns:
+// unspecified maps to nil.
+func CodeGenerationPtrFromProto(v promocodepbv1.CodeGeneration) *CodeGeneration {
+	if s := CodeGenerationFromProto(v); s != "" {
+		return &s
+	}
+	return nil
+}
+
+// CodeGenerationPtrToProto is CodeGenerationToProto for nullable columns.
+func CodeGenerationPtrToProto(v *CodeGeneration) promocodepbv1.CodeGeneration {
+	if v == nil {
+		return 0
+	}
+	return CodeGenerationToProto(*v)
+}
+
 // PromoCodeToProto converts the stored row (with its belongs-to associations,
 // when preloaded) to its proto message. Nil in, nil out.
 func PromoCodeToProto(m *PromoCode) *promocodepbv1.PromoCode {
@@ -77,7 +118,7 @@ func PromoCodeToProto(m *PromoCode) *promocodepbv1.PromoCode {
 	}
 	out := &promocodepbv1.PromoCode{}
 	out.Name = m.Name
-	out.Code = m.Code
+	out.Code = fromPtr(m.Code)
 	out.DisplayName = fromPtr(m.DisplayName)
 	out.Description = fromPtr(m.Description)
 	out.RedemptionCount = fromPtr(m.RedemptionCount)
@@ -86,6 +127,7 @@ func PromoCodeToProto(m *PromoCode) *promocodepbv1.PromoCode {
 	out.CreateTime = goValToTs(m.CreateTime)
 	out.UpdateTime = goValToTs(m.UpdateTime)
 	out.Etag = fromPtr(m.Etag)
+	out.CodeGeneration = CodeGenerationPtrToProto(m.CodeGeneration)
 	out.Discount = DiscountToProto(m.Discount)
 	out.Window = RedemptionWindowToProto(m.Window)
 	out.Limits = UsageLimitsToProto(m.Limits)
@@ -103,13 +145,14 @@ func PromoCodeFromProto(pb *promocodepbv1.PromoCode) *PromoCode {
 	m := &PromoCode{}
 	// not mapped here: discount (sub-row graph), window (sub-row graph), limits (sub-row graph), scope (sub-row graph)
 	m.Name = pb.GetName()
-	m.Code = pb.GetCode()
+	m.Code = toPtr(pb.GetCode())
 	m.DisplayName = toPtr(pb.GetDisplayName())
 	m.Description = toPtr(pb.GetDescription())
 	m.RedemptionCount = toPtr(pb.GetRedemptionCount())
 	m.State = PromoCodeStatePtrFromProto(pb.GetState())
 	m.Disabled = toPtr(pb.GetDisabled())
 	m.Etag = toPtr(pb.GetEtag())
+	m.CodeGeneration = CodeGenerationPtrFromProto(pb.GetCodeGeneration())
 	return m
 }
 

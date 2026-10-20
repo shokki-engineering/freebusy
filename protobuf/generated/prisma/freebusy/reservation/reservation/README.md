@@ -46,6 +46,6 @@ A Reservation is a confirmed booking: a hold made permanent. It is the last step
 | `cancel_time` | `TIMESTAMPTZ` | nullable |
 | `etag` | `VARCHAR(255)` | nullable |
 | `replaces` | `VARCHAR(255)` | nullable |
-| `replaced_by` | `VARCHAR(255)` | nullable |
+| `replacement` | `VARCHAR(255)` | nullable |
 | `organizational_unit_id` | `CHAR(26)` | not null |
 | `resources` | `VARCHAR(255)[]` | nullable |

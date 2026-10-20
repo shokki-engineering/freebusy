@@ -157,15 +157,16 @@ func (PromoCodeInvalidReason) EnumDescriptor() ([]byte, []int) {
 	return file_freebusy_promocode_v1_enums_proto_rawDescGZIP(), []int{1}
 }
 
-// How the human-facing code string is chosen when creating a promo code.
+// How a promo code's human-facing code string was chosen, as recorded on
+// PromoCode.code_generation.
 type CodeGeneration int32
 
 const (
-	// Unset; treated as MANUAL (use the caller-provided code).
+	// Not recorded: the code was created before this field existed.
 	CodeGeneration_CODE_GENERATION_UNSPECIFIED CodeGeneration = 0
-	// The caller provides the code in promo_code.code; the server uses it verbatim.
+	// The caller supplied the code and the server used it verbatim.
 	CodeGeneration_CODE_GENERATION_MANUAL CodeGeneration = 1
-	// The server generates a unique code; any code in promo_code.code is ignored.
+	// The caller left the code empty and the server generated it.
 	CodeGeneration_CODE_GENERATION_AUTO CodeGeneration = 2
 )
 

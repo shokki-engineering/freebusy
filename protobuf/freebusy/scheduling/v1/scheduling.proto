@@ -2,6 +2,11 @@ syntax = "proto3";
 
 package freebusy.scheduling.v1;
 
+// (-- api-linter: core::0215::foreign-type-reference=disabled
+//     aip.dev/not-precedent: freebusy.shared.v1 and freebusy.guest.v1 are
+//     deliberate, API-wide shared-types packages; reusing them beats inlining
+//     per-package copies. --)
+
 import "buf/validate/validate.proto";
 import "entity/v1/annotations.proto";
 import "freebusy/guest/v1/guest.proto";

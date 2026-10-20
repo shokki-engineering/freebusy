@@ -37,7 +37,8 @@ func fromParts(p parts) *promocodepbv1.PromoCode {
 	res := p.res
 	pc := &promocodepbv1.PromoCode{
 		Name:            res.Name,
-		Code:            res.Code,
+		Code:            repox.Deref(res.Code),
+		CodeGeneration:  codeGenerationValue(repox.Deref(res.CodeGeneration)),
 		DisplayName:     repox.Deref(res.DisplayName),
 		Description:     repox.Deref(res.Description),
 		Discount:        discountFromModel(p.discount, p.amountOff),
@@ -105,4 +106,10 @@ func scopeFromParts(s *scopesql.PromocodeScopes, minSub *moneysql.CommonMoneys, 
 		out.ApplicableUnits = append(out.ApplicableUnits, off[i].UnitName)
 	}
 	return out
+}
+
+// codeGenerationValue reads the stored CodeGeneration ("MANUAL", "AUTO"); a
+// NULL from a code created before the column existed reads as UNSPECIFIED.
+func codeGenerationValue(s string) promocodepbv1.CodeGeneration {
+	return promocodepbv1.CodeGeneration(promocodepbv1.CodeGeneration_value["CODE_GENERATION_"+s])
 }

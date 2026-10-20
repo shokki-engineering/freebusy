@@ -25,7 +25,7 @@ import (
 )
 
 // AllocationRepository is the provider-agnostic persistence surface for
-// Allocation (organizationalUnits/{organizational_unit}/holds/{hold}/allocations/{allocation}): full-message writes, AIP-160/AIP-132 lists with
+// Allocation (organizationalUnits/{organizational_unit}/allocations/{allocation}): full-message writes, AIP-160/AIP-132 lists with
 // opaque page tokens, field-mask updates, and etag optimistic concurrency.
 type AllocationRepository interface {
 	// Create persists m under parent and returns the stored record.

@@ -5,7 +5,9 @@ definition:
   name: InsertPromocodeResourceObject
   fields:
     - name: code
-      type: String_1!
+      type: String_1
+    - name: codeGeneration
+      type: String_1
     - name: createTime
       type: Timestamptz!
     - name: description
@@ -44,6 +46,9 @@ definition:
         code:
           column:
             name: code
+        codeGeneration:
+          column:
+            name: code_generation
         createTime:
           column:
             name: create_time
@@ -97,6 +102,7 @@ definition:
       output:
         allowedFields:
           - code
+          - codeGeneration
           - createTime
           - description
           - disabled

@@ -38,6 +38,8 @@ type PromoCode struct {
 	// Format: promoCodes/{promo_code}
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The human-entered code, unique across all promo codes (e.g. "SUMMER25").
+	// Leave empty on create to have the server generate one; `code_generation`
+	// then records that it did.
 	Code string `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
 	// Internal display name (not shown to customers).
 	DisplayName string `protobuf:"bytes,4,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
@@ -68,9 +70,12 @@ type PromoCode struct {
 	// Last-modification timestamp.
 	UpdateTime *timestamppb.Timestamp `protobuf:"bytes,19,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`
 	// Opaque version for optimistic concurrency (AIP-154); echo on update/delete.
-	Etag          string `protobuf:"bytes,21,opt,name=etag,proto3" json:"etag,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Etag string `protobuf:"bytes,21,opt,name=etag,proto3" json:"etag,omitempty"`
+	// How `code` was chosen: MANUAL when the caller supplied it, AUTO when the
+	// server generated it. Set once, on create.
+	CodeGeneration CodeGeneration `protobuf:"varint,27,opt,name=code_generation,json=codeGeneration,proto3,enum=freebusy.promocode.v1.CodeGeneration" json:"code_generation,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *PromoCode) Reset() {
@@ -199,6 +204,13 @@ func (x *PromoCode) GetEtag() string {
 		return x.Etag
 	}
 	return ""
+}
+
+func (x *PromoCode) GetCodeGeneration() CodeGeneration {
+	if x != nil {
+		return x.CodeGeneration
+	}
+	return CodeGeneration_CODE_GENERATION_UNSPECIFIED
 }
 
 // Discount describes how a promo code reduces a subtotal. Nested value object →
@@ -570,10 +582,10 @@ var File_freebusy_promocode_v1_promocode_proto protoreflect.FileDescriptor
 
 const file_freebusy_promocode_v1_promocode_proto_rawDesc = "" +
 	"\n" +
-	"%freebusy/promocode/v1/promocode.proto\x12\x15freebusy.promocode.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acache/v1/annotations.proto\x1a\x1bentity/v1/annotations.proto\x1a!freebusy/promocode/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x17google/type/money.proto\x1a\x1astore/v1/annotations.proto\"\xb2\a\n" +
+	"%freebusy/promocode/v1/promocode.proto\x12\x15freebusy.promocode.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acache/v1/annotations.proto\x1a\x1bentity/v1/annotations.proto\x1a!freebusy/promocode/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x17google/type/money.proto\x1a\x1astore/v1/annotations.proto\"\x87\b\n" +
 	"\tPromoCode\x123\n" +
 	"\x04name\x18\x01 \x01(\tB\x1f\xe0A\b\xbaH\x19\xd8\x01\x01r\x142\x12^promoCodes/[^/]+$R\x04name\x12'\n" +
-	"\x04code\x18\x03 \x01(\tB\x13\xe0A\x02ڵ\x18\x02\x18\x01\xe2\xb5\x18\x02\x18\x01\x92\xb2\x19\x00R\x04code\x12,\n" +
+	"\x04code\x18\x03 \x01(\tB\x13\xe0A\x01ڵ\x18\x02\x18\x01\xe2\xb5\x18\x02\x18\x01\x92\xb2\x19\x00R\x04code\x12,\n" +
 	"\fdisplay_name\x18\x04 \x01(\tB\t\xe0A\x01\xe2\xb5\x18\x02\x18\x01R\vdisplayName\x12/\n" +
 	"\vdescription\x18\x05 \x01(\tB\r\xe0A\x01ڵ\x18\x06\n" +
 	"\x04TEXTR\vdescription\x12@\n" +
@@ -588,7 +600,8 @@ const file_freebusy_promocode_v1_promocode_proto_rawDesc = "" +
 	"createTime\x12@\n" +
 	"\vupdate_time\x18\x13 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
 	"updateTime\x12\x12\n" +
-	"\x04etag\x18\x15 \x01(\tR\x04etag:k\xeaAQ\n" +
+	"\x04etag\x18\x15 \x01(\tR\x04etag\x12S\n" +
+	"\x0fcode_generation\x18\x1b \x01(\x0e2%.freebusy.promocode.v1.CodeGenerationB\x03\xe0A\x03R\x0ecodeGeneration:k\xeaAQ\n" +
 	"\x1ffreebusy.promocode.v1/PromoCode\x12\x17promoCodes/{promo_code}*\n" +
 	"promoCodes2\tpromoCode\xca\xf3\x18\x02\x18\x01\x8a\xb2\x19\r\b\x01\x10\x02\x1a\x03\b\xac\x02*\x02\b\x1eJ\x04\b\x02\x10\x03J\x04\b\x06\x10\aJ\x04\b\a\x10\bJ\x04\b\b\x10\tJ\x04\b\t\x10\n" +
 	"J\x04\b\n" +
@@ -650,9 +663,10 @@ var file_freebusy_promocode_v1_promocode_proto_goTypes = []any{
 	(*Redemption)(nil),            // 5: freebusy.promocode.v1.Redemption
 	(PromoCodeState)(0),           // 6: freebusy.promocode.v1.PromoCodeState
 	(*timestamppb.Timestamp)(nil), // 7: google.protobuf.Timestamp
-	(*money.Money)(nil),           // 8: google.type.Money
-	(*wrapperspb.Int64Value)(nil), // 9: google.protobuf.Int64Value
-	(*wrapperspb.Int32Value)(nil), // 10: google.protobuf.Int32Value
+	(CodeGeneration)(0),           // 8: freebusy.promocode.v1.CodeGeneration
+	(*money.Money)(nil),           // 9: google.type.Money
+	(*wrapperspb.Int64Value)(nil), // 10: google.protobuf.Int64Value
+	(*wrapperspb.Int32Value)(nil), // 11: google.protobuf.Int32Value
 }
 var file_freebusy_promocode_v1_promocode_proto_depIdxs = []int32{
 	1,  // 0: freebusy.promocode.v1.PromoCode.discount:type_name -> freebusy.promocode.v1.Discount
@@ -662,19 +676,20 @@ var file_freebusy_promocode_v1_promocode_proto_depIdxs = []int32{
 	6,  // 4: freebusy.promocode.v1.PromoCode.state:type_name -> freebusy.promocode.v1.PromoCodeState
 	7,  // 5: freebusy.promocode.v1.PromoCode.create_time:type_name -> google.protobuf.Timestamp
 	7,  // 6: freebusy.promocode.v1.PromoCode.update_time:type_name -> google.protobuf.Timestamp
-	8,  // 7: freebusy.promocode.v1.Discount.amount_off:type_name -> google.type.Money
-	7,  // 8: freebusy.promocode.v1.RedemptionWindow.start_time:type_name -> google.protobuf.Timestamp
-	7,  // 9: freebusy.promocode.v1.RedemptionWindow.end_time:type_name -> google.protobuf.Timestamp
-	9,  // 10: freebusy.promocode.v1.UsageLimits.max_redemptions:type_name -> google.protobuf.Int64Value
-	10, // 11: freebusy.promocode.v1.UsageLimits.per_customer_limit:type_name -> google.protobuf.Int32Value
-	8,  // 12: freebusy.promocode.v1.Scope.min_subtotal:type_name -> google.type.Money
-	7,  // 13: freebusy.promocode.v1.Redemption.redeemed_time:type_name -> google.protobuf.Timestamp
-	8,  // 14: freebusy.promocode.v1.Redemption.amount_applied:type_name -> google.type.Money
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	8,  // 7: freebusy.promocode.v1.PromoCode.code_generation:type_name -> freebusy.promocode.v1.CodeGeneration
+	9,  // 8: freebusy.promocode.v1.Discount.amount_off:type_name -> google.type.Money
+	7,  // 9: freebusy.promocode.v1.RedemptionWindow.start_time:type_name -> google.protobuf.Timestamp
+	7,  // 10: freebusy.promocode.v1.RedemptionWindow.end_time:type_name -> google.protobuf.Timestamp
+	10, // 11: freebusy.promocode.v1.UsageLimits.max_redemptions:type_name -> google.protobuf.Int64Value
+	11, // 12: freebusy.promocode.v1.UsageLimits.per_customer_limit:type_name -> google.protobuf.Int32Value
+	9,  // 13: freebusy.promocode.v1.Scope.min_subtotal:type_name -> google.type.Money
+	7,  // 14: freebusy.promocode.v1.Redemption.redeemed_time:type_name -> google.protobuf.Timestamp
+	9,  // 15: freebusy.promocode.v1.Redemption.amount_applied:type_name -> google.type.Money
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_freebusy_promocode_v1_promocode_proto_init() }

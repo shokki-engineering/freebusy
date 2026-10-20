@@ -203,11 +203,15 @@ func (x *Hold) GetEtag() string {
 // write as the hold. The copy is the point: a claim stops counting the instant
 // `expire_time` passes, with no sweeper write needed, because every read
 // filters on it.
+//
+// It sits under the site and names its hold, rather than nesting under the
+// hold: the engine asks about allocations by resource and time across a whole
+// site, never hold by hold, and a hold with child resources would owe
+// DeleteHold a `force` flag guarding rows no caller can see.
 type Allocation struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The allocation name, nested under the hold that took it so deleting the
-	// hold takes its claims with it.
-	// Format: organizationalUnits/{organizational_unit}/holds/{hold}/allocations/{allocation}
+	// The allocation name, under the site whose resource it takes.
+	// Format: organizationalUnits/{organizational_unit}/allocations/{allocation}
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The resource taken.
 	// Format: resources/{resource}
@@ -218,10 +222,14 @@ type Allocation struct {
 	EndTime *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	// When this claim stops counting. A copy of the hold's expire_time while it
 	// is ACTIVE; set to the release instant on release; unset once the hold is
-	// CONVERTED, which is the one outcome that keeps the resource taken.
+	// CONVERTED, which is the one outcome that keeps the resource taken. Always
+	// the server's to write, never a caller's.
 	ExpireTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"`
 	// Creation timestamp.
-	CreateTime    *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
+	CreateTime *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
+	// The hold that took it. Deleting the hold deletes its allocations with it.
+	// Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	Hold          string `protobuf:"bytes,7,opt,name=hold,proto3" json:"hold,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -296,6 +304,13 @@ func (x *Allocation) GetCreateTime() *timestamppb.Timestamp {
 		return x.CreateTime
 	}
 	return nil
+}
+
+func (x *Allocation) GetHold() string {
+	if x != nil {
+		return x.Hold
+	}
+	return ""
 }
 
 // One slice of an availability answer: how many resources are free across a
@@ -546,7 +561,7 @@ const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	" \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
 	"updateTime\x12\x17\n" +
 	"\x04etag\x18\v \x01(\tB\x03\xe0A\x03R\x04etag:k\xeaAb\n" +
-	"\x1bfreebusy.allocation.v1/Hold\x126organizationalUnits/{organizational_unit}/holds/{hold}*\x05holds2\x04hold\xca\xf3\x18\x02\x18\x01J\x04\b\a\x10\b\"\x9f\x04\n" +
+	"\x1bfreebusy.allocation.v1/Hold\x126organizationalUnits/{organizational_unit}/holds/{hold}*\x05holds2\x04hold\xca\xf3\x18\x02\x18\x01J\x04\b\a\x10\b\"\xcb\x04\n" +
 	"\n" +
 	"Allocation\x12\x17\n" +
 	"\x04name\x18\x01 \x01(\tB\x03\xe0A\bR\x04name\x12<\n" +
@@ -555,11 +570,13 @@ const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	"\n" +
 	"start_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x02R\tstartTime\x12:\n" +
 	"\bend_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x02R\aendTime\x12@\n" +
-	"\vexpire_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x01R\n" +
+	"\vexpire_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
 	"expireTime\x12@\n" +
 	"\vcreate_time\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
-	"createTime:\xb9\x01\xeaA\x8d\x01\n" +
-	"!freebusy.allocation.v1/Allocation\x12OorganizationalUnits/{organizational_unit}/holds/{hold}/allocations/{allocation}*\vallocations2\n" +
+	"createTime\x127\n" +
+	"\x04hold\x18\a \x01(\tB#\xe0A\x03\xfaA\x1d\n" +
+	"\x1bfreebusy.allocation.v1/HoldR\x04hold:\xac\x01\xeaA\x80\x01\n" +
+	"!freebusy.allocation.v1/Allocation\x12BorganizationalUnits/{organizational_unit}/allocations/{allocation}*\vallocations2\n" +
 	"allocation\xca\xf3\x18$\x18\x01* \n" +
 	"\bresource\n" +
 	"\n" +

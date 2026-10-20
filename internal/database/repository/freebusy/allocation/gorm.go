@@ -47,13 +47,13 @@ func NewGormAllocationRepository(db *gorm.DB) *GormAllocationRepository {
 
 // Create persists in under parent and returns the stored record.
 func (r *GormAllocationRepository) Create(ctx context.Context, parent string, in *allocationpbv1.Allocation) (*allocationpbv1.Allocation, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits", "holds")
+	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
 	if err != nil {
 		return nil, err
 	}
 	id := repox.NewULID()
 	if in.GetName() != "" {
-		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds", "allocations")
+		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "allocations")
 		if err != nil {
 			return nil, err
 		}
@@ -65,7 +65,7 @@ func (r *GormAllocationRepository) Create(ctx context.Context, parent string, in
 		id = ids[len(ids)-1]
 	}
 	in = proto.Clone(in).(*allocationpbv1.Allocation)
-	in.Name = FormatAllocationName(parentIDs[0], parentIDs[1], id)
+	in.Name = FormatAllocationName(parentIDs[0], id)
 	if h := r.Hooks.BeforeCreate; h != nil {
 		if err := h(ctx, in); err != nil {
 			return nil, err
@@ -75,7 +75,6 @@ func (r *GormAllocationRepository) Create(ctx context.Context, parent string, in
 	m.ID = id
 	m.Name = in.GetName()
 	m.OrganizationalUnitID = parentIDs[0]
-	m.HoldID = parentIDs[1]
 	if err := allocation.NewAllocationStore(r.DB).Create(ctx, m); err != nil {
 		return nil, repox.MapGormErr(err)
 	}
@@ -84,7 +83,7 @@ func (r *GormAllocationRepository) Create(ctx context.Context, parent string, in
 
 // Get returns the record addressed by its resource name.
 func (r *GormAllocationRepository) Get(ctx context.Context, name string) (*allocationpbv1.Allocation, error) {
-	ids, err := repox.SplitName(name, "organizationalUnits", "holds", "allocations")
+	ids, err := repox.SplitName(name, "organizationalUnits", "allocations")
 	if err != nil {
 		return nil, err
 	}
@@ -115,11 +114,11 @@ func (r *GormAllocationRepository) toProto(ctx context.Context, m *allocation.Al
 
 // List returns one page of records under parent.
 func (r *GormAllocationRepository) List(ctx context.Context, parent string, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits", "holds")
+	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
 	if err != nil {
 		return nil, "", err
 	}
-	scope := r.DB.Where("hold_id = ?", parentIDs[len(parentIDs)-1])
+	scope := r.DB.Where("organizational_unit_id = ?", parentIDs[len(parentIDs)-1])
 	return r.list(ctx, scope, in)
 }
 
@@ -155,7 +154,7 @@ func (r *GormAllocationRepository) list(ctx context.Context, scope *gorm.DB, in 
 // Update persists the masked fields of in; an empty mask replaces every
 // mutable field. The write happens in one transaction guarded by in.Etag.
 func (r *GormAllocationRepository) Update(ctx context.Context, in *allocationpbv1.Allocation, paths []string) (*allocationpbv1.Allocation, error) {
-	ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds", "allocations")
+	ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "allocations")
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +178,6 @@ func (r *GormAllocationRepository) Update(ctx context.Context, in *allocationpbv
 		existing.Resource = next.Resource
 		existing.StartTime = next.StartTime
 		existing.EndTime = next.EndTime
-		existing.ExpireTime = next.ExpireTime
 		return allocation.NewAllocationStore(tx).Update(ctx, &existing)
 	})
 	if err != nil {
@@ -190,7 +188,7 @@ func (r *GormAllocationRepository) Update(ctx context.Context, in *allocationpbv
 
 // Delete removes the record addressed by its resource name.
 func (r *GormAllocationRepository) Delete(ctx context.Context, name string) error {
-	ids, err := repox.SplitName(name, "organizationalUnits", "holds", "allocations")
+	ids, err := repox.SplitName(name, "organizationalUnits", "allocations")
 	if err != nil {
 		return err
 	}

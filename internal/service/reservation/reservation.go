@@ -52,25 +52,29 @@ func (s *Server) CreateReservation(ctx context.Context, req *reservationpbv1.Cre
 
 func (s *Server) create(ctx context.Context, req *reservationpbv1.CreateReservationRequest) (*reservationpbv1.Reservation, error) {
 	in := req.GetReservation()
-	return s.open(ctx, req.GetParent(), in.GetHold(), &reservationpbv1.Reservation{
+	return s.open(ctx, req.GetParent(), in.GetHold(), req.GetReservationId(), &reservationpbv1.Reservation{
 		Customer:   in.GetCustomer(),
 		Attributes: in.GetAttributes(),
 	})
 }
 
-// open makes, or finishes making, the reservation for a hold at parent.
-// CreateReservation and RescheduleReservation's replacement both come through
-// here; tmpl carries the fields the caller chose (customer, attributes, and
-// for a replacement, replaces).
-func (s *Server) open(ctx context.Context, parent, holdName string, tmpl *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
+// open makes, or finishes making, the reservation for a hold at parent, named
+// id when given and after the hold otherwise. CreateReservation and
+// RescheduleReservation's replacement both come through here; tmpl carries
+// the fields the caller chose (customer, attributes, and for a replacement,
+// replaces).
+func (s *Server) open(ctx context.Context, parent, holdName, id string, tmpl *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
 	name, err := reservationFor(parent, holdName)
 	if err != nil {
 		return nil, err
 	}
+	if id != "" {
+		name = parent + "/reservations/" + id
+	}
 
 	// A retry, or a second caller with the same hold: finish and return what
-	// is already there.
-	if existing, err := s.store.Get(ctx, name); err == nil {
+	// is already there, whatever it was named.
+	if existing, err := s.store.FindByHold(ctx, holdName); err == nil {
 		return s.advance(ctx, existing)
 	} else if !errors.Is(err, types.ErrNotFound) {
 		return nil, err
@@ -102,7 +106,13 @@ func (s *Server) open(ctx context.Context, parent, holdName string, tmpl *reserv
 	}
 	created, err := s.store.Insert(ctx, r)
 	if errors.Is(err, types.ErrAlreadyExists) {
-		created, err = s.store.Get(ctx, name)
+		// Either a concurrent call made this hold's reservation first -- then
+		// that one is the answer -- or the name belongs to another hold.
+		existing, ferr := s.store.FindByHold(ctx, holdName)
+		if ferr != nil {
+			return nil, errorf(types.ErrAlreadyExists, "%s is already taken by another hold", name)
+		}
+		created, err = existing, nil
 	}
 	if err != nil {
 		return nil, err
@@ -110,8 +120,8 @@ func (s *Server) open(ctx context.Context, parent, holdName string, tmpl *reserv
 	return s.advance(ctx, created)
 }
 
-// reservationFor names the reservation a hold at parent becomes: same site,
-// same id.
+// reservationFor names the reservation a hold at parent becomes by default:
+// same site, same id. It also checks the hold is at parent.
 func reservationFor(parent, holdName string) (string, error) {
 	prefix := parent + "/holds/"
 	if !strings.HasPrefix(holdName, prefix) || strings.Contains(holdName[len(prefix):], "/") {
@@ -265,7 +275,7 @@ func (s *Server) cancel(ctx context.Context, req *reservationpbv1.CancelReservat
 	case reservationpbv1.ReservationState_RESERVATION_STATE_FAILED:
 		return nil, errorf(types.ErrInvalidState, "reservation %s failed and holds nothing to cancel", r.GetName())
 	case reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED:
-		return nil, errorf(types.ErrInvalidState, "reservation %s was moved to %s; cancel that instead", r.GetName(), r.GetReplacedBy())
+		return nil, errorf(types.ErrInvalidState, "reservation %s was moved to %s; cancel that instead", r.GetName(), r.GetReplacement())
 	}
 
 	// Record the cancellation before freeing anything. Freeing first would

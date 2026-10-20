@@ -11,6 +11,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/oh-tarnished/freebusy/internal/database"
 	"net/url"
 	"os"
 	"sync"
@@ -33,7 +35,6 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
@@ -50,7 +51,7 @@ func backends(t *testing.T) (*gorm.DB, map[string]backend) {
 	if dsn == "" {
 		t.Skip("FREEBUSY_TEST_DATABASE_URL not set — live database tests skipped")
 	}
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: logger.Discard})
+	db, err := database.OpenGorm(dsn, &gorm.Config{Logger: logger.Discard})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -209,7 +210,7 @@ func TestLiveReservations(t *testing.T) {
 					t.Fatalf("replacement %v", rep)
 				}
 				old, _ := srv.GetReservation(ctx, &reservationpbv1.GetReservationRequest{Name: r.GetName()})
-				if old.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED || old.GetReplacedBy() != rep.GetName() {
+				if old.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED || old.GetReplacement() != rep.GetName() {
 					t.Fatalf("original %v", old)
 				}
 				time.Sleep(1200 * time.Millisecond) // past the hold TTL: only conversions count now
@@ -223,7 +224,7 @@ func TestLiveReservations(t *testing.T) {
 					t.Fatalf("move onto lapsed hold: %v", err)
 				}
 				kept, _ := srv.GetReservation(ctx, &reservationpbv1.GetReservationRequest{Name: rep.GetName()})
-				if kept.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED || kept.GetReplacedBy() != "" || free(19) != 0 {
+				if kept.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED || kept.GetReplacement() != "" || free(19) != 0 {
 					t.Fatalf("a failed move must leave the booking as it was: %v, %d free", kept, free(19))
 				}
 

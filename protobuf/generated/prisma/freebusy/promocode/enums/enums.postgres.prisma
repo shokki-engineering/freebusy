@@ -28,3 +28,17 @@ enum PromoCodeState {
   /// Maps the enum to the "promocode" schema in the database.
   @@schema("promocode")
 }
+
+/// How a promo code's human-facing code string was chosen, as recorded on PromoCode.code_generation.
+enum CodeGeneration {
+  /// The caller supplied the code and the server used it verbatim.
+  MANUAL
+
+  /// The caller left the code empty and the server generated it.
+  AUTO
+
+  /// Maps the enum to the "code_generation" type in the database.
+  @@map("code_generation")
+  /// Maps the enum to the "promocode" schema in the database.
+  @@schema("promocode")
+}

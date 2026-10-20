@@ -450,7 +450,12 @@ func (s *cachedPromoCodeStore) refile(ctx context.Context, m *promocode.PromoCod
 	opts := []cache.Option{
 		cache.TTL(5 * time.Minute),
 	}
-	opts = append(opts, cache.Index("code", m.Code))
+	// Code is nullable in the store's model. An unset value is left
+	// unfiled rather than filed under "", which would collect every PromoCode
+	// missing the field into one key — a hot key made of unrelated entries.
+	if m.Code != nil {
+		opts = append(opts, cache.Index("code", *m.Code))
+	}
 
 	err := s.indexed.Update(ctx, m.ID, m, opts...)
 	if !errors.Is(err, cache.ErrNotFound) {

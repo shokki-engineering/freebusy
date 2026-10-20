@@ -13,11 +13,11 @@ ReservationService turns holds into confirmed bookings and cancels them.  It is 
 
 | Method | Request | Response | Description |
 | --- | --- | --- | --- |
-| `CreateReservation` | `CreateReservationRequest` | `Reservation` | Makes a reservation from a live hold, converting the hold so its resources stay taken.  Idempotent: the reservation's id is the hold's, so a retry returns the reservation the first call made. Fails with FAILED_PRECONDITION when the hold has lapsed or been released. |
+| `CreateReservation` | `CreateReservationRequest` | `Reservation` | Makes a reservation from a live hold, converting the hold so its resources stay taken.  Idempotent: a hold backs at most one reservation, so a retry returns the reservation the first call made. Fails with FAILED_PRECONDITION when the hold has lapsed or been released. |
 | `GetReservation` | `GetReservationRequest` | `Reservation` | Retrieves one reservation. |
 | `ListReservations` | `ListReservationsRequest` | `ListReservationsResponse` | Lists a site's reservations. |
 | `CancelReservation` | `CancelReservationRequest` | `Reservation` | Cancels a reservation, freeing its resources.  Idempotent: cancelling a cancelled reservation succeeds and changes nothing. |
-| `RescheduleReservation` | `RescheduleReservationRequest` | `Reservation` | Moves a confirmed reservation onto a new hold, returning the reservation that replaces it.  The replacement is a new reservation made from the new hold, linked both ways (`replaces`, `replaced_by`); the original ends RESCHEDULED. The original keeps its resources until the replacement is confirmed, so a failure part-way -- the new hold lapsing, a crash -- leaves the customer with their old booking, never with neither. Idempotent: repeating the call with the same hold returns the same replacement. |
+| `RescheduleReservation` | `RescheduleReservationRequest` | `Reservation` | Moves a confirmed reservation onto a new hold, returning the reservation that replaces it.  The replacement is a new reservation made from the new hold, linked both ways (`replaces`, `replacement`); the original ends RESCHEDULED. The original keeps its resources until the replacement is confirmed, so a failure part-way -- the new hold lapsing, a crash -- leaves the customer with their old booking, never with neither. Idempotent: repeating the call with the same hold returns the same replacement. |
 
 ## Messages
 
@@ -27,7 +27,7 @@ A Reservation is a confirmed booking: a hold made permanent.  It is the last ste
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | `IDENTIFIER` | The reservation name. Its id is always the id of the hold it was made from, so a retried CreateReservation finds the reservation the first attempt wrote instead of making a second. Format: organizationalUnits/{organizational_unit}/reservations/{reservation} |
+| `name` | `string` | `IDENTIFIER` | The reservation name. Its id is the caller's reservation_id, or else the id of the hold it was made from. Format: organizationalUnits/{organizational_unit}/reservations/{reservation} |
 | `hold` | `string` | `REQUIRED` | The hold this reservation was made from, at the same site. Format: organizationalUnits/{organizational_unit}/holds/{hold} |
 | `resources` | `repeated string` | `OUTPUT_ONLY` | The resources taken, copied from the hold. Format: resources/{resource} |
 | `start_time` | `Timestamp` | `OUTPUT_ONLY` | Start of the reserved window, copied from the hold. |
@@ -42,16 +42,17 @@ A Reservation is a confirmed booking: a hold made permanent.  It is the last ste
 | `cancel_time` | `Timestamp` | `OUTPUT_ONLY` | When it was cancelled. |
 | `etag` | `string` | `OUTPUT_ONLY` | Opaque version for optimistic concurrency (AIP-154); echo on cancel. |
 | `replaces` | `string` | `OUTPUT_ONLY` | The reservation this one replaced, set when it was made by RescheduleReservation. Format: organizationalUnits/{organizational_unit}/reservations/{reservation} |
-| `replaced_by` | `string` | `OUTPUT_ONLY` | The reservation replacing this one, set when RescheduleReservation began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation} |
+| `replacement` | `string` | `OUTPUT_ONLY` | The reservation replacing this one, set when RescheduleReservation began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation} |
 
 ### CreateReservationRequest
 
-Request message for ReservationService.CreateReservation, AIP-133.  There is no reservation_id: the id is the hold's, which is what makes the call safe to retry without an idempotency key of its own.
+Request message for ReservationService.CreateReservation, AIP-133.  Safe to retry without an idempotency key of its own: a hold can back only one reservation, so a retry -- with or without reservation_id -- finds the reservation the first attempt made instead of making a second.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
 | `parent` | `string` | `REQUIRED` | The site the hold was taken at. Format: organizationalUnits/{organizational_unit} |
 | `reservation` | `Reservation` | `REQUIRED` | The reservation to make. `hold` is required; `customer` and `attributes` are optional. |
+| `reservation_id` | `string` | `OPTIONAL` | Client-assigned id, becoming the last segment of the reservation name. Defaults to the hold's id. A hold backs at most one reservation whatever its id, so naming a hold that already has one returns that reservation. |
 
 ### GetReservationRequest
 
@@ -116,8 +117,8 @@ Lifecycle of a Reservation.  Two of these states are in-between states, and they
 | `RESERVATION_STATE_CANCELLING` | 3 | Cancellation is recorded and the resources are being freed. Transient, like PENDING, and finished the same way. |
 | `RESERVATION_STATE_CANCELLED` | 4 | Cancelled; the resources are free again. Terminal. |
 | `RESERVATION_STATE_FAILED` | 5 | The hold lapsed or was released before it could be converted, so nothing was taken. Terminal. |
-| `RESERVATION_STATE_RESCHEDULING` | 6 | Being replaced by the reservation named in `replaced_by`. Transient: it keeps its resources until the replacement is confirmed, then becomes RESCHEDULED -- or returns to CONFIRMED if the replacement's hold lapsed. |
-| `RESERVATION_STATE_RESCHEDULED` | 7 | Replaced by `replaced_by`, which now holds the booking; this one's resources are free. Terminal. |
+| `RESERVATION_STATE_RESCHEDULING` | 6 | Being replaced by the reservation named in `replacement`. Transient: it keeps its resources until the replacement is confirmed, then becomes RESCHEDULED -- or returns to CONFIRMED if the replacement's hold lapsed. |
+| `RESERVATION_STATE_RESCHEDULED` | 7 | Replaced by `replacement`, which now holds the booking; this one's resources are free. Terminal. |
 
 ---
 

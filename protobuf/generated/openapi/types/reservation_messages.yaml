@@ -64,11 +64,10 @@ components:
                 Format: organizationalUnits/{organizational_unit}/holds/{hold}'
               type: string
             name:
-              description: 'The reservation name. Its id is always the id of the hold
-                it was made from, so a retried CreateReservation finds the reservation
-                the first attempt wrote instead of making a second. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
+              description: 'The reservation name. Its id is the caller''s reservation_id,
+                or else the id of the hold it was made from. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
               type: string
-            replacedBy:
+            replacement:
               description: 'The reservation replacing this one, set when RescheduleReservation
                 began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
               type: string
@@ -102,6 +101,11 @@ components:
               format: date-time
               type: string
           type: object
+        reservationId:
+          description: Client-assigned id, becoming the last segment of the reservation
+            name. Defaults to the hold's id. A hold backs at most one reservation
+            whatever its id, so naming a hold that already has one returns that reservation.
+          type: string
       type: object
     freebusy.reservation.v1.GetReservationRequest:
       description: Request message for ReservationService.GetReservation, AIP-131.
@@ -182,12 +186,10 @@ components:
                   site. Format: organizationalUnits/{organizational_unit}/holds/{hold}'
                 type: string
               name:
-                description: 'The reservation name. Its id is always the id of the
-                  hold it was made from, so a retried CreateReservation finds the
-                  reservation the first attempt wrote instead of making a second.
-                  Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
+                description: 'The reservation name. Its id is the caller''s reservation_id,
+                  or else the id of the hold it was made from. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
                 type: string
-              replacedBy:
+              replacement:
                 description: 'The reservation replacing this one, set when RescheduleReservation
                   began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
                 type: string

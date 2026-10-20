@@ -49,6 +49,7 @@ type ReservationStoreIface interface {
 	GetByID(ctx context.Context, id string) (*Reservation, error)
 	DeleteByID(ctx context.Context, id string) error
 	GetByName(ctx context.Context, v string) (*Reservation, error)
+	GetByHoldID(ctx context.Context, v string) (*Reservation, error)
 	ListByHoldID(ctx context.Context, id string, opts gormx.ListOptions) ([]Reservation, error)
 }
 
@@ -171,6 +172,21 @@ func (s *ReservationStore) GetByName(ctx context.Context, v string) (*Reservatio
 		return s.DB.WithContext(ctx).First(&m, "name = ?", v).Error
 	})
 	tel.RecordOp(ctx, "reservation.resource", "get_by_name", time.Since(start), err)
+	if err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
+// GetByHoldID fetches the Reservation with the given hold (a unique column).
+func (s *ReservationStore) GetByHoldID(ctx context.Context, v string) (*Reservation, error) {
+	var m Reservation
+	tel := gormx.OrNop(s.Telemetry)
+	start := time.Now()
+	err := tel.Span(ctx, "reservation.Reservation/GetByHoldID", nil, func(ctx context.Context) error {
+		return s.DB.WithContext(ctx).First(&m, "hold = ?", v).Error
+	})
+	tel.RecordOp(ctx, "reservation.resource", "get_by_hold", time.Since(start), err)
 	if err != nil {
 		return nil, err
 	}

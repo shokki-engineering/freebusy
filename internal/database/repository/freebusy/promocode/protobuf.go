@@ -69,7 +69,11 @@ func promoCodeToCreateInput(in *promocodepbv1.PromoCode) resourceql.CreateInput 
 func promoCodeToUpdatePatch(merged *promocodepbv1.PromoCode) resourceql.UpdateInput {
 	var patch resourceql.UpdateInput
 	patch.Name = graphql.Value(merged.GetName())
-	patch.Code = graphql.Value(merged.GetCode())
+	if v := merged.GetCode(); v != "" {
+		patch.Code = graphql.Value(v)
+	} else {
+		patch.Code = graphql.Null[string]()
+	}
 	if v := merged.GetDisplayName(); v != "" {
 		patch.DisplayName = graphql.Value(v)
 	} else {
@@ -96,7 +100,7 @@ func promoCodeFromRow(row *resourceql.PromocodeResource) *promocodepbv1.PromoCod
 	}
 	out := &promocodepbv1.PromoCode{}
 	out.Name = row.Name
-	out.Code = row.Code
+	out.Code = repox.Deref(row.Code)
 	out.DisplayName = repox.Deref(row.DisplayName)
 	out.Description = repox.Deref(row.Description)
 	out.Disabled = repox.Deref(row.Disabled)
@@ -104,6 +108,7 @@ func promoCodeFromRow(row *resourceql.PromocodeResource) *promocodepbv1.PromoCod
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
 	out.State = promocodepbv1.PromoCodeState(promocodepbv1.PromoCodeState_value["PROMO_CODE_STATE_"+repox.Deref(row.State)])
+	out.CodeGeneration = promocodepbv1.CodeGeneration(promocodepbv1.CodeGeneration_value["CODE_GENERATION_"+repox.Deref(row.CodeGeneration)])
 	return out
 }
 

@@ -60,18 +60,6 @@ paths:
             description: Creates a promo code.
             operationId: PromoCodeService_CreatePromoCode
             parameters:
-                - name: codeGeneration
-                  in: query
-                  description: |-
-                    Whether the human-facing code is supplied by the caller (MANUAL) or minted
-                     by the server (AUTO). Unset defaults to MANUAL. When AUTO, promo_code.code
-                     is ignored and the server returns the generated code on the created resource.
-                     (-- api-linter: core::0133::request-unknown-fields=disabled
-                         aip.dev/not-precedent: Code generation mode is intrinsic to creating a
-                         promo code and has no standard AIP-133 equivalent. --)
-                  schema:
-                    type: integer
-                    format: enum
                 - name: promoCodeId
                   in: query
                   description: Optional caller-chosen ID for the promo code; the server generates one if unset.
@@ -406,7 +394,6 @@ components:
             description: Represents an amount of money with its currency type.
         PromoCode:
             required:
-                - code
                 - discount
             type: object
             properties:
@@ -417,7 +404,10 @@ components:
                          Format: promoCodes/{promo_code}
                 code:
                     type: string
-                    description: The human-entered code, unique across all promo codes (e.g. "SUMMER25").
+                    description: |-
+                        The human-entered code, unique across all promo codes (e.g. "SUMMER25").
+                         Leave empty on create to have the server generate one; `code_generation`
+                         then records that it did.
                 displayName:
                     type: string
                     description: Internal display name (not shown to customers).
@@ -473,6 +463,13 @@ components:
                 etag:
                     type: string
                     description: Opaque version for optimistic concurrency (AIP-154); echo on update/delete.
+                codeGeneration:
+                    readOnly: true
+                    type: integer
+                    description: |-
+                        How `code` was chosen: MANUAL when the caller supplied it, AUTO when the
+                         server generated it. Set once, on create.
+                    format: enum
             description: |-
                 A redeemable discount applied to a booking's subtotal. Scoped by a redemption
                  window, usage caps, a minimum subtotal, and an optional set of properties /

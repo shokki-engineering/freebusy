@@ -3,27 +3,24 @@ components:
     freebusy.promocode.v1.CreatePromoCodeRequest:
       description: Request message for CreatePromoCode.
       properties:
-        codeGeneration:
-          description: 'Whether the human-facing code is supplied by the caller (MANUAL)
-            or minted by the server (AUTO). Unset defaults to MANUAL. When AUTO, promo_code.code
-            is ignored and the server returns the generated code on the created resource.
-            (-- api-linter: core::0133::request-unknown-fields=disabled aip.dev/not-precedent:
-            Code generation mode is intrinsic to creating a promo code and has no
-            standard AIP-133 equivalent. --)'
-          enum:
-          - CODE_GENERATION_UNSPECIFIED
-          - CODE_GENERATION_MANUAL
-          - CODE_GENERATION_AUTO
-          type: string
         promoCode:
           description: 'The promo code to create. Server-assigned fields are ignored
             on input: name, state, redemption_count, redemptions, create_time, update_time,
-            etag. promo_code.code is honored only when code_generation is MANUAL (or
-            unset).'
+            etag, code_generation. Leave promo_code.code empty to have the server
+            generate one.'
           properties:
             code:
               description: The human-entered code, unique across all promo codes (e.g.
-                "SUMMER25").
+                "SUMMER25"). Leave empty on create to have the server generate one;
+                `code_generation` then records that it did.
+              type: string
+            codeGeneration:
+              description: 'How `code` was chosen: MANUAL when the caller supplied
+                it, AUTO when the server generated it. Set once, on create.'
+              enum:
+              - CODE_GENERATION_UNSPECIFIED
+              - CODE_GENERATION_MANUAL
+              - CODE_GENERATION_AUTO
               type: string
             createTime:
               description: Creation timestamp.
@@ -251,7 +248,16 @@ components:
             properties:
               code:
                 description: The human-entered code, unique across all promo codes
-                  (e.g. "SUMMER25").
+                  (e.g. "SUMMER25"). Leave empty on create to have the server generate
+                  one; `code_generation` then records that it did.
+                type: string
+              codeGeneration:
+                description: 'How `code` was chosen: MANUAL when the caller supplied
+                  it, AUTO when the server generated it. Set once, on create.'
+                enum:
+                - CODE_GENERATION_UNSPECIFIED
+                - CODE_GENERATION_MANUAL
+                - CODE_GENERATION_AUTO
                 type: string
               createTime:
                 description: Creation timestamp.
@@ -506,7 +512,16 @@ components:
           properties:
             code:
               description: The human-entered code, unique across all promo codes (e.g.
-                "SUMMER25").
+                "SUMMER25"). Leave empty on create to have the server generate one;
+                `code_generation` then records that it did.
+              type: string
+            codeGeneration:
+              description: 'How `code` was chosen: MANUAL when the caller supplied
+                it, AUTO when the server generated it. Set once, on create.'
+              enum:
+              - CODE_GENERATION_UNSPECIFIED
+              - CODE_GENERATION_MANUAL
+              - CODE_GENERATION_AUTO
               type: string
             createTime:
               description: Creation timestamp.

@@ -26,10 +26,9 @@ var File_freebusy_reservation_v1_reservation_service_proto protoreflect.FileDesc
 
 const file_freebusy_reservation_v1_reservation_service_proto_rawDesc = "" +
 	"\n" +
-	"1freebusy/reservation/v1/reservation_service.proto\x12\x17freebusy.reservation.v1\x1a)freebusy/reservation/v1/reservation.proto\x1a2freebusy/reservation/v1/reservation_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1emcp/protobuf/annotations.proto2\xff\n" +
-	"\n" +
-	"\x12ReservationService\x12\x8a\x02\n" +
-	"\x11CreateReservation\x121.freebusy.reservation.v1.CreateReservationRequest\x1a$.freebusy.reservation.v1.Reservation\"\x9b\x01\xdaA\x12parent,reservation\xca\xf3\x18>\x12<Confirm a live hold as a reservation, keeping its resources.\x82\xd3\xe4\x93\x02>:\vreservation\"//v1/{parent=organizationalUnits/*}/reservations\x12\xbe\x01\n" +
+	"1freebusy/reservation/v1/reservation_service.proto\x12\x17freebusy.reservation.v1\x1a)freebusy/reservation/v1/reservation.proto\x1a2freebusy/reservation/v1/reservation_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1emcp/protobuf/annotations.proto2\x8e\v\n" +
+	"\x12ReservationService\x12\x99\x02\n" +
+	"\x11CreateReservation\x121.freebusy.reservation.v1.CreateReservationRequest\x1a$.freebusy.reservation.v1.Reservation\"\xaa\x01\xdaA!parent,reservation,reservation_id\xca\xf3\x18>\x12<Confirm a live hold as a reservation, keeping its resources.\x82\xd3\xe4\x93\x02>:\vreservation\"//v1/{parent=organizationalUnits/*}/reservations\x12\xbe\x01\n" +
 	"\x0eGetReservation\x12..freebusy.reservation.v1.GetReservationRequest\x1a$.freebusy.reservation.v1.Reservation\"V\xdaA\x04name\xca\xf3\x18\x14\x12\x12Get a reservation.\x82\xd3\xe4\x93\x021\x12//v1/{name=organizationalUnits/*/reservations/*}\x12\x89\x02\n" +
 	"\x10ListReservations\x120.freebusy.reservation.v1.ListReservationsRequest\x1a1.freebusy.reservation.v1.ListReservationsResponse\"\x8f\x01\xdaA\x06parent\xca\xf3\x18K\x12IList a site's reservations, filtered and ordered per AIP-160 and AIP-132.\x82\xd3\xe4\x93\x021\x12//v1/{parent=organizationalUnits/*}/reservations\x12\xe8\x01\n" +
 	"\x11CancelReservation\x121.freebusy.reservation.v1.CancelReservationRequest\x1a$.freebusy.reservation.v1.Reservation\"z\xdaA\x04name\xca\xf3\x18.\x12,Cancel a reservation and free its resources.\x82\xd3\xe4\x93\x02;:\x01*\"6/v1/{name=organizationalUnits/*/reservations/*}:cancel\x12\xba\x02\n" +

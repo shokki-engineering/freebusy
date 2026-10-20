@@ -1009,10 +1009,12 @@ definition:
                 underlying_type:
                   name: timestamptz
                   type: named
-            hold_id:
+            hold:
               type:
-                name: text
-                type: named
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
             id:
               type:
                 name: text
@@ -5295,10 +5297,12 @@ definition:
                 underlying_type:
                   name: timestamptz
                   type: named
-            hold_id:
+            hold:
               type:
-                name: text
-                type: named
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
             id:
               type:
                 name: text
@@ -9126,8 +9130,16 @@ definition:
           fields:
             code:
               type:
-                name: text
-                type: named
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            code_generation:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
             create_time:
               type:
                 name: timestamptz
@@ -10197,7 +10209,7 @@ definition:
               type:
                 name: text
                 type: named
-            replaced_by:
+            replacement:
               type:
                 type: nullable
                 underlying_type:
@@ -14038,8 +14050,16 @@ definition:
           fields:
             code:
               type:
-                name: text
-                type: named
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            code_generation:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
             create_time:
               type:
                 name: timestamptz
@@ -14977,7 +14997,7 @@ definition:
               type:
                 name: text
                 type: named
-            replaced_by:
+            replacement:
               type:
                 type: nullable
                 underlying_type:
@@ -16204,12 +16224,12 @@ definition:
                 underlying_type:
                   name: update_column_allocation_resource_expire_time
                   type: named
-            hold_id:
-              description: Update the 'hold_id' column in the 'allocation_resource' collection.
+            hold:
+              description: Update the 'hold' column in the 'allocation_resource' collection.
               type:
                 type: nullable
                 underlying_type:
-                  name: update_column_allocation_resource_hold_id
+                  name: update_column_allocation_resource_hold
                   type: named
             id:
               description: Update the 'id' column in the 'allocation_resource' collection.
@@ -17512,14 +17532,16 @@ definition:
                   name: timestamptz
                   type: named
           foreign_keys: {}
-        update_column_allocation_resource_hold_id:
-          description: Update the 'hold_id' column in the 'allocation_resource' collection
+        update_column_allocation_resource_hold:
+          description: Update the 'hold' column in the 'allocation_resource' collection
           fields:
             _set:
               description: Set the column to this value
               type:
-                name: text
-                type: named
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
           foreign_keys: {}
         update_column_allocation_resource_id:
           description: Update the 'id' column in the 'allocation_resource' collection
@@ -22760,8 +22782,21 @@ definition:
             _set:
               description: Set the column to this value
               type:
-                name: text
-                type: named
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_promocode_resource_code_generation:
+          description: Update the 'code_generation' column in the 'promocode_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
           foreign_keys: {}
         update_column_promocode_resource_create_time:
           description: Update the 'create_time' column in the 'promocode_resource' collection
@@ -24214,8 +24249,8 @@ definition:
                 name: text
                 type: named
           foreign_keys: {}
-        update_column_reservation_resource_replaced_by:
-          description: Update the 'replaced_by' column in the 'reservation_resource' collection
+        update_column_reservation_resource_replacement:
+          description: Update the 'replacement' column in the 'reservation_resource' collection
           fields:
             _set:
               description: Set the column to this value
@@ -31684,6 +31719,13 @@ definition:
                 underlying_type:
                   name: update_column_promocode_resource_code
                   type: named
+            code_generation:
+              description: Update the 'code_generation' column in the 'promocode_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_promocode_resource_code_generation
+                  type: named
             create_time:
               description: Update the 'create_time' column in the 'promocode_resource' collection.
               type:
@@ -33025,12 +33067,12 @@ definition:
                 underlying_type:
                   name: update_column_reservation_resource_organizational_unit_id
                   type: named
-            replaced_by:
-              description: Update the 'replaced_by' column in the 'reservation_resource' collection.
+            replacement:
+              description: Update the 'replacement' column in the 'reservation_resource' collection.
               type:
                 type: nullable
                 underlying_type:
-                  name: update_column_reservation_resource_replaced_by
+                  name: update_column_reservation_resource_replacement
                   type: named
             replaces:
               description: Update the 'replaces' column in the 'reservation_resource' collection.

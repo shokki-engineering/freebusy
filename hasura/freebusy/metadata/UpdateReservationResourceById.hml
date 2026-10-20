@@ -387,18 +387,18 @@ definition:
 kind: ObjectType
 version: v1
 definition:
-  name: UpdateColumnReservationResourceReplacedBy
-  description: Update the 'replaced_by' column in the 'reservation_resource' collection
+  name: UpdateColumnReservationResourceReplacement
+  description: Update the 'replacement' column in the 'reservation_resource' collection
   fields:
     - name: set
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceReplacedBy
-    inputTypeName: UpdateColumnReservationResourceReplacedByInput
+    typeName: UpdateColumnReservationResourceReplacement
+    inputTypeName: UpdateColumnReservationResourceReplacementInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
-      dataConnectorObjectType: update_column_reservation_resource_replaced_by
+      dataConnectorObjectType: update_column_reservation_resource_replacement
       fieldMapping:
         set:
           column:
@@ -408,7 +408,7 @@ definition:
 kind: TypePermissions
 version: v1
 definition:
-  typeName: UpdateColumnReservationResourceReplacedBy
+  typeName: UpdateColumnReservationResourceReplacement
   permissions:
     - role: admin
       output:
@@ -621,9 +621,9 @@ definition:
       type: UpdateColumnReservationResourceOrganizationalUnitId
       description: Update the 'organizational_unit_id' column in the
         'reservation_resource' collection.
-    - name: replacedBy
-      type: UpdateColumnReservationResourceReplacedBy
-      description: Update the 'replaced_by' column in the 'reservation_resource' collection.
+    - name: replacement
+      type: UpdateColumnReservationResourceReplacement
+      description: Update the 'replacement' column in the 'reservation_resource' collection.
     - name: replaces
       type: UpdateColumnReservationResourceReplaces
       description: Update the 'replaces' column in the 'reservation_resource' collection.
@@ -682,9 +682,9 @@ definition:
         organizationalUnitId:
           column:
             name: organizational_unit_id
-        replacedBy:
+        replacement:
           column:
-            name: replaced_by
+            name: replacement
         replaces:
           column:
             name: replaces
@@ -722,7 +722,7 @@ definition:
           - id
           - name
           - organizationalUnitId
-          - replacedBy
+          - replacement
           - replaces
           - resources
           - startTime

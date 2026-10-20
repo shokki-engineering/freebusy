@@ -15,12 +15,12 @@ erDiagram
     direction LR
     Allocation {
         string id PK
-        string hold_id FK
+        string hold FK
     }
     Hold {
         string id PK
     }
-    Allocation }o--|| Hold : "hold_id"
+    Allocation }o--|| Hold : "hold"
 ```
 
 ## Subfolders

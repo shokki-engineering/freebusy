@@ -10,8 +10,8 @@ definition:
       type: Timestamptz!
     - name: expireTime
       type: Timestamptz
-    - name: holdId
-      type: String_1!
+    - name: hold
+      type: String_1
     - name: id
       type: String_1!
     - name: name
@@ -38,9 +38,9 @@ definition:
         expireTime:
           column:
             name: expire_time
-        holdId:
+        hold:
           column:
-            name: hold_id
+            name: hold
         id:
           column:
             name: id
@@ -69,7 +69,7 @@ definition:
           - createTime
           - endTime
           - expireTime
-          - holdId
+          - hold
           - id
           - name
           - organizationalUnitId
@@ -91,7 +91,7 @@ definition:
           booleanExpressionType: TimestamptzBoolExp
         - fieldName: expireTime
           booleanExpressionType: TimestamptzBoolExp
-        - fieldName: holdId
+        - fieldName: hold
           booleanExpressionType: TextBoolExp
         - fieldName: id
           booleanExpressionType: TextBoolExp
@@ -126,7 +126,7 @@ definition:
           aggregateExpression: TimestamptzAggExp
         - fieldName: expireTime
           aggregateExpression: TimestamptzAggExp
-        - fieldName: holdId
+        - fieldName: hold
           aggregateExpression: TextAggExp
         - fieldName: id
           aggregateExpression: TextAggExp
@@ -159,7 +159,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
         - fieldName: expireTime
           orderByExpression: TimestamptzOrderByExp
-        - fieldName: holdId
+        - fieldName: hold
           orderByExpression: String1OrderByExp
         - fieldName: id
           orderByExpression: String1OrderByExp

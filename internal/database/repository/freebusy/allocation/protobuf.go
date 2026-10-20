@@ -80,7 +80,6 @@ func allocationToCreateInput(in *allocationpbv1.Allocation) resourceql.CreateInp
 	ci.Resource = in.GetResource()
 	ci.StartTime = tsToStr(in.GetStartTime())
 	ci.EndTime = tsToStr(in.GetEndTime())
-	ci.ExpireTime = tsToStr(in.GetExpireTime())
 	return ci
 }
 
@@ -93,11 +92,6 @@ func allocationToUpdatePatch(merged *allocationpbv1.Allocation) resourceql.Updat
 	patch.Resource = graphql.Value(merged.GetResource())
 	patch.StartTime = graphql.Value(tsToStr(merged.GetStartTime()))
 	patch.EndTime = graphql.Value(tsToStr(merged.GetEndTime()))
-	if v := tsToStr(merged.GetExpireTime()); v != "" {
-		patch.ExpireTime = graphql.Value(v)
-	} else {
-		patch.ExpireTime = graphql.Null[string]()
-	}
 	return patch
 }
 
@@ -112,7 +106,6 @@ func allocationFromRow(row *resourceql.AllocationResource) *allocationpbv1.Alloc
 	out.Resource = row.Resource
 	out.StartTime = strToTs(row.StartTime)
 	out.EndTime = strToTs(row.EndTime)
-	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
 	out.CreateTime = strToTs(row.CreateTime)
 	return out
 }

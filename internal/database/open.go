@@ -9,7 +9,6 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 	"go.opentelemetry.io/otel/propagation"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -44,7 +43,7 @@ func Open() (*Connection, error) {
 // process and was rejected as the worse trade.
 func openGorm() (*Connection, error) {
 	pg := config.Get().Database.Postgres
-	db, err := gorm.Open(postgres.Open(pg.DSN()), &gorm.Config{})
+	db, err := OpenGorm(pg.DSN(), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("open postgres: %w", err)
 	}

@@ -53,7 +53,7 @@ type AllocationStoreIface interface {
 }
 
 // AllocationStore provides typed CRUD access to Allocation records.
-// An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it.
+// An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it. It sits under the site and names its hold, rather than nesting under the hold: the engine asks about allocations by resource and time across a whole site, never hold by hold, and a hold with child resources would owe DeleteHold a `force` flag guarding rows no caller can see.
 type AllocationStore struct {
 	DB *gorm.DB
 	// Telemetry observes every operation; nil is a no-op. Wire the generated
@@ -177,15 +177,15 @@ func (s *AllocationStore) GetByName(ctx context.Context, v string) (*Allocation,
 	return &m, nil
 }
 
-// ListByHoldID returns the Allocation records whose hold_id matches id, with opts applied.
+// ListByHoldID returns the Allocation records whose hold matches id, with opts applied.
 func (s *AllocationStore) ListByHoldID(ctx context.Context, id string, opts gormx.ListOptions) ([]Allocation, error) {
 	var out []Allocation
 	tel := gormx.OrNop(s.Telemetry)
 	start := time.Now()
 	err := tel.Span(ctx, "allocation.Allocation/ListByHoldID", nil, func(ctx context.Context) error {
-		return opts.Apply(s.DB.WithContext(ctx).Where("hold_id = ?", id)).Find(&out).Error
+		return opts.Apply(s.DB.WithContext(ctx).Where("hold = ?", id)).Find(&out).Error
 	})
-	tel.RecordOp(ctx, "allocation.resource", "list_by_hold_id", time.Since(start), err)
+	tel.RecordOp(ctx, "allocation.resource", "list_by_hold", time.Since(start), err)
 	if err != nil {
 		return nil, err
 	}

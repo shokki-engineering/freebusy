@@ -119,6 +119,7 @@ func AllocationToProto(m *Allocation) *allocationpbv1.Allocation {
 		return nil
 	}
 	out := &allocationpbv1.Allocation{}
+	// not mapped here: hold (resource reference)
 	out.Name = m.Name
 	out.Resource = m.Resource
 	out.StartTime = goValToTs(m.StartTime)
@@ -136,6 +137,7 @@ func AllocationFromProto(pb *allocationpbv1.Allocation) *Allocation {
 		return nil
 	}
 	m := &Allocation{}
+	// not mapped here: hold (resource reference)
 	m.Name = pb.GetName()
 	m.Resource = pb.GetResource()
 	m.StartTime = tsToGoVal(pb.GetStartTime())

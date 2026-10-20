@@ -36,9 +36,9 @@ const (
 	ReservationStateCancelled ReservationState = "CANCELLED"
 	// The hold lapsed or was released before it could be converted, so nothing was taken. Terminal.
 	ReservationStateFailed ReservationState = "FAILED"
-	// Being replaced by the reservation named in `replaced_by`. Transient: it keeps its resources until the replacement is confirmed, then becomes RESCHEDULED -- or returns to CONFIRMED if the replacement's hold lapsed.
+	// Being replaced by the reservation named in `replacement`. Transient: it keeps its resources until the replacement is confirmed, then becomes RESCHEDULED -- or returns to CONFIRMED if the replacement's hold lapsed.
 	ReservationStateRescheduling ReservationState = "RESCHEDULING"
-	// Replaced by `replaced_by`, which now holds the booking; this one's resources are free. Terminal.
+	// Replaced by `replacement`, which now holds the booking; this one's resources are free. Terminal.
 	ReservationStateRescheduled ReservationState = "RESCHEDULED"
 )
 
@@ -46,10 +46,10 @@ const (
 type Reservation struct {
 	// Unique identifier for the record.
 	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
-	// The reservation name. Its id is always the id of the hold it was made from, so a retried CreateReservation finds the reservation the first attempt wrote instead of making a second. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+	// The reservation name. Its id is the caller's reservation_id, or else the id of the hold it was made from. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// The hold this reservation was made from, at the same site. Format: organizationalUnits/{organizational_unit}/holds/{hold}
-	HoldID string `gorm:"column:hold;not null;index:idx_resource_hold" json:"hold" validate:"required"`
+	HoldID string `gorm:"column:hold;not null;uniqueIndex:idx_resource_hold" json:"hold" validate:"required"`
 	// Start of the reserved window, copied from the hold.
 	StartTime *time.Time `gorm:"column:start_time;type:timestamptz" json:"start_time,omitempty"`
 	// End of the reserved window, exclusive, copied from the hold.
@@ -75,7 +75,7 @@ type Reservation struct {
 	// The reservation this one replaced, set when it was made by RescheduleReservation. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
 	Replaces *string `gorm:"column:replaces" json:"replaces,omitempty"`
 	// The reservation replacing this one, set when RescheduleReservation began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
-	ReplacedBy *string `gorm:"column:replaced_by" json:"replaced_by,omitempty"`
+	Replacement *string `gorm:"column:replacement" json:"replacement,omitempty"`
 	// Parent reference to OrganizationalUnit (from the AIP resource pattern). TODO: unresolved reference to OrganizationalUnit (not in this generation set); kept as a plain indexed column.
 	OrganizationalUnitID string `gorm:"column:organizational_unit_id;not null;index:idx_resource_organizational_unit_id" json:"organizational_unit_id" validate:"required"`
 	// The resources taken, copied from the hold. Format: resources/{resource}

@@ -28,7 +28,7 @@ definition:
       type: String_1!
     - name: organizationalUnitId
       type: String_1!
-    - name: replacedBy
+    - name: replacement
       type: String_1
     - name: replaces
       type: String_1
@@ -83,9 +83,9 @@ definition:
         organizationalUnitId:
           column:
             name: organizational_unit_id
-        replacedBy:
+        replacement:
           column:
-            name: replaced_by
+            name: replacement
         replaces:
           column:
             name: replaces
@@ -123,7 +123,7 @@ definition:
           - id
           - name
           - organizationalUnitId
-          - replacedBy
+          - replacement
           - replaces
           - resources
           - startTime
@@ -163,7 +163,7 @@ definition:
           booleanExpressionType: TextBoolExp
         - fieldName: organizationalUnitId
           booleanExpressionType: TextBoolExp
-        - fieldName: replacedBy
+        - fieldName: replacement
           booleanExpressionType: TextBoolExp
         - fieldName: replaces
           booleanExpressionType: TextBoolExp
@@ -214,7 +214,7 @@ definition:
           aggregateExpression: TextAggExp
         - fieldName: organizationalUnitId
           aggregateExpression: TextAggExp
-        - fieldName: replacedBy
+        - fieldName: replacement
           aggregateExpression: TextAggExp
         - fieldName: replaces
           aggregateExpression: TextAggExp
@@ -263,7 +263,7 @@ definition:
           orderByExpression: String1OrderByExp
         - fieldName: organizationalUnitId
           orderByExpression: String1OrderByExp
-        - fieldName: replacedBy
+        - fieldName: replacement
           orderByExpression: String1OrderByExp
         - fieldName: replaces
           orderByExpression: String1OrderByExp

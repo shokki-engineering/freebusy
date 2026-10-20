@@ -98,18 +98,18 @@ definition:
 kind: ObjectType
 version: v1
 definition:
-  name: UpdateColumnAllocationResourceHoldId
-  description: Update the 'hold_id' column in the 'allocation_resource' collection
+  name: UpdateColumnAllocationResourceHold
+  description: Update the 'hold' column in the 'allocation_resource' collection
   fields:
     - name: set
-      type: String_1!
+      type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceHoldId
-    inputTypeName: UpdateColumnAllocationResourceHoldIdInput
+    typeName: UpdateColumnAllocationResourceHold
+    inputTypeName: UpdateColumnAllocationResourceHoldInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
-      dataConnectorObjectType: update_column_allocation_resource_hold_id
+      dataConnectorObjectType: update_column_allocation_resource_hold
       fieldMapping:
         set:
           column:
@@ -119,7 +119,7 @@ definition:
 kind: TypePermissions
 version: v1
 definition:
-  typeName: UpdateColumnAllocationResourceHoldId
+  typeName: UpdateColumnAllocationResourceHold
   permissions:
     - role: admin
       output:
@@ -303,9 +303,9 @@ definition:
     - name: expireTime
       type: UpdateColumnAllocationResourceExpireTime
       description: Update the 'expire_time' column in the 'allocation_resource' collection.
-    - name: holdId
-      type: UpdateColumnAllocationResourceHoldId
-      description: Update the 'hold_id' column in the 'allocation_resource' collection.
+    - name: hold
+      type: UpdateColumnAllocationResourceHold
+      description: Update the 'hold' column in the 'allocation_resource' collection.
     - name: id
       type: UpdateColumnAllocationResourceId
       description: Update the 'id' column in the 'allocation_resource' collection.
@@ -338,9 +338,9 @@ definition:
         expireTime:
           column:
             name: expire_time
-        holdId:
+        hold:
           column:
-            name: hold_id
+            name: hold
         id:
           column:
             name: id
@@ -369,7 +369,7 @@ definition:
           - createTime
           - endTime
           - expireTime
-          - holdId
+          - hold
           - id
           - name
           - organizationalUnitId

@@ -6,10 +6,11 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 0 | 1 |
+| 0 | 2 |
 
 Schema file: [`enums.postgres.prisma`](./enums.postgres.prisma)
 
 ### Enums
 
 - `PromoCodeState`: ACTIVE, DISABLED, EXPIRED
+- `CodeGeneration`: MANUAL, AUTO

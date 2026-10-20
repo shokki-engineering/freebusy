@@ -32,7 +32,7 @@ var (
 	Id                   = graphql.StringField{Col: "id"}
 	Name                 = graphql.StringField{Col: "name"}
 	OrganizationalUnitId = graphql.StringField{Col: "organizationalUnitId"}
-	ReplacedBy           = graphql.StringField{Col: "replacedBy"}
+	Replacement          = graphql.StringField{Col: "replacement"}
 	Replaces             = graphql.StringField{Col: "replaces"}
 	StartTime            = graphql.StringField{Col: "startTime"}
 	State                = graphql.StringField{Col: "state"}

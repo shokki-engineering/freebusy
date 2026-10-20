@@ -57,6 +57,7 @@ var AllocationFilterSpec = filterx.Spec{
 		"create_time": {Column: "create_time", Kind: filterx.KindTimestamp},
 		"end_time":    {Column: "end_time", Kind: filterx.KindTimestamp},
 		"expire_time": {Column: "expire_time", Kind: filterx.KindTimestamp},
+		"hold":        {Column: "hold", Kind: filterx.KindRef},
 		"name":        {Column: "name", Kind: filterx.KindText},
 		"resource":    {Column: "resource", Kind: filterx.KindText},
 		"start_time":  {Column: "start_time", Kind: filterx.KindTimestamp},

@@ -41,7 +41,16 @@ components:
       properties:
         code:
           description: The human-entered code, unique across all promo codes (e.g.
-            "SUMMER25").
+            "SUMMER25"). Leave empty on create to have the server generate one; `code_generation`
+            then records that it did.
+          type: string
+        codeGeneration:
+          description: 'How `code` was chosen: MANUAL when the caller supplied it,
+            AUTO when the server generated it. Set once, on create.'
+          enum:
+          - CODE_GENERATION_UNSPECIFIED
+          - CODE_GENERATION_MANUAL
+          - CODE_GENERATION_AUTO
           type: string
         createTime:
           description: Creation timestamp.

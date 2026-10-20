@@ -41,7 +41,7 @@ type ReservationServiceClient interface {
 	// Makes a reservation from a live hold, converting the hold so its
 	// resources stay taken.
 	//
-	// Idempotent: the reservation's id is the hold's, so a retry returns the
+	// Idempotent: a hold backs at most one reservation, so a retry returns the
 	// reservation the first call made. Fails with FAILED_PRECONDITION when the
 	// hold has lapsed or been released.
 	CreateReservation(ctx context.Context, in *CreateReservationRequest, opts ...grpc.CallOption) (*Reservation, error)
@@ -58,7 +58,7 @@ type ReservationServiceClient interface {
 	// that replaces it.
 	//
 	// The replacement is a new reservation made from the new hold, linked both
-	// ways (`replaces`, `replaced_by`); the original ends RESCHEDULED. The
+	// ways (`replaces`, `replacement`); the original ends RESCHEDULED. The
 	// original keeps its resources until the replacement is confirmed, so a
 	// failure part-way -- the new hold lapsing, a crash -- leaves the customer
 	// with their old booking, never with neither. Idempotent: repeating the call
@@ -139,7 +139,7 @@ type ReservationServiceServer interface {
 	// Makes a reservation from a live hold, converting the hold so its
 	// resources stay taken.
 	//
-	// Idempotent: the reservation's id is the hold's, so a retry returns the
+	// Idempotent: a hold backs at most one reservation, so a retry returns the
 	// reservation the first call made. Fails with FAILED_PRECONDITION when the
 	// hold has lapsed or been released.
 	CreateReservation(context.Context, *CreateReservationRequest) (*Reservation, error)
@@ -156,7 +156,7 @@ type ReservationServiceServer interface {
 	// that replaces it.
 	//
 	// The replacement is a new reservation made from the new hold, linked both
-	// ways (`replaces`, `replaced_by`); the original ends RESCHEDULED. The
+	// ways (`replaces`, `replacement`); the original ends RESCHEDULED. The
 	// original keeps its resources until the replacement is confirmed, so a
 	// failure part-way -- the new hold lapsing, a crash -- leaves the customer
 	// with their old booking, never with neither. Idempotent: repeating the call

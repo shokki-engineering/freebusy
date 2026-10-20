@@ -14,8 +14,9 @@ option java_package = "dev.ohtarnished.freebusy.reservation.v1";
 
 // Request message for ReservationService.CreateReservation, AIP-133.
 //
-// There is no reservation_id: the id is the hold's, which is what makes the
-// call safe to retry without an idempotency key of its own.
+// Safe to retry without an idempotency key of its own: a hold can back only
+// one reservation, so a retry -- with or without reservation_id -- finds the
+// reservation the first attempt made instead of making a second.
 message CreateReservationRequest {
   // The site the hold was taken at.
   // Format: organizationalUnits/{organizational_unit}
@@ -30,6 +31,15 @@ message CreateReservationRequest {
   Reservation reservation = 2 [
     (google.api.field_behavior) = REQUIRED,
     (buf.validate.field).required = true
+  ];
+
+  // Client-assigned id, becoming the last segment of the reservation name.
+  // Defaults to the hold's id. A hold backs at most one reservation whatever
+  // its id, so naming a hold that already has one returns that reservation.
+  string reservation_id = 3 [
+    (google.api.field_behavior) = OPTIONAL,
+    (buf.validate.field).string.pattern = "^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$",
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
 }
 

@@ -747,17 +747,13 @@
           }
         },
         {
-          "name": "holdId",
+          "name": "hold",
           "description": "",
           "args": [],
           "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
           }
         },
         {
@@ -897,7 +893,7 @@
           }
         },
         {
-          "name": "holdId",
+          "name": "hold",
           "description": "",
           "args": [],
           "type": {
@@ -1068,7 +1064,7 @@
           "defaultValue": null
         },
         {
-          "name": "holdId",
+          "name": "hold",
           "description": "",
           "type": {
             "kind": "INPUT_OBJECT",
@@ -1226,7 +1222,7 @@
           "defaultValue": null
         },
         {
-          "name": "holdId",
+          "name": "hold",
           "description": "",
           "type": {
             "kind": "ENUM",
@@ -28152,16 +28148,12 @@
           "defaultValue": null
         },
         {
-          "name": "holdId",
+          "name": "hold",
           "description": "",
           "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
           },
           "defaultValue": null
         },
@@ -37163,13 +37155,19 @@
           "name": "code",
           "description": "",
           "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "codeGeneration",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
           },
           "defaultValue": null
         },
@@ -39840,7 +39838,7 @@
           "defaultValue": null
         },
         {
-          "name": "replacedBy",
+          "name": "replacement",
           "description": "",
           "type": {
             "kind": "SCALAR",
@@ -76052,13 +76050,19 @@
           "description": "",
           "args": [],
           "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
+          "name": "codeGeneration",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
           }
         },
         {
@@ -76247,6 +76251,20 @@
         },
         {
           "name": "code",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "codeGeneration",
           "description": "",
           "args": [],
           "type": {
@@ -76523,6 +76541,16 @@
           "defaultValue": null
         },
         {
+          "name": "codeGeneration",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
           "name": "createTime",
           "description": "",
           "type": {
@@ -76732,6 +76760,16 @@
       "inputFields": [
         {
           "name": "code",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "codeGeneration",
           "description": "",
           "type": {
             "kind": "ENUM",
@@ -98596,7 +98634,7 @@
           }
         },
         {
-          "name": "replacedBy",
+          "name": "replacement",
           "description": "",
           "args": [],
           "type": {
@@ -98856,7 +98894,7 @@
           }
         },
         {
-          "name": "replacedBy",
+          "name": "replacement",
           "description": "",
           "args": [],
           "type": {
@@ -99103,7 +99141,7 @@
           "defaultValue": null
         },
         {
-          "name": "replacedBy",
+          "name": "replacement",
           "description": "",
           "type": {
             "kind": "INPUT_OBJECT",
@@ -99341,7 +99379,7 @@
           "defaultValue": null
         },
         {
-          "name": "replacedBy",
+          "name": "replacement",
           "description": "",
           "type": {
             "kind": "ENUM",
@@ -124714,11 +124752,11 @@
           "defaultValue": null
         },
         {
-          "name": "holdId",
-          "description": "Update the 'hold_id' column in the 'allocation_resource' collection.",
+          "name": "hold",
+          "description": "Update the 'hold' column in the 'allocation_resource' collection.",
           "type": {
             "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnAllocationResourceHoldIdInput",
+            "name": "UpdateColumnAllocationResourceHoldInput",
             "ofType": null
           },
           "defaultValue": null
@@ -126869,21 +126907,17 @@
     },
     {
       "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnAllocationResourceHoldIdInput",
-      "description": "Update the 'hold_id' column in the 'allocation_resource' collection",
+      "name": "UpdateColumnAllocationResourceHoldInput",
+      "description": "Update the 'hold' column in the 'allocation_resource' collection",
       "fields": null,
       "inputFields": [
         {
           "name": "set",
           "description": "Set the column to this value",
           "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
           },
           "defaultValue": null
         }
@@ -137793,6 +137827,26 @@
     },
     {
       "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnPromocodeResourceCodeGenerationInput",
+      "description": "Update the 'code_generation' column in the 'promocode_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
       "name": "UpdateColumnPromocodeResourceCodeInput",
       "description": "Update the 'code' column in the 'promocode_resource' collection",
       "fields": null,
@@ -137801,13 +137855,9 @@
           "name": "set",
           "description": "Set the column to this value",
           "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
           },
           "defaultValue": null
         }
@@ -140981,8 +141031,8 @@
     },
     {
       "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnReservationResourceReplacedByInput",
-      "description": "Update the 'replaced_by' column in the 'reservation_resource' collection",
+      "name": "UpdateColumnReservationResourceReplacementInput",
+      "description": "Update the 'replacement' column in the 'reservation_resource' collection",
       "fields": null,
       "inputFields": [
         {
@@ -155420,6 +155470,16 @@
           "defaultValue": null
         },
         {
+          "name": "codeGeneration",
+          "description": "Update the 'code_generation' column in the 'promocode_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnPromocodeResourceCodeGenerationInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
           "name": "createTime",
           "description": "Update the 'create_time' column in the 'promocode_resource' collection.",
           "type": {
@@ -157802,11 +157862,11 @@
           "defaultValue": null
         },
         {
-          "name": "replacedBy",
-          "description": "Update the 'replaced_by' column in the 'reservation_resource' collection.",
+          "name": "replacement",
+          "description": "Update the 'replacement' column in the 'reservation_resource' collection.",
           "type": {
             "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnReservationResourceReplacedByInput",
+            "name": "UpdateColumnReservationResourceReplacementInput",
             "ofType": null
           },
           "defaultValue": null

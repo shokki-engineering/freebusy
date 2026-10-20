@@ -96,7 +96,7 @@ func (r *BookingRepository) loadPromo(ctx context.Context, promoID string) (*pri
 	if res == nil {
 		return nil, nil
 	}
-	p := &pricing.Promo{Code: res.Code, DisplayName: repox.Deref(res.DisplayName)}
+	p := &pricing.Promo{Code: repox.Deref(res.Code), DisplayName: repox.Deref(res.DisplayName)}
 
 	if res.DiscountId != "" {
 		d, err := r.svc.Query.Promocode.Discounts.Get(ctx, res.DiscountId)

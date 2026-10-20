@@ -403,12 +403,12 @@ func (s *Store) InsertHold(ctx context.Context, parent string, h *allocationpbv1
 		var aRes allocsql.InsertAllocationResourceResponse
 		in := allocsql.CreateInput{
 			Id:                   id,
-			Name:                 h.GetName() + "/allocations/" + id,
+			Name:                 parent + "/allocations/" + id,
 			Resource:             r,
 			StartTime:            ts(window.Start),
 			EndTime:              ts(window.End),
 			OrganizationalUnitId: ouID,
-			HoldId:               holdID,
+			Hold:                 holdID,
 			CreateTime:           ts(now),
 		}
 		if v, ok := expire.Get(); ok {
@@ -425,7 +425,7 @@ func (s *Store) InsertHold(ctx context.Context, parent string, h *allocationpbv1
 		return nil, err
 	}
 	for _, a := range live {
-		if a.HoldId != holdID {
+		if repox.Deref(a.Hold) != holdID {
 			if derr := s.deleteHold(ctx, holdID); derr != nil {
 				return nil, derr
 			}
@@ -551,7 +551,7 @@ func (s *Store) resync(ctx context.Context, name string) error {
 // queueAllocationExpiry adds an update setting exp on every allocation of a
 // hold. DDN updates by key only, so the keys are read first.
 func (s *Store) queueAllocationExpiry(ctx context.Context, tx *runtime.Tx, holdID string, exp graphql.Nullable[string]) error {
-	rows, err := s.svc.Query.Allocation.Resource.List(ctx, allocsql.List().Where(allocsql.HoldId.Eq(holdID)))
+	rows, err := s.svc.Query.Allocation.Resource.List(ctx, allocsql.List().Where(allocsql.Hold.Eq(holdID)))
 	if err != nil {
 		return dbutil.MapHasuraErr(err)
 	}
@@ -577,7 +577,7 @@ func (s *Store) DeleteHold(ctx context.Context, name, etag string) error {
 // deleteHold removes a hold and its allocations in one transaction,
 // allocations first so the foreign key is never left dangling.
 func (s *Store) deleteHold(ctx context.Context, holdID string) error {
-	rows, err := s.svc.Query.Allocation.Resource.List(ctx, allocsql.List().Where(allocsql.HoldId.Eq(holdID)))
+	rows, err := s.svc.Query.Allocation.Resource.List(ctx, allocsql.List().Where(allocsql.Hold.Eq(holdID)))
 	if err != nil {
 		return dbutil.MapHasuraErr(err)
 	}

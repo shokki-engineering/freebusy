@@ -23,8 +23,10 @@ type DeletePromocodeResourceByIdResponse struct {
 	AffectedRows int32 `graphql:"affectedRows"`
 	// Data from rows affected by the mutation
 	Returning []struct {
-		// Code selects the "code" field.
-		Code string `graphql:"code"`
+		// Code selects the "code" field; nil when the column is NULL.
+		Code *string `graphql:"code"`
+		// CodeGeneration selects the "codeGeneration" field; nil when the column is NULL.
+		CodeGeneration *string `graphql:"codeGeneration"`
 		// CreateTime selects the "createTime" field.
 		CreateTime string `graphql:"createTime"`
 		// Description selects the "description" field; nil when the column is NULL.
@@ -62,8 +64,10 @@ type InsertPromocodeResourceResponse struct {
 	AffectedRows int32 `graphql:"affectedRows"`
 	// Data from rows affected by the mutation
 	Returning []struct {
-		// Code selects the "code" field.
-		Code string `graphql:"code"`
+		// Code selects the "code" field; nil when the column is NULL.
+		Code *string `graphql:"code"`
+		// CodeGeneration selects the "codeGeneration" field; nil when the column is NULL.
+		CodeGeneration *string `graphql:"codeGeneration"`
 		// CreateTime selects the "createTime" field.
 		CreateTime string `graphql:"createTime"`
 		// Description selects the "description" field; nil when the column is NULL.
@@ -99,8 +103,10 @@ type InsertPromocodeResourceResponse struct {
 // column; nullable columns are pointers so NULL stays distinguishable from a
 // zero value.
 type PromocodeResource struct {
-	// Code selects the "code" field.
-	Code string `graphql:"code"`
+	// Code selects the "code" field; nil when the column is NULL.
+	Code *string `graphql:"code"`
+	// CodeGeneration selects the "codeGeneration" field; nil when the column is NULL.
+	CodeGeneration *string `graphql:"codeGeneration"`
 	// CreateTime selects the "createTime" field.
 	CreateTime string `graphql:"createTime"`
 	// Description selects the "description" field; nil when the column is NULL.
@@ -147,6 +153,17 @@ type PromocodeResourceAggExp struct {
 		// Min selects the "min" field; nil when the column is NULL.
 		Min *string `graphql:"min"`
 	} `graphql:"code"`
+	// CodeGeneration selects the "codeGeneration" field.
+	CodeGeneration struct {
+		// Count selects the "_count" field.
+		Count graphql.Int64 `graphql:"_count"`
+		// CountDistinct selects the "_count_distinct" field.
+		CountDistinct graphql.Int64 `graphql:"_count_distinct"`
+		// Max selects the "max" field; nil when the column is NULL.
+		Max *string `graphql:"max"`
+		// Min selects the "min" field; nil when the column is NULL.
+		Min *string `graphql:"min"`
+	} `graphql:"codeGeneration"`
 	// CreateTime selects the "createTime" field.
 	CreateTime struct {
 		// Count selects the "_count" field.
@@ -333,8 +350,10 @@ type UpdatePromocodeResourceByIdResponse struct {
 	AffectedRows int32 `graphql:"affectedRows"`
 	// Data from rows affected by the mutation
 	Returning []struct {
-		// Code selects the "code" field.
-		Code string `graphql:"code"`
+		// Code selects the "code" field; nil when the column is NULL.
+		Code *string `graphql:"code"`
+		// CodeGeneration selects the "codeGeneration" field; nil when the column is NULL.
+		CodeGeneration *string `graphql:"codeGeneration"`
 		// CreateTime selects the "createTime" field.
 		CreateTime string `graphql:"createTime"`
 		// Description selects the "description" field; nil when the column is NULL.

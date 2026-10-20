@@ -32,20 +32,66 @@ var _ svc.Store = (*Store)(nil)
 func New(db *gorm.DB) *Store {
 	return &Store{
 		db:   db,
-		repo: resrepo.NewGorm(db, resrepo.WithReservationHooks(resrepo.ReservationHooks{AfterRead: svc.FillHold})).Reservations,
+		repo: resrepo.NewGorm(db).Reservations,
 	}
 }
 
+// Get reads one row and converts it here: the generated converter leaves the
+// hold reference unmapped.
 func (s *Store) Get(ctx context.Context, name string) (*reservationpbv1.Reservation, error) {
-	return s.repo.Get(ctx, name)
+	return s.first(ctx, "name = ?", name)
 }
 
+// FindByHold reads the reservation a hold backs, through the unique index on
+// hold.
+func (s *Store) FindByHold(ctx context.Context, hold string) (*reservationpbv1.Reservation, error) {
+	return s.first(ctx, "hold = ?", repox.LastSegment(hold))
+}
+
+func (s *Store) first(ctx context.Context, where string, arg any) (*reservationpbv1.Reservation, error) {
+	var m reservation.Reservation
+	if err := s.db.WithContext(ctx).Where(where, arg).First(&m).Error; err != nil {
+		return nil, repox.MapGormErr(err)
+	}
+	return toProto(&m), nil
+}
+
+// List pages through the generated repository, which owns AIP-160 filtering
+// and page tokens, then re-reads that page's rows in one query to fill in the
+// hold.
 func (s *Store) List(ctx context.Context, parent string, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
-	return s.repo.List(ctx, parent, in)
+	page, next, err := s.repo.List(ctx, parent, in)
+	if err != nil || len(page) == 0 {
+		return page, next, err
+	}
+	names := make([]string, len(page))
+	for i, r := range page {
+		names[i] = r.GetName()
+	}
+	var rows []reservation.Reservation
+	if err := s.db.WithContext(ctx).Where("name IN ?", names).Find(&rows).Error; err != nil {
+		return nil, "", repox.MapGormErr(err)
+	}
+	full := make(map[string]*reservationpbv1.Reservation, len(rows))
+	for i := range rows {
+		full[rows[i].Name] = toProto(&rows[i])
+	}
+	for i, r := range page {
+		if f, ok := full[r.GetName()]; ok {
+			page[i] = f
+		}
+	}
+	return page, next, nil
 }
 
-// Insert writes the row exactly as given; a taken name surfaces as
-// types.ErrAlreadyExists through the unique index on name.
+func toProto(m *reservation.Reservation) *reservationpbv1.Reservation {
+	pb := reservation.ReservationToProto(m)
+	pb.Hold = svc.HoldName(m.OrganizationalUnitID, m.HoldID)
+	return pb
+}
+
+// Insert writes the row exactly as given; a taken name or hold surfaces as
+// types.ErrAlreadyExists through their unique indexes.
 func (s *Store) Insert(ctx context.Context, r *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
 	m := reservation.ReservationFromProto(r)
 	m.ID = repox.LastSegment(r.GetName())
@@ -62,10 +108,9 @@ func (s *Store) Insert(ctx context.Context, r *reservationpbv1.Reservation) (*re
 }
 
 // uniqueViolation reports a Postgres unique-constraint failure (SQLSTATE
-// 23505). repox.MapGormErr only recognises gorm.ErrDuplicatedKey, which GORM
-// produces solely when the connection opts into TranslateError -- and
-// freebusy's does not -- so two concurrent creates of one reservation would
-// otherwise surface the loser as Internal instead of "already exists".
+// 23505), whether or not the connection translates errors: freebusy's does,
+// wrapping the PgError, but a store handed a plain connection must still turn
+// the loser of two concurrent creates into "already exists", not Internal.
 func uniqueViolation(err error) bool {
 	var pg *pgconn.PgError
 	return errors.As(err, &pg) && pg.Code == "23505"
@@ -92,11 +137,11 @@ func (s *Store) Transition(ctx context.Context, name, etag string, from []reserv
 	if c.CancelReason != "" {
 		set["cancel_reason"] = c.CancelReason
 	}
-	if c.ReplacedBy != nil {
-		if *c.ReplacedBy == "" {
-			set["replaced_by"] = nil
+	if c.Replacement != nil {
+		if *c.Replacement == "" {
+			set["replacement"] = nil
 		} else {
-			set["replaced_by"] = *c.ReplacedBy
+			set["replacement"] = *c.Replacement
 		}
 	}
 	q := s.db.WithContext(ctx).Model(&reservation.Reservation{}).Where("name = ? AND state IN ?", name, states)
@@ -127,9 +172,7 @@ func (s *Store) Stuck(ctx context.Context, cutoff time.Time, limit int) ([]*rese
 	}
 	out := make([]*reservationpbv1.Reservation, 0, len(rows))
 	for i := range rows {
-		r := reservation.ReservationToProto(&rows[i])
-		r.Hold = svc.HoldOf(r.GetName())
-		out = append(out, r)
+		out = append(out, toProto(&rows[i]))
 	}
 	return out, nil
 }

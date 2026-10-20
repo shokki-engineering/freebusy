@@ -128,6 +128,11 @@ message Hold {
 // write as the hold. The copy is the point: a claim stops counting the instant
 // `expire_time` passes, with no sweeper write needed, because every read
 // filters on it.
+//
+// It sits under the site and names its hold, rather than nesting under the
+// hold: the engine asks about allocations by resource and time across a whole
+// site, never hold by hold, and a hold with child resources would owe
+// DeleteHold a `force` flag guarding rows no caller can see.
 message Allocation {
   option (entity.v1.table) = {
     id: ID_STRATEGY_ULID
@@ -144,14 +149,13 @@ message Allocation {
 
   option (google.api.resource) = {
     type: "freebusy.allocation.v1/Allocation"
-    pattern: "organizationalUnits/{organizational_unit}/holds/{hold}/allocations/{allocation}"
+    pattern: "organizationalUnits/{organizational_unit}/allocations/{allocation}"
     singular: "allocation"
     plural: "allocations"
   };
 
-  // The allocation name, nested under the hold that took it so deleting the
-  // hold takes its claims with it.
-  // Format: organizationalUnits/{organizational_unit}/holds/{hold}/allocations/{allocation}
+  // The allocation name, under the site whose resource it takes.
+  // Format: organizationalUnits/{organizational_unit}/allocations/{allocation}
   string name = 1 [(google.api.field_behavior) = IDENTIFIER];
 
   // The resource taken.
@@ -169,11 +173,19 @@ message Allocation {
 
   // When this claim stops counting. A copy of the hold's expire_time while it
   // is ACTIVE; set to the release instant on release; unset once the hold is
-  // CONVERTED, which is the one outcome that keeps the resource taken.
-  google.protobuf.Timestamp expire_time = 5 [(google.api.field_behavior) = OPTIONAL];
+  // CONVERTED, which is the one outcome that keeps the resource taken. Always
+  // the server's to write, never a caller's.
+  google.protobuf.Timestamp expire_time = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // Creation timestamp.
   google.protobuf.Timestamp create_time = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The hold that took it. Deleting the hold deletes its allocations with it.
+  // Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  string hold = 7 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (google.api.resource_reference).type = "freebusy.allocation.v1/Hold"
+  ];
 }
 
 // One slice of an availability answer: how many resources are free across a

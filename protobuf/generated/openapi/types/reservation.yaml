@@ -40,11 +40,10 @@ components:
             Format: organizationalUnits/{organizational_unit}/holds/{hold}'
           type: string
         name:
-          description: 'The reservation name. Its id is always the id of the hold
-            it was made from, so a retried CreateReservation finds the reservation
-            the first attempt wrote instead of making a second. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
+          description: 'The reservation name. Its id is the caller''s reservation_id,
+            or else the id of the hold it was made from. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
           type: string
-        replacedBy:
+        replacement:
           description: 'The reservation replacing this one, set when RescheduleReservation
             began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
           type: string

@@ -3,6 +3,7 @@ package reservation
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/oh-tarnished/freebusy/internal/runtime/rpc"
 	"github.com/oh-tarnished/freebusy/internal/types"
@@ -44,6 +45,14 @@ func (s *Server) reschedule(ctx context.Context, req *reservationpbv1.Reschedule
 	if err != nil {
 		return nil, err
 	}
+	// If the new hold already backs a reservation -- the caller reserved it,
+	// or an earlier attempt at this move got that far -- that is the
+	// replacement, whatever it was named.
+	if existing, err := s.store.FindByHold(ctx, req.GetHold()); err == nil {
+		replacement = existing.GetName()
+	} else if !errors.Is(err, types.ErrNotFound) {
+		return nil, err
+	}
 	if replacement == req.GetName() {
 		return nil, errorf(types.ErrInvalidArgument, "%s already holds %s; take a new hold for the new window", req.GetName(), req.GetHold())
 	}
@@ -61,8 +70,8 @@ func (s *Server) reschedule(ctx context.Context, req *reservationpbv1.Reschedule
 			continue
 		case reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULING,
 			reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED:
-			if r.GetReplacedBy() != replacement {
-				return nil, errorf(types.ErrInvalidState, "%s is already being moved to %s", r.GetName(), r.GetReplacedBy())
+			if r.GetReplacement() != replacement {
+				return nil, errorf(types.ErrInvalidState, "%s is already being moved to %s", r.GetName(), r.GetReplacement())
 			}
 			// A retry of this same move: finish it and answer as the first
 			// call would have.
@@ -73,8 +82,8 @@ func (s *Server) reschedule(ctx context.Context, req *reservationpbv1.Reschedule
 		}
 
 		marked, err := s.store.Transition(ctx, r.GetName(), req.GetEtag(), confirmed, Change{
-			State:      reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULING,
-			ReplacedBy: &replacement,
+			State:       reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULING,
+			Replacement: &replacement,
 		})
 		if errors.Is(err, types.ErrConflict) && req.GetEtag() == "" && attempt < rescheduleAttempts {
 			continue
@@ -89,13 +98,17 @@ func (s *Server) reschedule(ctx context.Context, req *reservationpbv1.Reschedule
 // finishReschedule carries a RESCHEDULING reservation to its end and returns
 // the replacement, or reverts the original and returns why.
 func (s *Server) finishReschedule(ctx context.Context, old *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
-	replacement := old.GetReplacedBy()
+	replacement := old.GetReplacement()
 	if old.GetState() == reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED {
 		return s.store.Get(ctx, replacement)
 	}
 
 	site := "organizationalUnits/" + SiteID(old.GetName())
-	rep, err := s.open(ctx, site, HoldOf(replacement), &reservationpbv1.Reservation{
+	newHold, err := s.replacementHold(ctx, old)
+	if err != nil {
+		return nil, err
+	}
+	rep, err := s.open(ctx, site, newHold, lastSegment(replacement), &reservationpbv1.Reservation{
 		Customer:   old.GetCustomer(),
 		Attributes: old.GetAttributes(),
 		Replaces:   old.GetName(),
@@ -127,14 +140,31 @@ func (s *Server) finishReschedule(ctx context.Context, old *reservationpbv1.Rese
 }
 
 // revertReschedule calls a move off: the original, which never let go of its
-// slot, goes back to CONFIRMED with replaced_by cleared.
+// slot, goes back to CONFIRMED with replacement cleared.
 func (s *Server) revertReschedule(ctx context.Context, old *reservationpbv1.Reservation) error {
 	empty := ""
 	if _, err := s.store.Transition(ctx, old.GetName(), "", rescheduling, Change{
-		State:      reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED,
-		ReplacedBy: &empty,
+		State:       reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED,
+		Replacement: &empty,
 	}); err != nil && !errors.Is(err, types.ErrConflict) {
 		return err
 	}
-	return errorf(types.ErrInvalidState, "the new hold %s can no longer be booked; %s keeps its original slot", HoldOf(old.GetReplacedBy()), old.GetName())
+	return errorf(types.ErrInvalidState, "the replacement %s could not be booked; %s keeps its original slot", old.GetReplacement(), old.GetName())
+}
+
+// replacementHold is the hold a move is onto. A replacement that exists says
+// so itself; one not yet made is named after its hold, by reschedule.
+func (s *Server) replacementHold(ctx context.Context, old *reservationpbv1.Reservation) (string, error) {
+	rep, err := s.store.Get(ctx, old.GetReplacement())
+	switch {
+	case err == nil:
+		return rep.GetHold(), nil
+	case errors.Is(err, types.ErrNotFound):
+		return HoldName(SiteID(old.GetName()), lastSegment(old.GetReplacement())), nil
+	}
+	return "", err
+}
+
+func lastSegment(name string) string {
+	return name[strings.LastIndex(name, "/")+1:]
 }

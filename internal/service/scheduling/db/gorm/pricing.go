@@ -69,7 +69,7 @@ func computePricing(plan *pricing_model.RatePlan, nights, units int64, promo *pr
 		in.Taxes = append(in.Taxes, pricing.Tax{Code: t.Code, DisplayName: repox.Deref(t.DisplayName), Percent: t.Percent})
 	}
 	if promo != nil {
-		p := &pricing.Promo{Code: promo.Code, DisplayName: repox.Deref(promo.DisplayName)}
+		p := &pricing.Promo{Code: repox.Deref(promo.Code), DisplayName: repox.Deref(promo.DisplayName)}
 		if promo.Discount != nil {
 			p.PercentOff = promo.Discount.PercentOff
 			p.AmountOff = common.MoneyToProto(promo.Discount.AmountOff)

@@ -95,11 +95,12 @@ func buildGraph(pc *promocodepbv1.PromoCode) *promoGraph {
 		state = promocode.PromoCodeStateDisabled
 	}
 	g.promo = &promocode.PromoCode{
-		Code:        pc.GetCode(),
-		DisplayName: strOrNil(pc.GetDisplayName()),
-		Description: strOrNil(pc.GetDescription()),
-		State:       &state,
-		Disabled:    repox.Ptr(pc.GetDisabled()),
+		Code:           repox.Ptr(pc.GetCode()),
+		DisplayName:    strOrNil(pc.GetDisplayName()),
+		Description:    strOrNil(pc.GetDescription()),
+		State:          &state,
+		Disabled:       repox.Ptr(pc.GetDisabled()),
+		CodeGeneration: promocode.CodeGenerationPtrFromProto(pc.GetCodeGeneration()),
 	}
 
 	// Discount is required: always materialize a row. A non-nil amount_off is the

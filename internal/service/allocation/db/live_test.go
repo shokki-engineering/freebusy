@@ -15,6 +15,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/oh-tarnished/freebusy/internal/database"
 	"net/url"
 	"os"
 	"sync"
@@ -38,7 +40,6 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
@@ -64,7 +65,7 @@ func liveDB(t *testing.T) *gorm.DB {
 	if dsn == "" {
 		t.Skip("FREEBUSY_TEST_DATABASE_URL not set — live database tests skipped")
 	}
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: logger.Discard})
+	db, err := database.OpenGorm(dsn, &gorm.Config{Logger: logger.Discard})
 	if err != nil {
 		t.Fatalf("open: %v", err)
 	}

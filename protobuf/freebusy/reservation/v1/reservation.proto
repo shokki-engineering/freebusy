@@ -30,7 +30,18 @@ option java_package = "dev.ohtarnished.freebusy.reservation.v1";
 // service, both referenced by name (AIP-215), and anything else a vertical
 // needs to remember rides in `attributes`.
 message Reservation {
-  option (entity.v1.table) = {id: ID_STRATEGY_ULID};
+  // A hold backs at most one reservation: the index is what makes a retried
+  // or concurrent CreateReservation find the first one instead of making a
+  // second.
+  option (entity.v1.table) = {
+    id: ID_STRATEGY_ULID
+    indexes: [
+      {
+        columns: ["hold"]
+        unique: true
+      }
+    ]
+  };
 
   option (google.api.resource) = {
     type: "freebusy.reservation.v1/Reservation"
@@ -39,9 +50,8 @@ message Reservation {
     plural: "reservations"
   };
 
-  // The reservation name. Its id is always the id of the hold it was made
-  // from, so a retried CreateReservation finds the reservation the first
-  // attempt wrote instead of making a second.
+  // The reservation name. Its id is the caller's reservation_id, or else the
+  // id of the hold it was made from.
   // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
   string name = 1 [
     (google.api.field_behavior) = IDENTIFIER,
@@ -116,5 +126,5 @@ message Reservation {
 
   // The reservation replacing this one, set when RescheduleReservation began.
   // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
-  string replaced_by = 16 [(google.api.field_behavior) = OUTPUT_ONLY];
+  string replacement = 16 [(google.api.field_behavior) = OUTPUT_ONLY];
 }

@@ -63,17 +63,17 @@ type Hold struct {
 	Resources pq.StringArray `gorm:"column:resources;type:text[];index:idx_holds_resources_gin,type:gin" json:"resources,omitempty"`
 	// Candidate resources the allocator may choose from, supplied on create. Empty offers every resource the site holds. Immutable: the choice is made once, and re-offering a different set is a different allocation. Format: resources/{resource}
 	CandidateResources pq.StringArray `gorm:"column:candidate_resources;type:text[];index:idx_holds_candidate_resources_gin,type:gin" json:"candidate_resources,omitempty"`
-	// Back-relation: Allocation records that reference this via hold_id.
+	// Back-relation: Allocation records that reference this via hold.
 	Resource []Allocation `gorm:"foreignKey:HoldID" json:"resource,omitempty"`
 }
 
 func (*Hold) TableName() string { return "allocation.holds" }
 
-// An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it.
+// An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it. It sits under the site and names its hold, rather than nesting under the hold: the engine asks about allocations by resource and time across a whole site, never hold by hold, and a hold with child resources would owe DeleteHold a `force` flag guarding rows no caller can see.
 type Allocation struct {
 	// Unique identifier for the record.
 	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
-	// The allocation name, nested under the hold that took it so deleting the hold takes its claims with it. Format: organizationalUnits/{organizational_unit}/holds/{hold}/allocations/{allocation}
+	// The allocation name, under the site whose resource it takes. Format: organizationalUnits/{organizational_unit}/allocations/{allocation}
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// The resource taken. Format: resources/{resource} TODO: unresolved reference to Resource (not in this generation set); kept as a plain indexed column.
 	Resource string `gorm:"column:resource;not null;index:idx_resource_resource_start_time_end_time,priority:1;index:idx_resource_resource" json:"resource" validate:"required"`
@@ -81,15 +81,15 @@ type Allocation struct {
 	StartTime time.Time `gorm:"column:start_time;type:timestamptz;not null;index:idx_resource_resource_start_time_end_time,priority:2" json:"start_time" validate:"required"`
 	// End of the span taken, exclusive. A copy of the hold's window end.
 	EndTime time.Time `gorm:"column:end_time;type:timestamptz;not null;index:idx_resource_resource_start_time_end_time,priority:3" json:"end_time" validate:"required"`
-	// When this claim stops counting. A copy of the hold's expire_time while it is ACTIVE; set to the release instant on release; unset once the hold is CONVERTED, which is the one outcome that keeps the resource taken.
+	// When this claim stops counting. A copy of the hold's expire_time while it is ACTIVE; set to the release instant on release; unset once the hold is CONVERTED, which is the one outcome that keeps the resource taken. Always the server's to write, never a caller's.
 	ExpireTime *time.Time `gorm:"column:expire_time;type:timestamptz" json:"expire_time,omitempty"`
 	// Creation timestamp.
 	CreateTime time.Time `gorm:"column:create_time;type:timestamptz;not null;autoCreateTime" json:"create_time"`
+	// The hold that took it. Deleting the hold deletes its allocations with it. Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	HoldID *string `gorm:"column:hold;index:idx_resource_hold" json:"hold,omitempty"`
+	Hold   *Hold   `gorm:"foreignKey:HoldID" json:"hold_rel,omitempty"`
 	// Parent reference to OrganizationalUnit (from the AIP resource pattern). TODO: unresolved reference to OrganizationalUnit (not in this generation set); kept as a plain indexed column.
 	OrganizationalUnitID string `gorm:"column:organizational_unit_id;not null;index:idx_resource_organizational_unit_id" json:"organizational_unit_id" validate:"required"`
-	// Parent reference to Hold (from the AIP resource pattern).
-	HoldID string `gorm:"column:hold_id;not null;index:idx_resource_hold_id" json:"hold_id" validate:"required"`
-	Hold   *Hold  `gorm:"foreignKey:HoldID;constraint:OnDelete:CASCADE" json:"hold,omitempty"`
 }
 
 func (*Allocation) TableName() string { return "allocation.resource" }

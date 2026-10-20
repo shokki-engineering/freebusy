@@ -19,8 +19,10 @@ import (
 
 // CreateInput holds the settable fields for creating one PromocodeResource row.
 type CreateInput struct {
-	// Code sets the "code" column (required).
-	Code string `json:"code"`
+	// Code sets the "code" column; the zero value is omitted (column default / NULL).
+	Code string `json:"code,omitzero"`
+	// CodeGeneration sets the "codeGeneration" column; the zero value is omitted (column default / NULL).
+	CodeGeneration string `json:"codeGeneration,omitzero"`
 	// CreateTime sets the "createTime" column (required).
 	CreateTime string `json:"createTime"`
 	// Description sets the "description" column; the zero value is omitted (column default / NULL).
@@ -55,6 +57,8 @@ type CreateInput struct {
 type UpdateInput struct {
 	// Update the 'code' column in the 'promocode_resource' collection.
 	Code graphql.Nullable[string] `json:"code"`
+	// Update the 'code_generation' column in the 'promocode_resource' collection.
+	CodeGeneration graphql.Nullable[string] `json:"codeGeneration"`
 	// Update the 'create_time' column in the 'promocode_resource' collection.
 	CreateTime graphql.Nullable[string] `json:"createTime"`
 	// Update the 'description' column in the 'promocode_resource' collection.

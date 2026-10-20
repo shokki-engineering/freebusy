@@ -48,11 +48,11 @@ const (
 	// The hold lapsed or was released before it could be converted, so nothing
 	// was taken. Terminal.
 	ReservationState_RESERVATION_STATE_FAILED ReservationState = 5
-	// Being replaced by the reservation named in `replaced_by`. Transient: it
+	// Being replaced by the reservation named in `replacement`. Transient: it
 	// keeps its resources until the replacement is confirmed, then becomes
 	// RESCHEDULED -- or returns to CONFIRMED if the replacement's hold lapsed.
 	ReservationState_RESERVATION_STATE_RESCHEDULING ReservationState = 6
-	// Replaced by `replaced_by`, which now holds the booking; this one's
+	// Replaced by `replacement`, which now holds the booking; this one's
 	// resources are free. Terminal.
 	ReservationState_RESERVATION_STATE_RESCHEDULED ReservationState = 7
 )

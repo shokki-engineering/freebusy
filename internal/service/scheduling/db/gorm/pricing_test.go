@@ -80,7 +80,7 @@ func TestComputePricingWithPromo(t *testing.T) {
 		},
 	}
 	promo := &promocode.PromoCode{
-		Code:     "SAVE20",
+		Code:     repox.Ptr("SAVE20"),
 		Discount: &promocode.Discount{PercentOff: repox.Ptr(int32(20))},
 	}
 
@@ -105,7 +105,7 @@ func TestComputePricingPromoScopeExcludesUnit(t *testing.T) {
 		Price:       inr(5000),
 	}
 	promo := &promocode.PromoCode{
-		Code:     "SUITEONLY",
+		Code:     repox.Ptr("SUITEONLY"),
 		Discount: &promocode.Discount{PercentOff: repox.Ptr(int32(50))},
 		Scope: &promocode.Scope{
 			ApplicableUnits: []string{"u2"},

@@ -72,7 +72,7 @@ paths:
                 Makes a reservation from a live hold, converting the hold so its
                  resources stay taken.
 
-                 Idempotent: the reservation's id is the hold's, so a retry returns the
+                 Idempotent: a hold backs at most one reservation, so a retry returns the
                  reservation the first call made. Fails with FAILED_PRECONDITION when the
                  hold has lapsed or been released.
             operationId: ReservationService_CreateReservation
@@ -81,6 +81,14 @@ paths:
                   in: path
                   description: The organizationalUnit id.
                   required: true
+                  schema:
+                    type: string
+                - name: reservationId
+                  in: query
+                  description: |-
+                    Client-assigned id, becoming the last segment of the reservation name.
+                     Defaults to the hold's id. A hold backs at most one reservation whatever
+                     its id, so naming a hold that already has one returns that reservation.
                   schema:
                     type: string
             requestBody:
@@ -185,7 +193,7 @@ paths:
                  that replaces it.
 
                  The replacement is a new reservation made from the new hold, linked both
-                 ways (`replaces`, `replaced_by`); the original ends RESCHEDULED. The
+                 ways (`replaces`, `replacement`); the original ends RESCHEDULED. The
                  original keeps its resources until the replacement is confirmed, so a
                  failure part-way -- the new hold lapsing, a crash -- leaves the customer
                  with their old booking, never with neither. Idempotent: repeating the call
@@ -294,9 +302,8 @@ components:
                 name:
                     type: string
                     description: |-
-                        The reservation name. Its id is always the id of the hold it was made
-                         from, so a retried CreateReservation finds the reservation the first
-                         attempt wrote instead of making a second.
+                        The reservation name. Its id is the caller's reservation_id, or else the
+                         id of the hold it was made from.
                          Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
                 hold:
                     type: string
@@ -371,7 +378,7 @@ components:
                         The reservation this one replaced, set when it was made by
                          RescheduleReservation.
                          Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
-                replacedBy:
+                replacement:
                     readOnly: true
                     type: string
                     description: |-

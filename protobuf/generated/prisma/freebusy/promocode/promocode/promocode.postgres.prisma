@@ -34,8 +34,8 @@ model PromoCode {
   /// The promo code name. Format: promoCodes/{promo_code}
   name String @unique @map("name")
 
-  /// The human-entered code, unique across all promo codes (e.g. "SUMMER25").
-  code String @unique @map("code")
+  /// The human-entered code, unique across all promo codes (e.g. "SUMMER25"). Leave empty on create to have the server generate one; `code_generation` then records that it did.
+  code String? @unique @map("code")
 
   /// Internal display name (not shown to customers).
   displayName String? @map("display_name")
@@ -60,6 +60,9 @@ model PromoCode {
 
   /// Opaque version for optimistic concurrency (AIP-154); echo on update/delete.
   etag String? @map("etag")
+
+  /// How `code` was chosen: MANUAL when the caller supplied it, AUTO when the server generated it. Set once, on create.
+  codeGeneration CodeGeneration? @map("code_generation")
 
   /// Foreign key to Discount.
   discountID String @map("discount_id")

@@ -61,13 +61,13 @@ func NewGraphQLAllocationRepository(svc *freebusyql.Service) *GraphQLAllocationR
 
 // Create persists in under parent and returns the stored record.
 func (r *GraphQLAllocationRepository) Create(ctx context.Context, parent string, in *allocationpbv1.Allocation) (*allocationpbv1.Allocation, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits", "holds")
+	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
 	if err != nil {
 		return nil, err
 	}
 	id := repox.NewULID()
 	if in.GetName() != "" {
-		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds", "allocations")
+		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "allocations")
 		if err != nil {
 			return nil, err
 		}
@@ -79,7 +79,7 @@ func (r *GraphQLAllocationRepository) Create(ctx context.Context, parent string,
 		id = ids[len(ids)-1]
 	}
 	in = proto.Clone(in).(*allocationpbv1.Allocation)
-	in.Name = FormatAllocationName(parentIDs[0], parentIDs[1], id)
+	in.Name = FormatAllocationName(parentIDs[0], id)
 	if h := r.Hooks.BeforeCreate; h != nil {
 		if err := h(ctx, in); err != nil {
 			return nil, err
@@ -88,7 +88,6 @@ func (r *GraphQLAllocationRepository) Create(ctx context.Context, parent string,
 	ci := allocationToCreateInput(in)
 	ci.Id = id
 	ci.OrganizationalUnitId = parentIDs[0]
-	ci.HoldId = parentIDs[1]
 	now := tsToStr(timestamppb.New(time.Now().UTC()))
 	ci.CreateTime = now
 	if _, err := r.Svc.Mutation.Allocation.Resource.Create(ctx, ci); err != nil {
@@ -99,7 +98,7 @@ func (r *GraphQLAllocationRepository) Create(ctx context.Context, parent string,
 
 // Get returns the record addressed by its resource name.
 func (r *GraphQLAllocationRepository) Get(ctx context.Context, name string) (*allocationpbv1.Allocation, error) {
-	ids, err := repox.SplitName(name, "organizationalUnits", "holds", "allocations")
+	ids, err := repox.SplitName(name, "organizationalUnits", "allocations")
 	if err != nil {
 		return nil, err
 	}
@@ -133,11 +132,11 @@ func (r *GraphQLAllocationRepository) toProto(ctx context.Context, row *resource
 
 // List returns one page of records under parent.
 func (r *GraphQLAllocationRepository) List(ctx context.Context, parent string, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits", "holds")
+	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
 	if err != nil {
 		return nil, "", err
 	}
-	return r.list(ctx, in, resourceql.HoldId.Eq(parentIDs[len(parentIDs)-1]))
+	return r.list(ctx, in, resourceql.OrganizationalUnitId.Eq(parentIDs[len(parentIDs)-1]))
 }
 
 func (r *GraphQLAllocationRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*allocationpbv1.Allocation, string, error) {
@@ -173,7 +172,7 @@ func (r *GraphQLAllocationRepository) list(ctx context.Context, in repox.ListInp
 // mutable field. When in.Etag is set the write is guarded server-side
 // (UpdateIfMatch); a stale etag returns repox.ErrConflict.
 func (r *GraphQLAllocationRepository) Update(ctx context.Context, in *allocationpbv1.Allocation, paths []string) (*allocationpbv1.Allocation, error) {
-	ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds", "allocations")
+	ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "allocations")
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +205,7 @@ func (r *GraphQLAllocationRepository) Update(ctx context.Context, in *allocation
 
 // Delete removes the record addressed by its resource name.
 func (r *GraphQLAllocationRepository) Delete(ctx context.Context, name string) error {
-	ids, err := repox.SplitName(name, "organizationalUnits", "holds", "allocations")
+	ids, err := repox.SplitName(name, "organizationalUnits", "allocations")
 	if err != nil {
 		return err
 	}

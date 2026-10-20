@@ -25,8 +25,9 @@ const (
 
 // Request message for ReservationService.CreateReservation, AIP-133.
 //
-// There is no reservation_id: the id is the hold's, which is what makes the
-// call safe to retry without an idempotency key of its own.
+// Safe to retry without an idempotency key of its own: a hold can back only
+// one reservation, so a retry -- with or without reservation_id -- finds the
+// reservation the first attempt made instead of making a second.
 type CreateReservationRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The site the hold was taken at.
@@ -34,7 +35,11 @@ type CreateReservationRequest struct {
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// The reservation to make. `hold` is required; `customer` and `attributes`
 	// are optional.
-	Reservation   *Reservation `protobuf:"bytes,2,opt,name=reservation,proto3" json:"reservation,omitempty"`
+	Reservation *Reservation `protobuf:"bytes,2,opt,name=reservation,proto3" json:"reservation,omitempty"`
+	// Client-assigned id, becoming the last segment of the reservation name.
+	// Defaults to the hold's id. A hold backs at most one reservation whatever
+	// its id, so naming a hold that already has one returns that reservation.
+	ReservationId string `protobuf:"bytes,3,opt,name=reservation_id,json=reservationId,proto3" json:"reservation_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -81,6 +86,13 @@ func (x *CreateReservationRequest) GetReservation() *Reservation {
 		return x.Reservation
 	}
 	return nil
+}
+
+func (x *CreateReservationRequest) GetReservationId() string {
+	if x != nil {
+		return x.ReservationId
+	}
+	return ""
 }
 
 // Request message for ReservationService.GetReservation, AIP-131.
@@ -405,10 +417,11 @@ var File_freebusy_reservation_v1_reservation_messages_proto protoreflect.FileDes
 
 const file_freebusy_reservation_v1_reservation_messages_proto_rawDesc = "" +
 	"\n" +
-	"2freebusy/reservation/v1/reservation_messages.proto\x12\x17freebusy.reservation.v1\x1a\x1bbuf/validate/validate.proto\x1a)freebusy/reservation/v1/reservation.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\"\xd4\x01\n" +
+	"2freebusy/reservation/v1/reservation_messages.proto\x12\x17freebusy.reservation.v1\x1a\x1bbuf/validate/validate.proto\x1a)freebusy/reservation/v1/reservation.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\"\xae\x02\n" +
 	"\x18CreateReservationRequest\x12e\n" +
 	"\x06parent\x18\x01 \x01(\tBM\xe0A\x02\xfaA%\x12#freebusy.reservation.v1/Reservation\xbaH\x1fr\x1d2\x1b^organizationalUnits/[^/]+$R\x06parent\x12Q\n" +
-	"\vreservation\x18\x02 \x01(\v2$.freebusy.reservation.v1.ReservationB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\vreservation\"\x8d\x01\n" +
+	"\vreservation\x18\x02 \x01(\v2$.freebusy.reservation.v1.ReservationB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\vreservation\x12X\n" +
+	"\x0ereservation_id\x18\x03 \x01(\tB1\xe0A\x01\xbaH+\xd8\x01\x01r&2$^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$R\rreservationId\"\x8d\x01\n" +
 	"\x15GetReservationRequest\x12t\n" +
 	"\x04name\x18\x01 \x01(\tB`\xe0A\x02\xfaA%\n" +
 	"#freebusy.reservation.v1/Reservation\xbaH2r02.^organizationalUnits/[^/]+/reservations/[^/]+$R\x04name\"\x8d\x02\n" +

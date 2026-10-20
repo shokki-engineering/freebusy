@@ -25,6 +25,7 @@ var PromoCodeFilterSpec = filterx.Spec{
 	Table: `"promocode"."resource"`,
 	Fields: map[string]filterx.FieldSpec{
 		"code":             {Column: "code", Kind: filterx.KindText},
+		"code_generation":  {Column: "code_generation", Kind: filterx.KindEnum, EnumPrefix: "CODE_GENERATION_"},
 		"create_time":      {Column: "create_time", Kind: filterx.KindTimestamp},
 		"description":      {Column: "description", Kind: filterx.KindText},
 		"disabled":         {Column: "disabled", Kind: filterx.KindBool},
@@ -36,7 +37,8 @@ var PromoCodeFilterSpec = filterx.Spec{
 	},
 	Search: []string{"code", "display_name"},
 	Sort: map[string]filterx.SortSpec{
-		"code":             {Column: "code", Kind: filterx.KindText, NotNull: true},
+		"code":             {Column: "code", Kind: filterx.KindText},
+		"code_generation":  {Column: "code_generation", Kind: filterx.KindEnum},
 		"create_time":      {Column: "create_time", Kind: filterx.KindTimestamp, NotNull: true},
 		"description":      {Column: "description", Kind: filterx.KindText},
 		"disabled":         {Column: "disabled", Kind: filterx.KindBool},

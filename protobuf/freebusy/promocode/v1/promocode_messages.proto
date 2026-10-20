@@ -65,8 +65,9 @@ message GetPromoCodeRequest {
 // Request message for CreatePromoCode.
 message CreatePromoCodeRequest {
   // The promo code to create. Server-assigned fields are ignored on input:
-  // name, state, redemption_count, redemptions, create_time, update_time, etag.
-  // promo_code.code is honored only when code_generation is MANUAL (or unset).
+  // name, state, redemption_count, redemptions, create_time, update_time, etag,
+  // code_generation. Leave promo_code.code empty to have the server generate
+  // one.
   PromoCode promo_code = 1 [
     (google.api.field_behavior) = REQUIRED,
     (buf.validate.field).required = true,
@@ -77,13 +78,11 @@ message CreatePromoCodeRequest {
     }
   ];
 
-  // Whether the human-facing code is supplied by the caller (MANUAL) or minted
-  // by the server (AUTO). Unset defaults to MANUAL. When AUTO, promo_code.code
-  // is ignored and the server returns the generated code on the created resource.
-  // (-- api-linter: core::0133::request-unknown-fields=disabled
-  //     aip.dev/not-precedent: Code generation mode is intrinsic to creating a
-  //     promo code and has no standard AIP-133 equivalent. --)
-  CodeGeneration code_generation = 5 [(google.api.field_behavior) = OPTIONAL];
+  // Was `code_generation`, the request's choice between a supplied and a
+  // generated code. That choice is now an empty promo_code.code, and the
+  // outcome is recorded on the resource as PromoCode.code_generation.
+  reserved 5;
+  reserved "code_generation";
 
   // Optional caller-chosen ID for the promo code; the server generates one if unset.
   string promo_code_id = 2 [

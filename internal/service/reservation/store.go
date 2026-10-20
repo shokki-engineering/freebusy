@@ -25,9 +25,9 @@ type Change struct {
 	ConfirmTime  *time.Time
 	CancelTime   *time.Time
 	CancelReason string
-	// ReplacedBy sets replaced_by when non-nil; pointing at "" clears it, which
+	// Replacement sets replacement when non-nil; pointing at "" clears it, which
 	// is how a move that fell through is undone.
-	ReplacedBy *string
+	Replacement *string
 }
 
 // Store persists reservations. Implementations exist for GORM and Hasura;
@@ -36,11 +36,15 @@ type Store interface {
 	// Get returns one reservation, or types.ErrNotFound.
 	Get(ctx context.Context, name string) (*reservationpbv1.Reservation, error)
 
+	// FindByHold returns the reservation a hold backs, or types.ErrNotFound.
+	// A hold backs at most one: the stores enforce it with a unique index.
+	FindByHold(ctx context.Context, hold string) (*reservationpbv1.Reservation, error)
+
 	// List returns a page of a site's reservations, AIP-160 filtered.
 	List(ctx context.Context, parent string, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error)
 
 	// Insert writes a new reservation exactly as given (name included), or
-	// fails with types.ErrAlreadyExists when the name is taken.
+	// fails with types.ErrAlreadyExists when the name, or the hold, is taken.
 	Insert(ctx context.Context, r *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error)
 
 	// Transition applies c if the stored state is one of from and, when etag

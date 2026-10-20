@@ -76,8 +76,10 @@ message PromoCode {
   reserved 2;
 
   // The human-entered code, unique across all promo codes (e.g. "SUMMER25").
+  // Leave empty on create to have the server generate one; `code_generation`
+  // then records that it did.
   string code = 3 [
-    (google.api.field_behavior) = REQUIRED,
+    (google.api.field_behavior) = OPTIONAL,
     (store.v1.column) = {unique: true},
     (store.v1.query) = {search: true},
     (cache.v1.cache_index) = {}
@@ -147,6 +149,10 @@ message PromoCode {
 
   // Opaque version for optimistic concurrency (AIP-154); echo on update/delete.
   string etag = 21;
+
+  // How `code` was chosen: MANUAL when the caller supplied it, AUTO when the
+  // server generated it. Set once, on create.
+  CodeGeneration code_generation = 27 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 // Discount describes how a promo code reduces a subtotal. Nested value object →

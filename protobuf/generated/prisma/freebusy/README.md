@@ -6,7 +6,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 42 | 21 |
+| 42 | 22 |
 
 ## Entity relationships
 
@@ -19,7 +19,7 @@ erDiagram
     }
     Allocation {
         string id PK
-        string hold_id FK
+        string hold FK
     }
     Attachment {
         string id PK
@@ -194,7 +194,7 @@ erDiagram
         string id PK
     }
     Adjustment }o--|| Money : "amount_delta_id"
-    Allocation }o--|| Hold : "hold_id"
+    Allocation }o--|| Hold : "hold"
     AvailabilityException }o--|| TimeWindow : "window_id"
     AvailabilityException }o--|| SharedDateRange : "date_range_id"
     Booking }o--|| PromoCode : "promo_code"

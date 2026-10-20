@@ -6,7 +6,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 6 | 2 |
+| 6 | 3 |
 
 ## Entity relationships
 

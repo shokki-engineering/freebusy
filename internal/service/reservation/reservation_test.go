@@ -46,6 +46,17 @@ func (m *memStore) Get(_ context.Context, name string) (*reservationpbv1.Reserva
 	return proto.Clone(r).(*reservationpbv1.Reservation), nil
 }
 
+func (m *memStore) FindByHold(_ context.Context, hold string) (*reservationpbv1.Reservation, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	for _, r := range m.rows {
+		if r.GetHold() == hold {
+			return proto.Clone(r).(*reservationpbv1.Reservation), nil
+		}
+	}
+	return nil, types.ErrNotFound
+}
+
 func (m *memStore) List(context.Context, string, repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
 	return nil, "", nil
 }
@@ -55,6 +66,11 @@ func (m *memStore) Insert(_ context.Context, r *reservationpbv1.Reservation) (*r
 	defer m.mu.Unlock()
 	if _, ok := m.rows[r.GetName()]; ok {
 		return nil, types.ErrAlreadyExists
+	}
+	for _, other := range m.rows {
+		if other.GetHold() == r.GetHold() {
+			return nil, types.ErrAlreadyExists // the unique index on hold
+		}
 	}
 	c := proto.Clone(r).(*reservationpbv1.Reservation)
 	m.version++
@@ -84,8 +100,8 @@ func (m *memStore) Transition(_ context.Context, name, etag string, from []reser
 	if c.CancelReason != "" {
 		r.CancelReason = c.CancelReason
 	}
-	if c.ReplacedBy != nil {
-		r.ReplacedBy = *c.ReplacedBy
+	if c.Replacement != nil {
+		r.Replacement = *c.Replacement
 	}
 	m.version++
 	r.Etag = strconv.Itoa(m.version)
@@ -356,7 +372,7 @@ func TestRescheduleMovesAndLinks(t *testing.T) {
 		t.Fatalf("replacement %v", rep)
 	}
 	o := f.get(t, old.GetName())
-	if o.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED || o.GetReplacedBy() != rep.GetName() {
+	if o.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED || o.GetReplacement() != rep.GetName() {
 		t.Fatalf("original %v", o)
 	}
 	if f.holds.ended[oldHold] != 1 || f.holds.holds[newHold].GetState() != allocationpbv1.HoldState_HOLD_STATE_CONVERTED {
@@ -386,7 +402,7 @@ func TestRescheduleOntoLapsedHoldKeepsOriginal(t *testing.T) {
 		t.Fatalf("got %v", err)
 	}
 	o := f.get(t, old.GetName())
-	if o.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED || o.GetReplacedBy() != "" {
+	if o.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED || o.GetReplacement() != "" {
 		t.Fatalf("original should be CONFIRMED again with no replacement: %v", o)
 	}
 	if f.holds.ended[oldHold] != 0 {
@@ -434,5 +450,53 @@ func TestRescheduleOntoCancelledReplacementReverts(t *testing.T) {
 	}
 	if s := f.get(t, old.GetName()).GetState(); s != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED {
 		t.Fatalf("original %v", s)
+	}
+}
+
+func (f *fixture) createAs(hold, id string) (*reservationpbv1.Reservation, error) {
+	return f.srv.CreateReservation(context.Background(), &reservationpbv1.CreateReservationRequest{
+		Parent: site, ReservationId: id, Reservation: &reservationpbv1.Reservation{Hold: hold},
+	})
+}
+
+func TestReservationID(t *testing.T) {
+	f := newFixture()
+	h1 := f.hold("h1", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
+	r, err := f.createAs(h1, "court-booking-1")
+	if err != nil || r.GetName() != site+"/reservations/court-booking-1" || r.GetHold() != h1 {
+		t.Fatalf("custom id: %v %v", r, err)
+	}
+	// The same hold under another id is the same reservation, not a second.
+	again, err := f.createAs(h1, "something-else")
+	if err != nil || again.GetName() != r.GetName() || len(f.store.rows) != 1 {
+		t.Fatalf("second id for one hold: %v %v", again, err)
+	}
+	// An id already used by another hold's reservation is taken.
+	h2 := f.hold("h2", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
+	if _, err := f.createAs(h2, "court-booking-1"); status.Code(err) != codes.AlreadyExists {
+		t.Fatalf("taken id: %v", err)
+	}
+	// Moving a custom-named reservation still works, and finds the
+	// replacement by its hold.
+	rep, err := f.move(r.GetName(), h2)
+	if err != nil || rep.GetName() != site+"/reservations/h2" || rep.GetReplaces() != r.GetName() {
+		t.Fatalf("move: %v %v", rep, err)
+	}
+}
+
+func TestRescheduleOntoAlreadyReservedHoldUsesIt(t *testing.T) {
+	f := newFixture()
+	old, _ := f.create(f.hold("h1", allocationpbv1.HoldState_HOLD_STATE_ACTIVE))
+	h2 := f.hold("h2", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
+	mine, err := f.createAs(h2, "custom")
+	if err != nil {
+		t.Fatal(err)
+	}
+	rep, err := f.move(old.GetName(), h2)
+	if err != nil || rep.GetName() != mine.GetName() {
+		t.Fatalf("move onto a hold that already has a reservation: %v %v", rep, err)
+	}
+	if o := f.get(t, old.GetName()); o.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED || o.GetReplacement() != mine.GetName() {
+		t.Fatalf("original %v", o)
 	}
 }

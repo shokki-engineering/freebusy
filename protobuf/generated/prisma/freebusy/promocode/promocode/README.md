@@ -67,7 +67,7 @@ A redeemable discount applied to a booking's subtotal. Scoped by a redemption wi
 | --- | --- | --- |
 | `id` | `CHAR(26)` | not null |
 | `name` | `VARCHAR(255)` | not null |
-| `code` | `VARCHAR(255)` | not null |
+| `code` | `VARCHAR(255)` | nullable |
 | `display_name` | `VARCHAR(255)` | nullable |
 | `description` | `TEXT` | nullable |
 | `redemption_count` | `BIGINT` | nullable |
@@ -76,6 +76,7 @@ A redeemable discount applied to a booking's subtotal. Scoped by a redemption wi
 | `create_time` | `TIMESTAMPTZ` | not null |
 | `update_time` | `TIMESTAMPTZ` | not null |
 | `etag` | `VARCHAR(255)` | nullable |
+| `code_generation` | `CodeGeneration` | nullable |
 | `discount_id` | `CHAR(26)` | not null |
 | `window_id` | `CHAR(26)` | nullable |
 | `limits_id` | `CHAR(26)` | nullable |

@@ -73,20 +73,18 @@ func (s *Server) GetPromoCode(ctx context.Context, req *promocodepbv1.GetPromoCo
 	return out, err
 }
 
-// CreatePromoCode creates a promo code. The code is taken from the request's
-// code_source oneof (a custom value or a generated one); a caller-supplied
-// promo_code_id fixes the resource name; a ttl is folded into the redemption
-// window; validate_only runs request validation without persisting.
+// CreatePromoCode creates a promo code. The code is the caller's
+// promo_code.code, or a generated one when that is empty, and which it was is
+// recorded as code_generation; a caller-supplied promo_code_id fixes the
+// resource name; validate_only runs request validation without persisting.
 func (s *Server) CreatePromoCode(ctx context.Context, req *promocodepbv1.CreatePromoCodeRequest) (*promocodepbv1.PromoCode, error) {
 	pc := req.GetPromoCode()
-	code, err := ResolveCode(req)
-	if err != nil {
-		return nil, err
-	}
+	code, generation := ResolveCode(req)
 	// Clone so the resolved code and caller-chosen name don't mutate the inbound
 	// request proto.
 	pc = proto.Clone(pc).(*promocodepbv1.PromoCode)
 	pc.Code = code
+	pc.CodeGeneration = generation
 	if id := req.GetPromoCodeId(); id != "" {
 		name, nerr := types.PromoCodeName(id)
 		if nerr != nil {
@@ -111,7 +109,7 @@ func (s *Server) CreatePromoCode(ctx context.Context, req *promocodepbv1.CreateP
 		return out, err
 	}
 	var out *promocodepbv1.PromoCode
-	err = rpc.Traced(ctx, "PromoCodeService", "CreatePromoCode", func(ctx context.Context) error {
+	err := rpc.Traced(ctx, "PromoCodeService", "CreatePromoCode", func(ctx context.Context) error {
 		created, err := s.repo.Create(ctx, pc)
 		if err != nil {
 			return rpc.ToStatusErr(err)

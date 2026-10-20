@@ -2029,18 +2029,6 @@ paths:
       description: Creates a promo code.
       operationId: PromoCodeService_CreatePromoCode
       parameters:
-        - name: codeGeneration
-          in: query
-          description: |-
-            Whether the human-facing code is supplied by the caller (MANUAL) or minted
-             by the server (AUTO). Unset defaults to MANUAL. When AUTO, promo_code.code
-             is ignored and the server returns the generated code on the created resource.
-             (-- api-linter: core::0133::request-unknown-fields=disabled
-                 aip.dev/not-precedent: Code generation mode is intrinsic to creating a
-                 promo code and has no standard AIP-133 equivalent. --)
-          schema:
-            type: integer
-            format: enum
         - name: promoCodeId
           in: query
           description: Optional caller-chosen ID for the promo code; the server generates one if unset.
@@ -2633,7 +2621,7 @@ paths:
         Makes a reservation from a live hold, converting the hold so its
          resources stay taken.
 
-         Idempotent: the reservation's id is the hold's, so a retry returns the
+         Idempotent: a hold backs at most one reservation, so a retry returns the
          reservation the first call made. Fails with FAILED_PRECONDITION when the
          hold has lapsed or been released.
       operationId: ReservationService_CreateReservation
@@ -2642,6 +2630,14 @@ paths:
           in: path
           description: The organizationalUnit id.
           required: true
+          schema:
+            type: string
+        - name: reservationId
+          in: query
+          description: |-
+            Client-assigned id, becoming the last segment of the reservation name.
+             Defaults to the hold's id. A hold backs at most one reservation whatever
+             its id, so naming a hold that already has one returns that reservation.
           schema:
             type: string
       requestBody:
@@ -2767,7 +2763,7 @@ paths:
          that replaces it.
 
          The replacement is a new reservation made from the new hold, linked both
-         ways (`replaces`, `replaced_by`); the original ends RESCHEDULED. The
+         ways (`replaces`, `replacement`); the original ends RESCHEDULED. The
          original keeps its resources until the replacement is confirmed, so a
          failure part-way -- the new hold lapsing, a crash -- leaves the customer
          with their old booking, never with neither. Idempotent: repeating the call
@@ -5062,7 +5058,6 @@ components:
       description: Response message for ListRedemptions.
     PromoCode:
       required:
-        - code
         - discount
       type: object
       properties:
@@ -5073,7 +5068,10 @@ components:
              Format: promoCodes/{promo_code}
         code:
           type: string
-          description: The human-entered code, unique across all promo codes (e.g. "SUMMER25").
+          description: |-
+            The human-entered code, unique across all promo codes (e.g. "SUMMER25").
+             Leave empty on create to have the server generate one; `code_generation`
+             then records that it did.
         displayName:
           type: string
           description: Internal display name (not shown to customers).
@@ -5129,6 +5127,13 @@ components:
         etag:
           type: string
           description: Opaque version for optimistic concurrency (AIP-154); echo on update/delete.
+        codeGeneration:
+          readOnly: true
+          type: integer
+          description: |-
+            How `code` was chosen: MANUAL when the caller supplied it, AUTO when the
+             server generated it. Set once, on create.
+          format: enum
       description: |-
         A redeemable discount applied to a booking's subtotal. Scoped by a redemption
          window, usage caps, a minimum subtotal, and an optional set of properties /
@@ -5481,9 +5486,8 @@ components:
         name:
           type: string
           description: |-
-            The reservation name. Its id is always the id of the hold it was made
-             from, so a retried CreateReservation finds the reservation the first
-             attempt wrote instead of making a second.
+            The reservation name. Its id is the caller's reservation_id, or else the
+             id of the hold it was made from.
              Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
         hold:
           type: string
@@ -5558,7 +5562,7 @@ components:
             The reservation this one replaced, set when it was made by
              RescheduleReservation.
              Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
-        replacedBy:
+        replacement:
           readOnly: true
           type: string
           description: |-

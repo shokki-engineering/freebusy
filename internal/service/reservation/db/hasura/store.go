@@ -33,7 +33,7 @@ var _ svc.Store = (*Store)(nil)
 func New(s *freebusyql.Service) *Store {
 	return &Store{
 		svc:  s,
-		repo: resrepo.NewGraphQL(s, resrepo.WithReservationHooks(resrepo.ReservationHooks{AfterRead: svc.FillHold})).Reservations,
+		repo: resrepo.NewGraphQL(s).Reservations,
 	}
 }
 
@@ -42,7 +42,17 @@ func New(s *freebusyql.Service) *Store {
 // through it would come back without the window, resources or any of the
 // lifecycle timestamps.
 func (s *Store) Get(ctx context.Context, name string) (*reservationpbv1.Reservation, error) {
-	rows, err := s.svc.Query.Reservation.Resource.List(ctx, ressql.List().Where(ressql.Name.Eq(name)).Limit(1))
+	return s.first(ctx, ressql.Name.Eq(name))
+}
+
+// FindByHold reads the reservation a hold backs, through the unique index on
+// hold.
+func (s *Store) FindByHold(ctx context.Context, hold string) (*reservationpbv1.Reservation, error) {
+	return s.first(ctx, ressql.Hold.Eq(repox.LastSegment(hold)))
+}
+
+func (s *Store) first(ctx context.Context, where graphql.Predicate) (*reservationpbv1.Reservation, error) {
+	rows, err := s.svc.Query.Reservation.Resource.List(ctx, ressql.List().Where(where).Limit(1))
 	if err != nil {
 		return nil, dbutil.MapHasuraErr(err)
 	}
@@ -147,8 +157,8 @@ func (s *Store) Transition(ctx context.Context, name, etag string, from []reserv
 	if c.CancelReason != "" {
 		patch.CancelReason = graphql.Value(c.CancelReason)
 	}
-	if c.ReplacedBy != nil {
-		patch.ReplacedBy = dbutil.NullableStr(*c.ReplacedBy)
+	if c.Replacement != nil {
+		patch.Replacement = dbutil.NullableStr(*c.Replacement)
 	}
 	if _, err := s.svc.Mutation.Reservation.Resource.UpdateIfMatch(ctx, repox.LastSegment(cur.GetName()), patch, match); err != nil {
 		return nil, dbutil.MapHasuraErr(err)
@@ -176,12 +186,12 @@ func (s *Store) Stuck(ctx context.Context, cutoff time.Time, limit int) ([]*rese
 func toProto(r ressql.ReservationResource) *reservationpbv1.Reservation {
 	pb := &reservationpbv1.Reservation{
 		Name:         r.Name,
-		Hold:         svc.HoldOf(r.Name),
+		Hold:         svc.HoldName(r.OrganizationalUnitId, r.Hold),
 		State:        stateValue(repox.Deref(r.State)),
 		Customer:     repox.Deref(r.Customer),
 		CancelReason: repox.Deref(r.CancelReason),
 		Replaces:     repox.Deref(r.Replaces),
-		ReplacedBy:   repox.Deref(r.ReplacedBy),
+		Replacement:  repox.Deref(r.Replacement),
 		Etag:         repox.Deref(r.Etag),
 		CreateTime:   parse(&r.CreateTime),
 		UpdateTime:   parse(&r.UpdateTime),

@@ -33,7 +33,7 @@ service ReservationService {
   // Makes a reservation from a live hold, converting the hold so its
   // resources stay taken.
   //
-  // Idempotent: the reservation's id is the hold's, so a retry returns the
+  // Idempotent: a hold backs at most one reservation, so a retry returns the
   // reservation the first call made. Fails with FAILED_PRECONDITION when the
   // hold has lapsed or been released.
   rpc CreateReservation(CreateReservationRequest) returns (Reservation) {
@@ -41,7 +41,7 @@ service ReservationService {
       post: "/v1/{parent=organizationalUnits/*}/reservations"
       body: "reservation"
     };
-    option (google.api.method_signature) = "parent,reservation";
+    option (google.api.method_signature) = "parent,reservation,reservation_id";
     option (mcp.tool) = {description: "Confirm a live hold as a reservation, keeping its resources."};
   }
 
@@ -76,7 +76,7 @@ service ReservationService {
   // that replaces it.
   //
   // The replacement is a new reservation made from the new hold, linked both
-  // ways (`replaces`, `replaced_by`); the original ends RESCHEDULED. The
+  // ways (`replaces`, `replacement`); the original ends RESCHEDULED. The
   // original keeps its resources until the replacement is confirmed, so a
   // failure part-way -- the new hold lapsing, a crash -- leaves the customer
   // with their old booking, never with neither. Idempotent: repeating the call

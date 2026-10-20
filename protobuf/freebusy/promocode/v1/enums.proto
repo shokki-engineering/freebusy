@@ -54,14 +54,15 @@ enum PromoCodeInvalidReason {
   PROMO_CODE_INVALID_REASON_OUT_OF_SCOPE = 8;
 }
 
-// How the human-facing code string is chosen when creating a promo code.
+// How a promo code's human-facing code string was chosen, as recorded on
+// PromoCode.code_generation.
 enum CodeGeneration {
-  // Unset; treated as MANUAL (use the caller-provided code).
+  // Not recorded: the code was created before this field existed.
   CODE_GENERATION_UNSPECIFIED = 0;
 
-  // The caller provides the code in promo_code.code; the server uses it verbatim.
+  // The caller supplied the code and the server used it verbatim.
   CODE_GENERATION_MANUAL = 1;
 
-  // The server generates a unique code; any code in promo_code.code is ignored.
+  // The caller left the code empty and the server generated it.
   CODE_GENERATION_AUTO = 2;
 }

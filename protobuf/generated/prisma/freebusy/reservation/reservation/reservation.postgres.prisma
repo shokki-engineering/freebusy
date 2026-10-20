@@ -17,7 +17,7 @@ model Reservation {
   /// Unique identifier for the record.
   id String @id @default(ulid()) @map("id")
 
-  /// The reservation name. Its id is always the id of the hold it was made from, so a retried CreateReservation finds the reservation the first attempt wrote instead of making a second. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  /// The reservation name. Its id is the caller's reservation_id, or else the id of the hold it was made from. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
   name String @unique @map("name")
 
   /// The hold this reservation was made from, at the same site. Format: organizationalUnits/{organizational_unit}/holds/{hold}
@@ -63,7 +63,7 @@ model Reservation {
   replaces String? @map("replaces")
 
   /// The reservation replacing this one, set when RescheduleReservation began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
-  replacedBy String? @map("replaced_by")
+  replacement String? @map("replacement")
 
   /// Parent reference to OrganizationalUnit (from the AIP resource pattern). TODO: unresolved reference to OrganizationalUnit (not in this generation set); kept as a plain indexed column.
   organizationalUnitID String @map("organizational_unit_id")
@@ -71,10 +71,10 @@ model Reservation {
   /// The resources taken, copied from the hold. Format: resources/{resource}
   resources String[] @map("resources")
 
+  /// Unique constraint on [hold].
+  @@unique([holdID])
   /// Index on [organizational_unit_id].
   @@index([organizationalUnitID])
-  /// Index on [hold].
-  @@index([holdID])
   /// GIN index: case-insensitive contains (ILIKE '%…%') cannot use a B-tree.
   @@index([customer(ops: raw("gin_trgm_ops"))], type: Gin)
   /// GIN index: tag containment (@>) cannot use a B-tree.

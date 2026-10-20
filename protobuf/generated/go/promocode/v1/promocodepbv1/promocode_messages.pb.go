@@ -215,17 +215,10 @@ func (x *GetPromoCodeRequest) GetName() string {
 type CreatePromoCodeRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The promo code to create. Server-assigned fields are ignored on input:
-	// name, state, redemption_count, redemptions, create_time, update_time, etag.
-	// promo_code.code is honored only when code_generation is MANUAL (or unset).
+	// name, state, redemption_count, redemptions, create_time, update_time, etag,
+	// code_generation. Leave promo_code.code empty to have the server generate
+	// one.
 	PromoCode *PromoCode `protobuf:"bytes,1,opt,name=promo_code,json=promoCode,proto3" json:"promo_code,omitempty"`
-	// Whether the human-facing code is supplied by the caller (MANUAL) or minted
-	// by the server (AUTO). Unset defaults to MANUAL. When AUTO, promo_code.code
-	// is ignored and the server returns the generated code on the created resource.
-	// (-- api-linter: core::0133::request-unknown-fields=disabled
-	//
-	//	aip.dev/not-precedent: Code generation mode is intrinsic to creating a
-	//	promo code and has no standard AIP-133 equivalent. --)
-	CodeGeneration CodeGeneration `protobuf:"varint,5,opt,name=code_generation,json=codeGeneration,proto3,enum=freebusy.promocode.v1.CodeGeneration" json:"code_generation,omitempty"`
 	// Optional caller-chosen ID for the promo code; the server generates one if unset.
 	PromoCodeId string `protobuf:"bytes,2,opt,name=promo_code_id,json=promoCodeId,proto3" json:"promo_code_id,omitempty"`
 	// Caller-supplied idempotency key; identical retries return the first result.
@@ -271,13 +264,6 @@ func (x *CreatePromoCodeRequest) GetPromoCode() *PromoCode {
 		return x.PromoCode
 	}
 	return nil
-}
-
-func (x *CreatePromoCodeRequest) GetCodeGeneration() CodeGeneration {
-	if x != nil {
-		return x.CodeGeneration
-	}
-	return CodeGeneration_CODE_GENERATION_UNSPECIFIED
 }
 
 func (x *CreatePromoCodeRequest) GetPromoCodeId() string {
@@ -829,16 +815,15 @@ const file_freebusy_promocode_v1_promocode_messages_proto_rawDesc = "" +
 	"total_size\x18\x03 \x01(\x05R\ttotalSize\"k\n" +
 	"\x13GetPromoCodeRequest\x12T\n" +
 	"\x04name\x18\x01 \x01(\tB@\xe0A\x02\xfaA!\n" +
-	"\x1ffreebusy.promocode.v1/PromoCode\xbaH\x16r\x142\x12^promoCodes/[^/]+$R\x04name\"\xc7\x03\n" +
+	"\x1ffreebusy.promocode.v1/PromoCode\xbaH\x16r\x142\x12^promoCodes/[^/]+$R\x04name\"\x89\x03\n" +
 	"\x16CreatePromoCodeRequest\x12\xbd\x01\n" +
 	"\n" +
 	"promo_code\x18\x01 \x01(\v2 .freebusy.promocode.v1.PromoCodeB|\xe0A\x02\xbaHv\xba\x01p\n" +
-	"\x1acreate_promo_code.discount\x12>promo_code.discount is required: set percent_off or amount_off\x1a\x12has(this.discount)\xc8\x01\x01R\tpromoCode\x12S\n" +
-	"\x0fcode_generation\x18\x05 \x01(\x0e2%.freebusy.promocode.v1.CodeGenerationB\x03\xe0A\x01R\x0ecodeGeneration\x12B\n" +
+	"\x1acreate_promo_code.discount\x12>promo_code.discount is required: set percent_off or amount_off\x1a\x12has(this.discount)\xc8\x01\x01R\tpromoCode\x12B\n" +
 	"\rpromo_code_id\x18\x02 \x01(\tB\x1e\xe0A\x01\xbaH\x18\xd8\x01\x01r\x132\x11^[a-z0-9-]{1,63}$R\vpromoCodeId\x12*\n" +
 	"\n" +
 	"request_id\x18\x03 \x01(\tB\v\xe0A\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\x12(\n" +
-	"\rvalidate_only\x18\x04 \x01(\bB\x03\xe0A\x01R\fvalidateOnly\"\xd4\x02\n" +
+	"\rvalidate_only\x18\x04 \x01(\bB\x03\xe0A\x01R\fvalidateOnlyJ\x04\b\x05\x10\x06R\x0fcode_generation\"\xd4\x02\n" +
 	"\x16UpdatePromoCodeRequest\x12\xcd\x01\n" +
 	"\n" +
 	"promo_code\x18\x01 \x01(\v2 .freebusy.promocode.v1.PromoCodeB\x8b\x01\xe0A\x02\xbaH\x84\x01\xba\x01~\n" +
@@ -914,28 +899,26 @@ var file_freebusy_promocode_v1_promocode_messages_proto_goTypes = []any{
 	(*ListRedemptionsRequest)(nil),    // 9: freebusy.promocode.v1.ListRedemptionsRequest
 	(*ListRedemptionsResponse)(nil),   // 10: freebusy.promocode.v1.ListRedemptionsResponse
 	(*PromoCode)(nil),                 // 11: freebusy.promocode.v1.PromoCode
-	(CodeGeneration)(0),               // 12: freebusy.promocode.v1.CodeGeneration
-	(*fieldmaskpb.FieldMask)(nil),     // 13: google.protobuf.FieldMask
-	(*money.Money)(nil),               // 14: google.type.Money
-	(PromoCodeInvalidReason)(0),       // 15: freebusy.promocode.v1.PromoCodeInvalidReason
-	(*Redemption)(nil),                // 16: freebusy.promocode.v1.Redemption
+	(*fieldmaskpb.FieldMask)(nil),     // 12: google.protobuf.FieldMask
+	(*money.Money)(nil),               // 13: google.type.Money
+	(PromoCodeInvalidReason)(0),       // 14: freebusy.promocode.v1.PromoCodeInvalidReason
+	(*Redemption)(nil),                // 15: freebusy.promocode.v1.Redemption
 }
 var file_freebusy_promocode_v1_promocode_messages_proto_depIdxs = []int32{
 	11, // 0: freebusy.promocode.v1.ListPromoCodesResponse.promo_codes:type_name -> freebusy.promocode.v1.PromoCode
 	11, // 1: freebusy.promocode.v1.CreatePromoCodeRequest.promo_code:type_name -> freebusy.promocode.v1.PromoCode
-	12, // 2: freebusy.promocode.v1.CreatePromoCodeRequest.code_generation:type_name -> freebusy.promocode.v1.CodeGeneration
-	11, // 3: freebusy.promocode.v1.UpdatePromoCodeRequest.promo_code:type_name -> freebusy.promocode.v1.PromoCode
-	13, // 4: freebusy.promocode.v1.UpdatePromoCodeRequest.update_mask:type_name -> google.protobuf.FieldMask
-	14, // 5: freebusy.promocode.v1.ValidatePromoCodeRequest.subtotal:type_name -> google.type.Money
-	15, // 6: freebusy.promocode.v1.ValidatePromoCodeResponse.invalid_reason:type_name -> freebusy.promocode.v1.PromoCodeInvalidReason
-	14, // 7: freebusy.promocode.v1.ValidatePromoCodeResponse.discount_amount:type_name -> google.type.Money
-	14, // 8: freebusy.promocode.v1.ValidatePromoCodeResponse.final_total:type_name -> google.type.Money
-	16, // 9: freebusy.promocode.v1.ListRedemptionsResponse.redemptions:type_name -> freebusy.promocode.v1.Redemption
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	11, // 2: freebusy.promocode.v1.UpdatePromoCodeRequest.promo_code:type_name -> freebusy.promocode.v1.PromoCode
+	12, // 3: freebusy.promocode.v1.UpdatePromoCodeRequest.update_mask:type_name -> google.protobuf.FieldMask
+	13, // 4: freebusy.promocode.v1.ValidatePromoCodeRequest.subtotal:type_name -> google.type.Money
+	14, // 5: freebusy.promocode.v1.ValidatePromoCodeResponse.invalid_reason:type_name -> freebusy.promocode.v1.PromoCodeInvalidReason
+	13, // 6: freebusy.promocode.v1.ValidatePromoCodeResponse.discount_amount:type_name -> google.type.Money
+	13, // 7: freebusy.promocode.v1.ValidatePromoCodeResponse.final_total:type_name -> google.type.Money
+	15, // 8: freebusy.promocode.v1.ListRedemptionsResponse.redemptions:type_name -> freebusy.promocode.v1.Redemption
+	9,  // [9:9] is the sub-list for method output_type
+	9,  // [9:9] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_freebusy_promocode_v1_promocode_messages_proto_init() }

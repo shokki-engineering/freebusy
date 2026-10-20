@@ -34,6 +34,17 @@ const (
 	PromoCodeStateExpired PromoCodeState = "EXPIRED"
 )
 
+// How a promo code's human-facing code string was chosen, as recorded on PromoCode.code_generation.
+type CodeGeneration string
+
+// CodeGeneration values as stored in the database.
+const (
+	// The caller supplied the code and the server used it verbatim.
+	CodeGenerationManual CodeGeneration = "MANUAL"
+	// The caller left the code empty and the server generated it.
+	CodeGenerationAuto CodeGeneration = "AUTO"
+)
+
 // Discriminator for the amount oneof of Discount.
 type DiscountAmountCase string
 
@@ -51,8 +62,8 @@ type PromoCode struct {
 	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
 	// The promo code name. Format: promoCodes/{promo_code}
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
-	// The human-entered code, unique across all promo codes (e.g. "SUMMER25").
-	Code string `gorm:"column:code;not null;uniqueIndex;index:idx_resource_code_trgm,type:gin,expression:code gin_trgm_ops" json:"code" validate:"required"`
+	// The human-entered code, unique across all promo codes (e.g. "SUMMER25"). Leave empty on create to have the server generate one; `code_generation` then records that it did.
+	Code *string `gorm:"column:code;uniqueIndex;index:idx_resource_code_trgm,type:gin,expression:code gin_trgm_ops" json:"code,omitempty"`
 	// Internal display name (not shown to customers).
 	DisplayName *string `gorm:"column:display_name;index:idx_resource_display_name_trgm,type:gin,expression:display_name gin_trgm_ops" json:"display_name,omitempty"`
 	// Free-form description.
@@ -69,6 +80,8 @@ type PromoCode struct {
 	UpdateTime time.Time `gorm:"column:update_time;type:timestamptz;not null;autoUpdateTime" json:"update_time"`
 	// Opaque version for optimistic concurrency (AIP-154); echo on update/delete.
 	Etag *string `gorm:"column:etag" json:"etag,omitempty"`
+	// How `code` was chosen: MANUAL when the caller supplied it, AUTO when the server generated it. Set once, on create.
+	CodeGeneration *CodeGeneration `gorm:"column:code_generation;check:chk_resource_code_generation,code_generation IN ('MANUAL','AUTO')" json:"code_generation,omitempty"`
 	// Foreign key to Discount.
 	DiscountID string    `gorm:"column:discount_id;not null;index:idx_resource_discount_id" json:"discount_id" validate:"required"`
 	Discount   *Discount `gorm:"foreignKey:DiscountID;constraint:OnDelete:CASCADE" json:"discount,omitempty"`

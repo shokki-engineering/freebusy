@@ -23,7 +23,7 @@ var (
 	CreateTime           = graphql.StringField{Col: "createTime"}
 	EndTime              = graphql.StringField{Col: "endTime"}
 	ExpireTime           = graphql.StringField{Col: "expireTime"}
-	HoldId               = graphql.StringField{Col: "holdId"}
+	Hold                 = graphql.StringField{Col: "hold"}
 	Id                   = graphql.StringField{Col: "id"}
 	Name                 = graphql.StringField{Col: "name"}
 	OrganizationalUnitId = graphql.StringField{Col: "organizationalUnitId"}

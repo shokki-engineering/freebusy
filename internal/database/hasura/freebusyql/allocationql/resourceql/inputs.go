@@ -25,8 +25,8 @@ type CreateInput struct {
 	EndTime string `json:"endTime"`
 	// ExpireTime sets the "expireTime" column; the zero value is omitted (column default / NULL).
 	ExpireTime string `json:"expireTime,omitzero"`
-	// HoldId sets the "holdId" column (required).
-	HoldId string `json:"holdId"`
+	// Hold sets the "hold" column; the zero value is omitted (column default / NULL).
+	Hold string `json:"hold,omitzero"`
 	// Id sets the "id" column (required).
 	Id string `json:"id"`
 	// Name sets the "name" column (required).
@@ -47,8 +47,8 @@ type UpdateInput struct {
 	EndTime graphql.Nullable[string] `json:"endTime"`
 	// Update the 'expire_time' column in the 'allocation_resource' collection.
 	ExpireTime graphql.Nullable[string] `json:"expireTime"`
-	// Update the 'hold_id' column in the 'allocation_resource' collection.
-	HoldId graphql.Nullable[string] `json:"holdId"`
+	// Update the 'hold' column in the 'allocation_resource' collection.
+	Hold graphql.Nullable[string] `json:"hold"`
 	// Update the 'id' column in the 'allocation_resource' collection.
 	Id graphql.Nullable[string] `json:"id"`
 	// Update the 'name' column in the 'allocation_resource' collection.

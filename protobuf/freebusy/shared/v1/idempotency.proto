@@ -2,13 +2,13 @@ syntax = "proto3";
 
 package freebusy.shared.v1;
 
+import "buf/validate/validate.proto";
 import "entity/v1/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/api/field_info.proto";
 import "google/api/resource.proto";
 import "google/protobuf/timestamp.proto";
 import "store/v1/annotations.proto";
-import "buf/validate/validate.proto";
 
 option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/shared/v1/sharedpbv1;sharedpbv1";
 option java_multiple_files = true;

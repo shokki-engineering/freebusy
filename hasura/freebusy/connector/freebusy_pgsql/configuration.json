@@ -245,12 +245,12 @@
             "nullable": "nullable",
             "description": null
           },
-          "hold_id": {
-            "name": "hold_id",
+          "hold": {
+            "name": "hold",
             "type": {
               "scalarType": "text"
             },
-            "nullable": "nonNullable",
+            "nullable": "nullable",
             "description": null
           },
           "id": {
@@ -5027,7 +5027,15 @@
             "type": {
               "scalarType": "text"
             },
-            "nullable": "nonNullable",
+            "nullable": "nullable",
+            "description": null
+          },
+          "code_generation": {
+            "name": "code_generation",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
             "description": null
           },
           "create_time": {
@@ -6638,8 +6646,8 @@
             "nullable": "nonNullable",
             "description": null
           },
-          "replaced_by": {
-            "name": "replaced_by",
+          "replacement": {
+            "name": "replacement",
             "type": {
               "scalarType": "text"
             },

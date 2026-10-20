@@ -106,7 +106,7 @@ func ReservationToProto(m *Reservation) *reservationpbv1.Reservation {
 	out.CancelTime = goToTs(m.CancelTime)
 	out.Etag = fromPtr(m.Etag)
 	out.Replaces = fromPtr(m.Replaces)
-	out.ReplacedBy = fromPtr(m.ReplacedBy)
+	out.Replacement = fromPtr(m.Replacement)
 	out.Resources = []string(m.Resources)
 	return out
 }
@@ -131,7 +131,7 @@ func ReservationFromProto(pb *reservationpbv1.Reservation) *Reservation {
 	m.CancelTime = tsToGo(pb.GetCancelTime())
 	m.Etag = toPtr(pb.GetEtag())
 	m.Replaces = toPtr(pb.GetReplaces())
-	m.ReplacedBy = toPtr(pb.GetReplacedBy())
+	m.Replacement = toPtr(pb.GetReplacement())
 	m.Resources = pq.StringArray(pb.GetResources())
 	return m
 }

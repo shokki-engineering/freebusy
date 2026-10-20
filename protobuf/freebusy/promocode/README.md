@@ -30,7 +30,7 @@ A redeemable discount applied to a booking's subtotal. Scoped by a redemption wi
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
 | `name` | `string` | `IDENTIFIER` | The promo code name. Format: promoCodes/{promo_code} |
-| `code` | `string` | `REQUIRED` | The human-entered code, unique across all promo codes (e.g. "SUMMER25"). |
+| `code` | `string` | `OPTIONAL` | The human-entered code, unique across all promo codes (e.g. "SUMMER25"). Leave empty on create to have the server generate one; `code_generation` then records that it did. |
 | `display_name` | `string` | `OPTIONAL` | Internal display name (not shown to customers). |
 | `description` | `string` | `OPTIONAL` | Free-form description. |
 | `discount` | `Discount` | `REQUIRED` | How the discount is computed → belongs-to child table promocode.discounts. |
@@ -43,6 +43,7 @@ A redeemable discount applied to a booking's subtotal. Scoped by a redemption wi
 | `create_time` | `Timestamp` | `OUTPUT_ONLY` | Creation timestamp. |
 | `update_time` | `Timestamp` | `OUTPUT_ONLY` | Last-modification timestamp. |
 | `etag` | `string` | - | Opaque version for optimistic concurrency (AIP-154); echo on update/delete. |
+| `code_generation` | `CodeGeneration` | `OUTPUT_ONLY` | How `code` was chosen: MANUAL when the caller supplied it, AUTO when the server generated it. Set once, on create. |
 
 ### Discount
 
@@ -128,8 +129,7 @@ Request message for CreatePromoCode.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `promo_code` | `PromoCode` | `REQUIRED` | The promo code to create. Server-assigned fields are ignored on input: name, state, redemption_count, redemptions, create_time, update_time, etag. promo_code.code is honored only when code_generation is MANUAL (or unset). |
-| `code_generation` | `CodeGeneration` | `OPTIONAL` | Whether the human-facing code is supplied by the caller (MANUAL) or minted by the server (AUTO). Unset defaults to MANUAL. When AUTO, promo_code.code is ignored and the server returns the generated code on the created resource. (-- api-linter: core::0133::request-unknown-fields=disabled     aip.dev/not-precedent: Code generation mode is intrinsic to creating a     promo code and has no standard AIP-133 equivalent. --) |
+| `promo_code` | `PromoCode` | `REQUIRED` | The promo code to create. Server-assigned fields are ignored on input: name, state, redemption_count, redemptions, create_time, update_time, etag, code_generation. Leave promo_code.code empty to have the server generate one. |
 | `promo_code_id` | `string` | `OPTIONAL` | Optional caller-chosen ID for the promo code; the server generates one if unset. |
 | `request_id` | `string` | `OPTIONAL` | Caller-supplied idempotency key; identical retries return the first result. |
 | `validate_only` | `bool` | `OPTIONAL` | If true, validate the request and return what would happen, but don't commit. |
@@ -240,13 +240,13 @@ Why a promo code failed validation, returned on ValidatePromoCodeResponse. Each 
 
 ### CodeGeneration
 
-How the human-facing code string is chosen when creating a promo code.
+How a promo code's human-facing code string was chosen, as recorded on PromoCode.code_generation.
 
 | Value | Number | Description |
 | --- | --- | --- |
-| `CODE_GENERATION_UNSPECIFIED` | 0 | Unset; treated as MANUAL (use the caller-provided code). |
-| `CODE_GENERATION_MANUAL` | 1 | The caller provides the code in promo_code.code; the server uses it verbatim. |
-| `CODE_GENERATION_AUTO` | 2 | The server generates a unique code; any code in promo_code.code is ignored. |
+| `CODE_GENERATION_UNSPECIFIED` | 0 | Not recorded: the code was created before this field existed. |
+| `CODE_GENERATION_MANUAL` | 1 | The caller supplied the code and the server used it verbatim. |
+| `CODE_GENERATION_AUTO` | 2 | The caller left the code empty and the server generated it. |
 
 ---
 

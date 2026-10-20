@@ -8,7 +8,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 42 | 21 |
+| 42 | 22 |
 
 ## Entity relationships
 
@@ -21,7 +21,7 @@ erDiagram
     }
     Allocation {
         string id PK
-        string hold_id FK
+        string hold FK
     }
     Attachment {
         string id PK
@@ -196,7 +196,7 @@ erDiagram
         string id PK
     }
     Adjustment }o--|| Money : "amount_delta_id"
-    Allocation }o--|| Hold : "hold_id"
+    Allocation }o--|| Hold : "hold"
     AvailabilityException }o--|| TimeWindow : "window_id"
     AvailabilityException }o--|| DateRange : "date_range_id"
     Booking }o--|| PromoCode : "promo_code"
@@ -286,7 +286,7 @@ A Hold is a temporary, expiring claim on one or more bookable resources for a wi
 
 ### `Allocation` → `resource`
 
-An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it.
+An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it. It sits under the site and names its hold, rather than nesting under the hold: the engine asks about allocations by resource and time across a whole site, never hold by hold, and a hold with child resources would owe DeleteHold a `force` flag guarding rows no caller can see.
 
 | Column | Type | Null |
 | --- | --- | --- |
@@ -297,8 +297,8 @@ An Allocation is one resource taken by one hold for one span: the row the engine
 | `end_time` | `TIMESTAMPTZ` | not null |
 | `expire_time` | `TIMESTAMPTZ` | nullable |
 | `create_time` | `TIMESTAMPTZ` | not null |
+| `hold` | `CHAR(26)` | nullable |
 | `organizational_unit_id` | `CHAR(26)` | not null |
-| `hold_id` | `CHAR(26)` | not null |
 
 ### Enums
 
@@ -445,7 +445,7 @@ A redeemable discount applied to a booking's subtotal. Scoped by a redemption wi
 | --- | --- | --- |
 | `id` | `CHAR(26)` | not null |
 | `name` | `VARCHAR(255)` | not null |
-| `code` | `VARCHAR(255)` | not null |
+| `code` | `VARCHAR(255)` | nullable |
 | `display_name` | `VARCHAR(255)` | nullable |
 | `description` | `TEXT` | nullable |
 | `redemption_count` | `BIGINT` | nullable |
@@ -454,6 +454,7 @@ A redeemable discount applied to a booking's subtotal. Scoped by a redemption wi
 | `create_time` | `TIMESTAMPTZ` | not null |
 | `update_time` | `TIMESTAMPTZ` | not null |
 | `etag` | `VARCHAR(255)` | nullable |
+| `code_generation` | `CodeGeneration` | nullable |
 | `discount_id` | `CHAR(26)` | not null |
 | `window_id` | `CHAR(26)` | nullable |
 | `limits_id` | `CHAR(26)` | nullable |
@@ -518,6 +519,7 @@ Scope restricts which bookings a code applies to. Nested value object → belong
 ### Enums
 
 - `PromoCodeState`: ACTIVE, DISABLED, EXPIRED
+- `CodeGeneration`: MANUAL, AUTO
 - `DiscountAmountCase`: PERCENT_OFF, AMOUNT_OFF
 
 ## Schema `property`
@@ -574,7 +576,7 @@ A Reservation is a confirmed booking: a hold made permanent. It is the last step
 | `cancel_time` | `TIMESTAMPTZ` | nullable |
 | `etag` | `VARCHAR(255)` | nullable |
 | `replaces` | `VARCHAR(255)` | nullable |
-| `replaced_by` | `VARCHAR(255)` | nullable |
+| `replacement` | `VARCHAR(255)` | nullable |
 | `organizational_unit_id` | `CHAR(26)` | not null |
 | `resources` | `VARCHAR(255)[]` | nullable |
 

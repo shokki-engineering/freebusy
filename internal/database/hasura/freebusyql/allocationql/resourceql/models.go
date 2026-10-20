@@ -27,8 +27,8 @@ type AllocationResource struct {
 	EndTime string `graphql:"endTime"`
 	// ExpireTime selects the "expireTime" field; nil when the column is NULL.
 	ExpireTime *string `graphql:"expireTime"`
-	// HoldId selects the "holdId" field.
-	HoldId string `graphql:"holdId"`
+	// Hold selects the "hold" field; nil when the column is NULL.
+	Hold *string `graphql:"hold"`
 	// Id selects the "id" field.
 	Id string `graphql:"id"`
 	// Name selects the "name" field.
@@ -79,8 +79,8 @@ type AllocationResourceAggExp struct {
 		// Min selects the "min" field; nil when the column is NULL.
 		Min *string `graphql:"min"`
 	} `graphql:"expireTime"`
-	// HoldId selects the "holdId" field.
-	HoldId struct {
+	// Hold selects the "hold" field.
+	Hold struct {
 		// Count selects the "_count" field.
 		Count graphql.Int64 `graphql:"_count"`
 		// CountDistinct selects the "_count_distinct" field.
@@ -89,7 +89,7 @@ type AllocationResourceAggExp struct {
 		Max *string `graphql:"max"`
 		// Min selects the "min" field; nil when the column is NULL.
 		Min *string `graphql:"min"`
-	} `graphql:"holdId"`
+	} `graphql:"hold"`
 	// Id selects the "id" field.
 	Id struct {
 		// Count selects the "_count" field.
@@ -159,8 +159,8 @@ type DeleteAllocationResourceByIdResponse struct {
 		EndTime string `graphql:"endTime"`
 		// ExpireTime selects the "expireTime" field; nil when the column is NULL.
 		ExpireTime *string `graphql:"expireTime"`
-		// HoldId selects the "holdId" field.
-		HoldId string `graphql:"holdId"`
+		// Hold selects the "hold" field; nil when the column is NULL.
+		Hold *string `graphql:"hold"`
 		// Id selects the "id" field.
 		Id string `graphql:"id"`
 		// Name selects the "name" field.
@@ -186,8 +186,8 @@ type InsertAllocationResourceResponse struct {
 		EndTime string `graphql:"endTime"`
 		// ExpireTime selects the "expireTime" field; nil when the column is NULL.
 		ExpireTime *string `graphql:"expireTime"`
-		// HoldId selects the "holdId" field.
-		HoldId string `graphql:"holdId"`
+		// Hold selects the "hold" field; nil when the column is NULL.
+		Hold *string `graphql:"hold"`
 		// Id selects the "id" field.
 		Id string `graphql:"id"`
 		// Name selects the "name" field.
@@ -213,8 +213,8 @@ type UpdateAllocationResourceByIdResponse struct {
 		EndTime string `graphql:"endTime"`
 		// ExpireTime selects the "expireTime" field; nil when the column is NULL.
 		ExpireTime *string `graphql:"expireTime"`
-		// HoldId selects the "holdId" field.
-		HoldId string `graphql:"holdId"`
+		// Hold selects the "hold" field; nil when the column is NULL.
+		Hold *string `graphql:"hold"`
 		// Id selects the "id" field.
 		Id string `graphql:"id"`
 		// Name selects the "name" field.

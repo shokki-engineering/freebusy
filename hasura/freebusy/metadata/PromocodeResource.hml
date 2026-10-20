@@ -5,7 +5,9 @@ definition:
   name: PromocodeResource
   fields:
     - name: code
-      type: String_1!
+      type: String_1
+    - name: codeGeneration
+      type: String_1
     - name: createTime
       type: Timestamptz!
     - name: description
@@ -44,6 +46,9 @@ definition:
         code:
           column:
             name: code
+        codeGeneration:
+          column:
+            name: code_generation
         createTime:
           column:
             name: create_time
@@ -97,6 +102,7 @@ definition:
       output:
         allowedFields:
           - code
+          - codeGeneration
           - createTime
           - description
           - disabled
@@ -122,6 +128,8 @@ definition:
       type: PromocodeResource
       comparableFields:
         - fieldName: code
+          booleanExpressionType: TextBoolExp
+        - fieldName: codeGeneration
           booleanExpressionType: TextBoolExp
         - fieldName: createTime
           booleanExpressionType: TimestamptzBoolExp
@@ -170,6 +178,8 @@ definition:
       aggregatableFields:
         - fieldName: code
           aggregateExpression: TextAggExp
+        - fieldName: codeGeneration
+          aggregateExpression: TextAggExp
         - fieldName: createTime
           aggregateExpression: TimestamptzAggExp
         - fieldName: description
@@ -214,6 +224,8 @@ definition:
       orderedType: PromocodeResource
       orderableFields:
         - fieldName: code
+          orderByExpression: String1OrderByExp
+        - fieldName: codeGeneration
           orderByExpression: String1OrderByExp
         - fieldName: createTime
           orderByExpression: TimestamptzOrderByExp

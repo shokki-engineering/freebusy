@@ -17,12 +17,16 @@ components:
           description: When this claim stops counting. A copy of the hold's expire_time
             while it is ACTIVE; set to the release instant on release; unset once
             the hold is CONVERTED, which is the one outcome that keeps the resource
-            taken.
+            taken. Always the server's to write, never a caller's.
           format: date-time
           type: string
+        hold:
+          description: 'The hold that took it. Deleting the hold deletes its allocations
+            with it. Format: organizationalUnits/{organizational_unit}/holds/{hold}'
+          type: string
         name:
-          description: 'The allocation name, nested under the hold that took it so
-            deleting the hold takes its claims with it. Format: organizationalUnits/{organizational_unit}/holds/{hold}/allocations/{allocation}'
+          description: 'The allocation name, under the site whose resource it takes.
+            Format: organizationalUnits/{organizational_unit}/allocations/{allocation}'
           type: string
         resource:
           description: 'The resource taken. Format: resources/{resource}'

@@ -38,9 +38,6 @@ func applyAllocationMask(merged, in *allocationpbv1.Allocation, paths []string) 
 	if repox.GroupTouched(paths, "end_time") {
 		merged.EndTime = in.GetEndTime()
 	}
-	if repox.GroupTouched(paths, "expire_time") {
-		merged.ExpireTime = in.GetExpireTime()
-	}
 }
 
 // applyHoldMask merges the masked fields of in onto merged. An empty

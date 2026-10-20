@@ -3,6 +3,7 @@ package hasura
 import (
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
 	"github.com/oh-tarnished/freebusy/internal/service/dbutil"
+	"strings"
 	"time"
 
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/commonql/moneysql"
@@ -105,13 +106,14 @@ func buildGraph(pc *promocodepbv1.PromoCode, now time.Time) *graph {
 	}
 	nowStr := dbutil.TsToStr(timestamppb.New(now))
 	g.resource = resourceql.CreateInput{
-		Code:        pc.GetCode(),
-		DisplayName: pc.GetDisplayName(),
-		Description: pc.GetDescription(),
-		Disabled:    pc.GetDisabled(),
-		State:       state,
-		CreateTime:  nowStr,
-		UpdateTime:  nowStr,
+		Code:           pc.GetCode(),
+		CodeGeneration: codeGenerationName(pc.GetCodeGeneration()),
+		DisplayName:    pc.GetDisplayName(),
+		Description:    pc.GetDescription(),
+		Disabled:       pc.GetDisabled(),
+		State:          state,
+		CreateTime:     nowStr,
+		UpdateTime:     nowStr,
 	}
 
 	// Discount is required: always materialize a row. A non-nil amount_off is the
@@ -180,4 +182,13 @@ func buildGraph(pc *promocodepbv1.PromoCode, now time.Time) *graph {
 	}
 
 	return g
+}
+
+// codeGenerationName is the stored form of a CodeGeneration, empty (omitted,
+// so NULL) when unspecified.
+func codeGenerationName(v promocodepbv1.CodeGeneration) string {
+	if v == promocodepbv1.CodeGeneration_CODE_GENERATION_UNSPECIFIED {
+		return ""
+	}
+	return strings.TrimPrefix(v.String(), "CODE_GENERATION_")
 }
