@@ -48,3 +48,26 @@ var HoldFilterSpec = filterx.Spec{
 	},
 	PK: []filterx.SortSpec{{Column: "id", Kind: filterx.KindText, NotNull: true}},
 }
+
+// AllocationFilterSpec is Allocation's AIP-160 filter / AIP-132 order_by surface,
+// consumed by the filterx.Gorm and filterx.Hasura engines.
+var AllocationFilterSpec = filterx.Spec{
+	Table: `"allocation"."resource"`,
+	Fields: map[string]filterx.FieldSpec{
+		"create_time": {Column: "create_time", Kind: filterx.KindTimestamp},
+		"end_time":    {Column: "end_time", Kind: filterx.KindTimestamp},
+		"expire_time": {Column: "expire_time", Kind: filterx.KindTimestamp},
+		"name":        {Column: "name", Kind: filterx.KindText},
+		"resource":    {Column: "resource", Kind: filterx.KindText},
+		"start_time":  {Column: "start_time", Kind: filterx.KindTimestamp},
+	},
+	Sort: map[string]filterx.SortSpec{
+		"create_time": {Column: "create_time", Kind: filterx.KindTimestamp, NotNull: true},
+		"end_time":    {Column: "end_time", Kind: filterx.KindTimestamp, NotNull: true},
+		"expire_time": {Column: "expire_time", Kind: filterx.KindTimestamp},
+		"name":        {Column: "name", Kind: filterx.KindText, NotNull: true},
+		"resource":    {Column: "resource", Kind: filterx.KindText, NotNull: true},
+		"start_time":  {Column: "start_time", Kind: filterx.KindTimestamp, NotNull: true},
+	},
+	PK: []filterx.SortSpec{{Column: "id", Kind: filterx.KindText, NotNull: true}},
+}

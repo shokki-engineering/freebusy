@@ -34,6 +34,13 @@ definition:
               unique_columns:
                 - id
         - arguments: {}
+          name: allocation_resource
+          type: allocation_resource
+          uniqueness_constraints:
+            resource_pkey:
+              unique_columns:
+                - id
+        - arguments: {}
           name: availability_availabilities
           type: availability_availabilities
           uniqueness_constraints:
@@ -979,6 +986,47 @@ definition:
                 name: text
                 type: named
           foreign_keys: {}
+        allocation_resource:
+          fields:
+            create_time:
+              type:
+                name: timestamptz
+                type: named
+            end_time:
+              type:
+                name: timestamptz
+                type: named
+            expire_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            hold_id:
+              type:
+                name: text
+                type: named
+            id:
+              type:
+                name: text
+                type: named
+            name:
+              type:
+                name: text
+                type: named
+            organizational_unit_id:
+              type:
+                name: text
+                type: named
+            resource:
+              type:
+                name: text
+                type: named
+            start_time:
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
         availability_availabilities:
           fields:
             busy_type:
@@ -1825,6 +1873,22 @@ definition:
               type:
                 element_type:
                   name: allocation_holds
+                  type: named
+                type: array
+          foreign_keys: {}
+        delete_allocation_resource_by_id_response:
+          description: Responses from the 'delete_allocation_resource_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: allocation_resource
                   type: named
                 type: array
           foreign_keys: {}
@@ -5189,6 +5253,63 @@ definition:
               type:
                 element_type:
                   name: allocation_holds
+                  type: named
+                type: array
+          foreign_keys: {}
+        insert_allocation_resource_object:
+          fields:
+            create_time:
+              type:
+                name: timestamptz
+                type: named
+            end_time:
+              type:
+                name: timestamptz
+                type: named
+            expire_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            hold_id:
+              type:
+                name: text
+                type: named
+            id:
+              type:
+                name: text
+                type: named
+            name:
+              type:
+                name: text
+                type: named
+            organizational_unit_id:
+              type:
+                name: text
+                type: named
+            resource:
+              type:
+                name: text
+                type: named
+            start_time:
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        insert_allocation_resource_response:
+          description: Responses from the 'insert_allocation_resource' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: allocation_resource
                   type: named
                 type: array
           foreign_keys: {}
@@ -15368,8 +15489,10 @@ definition:
                   type: named
             state:
               type:
-                name: text
-                type: named
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
             update_time:
               type:
                 name: timestamptz
@@ -15796,6 +15919,89 @@ definition:
                 type: nullable
                 underlying_type:
                   name: update_column_allocation_holds_window
+                  type: named
+          foreign_keys: {}
+        update_allocation_resource_by_id_response:
+          description: Responses from the 'update_allocation_resource_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: allocation_resource
+                  type: named
+                type: array
+          foreign_keys: {}
+        update_allocation_resource_by_id_update_columns:
+          description: Update the columns of the 'allocation_resource' collection
+          fields:
+            create_time:
+              description: Update the 'create_time' column in the 'allocation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_allocation_resource_create_time
+                  type: named
+            end_time:
+              description: Update the 'end_time' column in the 'allocation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_allocation_resource_end_time
+                  type: named
+            expire_time:
+              description: Update the 'expire_time' column in the 'allocation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_allocation_resource_expire_time
+                  type: named
+            hold_id:
+              description: Update the 'hold_id' column in the 'allocation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_allocation_resource_hold_id
+                  type: named
+            id:
+              description: Update the 'id' column in the 'allocation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_allocation_resource_id
+                  type: named
+            name:
+              description: Update the 'name' column in the 'allocation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_allocation_resource_name
+                  type: named
+            organizational_unit_id:
+              description: Update the 'organizational_unit_id' column in the 'allocation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_allocation_resource_organizational_unit_id
+                  type: named
+            resource:
+              description: Update the 'resource' column in the 'allocation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_allocation_resource_resource
+                  type: named
+            start_time:
+              description: Update the 'start_time' column in the 'allocation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_allocation_resource_start_time
                   type: named
           foreign_keys: {}
         update_availability_availabilities_by_id_response:
@@ -17032,6 +17238,89 @@ definition:
               description: Set the column to this value
               type:
                 name: text
+                type: named
+          foreign_keys: {}
+        update_column_allocation_resource_create_time:
+          description: Update the 'create_time' column in the 'allocation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        update_column_allocation_resource_end_time:
+          description: Update the 'end_time' column in the 'allocation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        update_column_allocation_resource_expire_time:
+          description: Update the 'expire_time' column in the 'allocation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+          foreign_keys: {}
+        update_column_allocation_resource_hold_id:
+          description: Update the 'hold_id' column in the 'allocation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_allocation_resource_id:
+          description: Update the 'id' column in the 'allocation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_allocation_resource_name:
+          description: Update the 'name' column in the 'allocation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_allocation_resource_organizational_unit_id:
+          description: Update the 'organizational_unit_id' column in the 'allocation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_allocation_resource_resource:
+          description: Update the 'resource' column in the 'allocation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_allocation_resource_start_time:
+          description: Update the 'start_time' column in the 'allocation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
                 type: named
           foreign_keys: {}
         update_column_availability_availabilities_busy_type:
@@ -24765,8 +25054,10 @@ definition:
             _set:
               description: Set the column to this value
               type:
-                name: text
-                type: named
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
           foreign_keys: {}
         update_column_shared_idempotency_keys_update_time:
           description: Update the 'update_time' column in the 'shared_idempotency_keys' collection
@@ -37059,6 +37350,23 @@ definition:
                 name: text
                 type: named
             pre_check:
+              description: Delete permission predicate over the 'allocation_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: allocation_resource
+                  type: predicate
+          description: Delete any row on the 'allocation_resource' collection using the 'id' key
+          name: delete_allocation_resource_by_id
+          result_type:
+            name: delete_allocation_resource_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            pre_check:
               description: Delete permission predicate over the 'availability_availabilities' collection
               type:
                 type: nullable
@@ -39096,6 +39404,25 @@ definition:
           name: insert_allocation_holds
           result_type:
             name: insert_allocation_holds_response
+            type: named
+        - arguments:
+            objects:
+              type:
+                element_type:
+                  name: insert_allocation_resource_object
+                  type: named
+                type: array
+            post_check:
+              description: Insert permission predicate over the 'allocation_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: allocation_resource
+                  type: predicate
+          description: Insert into the allocation_resource table
+          name: insert_allocation_resource
+          result_type:
+            name: insert_allocation_resource_response
             type: named
         - arguments:
             objects:
@@ -41394,6 +41721,34 @@ definition:
           name: update_allocation_holds_by_id
           result_type:
             name: update_allocation_holds_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            post_check:
+              description: Update permission post-condition predicate over the 'allocation_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: allocation_resource
+                  type: predicate
+            pre_check:
+              description: Update permission pre-condition predicate over the 'allocation_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: allocation_resource
+                  type: predicate
+            update_columns:
+              type:
+                name: update_allocation_resource_by_id_update_columns
+                type: named
+          description: Update any row on the 'allocation_resource' collection using the 'id' key
+          name: update_allocation_resource_by_id
+          result_type:
+            name: update_allocation_resource_by_id_response
             type: named
         - arguments:
             key_id:

@@ -17,6 +17,7 @@ package allocation
 
 import (
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/allocationql/holdsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/allocationql/resourceql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
@@ -67,6 +68,52 @@ func strSliceToPtrs(in []string) []*string {
 	for i := range in {
 		out = append(out, &in[i])
 	}
+	return out
+}
+
+// allocationToCreateInput maps the proto onto the client's insert input.
+// Identity (id, name resolution), parentage, audit timestamps, and etag are
+// set by the adapter.
+func allocationToCreateInput(in *allocationpbv1.Allocation) resourceql.CreateInput {
+	var ci resourceql.CreateInput
+	ci.Name = in.GetName()
+	ci.Resource = in.GetResource()
+	ci.StartTime = tsToStr(in.GetStartTime())
+	ci.EndTime = tsToStr(in.GetEndTime())
+	ci.ExpireTime = tsToStr(in.GetExpireTime())
+	return ci
+}
+
+// allocationToUpdatePatch maps the merged proto onto a replace-write
+// patch of every mutable column (mask semantics already applied to merged),
+// mirroring the gorm adapter's write-back exactly.
+func allocationToUpdatePatch(merged *allocationpbv1.Allocation) resourceql.UpdateInput {
+	var patch resourceql.UpdateInput
+	patch.Name = graphql.Value(merged.GetName())
+	patch.Resource = graphql.Value(merged.GetResource())
+	patch.StartTime = graphql.Value(tsToStr(merged.GetStartTime()))
+	patch.EndTime = graphql.Value(tsToStr(merged.GetEndTime()))
+	if v := tsToStr(merged.GetExpireTime()); v != "" {
+		patch.ExpireTime = graphql.Value(v)
+	} else {
+		patch.ExpireTime = graphql.Null[string]()
+	}
+	return patch
+}
+
+// allocationFromRow re-hydrates the proto from a client row, decorating
+// reference names from their stored bare ids.
+func allocationFromRow(row *resourceql.AllocationResource) *allocationpbv1.Allocation {
+	if row == nil {
+		return nil
+	}
+	out := &allocationpbv1.Allocation{}
+	out.Name = row.Name
+	out.Resource = row.Resource
+	out.StartTime = strToTs(row.StartTime)
+	out.EndTime = strToTs(row.EndTime)
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
+	out.CreateTime = strToTs(row.CreateTime)
 	return out
 }
 

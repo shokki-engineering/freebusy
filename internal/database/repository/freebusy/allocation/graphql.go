@@ -23,6 +23,7 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/allocation"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/allocationql/holdsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/allocationql/resourceql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
@@ -42,6 +43,191 @@ func mapGraphQLErr(err error) error {
 		return err
 	}
 }
+
+// GraphQLAllocationRepository is the GraphQL adapter of AllocationRepository
+// over the generated client: the same flat CRUD the gorm adapter implements,
+// against Allocation.Resource. Exported fields are the Tier-2 seam.
+type GraphQLAllocationRepository struct {
+	Svc   *freebusyql.Service
+	Hooks AllocationHooks
+	// ListOverrides substitute the generated dispatch for single filter fields.
+	ListOverrides map[string]filterx.GraphQLHandler
+}
+
+// NewGraphQLAllocationRepository returns the GraphQL adapter bound to svc.
+func NewGraphQLAllocationRepository(svc *freebusyql.Service) *GraphQLAllocationRepository {
+	return &GraphQLAllocationRepository{Svc: svc}
+}
+
+// Create persists in under parent and returns the stored record.
+func (r *GraphQLAllocationRepository) Create(ctx context.Context, parent string, in *allocationpbv1.Allocation) (*allocationpbv1.Allocation, error) {
+	parentIDs, err := repox.SplitName(parent, "organizationalUnits", "holds")
+	if err != nil {
+		return nil, err
+	}
+	id := repox.NewULID()
+	if in.GetName() != "" {
+		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds", "allocations")
+		if err != nil {
+			return nil, err
+		}
+		for i := range parentIDs {
+			if ids[i] != parentIDs[i] {
+				return nil, fmt.Errorf("%w: name %q is not under parent %q", repox.ErrInvalidArgument, in.GetName(), parent)
+			}
+		}
+		id = ids[len(ids)-1]
+	}
+	in = proto.Clone(in).(*allocationpbv1.Allocation)
+	in.Name = FormatAllocationName(parentIDs[0], parentIDs[1], id)
+	if h := r.Hooks.BeforeCreate; h != nil {
+		if err := h(ctx, in); err != nil {
+			return nil, err
+		}
+	}
+	ci := allocationToCreateInput(in)
+	ci.Id = id
+	ci.OrganizationalUnitId = parentIDs[0]
+	ci.HoldId = parentIDs[1]
+	now := tsToStr(timestamppb.New(time.Now().UTC()))
+	ci.CreateTime = now
+	if _, err := r.Svc.Mutation.Allocation.Resource.Create(ctx, ci); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
+	return r.get(ctx, id)
+}
+
+// Get returns the record addressed by its resource name.
+func (r *GraphQLAllocationRepository) Get(ctx context.Context, name string) (*allocationpbv1.Allocation, error) {
+	ids, err := repox.SplitName(name, "organizationalUnits", "holds", "allocations")
+	if err != nil {
+		return nil, err
+	}
+	return r.get(ctx, ids[len(ids)-1])
+}
+
+// get loads by surrogate key — the private read every generated method
+// re-reads through.
+func (r *GraphQLAllocationRepository) get(ctx context.Context, id string) (*allocationpbv1.Allocation, error) {
+	row, err := r.Svc.Query.Allocation.Resource.Get(ctx, id)
+	if err != nil {
+		return nil, mapGraphQLErr(err)
+	}
+	if row == nil {
+		return nil, repox.ErrNotFound
+	}
+	return r.toProto(ctx, row)
+}
+
+// toProto converts a loaded row, hydrating value objects through their
+// stored references, and runs the AfterRead hook.
+func (r *GraphQLAllocationRepository) toProto(ctx context.Context, row *resourceql.AllocationResource) (*allocationpbv1.Allocation, error) {
+	out := allocationFromRow(row)
+	if h := r.Hooks.AfterRead; h != nil {
+		if err := h(ctx, out); err != nil {
+			return nil, err
+		}
+	}
+	return out, nil
+}
+
+// List returns one page of records under parent.
+func (r *GraphQLAllocationRepository) List(ctx context.Context, parent string, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error) {
+	parentIDs, err := repox.SplitName(parent, "organizationalUnits", "holds")
+	if err != nil {
+		return nil, "", err
+	}
+	return r.list(ctx, in, resourceql.HoldId.Eq(parentIDs[len(parentIDs)-1]))
+}
+
+func (r *GraphQLAllocationRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*allocationpbv1.Allocation, string, error) {
+	conds, err := filterx.Parse(in.Filter)
+	if err != nil {
+		return nil, "", repox.MapFilterxErr(err)
+	}
+	eng := filterx.Hasura[resourceql.AllocationResource](allocation.AllocationFilterSpec, r.Svc.Query.Allocation.Resource).Scope(scope...)
+	for f, h := range r.ListOverrides {
+		eng.Override(f, h)
+	}
+	rows, next, err := eng.List(ctx, filterx.ListInput{
+		PageSize:  in.PageSize,
+		PageToken: in.PageToken,
+		OrderBy:   in.OrderBy,
+		Filter:    conds,
+	})
+	if err != nil {
+		return nil, "", repox.MapFilterxErr(err)
+	}
+	items := make([]*allocationpbv1.Allocation, 0, len(rows))
+	for i := range rows {
+		out, err := r.toProto(ctx, &rows[i])
+		if err != nil {
+			return nil, "", err
+		}
+		items = append(items, out)
+	}
+	return items, next, nil
+}
+
+// Update persists the masked fields of in; an empty mask replaces every
+// mutable field. When in.Etag is set the write is guarded server-side
+// (UpdateIfMatch); a stale etag returns repox.ErrConflict.
+func (r *GraphQLAllocationRepository) Update(ctx context.Context, in *allocationpbv1.Allocation, paths []string) (*allocationpbv1.Allocation, error) {
+	ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds", "allocations")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	row, err := r.Svc.Query.Allocation.Resource.Get(ctx, id)
+	if err != nil {
+		return nil, mapGraphQLErr(err)
+	}
+	if row == nil {
+		return nil, repox.ErrNotFound
+	}
+	existingPB := allocationFromRow(row)
+	merged := proto.Clone(existingPB).(*allocationpbv1.Allocation)
+	applyAllocationMask(merged, in, paths)
+	if h := r.Hooks.BeforeUpdate; h != nil {
+		if err := h(ctx, existingPB, merged, paths); err != nil {
+			return nil, err
+		}
+	}
+	patch := allocationToUpdatePatch(merged)
+	resp, err := r.Svc.Mutation.Allocation.Resource.Update(ctx, id, patch)
+	if err != nil {
+		return nil, mapGraphQLErr(err)
+	}
+	if resp.AffectedRows == 0 {
+		return nil, repox.ErrNotFound
+	}
+	return r.get(ctx, id)
+}
+
+// Delete removes the record addressed by its resource name.
+func (r *GraphQLAllocationRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "organizationalUnits", "holds", "allocations")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	id := ids[len(ids)-1]
+	resp, err := r.Svc.Mutation.Allocation.Resource.Delete(ctx, id)
+	if err != nil {
+		return mapGraphQLErr(err)
+	}
+	if resp.AffectedRows == 0 {
+		return repox.ErrNotFound
+	}
+	return nil
+}
+
+// Compile-time proof the adapter satisfies the interface.
+var _ AllocationRepository = (*GraphQLAllocationRepository)(nil)
 
 // GraphQLHoldRepository is the GraphQL adapter of HoldRepository
 // over the generated client: the same flat CRUD the gorm adapter implements,

@@ -9,9 +9,12 @@ import (
 	"github.com/oh-tarnished/freebusy/shared"
 
 	"github.com/oh-tarnished/freebusy/internal/database"
+	"github.com/oh-tarnished/freebusy/internal/service/allocation"
+	allocationdb "github.com/oh-tarnished/freebusy/internal/service/allocation/db"
 	"github.com/oh-tarnished/freebusy/internal/service/promocode"
 	"github.com/oh-tarnished/freebusy/internal/service/schedule"
 	"github.com/oh-tarnished/freebusy/internal/service/scheduling"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/promocode/v1/promocodepbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/schedule/v1/schedulepbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/scheduling/v1/schedulingpbv1"
@@ -48,6 +51,7 @@ func newServiceInstance(conn *database.Connection) (*Service, error) {
 		schedule.New(conn),
 		scheduling.New(conn, catalogue),
 		pricing.New(conn),
+		allocation.NewServer(allocationdb.New(conn)),
 	)
 	svc.conn = conn
 	return svc, nil
@@ -69,6 +73,8 @@ func registerServices(s *grpc.GRPCServer, svc *Service) {
 	schedulepbv1.RegisterScheduleServiceServer(s, svc)
 	schedulingpbv1.RegisterSchedulingServiceServer(s, svc)
 	pricingpbv1.RegisterRatePlanServiceServer(s, svc)
+	allocationpbv1.RegisterAllocationServiceServer(s, svc)
+	allocationpbv1.RegisterHoldServiceServer(s, svc)
 }
 
 // NewGRPCServer assembles the freebusy service on conn (opened from config
@@ -101,7 +107,13 @@ func registerHTTPGateways() grpc.Option {
 		if err := schedulingpbv1.RegisterSchedulingServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
 			return err
 		}
-		return pricingpbv1.RegisterRatePlanServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts)
+		if err := pricingpbv1.RegisterRatePlanServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
+			return err
+		}
+		if err := allocationpbv1.RegisterAllocationServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
+			return err
+		}
+		return allocationpbv1.RegisterHoldServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts)
 	})
 }
 
@@ -121,6 +133,12 @@ func registerMCPServices(svc *Service) grpc.Option {
 		},
 		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
 			return schedulingpbv1.ServeSchedulingServiceMCP(ctx, svc, cfg)
+		},
+		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
+			return allocationpbv1.ServeAllocationServiceMCP(ctx, svc, cfg)
+		},
+		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
+			return allocationpbv1.ServeHoldServiceMCP(ctx, svc, cfg)
 		},
 	)
 }

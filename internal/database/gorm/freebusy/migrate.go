@@ -122,6 +122,7 @@ func (*Registry) EnsureSchemas(db *gorm.DB) error {
 //	freebusy.Default.Register(&MyModel{})
 var Default = New().Register(
 	&allocation.Hold{},
+	&allocation.Allocation{},
 	&pricing.RatePlan{},
 	&pricing.RateOverride{},
 	&pricing.LosDiscount{},

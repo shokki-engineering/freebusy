@@ -1,0 +1,217 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: AllocationResource
+  fields:
+    - name: createTime
+      type: Timestamptz!
+    - name: endTime
+      type: Timestamptz!
+    - name: expireTime
+      type: Timestamptz
+    - name: holdId
+      type: String_1!
+    - name: id
+      type: String_1!
+    - name: name
+      type: String_1!
+    - name: organizationalUnitId
+      type: String_1!
+    - name: resource
+      type: String_1!
+    - name: startTime
+      type: Timestamptz!
+  graphql:
+    typeName: AllocationResource
+    inputTypeName: AllocationResourceInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: allocation_resource
+      fieldMapping:
+        createTime:
+          column:
+            name: create_time
+        endTime:
+          column:
+            name: end_time
+        expireTime:
+          column:
+            name: expire_time
+        holdId:
+          column:
+            name: hold_id
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        organizationalUnitId:
+          column:
+            name: organizational_unit_id
+        resource:
+          column:
+            name: resource
+        startTime:
+          column:
+            name: start_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: AllocationResource
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createTime
+          - endTime
+          - expireTime
+          - holdId
+          - id
+          - name
+          - organizationalUnitId
+          - resource
+          - startTime
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: AllocationResourceBoolExp
+  operand:
+    object:
+      type: AllocationResource
+      comparableFields:
+        - fieldName: createTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: endTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: expireTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: holdId
+          booleanExpressionType: TextBoolExp
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: name
+          booleanExpressionType: TextBoolExp
+        - fieldName: organizationalUnitId
+          booleanExpressionType: TextBoolExp
+        - fieldName: resource
+          booleanExpressionType: TextBoolExp
+        - fieldName: startTime
+          booleanExpressionType: TimestamptzBoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: AllocationResourceBoolExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: AllocationResourceAggExp
+  operand:
+    object:
+      aggregatedType: AllocationResource
+      aggregatableFields:
+        - fieldName: createTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: endTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: expireTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: holdId
+          aggregateExpression: TextAggExp
+        - fieldName: id
+          aggregateExpression: TextAggExp
+        - fieldName: name
+          aggregateExpression: TextAggExp
+        - fieldName: organizationalUnitId
+          aggregateExpression: TextAggExp
+        - fieldName: resource
+          aggregateExpression: TextAggExp
+        - fieldName: startTime
+          aggregateExpression: TimestamptzAggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: AllocationResourceAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: AllocationResourceOrderByExp
+  operand:
+    object:
+      orderedType: AllocationResource
+      orderableFields:
+        - fieldName: createTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: endTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: expireTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: holdId
+          orderByExpression: String1OrderByExp
+        - fieldName: id
+          orderByExpression: String1OrderByExp
+        - fieldName: name
+          orderByExpression: String1OrderByExp
+        - fieldName: organizationalUnitId
+          orderByExpression: String1OrderByExp
+        - fieldName: resource
+          orderByExpression: String1OrderByExp
+        - fieldName: startTime
+          orderByExpression: TimestamptzOrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: AllocationResourceOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: AllocationResource
+  objectType: AllocationResource
+  source:
+    dataConnectorName: freebusy_pgsql
+    collection: allocation_resource
+  filterExpressionType: AllocationResourceBoolExp
+  aggregateExpression: AllocationResourceAggExp
+  orderByExpression: AllocationResourceOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: allocationResource
+      subscription:
+        rootField: allocationResource
+    selectUniques:
+      - queryRootField: allocationResourceById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: allocationResourceById
+    filterInputTypeName: AllocationResourceFilterInput
+    aggregate:
+      queryRootField: allocationResourceAggregate
+      subscription:
+        rootField: allocationResourceAggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: AllocationResource
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+

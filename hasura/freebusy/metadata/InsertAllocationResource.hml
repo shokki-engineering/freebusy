@@ -1,0 +1,150 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertAllocationResourceObject
+  fields:
+    - name: createTime
+      type: Timestamptz!
+    - name: endTime
+      type: Timestamptz!
+    - name: expireTime
+      type: Timestamptz
+    - name: holdId
+      type: String_1!
+    - name: id
+      type: String_1!
+    - name: name
+      type: String_1!
+    - name: organizationalUnitId
+      type: String_1!
+    - name: resource
+      type: String_1!
+    - name: startTime
+      type: Timestamptz!
+  graphql:
+    typeName: InsertAllocationResourceObject
+    inputTypeName: InsertAllocationResourceObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_allocation_resource_object
+      fieldMapping:
+        createTime:
+          column:
+            name: create_time
+        endTime:
+          column:
+            name: end_time
+        expireTime:
+          column:
+            name: expire_time
+        holdId:
+          column:
+            name: hold_id
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        organizationalUnitId:
+          column:
+            name: organizational_unit_id
+        resource:
+          column:
+            name: resource
+        startTime:
+          column:
+            name: start_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertAllocationResourceObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createTime
+          - endTime
+          - expireTime
+          - holdId
+          - id
+          - name
+          - organizationalUnitId
+          - resource
+          - startTime
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertAllocationResourceResponse
+  description: Responses from the 'insert_allocation_resource' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[AllocationResource!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertAllocationResourceResponse
+    inputTypeName: InsertAllocationResourceResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_allocation_resource_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertAllocationResourceResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertAllocationResource
+  outputType: InsertAllocationResourceResponse!
+  arguments:
+    - name: objects
+      type: "[InsertAllocationResourceObject!]!"
+    - name: postCheck
+      type: AllocationResourceBoolExp
+      description: Insert permission predicate over the 'allocation_resource' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: insert_allocation_resource
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertAllocationResource
+    rootFieldKind: Mutation
+  description: Insert into the allocation_resource table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertAllocationResource
+  permissions:
+    - role: admin
+      allowExecution: true
+

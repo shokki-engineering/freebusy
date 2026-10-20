@@ -86,7 +86,10 @@ managed:
       path: protobuf/shared/sync/v1
       value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/shared/sync/v1/syncpbv1
 inputs:
-  - module: buf.build/the-protobuf-project/rfc
+  # Pinned to the commit buf.lock records: an unpinned module input resolves
+  # to the BSR head, and a regen then rewrites every RFC stub to whatever
+  # upstream last pushed.
+  - module: buf.build/the-protobuf-project/rfc:844dfa627e53499ba543aeabdcd2a663
 plugins:
   - remote: buf.build/protocolbuffers/go:v1.36.11
     out: protobuf/generated/go

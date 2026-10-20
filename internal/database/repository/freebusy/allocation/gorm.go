@@ -26,6 +26,190 @@ import (
 	"gorm.io/gorm"
 )
 
+// GormAllocationRepository is the GORM adapter of AllocationRepository: flat
+// CRUD over the generated model, store, converters, and filterx spec. Exported
+// fields and helpers are the Tier-2 seam — embed it and override whole methods
+// for behavior the schema cannot express; generated methods only call private
+// helpers, never the public interface, so overrides never re-enter generated
+// code.
+type GormAllocationRepository struct {
+	DB    *gorm.DB
+	Hooks AllocationHooks
+	// ListOverrides substitute the generated dispatch for single filter fields
+	// (e.g. a derived state computed via subqueries).
+	ListOverrides map[string]filterx.SQLHandler
+}
+
+// NewGormAllocationRepository returns the GORM adapter bound to db.
+func NewGormAllocationRepository(db *gorm.DB) *GormAllocationRepository {
+	return &GormAllocationRepository{DB: db}
+}
+
+// Create persists in under parent and returns the stored record.
+func (r *GormAllocationRepository) Create(ctx context.Context, parent string, in *allocationpbv1.Allocation) (*allocationpbv1.Allocation, error) {
+	parentIDs, err := repox.SplitName(parent, "organizationalUnits", "holds")
+	if err != nil {
+		return nil, err
+	}
+	id := repox.NewULID()
+	if in.GetName() != "" {
+		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds", "allocations")
+		if err != nil {
+			return nil, err
+		}
+		for i := range parentIDs {
+			if ids[i] != parentIDs[i] {
+				return nil, fmt.Errorf("%w: name %q is not under parent %q", repox.ErrInvalidArgument, in.GetName(), parent)
+			}
+		}
+		id = ids[len(ids)-1]
+	}
+	in = proto.Clone(in).(*allocationpbv1.Allocation)
+	in.Name = FormatAllocationName(parentIDs[0], parentIDs[1], id)
+	if h := r.Hooks.BeforeCreate; h != nil {
+		if err := h(ctx, in); err != nil {
+			return nil, err
+		}
+	}
+	m := allocation.AllocationFromProto(in)
+	m.ID = id
+	m.Name = in.GetName()
+	m.OrganizationalUnitID = parentIDs[0]
+	m.HoldID = parentIDs[1]
+	if err := allocation.NewAllocationStore(r.DB).Create(ctx, m); err != nil {
+		return nil, repox.MapGormErr(err)
+	}
+	return r.get(ctx, id)
+}
+
+// Get returns the record addressed by its resource name.
+func (r *GormAllocationRepository) Get(ctx context.Context, name string) (*allocationpbv1.Allocation, error) {
+	ids, err := repox.SplitName(name, "organizationalUnits", "holds", "allocations")
+	if err != nil {
+		return nil, err
+	}
+	return r.get(ctx, ids[len(ids)-1])
+}
+
+// get loads by surrogate key — the private read every generated method re-reads
+// through, so Tier-2 overrides of Get never re-enter generated writes.
+func (r *GormAllocationRepository) get(ctx context.Context, id string) (*allocationpbv1.Allocation, error) {
+	var m allocation.Allocation
+	if err := r.DB.WithContext(ctx).First(&m, "id = ?", id).Error; err != nil {
+		return nil, repox.MapGormErr(err)
+	}
+	return r.toProto(ctx, &m)
+}
+
+// toProto converts a loaded row, decorating reference names and running the
+// AfterRead hook.
+func (r *GormAllocationRepository) toProto(ctx context.Context, m *allocation.Allocation) (*allocationpbv1.Allocation, error) {
+	out := allocation.AllocationToProto(m)
+	if h := r.Hooks.AfterRead; h != nil {
+		if err := h(ctx, out); err != nil {
+			return nil, err
+		}
+	}
+	return out, nil
+}
+
+// List returns one page of records under parent.
+func (r *GormAllocationRepository) List(ctx context.Context, parent string, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error) {
+	parentIDs, err := repox.SplitName(parent, "organizationalUnits", "holds")
+	if err != nil {
+		return nil, "", err
+	}
+	scope := r.DB.Where("hold_id = ?", parentIDs[len(parentIDs)-1])
+	return r.list(ctx, scope, in)
+}
+
+func (r *GormAllocationRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error) {
+	conds, err := filterx.Parse(in.Filter)
+	if err != nil {
+		return nil, "", repox.MapFilterxErr(err)
+	}
+	eng := filterx.Gorm[allocation.Allocation](allocation.AllocationFilterSpec)
+	for f, h := range r.ListOverrides {
+		eng.Override(f, h)
+	}
+	rows, next, err := eng.List(ctx, scope, filterx.ListInput{
+		PageSize:  in.PageSize,
+		PageToken: in.PageToken,
+		OrderBy:   in.OrderBy,
+		Filter:    conds,
+	})
+	if err != nil {
+		return nil, "", repox.MapFilterxErr(err)
+	}
+	items := make([]*allocationpbv1.Allocation, 0, len(rows))
+	for i := range rows {
+		out, err := r.toProto(ctx, &rows[i])
+		if err != nil {
+			return nil, "", err
+		}
+		items = append(items, out)
+	}
+	return items, next, nil
+}
+
+// Update persists the masked fields of in; an empty mask replaces every
+// mutable field. The write happens in one transaction guarded by in.Etag.
+func (r *GormAllocationRepository) Update(ctx context.Context, in *allocationpbv1.Allocation, paths []string) (*allocationpbv1.Allocation, error) {
+	ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds", "allocations")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	err = r.DB.Transaction(func(tx *gorm.DB) error {
+		var existing allocation.Allocation
+		if err := tx.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+			return err
+		}
+		existingPB := allocation.AllocationToProto(&existing)
+		merged := proto.Clone(existingPB).(*allocationpbv1.Allocation)
+		applyAllocationMask(merged, in, paths)
+		if h := r.Hooks.BeforeUpdate; h != nil {
+			if err := h(ctx, existingPB, merged, paths); err != nil {
+				return err
+			}
+		}
+		next := allocation.AllocationFromProto(merged)
+		_ = next
+		existing.Name = next.Name
+		existing.Resource = next.Resource
+		existing.StartTime = next.StartTime
+		existing.EndTime = next.EndTime
+		existing.ExpireTime = next.ExpireTime
+		return allocation.NewAllocationStore(tx).Update(ctx, &existing)
+	})
+	if err != nil {
+		return nil, repox.MapGormErr(err)
+	}
+	return r.get(ctx, id)
+}
+
+// Delete removes the record addressed by its resource name.
+func (r *GormAllocationRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "organizationalUnits", "holds", "allocations")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	id := ids[len(ids)-1]
+	var existing allocation.Allocation
+	if err := r.DB.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+		return repox.MapGormErr(err)
+	}
+	return repox.MapGormErr(allocation.NewAllocationStore(r.DB).DeleteByID(ctx, id))
+}
+
+// Compile-time proof the adapter satisfies the interface.
+var _ AllocationRepository = (*GormAllocationRepository)(nil)
+
 // GormHoldRepository is the GORM adapter of HoldRepository: flat
 // CRUD over the generated model, store, converters, and filterx spec. Exported
 // fields and helpers are the Tier-2 seam — embed it and override whole methods

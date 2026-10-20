@@ -8,7 +8,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 40 | 20 |
+| 41 | 20 |
 
 ## Entity relationships
 
@@ -18,6 +18,10 @@ erDiagram
     Adjustment {
         string id PK
         string amount_delta_id FK
+    }
+    Allocation {
+        string id PK
+        string hold_id FK
     }
     Attachment {
         string id PK
@@ -188,6 +192,7 @@ erDiagram
         string id PK
     }
     Adjustment }o--|| Money : "amount_delta_id"
+    Allocation }o--|| Hold : "hold_id"
     AvailabilityException }o--|| TimeWindow : "window_id"
     AvailabilityException }o--|| DateRange : "date_range_id"
     Booking }o--|| PromoCode : "promo_code"
@@ -273,6 +278,22 @@ A Hold is a temporary, expiring claim on one or more bookable resources for a wi
 | `organizational_unit_id` | `CHAR(26)` | not null |
 | `resources` | `VARCHAR(255)[]` | nullable |
 | `candidate_resources` | `VARCHAR(255)[]` | nullable |
+
+### `Allocation` → `resource`
+
+An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it.
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `name` | `VARCHAR(255)` | not null |
+| `resource` | `VARCHAR(255)` | not null |
+| `start_time` | `TIMESTAMPTZ` | not null |
+| `end_time` | `TIMESTAMPTZ` | not null |
+| `expire_time` | `TIMESTAMPTZ` | nullable |
+| `create_time` | `TIMESTAMPTZ` | not null |
+| `organizational_unit_id` | `CHAR(26)` | not null |
+| `hold_id` | `CHAR(26)` | not null |
 
 ### Enums
 
@@ -693,7 +714,7 @@ The record behind every `request_id` field in this API: it remembers what the fi
 | `name` | `VARCHAR(255)` | not null |
 | `method` | `VARCHAR(255)` | not null |
 | `request_id` | `VARCHAR(255)` | not null |
-| `state` | `IdempotencyState` | not null |
+| `state` | `IdempotencyState` | nullable |
 | `response` | `TEXT` | nullable |
 | `create_time` | `TIMESTAMPTZ` | not null |
 | `update_time` | `TIMESTAMPTZ` | not null |

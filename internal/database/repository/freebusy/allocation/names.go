@@ -19,6 +19,24 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
 )
 
+// FormatAllocationName builds "organizationalUnits/{organizational_unit}/holds/{hold}/allocations/{allocation}" from bare ids.
+func FormatAllocationName(organizationalUnit, hold, allocation string) string {
+	return "organizationalUnits" + "/" + organizationalUnit + "/" + "holds" + "/" + hold + "/" + "allocations" + "/" + allocation
+}
+
+// ParseAllocationName splits a "organizationalUnits/{organizational_unit}/holds/{hold}/allocations/{allocation}" resource name into its bare ids,
+// rejecting other shapes with repox.ErrInvalidArgument.
+func ParseAllocationName(name string) (organizationalUnit, hold, allocation string, err error) {
+	ids, err := repox.SplitName(name, "organizationalUnits", "holds", "allocations")
+	if err != nil {
+		return
+	}
+	organizationalUnit = ids[0]
+	hold = ids[1]
+	allocation = ids[2]
+	return
+}
+
 // FormatHoldName builds "organizationalUnits/{organizational_unit}/holds/{hold}" from bare ids.
 func FormatHoldName(organizationalUnit, hold string) string {
 	return "organizationalUnits" + "/" + organizationalUnit + "/" + "holds" + "/" + hold

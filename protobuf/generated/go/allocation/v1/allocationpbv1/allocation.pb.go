@@ -190,6 +190,114 @@ func (x *Hold) GetEtag() string {
 	return ""
 }
 
+// An Allocation is one resource taken by one hold for one span: the row the
+// engine counts when it asks what is already claimed.
+//
+// Storage-only. No RPC returns it -- callers see a Hold and its `resources` --
+// but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is
+// one value and its resources a list, so an overlap query over holds would
+// have to unpack both on every row. One row per resource, with the span as two
+// indexed instants, makes that query a plain range scan on either backend.
+//
+// The span and `expire_time` are copies of the hold's, written in the same
+// write as the hold. The copy is the point: a claim stops counting the instant
+// `expire_time` passes, with no sweeper write needed, because every read
+// filters on it.
+type Allocation struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The allocation name, nested under the hold that took it so deleting the
+	// hold takes its claims with it.
+	// Format: organizationalUnits/{organizational_unit}/holds/{hold}/allocations/{allocation}
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The resource taken.
+	// Format: resources/{resource}
+	Resource string `protobuf:"bytes,2,opt,name=resource,proto3" json:"resource,omitempty"`
+	// Start of the span taken, inclusive. A copy of the hold's window start.
+	StartTime *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// End of the span taken, exclusive. A copy of the hold's window end.
+	EndTime *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	// When this claim stops counting. A copy of the hold's expire_time while it
+	// is ACTIVE; set to the release instant on release; unset once the hold is
+	// CONVERTED, which is the one outcome that keeps the resource taken.
+	ExpireTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"`
+	// Creation timestamp.
+	CreateTime    *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Allocation) Reset() {
+	*x = Allocation{}
+	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Allocation) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Allocation) ProtoMessage() {}
+
+func (x *Allocation) ProtoReflect() protoreflect.Message {
+	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Allocation.ProtoReflect.Descriptor instead.
+func (*Allocation) Descriptor() ([]byte, []int) {
+	return file_freebusy_allocation_v1_allocation_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Allocation) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Allocation) GetResource() string {
+	if x != nil {
+		return x.Resource
+	}
+	return ""
+}
+
+func (x *Allocation) GetStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartTime
+	}
+	return nil
+}
+
+func (x *Allocation) GetEndTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndTime
+	}
+	return nil
+}
+
+func (x *Allocation) GetExpireTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ExpireTime
+	}
+	return nil
+}
+
+func (x *Allocation) GetCreateTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreateTime
+	}
+	return nil
+}
+
 // One slice of an availability answer: how many resources are free across a
 // span, and which ones.
 //
@@ -218,7 +326,7 @@ type AvailabilityBucket struct {
 
 func (x *AvailabilityBucket) Reset() {
 	*x = AvailabilityBucket{}
-	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[1]
+	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -230,7 +338,7 @@ func (x *AvailabilityBucket) String() string {
 func (*AvailabilityBucket) ProtoMessage() {}
 
 func (x *AvailabilityBucket) ProtoReflect() protoreflect.Message {
-	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[1]
+	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -243,7 +351,7 @@ func (x *AvailabilityBucket) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AvailabilityBucket.ProtoReflect.Descriptor instead.
 func (*AvailabilityBucket) Descriptor() ([]byte, []int) {
-	return file_freebusy_allocation_v1_allocation_proto_rawDescGZIP(), []int{1}
+	return file_freebusy_allocation_v1_allocation_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AvailabilityBucket) GetWindow() *interval.Interval {
@@ -290,7 +398,7 @@ type UnbookableReason struct {
 
 func (x *UnbookableReason) Reset() {
 	*x = UnbookableReason{}
-	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[2]
+	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -302,7 +410,7 @@ func (x *UnbookableReason) String() string {
 func (*UnbookableReason) ProtoMessage() {}
 
 func (x *UnbookableReason) ProtoReflect() protoreflect.Message {
-	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[2]
+	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -315,7 +423,7 @@ func (x *UnbookableReason) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UnbookableReason.ProtoReflect.Descriptor instead.
 func (*UnbookableReason) Descriptor() ([]byte, []int) {
-	return file_freebusy_allocation_v1_allocation_proto_rawDescGZIP(), []int{2}
+	return file_freebusy_allocation_v1_allocation_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *UnbookableReason) GetCode() UnbookableReasonCode {
@@ -359,7 +467,7 @@ type AvailabilityMatch struct {
 
 func (x *AvailabilityMatch) Reset() {
 	*x = AvailabilityMatch{}
-	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[3]
+	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -371,7 +479,7 @@ func (x *AvailabilityMatch) String() string {
 func (*AvailabilityMatch) ProtoMessage() {}
 
 func (x *AvailabilityMatch) ProtoReflect() protoreflect.Message {
-	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[3]
+	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -384,7 +492,7 @@ func (x *AvailabilityMatch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AvailabilityMatch.ProtoReflect.Descriptor instead.
 func (*AvailabilityMatch) Descriptor() ([]byte, []int) {
-	return file_freebusy_allocation_v1_allocation_proto_rawDescGZIP(), []int{3}
+	return file_freebusy_allocation_v1_allocation_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *AvailabilityMatch) GetResource() string {
@@ -438,7 +546,25 @@ const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	" \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
 	"updateTime\x12\x17\n" +
 	"\x04etag\x18\v \x01(\tB\x03\xe0A\x03R\x04etag:k\xeaAb\n" +
-	"\x1bfreebusy.allocation.v1/Hold\x126organizationalUnits/{organizational_unit}/holds/{hold}*\x05holds2\x04hold\xca\xf3\x18\x02\x18\x01J\x04\b\a\x10\b\"\xc9\x01\n" +
+	"\x1bfreebusy.allocation.v1/Hold\x126organizationalUnits/{organizational_unit}/holds/{hold}*\x05holds2\x04hold\xca\xf3\x18\x02\x18\x01J\x04\b\a\x10\b\"\x9f\x04\n" +
+	"\n" +
+	"Allocation\x12\x17\n" +
+	"\x04name\x18\x01 \x01(\tB\x03\xe0A\bR\x04name\x12<\n" +
+	"\bresource\x18\x02 \x01(\tB \xe0A\x02\xfaA\x1a\n" +
+	"\x18protobufrfc.dev/ResourceR\bresource\x12>\n" +
+	"\n" +
+	"start_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x02R\tstartTime\x12:\n" +
+	"\bend_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x02R\aendTime\x12@\n" +
+	"\vexpire_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x01R\n" +
+	"expireTime\x12@\n" +
+	"\vcreate_time\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
+	"createTime:\xb9\x01\xeaA\x8d\x01\n" +
+	"!freebusy.allocation.v1/Allocation\x12OorganizationalUnits/{organizational_unit}/holds/{hold}/allocations/{allocation}*\vallocations2\n" +
+	"allocation\xca\xf3\x18$\x18\x01* \n" +
+	"\bresource\n" +
+	"\n" +
+	"start_time\n" +
+	"\bend_time\"\xc9\x01\n" +
 	"\x12AvailabilityBucket\x12-\n" +
 	"\x06window\x18\x01 \x01(\v2\x15.google.type.IntervalR\x06window\x12\x1d\n" +
 	"\n" +
@@ -473,31 +599,36 @@ func file_freebusy_allocation_v1_allocation_proto_rawDescGZIP() []byte {
 	return file_freebusy_allocation_v1_allocation_proto_rawDescData
 }
 
-var file_freebusy_allocation_v1_allocation_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_freebusy_allocation_v1_allocation_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_freebusy_allocation_v1_allocation_proto_goTypes = []any{
 	(*Hold)(nil),                  // 0: freebusy.allocation.v1.Hold
-	(*AvailabilityBucket)(nil),    // 1: freebusy.allocation.v1.AvailabilityBucket
-	(*UnbookableReason)(nil),      // 2: freebusy.allocation.v1.UnbookableReason
-	(*AvailabilityMatch)(nil),     // 3: freebusy.allocation.v1.AvailabilityMatch
-	(*interval.Interval)(nil),     // 4: google.type.Interval
-	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
-	(HoldState)(0),                // 6: freebusy.allocation.v1.HoldState
-	(UnbookableReasonCode)(0),     // 7: freebusy.allocation.v1.UnbookableReasonCode
+	(*Allocation)(nil),            // 1: freebusy.allocation.v1.Allocation
+	(*AvailabilityBucket)(nil),    // 2: freebusy.allocation.v1.AvailabilityBucket
+	(*UnbookableReason)(nil),      // 3: freebusy.allocation.v1.UnbookableReason
+	(*AvailabilityMatch)(nil),     // 4: freebusy.allocation.v1.AvailabilityMatch
+	(*interval.Interval)(nil),     // 5: google.type.Interval
+	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
+	(HoldState)(0),                // 7: freebusy.allocation.v1.HoldState
+	(UnbookableReasonCode)(0),     // 8: freebusy.allocation.v1.UnbookableReasonCode
 }
 var file_freebusy_allocation_v1_allocation_proto_depIdxs = []int32{
-	4, // 0: freebusy.allocation.v1.Hold.window:type_name -> google.type.Interval
-	5, // 1: freebusy.allocation.v1.Hold.expire_time:type_name -> google.protobuf.Timestamp
-	6, // 2: freebusy.allocation.v1.Hold.state:type_name -> freebusy.allocation.v1.HoldState
-	5, // 3: freebusy.allocation.v1.Hold.create_time:type_name -> google.protobuf.Timestamp
-	5, // 4: freebusy.allocation.v1.Hold.update_time:type_name -> google.protobuf.Timestamp
-	4, // 5: freebusy.allocation.v1.AvailabilityBucket.window:type_name -> google.type.Interval
-	7, // 6: freebusy.allocation.v1.UnbookableReason.code:type_name -> freebusy.allocation.v1.UnbookableReasonCode
-	4, // 7: freebusy.allocation.v1.AvailabilityMatch.window:type_name -> google.type.Interval
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	5,  // 0: freebusy.allocation.v1.Hold.window:type_name -> google.type.Interval
+	6,  // 1: freebusy.allocation.v1.Hold.expire_time:type_name -> google.protobuf.Timestamp
+	7,  // 2: freebusy.allocation.v1.Hold.state:type_name -> freebusy.allocation.v1.HoldState
+	6,  // 3: freebusy.allocation.v1.Hold.create_time:type_name -> google.protobuf.Timestamp
+	6,  // 4: freebusy.allocation.v1.Hold.update_time:type_name -> google.protobuf.Timestamp
+	6,  // 5: freebusy.allocation.v1.Allocation.start_time:type_name -> google.protobuf.Timestamp
+	6,  // 6: freebusy.allocation.v1.Allocation.end_time:type_name -> google.protobuf.Timestamp
+	6,  // 7: freebusy.allocation.v1.Allocation.expire_time:type_name -> google.protobuf.Timestamp
+	6,  // 8: freebusy.allocation.v1.Allocation.create_time:type_name -> google.protobuf.Timestamp
+	5,  // 9: freebusy.allocation.v1.AvailabilityBucket.window:type_name -> google.type.Interval
+	8,  // 10: freebusy.allocation.v1.UnbookableReason.code:type_name -> freebusy.allocation.v1.UnbookableReasonCode
+	5,  // 11: freebusy.allocation.v1.AvailabilityMatch.window:type_name -> google.type.Interval
+	12, // [12:12] is the sub-list for method output_type
+	12, // [12:12] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_freebusy_allocation_v1_allocation_proto_init() }
@@ -512,7 +643,7 @@ func file_freebusy_allocation_v1_allocation_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_freebusy_allocation_v1_allocation_proto_rawDesc), len(file_freebusy_allocation_v1_allocation_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

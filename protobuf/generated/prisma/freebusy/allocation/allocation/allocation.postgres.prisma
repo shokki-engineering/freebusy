@@ -53,6 +53,9 @@ model Hold {
   /// Candidate resources the allocator may choose from, supplied on create. Empty offers every resource the site holds. Immutable: the choice is made once, and re-offering a different set is a different allocation. Format: resources/{resource}
   candidateResources String[] @map("candidate_resources")
 
+  /// Back-relation: Allocation records that reference this model via hold_id.
+  resource Allocation[]
+
   /// Index on [organizational_unit_id].
   @@index([organizationalUnitID])
   /// GIN index: case-insensitive contains (ILIKE '%…%') cannot use a B-tree.
@@ -63,6 +66,52 @@ model Hold {
   @@index([candidateResources], type: Gin)
   /// Maps the model to the "holds" table in the database.
   @@map("holds")
+  /// Maps the model to the "allocation" schema in the database.
+  @@schema("allocation")
+}
+
+/// An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it.
+model Allocation {
+  /// Unique identifier for the record.
+  id String @id @default(ulid()) @map("id")
+
+  /// The allocation name, nested under the hold that took it so deleting the hold takes its claims with it. Format: organizationalUnits/{organizational_unit}/holds/{hold}/allocations/{allocation}
+  name String @unique @map("name")
+
+  /// The resource taken. Format: resources/{resource} TODO: unresolved reference to Resource (not in this generation set); kept as a plain indexed column.
+  resource String @map("resource")
+
+  /// Start of the span taken, inclusive. A copy of the hold's window start.
+  startTime DateTime @freebusy.Timestamptz(6) @map("start_time")
+
+  /// End of the span taken, exclusive. A copy of the hold's window end.
+  endTime DateTime @freebusy.Timestamptz(6) @map("end_time")
+
+  /// When this claim stops counting. A copy of the hold's expire_time while it is ACTIVE; set to the release instant on release; unset once the hold is CONVERTED, which is the one outcome that keeps the resource taken.
+  expireTime DateTime? @freebusy.Timestamptz(6) @map("expire_time")
+
+  /// Creation timestamp.
+  createTime DateTime @default(now()) @freebusy.Timestamptz(6) @map("create_time")
+
+  /// Parent reference to OrganizationalUnit (from the AIP resource pattern). TODO: unresolved reference to OrganizationalUnit (not in this generation set); kept as a plain indexed column.
+  organizationalUnitID String @map("organizational_unit_id")
+
+  /// Parent reference to Hold (from the AIP resource pattern).
+  holdID String @map("hold_id")
+
+  /// Relation to Hold via hold_id.
+  hold Hold @relation(fields: [holdID], references: [id], onDelete: Cascade)
+
+  /// Composite index on [resource, start_time, end_time].
+  @@index([resource, startTime, endTime])
+  /// Index on [resource].
+  @@index([resource])
+  /// Index on [organizational_unit_id].
+  @@index([organizationalUnitID])
+  /// Index on [hold_id].
+  @@index([holdID])
+  /// Maps the model to the "resource" table in the database.
+  @@map("resource")
   /// Maps the model to the "allocation" schema in the database.
   @@schema("allocation")
 }

@@ -24,6 +24,41 @@ import (
 	"gorm.io/gorm"
 )
 
+// AllocationRepository is the provider-agnostic persistence surface for
+// Allocation (organizationalUnits/{organizational_unit}/holds/{hold}/allocations/{allocation}): full-message writes, AIP-160/AIP-132 lists with
+// opaque page tokens, field-mask updates, and etag optimistic concurrency.
+type AllocationRepository interface {
+	// Create persists m under parent and returns the stored record.
+	Create(ctx context.Context, parent string, m *allocationpbv1.Allocation) (*allocationpbv1.Allocation, error)
+	// Get returns the record addressed by its resource name, or
+	// repox.ErrNotFound.
+	Get(ctx context.Context, name string) (*allocationpbv1.Allocation, error)
+	// List returns one page of records under parent.
+	List(ctx context.Context, parent string, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error)
+	// Update persists the masked fields of m; an empty mask replaces every
+	// mutable field. m.Etag, when set, guards against concurrent writes
+	// (repox.ErrConflict).
+	Update(ctx context.Context, m *allocationpbv1.Allocation, paths []string) (*allocationpbv1.Allocation, error)
+	// Delete removes the record addressed by its resource name.
+	Delete(ctx context.Context, name string) error
+}
+
+// AllocationHooks lets custom logic run inside the generated Allocation
+// adapters without editing them: normalization/derivation before writes,
+// derived fields after reads, and guards before deletes. Nil funcs are skipped.
+type AllocationHooks struct {
+	// BeforeCreate runs after name/id resolution, before the row is written.
+	BeforeCreate func(ctx context.Context, m *allocationpbv1.Allocation) error
+	// AfterRead runs on every record a read returns (Get, List, and the
+	// re-reads writes return).
+	AfterRead func(ctx context.Context, m *allocationpbv1.Allocation) error
+	// BeforeUpdate runs after the mask is applied to the merged record,
+	// before it is written.
+	BeforeUpdate func(ctx context.Context, existing, merged *allocationpbv1.Allocation, paths []string) error
+	// BeforeDelete runs before the row is removed; returning an error vetoes.
+	BeforeDelete func(ctx context.Context, name string) error
+}
+
 // HoldRepository is the provider-agnostic persistence surface for
 // Hold (organizationalUnits/{organizational_unit}/holds/{hold}): full-message writes, AIP-160/AIP-132 lists with
 // opaque page tokens, field-mask updates, and etag optimistic concurrency.
@@ -61,19 +96,39 @@ type HoldHooks struct {
 
 // Repositories bundles this schema's repository surfaces behind one factory.
 type Repositories struct {
-	Holds HoldRepository
+	Allocations AllocationRepository
+	Holds       HoldRepository
 }
 
 // options collects the per-resource customizations the factories thread into
 // the adapters they build.
 type options struct {
-	holdHooks        HoldHooks
-	holdOverrides    map[string]filterx.SQLHandler
-	holdGQLOverrides map[string]filterx.GraphQLHandler
+	allocationHooks        AllocationHooks
+	allocationOverrides    map[string]filterx.SQLHandler
+	holdHooks              HoldHooks
+	holdOverrides          map[string]filterx.SQLHandler
+	allocationGQLOverrides map[string]filterx.GraphQLHandler
+	holdGQLOverrides       map[string]filterx.GraphQLHandler
 }
 
 // Option customizes the adapters a factory builds.
 type Option func(*options)
+
+// WithAllocationHooks installs h on the Allocation adapters.
+func WithAllocationHooks(h AllocationHooks) Option {
+	return func(o *options) { o.allocationHooks = h }
+}
+
+// WithAllocationListOverride substitutes the generated filter dispatch for one
+// Allocation filter field (e.g. a derived state computed via subqueries).
+func WithAllocationListOverride(field string, h filterx.SQLHandler) Option {
+	return func(o *options) {
+		if o.allocationOverrides == nil {
+			o.allocationOverrides = map[string]filterx.SQLHandler{}
+		}
+		o.allocationOverrides[field] = h
+	}
+}
 
 // WithHoldHooks installs h on the Hold adapters.
 func WithHoldHooks(h HoldHooks) Option {
@@ -88,6 +143,17 @@ func WithHoldListOverride(field string, h filterx.SQLHandler) Option {
 			o.holdOverrides = map[string]filterx.SQLHandler{}
 		}
 		o.holdOverrides[field] = h
+	}
+}
+
+// WithAllocationGraphQLListOverride substitutes the generated filter dispatch
+// for one Allocation filter field on the GraphQL adapters.
+func WithAllocationGraphQLListOverride(field string, h filterx.GraphQLHandler) Option {
+	return func(o *options) {
+		if o.allocationGQLOverrides == nil {
+			o.allocationGQLOverrides = map[string]filterx.GraphQLHandler{}
+		}
+		o.allocationGQLOverrides[field] = h
 	}
 }
 
@@ -118,7 +184,8 @@ func NewGraphQL(svc *freebusyql.Service, opts ...Option) Repositories {
 		opt(&o)
 	}
 	return Repositories{
-		Holds: &GraphQLHoldRepository{Svc: svc, Hooks: o.holdHooks, ListOverrides: o.holdGQLOverrides},
+		Allocations: &GraphQLAllocationRepository{Svc: svc, Hooks: o.allocationHooks, ListOverrides: o.allocationGQLOverrides},
+		Holds:       &GraphQLHoldRepository{Svc: svc, Hooks: o.holdHooks, ListOverrides: o.holdGQLOverrides},
 	}
 }
 
@@ -129,6 +196,7 @@ func NewGorm(db *gorm.DB, opts ...Option) Repositories {
 		opt(&o)
 	}
 	return Repositories{
-		Holds: &GormHoldRepository{DB: db, Hooks: o.holdHooks, ListOverrides: o.holdOverrides},
+		Allocations: &GormAllocationRepository{DB: db, Hooks: o.allocationHooks, ListOverrides: o.allocationOverrides},
+		Holds:       &GormHoldRepository{DB: db, Hooks: o.holdHooks, ListOverrides: o.holdOverrides},
 	}
 }

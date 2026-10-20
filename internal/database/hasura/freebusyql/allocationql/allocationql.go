@@ -15,6 +15,7 @@ package allocationql
 
 import (
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/allocationql/holdsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/allocationql/resourceql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 
@@ -24,39 +25,50 @@ type AllocationHoldsAggExp = holdsql.AllocationHoldsAggExp
 type DeleteAllocationHoldsByIdResponse = holdsql.DeleteAllocationHoldsByIdResponse
 type InsertAllocationHoldsResponse = holdsql.InsertAllocationHoldsResponse
 type UpdateAllocationHoldsByIdResponse = holdsql.UpdateAllocationHoldsByIdResponse
+type AllocationResource = resourceql.AllocationResource
+type AllocationResourceAggExp = resourceql.AllocationResourceAggExp
+type DeleteAllocationResourceByIdResponse = resourceql.DeleteAllocationResourceByIdResponse
+type InsertAllocationResourceResponse = resourceql.InsertAllocationResourceResponse
+type UpdateAllocationResourceByIdResponse = resourceql.UpdateAllocationResourceByIdResponse
 
 // QueryHandler aggregates query handlers for the allocationql domain.
 type QueryHandler struct {
-	Holds holdsql.QueryHandler
+	Holds    holdsql.QueryHandler
+	Resource resourceql.QueryHandler
 }
 
 // NewQuery wires every query handler in the domain.
 func NewQuery(gql *runtime.GraphQLClient) QueryHandler {
 	return QueryHandler{
-		Holds: holdsql.NewQuery(gql),
+		Holds:    holdsql.NewQuery(gql),
+		Resource: resourceql.NewQuery(gql),
 	}
 }
 
 // MutationHandler aggregates mutation handlers for the allocationql domain.
 type MutationHandler struct {
-	Holds holdsql.MutationHandler
+	Holds    holdsql.MutationHandler
+	Resource resourceql.MutationHandler
 }
 
 // NewMutation wires every mutation handler in the domain.
 func NewMutation(gql *runtime.GraphQLClient) MutationHandler {
 	return MutationHandler{
-		Holds: holdsql.NewMutation(gql),
+		Holds:    holdsql.NewMutation(gql),
+		Resource: resourceql.NewMutation(gql),
 	}
 }
 
 // SubscriptionHandler aggregates subscription handlers for the allocationql domain.
 type SubscriptionHandler struct {
-	Holds holdsql.SubscriptionHandler
+	Holds    holdsql.SubscriptionHandler
+	Resource resourceql.SubscriptionHandler
 }
 
 // NewSubscription wires every subscription handler in the domain.
 func NewSubscription(gql *runtime.GraphQLClient) SubscriptionHandler {
 	return SubscriptionHandler{
-		Holds: holdsql.NewSubscription(gql),
+		Holds:    holdsql.NewSubscription(gql),
+		Resource: resourceql.NewSubscription(gql),
 	}
 }

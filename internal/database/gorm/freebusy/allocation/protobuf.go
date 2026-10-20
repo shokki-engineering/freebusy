@@ -112,6 +112,38 @@ func HoldFromProto(pb *allocationpbv1.Hold) *Hold {
 	return m
 }
 
+// AllocationToProto converts the stored row (with its belongs-to associations,
+// when preloaded) to its proto message. Nil in, nil out.
+func AllocationToProto(m *Allocation) *allocationpbv1.Allocation {
+	if m == nil {
+		return nil
+	}
+	out := &allocationpbv1.Allocation{}
+	out.Name = m.Name
+	out.Resource = m.Resource
+	out.StartTime = goValToTs(m.StartTime)
+	out.EndTime = goValToTs(m.EndTime)
+	out.ExpireTime = goToTs(m.ExpireTime)
+	out.CreateTime = goValToTs(m.CreateTime)
+	return out
+}
+
+// AllocationFromProto maps the proto message's data fields onto a fresh row.
+// It never invents keys or relations: primary keys, resource references, and
+// sub-row graph wiring stay with the caller. Nil in, nil out.
+func AllocationFromProto(pb *allocationpbv1.Allocation) *Allocation {
+	if pb == nil {
+		return nil
+	}
+	m := &Allocation{}
+	m.Name = pb.GetName()
+	m.Resource = pb.GetResource()
+	m.StartTime = tsToGoVal(pb.GetStartTime())
+	m.EndTime = tsToGoVal(pb.GetEndTime())
+	m.ExpireTime = tsToGo(pb.GetExpireTime())
+	return m
+}
+
 // toPtr returns a pointer to v, or nil for the zero value — a nullable column
 // stores absence, not the proto zero.
 func toPtr[T comparable](v T) *T {

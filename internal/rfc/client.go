@@ -50,6 +50,17 @@ type Profile struct {
 	// MaxOccupancy is the most guests one unit of this resource takes. Zero
 	// means unbounded, matching party.Fits.
 	MaxOccupancy int32 `json:"max_occupancy"`
+
+	// The booking policy the availability engine enforces, each an RFC 5545
+	// DURATION value such as "PT1H" or "P30D". Empty imposes nothing.
+	//
+	// MinDuration and MaxDuration bound the window's length: a minimum stay, a
+	// court's shortest slot. MinNotice is how far ahead a window must be booked
+	// and MaxAdvance how far ahead bookings open.
+	MinDuration string `json:"min_duration,omitempty"`
+	MaxDuration string `json:"max_duration,omitempty"`
+	MinNotice   string `json:"min_notice,omitempty"`
+	MaxAdvance  string `json:"max_advance,omitempty"`
 }
 
 // Client reads the RFC services. The zero value is unusable; use Dial.

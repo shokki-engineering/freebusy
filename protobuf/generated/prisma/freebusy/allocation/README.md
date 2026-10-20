@@ -6,16 +6,21 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 1 | 1 |
+| 2 | 1 |
 
 ## Entity relationships
 
 ```mermaid
 erDiagram
     direction LR
+    Allocation {
+        string id PK
+        string hold_id FK
+    }
     Hold {
         string id PK
     }
+    Allocation }o--|| Hold : "hold_id"
 ```
 
 ## Subfolders
