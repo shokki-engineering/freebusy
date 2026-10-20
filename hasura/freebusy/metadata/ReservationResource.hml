@@ -1,0 +1,295 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: ReservationResource
+  fields:
+    - name: attributes
+      type: Json
+    - name: cancelReason
+      type: String_1
+    - name: cancelTime
+      type: Timestamptz
+    - name: confirmTime
+      type: Timestamptz
+    - name: createTime
+      type: Timestamptz!
+    - name: customer
+      type: String_1
+    - name: endTime
+      type: Timestamptz
+    - name: etag
+      type: String_1
+    - name: hold
+      type: String_1!
+    - name: id
+      type: String_1!
+    - name: name
+      type: String_1!
+    - name: organizationalUnitId
+      type: String_1!
+    - name: resources
+      type: "[String_1]"
+    - name: startTime
+      type: Timestamptz
+    - name: state
+      type: String_1
+    - name: updateTime
+      type: Timestamptz!
+  graphql:
+    typeName: ReservationResource
+    inputTypeName: ReservationResourceInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: reservation_resource
+      fieldMapping:
+        attributes:
+          column:
+            name: attributes
+        cancelReason:
+          column:
+            name: cancel_reason
+        cancelTime:
+          column:
+            name: cancel_time
+        confirmTime:
+          column:
+            name: confirm_time
+        createTime:
+          column:
+            name: create_time
+        customer:
+          column:
+            name: customer
+        endTime:
+          column:
+            name: end_time
+        etag:
+          column:
+            name: etag
+        hold:
+          column:
+            name: hold
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        organizationalUnitId:
+          column:
+            name: organizational_unit_id
+        resources:
+          column:
+            name: resources
+        startTime:
+          column:
+            name: start_time
+        state:
+          column:
+            name: state
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: ReservationResource
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - attributes
+          - cancelReason
+          - cancelTime
+          - confirmTime
+          - createTime
+          - customer
+          - endTime
+          - etag
+          - hold
+          - id
+          - name
+          - organizationalUnitId
+          - resources
+          - startTime
+          - state
+          - updateTime
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: ReservationResourceBoolExp
+  operand:
+    object:
+      type: ReservationResource
+      comparableFields:
+        - fieldName: attributes
+          booleanExpressionType: JsonbBoolExp
+        - fieldName: cancelReason
+          booleanExpressionType: TextBoolExp
+        - fieldName: cancelTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: confirmTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: createTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: customer
+          booleanExpressionType: TextBoolExp
+        - fieldName: endTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: etag
+          booleanExpressionType: TextBoolExp
+        - fieldName: hold
+          booleanExpressionType: TextBoolExp
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: name
+          booleanExpressionType: TextBoolExp
+        - fieldName: organizationalUnitId
+          booleanExpressionType: TextBoolExp
+        - fieldName: startTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: state
+          booleanExpressionType: TextBoolExp
+        - fieldName: updateTime
+          booleanExpressionType: TimestamptzBoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: ReservationResourceBoolExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: ReservationResourceAggExp
+  operand:
+    object:
+      aggregatedType: ReservationResource
+      aggregatableFields:
+        - fieldName: attributes
+          aggregateExpression: JsonbAggExp
+        - fieldName: cancelReason
+          aggregateExpression: TextAggExp
+        - fieldName: cancelTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: confirmTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: createTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: customer
+          aggregateExpression: TextAggExp
+        - fieldName: endTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: etag
+          aggregateExpression: TextAggExp
+        - fieldName: hold
+          aggregateExpression: TextAggExp
+        - fieldName: id
+          aggregateExpression: TextAggExp
+        - fieldName: name
+          aggregateExpression: TextAggExp
+        - fieldName: organizationalUnitId
+          aggregateExpression: TextAggExp
+        - fieldName: startTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: state
+          aggregateExpression: TextAggExp
+        - fieldName: updateTime
+          aggregateExpression: TimestamptzAggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: ReservationResourceAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: ReservationResourceOrderByExp
+  operand:
+    object:
+      orderedType: ReservationResource
+      orderableFields:
+        - fieldName: attributes
+          orderByExpression: JsonOrderByExp
+        - fieldName: cancelReason
+          orderByExpression: String1OrderByExp
+        - fieldName: cancelTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: confirmTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: createTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: customer
+          orderByExpression: String1OrderByExp
+        - fieldName: endTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: etag
+          orderByExpression: String1OrderByExp
+        - fieldName: hold
+          orderByExpression: String1OrderByExp
+        - fieldName: id
+          orderByExpression: String1OrderByExp
+        - fieldName: name
+          orderByExpression: String1OrderByExp
+        - fieldName: organizationalUnitId
+          orderByExpression: String1OrderByExp
+        - fieldName: startTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: state
+          orderByExpression: String1OrderByExp
+        - fieldName: updateTime
+          orderByExpression: TimestamptzOrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: ReservationResourceOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: ReservationResource
+  objectType: ReservationResource
+  source:
+    dataConnectorName: freebusy_pgsql
+    collection: reservation_resource
+  filterExpressionType: ReservationResourceBoolExp
+  aggregateExpression: ReservationResourceAggExp
+  orderByExpression: ReservationResourceOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: reservationResource
+      subscription:
+        rootField: reservationResource
+    selectUniques:
+      - queryRootField: reservationResourceById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: reservationResourceById
+    filterInputTypeName: ReservationResourceFilterInput
+    aggregate:
+      queryRootField: reservationResourceAggregate
+      subscription:
+        rootField: reservationResourceAggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: ReservationResource
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+

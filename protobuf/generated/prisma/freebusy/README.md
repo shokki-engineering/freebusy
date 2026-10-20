@@ -6,7 +6,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 41 | 20 |
+| 42 | 21 |
 
 ## Entity relationships
 
@@ -158,6 +158,10 @@ erDiagram
         string id PK
         string cancellation_policy_id FK
     }
+    Reservation {
+        string id PK
+        string hold FK
+    }
     Schedule {
         string id PK
         string buffers_id FK
@@ -235,6 +239,7 @@ erDiagram
     Redemption }o--|| PromoCode : "promo_code_id"
     Redemption }o--|| Money : "amount_applied_id"
     RefundTier }o--|| CancellationPolicy : "cancellation_policy_id"
+    Reservation }o--|| Hold : "hold"
     Schedule }o--|| BufferSettings : "buffers_id"
     Schedule }o--|| StayConstraints : "stay_constraints_id"
     Schedule }o--|| CancellationPolicy : "cancellation_policy_id"
@@ -251,6 +256,7 @@ erDiagram
 - [`pricing/`](./pricing/README.md)
 - [`promocode/`](./promocode/README.md)
 - [`property/`](./property/README.md)
+- [`reservation/`](./reservation/README.md)
 - [`schedule/`](./schedule/README.md)
 - [`scheduling/`](./scheduling/README.md)
 - [`shared/`](./shared/README.md)

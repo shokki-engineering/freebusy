@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package freebusy.reservation.v1;
+
+import "buf/validate/validate.proto";
+import "freebusy/reservation/v1/reservation.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+
+option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1";
+option java_multiple_files = true;
+option java_outer_classname = "ReservationMessagesProto";
+option java_package = "dev.ohtarnished.freebusy.reservation.v1";
+
+// Request message for ReservationService.CreateReservation, AIP-133.
+//
+// There is no reservation_id: the id is the hold's, which is what makes the
+// call safe to retry without an idempotency key of its own.
+message CreateReservationRequest {
+  // The site the hold was taken at.
+  // Format: organizationalUnits/{organizational_unit}
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).child_type = "freebusy.reservation.v1/Reservation",
+    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+$"
+  ];
+
+  // The reservation to make. `hold` is required; `customer` and `attributes`
+  // are optional.
+  Reservation reservation = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).required = true
+  ];
+}
+
+// Request message for ReservationService.GetReservation, AIP-131.
+message GetReservationRequest {
+  // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "freebusy.reservation.v1/Reservation",
+    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/reservations/[^/]+$"
+  ];
+}
+
+// Request message for ReservationService.ListReservations, AIP-132.
+message ListReservationsRequest {
+  // Format: organizationalUnits/{organizational_unit}
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).child_type = "freebusy.reservation.v1/Reservation",
+    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+$"
+  ];
+
+  // Maximum reservations to return. Defaults to 50, capped at 1000.
+  int32 page_size = 2 [
+    (google.api.field_behavior) = OPTIONAL,
+    (buf.validate.field).int32 = {
+      gte: 0
+      lte: 1000
+    }
+  ];
+
+  // Page token from a previous ListReservationsResponse.next_page_token.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Filter expression, AIP-160, e.g.
+  // `state = RESERVATION_STATE_CONFIRMED AND start_time >= "2026-11-10T00:00:00Z"`.
+  string filter = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Ordering, AIP-132, e.g. `start_time desc`.
+  string order_by = 5 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Response message for ReservationService.ListReservations, AIP-132.
+message ListReservationsResponse {
+  // The reservations on this page.
+  repeated Reservation reservations = 1;
+
+  // Token for the next page, empty when this is the last page.
+  string next_page_token = 2;
+}
+
+// Request message for ReservationService.CancelReservation.
+message CancelReservationRequest {
+  // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "freebusy.reservation.v1/Reservation",
+    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/reservations/[^/]+$"
+  ];
+
+  // Why, in the canceller's words. Recorded, never parsed.
+  string reason = 2 [
+    (google.api.field_behavior) = OPTIONAL,
+    (buf.validate.field).string.max_len = 1024
+  ];
+
+  // Opaque version read from the reservation; the cancel is rejected if it
+  // changed since (AIP-154).
+  string etag = 3 [(google.api.field_behavior) = OPTIONAL];
+}

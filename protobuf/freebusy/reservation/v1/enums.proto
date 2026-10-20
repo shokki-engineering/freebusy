@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package freebusy.reservation.v1;
+
+option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1";
+option java_multiple_files = true;
+option java_outer_classname = "EnumsProto";
+option java_package = "dev.ohtarnished.freebusy.reservation.v1";
+
+// Lifecycle of a Reservation.
+//
+// Two of these states are in-between states, and they are why a crash never
+// leaves the books wrong. Confirming takes two writes -- this record and the
+// hold's conversion -- as does cancelling, and no transaction spans the engine
+// and this table on every backend. So each transition is written down before it
+// is carried out: a reservation seen PENDING or CANCELLING says what was being
+// attempted, and the reconciler finishes it.
+enum ReservationState {
+  // Default; never persisted.
+  RESERVATION_STATE_UNSPECIFIED = 0;
+
+  // Recorded, and its hold is being converted. Transient: the call that
+  // created it, a retry of that call, or the reconciler moves it on to
+  // CONFIRMED or FAILED.
+  RESERVATION_STATE_PENDING = 1;
+
+  // The hold was converted: the resources are taken for the window for good.
+  RESERVATION_STATE_CONFIRMED = 2;
+
+  // Cancellation is recorded and the resources are being freed. Transient,
+  // like PENDING, and finished the same way.
+  RESERVATION_STATE_CANCELLING = 3;
+
+  // Cancelled; the resources are free again. Terminal.
+  RESERVATION_STATE_CANCELLED = 4;
+
+  // The hold lapsed or was released before it could be converted, so nothing
+  // was taken. Terminal.
+  RESERVATION_STATE_FAILED = 5;
+}

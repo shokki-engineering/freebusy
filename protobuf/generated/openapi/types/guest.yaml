@@ -1,6 +1,6 @@
 components:
   schemas:
-    freebusy.identity.v1.ForeignerDetails:
+    freebusy.guest.v1.ForeignerDetails:
       description: Foreigner-registration details a hotel must capture for foreign
         nationals to file Form C with the FRRO within 24 hours of arrival (India).
         Nationals of exempt countries (e.g. Nepal, Bhutan) and diplomats may omit
@@ -88,7 +88,7 @@ components:
           description: Purpose of visit (e.g. "Tourism", "Business", "Medical").
           type: string
       type: object
-    freebusy.identity.v1.Guest:
+    freebusy.guest.v1.Guest:
       description: 'A guest is a person who stays under a booking. It is one of three
         distinct people the system models, all in the identity domain: - User (identity.proto):
         the account that signs in and books online. - Guest (this message): a person
@@ -528,7 +528,7 @@ components:
             the booking is held under). Exactly one guest in a party is primary.
           type: boolean
       type: object
-    freebusy.identity.v1.GuestPreferences:
+    freebusy.guest.v1.GuestPreferences:
       description: A guest's stay preferences and special requests. All optional;
         used to guide unit assignment and to surface requests to housekeeping / front
         desk.
@@ -579,7 +579,7 @@ components:
             type: string
           type: array
       type: object
-    freebusy.identity.v1.IdDocument:
+    freebusy.guest.v1.IdDocument:
       description: A government identity document. Passport fields are required for
         foreign nationals; domestic guests may present any accepted document type.
       properties:

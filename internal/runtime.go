@@ -12,10 +12,13 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
 	allocationdb "github.com/oh-tarnished/freebusy/internal/service/allocation/db"
 	"github.com/oh-tarnished/freebusy/internal/service/promocode"
+	"github.com/oh-tarnished/freebusy/internal/service/reservation"
+	reservationdb "github.com/oh-tarnished/freebusy/internal/service/reservation/db"
 	"github.com/oh-tarnished/freebusy/internal/service/schedule"
 	"github.com/oh-tarnished/freebusy/internal/service/scheduling"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/promocode/v1/promocodepbv1"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/schedule/v1/schedulepbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/scheduling/v1/schedulingpbv1"
 	"github.com/the-protobuf-project/runtime-go/grpc"
@@ -46,12 +49,14 @@ func newServiceInstance(conn *database.Connection) (*Service, error) {
 		}
 	}
 
+	engine := allocation.NewServer(allocationdb.New(conn))
 	svc := NewService(
 		promocode.New(conn),
 		schedule.New(conn),
 		scheduling.New(conn, catalogue),
 		pricing.New(conn),
-		allocation.NewServer(allocationdb.New(conn)),
+		engine,
+		reservation.NewServer(reservationdb.New(conn), engine),
 	)
 	svc.conn = conn
 	return svc, nil
@@ -75,6 +80,7 @@ func registerServices(s *grpc.GRPCServer, svc *Service) {
 	pricingpbv1.RegisterRatePlanServiceServer(s, svc)
 	allocationpbv1.RegisterAllocationServiceServer(s, svc)
 	allocationpbv1.RegisterHoldServiceServer(s, svc)
+	reservationpbv1.RegisterReservationServiceServer(s, svc)
 }
 
 // NewGRPCServer assembles the freebusy service on conn (opened from config
@@ -113,7 +119,10 @@ func registerHTTPGateways() grpc.Option {
 		if err := allocationpbv1.RegisterAllocationServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
 			return err
 		}
-		return allocationpbv1.RegisterHoldServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts)
+		if err := allocationpbv1.RegisterHoldServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
+			return err
+		}
+		return reservationpbv1.RegisterReservationServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts)
 	})
 }
 
@@ -139,6 +148,9 @@ func registerMCPServices(svc *Service) grpc.Option {
 		},
 		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
 			return allocationpbv1.ServeHoldServiceMCP(ctx, svc, cfg)
+		},
+		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
+			return reservationpbv1.ServeReservationServiceMCP(ctx, svc, cfg)
 		},
 	)
 }

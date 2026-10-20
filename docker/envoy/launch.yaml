@@ -91,6 +91,12 @@ static_resources:
                             timeout: 60s
 
                         - match:
+                            prefix: "/freebusy.reservation.v1.ReservationService/"
+                          route:
+                            cluster: freebusy_backend
+                            timeout: 60s
+
+                        - match:
                             prefix: "/freebusy.schedule.v1.ScheduleService/"
                           route:
                             cluster: freebusy_backend

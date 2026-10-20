@@ -12,22 +12,16 @@ info:
 servers:
     - url: https://freebusy.ohtarnished.dev
 paths:
-    /v1/properties/{property}/units/{unit}/availabilityExceptions:
+    /v1/resources/{resource}/availabilityExceptions:
         get:
             tags:
                 - ScheduleService
             description: Lists the exceptions configured for a unit.
             operationId: ScheduleService_ListAvailabilityExceptions
             parameters:
-                - name: property
+                - name: resource
                   in: path
-                  description: The property id.
-                  required: true
-                  schema:
-                    type: string
-                - name: unit
-                  in: path
-                  description: The unit id.
+                  description: The resource id.
                   required: true
                   schema:
                     type: string
@@ -71,15 +65,9 @@ paths:
             description: Adds an availability exception to a unit.
             operationId: ScheduleService_CreateAvailabilityException
             parameters:
-                - name: property
+                - name: resource
                   in: path
-                  description: The property id.
-                  required: true
-                  schema:
-                    type: string
-                - name: unit
-                  in: path
-                  description: The unit id.
+                  description: The resource id.
                   required: true
                   schema:
                     type: string
@@ -112,22 +100,16 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/properties/{property}/units/{unit}/availabilityExceptions/{availabilityException}:
+    /v1/resources/{resource}/availabilityExceptions/{availabilityException}:
         get:
             tags:
                 - ScheduleService
             description: Gets a single availability exception.
             operationId: ScheduleService_GetAvailabilityException
             parameters:
-                - name: property
+                - name: resource
                   in: path
-                  description: The property id.
-                  required: true
-                  schema:
-                    type: string
-                - name: unit
-                  in: path
-                  description: The unit id.
+                  description: The resource id.
                   required: true
                   schema:
                     type: string
@@ -156,15 +138,9 @@ paths:
             description: Removes an availability exception.
             operationId: ScheduleService_DeleteAvailabilityException
             parameters:
-                - name: property
+                - name: resource
                   in: path
-                  description: The property id.
-                  required: true
-                  schema:
-                    type: string
-                - name: unit
-                  in: path
-                  description: The unit id.
+                  description: The resource id.
                   required: true
                   schema:
                     type: string
@@ -184,22 +160,16 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/properties/{property}/units/{unit}/schedule:
+    /v1/resources/{resource}/schedule:
         get:
             tags:
                 - ScheduleService
             description: Reads the full availability configuration for a unit.
             operationId: ScheduleService_GetSchedule
             parameters:
-                - name: property
+                - name: resource
                   in: path
-                  description: The property id.
-                  required: true
-                  schema:
-                    type: string
-                - name: unit
-                  in: path
-                  description: The unit id.
+                  description: The resource id.
                   required: true
                   schema:
                     type: string
@@ -225,15 +195,9 @@ paths:
                  cancellation_policy.
             operationId: ScheduleService_UpdateSchedule
             parameters:
-                - name: property
+                - name: resource
                   in: path
-                  description: The property id.
-                  required: true
-                  schema:
-                    type: string
-                - name: unit
-                  in: path
-                  description: The unit id.
+                  description: The resource id.
                   required: true
                   schema:
                     type: string

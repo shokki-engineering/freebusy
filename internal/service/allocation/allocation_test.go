@@ -404,3 +404,40 @@ func equal(a, b []int32) bool {
 	}
 	return true
 }
+
+func TestConvertIdempotentAndEndConversion(t *testing.T) {
+	f := newFixture(t)
+	f.share()
+	h, err := f.srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{Parent: club, Hold: &allocationpbv1.Hold{Window: win(12, 13), Quantity: 3}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for range 2 {
+		if c, err := f.srv.ConvertHold(ctx(), h.GetName()); err != nil || c.GetState() != allocationpbv1.HoldState_HOLD_STATE_CONVERTED {
+			t.Fatalf("convert: %v %v", c.GetState(), err)
+		}
+	}
+	free := func() int32 {
+		res, err := f.srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Parent: club, Window: win(12, 13)})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return res.GetFreeCount()
+	}
+	if n := free(); n != 0 {
+		t.Fatalf("converted: %d free", n)
+	}
+	for range 2 {
+		if _, err := f.srv.EndConversion(ctx(), h.GetName(), f.clock); err != nil {
+			t.Fatal(err)
+		}
+	}
+	f.clock = f.clock.Add(time.Second)
+	if n := free(); n != 3 {
+		t.Fatalf("after EndConversion: %d free", n)
+	}
+	got, _ := f.srv.LookupHold(ctx(), h.GetName())
+	if got.GetState() != allocationpbv1.HoldState_HOLD_STATE_CONVERTED {
+		t.Fatalf("ended hold should stay CONVERTED, got %v", got.GetState())
+	}
+}

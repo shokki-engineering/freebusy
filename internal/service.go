@@ -9,8 +9,10 @@ import (
 
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
 	"github.com/oh-tarnished/freebusy/internal/service/pricing"
+	"github.com/oh-tarnished/freebusy/internal/service/reservation"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/pricing/v1/pricingpbv1"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"github.com/oh-tarnished/freebusy/shared"
 
 	"github.com/oh-tarnished/freebusy/internal/database"
@@ -31,10 +33,14 @@ type Service struct {
 	pricingpbv1.RatePlanServiceServer
 	allocationpbv1.AllocationServiceServer
 	allocationpbv1.HoldServiceServer
+	reservationpbv1.ReservationServiceServer
 
 	// allocation is the availability engine's server, retained so its hold
 	// sweeper can be started in StartBackground.
 	allocation *allocation.Server
+	// reservations is retained so its reconciler can be started in
+	// StartBackground.
+	reservations *reservation.Server
 	// scheduling is the concrete scheduling server, retained so background tasks (the
 	// hold sweeper) can be started against it in StartBackground.
 	scheduling *scheduling.Server
@@ -54,26 +60,34 @@ func NewService(
 	scheduling *scheduling.Server,
 	ratePlans *pricing.Server,
 	engine *allocation.Server,
+	reservations *reservation.Server,
 ) *Service {
 	return &Service{
-		PromoCodeServiceServer:  promoCode,
-		ScheduleServiceServer:   schedule,
-		SchedulingServiceServer: scheduling,
-		RatePlanServiceServer:   ratePlans,
-		AllocationServiceServer: engine,
-		HoldServiceServer:       engine,
-		scheduling:              scheduling,
-		allocation:              engine,
+		PromoCodeServiceServer:   promoCode,
+		ScheduleServiceServer:    schedule,
+		SchedulingServiceServer:  scheduling,
+		RatePlanServiceServer:    ratePlans,
+		AllocationServiceServer:  engine,
+		HoldServiceServer:        engine,
+		scheduling:               scheduling,
+		ReservationServiceServer: reservations,
+		allocation:               engine,
+		reservations:             reservations,
 	}
 }
 
 // StartBackground launches the service's background tasks, tied to ctx: the
-// scheduling and allocation hold sweepers, which converges lapsed holds' stored state, and the
+// scheduling and allocation hold sweepers, the reservation reconciler, which converges lapsed holds' stored state, and the
 // database pool monitor, which publishes the shared connection pool's health.
 // The goroutines exit when ctx is cancelled (on server Stop/Restart).
 func (s *Service) StartBackground(ctx context.Context) {
 	if s.scheduling != nil {
 		s.scheduling.StartHoldSweeper(ctx, 0)
+	}
+	if s.reservations != nil {
+		s.reservations.StartReconciler(ctx, 0, func(err error) {
+			_ = shared.Telemetry.Logger.Error("reservation reconciler failed", map[string]any{"error": err.Error()})
+		})
 	}
 	if s.allocation != nil {
 		s.allocation.StartHoldSweeper(ctx, 0, func(err error) {

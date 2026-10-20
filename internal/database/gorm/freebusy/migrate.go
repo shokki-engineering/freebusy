@@ -4,7 +4,7 @@
 // 	protoc (unknown)
 //
 // database: freebusy
-// schemas:  allocation, pricing, promocode, property, schedule, scheduling, shared, common, guest
+// schemas:  allocation, pricing, promocode, property, reservation, schedule, scheduling, shared, common, guest
 //
 // Migration aggregator: every model in one factory Registry.
 // annotations: entity.v1 1.5.4, store.v1 1.5.4
@@ -25,6 +25,7 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/pricing"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/promocode"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/property"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/reservation"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/schedule"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/scheduling"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/shared"
@@ -47,6 +48,7 @@ var schemas = []string{
 	"pricing",
 	"promocode",
 	"property",
+	"reservation",
 	"schedule",
 	"scheduling",
 	"shared",
@@ -140,6 +142,7 @@ var Default = New().Register(
 	&promocode.UsageLimits{},
 	&promocode.Scope{},
 	&property.Licence{},
+	&reservation.Reservation{},
 	&schedule.AvailabilityException{},
 	&schedule.Schedule{},
 	&schedule.RecurringRule{},

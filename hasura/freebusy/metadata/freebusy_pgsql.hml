@@ -538,6 +538,13 @@ definition:
               unique_columns:
                 - id
         - arguments: {}
+          name: reservation_resource
+          type: reservation_resource
+          uniqueness_constraints:
+            resource_pkey:
+              unique_columns:
+                - id
+        - arguments: {}
           name: resource_entity
           type: resource_entity
           uniqueness_constraints:
@@ -3048,6 +3055,22 @@ definition:
               type:
                 element_type:
                   name: property_units_link
+                  type: named
+                type: array
+          foreign_keys: {}
+        delete_reservation_resource_by_id_response:
+          description: Responses from the 'delete_reservation_resource_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: reservation_resource
                   type: named
                 type: array
           foreign_keys: {}
@@ -10110,6 +10133,113 @@ definition:
                   type: named
                 type: array
           foreign_keys: {}
+        insert_reservation_resource_object:
+          fields:
+            attributes:
+              type:
+                type: nullable
+                underlying_type:
+                  name: jsonb
+                  type: named
+            cancel_reason:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            cancel_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            confirm_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            create_time:
+              type:
+                name: timestamptz
+                type: named
+            customer:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            end_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            etag:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            hold:
+              type:
+                name: text
+                type: named
+            id:
+              type:
+                name: text
+                type: named
+            name:
+              type:
+                name: text
+                type: named
+            organizational_unit_id:
+              type:
+                name: text
+                type: named
+            resources:
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
+            start_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            state:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            update_time:
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        insert_reservation_resource_response:
+          description: Responses from the 'insert_reservation_resource' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: reservation_resource
+                  type: named
+                type: array
+          foreign_keys: {}
         insert_resource_entity_object:
           fields:
             calendar:
@@ -14771,6 +14901,97 @@ definition:
                 unit_id:
                   - id
               foreign_collection: property_units
+        reservation_resource:
+          fields:
+            attributes:
+              type:
+                type: nullable
+                underlying_type:
+                  name: jsonb
+                  type: named
+            cancel_reason:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            cancel_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            confirm_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            create_time:
+              type:
+                name: timestamptz
+                type: named
+            customer:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            end_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            etag:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            hold:
+              type:
+                name: text
+                type: named
+            id:
+              type:
+                name: text
+                type: named
+            name:
+              type:
+                name: text
+                type: named
+            organizational_unit_id:
+              type:
+                name: text
+                type: named
+            resources:
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
+            start_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            state:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            update_time:
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
         resource_entity:
           fields:
             calendar:
@@ -15489,10 +15710,8 @@ definition:
                   type: named
             state:
               type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
+                name: text
+                type: named
             update_time:
               type:
                 name: timestamptz
@@ -23849,6 +24068,174 @@ definition:
                 name: timestamptz
                 type: named
           foreign_keys: {}
+        update_column_reservation_resource_attributes:
+          description: Update the 'attributes' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: jsonb
+                  type: named
+          foreign_keys: {}
+        update_column_reservation_resource_cancel_reason:
+          description: Update the 'cancel_reason' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_reservation_resource_cancel_time:
+          description: Update the 'cancel_time' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+          foreign_keys: {}
+        update_column_reservation_resource_confirm_time:
+          description: Update the 'confirm_time' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+          foreign_keys: {}
+        update_column_reservation_resource_create_time:
+          description: Update the 'create_time' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        update_column_reservation_resource_customer:
+          description: Update the 'customer' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_reservation_resource_end_time:
+          description: Update the 'end_time' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+          foreign_keys: {}
+        update_column_reservation_resource_etag:
+          description: Update the 'etag' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_reservation_resource_hold:
+          description: Update the 'hold' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_reservation_resource_id:
+          description: Update the 'id' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_reservation_resource_name:
+          description: Update the 'name' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_reservation_resource_organizational_unit_id:
+          description: Update the 'organizational_unit_id' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_reservation_resource_resources:
+          description: Update the 'resources' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
+          foreign_keys: {}
+        update_column_reservation_resource_start_time:
+          description: Update the 'start_time' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+          foreign_keys: {}
+        update_column_reservation_resource_state:
+          description: Update the 'state' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_reservation_resource_update_time:
+          description: Update the 'update_time' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
         update_column_resource_entity_calendar:
           description: Update the 'calendar' column in the 'resource_entity' collection
           fields:
@@ -25054,10 +25441,8 @@ definition:
             _set:
               description: Set the column to this value
               type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
+                name: text
+                type: named
           foreign_keys: {}
         update_column_shared_idempotency_keys_update_time:
           description: Update the 'update_time' column in the 'shared_idempotency_keys' collection
@@ -32491,6 +32876,138 @@ definition:
                   name: update_column_property_units_link_unit_name
                   type: named
           foreign_keys: {}
+        update_reservation_resource_by_id_response:
+          description: Responses from the 'update_reservation_resource_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: reservation_resource
+                  type: named
+                type: array
+          foreign_keys: {}
+        update_reservation_resource_by_id_update_columns:
+          description: Update the columns of the 'reservation_resource' collection
+          fields:
+            attributes:
+              description: Update the 'attributes' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_attributes
+                  type: named
+            cancel_reason:
+              description: Update the 'cancel_reason' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_cancel_reason
+                  type: named
+            cancel_time:
+              description: Update the 'cancel_time' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_cancel_time
+                  type: named
+            confirm_time:
+              description: Update the 'confirm_time' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_confirm_time
+                  type: named
+            create_time:
+              description: Update the 'create_time' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_create_time
+                  type: named
+            customer:
+              description: Update the 'customer' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_customer
+                  type: named
+            end_time:
+              description: Update the 'end_time' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_end_time
+                  type: named
+            etag:
+              description: Update the 'etag' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_etag
+                  type: named
+            hold:
+              description: Update the 'hold' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_hold
+                  type: named
+            id:
+              description: Update the 'id' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_id
+                  type: named
+            name:
+              description: Update the 'name' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_name
+                  type: named
+            organizational_unit_id:
+              description: Update the 'organizational_unit_id' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_organizational_unit_id
+                  type: named
+            resources:
+              description: Update the 'resources' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_resources
+                  type: named
+            start_time:
+              description: Update the 'start_time' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_start_time
+                  type: named
+            state:
+              description: Update the 'state' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_state
+                  type: named
+            update_time:
+              description: Update the 'update_time' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_update_time
+                  type: named
+          foreign_keys: {}
         update_resource_entity_by_id_response:
           description: Responses from the 'update_resource_entity_by_id' procedure
           fields:
@@ -38574,6 +39091,23 @@ definition:
                 name: text
                 type: named
             pre_check:
+              description: Delete permission predicate over the 'reservation_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: reservation_resource
+                  type: predicate
+          description: Delete any row on the 'reservation_resource' collection using the 'id' key
+          name: delete_reservation_resource_by_id
+          result_type:
+            name: delete_reservation_resource_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            pre_check:
               description: Delete permission predicate over the 'resource_entity' collection
               type:
                 type: nullable
@@ -40772,6 +41306,25 @@ definition:
           name: insert_property_units_link
           result_type:
             name: insert_property_units_link_response
+            type: named
+        - arguments:
+            objects:
+              type:
+                element_type:
+                  name: insert_reservation_resource_object
+                  type: named
+                type: array
+            post_check:
+              description: Insert permission predicate over the 'reservation_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: reservation_resource
+                  type: predicate
+          description: Insert into the reservation_resource table
+          name: insert_reservation_resource
+          result_type:
+            name: insert_reservation_resource_response
             type: named
         - arguments:
             objects:
@@ -43737,6 +44290,34 @@ definition:
           name: update_property_units_link_by_id
           result_type:
             name: update_property_units_link_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            post_check:
+              description: Update permission post-condition predicate over the 'reservation_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: reservation_resource
+                  type: predicate
+            pre_check:
+              description: Update permission pre-condition predicate over the 'reservation_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: reservation_resource
+                  type: predicate
+            update_columns:
+              type:
+                name: update_reservation_resource_by_id_update_columns
+                type: named
+          description: Update any row on the 'reservation_resource' collection using the 'id' key
+          name: update_reservation_resource_by_id
+          result_type:
+            name: update_reservation_resource_by_id_response
             type: named
         - arguments:
             key_id:

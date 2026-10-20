@@ -33,6 +33,7 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/projectql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/promocodeql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/propertyql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/reservationql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/resourceql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/scheduleql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/schedulingql"
@@ -72,6 +73,7 @@ type QueryHandler struct {
 	Project      projectql.QueryHandler
 	Promocode    promocodeql.QueryHandler
 	Property     propertyql.QueryHandler
+	Reservation  reservationql.QueryHandler
 	Resource     resourceql.QueryHandler
 	Schedule     scheduleql.QueryHandler
 	Scheduling   schedulingql.QueryHandler
@@ -115,6 +117,7 @@ type MutationHandler struct {
 	Project      projectql.MutationHandler
 	Promocode    promocodeql.MutationHandler
 	Property     propertyql.MutationHandler
+	Reservation  reservationql.MutationHandler
 	Resource     resourceql.MutationHandler
 	Schedule     scheduleql.MutationHandler
 	Scheduling   schedulingql.MutationHandler
@@ -162,6 +165,7 @@ type SubscriptionHandler struct {
 	Project      projectql.SubscriptionHandler
 	Promocode    promocodeql.SubscriptionHandler
 	Property     propertyql.SubscriptionHandler
+	Reservation  reservationql.SubscriptionHandler
 	Resource     resourceql.SubscriptionHandler
 	Schedule     scheduleql.SubscriptionHandler
 	Scheduling   schedulingql.SubscriptionHandler
@@ -204,6 +208,7 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Project:      projectql.NewQuery(gql),
 			Promocode:    promocodeql.NewQuery(gql),
 			Property:     propertyql.NewQuery(gql),
+			Reservation:  reservationql.NewQuery(gql),
 			Resource:     resourceql.NewQuery(gql),
 			Schedule:     scheduleql.NewQuery(gql),
 			Scheduling:   schedulingql.NewQuery(gql),
@@ -231,6 +236,7 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Project:      projectql.NewMutation(gql),
 			Promocode:    promocodeql.NewMutation(gql),
 			Property:     propertyql.NewMutation(gql),
+			Reservation:  reservationql.NewMutation(gql),
 			Resource:     resourceql.NewMutation(gql),
 			Schedule:     scheduleql.NewMutation(gql),
 			Scheduling:   schedulingql.NewMutation(gql),
@@ -257,6 +263,7 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Project:      projectql.NewSubscription(gql),
 			Promocode:    promocodeql.NewSubscription(gql),
 			Property:     propertyql.NewSubscription(gql),
+			Reservation:  reservationql.NewSubscription(gql),
 			Resource:     resourceql.NewSubscription(gql),
 			Schedule:     scheduleql.NewSubscription(gql),
 			Scheduling:   schedulingql.NewSubscription(gql),

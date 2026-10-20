@@ -56,6 +56,9 @@ model Hold {
   /// Back-relation: Allocation records that reference this model via hold_id.
   resource Allocation[]
 
+  /// Back-relation: Reservation records that reference this model via hold.
+  resource2 Reservation[]
+
   /// Index on [organizational_unit_id].
   @@index([organizationalUnitID])
   /// GIN index: case-insensitive contains (ILIKE '%…%') cannot use a B-tree.

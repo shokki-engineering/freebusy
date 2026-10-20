@@ -50,6 +50,19 @@ A Hold is a temporary, expiring claim on one or more bookable resources for a wi
 | `update_time` | `Timestamp` | `OUTPUT_ONLY` | Last-modification timestamp. |
 | `etag` | `string` | `OUTPUT_ONLY` | Opaque version for optimistic concurrency (AIP-154); echo on update/delete. |
 
+### Allocation
+
+An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed.  Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend.  The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it.
+
+| Field | Type | Behavior | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | `IDENTIFIER` | The allocation name, nested under the hold that took it so deleting the hold takes its claims with it. Format: organizationalUnits/{organizational_unit}/holds/{hold}/allocations/{allocation} |
+| `resource` | `string` | `REQUIRED` | The resource taken. Format: resources/{resource} |
+| `start_time` | `Timestamp` | `REQUIRED` | Start of the span taken, inclusive. A copy of the hold's window start. |
+| `end_time` | `Timestamp` | `REQUIRED` | End of the span taken, exclusive. A copy of the hold's window end. |
+| `expire_time` | `Timestamp` | `OPTIONAL` | When this claim stops counting. A copy of the hold's expire_time while it is ACTIVE; set to the release instant on release; unset once the hold is CONVERTED, which is the one outcome that keeps the resource taken. |
+| `create_time` | `Timestamp` | `OUTPUT_ONLY` | Creation timestamp. |
+
 ### AvailabilityBucket
 
 One slice of an availability answer: how many resources are free across a span, and which ones.  This is where pooling happens. No RFC counts inventory -- RFC 5545 and 7953 are one-calendar-one-timeline -- so a count is produced by asking each resource's calendar whether it is free and totalling the answers, rather than by storing a capacity number anywhere.

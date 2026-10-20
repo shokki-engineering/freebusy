@@ -8,7 +8,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 41 | 20 |
+| 42 | 21 |
 
 ## Entity relationships
 
@@ -163,6 +163,10 @@ erDiagram
         string id PK
         string cancellation_policy_id FK
     }
+    Reservation {
+        string id PK
+        string hold FK
+    }
     Schedule {
         string id PK
         string buffers_id FK
@@ -237,6 +241,7 @@ erDiagram
     Redemption }o--|| PromoCode : "promo_code_id"
     Redemption }o--|| Money : "amount_applied_id"
     RefundTier }o--|| CancellationPolicy : "cancellation_policy_id"
+    Reservation }o--|| Hold : "hold"
     Schedule }o--|| BufferSettings : "buffers_id"
     Schedule }o--|| StayConstraints : "stay_constraints_id"
     Schedule }o--|| CancellationPolicy : "cancellation_policy_id"
@@ -545,6 +550,35 @@ A regulatory licence or certificate held by a site or one of its bookable resour
 - `LicenceTarget`: PROPERTY, UNIT
 - `LicenceType`: TRADE, FIRE_SAFETY, LIQUOR, FOOD_SAFETY, TOURISM, HEALTH, OTHER
 - `LicenceState`: ACTIVE, ARCHIVED
+
+## Schema `reservation`
+
+### `Reservation` → `resource`
+
+A Reservation is a confirmed booking: a hold made permanent. It is the last step of booking, not the first. The caller checks availability, takes a hold, settles whatever its vertical needs settled -- payment, a guest list, a waiver -- and then creates a reservation from the hold. The reservation records the outcome; the engine already holds the resources. Deliberately thin. scheduling.v1's Booking carried price, discount, promo code, refund, guests and occupancy, which made it a hotel booking. None of that is here: money belongs to the payment service and people to the user service, both referenced by name (AIP-215), and anything else a vertical needs to remember rides in `attributes`.
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `name` | `VARCHAR(255)` | not null |
+| `hold` | `CHAR(26)` | not null |
+| `start_time` | `TIMESTAMPTZ` | nullable |
+| `end_time` | `TIMESTAMPTZ` | nullable |
+| `customer` | `VARCHAR(255)` | nullable |
+| `state` | `ReservationState` | nullable |
+| `attributes` | `JSONB` | nullable |
+| `cancel_reason` | `VARCHAR(255)` | nullable |
+| `create_time` | `TIMESTAMPTZ` | not null |
+| `update_time` | `TIMESTAMPTZ` | not null |
+| `confirm_time` | `TIMESTAMPTZ` | nullable |
+| `cancel_time` | `TIMESTAMPTZ` | nullable |
+| `etag` | `VARCHAR(255)` | nullable |
+| `organizational_unit_id` | `CHAR(26)` | not null |
+| `resources` | `VARCHAR(255)[]` | nullable |
+
+### Enums
+
+- `ReservationState`: PENDING, CONFIRMED, CANCELLING, CANCELLED, FAILED
 
 ## Schema `schedule`
 

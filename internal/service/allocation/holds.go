@@ -205,15 +205,84 @@ func (s *Server) DeleteHold(ctx context.Context, req *allocationpbv1.DeleteHoldR
 }
 
 // ConvertHold turns a live hold into a permanent claim on its resources. Not an
-// RPC: conversion is the booking side's decision, made after payment, and
-// whatever records the booking calls this in-process rather than reaching into
+// RPC: conversion is the booking side's decision, made after payment, and the
+// reservation service calls this in-process rather than reaching into
 // HoldService over the wire.
+//
+// Idempotent, including under concurrency: converting a hold that is already
+// CONVERTED returns it, and so does losing the race to convert it, since the
+// winner's result is the one the caller wanted. A reservation retried after a
+// crash, or created twice at once, therefore finishes rather than fails.
 func (s *Server) ConvertHold(ctx context.Context, name string) (*allocationpbv1.Hold, error) {
-	h, err := s.live(ctx, name)
+	return s.settle(ctx, name, func() (*allocationpbv1.Hold, error) {
+		stored, err := s.store.GetHold(ctx, name)
+		if err != nil {
+			return nil, err
+		}
+		// One read decides. Reading again to check liveness would let a
+		// concurrent conversion land between the reads and turn this
+		// caller's success into "no longer convertible".
+		switch h := s.authoritative(stored); h.GetState() {
+		case allocationpbv1.HoldState_HOLD_STATE_CONVERTED:
+			return stored, nil
+		case allocationpbv1.HoldState_HOLD_STATE_ACTIVE:
+			return s.store.UpdateHold(ctx, name, stored.GetEtag(), allocationpbv1.HoldState_HOLD_STATE_CONVERTED, nil)
+		default:
+			return nil, errorf(types.ErrInvalidState, "hold %s is %s", name, h.GetState())
+		}
+	})
+}
+
+// settleAttempts bounds how often settle re-runs a step that lost an etag race.
+const settleAttempts = 4
+
+// settle runs an idempotent step, re-running it when it loses an etag race.
+// Each re-run re-reads the hold, so a step whose goal another caller already
+// reached returns that result instead of the conflict.
+func (s *Server) settle(ctx context.Context, name string, step func() (*allocationpbv1.Hold, error)) (*allocationpbv1.Hold, error) {
+	for attempt := 1; ; attempt++ {
+		h, err := step()
+		if !errors.Is(err, types.ErrConflict) || attempt >= settleAttempts {
+			return h, err
+		}
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
+	}
+}
+
+// EndConversion frees the resources a hold keeps, as of at. In-process, for the
+// reservation service when a reservation is cancelled.
+//
+// A converted hold stays CONVERTED -- that it was booked is history worth
+// keeping -- but gains an expiry, and like any claim it stops counting the
+// instant that passes. A hold still ACTIVE is released instead. Idempotent:
+// a hold already ended, released or expired is returned unchanged.
+func (s *Server) EndConversion(ctx context.Context, name string, at time.Time) (*allocationpbv1.Hold, error) {
+	return s.settle(ctx, name, func() (*allocationpbv1.Hold, error) {
+		stored, err := s.store.GetHold(ctx, name)
+		if err != nil {
+			return nil, err
+		}
+		switch h := s.authoritative(stored); {
+		case h.GetState() == allocationpbv1.HoldState_HOLD_STATE_CONVERTED && h.GetExpireTime() == nil:
+			return s.store.UpdateHold(ctx, name, stored.GetEtag(), allocationpbv1.HoldState_HOLD_STATE_CONVERTED, &at)
+		case h.GetState() == allocationpbv1.HoldState_HOLD_STATE_ACTIVE:
+			return s.store.UpdateHold(ctx, name, stored.GetEtag(), allocationpbv1.HoldState_HOLD_STATE_RELEASED, &at)
+		default:
+			return h, nil
+		}
+	})
+}
+
+// LookupHold returns one hold with expiry applied, for in-process callers that
+// want domain errors rather than gRPC statuses.
+func (s *Server) LookupHold(ctx context.Context, name string) (*allocationpbv1.Hold, error) {
+	h, err := s.store.GetHold(ctx, name)
 	if err != nil {
 		return nil, err
 	}
-	return s.store.UpdateHold(ctx, h.GetName(), h.GetEtag(), allocationpbv1.HoldState_HOLD_STATE_CONVERTED, nil)
+	return s.authoritative(h), nil
 }
 
 // live returns a hold that is ACTIVE and not lapsed, or ErrInvalidState.

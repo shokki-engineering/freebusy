@@ -1,0 +1,326 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ReservationService API
+    description: |-
+        ReservationService turns holds into confirmed bookings and cancels them.
+
+         It is where HoldService's conversion is driven from: a hold is never
+         converted by a caller reaching into HoldService, only by a reservation being
+         made of it. There is no UpdateReservation -- the window and resources are the
+         hold's, and changing either is a new hold and a new reservation.
+    version: 0.0.1
+servers:
+    - url: https://freebusy.ohtarnished.dev
+paths:
+    /v1/organizationalUnits/{organizationalUnit}/reservations:
+        get:
+            tags:
+                - ReservationService
+            description: Lists a site's reservations.
+            operationId: ReservationService_ListReservations
+            parameters:
+                - name: organizationalUnit
+                  in: path
+                  description: The organizationalUnit id.
+                  required: true
+                  schema:
+                    type: string
+                - name: pageSize
+                  in: query
+                  description: Maximum reservations to return. Defaults to 50, capped at 1000.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  description: Page token from a previous ListReservationsResponse.next_page_token.
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: |-
+                    Filter expression, AIP-160, e.g.
+                     `state = RESERVATION_STATE_CONFIRMED AND start_time >= "2026-11-10T00:00:00Z"`.
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  description: Ordering, AIP-132, e.g. `start_time desc`.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListReservationsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - ReservationService
+            description: |-
+                Makes a reservation from a live hold, converting the hold so its
+                 resources stay taken.
+
+                 Idempotent: the reservation's id is the hold's, so a retry returns the
+                 reservation the first call made. Fails with FAILED_PRECONDITION when the
+                 hold has lapsed or been released.
+            operationId: ReservationService_CreateReservation
+            parameters:
+                - name: organizationalUnit
+                  in: path
+                  description: The organizationalUnit id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Reservation'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Reservation'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/organizationalUnits/{organizationalUnit}/reservations/{reservation}:
+        get:
+            tags:
+                - ReservationService
+            description: Retrieves one reservation.
+            operationId: ReservationService_GetReservation
+            parameters:
+                - name: organizationalUnit
+                  in: path
+                  description: The organizationalUnit id.
+                  required: true
+                  schema:
+                    type: string
+                - name: reservation
+                  in: path
+                  description: The reservation id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Reservation'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/organizationalUnits/{organizationalUnit}/reservations/{reservation}:cancel:
+        post:
+            tags:
+                - ReservationService
+            description: |-
+                Cancels a reservation, freeing its resources.
+
+                 Idempotent: cancelling a cancelled reservation succeeds and changes
+                 nothing.
+            operationId: ReservationService_CancelReservation
+            parameters:
+                - name: organizationalUnit
+                  in: path
+                  description: The organizationalUnit id.
+                  required: true
+                  schema:
+                    type: string
+                - name: reservation
+                  in: path
+                  description: The reservation id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CancelReservationRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Reservation'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        CancelReservationRequest:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: 'Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
+                reason:
+                    type: string
+                    description: Why, in the canceller's words. Recorded, never parsed.
+                etag:
+                    type: string
+                    description: |-
+                        Opaque version read from the reservation; the cancel is rejected if it
+                         changed since (AIP-154).
+            description: Request message for ReservationService.CancelReservation.
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        ListReservationsResponse:
+            type: object
+            properties:
+                reservations:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Reservation'
+                    description: The reservations on this page.
+                nextPageToken:
+                    type: string
+                    description: Token for the next page, empty when this is the last page.
+            description: Response message for ReservationService.ListReservations, AIP-132.
+        Reservation:
+            required:
+                - hold
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: |-
+                        The reservation name. Its id is always the id of the hold it was made
+                         from, so a retried CreateReservation finds the reservation the first
+                         attempt wrote instead of making a second.
+                         Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                hold:
+                    type: string
+                    description: |-
+                        The hold this reservation was made from, at the same site.
+                         Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                resources:
+                    readOnly: true
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        The resources taken, copied from the hold.
+                         Format: resources/{resource}
+                startTime:
+                    readOnly: true
+                    type: string
+                    description: Start of the reserved window, copied from the hold.
+                    format: date-time
+                endTime:
+                    readOnly: true
+                    type: string
+                    description: End of the reserved window, exclusive, copied from the hold.
+                    format: date-time
+                customer:
+                    type: string
+                    description: |-
+                        Who the reservation is for, by name in the user service.
+                         Format: users/{user}
+                state:
+                    readOnly: true
+                    type: integer
+                    description: Lifecycle state.
+                    format: enum
+                attributes:
+                    type: object
+                    description: |-
+                        Whatever a vertical needs to keep with the reservation: a party size, a
+                         payment reference, a licence plate. Opaque to the engine.
+                cancelReason:
+                    readOnly: true
+                    type: string
+                    description: Why it was cancelled, in the canceller's words. Set by CancelReservation.
+                createTime:
+                    readOnly: true
+                    type: string
+                    description: Creation timestamp.
+                    format: date-time
+                updateTime:
+                    readOnly: true
+                    type: string
+                    description: Last-modification timestamp.
+                    format: date-time
+                confirmTime:
+                    readOnly: true
+                    type: string
+                    description: When it was confirmed.
+                    format: date-time
+                cancelTime:
+                    readOnly: true
+                    type: string
+                    description: When it was cancelled.
+                    format: date-time
+                etag:
+                    readOnly: true
+                    type: string
+                    description: Opaque version for optimistic concurrency (AIP-154); echo on cancel.
+            description: |-
+                A Reservation is a confirmed booking: a hold made permanent.
+
+                 It is the last step of booking, not the first. The caller checks
+                 availability, takes a hold, settles whatever its vertical needs settled --
+                 payment, a guest list, a waiver -- and then creates a reservation from the
+                 hold. The reservation records the outcome; the engine already holds the
+                 resources.
+
+                 Deliberately thin. scheduling.v1's Booking carried price, discount, promo
+                 code, refund, guests and occupancy, which made it a hotel booking. None of
+                 that is here: money belongs to the payment service and people to the user
+                 service, both referenced by name (AIP-215), and anything else a vertical
+                 needs to remember rides in `attributes`.
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+tags:
+    - name: ReservationService

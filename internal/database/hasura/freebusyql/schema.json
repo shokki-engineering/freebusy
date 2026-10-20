@@ -13297,6 +13297,52 @@
     },
     {
       "kind": "OBJECT",
+      "name": "DeleteReservationResourceByIdResponse",
+      "description": "Responses from the 'delete_reservation_resource_by_id' procedure",
+      "fields": [
+        {
+          "name": "affectedRows",
+          "description": "The number of rows affected by the mutation",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Int32",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "returning",
+          "description": "Data from rows affected by the mutation",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "LIST",
+              "name": "",
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "ReservationResource",
+                  "ofType": null
+                }
+              }
+            }
+          }
+        }
+      ],
+      "inputFields": null,
+      "enumValues": null,
+      "interfaces": []
+    },
+    {
+      "kind": "OBJECT",
       "name": "DeleteResourceEntityByIdResponse",
       "description": "Responses from the 'delete_resource_entity_by_id' procedure",
       "fields": [
@@ -39649,6 +39695,250 @@
     },
     {
       "kind": "INPUT_OBJECT",
+      "name": "InsertReservationResourceObjectInput",
+      "description": "",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "attributes",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Json",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "cancelReason",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "cancelTime",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Timestamptz",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "confirmTime",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Timestamptz",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "createTime",
+          "description": "",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Timestamptz",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "customer",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "endTime",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Timestamptz",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "etag",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "hold",
+          "description": "",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "id",
+          "description": "",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "name",
+          "description": "",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "organizationalUnitId",
+          "description": "",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "resources",
+          "description": "",
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "startTime",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Timestamptz",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "state",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "updateTime",
+          "description": "",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Timestamptz",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "OBJECT",
+      "name": "InsertReservationResourceResponse",
+      "description": "Responses from the 'insert_reservation_resource' procedure",
+      "fields": [
+        {
+          "name": "affectedRows",
+          "description": "The number of rows affected by the mutation",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Int32",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "returning",
+          "description": "Data from rows affected by the mutation",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "LIST",
+              "name": "",
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "ReservationResource",
+                  "ofType": null
+                }
+              }
+            }
+          }
+        }
+      ],
+      "inputFields": null,
+      "enumValues": null,
+      "interfaces": []
+    },
+    {
+      "kind": "INPUT_OBJECT",
       "name": "InsertResourceEntityObjectInput",
       "description": "",
       "fields": null,
@@ -52438,6 +52728,45 @@
           }
         },
         {
+          "name": "deleteReservationResourceById",
+          "description": "Delete any row on the 'reservation_resource' collection using the 'id' key",
+          "args": [
+            {
+              "name": "keyId",
+              "description": "",
+              "type": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String1",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "preCheck",
+              "description": "Delete permission predicate over the 'reservation_resource' collection",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ReservationResourceBoolExp",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "DeleteReservationResourceByIdResponse",
+              "ofType": null
+            }
+          }
+        },
+        {
           "name": "deleteResourceEntityById",
           "description": "Delete any row on the 'resource_entity' collection using the 'id' key",
           "args": [
@@ -57744,6 +58073,53 @@
             "ofType": {
               "kind": "OBJECT",
               "name": "InsertPropertyUnitsLinkResponse",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "insertReservationResource",
+          "description": "Insert into the reservation_resource table",
+          "args": [
+            {
+              "name": "objects",
+              "description": "",
+              "type": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "LIST",
+                  "name": "",
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": "",
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "InsertReservationResourceObjectInput",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "postCheck",
+              "description": "Insert permission predicate over the 'reservation_resource' collection",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ReservationResourceBoolExp",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "InsertReservationResourceResponse",
               "ofType": null
             }
           }
@@ -64615,6 +64991,69 @@
             "ofType": {
               "kind": "OBJECT",
               "name": "UpdatePropertyUnitsLinkByIdResponse",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "updateReservationResourceById",
+          "description": "Update any row on the 'reservation_resource' collection using the 'id' key",
+          "args": [
+            {
+              "name": "keyId",
+              "description": "",
+              "type": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String1",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "postCheck",
+              "description": "Update permission post-condition predicate over the 'reservation_resource' collection",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ReservationResourceBoolExp",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "preCheck",
+              "description": "Update permission pre-condition predicate over the 'reservation_resource' collection",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ReservationResourceBoolExp",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "updateColumns",
+              "description": "",
+              "type": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "UpdateReservationResourceByIdUpdateColumnsInput",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "UpdateReservationResourceByIdResponse",
               "ofType": null
             }
           }
@@ -92563,6 +93002,119 @@
           }
         },
         {
+          "name": "reservationResource",
+          "description": "",
+          "args": [
+            {
+              "name": "limit",
+              "description": "",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "offset",
+              "description": "",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "order_by",
+              "description": "",
+              "type": {
+                "kind": "LIST",
+                "name": "",
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": "",
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ReservationResourceOrderByExp",
+                    "ofType": null
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "where",
+              "description": "",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ReservationResourceBoolExp",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "NON_NULL",
+              "name": "",
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ReservationResource",
+                "ofType": null
+              }
+            }
+          }
+        },
+        {
+          "name": "reservationResourceAggregate",
+          "description": "",
+          "args": [
+            {
+              "name": "filter_input",
+              "description": "",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ReservationResourceFilterInput",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "OBJECT",
+            "name": "ReservationResourceAggExp",
+            "ofType": null
+          }
+        },
+        {
+          "name": "reservationResourceById",
+          "description": "",
+          "args": [
+            {
+              "name": "id",
+              "description": "",
+              "type": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String1",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "OBJECT",
+            "name": "ReservationResource",
+            "ofType": null
+          }
+        },
+        {
           "name": "resourceEntity",
           "description": "",
           "args": [
@@ -97877,6 +98429,862 @@
       "inputFields": null,
       "enumValues": null,
       "interfaces": []
+    },
+    {
+      "kind": "OBJECT",
+      "name": "ReservationResource",
+      "description": "",
+      "fields": [
+        {
+          "name": "attributes",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "Json",
+            "ofType": null
+          }
+        },
+        {
+          "name": "cancelReason",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
+          "name": "cancelTime",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "Timestamptz",
+            "ofType": null
+          }
+        },
+        {
+          "name": "confirmTime",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "Timestamptz",
+            "ofType": null
+          }
+        },
+        {
+          "name": "createTime",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Timestamptz",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "customer",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
+          "name": "endTime",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "Timestamptz",
+            "ofType": null
+          }
+        },
+        {
+          "name": "etag",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
+          "name": "hold",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "id",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "name",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "organizationalUnitId",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "resources",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "startTime",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "Timestamptz",
+            "ofType": null
+          }
+        },
+        {
+          "name": "state",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
+          "name": "updateTime",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Timestamptz",
+              "ofType": null
+            }
+          }
+        }
+      ],
+      "inputFields": null,
+      "enumValues": null,
+      "interfaces": []
+    },
+    {
+      "kind": "OBJECT",
+      "name": "ReservationResourceAggExp",
+      "description": "",
+      "fields": [
+        {
+          "name": "_count",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Int64",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "attributes",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "JsonbAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "cancelReason",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "cancelTime",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TimestamptzAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "confirmTime",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TimestamptzAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "createTime",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TimestamptzAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "customer",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "endTime",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TimestamptzAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "etag",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "hold",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "id",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "name",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "organizationalUnitId",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "startTime",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TimestamptzAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "state",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "updateTime",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TimestamptzAggExp",
+              "ofType": null
+            }
+          }
+        }
+      ],
+      "inputFields": null,
+      "enumValues": null,
+      "interfaces": []
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "ReservationResourceBoolExp",
+      "description": "",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "_and",
+          "description": "",
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "NON_NULL",
+              "name": "",
+              "ofType": {
+                "kind": "INPUT_OBJECT",
+                "name": "ReservationResourceBoolExp",
+                "ofType": null
+              }
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "_not",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "ReservationResourceBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "_or",
+          "description": "",
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "NON_NULL",
+              "name": "",
+              "ofType": {
+                "kind": "INPUT_OBJECT",
+                "name": "ReservationResourceBoolExp",
+                "ofType": null
+              }
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "attributes",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "JsonbBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "cancelReason",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "cancelTime",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TimestamptzBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "confirmTime",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TimestamptzBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "createTime",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TimestamptzBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "customer",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "endTime",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TimestamptzBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "etag",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "hold",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "id",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "name",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "organizationalUnitId",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "startTime",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TimestamptzBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "state",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "updateTime",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TimestamptzBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "ReservationResourceFilterInput",
+      "description": "",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "limit",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Int",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "offset",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Int",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "order_by",
+          "description": "",
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "NON_NULL",
+              "name": "",
+              "ofType": {
+                "kind": "INPUT_OBJECT",
+                "name": "ReservationResourceOrderByExp",
+                "ofType": null
+              }
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "where",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "ReservationResourceBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "ReservationResourceOrderByExp",
+      "description": "",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "attributes",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "cancelReason",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "cancelTime",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "confirmTime",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "createTime",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "customer",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "endTime",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "etag",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "hold",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "id",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "name",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "organizationalUnitId",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "startTime",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "state",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "updateTime",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
     },
     {
       "kind": "OBJECT",
@@ -105356,9 +106764,13 @@
           "description": "",
           "args": [],
           "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
           }
         },
         {
@@ -114914,6 +116326,119 @@
           "type": {
             "kind": "OBJECT",
             "name": "PropertyUnitsLink",
+            "ofType": null
+          }
+        },
+        {
+          "name": "reservationResource",
+          "description": "",
+          "args": [
+            {
+              "name": "limit",
+              "description": "",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "offset",
+              "description": "",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "order_by",
+              "description": "",
+              "type": {
+                "kind": "LIST",
+                "name": "",
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": "",
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ReservationResourceOrderByExp",
+                    "ofType": null
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "where",
+              "description": "",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ReservationResourceBoolExp",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "NON_NULL",
+              "name": "",
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ReservationResource",
+                "ofType": null
+              }
+            }
+          }
+        },
+        {
+          "name": "reservationResourceAggregate",
+          "description": "",
+          "args": [
+            {
+              "name": "filter_input",
+              "description": "",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ReservationResourceFilterInput",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "OBJECT",
+            "name": "ReservationResourceAggExp",
+            "ofType": null
+          }
+        },
+        {
+          "name": "reservationResourceById",
+          "description": "",
+          "args": [
+            {
+              "name": "id",
+              "description": "",
+              "type": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String1",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "OBJECT",
+            "name": "ReservationResource",
             "ofType": null
           }
         },
@@ -139088,6 +140613,354 @@
     },
     {
       "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceAttributesInput",
+      "description": "Update the 'attributes' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Json",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceCancelReasonInput",
+      "description": "Update the 'cancel_reason' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceCancelTimeInput",
+      "description": "Update the 'cancel_time' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Timestamptz",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceConfirmTimeInput",
+      "description": "Update the 'confirm_time' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Timestamptz",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceCreateTimeInput",
+      "description": "Update the 'create_time' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Timestamptz",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceCustomerInput",
+      "description": "Update the 'customer' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceEndTimeInput",
+      "description": "Update the 'end_time' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Timestamptz",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceEtagInput",
+      "description": "Update the 'etag' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceHoldInput",
+      "description": "Update the 'hold' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceIdInput",
+      "description": "Update the 'id' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceNameInput",
+      "description": "Update the 'name' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceOrganizationalUnitIdInput",
+      "description": "Update the 'organizational_unit_id' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceResourcesInput",
+      "description": "Update the 'resources' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceStartTimeInput",
+      "description": "Update the 'start_time' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Timestamptz",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceStateInput",
+      "description": "Update the 'state' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceUpdateTimeInput",
+      "description": "Update the 'update_time' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Timestamptz",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
       "name": "UpdateColumnResourceEntityCalendarInput",
       "description": "Update the 'calendar' column in the 'resource_entity' collection",
       "fields": null,
@@ -141624,9 +143497,13 @@
           "name": "set",
           "description": "Set the column to this value",
           "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
           },
           "defaultValue": null
         }
@@ -155596,6 +157473,222 @@
           "type": {
             "kind": "INPUT_OBJECT",
             "name": "UpdateColumnPropertyUnitsLinkUnitNameInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "OBJECT",
+      "name": "UpdateReservationResourceByIdResponse",
+      "description": "Responses from the 'update_reservation_resource_by_id' procedure",
+      "fields": [
+        {
+          "name": "affectedRows",
+          "description": "The number of rows affected by the mutation",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Int32",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "returning",
+          "description": "Data from rows affected by the mutation",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "LIST",
+              "name": "",
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "ReservationResource",
+                  "ofType": null
+                }
+              }
+            }
+          }
+        }
+      ],
+      "inputFields": null,
+      "enumValues": null,
+      "interfaces": []
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateReservationResourceByIdUpdateColumnsInput",
+      "description": "Update the columns of the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "attributes",
+          "description": "Update the 'attributes' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceAttributesInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "cancelReason",
+          "description": "Update the 'cancel_reason' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceCancelReasonInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "cancelTime",
+          "description": "Update the 'cancel_time' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceCancelTimeInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "confirmTime",
+          "description": "Update the 'confirm_time' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceConfirmTimeInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "createTime",
+          "description": "Update the 'create_time' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceCreateTimeInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "customer",
+          "description": "Update the 'customer' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceCustomerInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "endTime",
+          "description": "Update the 'end_time' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceEndTimeInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "etag",
+          "description": "Update the 'etag' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceEtagInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "hold",
+          "description": "Update the 'hold' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceHoldInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "id",
+          "description": "Update the 'id' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceIdInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "name",
+          "description": "Update the 'name' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceNameInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "organizationalUnitId",
+          "description": "Update the 'organizational_unit_id' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceOrganizationalUnitIdInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "resources",
+          "description": "Update the 'resources' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceResourcesInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "startTime",
+          "description": "Update the 'start_time' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceStartTimeInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "state",
+          "description": "Update the 'state' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceStateInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "updateTime",
+          "description": "Update the 'update_time' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceUpdateTimeInput",
             "ofType": null
           },
           "defaultValue": null
