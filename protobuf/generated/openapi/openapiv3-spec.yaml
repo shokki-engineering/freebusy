@@ -2758,6 +2758,60 @@ paths:
               schema:
                 $ref: '#/components/schemas/Status'
       summary: Cancel Reservation
+  /v1/organizationalUnits/{organizationalUnit}/reservations/{reservation}:reschedule:
+    post:
+      tags:
+        - Reservation Service
+      description: |-
+        Moves a confirmed reservation onto a new hold, returning the reservation
+         that replaces it.
+
+         The replacement is a new reservation made from the new hold, linked both
+         ways (`replaces`, `replaced_by`); the original ends RESCHEDULED. The
+         original keeps its resources until the replacement is confirmed, so a
+         failure part-way -- the new hold lapsing, a crash -- leaves the customer
+         with their old booking, never with neither. Idempotent: repeating the call
+         with the same hold returns the same replacement.
+      operationId: ReservationService_RescheduleReservation
+      parameters:
+        - name: organizationalUnit
+          in: path
+          description: The organizationalUnit id.
+          required: true
+          schema:
+            type: string
+        - name: reservation
+          in: path
+          description: The reservation id.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RescheduleReservationRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        default:
+          description: Default error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+      summary: Reschedule Reservation
   /v1/resources/{resource}/availabilityExceptions:
     get:
       tags:
@@ -5395,6 +5449,30 @@ components:
           type: string
           description: Token for the next page, empty when this is the last page.
       description: Response message for ReservationService.ListReservations, AIP-132.
+    RescheduleReservationRequest:
+      required:
+        - name
+        - hold
+      type: object
+      properties:
+        name:
+          type: string
+          description: |-
+            The confirmed reservation to move.
+             Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+        hold:
+          type: string
+          description: |-
+            A live hold at the same site on the new window, taken by the caller with
+             HoldService.CreateHold. Taking it first is what makes the move safe: the
+             new slot is secured before the old one is let go.
+             Format: organizationalUnits/{organizational_unit}/holds/{hold}
+        etag:
+          type: string
+          description: |-
+            Opaque version read from the reservation; the move is rejected if it
+             changed since (AIP-154).
+      description: Request message for ReservationService.RescheduleReservation.
     Reservation:
       required:
         - hold
@@ -5473,6 +5551,19 @@ components:
           readOnly: true
           type: string
           description: Opaque version for optimistic concurrency (AIP-154); echo on cancel.
+        replaces:
+          readOnly: true
+          type: string
+          description: |-
+            The reservation this one replaced, set when it was made by
+             RescheduleReservation.
+             Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+        replacedBy:
+          readOnly: true
+          type: string
+          description: |-
+            The reservation replacing this one, set when RescheduleReservation began.
+             Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
       description: |-
         A Reservation is a confirmed booking: a hold made permanent.
 

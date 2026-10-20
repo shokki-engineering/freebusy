@@ -100,3 +100,28 @@ message CancelReservationRequest {
   // changed since (AIP-154).
   string etag = 3 [(google.api.field_behavior) = OPTIONAL];
 }
+
+// Request message for ReservationService.RescheduleReservation.
+message RescheduleReservationRequest {
+  // The confirmed reservation to move.
+  // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "freebusy.reservation.v1/Reservation",
+    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/reservations/[^/]+$"
+  ];
+
+  // A live hold at the same site on the new window, taken by the caller with
+  // HoldService.CreateHold. Taking it first is what makes the move safe: the
+  // new slot is secured before the old one is let go.
+  // Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  string hold = 2 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "freebusy.allocation.v1/Hold",
+    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/holds/[^/]+$"
+  ];
+
+  // Opaque version read from the reservation; the move is rejected if it
+  // changed since (AIP-154).
+  string etag = 3 [(google.api.field_behavior) = OPTIONAL];
+}

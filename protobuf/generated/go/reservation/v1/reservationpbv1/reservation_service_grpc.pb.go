@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ReservationService_CreateReservation_FullMethodName = "/freebusy.reservation.v1.ReservationService/CreateReservation"
-	ReservationService_GetReservation_FullMethodName    = "/freebusy.reservation.v1.ReservationService/GetReservation"
-	ReservationService_ListReservations_FullMethodName  = "/freebusy.reservation.v1.ReservationService/ListReservations"
-	ReservationService_CancelReservation_FullMethodName = "/freebusy.reservation.v1.ReservationService/CancelReservation"
+	ReservationService_CreateReservation_FullMethodName     = "/freebusy.reservation.v1.ReservationService/CreateReservation"
+	ReservationService_GetReservation_FullMethodName        = "/freebusy.reservation.v1.ReservationService/GetReservation"
+	ReservationService_ListReservations_FullMethodName      = "/freebusy.reservation.v1.ReservationService/ListReservations"
+	ReservationService_CancelReservation_FullMethodName     = "/freebusy.reservation.v1.ReservationService/CancelReservation"
+	ReservationService_RescheduleReservation_FullMethodName = "/freebusy.reservation.v1.ReservationService/RescheduleReservation"
 )
 
 // ReservationServiceClient is the client API for ReservationService service.
@@ -34,7 +35,8 @@ const (
 // It is where HoldService's conversion is driven from: a hold is never
 // converted by a caller reaching into HoldService, only by a reservation being
 // made of it. There is no UpdateReservation -- the window and resources are the
-// hold's, and changing either is a new hold and a new reservation.
+// hold's, and changing either is a new hold and a new reservation, which is
+// exactly what RescheduleReservation does.
 type ReservationServiceClient interface {
 	// Makes a reservation from a live hold, converting the hold so its
 	// resources stay taken.
@@ -52,6 +54,16 @@ type ReservationServiceClient interface {
 	// Idempotent: cancelling a cancelled reservation succeeds and changes
 	// nothing.
 	CancelReservation(ctx context.Context, in *CancelReservationRequest, opts ...grpc.CallOption) (*Reservation, error)
+	// Moves a confirmed reservation onto a new hold, returning the reservation
+	// that replaces it.
+	//
+	// The replacement is a new reservation made from the new hold, linked both
+	// ways (`replaces`, `replaced_by`); the original ends RESCHEDULED. The
+	// original keeps its resources until the replacement is confirmed, so a
+	// failure part-way -- the new hold lapsing, a crash -- leaves the customer
+	// with their old booking, never with neither. Idempotent: repeating the call
+	// with the same hold returns the same replacement.
+	RescheduleReservation(ctx context.Context, in *RescheduleReservationRequest, opts ...grpc.CallOption) (*Reservation, error)
 }
 
 type reservationServiceClient struct {
@@ -102,6 +114,16 @@ func (c *reservationServiceClient) CancelReservation(ctx context.Context, in *Ca
 	return out, nil
 }
 
+func (c *reservationServiceClient) RescheduleReservation(ctx context.Context, in *RescheduleReservationRequest, opts ...grpc.CallOption) (*Reservation, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Reservation)
+	err := c.cc.Invoke(ctx, ReservationService_RescheduleReservation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReservationServiceServer is the server API for ReservationService service.
 // All implementations must embed UnimplementedReservationServiceServer
 // for forward compatibility.
@@ -111,7 +133,8 @@ func (c *reservationServiceClient) CancelReservation(ctx context.Context, in *Ca
 // It is where HoldService's conversion is driven from: a hold is never
 // converted by a caller reaching into HoldService, only by a reservation being
 // made of it. There is no UpdateReservation -- the window and resources are the
-// hold's, and changing either is a new hold and a new reservation.
+// hold's, and changing either is a new hold and a new reservation, which is
+// exactly what RescheduleReservation does.
 type ReservationServiceServer interface {
 	// Makes a reservation from a live hold, converting the hold so its
 	// resources stay taken.
@@ -129,6 +152,16 @@ type ReservationServiceServer interface {
 	// Idempotent: cancelling a cancelled reservation succeeds and changes
 	// nothing.
 	CancelReservation(context.Context, *CancelReservationRequest) (*Reservation, error)
+	// Moves a confirmed reservation onto a new hold, returning the reservation
+	// that replaces it.
+	//
+	// The replacement is a new reservation made from the new hold, linked both
+	// ways (`replaces`, `replaced_by`); the original ends RESCHEDULED. The
+	// original keeps its resources until the replacement is confirmed, so a
+	// failure part-way -- the new hold lapsing, a crash -- leaves the customer
+	// with their old booking, never with neither. Idempotent: repeating the call
+	// with the same hold returns the same replacement.
+	RescheduleReservation(context.Context, *RescheduleReservationRequest) (*Reservation, error)
 	mustEmbedUnimplementedReservationServiceServer()
 }
 
@@ -150,6 +183,9 @@ func (UnimplementedReservationServiceServer) ListReservations(context.Context, *
 }
 func (UnimplementedReservationServiceServer) CancelReservation(context.Context, *CancelReservationRequest) (*Reservation, error) {
 	return nil, status.Error(codes.Unimplemented, "method CancelReservation not implemented")
+}
+func (UnimplementedReservationServiceServer) RescheduleReservation(context.Context, *RescheduleReservationRequest) (*Reservation, error) {
+	return nil, status.Error(codes.Unimplemented, "method RescheduleReservation not implemented")
 }
 func (UnimplementedReservationServiceServer) mustEmbedUnimplementedReservationServiceServer() {}
 func (UnimplementedReservationServiceServer) testEmbeddedByValue()                            {}
@@ -244,6 +280,24 @@ func _ReservationService_CancelReservation_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReservationService_RescheduleReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RescheduleReservationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReservationServiceServer).RescheduleReservation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReservationService_RescheduleReservation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReservationServiceServer).RescheduleReservation(ctx, req.(*RescheduleReservationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ReservationService_ServiceDesc is the grpc.ServiceDesc for ReservationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -266,6 +320,10 @@ var ReservationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CancelReservation",
 			Handler:    _ReservationService_CancelReservation_Handler,
+		},
+		{
+			MethodName: "RescheduleReservation",
+			Handler:    _ReservationService_RescheduleReservation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -84,6 +84,9 @@ func (m *memStore) Transition(_ context.Context, name, etag string, from []reser
 	if c.CancelReason != "" {
 		r.CancelReason = c.CancelReason
 	}
+	if c.ReplacedBy != nil {
+		r.ReplacedBy = *c.ReplacedBy
+	}
 	m.version++
 	r.Etag = strconv.Itoa(m.version)
 	m.updated[name] = m.clock()
@@ -96,7 +99,8 @@ func (m *memStore) Stuck(_ context.Context, cutoff time.Time, limit int) ([]*res
 	var out []*reservationpbv1.Reservation
 	for n, r := range m.rows {
 		switch r.GetState() {
-		case reservationpbv1.ReservationState_RESERVATION_STATE_PENDING, reservationpbv1.ReservationState_RESERVATION_STATE_CANCELLING:
+		case reservationpbv1.ReservationState_RESERVATION_STATE_PENDING, reservationpbv1.ReservationState_RESERVATION_STATE_CANCELLING,
+			reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULING:
 			if m.updated[n].Before(cutoff) && len(out) < limit {
 				out = append(out, proto.Clone(r).(*reservationpbv1.Reservation))
 			}
@@ -319,5 +323,116 @@ func TestLostConvertRaceConfirmsNotFails(t *testing.T) {
 	r, err := f.create(h)
 	if err != nil || r.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED {
 		t.Fatalf("got %v %v", r.GetState(), err)
+	}
+}
+
+func (f *fixture) move(name, hold string) (*reservationpbv1.Reservation, error) {
+	return f.srv.RescheduleReservation(context.Background(), &reservationpbv1.RescheduleReservationRequest{Name: name, Hold: hold})
+}
+
+func (f *fixture) get(t *testing.T, name string) *reservationpbv1.Reservation {
+	t.Helper()
+	r, err := f.store.Get(context.Background(), name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return r
+}
+
+func TestRescheduleMovesAndLinks(t *testing.T) {
+	f := newFixture()
+	oldHold := f.hold("h1", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
+	old, err := f.create(oldHold)
+	if err != nil {
+		t.Fatal(err)
+	}
+	newHold := f.hold("h2", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
+	rep, err := f.move(old.GetName(), newHold)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rep.GetName() != site+"/reservations/h2" || rep.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED ||
+		rep.GetReplaces() != old.GetName() || rep.GetCustomer() != "users/ana" {
+		t.Fatalf("replacement %v", rep)
+	}
+	o := f.get(t, old.GetName())
+	if o.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED || o.GetReplacedBy() != rep.GetName() {
+		t.Fatalf("original %v", o)
+	}
+	if f.holds.ended[oldHold] != 1 || f.holds.holds[newHold].GetState() != allocationpbv1.HoldState_HOLD_STATE_CONVERTED {
+		t.Fatalf("old ended %d, new hold %v", f.holds.ended[oldHold], f.holds.holds[newHold].GetState())
+	}
+
+	again, err := f.move(old.GetName(), newHold)
+	if err != nil || again.GetName() != rep.GetName() {
+		t.Fatalf("retry: %v %v", again, err)
+	}
+	other := f.hold("h3", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
+	if _, err := f.move(old.GetName(), other); status.Code(err) != codes.FailedPrecondition {
+		t.Fatalf("moving a moved reservation elsewhere: %v", err)
+	}
+	if _, err := f.srv.CancelReservation(context.Background(), &reservationpbv1.CancelReservationRequest{Name: old.GetName()}); status.Code(err) != codes.FailedPrecondition {
+		t.Fatalf("cancelling the moved-from reservation: %v", err)
+	}
+}
+
+func TestRescheduleOntoLapsedHoldKeepsOriginal(t *testing.T) {
+	f := newFixture()
+	oldHold := f.hold("h1", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
+	old, _ := f.create(oldHold)
+	newHold := f.hold("h2", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
+	f.holds.failConvert = types.ErrInvalidState // lapses between lookup and convert
+	if _, err := f.move(old.GetName(), newHold); status.Code(err) != codes.FailedPrecondition {
+		t.Fatalf("got %v", err)
+	}
+	o := f.get(t, old.GetName())
+	if o.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED || o.GetReplacedBy() != "" {
+		t.Fatalf("original should be CONFIRMED again with no replacement: %v", o)
+	}
+	if f.holds.ended[oldHold] != 0 {
+		t.Fatal("the original's slot was let go for a move that never happened")
+	}
+}
+
+func TestReconcilerFinishesInterruptedReschedule(t *testing.T) {
+	f := newFixture()
+	oldHold := f.hold("h1", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
+	old, _ := f.create(oldHold)
+	newHold := f.hold("h2", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
+	f.holds.failConvert = errors.New("engine unreachable")
+	if _, err := f.move(old.GetName(), newHold); err == nil {
+		t.Fatal("expected the interrupted move to fail")
+	}
+	if s := f.get(t, old.GetName()).GetState(); s != reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULING {
+		t.Fatalf("original %v", s)
+	}
+	if f.holds.ended[oldHold] != 0 {
+		t.Fatal("old slot let go before the replacement was confirmed")
+	}
+	f.clock = f.clock.Add(stuckAfter + time.Second)
+	if _, err := f.srv.Reconcile(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if s := f.get(t, old.GetName()).GetState(); s != reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED {
+		t.Fatalf("after reconcile original %v", s)
+	}
+	if s := f.get(t, site+"/reservations/h2").GetState(); s != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED {
+		t.Fatalf("after reconcile replacement %v", s)
+	}
+}
+
+func TestRescheduleOntoCancelledReplacementReverts(t *testing.T) {
+	f := newFixture()
+	old, _ := f.create(f.hold("h1", allocationpbv1.HoldState_HOLD_STATE_ACTIVE))
+	newHold := f.hold("h2", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
+	rep, _ := f.create(newHold)
+	if _, err := f.srv.CancelReservation(context.Background(), &reservationpbv1.CancelReservationRequest{Name: rep.GetName()}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := f.move(old.GetName(), newHold); status.Code(err) != codes.FailedPrecondition {
+		t.Fatalf("got %v", err)
+	}
+	if s := f.get(t, old.GetName()).GetState(); s != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED {
+		t.Fatalf("original %v", s)
 	}
 }

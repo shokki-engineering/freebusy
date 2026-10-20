@@ -59,6 +59,12 @@ model Reservation {
   /// Opaque version for optimistic concurrency (AIP-154); echo on cancel.
   etag String? @map("etag")
 
+  /// The reservation this one replaced, set when it was made by RescheduleReservation. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  replaces String? @map("replaces")
+
+  /// The reservation replacing this one, set when RescheduleReservation began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  replacedBy String? @map("replaced_by")
+
   /// Parent reference to OrganizationalUnit (from the AIP resource pattern). TODO: unresolved reference to OrganizationalUnit (not in this generation set); kept as a plain indexed column.
   organizationalUnitID String @map("organizational_unit_id")
 

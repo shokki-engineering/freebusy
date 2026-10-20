@@ -17,24 +17,27 @@ import (
 
 // JSON schemas for each RPC method, used as the inputSchema for MCP tools.
 var ReservationService_CancelReservationSchemaJSON = `{"description":"Cancel a reservation and free its resources.","properties":{"etag":{"type":"string"},"name":{"pattern":"^organizationalUnits/[^/]+/reservations/[^/]+$","type":"string"},"reason":{"maxLength":1024,"type":"string"}},"required":["name"],"type":"object"}`
-var ReservationService_CreateReservationSchemaJSON = `{"description":"Confirm a live hold as a reservation, keeping its resources.","properties":{"parent":{"pattern":"^organizationalUnits/[^/]+$","type":"string"},"reservation":{"properties":{"attributes":{"additionalProperties":true,"type":"object"},"cancel_reason":{"type":"string"},"cancel_time":{"format":"date-time","type":["string","null"]},"confirm_time":{"format":"date-time","type":["string","null"]},"create_time":{"format":"date-time","type":["string","null"]},"customer":{"anyOf":[{"const":""},{"pattern":"^users/[^/]+$"}],"type":"string"},"end_time":{"format":"date-time","type":["string","null"]},"etag":{"type":"string"},"hold":{"pattern":"^organizationalUnits/[^/]+/holds/[^/]+$","type":"string"},"name":{"anyOf":[{"const":""},{"pattern":"^organizationalUnits/[^/]+/reservations/[^/]+$"}],"type":"string"},"resources":{"items":{"type":"string"},"type":"array"},"start_time":{"format":"date-time","type":["string","null"]},"state":{"enum":["RESERVATION_STATE_UNSPECIFIED","RESERVATION_STATE_PENDING","RESERVATION_STATE_CONFIRMED","RESERVATION_STATE_CANCELLING","RESERVATION_STATE_CANCELLED","RESERVATION_STATE_FAILED"],"type":"string"},"update_time":{"format":"date-time","type":["string","null"]}},"required":["hold"],"type":"object"}},"required":["parent","reservation"],"type":"object"}`
+var ReservationService_CreateReservationSchemaJSON = `{"description":"Confirm a live hold as a reservation, keeping its resources.","properties":{"parent":{"pattern":"^organizationalUnits/[^/]+$","type":"string"},"reservation":{"properties":{"attributes":{"additionalProperties":true,"type":"object"},"cancel_reason":{"type":"string"},"cancel_time":{"format":"date-time","type":["string","null"]},"confirm_time":{"format":"date-time","type":["string","null"]},"create_time":{"format":"date-time","type":["string","null"]},"customer":{"anyOf":[{"const":""},{"pattern":"^users/[^/]+$"}],"type":"string"},"end_time":{"format":"date-time","type":["string","null"]},"etag":{"type":"string"},"hold":{"pattern":"^organizationalUnits/[^/]+/holds/[^/]+$","type":"string"},"name":{"anyOf":[{"const":""},{"pattern":"^organizationalUnits/[^/]+/reservations/[^/]+$"}],"type":"string"},"replaced_by":{"type":"string"},"replaces":{"type":"string"},"resources":{"items":{"type":"string"},"type":"array"},"start_time":{"format":"date-time","type":["string","null"]},"state":{"enum":["RESERVATION_STATE_UNSPECIFIED","RESERVATION_STATE_PENDING","RESERVATION_STATE_CONFIRMED","RESERVATION_STATE_CANCELLING","RESERVATION_STATE_CANCELLED","RESERVATION_STATE_FAILED","RESERVATION_STATE_RESCHEDULING","RESERVATION_STATE_RESCHEDULED"],"type":"string"},"update_time":{"format":"date-time","type":["string","null"]}},"required":["hold"],"type":"object"}},"required":["parent","reservation"],"type":"object"}`
 var ReservationService_GetReservationSchemaJSON = `{"description":"Get a reservation.","properties":{"name":{"pattern":"^organizationalUnits/[^/]+/reservations/[^/]+$","type":"string"}},"required":["name"],"type":"object"}`
 var ReservationService_ListReservationsSchemaJSON = `{"description":"List a site's reservations, filtered and ordered per AIP-160 and AIP-132.","properties":{"filter":{"type":"string"},"order_by":{"type":"string"},"page_size":{"maximum":1000,"minimum":0,"type":"integer"},"page_token":{"type":"string"},"parent":{"pattern":"^organizationalUnits/[^/]+$","type":"string"}},"required":["parent"],"type":"object"}`
+var ReservationService_RescheduleReservationSchemaJSON = `{"description":"Move a confirmed reservation onto a new live hold; the old slot is freed only once the new one is confirmed.","properties":{"etag":{"type":"string"},"hold":{"pattern":"^organizationalUnits/[^/]+/holds/[^/]+$","type":"string"},"name":{"pattern":"^organizationalUnits/[^/]+/reservations/[^/]+$","type":"string"}},"required":["name","hold"],"type":"object"}`
 
 // JSON schemas for each RPC method's response, advertised as the tool's
 // outputSchema and satisfied by the structuredContent each handler returns.
-var ReservationService_CancelReservationOutputSchemaJSON = `{"properties":{"attributes":{"additionalProperties":true,"type":"object"},"cancel_reason":{"type":"string"},"cancel_time":{"format":"date-time","type":["string","null"]},"confirm_time":{"format":"date-time","type":["string","null"]},"create_time":{"format":"date-time","type":["string","null"]},"customer":{"anyOf":[{"const":""},{"pattern":"^users/[^/]+$"}],"type":"string"},"end_time":{"format":"date-time","type":["string","null"]},"etag":{"type":"string"},"hold":{"pattern":"^organizationalUnits/[^/]+/holds/[^/]+$","type":"string"},"name":{"anyOf":[{"const":""},{"pattern":"^organizationalUnits/[^/]+/reservations/[^/]+$"}],"type":"string"},"resources":{"items":{"type":"string"},"type":"array"},"start_time":{"format":"date-time","type":["string","null"]},"state":{"enum":["RESERVATION_STATE_UNSPECIFIED","RESERVATION_STATE_PENDING","RESERVATION_STATE_CONFIRMED","RESERVATION_STATE_CANCELLING","RESERVATION_STATE_CANCELLED","RESERVATION_STATE_FAILED"],"type":"string"},"update_time":{"format":"date-time","type":["string","null"]}},"required":["hold"],"type":"object"}`
-var ReservationService_CreateReservationOutputSchemaJSON = `{"properties":{"attributes":{"additionalProperties":true,"type":"object"},"cancel_reason":{"type":"string"},"cancel_time":{"format":"date-time","type":["string","null"]},"confirm_time":{"format":"date-time","type":["string","null"]},"create_time":{"format":"date-time","type":["string","null"]},"customer":{"anyOf":[{"const":""},{"pattern":"^users/[^/]+$"}],"type":"string"},"end_time":{"format":"date-time","type":["string","null"]},"etag":{"type":"string"},"hold":{"pattern":"^organizationalUnits/[^/]+/holds/[^/]+$","type":"string"},"name":{"anyOf":[{"const":""},{"pattern":"^organizationalUnits/[^/]+/reservations/[^/]+$"}],"type":"string"},"resources":{"items":{"type":"string"},"type":"array"},"start_time":{"format":"date-time","type":["string","null"]},"state":{"enum":["RESERVATION_STATE_UNSPECIFIED","RESERVATION_STATE_PENDING","RESERVATION_STATE_CONFIRMED","RESERVATION_STATE_CANCELLING","RESERVATION_STATE_CANCELLED","RESERVATION_STATE_FAILED"],"type":"string"},"update_time":{"format":"date-time","type":["string","null"]}},"required":["hold"],"type":"object"}`
-var ReservationService_GetReservationOutputSchemaJSON = `{"properties":{"attributes":{"additionalProperties":true,"type":"object"},"cancel_reason":{"type":"string"},"cancel_time":{"format":"date-time","type":["string","null"]},"confirm_time":{"format":"date-time","type":["string","null"]},"create_time":{"format":"date-time","type":["string","null"]},"customer":{"anyOf":[{"const":""},{"pattern":"^users/[^/]+$"}],"type":"string"},"end_time":{"format":"date-time","type":["string","null"]},"etag":{"type":"string"},"hold":{"pattern":"^organizationalUnits/[^/]+/holds/[^/]+$","type":"string"},"name":{"anyOf":[{"const":""},{"pattern":"^organizationalUnits/[^/]+/reservations/[^/]+$"}],"type":"string"},"resources":{"items":{"type":"string"},"type":"array"},"start_time":{"format":"date-time","type":["string","null"]},"state":{"enum":["RESERVATION_STATE_UNSPECIFIED","RESERVATION_STATE_PENDING","RESERVATION_STATE_CONFIRMED","RESERVATION_STATE_CANCELLING","RESERVATION_STATE_CANCELLED","RESERVATION_STATE_FAILED"],"type":"string"},"update_time":{"format":"date-time","type":["string","null"]}},"required":["hold"],"type":"object"}`
-var ReservationService_ListReservationsOutputSchemaJSON = `{"properties":{"next_page_token":{"type":"string"},"reservations":{"items":{"properties":{"attributes":{"additionalProperties":true,"type":"object"},"cancel_reason":{"type":"string"},"cancel_time":{"format":"date-time","type":["string","null"]},"confirm_time":{"format":"date-time","type":["string","null"]},"create_time":{"format":"date-time","type":["string","null"]},"customer":{"anyOf":[{"const":""},{"pattern":"^users/[^/]+$"}],"type":"string"},"end_time":{"format":"date-time","type":["string","null"]},"etag":{"type":"string"},"hold":{"pattern":"^organizationalUnits/[^/]+/holds/[^/]+$","type":"string"},"name":{"anyOf":[{"const":""},{"pattern":"^organizationalUnits/[^/]+/reservations/[^/]+$"}],"type":"string"},"resources":{"items":{"type":"string"},"type":"array"},"start_time":{"format":"date-time","type":["string","null"]},"state":{"enum":["RESERVATION_STATE_UNSPECIFIED","RESERVATION_STATE_PENDING","RESERVATION_STATE_CONFIRMED","RESERVATION_STATE_CANCELLING","RESERVATION_STATE_CANCELLED","RESERVATION_STATE_FAILED"],"type":"string"},"update_time":{"format":"date-time","type":["string","null"]}},"required":["hold"],"type":"object"},"type":"array"}},"required":[],"type":"object"}`
+var ReservationService_CancelReservationOutputSchemaJSON = `{"properties":{"attributes":{"additionalProperties":true,"type":"object"},"cancel_reason":{"type":"string"},"cancel_time":{"format":"date-time","type":["string","null"]},"confirm_time":{"format":"date-time","type":["string","null"]},"create_time":{"format":"date-time","type":["string","null"]},"customer":{"anyOf":[{"const":""},{"pattern":"^users/[^/]+$"}],"type":"string"},"end_time":{"format":"date-time","type":["string","null"]},"etag":{"type":"string"},"hold":{"pattern":"^organizationalUnits/[^/]+/holds/[^/]+$","type":"string"},"name":{"anyOf":[{"const":""},{"pattern":"^organizationalUnits/[^/]+/reservations/[^/]+$"}],"type":"string"},"replaced_by":{"type":"string"},"replaces":{"type":"string"},"resources":{"items":{"type":"string"},"type":"array"},"start_time":{"format":"date-time","type":["string","null"]},"state":{"enum":["RESERVATION_STATE_UNSPECIFIED","RESERVATION_STATE_PENDING","RESERVATION_STATE_CONFIRMED","RESERVATION_STATE_CANCELLING","RESERVATION_STATE_CANCELLED","RESERVATION_STATE_FAILED","RESERVATION_STATE_RESCHEDULING","RESERVATION_STATE_RESCHEDULED"],"type":"string"},"update_time":{"format":"date-time","type":["string","null"]}},"required":["hold"],"type":"object"}`
+var ReservationService_CreateReservationOutputSchemaJSON = `{"properties":{"attributes":{"additionalProperties":true,"type":"object"},"cancel_reason":{"type":"string"},"cancel_time":{"format":"date-time","type":["string","null"]},"confirm_time":{"format":"date-time","type":["string","null"]},"create_time":{"format":"date-time","type":["string","null"]},"customer":{"anyOf":[{"const":""},{"pattern":"^users/[^/]+$"}],"type":"string"},"end_time":{"format":"date-time","type":["string","null"]},"etag":{"type":"string"},"hold":{"pattern":"^organizationalUnits/[^/]+/holds/[^/]+$","type":"string"},"name":{"anyOf":[{"const":""},{"pattern":"^organizationalUnits/[^/]+/reservations/[^/]+$"}],"type":"string"},"replaced_by":{"type":"string"},"replaces":{"type":"string"},"resources":{"items":{"type":"string"},"type":"array"},"start_time":{"format":"date-time","type":["string","null"]},"state":{"enum":["RESERVATION_STATE_UNSPECIFIED","RESERVATION_STATE_PENDING","RESERVATION_STATE_CONFIRMED","RESERVATION_STATE_CANCELLING","RESERVATION_STATE_CANCELLED","RESERVATION_STATE_FAILED","RESERVATION_STATE_RESCHEDULING","RESERVATION_STATE_RESCHEDULED"],"type":"string"},"update_time":{"format":"date-time","type":["string","null"]}},"required":["hold"],"type":"object"}`
+var ReservationService_GetReservationOutputSchemaJSON = `{"properties":{"attributes":{"additionalProperties":true,"type":"object"},"cancel_reason":{"type":"string"},"cancel_time":{"format":"date-time","type":["string","null"]},"confirm_time":{"format":"date-time","type":["string","null"]},"create_time":{"format":"date-time","type":["string","null"]},"customer":{"anyOf":[{"const":""},{"pattern":"^users/[^/]+$"}],"type":"string"},"end_time":{"format":"date-time","type":["string","null"]},"etag":{"type":"string"},"hold":{"pattern":"^organizationalUnits/[^/]+/holds/[^/]+$","type":"string"},"name":{"anyOf":[{"const":""},{"pattern":"^organizationalUnits/[^/]+/reservations/[^/]+$"}],"type":"string"},"replaced_by":{"type":"string"},"replaces":{"type":"string"},"resources":{"items":{"type":"string"},"type":"array"},"start_time":{"format":"date-time","type":["string","null"]},"state":{"enum":["RESERVATION_STATE_UNSPECIFIED","RESERVATION_STATE_PENDING","RESERVATION_STATE_CONFIRMED","RESERVATION_STATE_CANCELLING","RESERVATION_STATE_CANCELLED","RESERVATION_STATE_FAILED","RESERVATION_STATE_RESCHEDULING","RESERVATION_STATE_RESCHEDULED"],"type":"string"},"update_time":{"format":"date-time","type":["string","null"]}},"required":["hold"],"type":"object"}`
+var ReservationService_ListReservationsOutputSchemaJSON = `{"properties":{"next_page_token":{"type":"string"},"reservations":{"items":{"properties":{"attributes":{"additionalProperties":true,"type":"object"},"cancel_reason":{"type":"string"},"cancel_time":{"format":"date-time","type":["string","null"]},"confirm_time":{"format":"date-time","type":["string","null"]},"create_time":{"format":"date-time","type":["string","null"]},"customer":{"anyOf":[{"const":""},{"pattern":"^users/[^/]+$"}],"type":"string"},"end_time":{"format":"date-time","type":["string","null"]},"etag":{"type":"string"},"hold":{"pattern":"^organizationalUnits/[^/]+/holds/[^/]+$","type":"string"},"name":{"anyOf":[{"const":""},{"pattern":"^organizationalUnits/[^/]+/reservations/[^/]+$"}],"type":"string"},"replaced_by":{"type":"string"},"replaces":{"type":"string"},"resources":{"items":{"type":"string"},"type":"array"},"start_time":{"format":"date-time","type":["string","null"]},"state":{"enum":["RESERVATION_STATE_UNSPECIFIED","RESERVATION_STATE_PENDING","RESERVATION_STATE_CONFIRMED","RESERVATION_STATE_CANCELLING","RESERVATION_STATE_CANCELLED","RESERVATION_STATE_FAILED","RESERVATION_STATE_RESCHEDULING","RESERVATION_STATE_RESCHEDULED"],"type":"string"},"update_time":{"format":"date-time","type":["string","null"]}},"required":["hold"],"type":"object"},"type":"array"}},"required":[],"type":"object"}`
+var ReservationService_RescheduleReservationOutputSchemaJSON = `{"properties":{"attributes":{"additionalProperties":true,"type":"object"},"cancel_reason":{"type":"string"},"cancel_time":{"format":"date-time","type":["string","null"]},"confirm_time":{"format":"date-time","type":["string","null"]},"create_time":{"format":"date-time","type":["string","null"]},"customer":{"anyOf":[{"const":""},{"pattern":"^users/[^/]+$"}],"type":"string"},"end_time":{"format":"date-time","type":["string","null"]},"etag":{"type":"string"},"hold":{"pattern":"^organizationalUnits/[^/]+/holds/[^/]+$","type":"string"},"name":{"anyOf":[{"const":""},{"pattern":"^organizationalUnits/[^/]+/reservations/[^/]+$"}],"type":"string"},"replaced_by":{"type":"string"},"replaces":{"type":"string"},"resources":{"items":{"type":"string"},"type":"array"},"start_time":{"format":"date-time","type":["string","null"]},"state":{"enum":["RESERVATION_STATE_UNSPECIFIED","RESERVATION_STATE_PENDING","RESERVATION_STATE_CONFIRMED","RESERVATION_STATE_CANCELLING","RESERVATION_STATE_CANCELLED","RESERVATION_STATE_FAILED","RESERVATION_STATE_RESCHEDULING","RESERVATION_STATE_RESCHEDULED"],"type":"string"},"update_time":{"format":"date-time","type":["string","null"]}},"required":["hold"],"type":"object"}`
 
 // MCP tool descriptors. Each pairs a schema with a tool name and description
 // so that LLM clients can discover and invoke the underlying RPCs.
 var (
-	ReservationService_CancelReservationTool = newTool("reservation_service-cancel_reservation_v1", `Cancel a reservation and free its resources.`, ReservationService_CancelReservationSchemaJSON, ReservationService_CancelReservationOutputSchemaJSON, nil, "", nil)
-	ReservationService_CreateReservationTool = newTool("reservation_service-create_reservation_v1", `Confirm a live hold as a reservation, keeping its resources.`, ReservationService_CreateReservationSchemaJSON, ReservationService_CreateReservationOutputSchemaJSON, nil, "", nil)
-	ReservationService_GetReservationTool    = newTool("reservation_service-get_reservation_v1", `Get a reservation.`, ReservationService_GetReservationSchemaJSON, ReservationService_GetReservationOutputSchemaJSON, nil, "", nil)
-	ReservationService_ListReservationsTool  = newTool("reservation_service-list_reservations_v1", `List a site's reservations, filtered and ordered per AIP-160 and AIP-132.`, ReservationService_ListReservationsSchemaJSON, ReservationService_ListReservationsOutputSchemaJSON, nil, "", nil)
+	ReservationService_CancelReservationTool     = newTool("reservation_service-cancel_reservation_v1", `Cancel a reservation and free its resources.`, ReservationService_CancelReservationSchemaJSON, ReservationService_CancelReservationOutputSchemaJSON, nil, "", nil)
+	ReservationService_CreateReservationTool     = newTool("reservation_service-create_reservation_v1", `Confirm a live hold as a reservation, keeping its resources.`, ReservationService_CreateReservationSchemaJSON, ReservationService_CreateReservationOutputSchemaJSON, nil, "", nil)
+	ReservationService_GetReservationTool        = newTool("reservation_service-get_reservation_v1", `Get a reservation.`, ReservationService_GetReservationSchemaJSON, ReservationService_GetReservationOutputSchemaJSON, nil, "", nil)
+	ReservationService_ListReservationsTool      = newTool("reservation_service-list_reservations_v1", `List a site's reservations, filtered and ordered per AIP-160 and AIP-132.`, ReservationService_ListReservationsSchemaJSON, ReservationService_ListReservationsOutputSchemaJSON, nil, "", nil)
+	ReservationService_RescheduleReservationTool = newTool("reservation_service-reschedule_reservation_v1", `Move a confirmed reservation onto a new live hold; the old slot is freed only once the new one is confirmed.`, ReservationService_RescheduleReservationSchemaJSON, ReservationService_RescheduleReservationOutputSchemaJSON, nil, "", nil)
 )
 
 // ReservationServiceMCPServer is the interface that users implement to handle MCP
@@ -47,6 +50,7 @@ type ReservationServiceMCPServer interface {
 	CreateReservation(ctx context.Context, req *CreateReservationRequest) (*Reservation, error)
 	GetReservation(ctx context.Context, req *GetReservationRequest) (*Reservation, error)
 	ListReservations(ctx context.Context, req *ListReservationsRequest) (*ListReservationsResponse, error)
+	RescheduleReservation(ctx context.Context, req *RescheduleReservationRequest) (*Reservation, error)
 }
 
 // ReservationServiceMCPClient is the gRPC client interface used when forwarding MCP
@@ -56,6 +60,7 @@ type ReservationServiceMCPClient interface {
 	CreateReservation(ctx context.Context, req *CreateReservationRequest, opts ...grpc.CallOption) (*Reservation, error)
 	GetReservation(ctx context.Context, req *GetReservationRequest, opts ...grpc.CallOption) (*Reservation, error)
 	ListReservations(ctx context.Context, req *ListReservationsRequest, opts ...grpc.CallOption) (*ListReservationsResponse, error)
+	RescheduleReservation(ctx context.Context, req *RescheduleReservationRequest, opts ...grpc.CallOption) (*Reservation, error)
 }
 
 // RegisterReservationServiceMCPHandler registers all ReservationService RPC methods as MCP
@@ -157,6 +162,31 @@ func RegisterReservationServiceMCPHandler(s *mcp.Server, srv ReservationServiceM
 				return mcp.HandleError(err)
 			}
 			resp := rawResp.(*ListReservationsResponse)
+			out, err := (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
+			if err != nil {
+				return nil, err
+			}
+			return structuredResult(out)
+		})
+	}
+	{
+		tool := mcp.PrepareToolWithExtras(ReservationService_RescheduleReservationTool, cfg.ExtraProperties)
+		tool = mcp.SetToolAppMeta(tool, appResourceURI)
+		s.AddTool(tool, func(ctx context.Context, req *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+			var pbReq RescheduleReservationRequest
+			args, ctx := mcp.ExtractExtras(ctx, req.Params.Arguments, cfg)
+			if err := (protojson.UnmarshalOptions{DiscardUnknown: true}).Unmarshal(args, &pbReq); err != nil {
+				return nil, err
+			}
+			// Dispatch through the unary interceptor chain (when configured) so
+			// middleware sees this call exactly as it would the wire RPC.
+			rawResp, err := mcp.InvokeUnary(ctx, cfg.UnaryInterceptor, "/freebusy.reservation.v1.ReservationService/RescheduleReservation", srv, &pbReq, func(ctx context.Context, req any) (any, error) {
+				return srv.RescheduleReservation(ctx, req.(*RescheduleReservationRequest))
+			})
+			if err != nil {
+				return mcp.HandleError(err)
+			}
+			resp := rawResp.(*Reservation)
 			out, err := (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
 			if err != nil {
 				return nil, err
@@ -297,6 +327,27 @@ func ForwardToReservationServiceMCPClient(s *mcp.Server, client ReservationServi
 			}
 			ctx = mcp.ForwardMetadata(ctx)
 			resp, err := client.ListReservations(ctx, &pbReq)
+			if err != nil {
+				return mcp.HandleError(err)
+			}
+			out, err := (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
+			if err != nil {
+				return nil, err
+			}
+			return structuredResult(out)
+		})
+	}
+	{
+		tool := mcp.PrepareToolWithExtras(ReservationService_RescheduleReservationTool, cfg.ExtraProperties)
+		tool = mcp.SetToolAppMeta(tool, appResourceURI)
+		s.AddTool(tool, func(ctx context.Context, req *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+			var pbReq RescheduleReservationRequest
+			args, ctx := mcp.ExtractExtras(ctx, req.Params.Arguments, cfg)
+			if err := (protojson.UnmarshalOptions{DiscardUnknown: true}).Unmarshal(args, &pbReq); err != nil {
+				return nil, err
+			}
+			ctx = mcp.ForwardMetadata(ctx)
+			resp, err := client.RescheduleReservation(ctx, &pbReq)
 			if err != nil {
 				return mcp.HandleError(err)
 			}

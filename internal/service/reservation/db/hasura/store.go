@@ -89,6 +89,7 @@ func (s *Store) Insert(ctx context.Context, r *reservationpbv1.Reservation) (*re
 		OrganizationalUnitId: svc.SiteID(r.GetName()),
 		Hold:                 repox.LastSegment(r.GetHold()),
 		Customer:             r.GetCustomer(),
+		Replaces:             r.GetReplaces(),
 		State:                stateName(r.GetState()),
 		Etag:                 repox.NewULID(),
 		CreateTime:           now,
@@ -146,6 +147,9 @@ func (s *Store) Transition(ctx context.Context, name, etag string, from []reserv
 	if c.CancelReason != "" {
 		patch.CancelReason = graphql.Value(c.CancelReason)
 	}
+	if c.ReplacedBy != nil {
+		patch.ReplacedBy = dbutil.NullableStr(*c.ReplacedBy)
+	}
 	if _, err := s.svc.Mutation.Reservation.Resource.UpdateIfMatch(ctx, repox.LastSegment(cur.GetName()), patch, match); err != nil {
 		return nil, dbutil.MapHasuraErr(err)
 	}
@@ -155,7 +159,7 @@ func (s *Store) Transition(ctx context.Context, name, etag string, from []reserv
 // Stuck reads mid-transition reservations across every site.
 func (s *Store) Stuck(ctx context.Context, cutoff time.Time, limit int) ([]*reservationpbv1.Reservation, error) {
 	rows, err := s.svc.Query.Reservation.Resource.List(ctx, ressql.List().Where(ressql.And(
-		ressql.State.In("PENDING", "CANCELLING"),
+		ressql.State.In("PENDING", "CANCELLING", "RESCHEDULING"),
 		ressql.UpdateTime.Lt(ts(cutoff)),
 	)).OrderBy(ressql.UpdateTime.Asc()).Limit(limit))
 	if err != nil {
@@ -176,6 +180,8 @@ func toProto(r ressql.ReservationResource) *reservationpbv1.Reservation {
 		State:        stateValue(repox.Deref(r.State)),
 		Customer:     repox.Deref(r.Customer),
 		CancelReason: repox.Deref(r.CancelReason),
+		Replaces:     repox.Deref(r.Replaces),
+		ReplacedBy:   repox.Deref(r.ReplacedBy),
 		Etag:         repox.Deref(r.Etag),
 		CreateTime:   parse(&r.CreateTime),
 		UpdateTime:   parse(&r.UpdateTime),

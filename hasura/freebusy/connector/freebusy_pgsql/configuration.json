@@ -6638,6 +6638,22 @@
             "nullable": "nonNullable",
             "description": null
           },
+          "replaced_by": {
+            "name": "replaced_by",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "replaces": {
+            "name": "replaces",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
           "resources": {
             "name": "resources",
             "type": {

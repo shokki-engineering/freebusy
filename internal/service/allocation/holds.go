@@ -2,6 +2,8 @@ package allocation
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"math/rand/v2"
 	"time"
@@ -51,22 +53,42 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 	if err != nil {
 		return nil, err
 	}
-	if key := in.GetIdempotencyKey(); key != "" {
-		prev, ferr := s.store.FindHold(ctx, parent, key)
-		switch {
-		case ferr == nil:
-			return s.authoritative(prev), nil
-		case !errors.Is(ferr, types.ErrNotFound):
-			return nil, ferr
+	// prior returns the hold already taken under this request's idempotency
+	// key, if any. Checked before every attempt, not just the first: a
+	// concurrent caller with the same key may land between attempts, and its
+	// claim on the resources then looks like a conflict -- or exhaustion --
+	// rather than the duplicate it is.
+	prior := func() (*allocationpbv1.Hold, error) {
+		key := in.GetIdempotencyKey()
+		if key == "" {
+			return nil, nil
 		}
+		prev, err := s.store.FindHold(ctx, parent, key)
+		switch {
+		case err == nil:
+			return s.authoritative(prev), nil
+		case errors.Is(err, types.ErrNotFound):
+			return nil, nil
+		}
+		return nil, err
 	}
 	id := req.GetHoldId()
-	if id == "" {
+	switch {
+	case id != "":
+	case in.GetIdempotencyKey() != "":
+		// Derived, not random: two concurrent calls with one key then race
+		// for one name, the store's uniqueness picks a winner, and the loser
+		// returns the winner's hold below. A random id would let both win.
+		id = keyedID(parent, in.GetIdempotencyKey())
+	default:
 		id = ulid.GenerateString()
 	}
 	quantity := max(int(in.GetQuantity()), 1)
 
 	for attempt := 0; ; attempt++ {
+		if prev, err := prior(); prev != nil || err != nil {
+			return prev, err
+		}
 		now := s.now()
 		st, err := s.gather(ctx, ResourceQuery{
 			OrganizationalUnits: []string{parent},
@@ -77,6 +99,9 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 		}
 		res := engine.Check(st.resources, window, quantity, now)
 		if !res.Bookable {
+			if prev, err := prior(); prev != nil || err != nil {
+				return prev, err
+			}
 			return nil, errorf(types.ErrCapacityExhausted, "%d of %d requested resources free", len(res.Candidates), quantity)
 		}
 		hold := &allocationpbv1.Hold{
@@ -93,6 +118,11 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 		if err == nil {
 			return created, nil
 		}
+		if errors.Is(err, types.ErrAlreadyExists) {
+			if prev, perr := prior(); prev != nil || perr != nil {
+				return prev, perr
+			}
+		}
 		if !errors.Is(err, types.ErrConflict) || attempt+1 >= createAttempts {
 			return nil, err
 		}
@@ -103,6 +133,13 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 		case <-time.After(wait):
 		}
 	}
+}
+
+// keyedID derives a hold id from a site and an idempotency key: 26 lowercase
+// hex characters of their SHA-256, the length of a ULID so names stay uniform.
+func keyedID(parent, key string) string {
+	sum := sha256.Sum256([]byte(parent + "\x00" + key))
+	return hex.EncodeToString(sum[:13])
 }
 
 // GetHold returns one hold, with expiry applied.

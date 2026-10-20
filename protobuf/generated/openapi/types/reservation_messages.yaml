@@ -68,6 +68,14 @@ components:
                 it was made from, so a retried CreateReservation finds the reservation
                 the first attempt wrote instead of making a second. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
               type: string
+            replacedBy:
+              description: 'The reservation replacing this one, set when RescheduleReservation
+                began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
+              type: string
+            replaces:
+              description: 'The reservation this one replaced, set when it was made
+                by RescheduleReservation. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
+              type: string
             resources:
               description: 'The resources taken, copied from the hold. Format: resources/{resource}'
               items:
@@ -86,6 +94,8 @@ components:
               - RESERVATION_STATE_CANCELLING
               - RESERVATION_STATE_CANCELLED
               - RESERVATION_STATE_FAILED
+              - RESERVATION_STATE_RESCHEDULING
+              - RESERVATION_STATE_RESCHEDULED
               type: string
             updateTime:
               description: Last-modification timestamp.
@@ -177,6 +187,14 @@ components:
                   reservation the first attempt wrote instead of making a second.
                   Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
                 type: string
+              replacedBy:
+                description: 'The reservation replacing this one, set when RescheduleReservation
+                  began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
+                type: string
+              replaces:
+                description: 'The reservation this one replaced, set when it was made
+                  by RescheduleReservation. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
+                type: string
               resources:
                 description: 'The resources taken, copied from the hold. Format: resources/{resource}'
                 items:
@@ -195,6 +213,8 @@ components:
                 - RESERVATION_STATE_CANCELLING
                 - RESERVATION_STATE_CANCELLED
                 - RESERVATION_STATE_FAILED
+                - RESERVATION_STATE_RESCHEDULING
+                - RESERVATION_STATE_RESCHEDULED
                 type: string
               updateTime:
                 description: Last-modification timestamp.
@@ -202,6 +222,23 @@ components:
                 type: string
             type: object
           type: array
+      type: object
+    freebusy.reservation.v1.RescheduleReservationRequest:
+      description: Request message for ReservationService.RescheduleReservation.
+      properties:
+        etag:
+          description: Opaque version read from the reservation; the move is rejected
+            if it changed since (AIP-154).
+          type: string
+        hold:
+          description: 'A live hold at the same site on the new window, taken by the
+            caller with HoldService.CreateHold. Taking it first is what makes the
+            move safe: the new slot is secured before the old one is let go. Format:
+            organizationalUnits/{organizational_unit}/holds/{hold}'
+          type: string
+        name:
+          description: 'The confirmed reservation to move. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
+          type: string
       type: object
 info:
   title: OpenAPI Spec for Solo APIs.

@@ -28,6 +28,10 @@ definition:
       type: String_1!
     - name: organizationalUnitId
       type: String_1!
+    - name: replacedBy
+      type: String_1
+    - name: replaces
+      type: String_1
     - name: resources
       type: "[String_1]"
     - name: startTime
@@ -79,6 +83,12 @@ definition:
         organizationalUnitId:
           column:
             name: organizational_unit_id
+        replacedBy:
+          column:
+            name: replaced_by
+        replaces:
+          column:
+            name: replaces
         resources:
           column:
             name: resources
@@ -113,6 +123,8 @@ definition:
           - id
           - name
           - organizationalUnitId
+          - replacedBy
+          - replaces
           - resources
           - startTime
           - state

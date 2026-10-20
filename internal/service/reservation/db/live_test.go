@@ -194,6 +194,78 @@ func TestLiveReservations(t *testing.T) {
 				}
 			})
 
+			t.Run("reschedule", func(t *testing.T) {
+				r, err := create(hold(18).GetName())
+				if err != nil {
+					t.Fatal(err)
+				}
+				nh := hold(19)
+				rep, err := srv.RescheduleReservation(ctx, &reservationpbv1.RescheduleReservationRequest{Name: r.GetName(), Hold: nh.GetName()})
+				if err != nil {
+					t.Fatal(err)
+				}
+				if rep.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED || rep.GetReplaces() != r.GetName() ||
+					!rep.GetStartTime().AsTime().Equal(win(19).GetStartTime().AsTime()) {
+					t.Fatalf("replacement %v", rep)
+				}
+				old, _ := srv.GetReservation(ctx, &reservationpbv1.GetReservationRequest{Name: r.GetName()})
+				if old.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED || old.GetReplacedBy() != rep.GetName() {
+					t.Fatalf("original %v", old)
+				}
+				time.Sleep(1200 * time.Millisecond) // past the hold TTL: only conversions count now
+				if a, b := free(18), free(19); a != 1 || b != 0 {
+					t.Fatalf("after move: old window %d free (want 1), new window %d free (want 0)", a, b)
+				}
+
+				lapsed := hold(20)
+				time.Sleep(1200 * time.Millisecond)
+				if _, err := srv.RescheduleReservation(ctx, &reservationpbv1.RescheduleReservationRequest{Name: rep.GetName(), Hold: lapsed.GetName()}); status.Code(err) != codes.FailedPrecondition {
+					t.Fatalf("move onto lapsed hold: %v", err)
+				}
+				kept, _ := srv.GetReservation(ctx, &reservationpbv1.GetReservationRequest{Name: rep.GetName()})
+				if kept.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED || kept.GetReplacedBy() != "" || free(19) != 0 {
+					t.Fatalf("a failed move must leave the booking as it was: %v, %d free", kept, free(19))
+				}
+
+				target := hold(21)
+				var wg sync.WaitGroup
+				names := make([]string, 6)
+				errs := make([]error, 6)
+				for i := range 6 {
+					wg.Go(func() {
+						out, err := srv.RescheduleReservation(ctx, &reservationpbv1.RescheduleReservationRequest{Name: rep.GetName(), Hold: target.GetName()})
+						names[i], errs[i] = out.GetName(), err
+					})
+				}
+				wg.Wait()
+				for i := range 6 {
+					if errs[i] != nil || names[i] != names[0] {
+						t.Fatalf("concurrent move %d: %q %v", i, names[i], errs[i])
+					}
+				}
+			})
+
+			t.Run("concurrent holds with one idempotency key", func(t *testing.T) {
+				key := "cart-" + ulid.GenerateString()
+				var wg sync.WaitGroup
+				names := make([]string, 8)
+				errs := make([]error, 8)
+				for i := range 8 {
+					wg.Go(func() {
+						h, err := engine.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{
+							Parent: site, Hold: &allocationpbv1.Hold{Window: win(22), IdempotencyKey: key},
+						})
+						names[i], errs[i] = h.GetName(), err
+					})
+				}
+				wg.Wait()
+				for i := range 8 {
+					if errs[i] != nil || names[i] != names[0] {
+						t.Fatalf("caller %d: %q %v", i, names[i], errs[i])
+					}
+				}
+			})
+
 			t.Run("concurrent creates from one hold", func(t *testing.T) {
 				h := hold(16)
 				var wg sync.WaitGroup

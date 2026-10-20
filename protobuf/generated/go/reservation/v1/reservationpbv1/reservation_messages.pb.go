@@ -332,6 +332,75 @@ func (x *CancelReservationRequest) GetEtag() string {
 	return ""
 }
 
+// Request message for ReservationService.RescheduleReservation.
+type RescheduleReservationRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The confirmed reservation to move.
+	// Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// A live hold at the same site on the new window, taken by the caller with
+	// HoldService.CreateHold. Taking it first is what makes the move safe: the
+	// new slot is secured before the old one is let go.
+	// Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	Hold string `protobuf:"bytes,2,opt,name=hold,proto3" json:"hold,omitempty"`
+	// Opaque version read from the reservation; the move is rejected if it
+	// changed since (AIP-154).
+	Etag          string `protobuf:"bytes,3,opt,name=etag,proto3" json:"etag,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RescheduleReservationRequest) Reset() {
+	*x = RescheduleReservationRequest{}
+	mi := &file_freebusy_reservation_v1_reservation_messages_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RescheduleReservationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RescheduleReservationRequest) ProtoMessage() {}
+
+func (x *RescheduleReservationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_freebusy_reservation_v1_reservation_messages_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RescheduleReservationRequest.ProtoReflect.Descriptor instead.
+func (*RescheduleReservationRequest) Descriptor() ([]byte, []int) {
+	return file_freebusy_reservation_v1_reservation_messages_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *RescheduleReservationRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *RescheduleReservationRequest) GetHold() string {
+	if x != nil {
+		return x.Hold
+	}
+	return ""
+}
+
+func (x *RescheduleReservationRequest) GetEtag() string {
+	if x != nil {
+		return x.Etag
+	}
+	return ""
+}
+
 var File_freebusy_reservation_v1_reservation_messages_proto protoreflect.FileDescriptor
 
 const file_freebusy_reservation_v1_reservation_messages_proto_rawDesc = "" +
@@ -357,6 +426,12 @@ const file_freebusy_reservation_v1_reservation_messages_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tB`\xe0A\x02\xfaA%\n" +
 	"#freebusy.reservation.v1/Reservation\xbaH2r02.^organizationalUnits/[^/]+/reservations/[^/]+$R\x04name\x12#\n" +
 	"\x06reason\x18\x02 \x01(\tB\v\xe0A\x01\xbaH\x05r\x03\x18\x80\bR\x06reason\x12\x17\n" +
+	"\x04etag\x18\x03 \x01(\tB\x03\xe0A\x01R\x04etag\"\x94\x02\n" +
+	"\x1cRescheduleReservationRequest\x12t\n" +
+	"\x04name\x18\x01 \x01(\tB`\xe0A\x02\xfaA%\n" +
+	"#freebusy.reservation.v1/Reservation\xbaH2r02.^organizationalUnits/[^/]+/reservations/[^/]+$R\x04name\x12e\n" +
+	"\x04hold\x18\x02 \x01(\tBQ\xe0A\x02\xfaA\x1d\n" +
+	"\x1bfreebusy.allocation.v1/Hold\xbaH+r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\x04hold\x12\x17\n" +
 	"\x04etag\x18\x03 \x01(\tB\x03\xe0A\x01R\x04etagB\x9c\x02\n" +
 	"\x1bcom.freebusy.reservation.v1B\x18ReservationMessagesProtoP\x01Zegithub.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
 
@@ -372,18 +447,19 @@ func file_freebusy_reservation_v1_reservation_messages_proto_rawDescGZIP() []byt
 	return file_freebusy_reservation_v1_reservation_messages_proto_rawDescData
 }
 
-var file_freebusy_reservation_v1_reservation_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_freebusy_reservation_v1_reservation_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_freebusy_reservation_v1_reservation_messages_proto_goTypes = []any{
-	(*CreateReservationRequest)(nil), // 0: freebusy.reservation.v1.CreateReservationRequest
-	(*GetReservationRequest)(nil),    // 1: freebusy.reservation.v1.GetReservationRequest
-	(*ListReservationsRequest)(nil),  // 2: freebusy.reservation.v1.ListReservationsRequest
-	(*ListReservationsResponse)(nil), // 3: freebusy.reservation.v1.ListReservationsResponse
-	(*CancelReservationRequest)(nil), // 4: freebusy.reservation.v1.CancelReservationRequest
-	(*Reservation)(nil),              // 5: freebusy.reservation.v1.Reservation
+	(*CreateReservationRequest)(nil),     // 0: freebusy.reservation.v1.CreateReservationRequest
+	(*GetReservationRequest)(nil),        // 1: freebusy.reservation.v1.GetReservationRequest
+	(*ListReservationsRequest)(nil),      // 2: freebusy.reservation.v1.ListReservationsRequest
+	(*ListReservationsResponse)(nil),     // 3: freebusy.reservation.v1.ListReservationsResponse
+	(*CancelReservationRequest)(nil),     // 4: freebusy.reservation.v1.CancelReservationRequest
+	(*RescheduleReservationRequest)(nil), // 5: freebusy.reservation.v1.RescheduleReservationRequest
+	(*Reservation)(nil),                  // 6: freebusy.reservation.v1.Reservation
 }
 var file_freebusy_reservation_v1_reservation_messages_proto_depIdxs = []int32{
-	5, // 0: freebusy.reservation.v1.CreateReservationRequest.reservation:type_name -> freebusy.reservation.v1.Reservation
-	5, // 1: freebusy.reservation.v1.ListReservationsResponse.reservations:type_name -> freebusy.reservation.v1.Reservation
+	6, // 0: freebusy.reservation.v1.CreateReservationRequest.reservation:type_name -> freebusy.reservation.v1.Reservation
+	6, // 1: freebusy.reservation.v1.ListReservationsResponse.reservations:type_name -> freebusy.reservation.v1.Reservation
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -403,7 +479,7 @@ func file_freebusy_reservation_v1_reservation_messages_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_freebusy_reservation_v1_reservation_messages_proto_rawDesc), len(file_freebusy_reservation_v1_reservation_messages_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

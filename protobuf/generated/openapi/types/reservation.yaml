@@ -44,6 +44,14 @@ components:
             it was made from, so a retried CreateReservation finds the reservation
             the first attempt wrote instead of making a second. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
           type: string
+        replacedBy:
+          description: 'The reservation replacing this one, set when RescheduleReservation
+            began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
+          type: string
+        replaces:
+          description: 'The reservation this one replaced, set when it was made by
+            RescheduleReservation. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
+          type: string
         resources:
           description: 'The resources taken, copied from the hold. Format: resources/{resource}'
           items:
@@ -62,6 +70,8 @@ components:
           - RESERVATION_STATE_CANCELLING
           - RESERVATION_STATE_CANCELLED
           - RESERVATION_STATE_FAILED
+          - RESERVATION_STATE_RESCHEDULING
+          - RESERVATION_STATE_RESCHEDULED
           type: string
         updateTime:
           description: Last-modification timestamp.

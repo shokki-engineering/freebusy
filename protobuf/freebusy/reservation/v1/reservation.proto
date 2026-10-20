@@ -108,4 +108,13 @@ message Reservation {
 
   // Opaque version for optimistic concurrency (AIP-154); echo on cancel.
   string etag = 14 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The reservation this one replaced, set when it was made by
+  // RescheduleReservation.
+  // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  string replaces = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The reservation replacing this one, set when RescheduleReservation began.
+  // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  string replaced_by = 16 [(google.api.field_behavior) = OUTPUT_ONLY];
 }

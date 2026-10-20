@@ -38,6 +38,10 @@ func ReservationStateFromProto(v reservationpbv1.ReservationState) ReservationSt
 		return ReservationStateCancelled
 	case reservationpbv1.ReservationState_RESERVATION_STATE_FAILED:
 		return ReservationStateFailed
+	case reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULING:
+		return ReservationStateRescheduling
+	case reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED:
+		return ReservationStateRescheduled
 	}
 	return ""
 }
@@ -56,6 +60,10 @@ func ReservationStateToProto(v ReservationState) reservationpbv1.ReservationStat
 		return reservationpbv1.ReservationState_RESERVATION_STATE_CANCELLED
 	case ReservationStateFailed:
 		return reservationpbv1.ReservationState_RESERVATION_STATE_FAILED
+	case ReservationStateRescheduling:
+		return reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULING
+	case ReservationStateRescheduled:
+		return reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED
 	}
 	return 0
 }
@@ -97,6 +105,8 @@ func ReservationToProto(m *Reservation) *reservationpbv1.Reservation {
 	out.ConfirmTime = goToTs(m.ConfirmTime)
 	out.CancelTime = goToTs(m.CancelTime)
 	out.Etag = fromPtr(m.Etag)
+	out.Replaces = fromPtr(m.Replaces)
+	out.ReplacedBy = fromPtr(m.ReplacedBy)
 	out.Resources = []string(m.Resources)
 	return out
 }
@@ -120,6 +130,8 @@ func ReservationFromProto(pb *reservationpbv1.Reservation) *Reservation {
 	m.ConfirmTime = tsToGo(pb.GetConfirmTime())
 	m.CancelTime = tsToGo(pb.GetCancelTime())
 	m.Etag = toPtr(pb.GetEtag())
+	m.Replaces = toPtr(pb.GetReplaces())
+	m.ReplacedBy = toPtr(pb.GetReplacedBy())
 	m.Resources = pq.StringArray(pb.GetResources())
 	return m
 }

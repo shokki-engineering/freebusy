@@ -51,14 +51,22 @@ func (s *Server) CreateReservation(ctx context.Context, req *reservationpbv1.Cre
 }
 
 func (s *Server) create(ctx context.Context, req *reservationpbv1.CreateReservationRequest) (*reservationpbv1.Reservation, error) {
-	parent := req.GetParent()
 	in := req.GetReservation()
-	holdName := in.GetHold()
-	prefix := parent + "/holds/"
-	if !strings.HasPrefix(holdName, prefix) || strings.Contains(holdName[len(prefix):], "/") {
-		return nil, errorf(types.ErrInvalidArgument, "hold %q is not a hold at %s", holdName, parent)
+	return s.open(ctx, req.GetParent(), in.GetHold(), &reservationpbv1.Reservation{
+		Customer:   in.GetCustomer(),
+		Attributes: in.GetAttributes(),
+	})
+}
+
+// open makes, or finishes making, the reservation for a hold at parent.
+// CreateReservation and RescheduleReservation's replacement both come through
+// here; tmpl carries the fields the caller chose (customer, attributes, and
+// for a replacement, replaces).
+func (s *Server) open(ctx context.Context, parent, holdName string, tmpl *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
+	name, err := reservationFor(parent, holdName)
+	if err != nil {
+		return nil, err
 	}
-	name := parent + "/reservations/" + holdName[len(prefix):]
 
 	// A retry, or a second caller with the same hold: finish and return what
 	// is already there.
@@ -87,9 +95,10 @@ func (s *Server) create(ctx context.Context, req *reservationpbv1.CreateReservat
 		Resources:  h.GetResources(),
 		StartTime:  h.GetWindow().GetStartTime(),
 		EndTime:    h.GetWindow().GetEndTime(),
-		Customer:   in.GetCustomer(),
+		Customer:   tmpl.GetCustomer(),
 		State:      reservationpbv1.ReservationState_RESERVATION_STATE_PENDING,
-		Attributes: in.GetAttributes(),
+		Attributes: tmpl.GetAttributes(),
+		Replaces:   tmpl.GetReplaces(),
 	}
 	created, err := s.store.Insert(ctx, r)
 	if errors.Is(err, types.ErrAlreadyExists) {
@@ -99,6 +108,16 @@ func (s *Server) create(ctx context.Context, req *reservationpbv1.CreateReservat
 		return nil, err
 	}
 	return s.advance(ctx, created)
+}
+
+// reservationFor names the reservation a hold at parent becomes: same site,
+// same id.
+func reservationFor(parent, holdName string) (string, error) {
+	prefix := parent + "/holds/"
+	if !strings.HasPrefix(holdName, prefix) || strings.Contains(holdName[len(prefix):], "/") {
+		return "", errorf(types.ErrInvalidArgument, "hold %q is not a hold at %s", holdName, parent)
+	}
+	return parent + "/reservations/" + holdName[len(prefix):], nil
 }
 
 // advance carries a reservation in a transient state through to the state it
@@ -112,6 +131,8 @@ func (s *Server) advance(ctx context.Context, r *reservationpbv1.Reservation) (*
 		return s.confirm(ctx, r)
 	case reservationpbv1.ReservationState_RESERVATION_STATE_CANCELLING:
 		return s.finishCancel(ctx, r)
+	case reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULING:
+		return s.finishReschedule(ctx, r)
 	}
 	return r, nil
 }
@@ -173,9 +194,10 @@ func (s *Server) settled(ctx context.Context, name string, err error) (*reservat
 }
 
 var (
-	pending    = []reservationpbv1.ReservationState{reservationpbv1.ReservationState_RESERVATION_STATE_PENDING}
-	cancelling = []reservationpbv1.ReservationState{reservationpbv1.ReservationState_RESERVATION_STATE_CANCELLING}
-	confirmed  = []reservationpbv1.ReservationState{reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED}
+	pending      = []reservationpbv1.ReservationState{reservationpbv1.ReservationState_RESERVATION_STATE_PENDING}
+	cancelling   = []reservationpbv1.ReservationState{reservationpbv1.ReservationState_RESERVATION_STATE_CANCELLING}
+	confirmed    = []reservationpbv1.ReservationState{reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED}
+	rescheduling = []reservationpbv1.ReservationState{reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULING}
 )
 
 // GetReservation returns one reservation.
@@ -224,9 +246,10 @@ func (s *Server) cancel(ctx context.Context, req *reservationpbv1.CancelReservat
 	if err != nil {
 		return nil, err
 	}
-	// A reservation still confirming is finished first: cancelling something
-	// half-made would race the conversion.
-	if r.GetState() == reservationpbv1.ReservationState_RESERVATION_STATE_PENDING {
+	// A reservation still confirming, or mid-move, is finished first:
+	// cancelling something half-made would race the conversion.
+	if r.GetState() == reservationpbv1.ReservationState_RESERVATION_STATE_PENDING ||
+		r.GetState() == reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULING {
 		if _, err := s.advance(ctx, r); err != nil && !errors.Is(err, types.ErrInvalidState) {
 			return nil, err
 		}
@@ -241,6 +264,8 @@ func (s *Server) cancel(ctx context.Context, req *reservationpbv1.CancelReservat
 		return s.advance(ctx, r)
 	case reservationpbv1.ReservationState_RESERVATION_STATE_FAILED:
 		return nil, errorf(types.ErrInvalidState, "reservation %s failed and holds nothing to cancel", r.GetName())
+	case reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED:
+		return nil, errorf(types.ErrInvalidState, "reservation %s was moved to %s; cancel that instead", r.GetName(), r.GetReplacedBy())
 	}
 
 	// Record the cancellation before freeing anything. Freeing first would

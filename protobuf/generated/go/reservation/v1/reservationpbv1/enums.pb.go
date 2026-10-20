@@ -48,6 +48,13 @@ const (
 	// The hold lapsed or was released before it could be converted, so nothing
 	// was taken. Terminal.
 	ReservationState_RESERVATION_STATE_FAILED ReservationState = 5
+	// Being replaced by the reservation named in `replaced_by`. Transient: it
+	// keeps its resources until the replacement is confirmed, then becomes
+	// RESCHEDULED -- or returns to CONFIRMED if the replacement's hold lapsed.
+	ReservationState_RESERVATION_STATE_RESCHEDULING ReservationState = 6
+	// Replaced by `replaced_by`, which now holds the booking; this one's
+	// resources are free. Terminal.
+	ReservationState_RESERVATION_STATE_RESCHEDULED ReservationState = 7
 )
 
 // Enum value maps for ReservationState.
@@ -59,14 +66,18 @@ var (
 		3: "RESERVATION_STATE_CANCELLING",
 		4: "RESERVATION_STATE_CANCELLED",
 		5: "RESERVATION_STATE_FAILED",
+		6: "RESERVATION_STATE_RESCHEDULING",
+		7: "RESERVATION_STATE_RESCHEDULED",
 	}
 	ReservationState_value = map[string]int32{
-		"RESERVATION_STATE_UNSPECIFIED": 0,
-		"RESERVATION_STATE_PENDING":     1,
-		"RESERVATION_STATE_CONFIRMED":   2,
-		"RESERVATION_STATE_CANCELLING":  3,
-		"RESERVATION_STATE_CANCELLED":   4,
-		"RESERVATION_STATE_FAILED":      5,
+		"RESERVATION_STATE_UNSPECIFIED":  0,
+		"RESERVATION_STATE_PENDING":      1,
+		"RESERVATION_STATE_CONFIRMED":    2,
+		"RESERVATION_STATE_CANCELLING":   3,
+		"RESERVATION_STATE_CANCELLED":    4,
+		"RESERVATION_STATE_FAILED":       5,
+		"RESERVATION_STATE_RESCHEDULING": 6,
+		"RESERVATION_STATE_RESCHEDULED":  7,
 	}
 )
 
@@ -101,14 +112,16 @@ var File_freebusy_reservation_v1_enums_proto protoreflect.FileDescriptor
 
 const file_freebusy_reservation_v1_enums_proto_rawDesc = "" +
 	"\n" +
-	"#freebusy/reservation/v1/enums.proto\x12\x17freebusy.reservation.v1*\xd6\x01\n" +
+	"#freebusy/reservation/v1/enums.proto\x12\x17freebusy.reservation.v1*\x9d\x02\n" +
 	"\x10ReservationState\x12!\n" +
 	"\x1dRESERVATION_STATE_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19RESERVATION_STATE_PENDING\x10\x01\x12\x1f\n" +
 	"\x1bRESERVATION_STATE_CONFIRMED\x10\x02\x12 \n" +
 	"\x1cRESERVATION_STATE_CANCELLING\x10\x03\x12\x1f\n" +
 	"\x1bRESERVATION_STATE_CANCELLED\x10\x04\x12\x1c\n" +
-	"\x18RESERVATION_STATE_FAILED\x10\x05B\x8e\x02\n" +
+	"\x18RESERVATION_STATE_FAILED\x10\x05\x12\"\n" +
+	"\x1eRESERVATION_STATE_RESCHEDULING\x10\x06\x12!\n" +
+	"\x1dRESERVATION_STATE_RESCHEDULED\x10\aB\x8e\x02\n" +
 	"\x1bcom.freebusy.reservation.v1B\n" +
 	"EnumsProtoP\x01Zegithub.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
 

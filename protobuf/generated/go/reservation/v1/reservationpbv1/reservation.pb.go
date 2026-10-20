@@ -76,7 +76,14 @@ type Reservation struct {
 	// When it was cancelled.
 	CancelTime *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=cancel_time,json=cancelTime,proto3" json:"cancel_time,omitempty"`
 	// Opaque version for optimistic concurrency (AIP-154); echo on cancel.
-	Etag          string `protobuf:"bytes,14,opt,name=etag,proto3" json:"etag,omitempty"`
+	Etag string `protobuf:"bytes,14,opt,name=etag,proto3" json:"etag,omitempty"`
+	// The reservation this one replaced, set when it was made by
+	// RescheduleReservation.
+	// Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+	Replaces string `protobuf:"bytes,15,opt,name=replaces,proto3" json:"replaces,omitempty"`
+	// The reservation replacing this one, set when RescheduleReservation began.
+	// Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+	ReplacedBy    string `protobuf:"bytes,16,opt,name=replaced_by,json=replacedBy,proto3" json:"replaced_by,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -209,11 +216,25 @@ func (x *Reservation) GetEtag() string {
 	return ""
 }
 
+func (x *Reservation) GetReplaces() string {
+	if x != nil {
+		return x.Replaces
+	}
+	return ""
+}
+
+func (x *Reservation) GetReplacedBy() string {
+	if x != nil {
+		return x.ReplacedBy
+	}
+	return ""
+}
+
 var File_freebusy_reservation_v1_reservation_proto protoreflect.FileDescriptor
 
 const file_freebusy_reservation_v1_reservation_proto_rawDesc = "" +
 	"\n" +
-	")freebusy/reservation/v1/reservation.proto\x12\x17freebusy.reservation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a#freebusy/reservation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\xb9\b\n" +
+	")freebusy/reservation/v1/reservation.proto\x12\x17freebusy.reservation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a#freebusy/reservation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\x80\t\n" +
 	"\vReservation\x12O\n" +
 	"\x04name\x18\x01 \x01(\tB;\xe0A\b\xbaH5\xd8\x01\x01r02.^organizationalUnits/[^/]+/reservations/[^/]+$R\x04name\x12n\n" +
 	"\x04hold\x18\x02 \x01(\tBZ\xe0A\x02\xe0A\x05\xfaA\x1d\n" +
@@ -237,7 +258,10 @@ const file_freebusy_reservation_v1_reservation_proto_rawDesc = "" +
 	"\fconfirm_time\x18\f \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\vconfirmTime\x12@\n" +
 	"\vcancel_time\x18\r \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
 	"cancelTime\x12\x17\n" +
-	"\x04etag\x18\x0e \x01(\tB\x03\xe0A\x03R\x04etag:\x90\x01\xeaA\x86\x01\n" +
+	"\x04etag\x18\x0e \x01(\tB\x03\xe0A\x03R\x04etag\x12\x1f\n" +
+	"\breplaces\x18\x0f \x01(\tB\x03\xe0A\x03R\breplaces\x12$\n" +
+	"\vreplaced_by\x18\x10 \x01(\tB\x03\xe0A\x03R\n" +
+	"replacedBy:\x90\x01\xeaA\x86\x01\n" +
 	"#freebusy.reservation.v1/Reservation\x12DorganizationalUnits/{organizational_unit}/reservations/{reservation}*\freservations2\vreservation\xca\xf3\x18\x02\x18\x01B\x94\x02\n" +
 	"\x1bcom.freebusy.reservation.v1B\x10ReservationProtoP\x01Zegithub.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
 

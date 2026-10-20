@@ -9,6 +9,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/lib/pq"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/allocation"
 	rfcavail "github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/availability"
@@ -322,10 +323,23 @@ func (s *Store) InsertHold(ctx context.Context, parent string, h *allocationpbv1
 	if errors.Is(err, types.ErrConflict) {
 		return nil, err
 	}
+	if uniqueViolation(err) {
+		return nil, types.ErrAlreadyExists
+	}
 	if err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return s.GetHold(ctx, h.GetName())
+}
+
+// uniqueViolation reports a Postgres unique-constraint failure (SQLSTATE
+// 23505). repox.MapGormErr only recognises gorm.ErrDuplicatedKey, which GORM
+// produces solely when the connection opts into TranslateError -- and
+// freebusy's does not -- so a hold name taken twice would otherwise surface as
+// Internal instead of "already exists".
+func uniqueViolation(err error) bool {
+	var pg *pgconn.PgError
+	return errors.As(err, &pg) && pg.Code == "23505"
 }
 
 // GetHold reads one hold.

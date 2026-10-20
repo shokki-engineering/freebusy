@@ -29,6 +29,12 @@ enum ReservationState {
   /// The hold lapsed or was released before it could be converted, so nothing was taken. Terminal.
   FAILED
 
+  /// Being replaced by the reservation named in `replaced_by`. Transient: it keeps its resources until the replacement is confirmed, then becomes RESCHEDULED -- or returns to CONFIRMED if the replacement's hold lapsed.
+  RESCHEDULING
+
+  /// Replaced by `replaced_by`, which now holds the booking; this one's resources are free. Terminal.
+  RESCHEDULED
+
   /// Maps the enum to the "reservation_state" type in the database.
   @@map("reservation_state")
   /// Maps the enum to the "reservation" schema in the database.

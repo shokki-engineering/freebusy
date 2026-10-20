@@ -44,6 +44,10 @@ type CreateInput struct {
 	Name string `json:"name"`
 	// OrganizationalUnitId sets the "organizationalUnitId" column (required).
 	OrganizationalUnitId string `json:"organizationalUnitId"`
+	// ReplacedBy sets the "replacedBy" column; the zero value is omitted (column default / NULL).
+	ReplacedBy string `json:"replacedBy,omitzero"`
+	// Replaces sets the "replaces" column; the zero value is omitted (column default / NULL).
+	Replaces string `json:"replaces,omitzero"`
 	// Resources sets the "resources" column; the zero value is omitted (column default / NULL).
 	Resources []*string `json:"resources,omitzero"`
 	// StartTime sets the "startTime" column; the zero value is omitted (column default / NULL).
@@ -80,6 +84,10 @@ type UpdateInput struct {
 	Name graphql.Nullable[string] `json:"name"`
 	// Update the 'organizational_unit_id' column in the 'reservation_resource' collection.
 	OrganizationalUnitId graphql.Nullable[string] `json:"organizationalUnitId"`
+	// Update the 'replaced_by' column in the 'reservation_resource' collection.
+	ReplacedBy graphql.Nullable[string] `json:"replacedBy"`
+	// Update the 'replaces' column in the 'reservation_resource' collection.
+	Replaces graphql.Nullable[string] `json:"replaces"`
 	// Update the 'resources' column in the 'reservation_resource' collection.
 	Resources graphql.Nullable[[]*string] `json:"resources"`
 	// Update the 'start_time' column in the 'reservation_resource' collection.

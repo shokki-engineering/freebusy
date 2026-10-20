@@ -3,6 +3,7 @@ package allocation
 import (
 	"context"
 	"errors"
+	"sync"
 	"testing"
 	"time"
 
@@ -439,5 +440,30 @@ func TestConvertIdempotentAndEndConversion(t *testing.T) {
 	got, _ := f.srv.LookupHold(ctx(), h.GetName())
 	if got.GetState() != allocationpbv1.HoldState_HOLD_STATE_CONVERTED {
 		t.Fatalf("ended hold should stay CONVERTED, got %v", got.GetState())
+	}
+}
+
+func TestConcurrentIdempotentCreatesTakeOneHold(t *testing.T) {
+	f := newFixture(t)
+	f.share()
+	var wg sync.WaitGroup
+	names := make([]string, 8)
+	errs := make([]error, 8)
+	for i := range 8 {
+		wg.Go(func() {
+			h, err := f.srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
+				Parent: club, Hold: &allocationpbv1.Hold{Window: win(10, 11), IdempotencyKey: "cart-7"},
+			})
+			names[i], errs[i] = h.GetName(), err
+		})
+	}
+	wg.Wait()
+	for i := range 8 {
+		if errs[i] != nil || names[i] != names[0] {
+			t.Fatalf("caller %d: %q %v", i, names[i], errs[i])
+		}
+	}
+	if len(f.store.holds) != 1 {
+		t.Fatalf("%d holds taken for one idempotency key", len(f.store.holds))
 	}
 }

@@ -12,4 +12,4 @@ Schema file: [`enums.postgres.prisma`](./enums.postgres.prisma)
 
 ### Enums
 
-- `ReservationState`: PENDING, CONFIRMED, CANCELLING, CANCELLED, FAILED
+- `ReservationState`: PENDING, CONFIRMED, CANCELLING, CANCELLED, FAILED, RESCHEDULING, RESCHEDULED

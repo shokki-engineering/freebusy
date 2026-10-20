@@ -3,7 +3,10 @@ package gorm
 
 import (
 	"context"
+	"errors"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/reservation"
 	resrepo "github.com/oh-tarnished/freebusy/internal/database/repository/freebusy/reservation"
@@ -50,9 +53,22 @@ func (s *Store) Insert(ctx context.Context, r *reservationpbv1.Reservation) (*re
 	m.HoldID = repox.LastSegment(r.GetHold())
 	m.Etag = repox.Ptr(repox.NewULID())
 	if err := s.db.WithContext(ctx).Create(m).Error; err != nil {
+		if uniqueViolation(err) {
+			return nil, types.ErrAlreadyExists
+		}
 		return nil, repox.MapGormErr(err)
 	}
 	return s.Get(ctx, r.GetName())
+}
+
+// uniqueViolation reports a Postgres unique-constraint failure (SQLSTATE
+// 23505). repox.MapGormErr only recognises gorm.ErrDuplicatedKey, which GORM
+// produces solely when the connection opts into TranslateError -- and
+// freebusy's does not -- so two concurrent creates of one reservation would
+// otherwise surface the loser as Internal instead of "already exists".
+func uniqueViolation(err error) bool {
+	var pg *pgconn.PgError
+	return errors.As(err, &pg) && pg.Code == "23505"
 }
 
 // Transition is one conditional UPDATE: the state and etag checks are in its
@@ -76,6 +92,13 @@ func (s *Store) Transition(ctx context.Context, name, etag string, from []reserv
 	if c.CancelReason != "" {
 		set["cancel_reason"] = c.CancelReason
 	}
+	if c.ReplacedBy != nil {
+		if *c.ReplacedBy == "" {
+			set["replaced_by"] = nil
+		} else {
+			set["replaced_by"] = *c.ReplacedBy
+		}
+	}
 	q := s.db.WithContext(ctx).Model(&reservation.Reservation{}).Where("name = ? AND state IN ?", name, states)
 	if etag != "" {
 		q = q.Where("etag = ?", etag)
@@ -97,7 +120,7 @@ func (s *Store) Transition(ctx context.Context, name, etag string, from []reserv
 func (s *Store) Stuck(ctx context.Context, cutoff time.Time, limit int) ([]*reservationpbv1.Reservation, error) {
 	var rows []reservation.Reservation
 	err := s.db.WithContext(ctx).
-		Where("state IN ? AND update_time < ?", []reservation.ReservationState{reservation.ReservationStatePending, reservation.ReservationStateCancelling}, cutoff).
+		Where("state IN ? AND update_time < ?", []reservation.ReservationState{reservation.ReservationStatePending, reservation.ReservationStateCancelling, reservation.ReservationStateRescheduling}, cutoff).
 		Order("update_time").Limit(limit).Find(&rows).Error
 	if err != nil {
 		return nil, repox.MapGormErr(err)

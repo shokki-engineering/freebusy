@@ -10197,6 +10197,18 @@ definition:
               type:
                 name: text
                 type: named
+            replaced_by:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            replaces:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
             resources:
               type:
                 type: nullable
@@ -14965,6 +14977,18 @@ definition:
               type:
                 name: text
                 type: named
+            replaced_by:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            replaces:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
             resources:
               type:
                 type: nullable
@@ -24190,6 +24214,28 @@ definition:
                 name: text
                 type: named
           foreign_keys: {}
+        update_column_reservation_resource_replaced_by:
+          description: Update the 'replaced_by' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_reservation_resource_replaces:
+          description: Update the 'replaces' column in the 'reservation_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
         update_column_reservation_resource_resources:
           description: Update the 'resources' column in the 'reservation_resource' collection
           fields:
@@ -32978,6 +33024,20 @@ definition:
                 type: nullable
                 underlying_type:
                   name: update_column_reservation_resource_organizational_unit_id
+                  type: named
+            replaced_by:
+              description: Update the 'replaced_by' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_replaced_by
+                  type: named
+            replaces:
+              description: Update the 'replaces' column in the 'reservation_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_reservation_resource_replaces
                   type: named
             resources:
               description: Update the 'resources' column in the 'reservation_resource' collection.

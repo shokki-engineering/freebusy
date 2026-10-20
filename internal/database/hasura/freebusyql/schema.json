@@ -39840,6 +39840,26 @@
           "defaultValue": null
         },
         {
+          "name": "replacedBy",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "replaces",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
           "name": "resources",
           "description": "",
           "type": {
@@ -98576,6 +98596,26 @@
           }
         },
         {
+          "name": "replacedBy",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
+          "name": "replaces",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
           "name": "resources",
           "description": "",
           "args": [],
@@ -98816,6 +98856,34 @@
           }
         },
         {
+          "name": "replacedBy",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "replaces",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
           "name": "startTime",
           "description": "",
           "args": [],
@@ -99035,6 +99103,26 @@
           "defaultValue": null
         },
         {
+          "name": "replacedBy",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "replaces",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
           "name": "startTime",
           "description": "",
           "type": {
@@ -99244,6 +99332,26 @@
         },
         {
           "name": "organizationalUnitId",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "replacedBy",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "replaces",
           "description": "",
           "type": {
             "kind": "ENUM",
@@ -140873,6 +140981,46 @@
     },
     {
       "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceReplacedByInput",
+      "description": "Update the 'replaced_by' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceReplacesInput",
+      "description": "Update the 'replaces' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
       "name": "UpdateColumnReservationResourceResourcesInput",
       "description": "Update the 'resources' column in the 'reservation_resource' collection",
       "fields": null,
@@ -157649,6 +157797,26 @@
           "type": {
             "kind": "INPUT_OBJECT",
             "name": "UpdateColumnReservationResourceOrganizationalUnitIdInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "replacedBy",
+          "description": "Update the 'replaced_by' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceReplacedByInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "replaces",
+          "description": "Update the 'replaces' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceReplacesInput",
             "ofType": null
           },
           "defaultValue": null

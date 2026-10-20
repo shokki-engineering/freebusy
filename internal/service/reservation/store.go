@@ -25,6 +25,9 @@ type Change struct {
 	ConfirmTime  *time.Time
 	CancelTime   *time.Time
 	CancelReason string
+	// ReplacedBy sets replaced_by when non-nil; pointing at "" clears it, which
+	// is how a move that fell through is undone.
+	ReplacedBy *string
 }
 
 // Store persists reservations. Implementations exist for GORM and Hasura;
@@ -46,8 +49,8 @@ type Store interface {
 	// racing cancels, or a cancel racing the reconciler, safe.
 	Transition(ctx context.Context, name, etag string, from []reservationpbv1.ReservationState, c Change) (*reservationpbv1.Reservation, error)
 
-	// Stuck returns up to limit reservations, across every site, left PENDING
-	// or CANCELLING since before cutoff.
+	// Stuck returns up to limit reservations, across every site, left PENDING,
+	// CANCELLING or RESCHEDULING since before cutoff.
 	Stuck(ctx context.Context, cutoff time.Time, limit int) ([]*reservationpbv1.Reservation, error)
 }
 

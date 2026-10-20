@@ -36,6 +36,10 @@ const (
 	ReservationStateCancelled ReservationState = "CANCELLED"
 	// The hold lapsed or was released before it could be converted, so nothing was taken. Terminal.
 	ReservationStateFailed ReservationState = "FAILED"
+	// Being replaced by the reservation named in `replaced_by`. Transient: it keeps its resources until the replacement is confirmed, then becomes RESCHEDULED -- or returns to CONFIRMED if the replacement's hold lapsed.
+	ReservationStateRescheduling ReservationState = "RESCHEDULING"
+	// Replaced by `replaced_by`, which now holds the booking; this one's resources are free. Terminal.
+	ReservationStateRescheduled ReservationState = "RESCHEDULED"
 )
 
 // A Reservation is a confirmed booking: a hold made permanent. It is the last step of booking, not the first. The caller checks availability, takes a hold, settles whatever its vertical needs settled -- payment, a guest list, a waiver -- and then creates a reservation from the hold. The reservation records the outcome; the engine already holds the resources. Deliberately thin. scheduling.v1's Booking carried price, discount, promo code, refund, guests and occupancy, which made it a hotel booking. None of that is here: money belongs to the payment service and people to the user service, both referenced by name (AIP-215), and anything else a vertical needs to remember rides in `attributes`.
@@ -53,7 +57,7 @@ type Reservation struct {
 	// Who the reservation is for, by name in the user service. Format: users/{user}
 	Customer *string `gorm:"column:customer;index:idx_resource_customer_trgm,type:gin,expression:customer gin_trgm_ops" json:"customer,omitempty"`
 	// Lifecycle state.
-	State *ReservationState `gorm:"column:state;default:'PENDING';check:chk_resource_state,state IN ('PENDING','CONFIRMED','CANCELLING','CANCELLED','FAILED')" json:"state,omitempty"`
+	State *ReservationState `gorm:"column:state;default:'PENDING';check:chk_resource_state,state IN ('PENDING','CONFIRMED','CANCELLING','CANCELLED','FAILED','RESCHEDULING','RESCHEDULED')" json:"state,omitempty"`
 	// Whatever a vertical needs to keep with the reservation: a party size, a payment reference, a licence plate. Opaque to the engine.
 	Attributes json.RawMessage `gorm:"column:attributes;type:jsonb" json:"attributes,omitempty"`
 	// Why it was cancelled, in the canceller's words. Set by CancelReservation.
@@ -68,6 +72,10 @@ type Reservation struct {
 	CancelTime *time.Time `gorm:"column:cancel_time;type:timestamptz" json:"cancel_time,omitempty"`
 	// Opaque version for optimistic concurrency (AIP-154); echo on cancel.
 	Etag *string `gorm:"column:etag" json:"etag,omitempty"`
+	// The reservation this one replaced, set when it was made by RescheduleReservation. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+	Replaces *string `gorm:"column:replaces" json:"replaces,omitempty"`
+	// The reservation replacing this one, set when RescheduleReservation began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+	ReplacedBy *string `gorm:"column:replaced_by" json:"replaced_by,omitempty"`
 	// Parent reference to OrganizationalUnit (from the AIP resource pattern). TODO: unresolved reference to OrganizationalUnit (not in this generation set); kept as a plain indexed column.
 	OrganizationalUnitID string `gorm:"column:organizational_unit_id;not null;index:idx_resource_organizational_unit_id" json:"organizational_unit_id" validate:"required"`
 	// The resources taken, copied from the hold. Format: resources/{resource}

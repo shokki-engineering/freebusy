@@ -28,6 +28,10 @@ definition:
       type: String_1!
     - name: organizationalUnitId
       type: String_1!
+    - name: replacedBy
+      type: String_1
+    - name: replaces
+      type: String_1
     - name: resources
       type: "[String_1]"
     - name: startTime
@@ -79,6 +83,12 @@ definition:
         organizationalUnitId:
           column:
             name: organizational_unit_id
+        replacedBy:
+          column:
+            name: replaced_by
+        replaces:
+          column:
+            name: replaces
         resources:
           column:
             name: resources
@@ -113,6 +123,8 @@ definition:
           - id
           - name
           - organizationalUnitId
+          - replacedBy
+          - replaces
           - resources
           - startTime
           - state
@@ -150,6 +162,10 @@ definition:
         - fieldName: name
           booleanExpressionType: TextBoolExp
         - fieldName: organizationalUnitId
+          booleanExpressionType: TextBoolExp
+        - fieldName: replacedBy
+          booleanExpressionType: TextBoolExp
+        - fieldName: replaces
           booleanExpressionType: TextBoolExp
         - fieldName: startTime
           booleanExpressionType: TimestamptzBoolExp
@@ -198,6 +214,10 @@ definition:
           aggregateExpression: TextAggExp
         - fieldName: organizationalUnitId
           aggregateExpression: TextAggExp
+        - fieldName: replacedBy
+          aggregateExpression: TextAggExp
+        - fieldName: replaces
+          aggregateExpression: TextAggExp
         - fieldName: startTime
           aggregateExpression: TimestamptzAggExp
         - fieldName: state
@@ -242,6 +262,10 @@ definition:
         - fieldName: name
           orderByExpression: String1OrderByExp
         - fieldName: organizationalUnitId
+          orderByExpression: String1OrderByExp
+        - fieldName: replacedBy
+          orderByExpression: String1OrderByExp
+        - fieldName: replaces
           orderByExpression: String1OrderByExp
         - fieldName: startTime
           orderByExpression: TimestamptzOrderByExp
