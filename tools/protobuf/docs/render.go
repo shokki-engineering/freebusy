@@ -108,7 +108,7 @@ func generateReadme(mod Module) (err error) {
 	}
 
 	_, _ = fmt.Fprintf(w, "---\n\n")
-	_, _ = fmt.Fprintf(w, "© 2026 shokki-engineering | Apache 2.0 License\n")
+	_, _ = fmt.Fprintf(w, "© 2026 Srikanth K | Apache 2.0 License\n")
 
 	// bufio.Writer accumulates a sticky error across all the writes above;
 	// Flush surfaces it as the single write-error checkpoint.

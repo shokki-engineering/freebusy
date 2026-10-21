@@ -590,6 +590,9 @@ Ready to build on. Not built yet:
 
 ## Licence
 
+Copyright © 2026 Srikanth K. All rights reserved, except as granted by the
+licences below.
+
 Dual-licensed.
 
 - **[AGPL-3.0-or-later](./LICENSE)** — free for open-source work, forever.
@@ -608,4 +611,4 @@ sign off every commit (`git commit -s`).
 
 ---
 
-© 2026 shokki-engineering
+© 2026 Srikanth K. All rights reserved.

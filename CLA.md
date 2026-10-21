@@ -25,11 +25,12 @@ authorised by the copyright owner, entering into this agreement.
 "Contribution" means any original work of authorship you intentionally submit
 for inclusion in this project.
 
-**2. Copyright licence.** You grant the project maintainer a perpetual,
-worldwide, non-exclusive, irrevocable, royalty-free licence to reproduce,
-prepare derivative works of, publicly display and perform, sublicense, and
-distribute your Contribution and such derivative works, **under any licence
-terms, including proprietary terms**. This is what makes dual-licensing possible.
+**2. Copyright licence.** You grant Srikanth K, the copyright holder and
+maintainer of freebusy, a perpetual, worldwide, non-exclusive, irrevocable,
+royalty-free licence to reproduce, prepare derivative works of, publicly
+display and perform, sublicense, and distribute your Contribution and such
+derivative works, **under any licence terms, including proprietary terms**.
+This is what makes dual-licensing possible.
 
 **3. Patent licence.** You grant a perpetual, worldwide, non-exclusive,
 irrevocable, royalty-free patent licence to make, use, sell, offer to sell,

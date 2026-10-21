@@ -30,4 +30,4 @@ graph LR
 
 ---
 
-© 2026 shokki-engineering | Apache 2.0 License
+© 2026 Srikanth K | Apache 2.0 License

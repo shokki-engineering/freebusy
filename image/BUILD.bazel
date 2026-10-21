@@ -43,6 +43,8 @@ ARCHS = [
         "org.opencontainers.image.description": "Generic availability and booking engine.",
         "org.opencontainers.image.source": "https://github.com/shokki-engineering/freebusy",
         "org.opencontainers.image.licenses": "AGPL-3.0-or-later",
+        "org.opencontainers.image.authors": "Srikanth K",
+        "org.opencontainers.image.vendor": "Srikanth K",
     },
     os = "linux",
     tars = [":layer_" + arch],

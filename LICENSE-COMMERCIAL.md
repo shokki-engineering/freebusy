@@ -1,6 +1,7 @@
 # Commercial licence
 
-freebusy is dual-licensed.
+freebusy is copyright © 2026 Srikanth K, who holds all rights in it and is the
+only party who can grant a commercial licence. It is dual-licensed.
 
 | You are | Your licence | Cost |
 |---|---|---|
@@ -52,13 +53,13 @@ is proprietary it needs a commercial licence.
 
 ## Getting one
 
-Open an issue titled `commercial licence` or contact the maintainer through the
-repository. Include roughly what you are building and how you intend to deploy
+Open an issue titled `commercial licence`, or contact Srikanth K, the copyright
+holder, through the repository. Include roughly what you are building and how you intend to deploy
 it — that is usually enough to size it.
 
 ---
 
 **This file describes the offer. It is not itself a contract**, and it does not
-grant rights. An executed commercial agreement does. Nothing here is legal
+grant rights. An executed commercial agreement with Srikanth K does. Nothing here is legal
 advice; if the licensing boundary matters to your business, have a lawyer read
 both this and the AGPL before you rely on either.

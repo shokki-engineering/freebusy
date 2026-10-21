@@ -1,0 +1,14 @@
+freebusy
+Copyright © 2026 Srikanth K. All rights reserved.
+
+freebusy is licensed under the GNU Affero General Public License, version 3
+or later (LICENSE), or under a commercial licence from Srikanth K
+(LICENSE-COMMERCIAL.md). No other rights are granted.
+
+The protobuf contract and the code generated from it, under protobuf/, are
+licensed separately under the Apache License, Version 2.0 (protobuf/LICENSE,
+protobuf/NOTICE).
+
+Generated files under protobuf/generated/ may carry the header of the code
+generator that produced them; that header names the generator's authors, not
+the owner of the generated output.
