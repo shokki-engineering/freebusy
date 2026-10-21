@@ -25,7 +25,7 @@ var telemetryConfigData []byte
 
 var (
 	Telemetry *telemetry.Telemetry // Telemetry is the singleton client initialised at package load time.
-	once      sync.Once                      // once is used to ensure that the client is initialised only once.
+	once      sync.Once            // once is used to ensure that the client is initialised only once.
 )
 
 func init() {
