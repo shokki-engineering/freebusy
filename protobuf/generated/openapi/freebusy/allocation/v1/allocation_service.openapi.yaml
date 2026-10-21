@@ -406,7 +406,7 @@ components:
                     items:
                         type: string
                     description: |-
-                        Restrict to sites, e.g. one car park or one hotel. Empty searches all.
+                        Restrict to sites, e.g. one car park or one venue. Empty searches all.
                          Format: organizationalUnits/{organizational_unit}
                 resourceTypes:
                     type: array

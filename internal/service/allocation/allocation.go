@@ -162,7 +162,7 @@ func (s *Server) BatchComputeAvailability(ctx context.Context, req *allocationpb
 
 // SearchAvailability sweeps an operator's sites for resources free across a
 // window. A site matches only if it has `quantity` free together, so a family
-// asking for three rooms is never shown a hotel with one.
+// asking for three rooms is never shown a site with one.
 func (s *Server) SearchAvailability(ctx context.Context, req *allocationpbv1.SearchAvailabilityRequest) (*allocationpbv1.SearchAvailabilityResponse, error) {
 	var out *allocationpbv1.SearchAvailabilityResponse
 	err := rpc.Traced(ctx, "AllocationService", "SearchAvailability", func(ctx context.Context) error {

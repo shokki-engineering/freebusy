@@ -442,7 +442,7 @@ type SearchAvailabilityRequest struct {
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// The window that must be free.
 	Window *interval.Interval `protobuf:"bytes,2,opt,name=window,proto3" json:"window,omitempty"`
-	// Restrict to sites, e.g. one car park or one hotel. Empty searches all.
+	// Restrict to sites, e.g. one car park or one venue. Empty searches all.
 	// Format: organizationalUnits/{organizational_unit}
 	OrganizationalUnits []string `protobuf:"bytes,3,rep,name=organizational_units,json=organizationalUnits,proto3" json:"organizational_units,omitempty"`
 	// Restrict to RESOURCE-TYPE values, RFC 9073 section 6.3, e.g. "room" or

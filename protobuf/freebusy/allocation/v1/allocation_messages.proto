@@ -151,7 +151,7 @@ message SearchAvailabilityRequest {
     (buf.validate.field).required = true
   ];
 
-  // Restrict to sites, e.g. one car park or one hotel. Empty searches all.
+  // Restrict to sites, e.g. one car park or one venue. Empty searches all.
   // Format: organizationalUnits/{organizational_unit}
   repeated string organizational_units = 3 [
     (google.api.field_behavior) = OPTIONAL,

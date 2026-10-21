@@ -280,7 +280,7 @@ components:
         answers for one site already chosen.
       properties:
         organizationalUnits:
-          description: 'Restrict to sites, e.g. one car park or one hotel. Empty searches
+          description: 'Restrict to sites, e.g. one car park or one venue. Empty searches
             all. Format: organizationalUnits/{organizational_unit}'
           items:
             type: string

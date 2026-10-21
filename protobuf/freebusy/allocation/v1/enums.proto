@@ -42,7 +42,7 @@ enum AvailabilityGranularity {
   AVAILABILITY_GRANULARITY_SLOT = 1;
 
   // One bucket per calendar day in the target time zone, for overnight
-  // bookings: hotel rooms, daily parking.
+  // bookings: rooms, daily parking, multi-day rentals.
   AVAILABILITY_GRANULARITY_DAY = 2;
 }
 

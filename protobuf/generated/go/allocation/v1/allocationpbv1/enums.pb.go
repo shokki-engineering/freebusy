@@ -99,7 +99,7 @@ const (
 	// courts, equipment.
 	AvailabilityGranularity_AVAILABILITY_GRANULARITY_SLOT AvailabilityGranularity = 1
 	// One bucket per calendar day in the target time zone, for overnight
-	// bookings: hotel rooms, daily parking.
+	// bookings: rooms, daily parking, multi-day rentals.
 	AvailabilityGranularity_AVAILABILITY_GRANULARITY_DAY AvailabilityGranularity = 2
 )
 

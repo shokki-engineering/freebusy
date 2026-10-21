@@ -23,7 +23,7 @@ ReservationService turns holds into confirmed bookings and cancels them.  It is 
 
 ### Reservation
 
-A Reservation is a confirmed booking: a hold made permanent.  It is the last step of booking, not the first. The caller checks availability, takes a hold, settles whatever its vertical needs settled -- payment, a guest list, a waiver -- and then creates a reservation from the hold. The reservation records the outcome; the engine already holds the resources.  Deliberately thin. Price, discount, promo code, refund, guests and occupancy are what would make it a hotel booking, and none of them is here: money belongs to the payment service and people to the user service, both referenced by name (AIP-215), and anything else a vertical needs to remember rides in `attributes`.
+A Reservation is a confirmed booking: a hold made permanent.  It is the last step of booking, not the first. The caller checks availability, takes a hold, settles whatever its vertical needs settled -- payment, a guest list, a waiver -- and then creates a reservation from the hold. The reservation records the outcome; the engine already holds the resources.  Deliberately thin. Price, discount, promo code, refund, guests and occupancy are what would tie it to one vertical, and none of them is here: money belongs to the payment service and people to the user service, both referenced by name (AIP-215), and anything else a vertical needs to remember rides in `attributes`.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |

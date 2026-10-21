@@ -1,7 +1,7 @@
 // Package engine is the availability engine's arithmetic: what was offered, what
 // has been taken, and what is left, for any bookable thing over any window.
 //
-// It knows nothing about hotels, courts or car parks, and nothing about storage.
+// It knows nothing about rooms, courts or car parks, and nothing about storage.
 // Callers hand it plain values -- a resource's RFC 7953 availability, the spans
 // already claimed on it, the policy it was published with -- and get spans back.
 // Every vertical fact the engine needs arrives as one of those values, which is

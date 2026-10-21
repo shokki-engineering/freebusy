@@ -1,26 +1,20 @@
 # Telemetry configuration for the freebusy service.
 #
 # This file is embedded in the binary and holds defaults. The values that vary
-# per deployment — the OTLP collector endpoint, the environment, and the
-# hotel-property labels — are overridden at runtime from environment variables
-# (see shared/telemetry.go), so the same binary serves every property without
-# a rebuild.
+# per deployment — the OTLP collector endpoint, the environment, and the site
+# labels — are overridden at runtime from environment variables (see
+# shared/telemetry.go), so the same binary serves every deployment without a
+# rebuild.
 
 [service]
 name = "freebusy"
 version = "1.0.0"
 environment = "development"
-description = "Booking and promo-code service for the freebusy platform."
+description = "Generic availability and booking engine."
 
-# Global attributes added to ALL telemetry (logs, metrics, traces). Here they
-# identify the hotel property this instance serves. Override per deployment
-# with FREEBUSY_PROPERTY / FREEBUSY_PROPERTY_NAME (see shared/telemetry.go).
-[service.labels]
-brand = "hilton"
-property = "doubletree-del-mar-san-diego"
-property_name = "DoubleTree by Hilton Hotel San Diego - Del Mar"
-city = "san-diego"
-region = "us-west"
+# Attributes added to all telemetry (logs, metrics, traces) come from the
+# deployment, not from here: FREEBUSY_SITE and FREEBUSY_SITE_NAME label what
+# this instance serves (see shared/telemetry.go).
 
 [telemetry]
 enabled = true

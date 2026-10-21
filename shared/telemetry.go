@@ -57,13 +57,13 @@ func init() {
 
 // applyDeploymentOverrides layers per-deployment values over the embedded
 // opentelementry.toml defaults, so one binary serves every environment and
-// hotel property without a rebuild. Each override is optional — an unset
+// deployment without a rebuild. Each override is optional — an unset
 // variable leaves the embedded default in place.
 //
 //	FREEBUSY_TELEMETRY_ENVIRONMENT  deployment environment (development|staging|production)
 //	FREEBUSY_OTLP_ENDPOINT          OTLP collector as host:port
-//	FREEBUSY_PROPERTY               property label slug (e.g. "doubletree-del-mar-san-diego")
-//	FREEBUSY_PROPERTY_NAME          human-readable property name
+//	FREEBUSY_SITE                   label slug for what this deployment serves (e.g. "riverside-club")
+//	FREEBUSY_SITE_NAME              human-readable name for it
 func applyDeploymentOverrides(b *opentelementry.Builder) {
 	if env := os.Getenv("FREEBUSY_TELEMETRY_ENVIRONMENT"); env != "" {
 		b.WithEnvironment(options.Environment(env))
@@ -76,11 +76,11 @@ func applyDeploymentOverrides(b *opentelementry.Builder) {
 		}
 	}
 	labels := map[string]string{}
-	if v := os.Getenv("FREEBUSY_PROPERTY"); v != "" {
-		labels["property"] = v
+	if v := os.Getenv("FREEBUSY_SITE"); v != "" {
+		labels["site"] = v
 	}
-	if v := os.Getenv("FREEBUSY_PROPERTY_NAME"); v != "" {
-		labels["property_name"] = v
+	if v := os.Getenv("FREEBUSY_SITE_NAME"); v != "" {
+		labels["site_name"] = v
 	}
 	if len(labels) > 0 {
 		b.WithLabels(labels)

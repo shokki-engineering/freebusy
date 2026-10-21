@@ -1461,7 +1461,7 @@ components:
           items:
             type: string
           description: |-
-            Restrict to sites, e.g. one car park or one hotel. Empty searches all.
+            Restrict to sites, e.g. one car park or one venue. Empty searches all.
              Format: organizationalUnits/{organizational_unit}
         resourceTypes:
           type: array
@@ -1825,7 +1825,7 @@ components:
          resources.
 
          Deliberately thin. Price, discount, promo code, refund, guests and occupancy
-         are what would make it a hotel booking, and none of them is here: money belongs to the payment service and people to the user
+         are what would tie it to one vertical, and none of them is here: money belongs to the payment service and people to the user
          service, both referenced by name (AIP-215), and anything else a vertical
          needs to remember rides in `attributes`.
     Delivery:

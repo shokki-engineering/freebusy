@@ -165,7 +165,7 @@ Request message for AllocationService.SearchAvailability. Sweeps a whole operato
 | --- | --- | --- | --- |
 | `parent` | `string` | `REQUIRED` | The operator to search within. Format: organizations/{organization} |
 | `window` | `Interval` | `REQUIRED` | The window that must be free. |
-| `organizational_units` | `repeated string` | `OPTIONAL` | Restrict to sites, e.g. one car park or one hotel. Empty searches all. Format: organizationalUnits/{organizational_unit} |
+| `organizational_units` | `repeated string` | `OPTIONAL` | Restrict to sites, e.g. one car park or one venue. Empty searches all. Format: organizationalUnits/{organizational_unit} |
 | `resource_types` | `repeated string` | `OPTIONAL` | Restrict to RESOURCE-TYPE values, RFC 9073 section 6.3, e.g. "room" or "parking-bay". Empty matches every type. |
 | `quantity` | `int32` | `OPTIONAL` | How many resources must be free together at one site for it to match. Defaults to 1. |
 | `page_size` | `int32` | `OPTIONAL` | Maximum matches to return. Defaults to 50, capped at 1000. |
@@ -268,7 +268,7 @@ The slicing of an availability answer over a window.
 | --- | --- | --- |
 | `AVAILABILITY_GRANULARITY_UNSPECIFIED` | 0 | Default; the server picks DAY for windows longer than 48 hours and SLOT below that. |
 | `AVAILABILITY_GRANULARITY_SLOT` | 1 | One bucket per slot of slot_duration, for hourly bookings: meeting rooms, courts, equipment. |
-| `AVAILABILITY_GRANULARITY_DAY` | 2 | One bucket per calendar day in the target time zone, for overnight bookings: hotel rooms, daily parking. |
+| `AVAILABILITY_GRANULARITY_DAY` | 2 | One bucket per calendar day in the target time zone, for overnight bookings: rooms, daily parking, multi-day rentals. |
 
 ### UnbookableReasonCode
 

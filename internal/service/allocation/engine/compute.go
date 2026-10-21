@@ -133,7 +133,7 @@ var ErrTooManyBuckets = errors.New("engine: window and granularity produce too m
 // trailing partial slot: half a padel booking is not a booking.
 //
 // DAY cuts one bucket per local day, anchored at the window's own start time of
-// day rather than at midnight. A hotel asked "15:00 on the 1st to 11:00 on the
+// day rather than at midnight. A stay asked "15:00 on the 1st to 11:00 on the
 // 5th" means four nights running 15:00 to 15:00, the last cut short at 11:00; a
 // car park asked "midnight to midnight" gets calendar days. Same code, and the
 // engine never has to know what a check-in time is. Steps are taken on the
