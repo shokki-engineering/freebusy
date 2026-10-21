@@ -13,6 +13,8 @@ import (
 	"context"
 	"time"
 
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
@@ -47,30 +49,6 @@ type ResourceRecord struct {
 	TimeZone string
 }
 
-// AvailabilityRecord is one stored RFC 7953 VAVAILABILITY, as instants. The
-// service re-reads each instant in the calendar's zone before expanding rules,
-// so the store never needs to know about zones.
-type AvailabilityRecord struct {
-	// Range is DTSTART..DTEND; a zero end is open-ended.
-	Range engine.Span
-	// RangeAllDay marks a Range given as RFC 5545 DATE values, whose instants
-	// carry only the date (at UTC midnight) and are re-read as local midnight.
-	RangeAllDay bool
-	Priority    int
-	Periods     []PeriodRecord
-}
-
-// PeriodRecord is one AVAILABLE sub-component, or one RFC 5545 event.
-type PeriodRecord struct {
-	Start time.Time
-	End   time.Time
-	// RRule is the unparsed recurrence rule, empty for a single occurrence.
-	RRule string
-	// AllDay marks Start and End as RFC 5545 DATE values: a date at UTC
-	// midnight, meaning local midnight in the calendar's zone, not an instant.
-	AllDay bool
-}
-
 // Claims are the spans live allocation rows hold against each resource.
 type Claims struct {
 	// Held is time claimed by ACTIVE holds whose expiry has not passed.
@@ -87,14 +65,15 @@ type Store interface {
 	Resources(ctx context.Context, q ResourceQuery) ([]ResourceRecord, error)
 
 	// Availability returns the RFC 7953 components on each calendar, keyed by
-	// calendar name. A calendar with none is absent from the map.
-	Availability(ctx context.Context, calendars []string) (map[string][]AvailabilityRecord, error)
+	// calendar name. A calendar with none is absent from the map. Times are
+	// read, in the calendar's zone, by the caller.
+	Availability(ctx context.Context, calendars []string) (map[string][]*availabilityv1.Availability, error)
 
 	// Events returns the busy RFC 5545 events on each calendar that may
 	// overlap window, keyed by calendar name: opaque, not cancelled. A
-	// recurring event is returned once with its rule; expansion is the
-	// caller's.
-	Events(ctx context.Context, calendars []string, window engine.Span) (map[string][]PeriodRecord, error)
+	// recurring event is returned once with its rule; expansion, through
+	// Occurrences, is the caller's.
+	Events(ctx context.Context, calendars []string, window engine.Span) (map[string][]*eventv1.Event, error)
 
 	// Claims returns the live allocation spans overlapping window on each
 	// resource, as of now.

@@ -1,12 +1,14 @@
 package allocation
 
 import (
+	"fmt"
+	"slices"
 	"strings"
 	"time"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
+	"github.com/oh-tarnished/freebusy/internal/types"
 	"google.golang.org/genproto/googleapis/type/date"
 	"google.golang.org/genproto/googleapis/type/datetime"
 	"google.golang.org/genproto/googleapis/type/dayofweek"
@@ -93,54 +95,103 @@ func RecurrenceFromProto(r *eventv1.Recurrence, loc *time.Location) (p Recurrenc
 	return p, unsupported
 }
 
-// EventRecord turns a stored event into the busy period the engine reads,
-// with its rule rendered for the expander. A DATE event with no end lasts the
-// day, RFC 5545 section 3.6.1.
-func EventRecord(e *eventv1.Event) PeriodRecord {
-	start, allDay, _ := Instant(e.GetStart(), time.UTC)
+// instantIn reads a stored DATE or DATE-TIME as the instant it means on a
+// calendar whose zone is loc: a DATE is local midnight there and a floating
+// DATE-TIME its wall clock there, while a zoned or offset DATE-TIME keeps its
+// own zone, so a rule expanded from it keeps that zone's wall clock across DST.
+func instantIn(t calendarTime, loc *time.Location) (at time.Time, allDay, ok bool) {
+	at, allDay, ok = Instant(t, loc)
+	if allDay {
+		at = time.Date(at.Year(), at.Month(), at.Day(), 0, 0, 0, 0, loc)
+	}
+	return at, allDay, ok
+}
+
+// EventSpan is the time one occurrence of e covers on a calendar in loc:
+// DTSTART to DTEND, or DTSTART plus DURATION, or the whole day for a DATE with
+// neither, RFC 5545 section 3.6.1.
+func EventSpan(e *eventv1.Event, loc *time.Location) (engine.Span, error) {
+	start, allDay, ok := instantIn(e.GetStart(), loc)
+	if !ok {
+		return engine.Span{}, fmt.Errorf("%w: %s has no start", types.ErrInvalidState, e.GetName())
+	}
 	end := start
 	switch {
 	case e.GetDuration() != nil:
 		end = start.Add(e.GetDuration().AsDuration())
 	case e.GetEnd() != nil:
-		end, _, _ = Instant(e.GetEnd(), time.UTC)
+		if end, _, ok = instantIn(e.GetEnd(), loc); !ok {
+			return engine.Span{}, fmt.Errorf("%w: %s has an empty end", types.ErrInvalidState, e.GetName())
+		}
 	case allDay:
 		end = start.Add(24 * time.Hour)
 	}
-	rec := PeriodRecord{Start: start, End: end, AllDay: allDay}
-	if r := e.GetRecurrence(); r != nil {
-		parts, _ := RecurrenceFromProto(r, time.UTC)
-		rec.RRule = parts.RRule()
-	}
-	return rec
+	return engine.Span{Start: start, End: end}, nil
 }
 
-// AvailabilityRecordOf turns a stored RFC 7953 component into the engine's
-// record: its range, priority, and AVAILABLE periods.
-func AvailabilityRecordOf(a *availabilityv1.Availability) AvailabilityRecord {
-	start, startDay, _ := Instant(a.GetStart(), time.UTC)
-	var end time.Time
-	switch {
-	case a.GetDuration() != nil && !start.IsZero():
-		end = start.Add(a.GetDuration().AsDuration())
-	case a.GetEnd() != nil:
-		end, _, _ = Instant(a.GetEnd(), time.UTC)
+// Occurrences returns the start of every occurrence of e overlapping window,
+// and how long each lasts: the RRULE's instances less EXDATE, plus RDATE, RFC
+// 5545 section 3.8.5; a single event is its one occurrence. A zero-length
+// occurrence overlaps a window containing its instant, RFC 4791 section 9.9.
+//
+// The engine's busy time, ExpandEvent and CalDAV all read events through it,
+// so an instance a client is shown is exactly the time the engine blocks.
+func Occurrences(e *eventv1.Event, loc *time.Location, window engine.Span) ([]time.Time, time.Duration, error) {
+	first, err := EventSpan(e, loc)
+	if err != nil {
+		return nil, 0, err
 	}
-	rec := AvailabilityRecord{
-		Range:       engine.Span{Start: start, End: end},
-		RangeAllDay: startDay,
-		Priority:    int(a.GetPriority()),
+	dur := first.End.Sub(first.Start)
+	if dur < 0 {
+		return nil, 0, fmt.Errorf("%w: %s ends before it starts", types.ErrInvalidState, e.GetName())
 	}
-	for _, p := range a.GetAvailablePeriods() {
-		ps, allDay, _ := Instant(p.GetStart(), time.UTC)
-		pe := ps
-		switch {
-		case p.GetDuration() != nil:
-			pe = ps.Add(p.GetDuration().AsDuration())
-		case p.GetEnd() != nil:
-			pe, _, _ = Instant(p.GetEnd(), time.UTC)
+	// The expander skips empty occurrences; probe with a nanosecond so a
+	// zero-length one is still reported.
+	probe := max(dur, time.Nanosecond)
+	occurs := func(t time.Time) bool { return engine.Span{Start: t, End: t.Add(probe)}.Overlaps(window) }
+	if e.GetRecurrence() == nil {
+		if occurs(first.Start) {
+			return []time.Time{first.Start}, dur, nil
 		}
-		rec.Periods = append(rec.Periods, PeriodRecord{Start: ps, End: pe, RRule: p.GetRecurrenceRule(), AllDay: allDay})
+		return nil, dur, nil
 	}
-	return rec
+
+	parts, unsupported := RecurrenceFromProto(e.GetRecurrence(), loc)
+	if len(unsupported) > 0 {
+		return nil, dur, fmt.Errorf("%w: rule parts %s are not expanded", types.ErrUnimplemented, strings.Join(unsupported, ", "))
+	}
+	rule, err := engine.ParseRRule(parts.RRule(), first.Start.Location())
+	if err != nil {
+		return nil, dur, fmt.Errorf("%w: recurrence of %s: %v", types.ErrUnimplemented, e.GetName(), err)
+	}
+	excluded := map[int64]bool{}
+	for _, x := range e.GetExcludedTimes() {
+		t, _, ok := instantIn(x, loc)
+		if !ok {
+			return nil, dur, fmt.Errorf("%w: %s has an empty EXDATE", types.ErrInvalidState, e.GetName())
+		}
+		excluded[t.UnixNano()] = true
+	}
+	var starts []time.Time
+	seen := map[int64]bool{}
+	keep := func(t time.Time) {
+		if k := t.UnixNano(); !excluded[k] && !seen[k] {
+			seen[k] = true
+			starts = append(starts, t)
+		}
+	}
+	for _, occ := range rule.Occurrences(first.Start, probe, window) {
+		keep(occ.Start)
+	}
+	for _, x := range e.GetAdditionalTimes() {
+		t, _, ok := instantIn(x, loc)
+		if !ok {
+			return nil, dur, fmt.Errorf("%w: %s has an empty RDATE", types.ErrInvalidState, e.GetName())
+		}
+		if occurs(t) {
+			keep(t)
+		}
+	}
+	slices.SortFunc(starts, time.Time.Compare)
+	return starts, dur, nil
 }

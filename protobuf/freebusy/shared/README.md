@@ -39,16 +39,6 @@ A half-open range of calendar dates [start_date, end_date), evaluated in the res
 | `start_date` | `Date` | `REQUIRED` | Inclusive first date of the range. |
 | `end_date` | `Date` | `REQUIRED` | Exclusive end date of the range. |
 
-### Contact
-
-Contact details for the person a booking is for. When a booking carries a `customer` (a users/{user} reference) these typically mirror the user's profile; for walk-in or email-only bookings made by someone who is not a registered user, this is the only contact information captured. The server requires at least one reachable channel (email or phone) when no customer is set.
-
-| Field | Type | Behavior | Description |
-| --- | --- | --- | --- |
-| `display_name` | `string` | `OPTIONAL` | Full name of the guest. |
-| `email` | `string` | `OPTIONAL` | Email address for the confirmation and any follow-ups. |
-| `phone_number` | `string` | `OPTIONAL` | Phone number in E.164 form (e.g. "+14155552671"). |
-
 ### PriceComponent
 
 One line in a price breakdown: a base charge, a fee, a tax, or a discount. Clients branch on `type` and `code`; the signed `amount` rolls up to the booking total (charges positive, discounts negative).
@@ -59,19 +49,6 @@ One line in a price breakdown: a base charge, a fee, a tax, or a discount. Clien
 | `code` | `string` | - | Stable machine code for the line, e.g. "base", "cleaning_fee", "occupancy_tax", or a promo code. Clients key display and logic off this. |
 | `display_name` | `string` | - | Human-readable label suitable for display on an itemized receipt. |
 | `amount` | `Money` | - | Signed amount: positive for charges (base, fees, taxes), negative for discounts. Summing every component yields the booking total. |
-
-### Attachment
-
-An uploaded file attached to a document- or licence-carrying record (e.g. a guest's IdDocument scan, or a property/unit licence certificate). The bytes are stored inline in `content` today; `uri` is populated once the file is migrated to object storage (S3 or any CDN-fronted host). At most one of the two is authoritative at a time — prefer `uri` when both are set.
-
-| Field | Type | Behavior | Description |
-| --- | --- | --- | --- |
-| `filename` | `string` | `OPTIONAL` | Original filename as uploaded. |
-| `mime_type` | `string` | `OPTIONAL` | MIME type of the file (e.g. "application/pdf", "image/jpeg"). |
-| `size_bytes` | `int64` | `OPTIONAL` | Size of the file in bytes. |
-| `content` | `bytes` | `OPTIONAL` | Raw file content, stored inline in the database. Cleared once the file is migrated to object storage, at which point `uri` takes over. |
-| `uri` | `string` | `OPTIONAL` | Location of the file once moved to object storage (e.g. an s3:// or https:// URL). Unset while the file lives inline in `content`. |
-| `upload_time` | `Timestamp` | `OUTPUT_ONLY` | When the file was uploaded. |
 
 ## Enums
 

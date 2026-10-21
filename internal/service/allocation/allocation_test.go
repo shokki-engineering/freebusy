@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/oh-tarnished/freebusy/internal/rfc"
 	"github.com/oh-tarnished/freebusy/internal/runtime/rpc"
@@ -48,10 +50,8 @@ func newFixture(t *testing.T) *fixture {
 	for _, n := range []string{"court-1", "court-2", "court-3"} {
 		f.addResource(n, "")
 	}
-	f.store.avail["calendars/club"] = []AvailabilityRecord{{
-		Periods: []PeriodRecord{{Start: hr(8), End: hr(22), RRule: "FREQ=DAILY"}},
-	}}
-	f.store.events["calendars/club-court-1"] = []PeriodRecord{{Start: hr(18), End: hr(19)}}
+	f.store.avail["calendars/club"] = []*availabilityv1.Availability{opens(hr(8), hr(22), "FREQ=DAILY")}
+	f.store.events["calendars/club-court-1"] = []*eventv1.Event{busy(hr(18), hr(19))}
 	f.srv = NewServer(f.store, WithClock(now))
 	return f
 }
@@ -323,14 +323,14 @@ func TestDayBucketsInSiteZone(t *testing.T) {
 	}
 	f := newFixture(t)
 	f.store.resources = nil
-	f.store.avail = map[string][]AvailabilityRecord{}
-	f.store.events = map[string][]PeriodRecord{}
+	f.store.avail = map[string][]*availabilityv1.Availability{}
+	f.store.events = map[string][]*eventv1.Event{}
 	f.addResource("room-101", "")
 	f.store.resources[0].TimeZone = "Asia/Kolkata"
 	// A three-night stay, check-in 14:00 local.
 	in := time.Date(2026, 11, 2, 14, 0, 0, 0, kolkata)
 	out := time.Date(2026, 11, 5, 11, 0, 0, 0, kolkata)
-	f.store.events["calendars/club-room-101"] = []PeriodRecord{{Start: in.AddDate(0, 0, 1), End: in.AddDate(0, 0, 2)}}
+	f.store.events["calendars/club-room-101"] = []*eventv1.Event{busy(in.AddDate(0, 0, 1), in.AddDate(0, 0, 2))}
 	res, err := f.srv.ComputeAvailability(ctx(), &allocationpbv1.ComputeAvailabilityRequest{
 		Parent: club,
 		Window: &interval.Interval{StartTime: timestamppb.New(in), EndTime: timestamppb.New(out)},
@@ -385,7 +385,9 @@ func TestICalDuration(t *testing.T) {
 
 func TestUnsupportedEventRuleBlocks(t *testing.T) {
 	span := engine.Span{Start: hr(0), End: hr(48)}
-	got := expandEvents([]PeriodRecord{{Start: hr(10), End: hr(11), RRule: "FREQ=HOURLY"}}, time.UTC, span)
+	hourly := busy(hr(10), hr(11))
+	hourly.Recurrence = &eventv1.Recurrence{Frequency: eventv1.Frequency_FREQUENCY_HOURLY}
+	got := expandEvents([]*eventv1.Event{hourly}, time.UTC, span)
 	if !got.Covers(engine.Span{Start: hr(10), End: hr(48)}) {
 		t.Fatalf("unreadable recurring booking should block from its start: %v", got)
 	}

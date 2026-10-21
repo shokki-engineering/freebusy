@@ -22,7 +22,6 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/cardql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/commonql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/guestql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/journalql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/ldapgroupql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/membershipql"
@@ -62,7 +61,6 @@ type QueryHandler struct {
 	Card         cardql.QueryHandler
 	Common       commonql.QueryHandler
 	Event        eventql.QueryHandler
-	Guest        guestql.QueryHandler
 	Journal      journalql.QueryHandler
 	Ldapgroup    ldapgroupql.QueryHandler
 	Membership   membershipql.QueryHandler
@@ -106,7 +104,6 @@ type MutationHandler struct {
 	Card         cardql.MutationHandler
 	Common       commonql.MutationHandler
 	Event        eventql.MutationHandler
-	Guest        guestql.MutationHandler
 	Journal      journalql.MutationHandler
 	Ldapgroup    ldapgroupql.MutationHandler
 	Membership   membershipql.MutationHandler
@@ -154,7 +151,6 @@ type SubscriptionHandler struct {
 	Card         cardql.SubscriptionHandler
 	Common       commonql.SubscriptionHandler
 	Event        eventql.SubscriptionHandler
-	Guest        guestql.SubscriptionHandler
 	Journal      journalql.SubscriptionHandler
 	Ldapgroup    ldapgroupql.SubscriptionHandler
 	Membership   membershipql.SubscriptionHandler
@@ -197,7 +193,6 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Card:         cardql.NewQuery(gql),
 			Common:       commonql.NewQuery(gql),
 			Event:        eventql.NewQuery(gql),
-			Guest:        guestql.NewQuery(gql),
 			Journal:      journalql.NewQuery(gql),
 			Ldapgroup:    ldapgroupql.NewQuery(gql),
 			Membership:   membershipql.NewQuery(gql),
@@ -225,7 +220,6 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Card:         cardql.NewMutation(gql),
 			Common:       commonql.NewMutation(gql),
 			Event:        eventql.NewMutation(gql),
-			Guest:        guestql.NewMutation(gql),
 			Journal:      journalql.NewMutation(gql),
 			Ldapgroup:    ldapgroupql.NewMutation(gql),
 			Membership:   membershipql.NewMutation(gql),
@@ -252,7 +246,6 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Card:         cardql.NewSubscription(gql),
 			Common:       commonql.NewSubscription(gql),
 			Event:        eventql.NewSubscription(gql),
-			Guest:        guestql.NewSubscription(gql),
 			Journal:      journalql.NewSubscription(gql),
 			Ldapgroup:    ldapgroupql.NewSubscription(gql),
 			Membership:   membershipql.NewSubscription(gql),

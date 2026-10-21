@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"time"
 
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"github.com/oh-tarnished/freebusy/internal/rfc"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
 )
@@ -97,25 +99,41 @@ func zone(name string) *time.Location {
 	return loc
 }
 
-// toAvailabilities converts stored components, reading every instant in loc so
-// recurring periods keep their wall-clock time.
+// toAvailabilities converts stored components for a calendar in loc. Each
+// time keeps its own zone, a floating time or a DATE taking loc's, so a
+// recurring period keeps its wall-clock time across DST.
 //
 // A period whose rule the engine cannot expand is dropped, which offers less
 // time rather than more: a misread opening-hours rule should make a court look
 // closed, never make it bookable at 3 a.m.
-func toAvailabilities(recs []AvailabilityRecord, loc *time.Location) []engine.Availability {
-	out := make([]engine.Availability, 0, len(recs))
-	for _, r := range recs {
-		rng := r.Range
-		if r.RangeAllDay {
-			rng = engine.Span{Start: localDate(rng.Start, loc), End: localDate(rng.End, loc)}
+func toAvailabilities(comps []*availabilityv1.Availability, loc *time.Location) []engine.Availability {
+	out := make([]engine.Availability, 0, len(comps))
+	for _, c := range comps {
+		// An absent DTSTART or DTEND reads as the zero time: open-ended.
+		start, _, _ := instantIn(c.GetStart(), loc)
+		var end time.Time
+		switch {
+		case c.GetDuration() != nil && !start.IsZero():
+			end = start.Add(c.GetDuration().AsDuration())
+		case c.GetEnd() != nil:
+			end, _, _ = instantIn(c.GetEnd(), loc)
 		}
-		a := engine.Availability{Range: rng, Priority: r.Priority}
-		for _, p := range r.Periods {
-			start, end := localize(p, loc)
-			period := engine.Period{Start: start, End: end}
-			if p.RRule != "" {
-				rule, err := engine.ParseRRule(p.RRule, loc)
+		a := engine.Availability{Range: engine.Span{Start: start, End: end}, Priority: int(c.GetPriority())}
+		for _, p := range c.GetAvailablePeriods() {
+			ps, _, ok := instantIn(p.GetStart(), loc)
+			if !ok {
+				continue
+			}
+			pe := ps
+			switch {
+			case p.GetDuration() != nil:
+				pe = ps.Add(p.GetDuration().AsDuration())
+			case p.GetEnd() != nil:
+				pe, _, _ = instantIn(p.GetEnd(), loc)
+			}
+			period := engine.Period{Start: ps, End: pe}
+			if r := p.GetRecurrenceRule(); r != "" {
+				rule, err := engine.ParseRRule(r, ps.Location())
 				if err != nil {
 					continue
 				}
@@ -128,47 +146,28 @@ func toAvailabilities(recs []AvailabilityRecord, loc *time.Location) []engine.Av
 	return out
 }
 
-// expandEvents turns stored events into busy time over span.
+// expandEvents turns stored events on a calendar in loc into busy time over
+// span, through Occurrences.
 //
-// The opposite fallback to toAvailabilities: an event whose rule cannot be
-// expanded blocks the whole span from its first occurrence on, because
+// The opposite fallback to toAvailabilities: an event whose occurrences cannot
+// be listed blocks the whole span from its first occurrence on, because
 // overselling a resource someone already booked is the failure a booking engine
 // exists to prevent.
-func expandEvents(recs []PeriodRecord, loc *time.Location, span engine.Span) engine.Spans {
+func expandEvents(events []*eventv1.Event, loc *time.Location, span engine.Span) engine.Spans {
 	var out []engine.Span
-	for _, e := range recs {
-		start, end := localize(e, loc)
-		if e.RRule == "" {
-			out = append(out, engine.Span{Start: start, End: end}.Intersect(span))
-			continue
-		}
-		rule, err := engine.ParseRRule(e.RRule, loc)
+	for _, e := range events {
+		starts, dur, err := Occurrences(e, loc, span)
 		if err != nil {
-			out = append(out, engine.Span{Start: start, End: span.End}.Intersect(span))
+			if first, err := EventSpan(e, loc); err == nil {
+				out = append(out, engine.Span{Start: first.Start, End: span.End}.Intersect(span))
+			}
 			continue
 		}
-		out = append(out, rule.Expand(start, end.Sub(start), span)...)
+		for _, s := range starts {
+			out = append(out, engine.Span{Start: s, End: s.Add(dur)}.Intersect(span))
+		}
 	}
 	return engine.Normalize(out)
-}
-
-// localize reads a record's ends in loc: an instant is re-read there, a DATE
-// becomes that date's local midnight.
-func localize(p PeriodRecord, loc *time.Location) (time.Time, time.Time) {
-	if p.AllDay {
-		return localDate(p.Start, loc), localDate(p.End, loc)
-	}
-	return p.Start.In(loc), p.End.In(loc)
-}
-
-// localDate turns a DATE stored at UTC midnight into local midnight in loc. A
-// zero time stays zero, since it means open-ended.
-func localDate(t time.Time, loc *time.Location) time.Time {
-	if t.IsZero() {
-		return t
-	}
-	u := t.UTC()
-	return time.Date(u.Year(), u.Month(), u.Day(), 0, 0, 0, 0, loc)
 }
 
 // policyOf reads the booking policy off a resource's STRUCTURED-DATA. A

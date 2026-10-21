@@ -102,8 +102,8 @@ func (s *Store) Resources(ctx context.Context, q allocation.ResourceQuery) ([]al
 }
 
 // Availability reads every live VAVAILABILITY on the calendars.
-func (s *Store) Availability(ctx context.Context, calendars []string) (map[string][]allocation.AvailabilityRecord, error) {
-	out := map[string][]allocation.AvailabilityRecord{}
+func (s *Store) Availability(ctx context.Context, calendars []string) (map[string][]*availabilityv1.Availability, error) {
+	out := map[string][]*availabilityv1.Availability{}
 	if len(calendars) == 0 {
 		return out, nil
 	}
@@ -118,7 +118,7 @@ func (s *Store) Availability(ctx context.Context, calendars []string) (map[strin
 	}
 	for _, a := range found {
 		cal := parentOf(a.GetName())
-		out[cal] = append(out[cal], allocation.AvailabilityRecordOf(a))
+		out[cal] = append(out[cal], a)
 	}
 	return out, nil
 }
@@ -127,8 +127,8 @@ func (s *Store) Availability(ctx context.Context, calendars []string) (map[strin
 // opaque, not cancelled. A recurring event begun before the window ends is
 // returned once with its rule, however long ago it began; the engine expands
 // and clips it.
-func (s *Store) Events(ctx context.Context, calendars []string, window engine.Span) (map[string][]allocation.PeriodRecord, error) {
-	out := map[string][]allocation.PeriodRecord{}
+func (s *Store) Events(ctx context.Context, calendars []string, window engine.Span) (map[string][]*eventv1.Event, error) {
+	out := map[string][]*eventv1.Event{}
 	if len(calendars) == 0 {
 		return out, nil
 	}
@@ -153,13 +153,16 @@ func (s *Store) Events(ctx context.Context, calendars []string, window engine.Sp
 			e.GetConfirmation() == eventv1.Confirmation_CONFIRMATION_CANCELLED {
 			continue
 		}
-		// A series that begins after the window has no instance in it.
-		rec := allocation.EventRecord(e)
-		if !rec.Start.Before(hi) || (e.GetRecurrence() == nil && !rec.End.After(lo)) {
+		// A series that begins after the window has no instance in it. Read
+		// in UTC, a floating time is off by at most a zone's offset, which the
+		// day of slack covers. An event whose times cannot be read is kept for
+		// the engine to judge.
+		if sp, err := allocation.EventSpan(e, time.UTC); err == nil &&
+			(!sp.Start.Before(hi) || (e.GetRecurrence() == nil && !sp.End.After(lo))) {
 			continue
 		}
 		cal := parentOf(e.GetName())
-		out[cal] = append(out[cal], rec)
+		out[cal] = append(out[cal], e)
 	}
 	return out, nil
 }

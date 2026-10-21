@@ -1,55 +1,5 @@
 components:
   schemas:
-    freebusy.shared.v1.Attachment:
-      description: An uploaded file attached to a document- or licence-carrying record
-        (e.g. a guest's IdDocument scan, or a property/unit licence certificate).
-        The bytes are stored inline in `content` today; `uri` is populated once the
-        file is migrated to object storage (S3 or any CDN-fronted host). At most one
-        of the two is authoritative at a time — prefer `uri` when both are set.
-      properties:
-        content:
-          description: Raw file content, stored inline in the database. Cleared once
-            the file is migrated to object storage, at which point `uri` takes over.
-          format: byte
-          type: string
-        filename:
-          description: Original filename as uploaded.
-          type: string
-        mimeType:
-          description: MIME type of the file (e.g. "application/pdf", "image/jpeg").
-          type: string
-        sizeBytes:
-          description: Size of the file in bytes.
-          format: int64
-          type: integer
-          x-kubernetes-int-or-string: true
-        uploadTime:
-          description: When the file was uploaded.
-          format: date-time
-          type: string
-        uri:
-          description: Location of the file once moved to object storage (e.g. an
-            s3:// or https:// URL). Unset while the file lives inline in `content`.
-          type: string
-      type: object
-    freebusy.shared.v1.Contact:
-      description: Contact details for the person a booking is for. When a booking
-        carries a `customer` (a users/{user} reference) these typically mirror the
-        user's profile; for walk-in or email-only bookings made by someone who is
-        not a registered user, this is the only contact information captured. The
-        server requires at least one reachable channel (email or phone) when no customer
-        is set.
-      properties:
-        displayName:
-          description: Full name of the guest.
-          type: string
-        email:
-          description: Email address for the confirmation and any follow-ups.
-          type: string
-        phoneNumber:
-          description: Phone number in E.164 form (e.g. "+14155552671").
-          type: string
-      type: object
     freebusy.shared.v1.DateRange:
       description: 'A half-open range of calendar dates [start_date, end_date), evaluated
         in the resource''s local timezone. The natural query and exception shape for

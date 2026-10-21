@@ -7,10 +7,13 @@ import (
 	"sync"
 	"time"
 
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
 	"github.com/oh-tarnished/freebusy/internal/types"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
+	"google.golang.org/genproto/googleapis/type/datetime"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -20,8 +23,8 @@ import (
 type memStore struct {
 	mu        sync.Mutex
 	resources []ResourceRecord
-	avail     map[string][]AvailabilityRecord
-	events    map[string][]PeriodRecord
+	avail     map[string][]*availabilityv1.Availability
+	events    map[string][]*eventv1.Event
 	holds     map[string]*allocationpbv1.Hold
 	order     []string
 	version   int
@@ -35,8 +38,8 @@ type memStore struct {
 
 func newMemStore() *memStore {
 	return &memStore{
-		avail:  map[string][]AvailabilityRecord{},
-		events: map[string][]PeriodRecord{},
+		avail:  map[string][]*availabilityv1.Availability{},
+		events: map[string][]*eventv1.Event{},
 		holds:  map[string]*allocationpbv1.Hold{},
 		clock:  time.Now,
 	}
@@ -65,8 +68,8 @@ func (m *memStore) Resources(_ context.Context, q ResourceQuery) ([]ResourceReco
 	return out, nil
 }
 
-func (m *memStore) Availability(_ context.Context, calendars []string) (map[string][]AvailabilityRecord, error) {
-	out := map[string][]AvailabilityRecord{}
+func (m *memStore) Availability(_ context.Context, calendars []string) (map[string][]*availabilityv1.Availability, error) {
+	out := map[string][]*availabilityv1.Availability{}
 	for _, c := range calendars {
 		if a, ok := m.avail[c]; ok {
 			out[c] = a
@@ -75,8 +78,8 @@ func (m *memStore) Availability(_ context.Context, calendars []string) (map[stri
 	return out, nil
 }
 
-func (m *memStore) Events(_ context.Context, calendars []string, _ engine.Span) (map[string][]PeriodRecord, error) {
-	out := map[string][]PeriodRecord{}
+func (m *memStore) Events(_ context.Context, calendars []string, _ engine.Span) (map[string][]*eventv1.Event, error) {
+	out := map[string][]*eventv1.Event{}
 	for _, c := range calendars {
 		if e, ok := m.events[c]; ok {
 			out[c] = e
@@ -219,4 +222,33 @@ func (m *memStore) ExpireHolds(_ context.Context, now time.Time) (int64, error) 
 		}
 	}
 	return n, nil
+}
+
+// dateTime is t stored as a DATE-TIME in t's own zone.
+func dateTime(t time.Time) *datetime.DateTime {
+	return &datetime.DateTime{
+		Year: int32(t.Year()), Month: int32(t.Month()), Day: int32(t.Day()),
+		Hours: int32(t.Hour()), Minutes: int32(t.Minute()), Seconds: int32(t.Second()),
+		TimeOffset: &datetime.DateTime_TimeZone{TimeZone: &datetime.TimeZone{Id: t.Location().String()}},
+	}
+}
+
+func eventTime(t time.Time) *eventv1.CalendarTime {
+	return &eventv1.CalendarTime{Value: &eventv1.CalendarTime_DateTime{DateTime: dateTime(t)}}
+}
+
+// busy is a stored event from start to end.
+func busy(start, end time.Time) *eventv1.Event {
+	return &eventv1.Event{Start: eventTime(start), Ends: &eventv1.Event_End{End: eventTime(end)}}
+}
+
+// opens is a stored VAVAILABILITY with one AVAILABLE period from start to
+// end, repeating by rule when it is set.
+func opens(start, end time.Time, rule string) *availabilityv1.Availability {
+	at := func(t time.Time) *availabilityv1.CalendarTime {
+		return &availabilityv1.CalendarTime{Value: &availabilityv1.CalendarTime_DateTime{DateTime: dateTime(t)}}
+	}
+	return &availabilityv1.Availability{AvailablePeriods: []*availabilityv1.AvailablePeriod{{
+		Start: at(start), EndForm: &availabilityv1.AvailablePeriod_End{End: at(end)}, RecurrenceRule: rule,
+	}}}
 }

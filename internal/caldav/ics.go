@@ -9,7 +9,6 @@ import (
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
-	"github.com/oh-tarnished/freebusy/internal/service/rfcsvc"
 	"github.com/the-protobuf-project/runtime-go/rfc"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -120,7 +119,7 @@ func instanceComponents(master *eventv1.Event, instances []*eventv1.Event, loc *
 			return nil, err
 		}
 		if master.GetRecurrence() != nil {
-			sp, err := rfcsvc.EventSpan(inst, loc)
+			sp, err := allocation.EventSpan(inst, loc)
 			if err != nil {
 				return nil, err
 			}

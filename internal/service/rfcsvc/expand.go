@@ -2,7 +2,6 @@ package rfcsvc
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
@@ -23,122 +22,37 @@ func Instances(e *eventv1.Event, loc *time.Location, window engine.Span) ([]*eve
 	if e.GetRecurrence() != nil {
 		return expand(e, loc, window)
 	}
-	sp, err := EventSpan(e, loc)
-	if err != nil {
+	starts, _, err := allocation.Occurrences(e, loc, window)
+	if err != nil || len(starts) == 0 {
 		return nil, err
 	}
-	// A zero-length event occupies its instant: it overlaps a window that
-	// contains it, RFC 4791 section 9.9.
-	if sp.Empty() {
-		if !sp.Start.Before(window.Start) && sp.Start.Before(window.End) {
-			return []*eventv1.Event{e}, nil
-		}
-		return nil, nil
-	}
-	if sp.Overlaps(window) {
-		return []*eventv1.Event{e}, nil
-	}
-	return nil, nil
+	return []*eventv1.Event{e}, nil
 }
 
-// EventSpan is the time one event occurrence covers, its ends read in the
-// calendar's zone loc: DTEND, or DTSTART plus DURATION, or a whole day for a
-// DATE with neither, RFC 5545 section 3.6.1.
-func EventSpan(e *eventv1.Event, loc *time.Location) (engine.Span, error) {
-	start, f, err := readTime(e.GetStart(), loc)
-	if err != nil {
-		return engine.Span{}, err
-	}
-	end := start
-	switch {
-	case e.GetDuration() != nil:
-		end = start.Add(e.GetDuration().AsDuration())
-	case e.GetEnd() != nil:
-		if end, _, err = readTime(e.GetEnd(), loc); err != nil {
-			return engine.Span{}, err
-		}
-	case f.date:
-		end = start.Add(24 * time.Hour)
-	}
-	return engine.Span{Start: start, End: end}, nil
-}
-
-// expand materialises e's instances overlapping window. It uses the engine's
-// RRULE expander, so an instance listed here is exactly the busy time the
-// engine blocks for it; EXDATE removes instances and RDATE adds them, RFC 5545
-// section 3.8.5.
+// expand materialises e's instances overlapping window, as
+// allocation.Occurrences lists them -- so an instance listed here is exactly
+// the busy time the engine blocks for it.
 //
 // Instances keep the event's own time form -- a DATE stays a DATE, a zoned
 // DATE-TIME keeps its zone -- and carry no name: none is a stored resource.
 func expand(e *eventv1.Event, loc *time.Location, window engine.Span) ([]*eventv1.Event, error) {
-	rec := e.GetRecurrence()
-	if rec == nil {
+	if e.GetRecurrence() == nil {
 		return nil, fmt.Errorf("%w: %s has no recurrence rule", types.ErrInvalidState, e.GetName())
 	}
-	start, startForm, err := readTime(e.GetStart(), loc)
+	starts, dur, err := allocation.Occurrences(e, loc, window)
+	if err != nil {
+		return nil, err
+	}
+	_, startForm, err := readTime(e.GetStart(), loc)
 	if err != nil {
 		return nil, err
 	}
 	var endForm timeForm
-	var dur time.Duration
-	switch {
-	case e.GetDuration() != nil:
-		dur = e.GetDuration().AsDuration()
-	case e.GetEnd() != nil:
-		var end time.Time
-		if end, endForm, err = readTime(e.GetEnd(), loc); err != nil {
+	if e.GetEnd() != nil {
+		if _, endForm, err = readTime(e.GetEnd(), loc); err != nil {
 			return nil, err
 		}
-		dur = end.Sub(start)
-	case startForm.date:
-		dur = 24 * time.Hour // RFC 5545 3.6.1: a DATE event with no end lasts the day
 	}
-	if dur < 0 {
-		return nil, fmt.Errorf("%w: %s ends before it starts", types.ErrInvalidState, e.GetName())
-	}
-
-	parts, err := recurrenceParts(rec, loc)
-	if err != nil {
-		return nil, err
-	}
-	rule, err := engine.ParseRRule(parts.RRule(), start.Location())
-	if err != nil {
-		return nil, fmt.Errorf("%w: recurrence of %s: %v", types.ErrUnimplemented, e.GetName(), err)
-	}
-
-	// A zero-length event still occurs; probe with a nanosecond so the
-	// expander, which skips empty occurrences, reports it.
-	probe := max(dur, time.Nanosecond)
-	excluded := map[int64]bool{}
-	for _, x := range e.GetExcludedTimes() {
-		t, _, err := readTime(x, loc)
-		if err != nil {
-			return nil, err
-		}
-		excluded[t.UnixNano()] = true
-	}
-	var starts []time.Time
-	seen := map[int64]bool{}
-	keep := func(t time.Time) {
-		if k := t.UnixNano(); !excluded[k] && !seen[k] {
-			seen[k] = true
-			starts = append(starts, t)
-		}
-	}
-	for _, occ := range rule.Occurrences(start, probe, window) {
-		keep(occ.Start)
-	}
-	for _, x := range e.GetAdditionalTimes() {
-		t, _, err := readTime(x, loc)
-		if err != nil {
-			return nil, err
-		}
-		if (engine.Span{Start: t, End: t.Add(probe)}).Overlaps(window) {
-			keep(t)
-		}
-	}
-	sortBy(starts, time.Time.Before)
-
 	out := make([]*eventv1.Event, 0, len(starts))
 	for _, t := range starts {
 		inst := proto.Clone(e).(*eventv1.Event)
@@ -208,17 +122,6 @@ func (f timeForm) render(t time.Time) *eventv1.CalendarTime {
 		dt.TimeOffset = &datetime.DateTime_UtcOffset{UtcOffset: f.offset}
 	}
 	return &eventv1.CalendarTime{Value: &eventv1.CalendarTime_DateTime{DateTime: dt}}
-}
-
-// recurrenceParts maps a stored recurrence onto the engine's rule parts. A
-// part the engine cannot expand is refused rather than ignored: dropping a
-// BYHOUR would list instances the rule never produces.
-func recurrenceParts(r *eventv1.Recurrence, loc *time.Location) (allocation.RecurrenceParts, error) {
-	p, unsupported := allocation.RecurrenceFromProto(r, loc)
-	if len(unsupported) > 0 {
-		return p, fmt.Errorf("%w: rule parts %s are not expanded", types.ErrUnimplemented, strings.Join(unsupported, ", "))
-	}
-	return p, nil
 }
 
 // ZoneOf loads an IANA zone, falling back to UTC as the engine does: a bad

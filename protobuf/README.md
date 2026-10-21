@@ -10,10 +10,9 @@ Every protobuf module under `protobuf/`. Each row links to that module's generat
 | Module | Package | Services | Messages | Enums | Reference |
 | --- | --- | --- | --- | --- | --- |
 | Allocation | `freebusy.allocation.v1` | 2 | 20 | 3 | [README](freebusy/allocation/README.md) |
-| Guest | `freebusy.guest.v1` | 0 | 4 | 5 | [README](freebusy/guest/README.md) |
 | Reservation | `freebusy.reservation.v1` | 1 | 7 | 1 | [README](freebusy/reservation/README.md) |
-| Shared | `freebusy.shared.v1` | 0 | 6 | 5 | [README](freebusy/shared/README.md) |
-| **Total** | _4 modules_ | 3 | 37 | 14 | |
+| Shared | `freebusy.shared.v1` | 0 | 4 | 5 | [README](freebusy/shared/README.md) |
+| **Total** | _3 modules_ | 3 | 31 | 9 | |
 
 ## Dependency graph
 
@@ -22,10 +21,9 @@ Local (`freebusy.*`) import relationships between modules. External deps (`googl
 ```mermaid
 graph LR
     freebusy_allocation_v1["Allocation<br/>freebusy.allocation.v1"]
-    freebusy_guest_v1["Guest<br/>freebusy.guest.v1"]
     freebusy_reservation_v1["Reservation<br/>freebusy.reservation.v1"]
     freebusy_shared_v1["Shared<br/>freebusy.shared.v1"]
-    freebusy_guest_v1 --> freebusy_shared_v1
+    %% no local cross-module imports
 ```
 
 ---
