@@ -89,3 +89,37 @@ func TestFloatingAvailabilityReadInCalendarZone(t *testing.T) {
 		t.Fatalf("floating 09:00-17:00 on a Kolkata calendar offered %v, want %v", got, want)
 	}
 }
+
+func TestOverridesReplaceTheirInstances(t *testing.T) {
+	series := daily(hr(18), hr(19))
+	series.IcalUid = "standup"
+	// Day 1's instance moved to 09:00 the next morning; day 2's cancelled.
+	moved := busy(hr(48+9), hr(48+10))
+	moved.IcalUid, moved.OriginalStart = "standup", eventTime(hr(24+18))
+	cancelled := busy(hr(48+18), hr(48+19))
+	cancelled.IcalUid, cancelled.OriginalStart = "standup", eventTime(hr(48+18))
+	cancelled.Confirmation = eventv1.Confirmation_CONFIRMATION_CANCELLED
+
+	got := expandEvents([]*eventv1.Event{series, moved, cancelled}, time.UTC, engine.Span{Start: hr(0), End: hr(96)})
+	for _, free := range []engine.Span{{Start: hr(24 + 18), End: hr(24 + 19)}, {Start: hr(48 + 18), End: hr(48 + 19)}} {
+		if len(got.Clip(free)) > 0 {
+			t.Fatalf("overridden instance %v still blocks: %v", free, got)
+		}
+	}
+	for _, b := range []engine.Span{{Start: hr(18), End: hr(19)}, {Start: hr(48 + 9), End: hr(48 + 10)}, {Start: hr(72 + 18), End: hr(72 + 19)}} {
+		if !got.Covers(b) {
+			t.Fatalf("%v should be busy: %v", b, got)
+		}
+	}
+}
+
+func TestOverrideOfAnotherSeriesIsIgnored(t *testing.T) {
+	series := daily(hr(18), hr(19))
+	series.IcalUid = "standup"
+	other := busy(hr(48+9), hr(48+10))
+	other.IcalUid, other.OriginalStart = "retro", eventTime(hr(24+18))
+	got := expandEvents([]*eventv1.Event{series, other}, time.UTC, engine.Span{Start: hr(0), End: hr(72)})
+	if !got.Covers(engine.Span{Start: hr(24 + 18), End: hr(24 + 19)}) {
+		t.Fatalf("an override with another UID freed this series' instance: %v", got)
+	}
+}

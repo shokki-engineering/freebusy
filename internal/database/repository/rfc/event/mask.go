@@ -74,6 +74,9 @@ func applyEventMask(merged, in *eventv1.Event, paths []string) {
 	if repox.GroupTouched(paths, "recurrence") {
 		merged.Recurrence = in.GetRecurrence()
 	}
+	if repox.GroupTouched(paths, "original_start") {
+		merged.OriginalStart = in.GetOriginalStart()
+	}
 	if repox.GroupTouched(paths, "alarms") {
 		merged.Alarms = in.GetAlarms()
 	}

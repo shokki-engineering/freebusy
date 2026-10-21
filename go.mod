@@ -27,9 +27,9 @@ require (
 )
 
 require (
-	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20260908111956-0fb3b0591946.1 // indirect
-	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20260908111956-0fb3b0591946.2 // indirect
-	github.com/the-protobuf-project/runtime-go/rfc v0.0.0-20261019152637-a91d78dbb831 // indirect
+	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261021085804-ae1e2acc01d5.1 // indirect
+	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261021085804-ae1e2acc01d5.2 // indirect
+	github.com/the-protobuf-project/runtime-go/rfc v0.0.0-20261021085950-c238e87067e6 // indirect
 )
 
 require (

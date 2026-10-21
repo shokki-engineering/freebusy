@@ -337,6 +337,9 @@ type Event struct {
 	// Foreign key to Recurrence.
 	RecurrenceID *string     `gorm:"column:recurrence_id;index:idx_resource_recurrence_id" json:"recurrence_id,omitempty"`
 	Recurrence   *Recurrence `gorm:"foreignKey:RecurrenceID;constraint:OnDelete:SET NULL" json:"recurrence,omitempty"`
+	// Foreign key to CalendarTime.
+	OriginalStartID *string       `gorm:"column:original_start_id;index:idx_resource_original_start_id" json:"original_start_id,omitempty"`
+	OriginalStart   *CalendarTime `gorm:"foreignKey:OriginalStartID;constraint:OnDelete:SET NULL" json:"originalstart,omitempty"`
 	// Foreign key to Organizer.
 	OrganizerID *string    `gorm:"column:organizer_id;index:idx_resource_organizer_id" json:"organizer_id,omitempty"`
 	Organizer   *Organizer `gorm:"foreignKey:OrganizerID;constraint:OnDelete:SET NULL" json:"organizer,omitempty"`
@@ -383,6 +386,8 @@ type CalendarTime struct {
 	Resource []Event `gorm:"foreignKey:StartID" json:"resource,omitempty"`
 	// Back-relation: Event records that reference this via end_id.
 	Resource2 []Event `gorm:"foreignKey:EndID" json:"resource2,omitempty"`
+	// Back-relation: Event records that reference this via original_start_id.
+	Resource3 []Event `gorm:"foreignKey:OriginalStartID" json:"resource3,omitempty"`
 	// Back-relation: Recurrence records that reference this via until_id.
 	Recurrences []Recurrence `gorm:"foreignKey:UntilID" json:"recurrences,omitempty"`
 }

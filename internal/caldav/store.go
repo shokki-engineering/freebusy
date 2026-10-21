@@ -1,33 +1,50 @@
 package caldav
 
 import (
+	"cmp"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"net/http"
+	"slices"
 	"strings"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
 	"github.com/oh-tarnished/freebusy/internal/types"
 )
 
 // object is one calendar object resource: an event or an availability.
-// Exactly one is set.
+// Exactly one is set. An event that is a recurring series carries the
+// overrides of its instances with it, RFC 4791 section 4.1: they share its
+// UID, so they are one object, stored as events of their own.
 type object struct {
-	id    string
-	event *eventv1.Event
-	avail *availabilityv1.Availability
+	id        string
+	event     *eventv1.Event
+	overrides []*eventv1.Event
+	avail     *availabilityv1.Availability
 }
 
+// etag is the object's entity tag. With overrides it covers each of them as
+// well as the series, so editing one instance changes the object's tag.
 func (o object) etag() string {
-	if o.event != nil {
+	if o.avail != nil {
+		return o.avail.GetEtag()
+	}
+	if len(o.overrides) == 0 {
 		return o.event.GetEtag()
 	}
-	return o.avail.GetEtag()
+	parts := []string{o.event.GetEtag()}
+	for _, e := range o.overrides {
+		parts = append(parts, e.GetName()+"\x00"+e.GetEtag())
+	}
+	slices.Sort(parts[1:])
+	sum := sha256.Sum256([]byte(strings.Join(parts, "\x00")))
+	return hex.EncodeToString(sum[:16])
 }
 
 // calendar returns the live calendar id, or a 404. A soft-deleted calendar
@@ -43,13 +60,24 @@ func (h *Handler) calendar(ctx context.Context, id string) (*calendarv1.Calendar
 	return c, nil
 }
 
-// object returns the live object id under calendar: an event, else an
-// availability of that id.
+// object returns the live object id under calendar: an event, with the
+// overrides of its instances, else an availability of that id. An override
+// is part of its series' object, not one of its own, so its id is not found.
 func (h *Handler) object(ctx context.Context, calendar, id string) (object, error) {
 	e, err := h.repos.Events.Get(ctx, calendarName(calendar)+"/events/"+id)
 	switch {
 	case err == nil && e.GetDeleteTime() == nil:
-		return object{id: id, event: e}, nil
+		if e.GetOriginalStart() != nil {
+			if attached, err := h.hasSeries(ctx, e); err != nil || attached {
+				return object{}, cmp.Or(err, types.ErrNotFound)
+			}
+			return object{id: id, event: e}, nil
+		}
+		overrides, err := h.repos.Overrides(ctx, e)
+		if err != nil {
+			return object{}, err
+		}
+		return object{id: id, event: e, overrides: overrides}, nil
 	case err != nil && !errors.Is(err, types.ErrNotFound):
 		return object{}, err
 	}
@@ -63,20 +91,55 @@ func (h *Handler) object(ctx context.Context, calendar, id string) (object, erro
 	return object{}, types.ErrNotFound
 }
 
-// objects returns every live object in a calendar, events first.
+// hasSeries reports whether override belongs to a live recurring series in
+// its calendar, which makes it part of that series' object.
+func (h *Handler) hasSeries(ctx context.Context, override *eventv1.Event) (bool, error) {
+	series, _, err := h.repos.Events.List(ctx, parentOf(override.GetName()), repox.ListInput{
+		PageSize: 1,
+		Where: []filterx.Condition{
+			{Field: "ical_uid", Op: filterx.OpEq, Value: override.GetIcalUid()},
+			filterx.IsNull("original_start", true),
+			filterx.IsNull("recurrence", false),
+		},
+	})
+	return len(series) > 0, err
+}
+
+// objects returns every live object in a calendar, events first. Overrides
+// are gathered into their series' object; one whose series is not in the
+// calendar stands as an object of its own.
 func (h *Handler) objects(ctx context.Context, calendar string) ([]object, error) {
-	var out []object
+	var events []*eventv1.Event
 	parent := calendarName(calendar)
 	for token := ""; ; {
 		page, next, err := h.repos.Events.List(ctx, parent, repox.ListInput{PageSize: 1000, PageToken: token})
 		if err != nil {
 			return nil, err
 		}
-		for _, e := range page {
-			out = append(out, object{id: lastSegment(e.GetName()), event: e})
-		}
+		events = append(events, page...)
 		if token = next; token == "" {
 			break
+		}
+	}
+	var out []object
+	series := map[string]int{}
+	for _, e := range events {
+		if e.GetOriginalStart() != nil {
+			continue
+		}
+		if e.GetRecurrence() != nil && e.GetIcalUid() != "" {
+			series[e.GetIcalUid()] = len(out)
+		}
+		out = append(out, object{id: lastSegment(e.GetName()), event: e})
+	}
+	for _, e := range events {
+		if e.GetOriginalStart() == nil {
+			continue
+		}
+		if i, ok := series[e.GetIcalUid()]; ok {
+			out[i].overrides = append(out[i].overrides, e)
+		} else {
+			out = append(out, object{id: lastSegment(e.GetName()), event: e})
 		}
 	}
 	for token := ""; ; {
@@ -122,6 +185,15 @@ func ctag(c *calendarv1.Calendar, objs []object) string {
 		h.Write([]byte(o.etag()))
 	}
 	return hex.EncodeToString(h.Sum(nil)[:16])
+}
+
+// parentOf is the collection an event sits in.
+// "calendars/c/events/e" -> "calendars/c".
+func parentOf(name string) string {
+	if i := strings.LastIndex(name, "/events/"); i >= 0 {
+		return name[:i]
+	}
+	return name
 }
 
 func lastSegment(name string) string {

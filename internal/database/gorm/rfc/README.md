@@ -93,6 +93,7 @@ erDiagram
         string start_id FK
         string end_id FK
         string recurrence_id FK
+        string original_start_id FK
         string organizer_id FK
     }
     ExtensionField {
@@ -350,6 +351,7 @@ erDiagram
     Event }o--|| CalendarTime : "start_id"
     Event }o--|| CalendarTime : "end_id"
     Event }o--|| Recurrence : "recurrence_id"
+    Event }o--|| CalendarTime : "original_start_id"
     Event }o--|| Organizer : "organizer_id"
     ExtensionField }o--|| Record : "record_id"
     ExtensionField }o--|| Record : "record_id"
@@ -578,6 +580,7 @@ Event is the VEVENT component, RFC 5545 section 3.6.1 <https://www.rfc-editor.or
 | `start_id` | `CHAR(26)` | not null |
 | `end_id` | `CHAR(26)` | nullable |
 | `recurrence_id` | `CHAR(26)` | nullable |
+| `original_start_id` | `CHAR(26)` | nullable |
 | `organizer_id` | `CHAR(26)` | nullable |
 
 ### `CalendarTime` → `calendar_times`

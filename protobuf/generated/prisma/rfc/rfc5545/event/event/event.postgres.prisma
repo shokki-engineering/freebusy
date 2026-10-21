@@ -115,6 +115,12 @@ model Event {
   /// Relation to Recurrence via recurrence_id.
   recurrence Recurrence? @relation(fields: [recurrenceID], references: [id], onDelete: SetNull)
 
+  /// Foreign key to CalendarTime.
+  originalStartID String? @map("original_start_id")
+
+  /// Relation to EventCalendarTime via original_start_id.
+  originalStart EventCalendarTime? @relation("EventOriginalStart", fields: [originalStartID], references: [id], onDelete: SetNull)
+
   /// Foreign key to Organizer.
   organizerID String? @map("organizer_id")
 
@@ -161,6 +167,8 @@ model Event {
   @@index([endID])
   /// Index on [recurrence_id].
   @@index([recurrenceID])
+  /// Index on [original_start_id].
+  @@index([originalStartID])
   /// Index on [organizer_id].
   @@index([organizerID])
   /// GIN index: tag containment (@>) cannot use a B-tree.

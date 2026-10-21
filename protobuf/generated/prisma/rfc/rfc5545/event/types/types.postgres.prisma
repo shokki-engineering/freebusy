@@ -103,6 +103,9 @@ model EventCalendarTime {
   /// Back-relation: Event records that reference this model via end_id.
   resource2 Event[] @relation("EventEnd")
 
+  /// Back-relation: Event records that reference this model via original_start_id.
+  resource3 Event[] @relation("EventOriginalStart")
+
   /// Back-relation: Recurrence records that reference this model via until_id.
   recurrences Recurrence[]
 

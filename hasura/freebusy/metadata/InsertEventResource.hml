@@ -38,6 +38,8 @@ definition:
       type: String_1!
     - name: organizerId
       type: String_1
+    - name: originalStartId
+      type: String_1
     - name: position
       type: String_1
     - name: recurrenceId
@@ -114,6 +116,9 @@ definition:
         organizerId:
           column:
             name: organizer_id
+        originalStartId:
+          column:
+            name: original_start_id
         position:
           column:
             name: position
@@ -168,6 +173,7 @@ definition:
           - location
           - name
           - organizerId
+          - originalStartId
           - position
           - recurrenceId
           - refids

@@ -14,6 +14,8 @@ import (
 	"fmt"
 	"regexp"
 
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/rfc/availability"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/rfc/calendar"
@@ -51,6 +53,32 @@ func NewRepositories(conn repox.Conn) Repositories {
 		Calendars:      calendar.New(conn).Calendars,
 		Availabilities: availability.New(conn).Availabilities,
 		Events:         event.New(conn).Events,
+	}
+}
+
+// Overrides returns the live overrides of series, RFC 5545 section 3.8.4.4:
+// the events in its calendar sharing its ical_uid that carry an
+// original_start. Anything other than a recurring series has none.
+func (r Repositories) Overrides(ctx context.Context, series *eventv1.Event) ([]*eventv1.Event, error) {
+	if series.GetRecurrence() == nil || series.GetIcalUid() == "" || series.GetOriginalStart() != nil {
+		return nil, nil
+	}
+	var found []*eventv1.Event
+	for token := ""; ; {
+		page, next, err := r.Events.List(ctx, calendarOf(series.GetName()), repox.ListInput{
+			PageSize: 1000, PageToken: token,
+			Where: []filterx.Condition{
+				{Field: "ical_uid", Op: filterx.OpEq, Value: series.GetIcalUid()},
+				filterx.IsNull("original_start", false),
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+		found = append(found, page...)
+		if token = next; token == "" {
+			return allocation.OverridesOf(series, found), nil
+		}
 	}
 }
 

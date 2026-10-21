@@ -54,6 +54,7 @@ type EventStoreIface interface {
 	ListByStartID(ctx context.Context, id string, opts gormx.ListOptions) ([]Event, error)
 	ListByEndID(ctx context.Context, id string, opts gormx.ListOptions) ([]Event, error)
 	ListByRecurrenceID(ctx context.Context, id string, opts gormx.ListOptions) ([]Event, error)
+	ListByOriginalStartID(ctx context.Context, id string, opts gormx.ListOptions) ([]Event, error)
 	ListByOrganizerID(ctx context.Context, id string, opts gormx.ListOptions) ([]Event, error)
 }
 
@@ -251,6 +252,21 @@ func (s *EventStore) ListByRecurrenceID(ctx context.Context, id string, opts gor
 		return opts.Apply(s.DB.WithContext(ctx).Where("recurrence_id = ?", id)).Find(&out).Error
 	})
 	tel.RecordOp(ctx, "event.resource", "list_by_recurrence_id", time.Since(start), err)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ListByOriginalStartID returns the Event records whose original_start_id matches id, with opts applied.
+func (s *EventStore) ListByOriginalStartID(ctx context.Context, id string, opts gormx.ListOptions) ([]Event, error) {
+	var out []Event
+	tel := gormx.OrNop(s.Telemetry)
+	start := time.Now()
+	err := tel.Span(ctx, "event.Event/ListByOriginalStartID", nil, func(ctx context.Context) error {
+		return opts.Apply(s.DB.WithContext(ctx).Where("original_start_id = ?", id)).Find(&out).Error
+	})
+	tel.RecordOp(ctx, "event.resource", "list_by_original_start_id", time.Since(start), err)
 	if err != nil {
 		return nil, err
 	}

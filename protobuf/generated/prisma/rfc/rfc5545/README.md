@@ -36,6 +36,7 @@ erDiagram
         string start_id FK
         string end_id FK
         string recurrence_id FK
+        string original_start_id FK
         string organizer_id FK
     }
     EventCalendarTime {
@@ -125,6 +126,7 @@ erDiagram
     Event }o--|| EventCalendarTime : "start_id"
     Event }o--|| EventCalendarTime : "end_id"
     Event }o--|| Recurrence : "recurrence_id"
+    Event }o--|| EventCalendarTime : "original_start_id"
     Event }o--|| Organizer : "organizer_id"
     EventCalendarTime }o--|| Event : "event_id"
     EventExtensionProperty }o--|| Event : "event_id"

@@ -97,7 +97,7 @@ inputs:
   # Pinned to the commit buf.lock records: an unpinned module input resolves
   # to the BSR head, and a regen then rewrites every RFC stub to whatever
   # upstream last pushed.
-  - module: buf.build/the-protobuf-project/rfc:0fb3b05919464d84a2e18d200f5650c7
+  - module: buf.build/the-protobuf-project/rfc:ae1e2acc01d54d618303e57275f86dee
 
 plugins:
   # strategy: all is required — store must see every proto file in one

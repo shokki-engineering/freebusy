@@ -230,7 +230,7 @@ func (f filter) matches(o object, loc *time.Location) (bool, error) {
 	if f.window == nil || o.event == nil {
 		return true, nil
 	}
-	instances, err := rfcsvc.Instances(o.event, loc, *f.window)
+	instances, err := rfcsvc.Instances(o.event, o.overrides, loc, *f.window)
 	if err != nil {
 		return false, err
 	}
@@ -269,7 +269,7 @@ func objectData(o object, expand *engine.Span, loc *time.Location) (string, erro
 		block, err := objectComponent(o)
 		return calendarObject(block), err
 	}
-	instances, err := rfcsvc.Instances(o.event, loc, *expand)
+	instances, err := rfcsvc.Instances(o.event, o.overrides, loc, *expand)
 	if err != nil {
 		return "", err
 	}

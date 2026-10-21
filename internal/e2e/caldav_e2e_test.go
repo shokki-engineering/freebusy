@@ -18,6 +18,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/oh-tarnished/freebusy/internal/caldav"
 	"github.com/oh-tarnished/freebusy/internal/database"
+	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation/db"
 	"github.com/oh-tarnished/freebusy/internal/service/rfcsvc"
@@ -217,12 +218,85 @@ func caldavFlow(t *testing.T, conn *database.Connection) {
 		t.Fatalf("display name %q after a refused PROPPATCH", got.GetDisplayName())
 	}
 
-	// An edited single occurrence has nowhere to go in the schema: refused,
-	// not silently dropped.
-	override := strings.Replace(event("Resurfacing"), "END:VCALENDAR\r\n",
-		"BEGIN:VEVENT\r\nUID:maint-"+suffix+"@example.com\r\nDTSTAMP:"+stamp(time.Now())+"\r\nRECURRENCE-ID;TZID=Europe/Madrid:"+local(at(10))+"\r\nDTSTART;TZID=Europe/Madrid:"+local(at(12))+"\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n", 1)
-	_, out = c.want("PUT", obj, override, http.StatusForbidden)
-	mustContain(t, "override", out, "valid-calendar-object-resource")
+	// Single occurrences edited, RFC 5545 section 3.8.4.4: the first week
+	// moved to 12:00, the second cancelled. One object, three VEVENTs.
+	uid := "maint-" + suffix + "@example.com"
+	override := func(week int, extra string) string {
+		orig := at(10).AddDate(0, 0, 7*week)
+		return "BEGIN:VEVENT\r\nUID:" + uid + "\r\nDTSTAMP:" + stamp(time.Now()) + "\r\n" +
+			"RECURRENCE-ID;TZID=Europe/Madrid:" + local(orig) + "\r\n" + extra + "END:VEVENT\r\n"
+	}
+	edited := strings.Replace(event("Resurfacing"), "END:VCALENDAR\r\n",
+		override(0, "DTSTART;TZID=Europe/Madrid:"+local(at(12))+"\r\nDTEND;TZID=Europe/Madrid:"+local(at(13))+"\r\nSUMMARY:Moved\r\n")+
+			override(1, "DTSTART;TZID=Europe/Madrid:"+local(at(10).AddDate(0, 0, 7))+"\r\nSTATUS:CANCELLED\r\n")+
+			"END:VCALENDAR\r\n", 1)
+	resp, _ = c.want("PUT", obj, edited, http.StatusNoContent)
+	editedTag := resp.Header.Get("ETag")
+	resp, out = c.want("GET", obj, "", http.StatusOK)
+	if n := strings.Count(out, "BEGIN:VEVENT"); n != 3 || resp.Header.Get("ETag") != editedTag {
+		t.Fatalf("GET of an edited series: %d VEVENTs, ETag %q (PUT gave %q)\n%s", n, resp.Header.Get("ETag"), editedTag, out)
+	}
+	mustContain(t, "edited GET", out, "RRULE:FREQ=WEEKLY;COUNT=3",
+		"RECURRENCE-ID;TZID=Europe/Madrid:"+local(at(10)), "SUMMARY:Moved",
+		"RECURRENCE-ID;TZID=Europe/Madrid:"+local(at(10).AddDate(0, 0, 7)), "STATUS:CANCELLED")
+	_, out = c.want("PROPFIND", cal, `<D:propfind xmlns:D="DAV:"><D:prop><D:getetag/></D:prop></D:propfind>`, http.StatusMultiStatus, "Depth", "1")
+	if n := strings.Count(out, "<D:response>"); n != 3 { // the calendar, the series, the hours
+		t.Fatalf("overrides listed as objects of their own:\n%s", out)
+	}
+
+	// Expanded, the moved instance is at 12:00 and the cancelled one is gone.
+	_, out = c.want("REPORT", cal, window(day, day.AddDate(0, 0, 21)), http.StatusMultiStatus, "Depth", "1")
+	if n := strings.Count(out, "BEGIN:VEVENT"); n != 2 {
+		t.Fatalf("expanded %d instances of the edited series, want 2:\n%s", n, out)
+	}
+	mustContain(t, "edited expand", out, "SUMMARY:Moved", "DTSTART;TZID=Europe/Madrid:"+local(at(12)),
+		"RECURRENCE-ID:"+m(10))
+	// And the engine agrees: 10:00 is free, 12:00 busy, the second week free.
+	fbWeek := func(week int) string {
+		d := day.AddDate(0, 0, 7*week)
+		mm := func(h int) string { return stamp(time.Date(d.Year(), d.Month(), d.Day(), h, 0, 0, 0, madridLoc)) }
+		_, out := c.want("REPORT", cal, `<C:free-busy-query xmlns:C="urn:ietf:params:xml:ns:caldav"><C:time-range start="`+mm(8)+`" end="`+mm(20)+`"/></C:free-busy-query>`, http.StatusOK, "Depth", "1")
+		return out
+	}
+	out = fbWeek(0)
+	mustContain(t, "edited free-busy", out, "FREEBUSY;FBTYPE=BUSY:"+m(12)+"/"+m(13))
+	if strings.Contains(out, "FBTYPE=BUSY:"+m(10)) {
+		t.Fatalf("the moved instance still blocks 10:00:\n%s", out)
+	}
+	if out = fbWeek(1); strings.Contains(out, "FBTYPE=BUSY:") {
+		t.Fatalf("the cancelled instance still blocks:\n%s", out)
+	}
+
+	// Re-PUT the series without overrides: both instances come back.
+	resp, _ = c.want("PUT", obj, event("Resurfacing"), http.StatusNoContent, "If-Match", editedTag)
+	_, out = c.want("GET", obj, "", http.StatusOK)
+	if n := strings.Count(out, "BEGIN:VEVENT"); n != 1 {
+		t.Fatalf("overrides survived a PUT without them:\n%s", out)
+	}
+	_, out = c.want("REPORT", cal, window(day, day.AddDate(0, 0, 21)), http.StatusMultiStatus, "Depth", "1")
+	if n := strings.Count(out, "BEGIN:VEVENT"); n != 3 {
+		t.Fatalf("expanded %d instances after the overrides were dropped, want 3:\n%s", n, out)
+	}
+	// Overrides without their series, or carrying their own RRULE, are not
+	// one object.
+	_, out = c.want("PUT", cal+"orphans.ics", "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//test//EN\r\n"+madrid+
+		override(0, "DTSTART;TZID=Europe/Madrid:"+local(at(12))+"\r\n")+override(1, "DTSTART;TZID=Europe/Madrid:"+local(at(12))+"\r\n")+
+		"END:VCALENDAR\r\n", http.StatusForbidden)
+	mustContain(t, "orphans", out, "valid-calendar-object-resource")
+
+	// DELETE takes the overrides with the series.
+	resp, _ = c.want("PUT", obj, edited, http.StatusNoContent)
+	c.want("DELETE", obj, "", http.StatusNoContent, "If-Match", resp.Header.Get("ETag"))
+	left, _, err := repos.Events.List(context.Background(), calName, repox.ListInput{PageSize: 100})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(left) != 0 {
+		t.Fatalf("%d events live after the series was deleted", len(left))
+	}
+	if _, err := repos.Events.Undelete(context.Background(), calName+"/events/Weekly-Maint.ics"); err != nil {
+		t.Fatal(err)
+	}
 
 	// DELETE is soft: gone from CalDAV and the engine, recoverable over gRPC.
 	_, cur := c.want("PROPFIND", obj, `<D:propfind xmlns:D="DAV:"><D:prop><D:getetag/></D:prop></D:propfind>`, http.StatusMultiStatus, "Depth", "0")
@@ -239,8 +313,9 @@ func caldavFlow(t *testing.T, conn *database.Connection) {
 	c.want("DELETE", cal, "", http.StatusNoContent)
 	c.want("PROPFIND", cal, "", http.StatusNotFound, "Depth", "0")
 	c.want("PUT", cal+"late.ics", event("Late"), http.StatusConflict)
-	for _, n := range []string{calName + "/events/Weekly-Maint.ics", calName + "/events/late.ics"} {
-		_ = repos.Events.Purge(context.Background(), n)
+	all, _, _ := repos.Events.List(context.Background(), calName, repox.ListInput{PageSize: 100, ShowDeleted: true})
+	for _, e := range all {
+		_ = repos.Events.Purge(context.Background(), e.GetName())
 	}
 	_ = repos.Availabilities.Purge(context.Background(), calName+"/availabilities/hours.ics")
 }

@@ -2428,6 +2428,14 @@
             "nullable": "nullable",
             "description": null
           },
+          "original_start_id": {
+            "name": "original_start_id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
           "position": {
             "name": "position",
             "type": {

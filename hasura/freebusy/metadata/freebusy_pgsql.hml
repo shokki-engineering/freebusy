@@ -3418,6 +3418,12 @@ definition:
                 underlying_type:
                   name: text
                   type: named
+            original_start_id:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
             position:
               type:
                 type: nullable
@@ -5570,6 +5576,12 @@ definition:
                 name: text
                 type: named
             organizer_id:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            original_start_id:
               type:
                 type: nullable
                 underlying_type:
@@ -15432,6 +15444,17 @@ definition:
                   name: text
                   type: named
           foreign_keys: {}
+        update_column_event_resource_original_start_id:
+          description: Update the 'original_start_id' column in the 'event_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
         update_column_event_resource_position:
           description: Update the 'position' column in the 'event_resource' collection
           fields:
@@ -22154,6 +22177,13 @@ definition:
                 type: nullable
                 underlying_type:
                   name: update_column_event_resource_organizer_id
+                  type: named
+            original_start_id:
+              description: Update the 'original_start_id' column in the 'event_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_event_resource_original_start_id
                   type: named
             position:
               description: Update the 'position' column in the 'event_resource' collection.

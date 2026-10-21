@@ -53,6 +53,8 @@ type CreateInput struct {
 	Name string `json:"name"`
 	// OrganizerId sets the "organizerId" column; the zero value is omitted (column default / NULL).
 	OrganizerId string `json:"organizerId,omitzero"`
+	// OriginalStartId sets the "originalStartId" column; the zero value is omitted (column default / NULL).
+	OriginalStartId string `json:"originalStartId,omitzero"`
 	// Position sets the "position" column; the zero value is omitted (column default / NULL).
 	Position string `json:"position,omitzero"`
 	// RecurrenceId sets the "recurrenceId" column; the zero value is omitted (column default / NULL).
@@ -109,6 +111,8 @@ type UpdateInput struct {
 	Name graphql.Nullable[string] `json:"name"`
 	// Update the 'organizer_id' column in the 'event_resource' collection.
 	OrganizerId graphql.Nullable[string] `json:"organizerId"`
+	// Update the 'original_start_id' column in the 'event_resource' collection.
+	OriginalStartId graphql.Nullable[string] `json:"originalStartId"`
 	// Update the 'position' column in the 'event_resource' collection.
 	Position graphql.Nullable[string] `json:"position"`
 	// Update the 'recurrence_id' column in the 'event_resource' collection.

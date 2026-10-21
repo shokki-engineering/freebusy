@@ -69,10 +69,12 @@ type Store interface {
 	// read, in the calendar's zone, by the caller.
 	Availability(ctx context.Context, calendars []string) (map[string][]*availabilityv1.Availability, error)
 
-	// Events returns the busy RFC 5545 events on each calendar that may
-	// overlap window, keyed by calendar name: opaque, not cancelled. A
-	// recurring event is returned once with its rule; expansion, through
-	// Occurrences, is the caller's.
+	// Events returns the RFC 5545 events on each calendar that may overlap
+	// window, keyed by calendar name, with every override of a returned series
+	// wherever it moved to -- cancelled and transparent ones too, since an
+	// override frees the instance it replaces whatever it says itself. A
+	// recurring event is returned once with its rule; which events are busy,
+	// and expansion through Occurrences, are the caller's.
 	Events(ctx context.Context, calendars []string, window engine.Span) (map[string][]*eventv1.Event, error)
 
 	// Claims returns the live allocation spans overlapping window on each

@@ -123,10 +123,11 @@ func (s *Store) Availability(ctx context.Context, calendars []string) (map[strin
 	return out, nil
 }
 
-// Events reads the busy events on the calendars that may overlap window:
-// opaque, not cancelled. A recurring event begun before the window ends is
-// returned once with its rule, however long ago it began; the engine expands
-// and clips it.
+// Events reads the events on the calendars that may overlap window, and every
+// override (an event with an original_start) on them, wherever it moved to. A
+// recurring event begun before the window ends is returned once with its rule,
+// however long ago it began; the engine expands and clips it, and decides
+// which events are busy.
 func (s *Store) Events(ctx context.Context, calendars []string, window engine.Span) (map[string][]*eventv1.Event, error) {
 	out := map[string][]*eventv1.Event{}
 	if len(calendars) == 0 {
@@ -146,18 +147,11 @@ func (s *Store) Events(ctx context.Context, calendars []string, window engine.Sp
 		return nil, err
 	}
 	for _, e := range found {
-		// Unset is the RFC 5545 default -- OPAQUE, CONFIRMED -- so these are
-		// read here: a SQL "<>" would drop the unset rows with the excluded
-		// ones.
-		if e.GetTransparency() == eventv1.Transparency_TRANSPARENCY_TRANSPARENT ||
-			e.GetConfirmation() == eventv1.Confirmation_CONFIRMATION_CANCELLED {
-			continue
-		}
 		// A series that begins after the window has no instance in it. Read
 		// in UTC, a floating time is off by at most a zone's offset, which the
 		// day of slack covers. An event whose times cannot be read is kept for
 		// the engine to judge.
-		if sp, err := allocation.EventSpan(e, time.UTC); err == nil &&
+		if sp, err := allocation.EventSpan(e, time.UTC); err == nil && e.GetOriginalStart() == nil &&
 			(!sp.Start.Before(hi) || (e.GetRecurrence() == nil && !sp.End.After(lo))) {
 			continue
 		}
@@ -168,19 +162,22 @@ func (s *Store) Events(ctx context.Context, calendars []string, window engine.Sp
 }
 
 // windowHints narrow the events read to those that may touch [lo, hi): begun
-// before hi, and recurring, open-ended or ended after lo. A DATE is compared
-// by day, so the hints keep a superset of what Events keeps. They are hints:
-// a backend that cannot reach an event's start or end ignores them, and the
-// checks in Events decide.
+// before hi, and recurring, open-ended or ended after lo -- plus every
+// override, whose original_start may sit in the window while it moved out. A
+// DATE is compared by day, so the hints keep a superset of what Events keeps.
+// They are hints: a backend that cannot reach an event's start or end ignores
+// them, and the checks in Events decide.
 func windowHints(lo, hi time.Time) []filterx.Condition {
 	const day = "2006-01-02"
 	return []filterx.Condition{
 		filterx.AsHint(filterx.Or(
+			filterx.IsNull("original_start", false),
 			filterx.IsNull("start", true),
 			filterx.Condition{Field: "start.date_time", Op: filterx.OpLt, Value: hi.UTC().Format(time.RFC3339Nano)},
 			filterx.Condition{Field: "start.date", Op: filterx.OpLte, Value: hi.UTC().Format(day)},
 		)),
 		filterx.AsHint(filterx.Or(
+			filterx.IsNull("original_start", false),
 			filterx.IsNull("recurrence", false),
 			filterx.IsNull("end", true),
 			filterx.Condition{Field: "end.date_time", Op: filterx.OpGt, Value: lo.UTC().Format(time.RFC3339Nano)},

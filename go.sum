@@ -2,8 +2,12 @@ buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-202608252041
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2/go.mod h1:TCt1lluMFnctISJXvkIQ4x3ABrPuUKCWKyjKdkJNBpw=
 buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20260908111956-0fb3b0591946.1 h1:B1msAuWjSNTBkgXG7JgbPA/PFPk5kZwcfqYQOHIjAKk=
 buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20260908111956-0fb3b0591946.1/go.mod h1:0MLYBQ9GuWmxBNfj5XVxtjfo9BpLMYLeIIKCvlbuzNE=
+buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261021085804-ae1e2acc01d5.1 h1:6u9A8YjWPbn94fcoLZzixBcieP2u6CeKH12hAN74mTE=
+buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261021085804-ae1e2acc01d5.1/go.mod h1:Xm2cSkNERXD59Mk+HcqTFayEIKRMCA7MBpK/SvHp3OE=
 buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20260908111956-0fb3b0591946.2 h1:R5csJZ6ddHZBQ9UWehWsS7JTeu+5GzSPE4I+H+BTzTs=
 buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20260908111956-0fb3b0591946.2/go.mod h1:BgS6YLECIrB3HN5MHkAZHOEuIBYzm+EBm8z+hZX5Q/o=
+buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261021085804-ae1e2acc01d5.2 h1:zyuIRbUZ/vc/9Hke5RJgwQoBR57VfM7nMyXElxYbkVg=
+buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261021085804-ae1e2acc01d5.2/go.mod h1:BgS6YLECIrB3HN5MHkAZHOEuIBYzm+EBm8z+hZX5Q/o=
 buf.build/go/protovalidate v1.4.0 h1:UjLrYbt5VX7+TMOs2+pG5FhZhIG1mSfK4EIopbb4LcM=
 buf.build/go/protovalidate v1.4.0/go.mod h1:8vJfzNT6NIG2qm3uFsJDXMlRmG+bQJzbcIn1Aa0vPGs=
 cel.dev/cel-go v0.32.0 h1:irvpFKr5EuGPyxeME03ERh0rii1TX+BDAnB9eL3IvNk=
@@ -242,6 +246,10 @@ github.com/the-protobuf-project/runtime-go/observability v0.0.0-20260904124504-3
 github.com/the-protobuf-project/runtime-go/observability v0.0.0-20260904124504-3aec40995305/go.mod h1:pDTcVbE2J9GnGYFsLdhrrGhbrPgtsCRIRpFl43qXQeA=
 github.com/the-protobuf-project/runtime-go/rfc v0.0.0-20261019152637-a91d78dbb831 h1:dZrjIzaYCiXe2zLs+8J4e195hGannXB/fEkcfVKdFyQ=
 github.com/the-protobuf-project/runtime-go/rfc v0.0.0-20261019152637-a91d78dbb831/go.mod h1:8/PgDj9L8x9ixKsE0wZfFyYPtayH4vs8zl7qGA0+tqI=
+github.com/the-protobuf-project/runtime-go/rfc v0.0.0-20261021085829-8457d9d2cbe1 h1:NZEsW5pOI/WnxHjnzD4rdrw0Bk7C+F2ymcwEpDXkCu4=
+github.com/the-protobuf-project/runtime-go/rfc v0.0.0-20261021085829-8457d9d2cbe1/go.mod h1:8/PgDj9L8x9ixKsE0wZfFyYPtayH4vs8zl7qGA0+tqI=
+github.com/the-protobuf-project/runtime-go/rfc v0.0.0-20261021085950-c238e87067e6 h1:6xtpZYv3BhwZX3/RJWDGUTjgNTNE61q04+JknkEan3Q=
+github.com/the-protobuf-project/runtime-go/rfc v0.0.0-20261021085950-c238e87067e6/go.mod h1:/DGRahnKFSTq/nOetTYpIE7nCnEYxTKNbcfoKgG/KbE=
 github.com/the-protobuf-project/runtime-go/telemetry v0.0.0-20260904124504-3aec40995305 h1:Thay/ZRIlDsLWTdbbNxSpYpj8ac6HN/Qu+VQ52FlSEM=
 github.com/the-protobuf-project/runtime-go/telemetry v0.0.0-20260904124504-3aec40995305/go.mod h1:2XnLUtLO2nHO4F9MI7D7XK9WZibQmxCK6ty/Wo/n6m0=
 github.com/the-protobuf-project/runtime-go/ulid v0.0.0-20260905053038-c759cd76211f h1:t+DiWawSoaotDoBkH4YegLzyUyF0CskX0JgM6C/4blI=

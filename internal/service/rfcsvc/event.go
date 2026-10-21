@@ -141,7 +141,11 @@ func (s *EventServer) ExpandEvent(ctx context.Context, req *eventv1.ExpandEventR
 		if err != nil {
 			return rpc.ToStatusErr(err)
 		}
-		instances, err := expand(e, ZoneOf(cal.GetTimeZone().GetId()), window)
+		overrides, err := s.repos.Overrides(ctx, e)
+		if err != nil {
+			return rpc.ToStatusErr(err)
+		}
+		instances, err := expand(e, overrides, ZoneOf(cal.GetTimeZone().GetId()), window)
 		if err != nil {
 			return rpc.ToStatusErr(err)
 		}

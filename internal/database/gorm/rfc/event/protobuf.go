@@ -650,6 +650,7 @@ func EventToProto(m *Event) *eventv1.Event {
 		out.Ends = &eventv1.Event_End{End: v}
 	}
 	out.Recurrence = RecurrenceToProto(m.Recurrence)
+	out.OriginalStart = CalendarTimeToProto(m.OriginalStart)
 	out.Organizer = OrganizerToProto(m.Organizer)
 	for i := range m.Alarms {
 		out.Alarms = append(out.Alarms, AlarmToProto(&m.Alarms[i]))
@@ -674,7 +675,7 @@ func EventFromProto(pb *eventv1.Event) *Event {
 		return nil
 	}
 	m := &Event{}
-	// not mapped here: position, start (sub-row graph), end (sub-row graph), recurrence (sub-row graph), organizer (sub-row graph), alarms (sub-row graph), extensions (sub-row graph), links (sub-row graph), participants (sub-row graph)
+	// not mapped here: position, start (sub-row graph), end (sub-row graph), recurrence (sub-row graph), original_start (sub-row graph), organizer (sub-row graph), alarms (sub-row graph), extensions (sub-row graph), links (sub-row graph), participants (sub-row graph)
 	m.Name = pb.GetName()
 	m.UID = toPtr(pb.GetUid())
 	m.IcalUID = toPtr(pb.GetIcalUid())

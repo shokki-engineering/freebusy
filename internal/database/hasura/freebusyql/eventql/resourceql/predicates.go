@@ -20,30 +20,31 @@ import (
 // Filter fields for EventResource. Build predicates like CalendarId.Eq(v) and combine
 // them with And/Or/Not.
 var (
-	CalendarId     = graphql.StringField{Col: "calendarId"}
-	Classification = graphql.StringField{Col: "classification"}
-	Confirmation   = graphql.StringField{Col: "confirmation"}
-	CreateTime     = graphql.StringField{Col: "createTime"}
-	DeleteTime     = graphql.StringField{Col: "deleteTime"}
-	Description    = graphql.StringField{Col: "description"}
-	Duration       = graphql.StringField{Col: "duration"}
-	EndId          = graphql.StringField{Col: "endId"}
-	EndsCase       = graphql.StringField{Col: "endsCase"}
-	Etag           = graphql.StringField{Col: "etag"}
-	ExpireTime     = graphql.StringField{Col: "expireTime"}
-	IcalUid        = graphql.StringField{Col: "icalUid"}
-	Id             = graphql.StringField{Col: "id"}
-	Location       = graphql.StringField{Col: "location"}
-	Name           = graphql.StringField{Col: "name"}
-	OrganizerId    = graphql.StringField{Col: "organizerId"}
-	Position       = graphql.StringField{Col: "position"}
-	RecurrenceId   = graphql.StringField{Col: "recurrenceId"}
-	Sequence       = graphql.Int64Field{Col: "sequence"}
-	StartId        = graphql.StringField{Col: "startId"}
-	Summary        = graphql.StringField{Col: "summary"}
-	Transparency   = graphql.StringField{Col: "transparency"}
-	Uid            = graphql.StringField{Col: "uid"}
-	UpdateTime     = graphql.StringField{Col: "updateTime"}
+	CalendarId      = graphql.StringField{Col: "calendarId"}
+	Classification  = graphql.StringField{Col: "classification"}
+	Confirmation    = graphql.StringField{Col: "confirmation"}
+	CreateTime      = graphql.StringField{Col: "createTime"}
+	DeleteTime      = graphql.StringField{Col: "deleteTime"}
+	Description     = graphql.StringField{Col: "description"}
+	Duration        = graphql.StringField{Col: "duration"}
+	EndId           = graphql.StringField{Col: "endId"}
+	EndsCase        = graphql.StringField{Col: "endsCase"}
+	Etag            = graphql.StringField{Col: "etag"}
+	ExpireTime      = graphql.StringField{Col: "expireTime"}
+	IcalUid         = graphql.StringField{Col: "icalUid"}
+	Id              = graphql.StringField{Col: "id"}
+	Location        = graphql.StringField{Col: "location"}
+	Name            = graphql.StringField{Col: "name"}
+	OrganizerId     = graphql.StringField{Col: "organizerId"}
+	OriginalStartId = graphql.StringField{Col: "originalStartId"}
+	Position        = graphql.StringField{Col: "position"}
+	RecurrenceId    = graphql.StringField{Col: "recurrenceId"}
+	Sequence        = graphql.Int64Field{Col: "sequence"}
+	StartId         = graphql.StringField{Col: "startId"}
+	Summary         = graphql.StringField{Col: "summary"}
+	Transparency    = graphql.StringField{Col: "transparency"}
+	Uid             = graphql.StringField{Col: "uid"}
+	UpdateTime      = graphql.StringField{Col: "updateTime"}
 )
 
 // And matches rows satisfying every predicate.

@@ -10,7 +10,9 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
 	"github.com/the-protobuf-project/runtime-go/rfc"
+	"google.golang.org/genproto/googleapis/type/datetime"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -94,18 +96,28 @@ func availabilityComponent(a *availabilityv1.Availability) (string, error) {
 	return component(text, "VAVAILABILITY"), nil
 }
 
-// objectComponent renders one stored object.
+// objectComponent renders one stored object: an availability, or an event
+// followed by the overrides of its instances, each a VEVENT carrying its
+// RECURRENCE-ID, RFC 5545 section 3.8.4.4.
 func objectComponent(o object) (string, error) {
-	if o.event != nil {
-		return eventComponent(o.event)
+	if o.avail != nil {
+		return availabilityComponent(o.avail)
 	}
-	return availabilityComponent(o.avail)
+	var b strings.Builder
+	for _, e := range append([]*eventv1.Event{o.event}, o.overrides...) {
+		block, err := eventComponent(e)
+		if err != nil {
+			return "", err
+		}
+		b.WriteString(block)
+	}
+	return b.String(), nil
 }
 
 // instanceComponents renders the expanded instances of master as VEVENTs,
 // each carrying the master's UID and a RECURRENCE-ID naming the occurrence it
-// is, RFC 4791 section 9.6.5. The instances come from the engine's expander,
-// so they are exactly the time the engine blocks.
+// is, in UTC, RFC 4791 section 9.6.5. The instances come from the engine's
+// expander, so they are exactly the time the engine blocks.
 func instanceComponents(master *eventv1.Event, instances []*eventv1.Event, loc *time.Location) ([]string, error) {
 	var out []string
 	for _, inst := range instances {
@@ -114,16 +126,17 @@ func instanceComponents(master *eventv1.Event, instances []*eventv1.Event, loc *
 		if c.IcalUid == "" && c.Uid == "" {
 			c.IcalUid = master.GetName()
 		}
+		if at, allDay, ok := allocation.Instant(c.GetOriginalStart(), loc); ok && !allDay {
+			at = at.UTC()
+			c.OriginalStart = &eventv1.CalendarTime{Value: &eventv1.CalendarTime_DateTime{DateTime: &datetime.DateTime{
+				Year: int32(at.Year()), Month: int32(at.Month()), Day: int32(at.Day()),
+				Hours: int32(at.Hour()), Minutes: int32(at.Minute()), Seconds: int32(at.Second()),
+				TimeOffset: &datetime.DateTime_UtcOffset{UtcOffset: &durationpb.Duration{}},
+			}}}
+		}
 		block, err := eventComponent(c)
 		if err != nil {
 			return nil, err
-		}
-		if master.GetRecurrence() != nil {
-			sp, err := allocation.EventSpan(inst, loc)
-			if err != nil {
-				return nil, err
-			}
-			block = insertAfter(block, "BEGIN:VEVENT"+crlf, "RECURRENCE-ID:"+sp.Start.UTC().Format(utcStamp)+crlf)
 		}
 		out = append(out, block)
 	}
@@ -182,17 +195,18 @@ func insertAfter(block, marker, line string) string {
 	return block[:i] + line + block[i:]
 }
 
-// decoded is a PUT body read into the message it holds.
+// decoded is a PUT body read into the messages it holds.
 type decoded struct {
-	event *eventv1.Event
-	avail *availabilityv1.Availability
+	event     *eventv1.Event
+	overrides []*eventv1.Event
+	avail     *availabilityv1.Availability
 }
 
 // decode reads a calendar object resource, RFC 4791 section 4.1: one
-// VCALENDAR holding one VEVENT or one VAVAILABILITY. Overridden instances
-// (more VEVENTs sharing the UID, each with a RECURRENCE-ID) are refused
-// rather than read: the schema has no place for them, and dropping them
-// would silently lose the client's edit of one occurrence.
+// VCALENDAR holding one VAVAILABILITY, or VEVENTs sharing one UID -- a single
+// event, or a recurring series with overrides of its instances, each carrying
+// a RECURRENCE-ID. An override on its own, for an instance of a series kept
+// elsewhere, is one event too.
 func decode(text string) (decoded, error) {
 	switch {
 	case strings.Contains(text, "BEGIN:VAVAILABILITY"):
@@ -201,16 +215,42 @@ func decode(text string) (decoded, error) {
 			return decoded{}, failf(403, "C:valid-calendar-data", "%v", err)
 		}
 		return decoded{avail: a}, nil
-	case strings.Count(text, "BEGIN:VEVENT") == 1 && !strings.Contains(text, "RECURRENCE-ID"):
-		e, err := rfc.ICalendar(text).Validate().Event()
-		if err != nil {
-			return decoded{}, failf(403, "C:valid-calendar-data", "%v", err)
-		}
-		return decoded{event: e}, nil
-	case strings.Contains(text, "BEGIN:VEVENT"):
-		return decoded{}, failf(403, "C:valid-calendar-object-resource",
-			"overridden instances (RECURRENCE-ID) are not supported; edit the whole series")
+	case !strings.Contains(text, "BEGIN:VEVENT"):
+		return decoded{}, failf(403, "C:supported-calendar-component",
+			"a calendar object here holds VEVENTs or one VAVAILABILITY")
 	}
-	return decoded{}, failf(403, "C:supported-calendar-component",
-		"a calendar object here holds one VEVENT or one VAVAILABILITY")
+	events, err := rfc.ICalendar(text).Validate().Events()
+	if err != nil {
+		return decoded{}, failf(403, "C:valid-calendar-data", "%v", err)
+	}
+	invalid := func(format string, args ...any) (decoded, error) {
+		return decoded{}, failf(403, "C:valid-calendar-object-resource", format, args...)
+	}
+	var d decoded
+	for _, e := range events {
+		switch {
+		case e.GetIcalUid() != events[0].GetIcalUid():
+			return invalid("every component of one calendar object shares a UID")
+		case e.GetOriginalStart() == nil && d.event != nil && d.event.GetOriginalStart() == nil:
+			return invalid("a calendar object holds one series; its other VEVENTs need a RECURRENCE-ID")
+		case e.GetOriginalStart() == nil:
+			if d.event != nil {
+				d.overrides = append(d.overrides, d.event)
+			}
+			d.event = e
+		case e.GetRecurrence() != nil:
+			return invalid("an overridden instance cannot carry its own RRULE")
+		case d.event == nil:
+			d.event = e
+		default:
+			d.overrides = append(d.overrides, e)
+		}
+	}
+	switch {
+	case len(d.overrides) > 0 && d.event.GetOriginalStart() != nil:
+		return invalid("overridden instances need their series in the same object")
+	case len(d.overrides) > 0 && d.event.GetRecurrence() == nil:
+		return invalid("only a recurring event has instances to override")
+	}
+	return d, nil
 }

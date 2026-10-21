@@ -18085,6 +18085,16 @@
           }
         },
         {
+          "name": "originalStartId",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
           "name": "position",
           "description": "",
           "args": [],
@@ -18435,6 +18445,20 @@
           }
         },
         {
+          "name": "originalStartId",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
           "name": "position",
           "description": "",
           "args": [],
@@ -18764,6 +18788,16 @@
           "defaultValue": null
         },
         {
+          "name": "originalStartId",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
           "name": "position",
           "description": "",
           "type": {
@@ -19063,6 +19097,16 @@
         },
         {
           "name": "organizerId",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "originalStartId",
           "description": "",
           "type": {
             "kind": "ENUM",
@@ -25624,6 +25668,16 @@
         },
         {
           "name": "organizerId",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "originalStartId",
           "description": "",
           "type": {
             "kind": "SCALAR",
@@ -91552,6 +91606,26 @@
     },
     {
       "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnEventResourceOriginalStartIdInput",
+      "description": "Update the 'original_start_id' column in the 'event_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
       "name": "UpdateColumnEventResourcePositionInput",
       "description": "Update the 'position' column in the 'event_resource' collection",
       "fields": null,
@@ -105094,6 +105168,16 @@
           "type": {
             "kind": "INPUT_OBJECT",
             "name": "UpdateColumnEventResourceOrganizerIdInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "originalStartId",
+          "description": "Update the 'original_start_id' column in the 'event_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnEventResourceOriginalStartIdInput",
             "ofType": null
           },
           "defaultValue": null

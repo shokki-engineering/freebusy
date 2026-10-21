@@ -147,7 +147,9 @@ func toAvailabilities(comps []*availabilityv1.Availability, loc *time.Location) 
 }
 
 // expandEvents turns stored events on a calendar in loc into busy time over
-// span, through Occurrences.
+// span, through Occurrences: each series less the instances its overrides
+// replace, and each override, which stands for its instance, on its own. A
+// cancelled or transparent override frees its instance and blocks nothing.
 //
 // The opposite fallback to toAvailabilities: an event whose occurrences cannot
 // be listed blocks the whole span from its first occurrence on, because
@@ -156,7 +158,10 @@ func toAvailabilities(comps []*availabilityv1.Availability, loc *time.Location) 
 func expandEvents(events []*eventv1.Event, loc *time.Location, span engine.Span) engine.Spans {
 	var out []engine.Span
 	for _, e := range events {
-		starts, dur, err := Occurrences(e, loc, span)
+		if !Busy(e) {
+			continue
+		}
+		starts, dur, err := Occurrences(e, OverridesOf(e, events), loc, span)
 		if err != nil {
 			if first, err := EventSpan(e, loc); err == nil {
 				out = append(out, engine.Span{Start: first.Start, End: span.End}.Intersect(span))

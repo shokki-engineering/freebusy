@@ -14,15 +14,15 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 
-// Instances returns e's occurrences overlapping window: the instances of a
-// recurring event, as expand gives them, or e itself when it is a single
-// occurrence that overlaps. A CalDAV time-range filter and its expand
-// element read the same answer ExpandEvent does.
-func Instances(e *eventv1.Event, loc *time.Location, window engine.Span) ([]*eventv1.Event, error) {
+// Instances returns e's occurrences overlapping window: for a recurring
+// series, its instances with overrides applied, as expand gives them; for any
+// other event, e itself when it overlaps. A CalDAV time-range filter and its
+// expand element read the same answer ExpandEvent does.
+func Instances(e *eventv1.Event, overrides []*eventv1.Event, loc *time.Location, window engine.Span) ([]*eventv1.Event, error) {
 	if e.GetRecurrence() != nil {
-		return expand(e, loc, window)
+		return expand(e, overrides, loc, window)
 	}
-	starts, _, err := allocation.Occurrences(e, loc, window)
+	starts, _, err := allocation.Occurrences(e, nil, loc, window)
 	if err != nil || len(starts) == 0 {
 		return nil, err
 	}
@@ -31,15 +31,20 @@ func Instances(e *eventv1.Event, loc *time.Location, window engine.Span) ([]*eve
 
 // expand materialises e's instances overlapping window, as
 // allocation.Occurrences lists them -- so an instance listed here is exactly
-// the busy time the engine blocks for it.
+// the busy time the engine blocks for it. Each override replaces the
+// instance its original_start names: a moved one is listed at its new time,
+// when that overlaps window, and a cancelled one not at all, RFC 5545
+// section 3.8.4.4.
 //
 // Instances keep the event's own time form -- a DATE stays a DATE, a zoned
-// DATE-TIME keeps its zone -- and carry no name: none is a stored resource.
-func expand(e *eventv1.Event, loc *time.Location, window engine.Span) ([]*eventv1.Event, error) {
+// DATE-TIME keeps its zone -- carry the original_start that identifies them
+// within the series, and carry no name: none is a stored resource. An
+// override keeps its own name, since it is one.
+func expand(e *eventv1.Event, overrides []*eventv1.Event, loc *time.Location, window engine.Span) ([]*eventv1.Event, error) {
 	if e.GetRecurrence() == nil {
 		return nil, fmt.Errorf("%w: %s has no recurrence rule", types.ErrInvalidState, e.GetName())
 	}
-	starts, dur, err := allocation.Occurrences(e, loc, window)
+	starts, dur, err := allocation.Occurrences(e, overrides, loc, window)
 	if err != nil {
 		return nil, err
 	}
@@ -53,18 +58,40 @@ func expand(e *eventv1.Event, loc *time.Location, window engine.Span) ([]*eventv
 			return nil, err
 		}
 	}
-	out := make([]*eventv1.Event, 0, len(starts))
+	type instance struct {
+		start time.Time
+		event *eventv1.Event
+	}
+	out := make([]instance, 0, len(starts)+len(overrides))
 	for _, t := range starts {
 		inst := proto.Clone(e).(*eventv1.Event)
 		inst.Name, inst.Etag = "", ""
 		inst.Recurrence, inst.ExcludedTimes, inst.AdditionalTimes = nil, nil, nil
 		inst.Start = startForm.render(t)
+		inst.OriginalStart = startForm.render(t)
 		if e.GetEnd() != nil {
 			inst.Ends = &eventv1.Event_End{End: endForm.render(t.Add(dur))}
 		}
-		out = append(out, inst)
+		out = append(out, instance{t, inst})
 	}
-	return out, nil
+	for _, o := range overrides {
+		if o.GetConfirmation() == eventv1.Confirmation_CONFIRMATION_CANCELLED {
+			continue
+		}
+		at, _, err := allocation.Occurrences(o, nil, loc, window)
+		if err != nil {
+			return nil, err
+		}
+		if len(at) > 0 {
+			out = append(out, instance{at[0], o})
+		}
+	}
+	sortBy(out, func(a, b instance) bool { return a.start.Before(b.start) })
+	events := make([]*eventv1.Event, len(out))
+	for i, in := range out {
+		events[i] = in.event
+	}
+	return events, nil
 }
 
 // timeForm is how a stored RFC 5545 time was written, so an instance can be

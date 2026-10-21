@@ -134,9 +134,13 @@ func EventSpan(e *eventv1.Event, loc *time.Location) (engine.Span, error) {
 // 5545 section 3.8.5; a single event is its one occurrence. A zero-length
 // occurrence overlaps a window containing its instant, RFC 4791 section 9.9.
 //
+// overrides are the events replacing single instances of e, section 3.8.4.4:
+// the instance each one's original_start names is left out here, and the
+// override stands in for it as an event of its own.
+//
 // The engine's busy time, ExpandEvent and CalDAV all read events through it,
 // so an instance a client is shown is exactly the time the engine blocks.
-func Occurrences(e *eventv1.Event, loc *time.Location, window engine.Span) ([]time.Time, time.Duration, error) {
+func Occurrences(e *eventv1.Event, overrides []*eventv1.Event, loc *time.Location, window engine.Span) ([]time.Time, time.Duration, error) {
 	first, err := EventSpan(e, loc)
 	if err != nil {
 		return nil, 0, err
@@ -172,6 +176,11 @@ func Occurrences(e *eventv1.Event, loc *time.Location, window engine.Span) ([]ti
 		}
 		excluded[t.UnixNano()] = true
 	}
+	for _, o := range overrides {
+		if t, _, ok := instantIn(o.GetOriginalStart(), loc); ok {
+			excluded[t.UnixNano()] = true
+		}
+	}
 	var starts []time.Time
 	seen := map[int64]bool{}
 	keep := func(t time.Time) {
@@ -194,4 +203,28 @@ func Occurrences(e *eventv1.Event, loc *time.Location, window engine.Span) ([]ti
 	}
 	slices.SortFunc(starts, time.Time.Compare)
 	return starts, dur, nil
+}
+
+// Busy reports whether e blocks time: OPAQUE and not CANCELLED, which unset
+// fields default to, RFC 5545 sections 3.8.2.7 and 3.8.1.11.
+func Busy(e *eventv1.Event) bool {
+	return e.GetTransparency() != eventv1.Transparency_TRANSPARENCY_TRANSPARENT &&
+		e.GetConfirmation() != eventv1.Confirmation_CONFIRMATION_CANCELLED
+}
+
+// OverridesOf returns the events in events that override instances of
+// series: those carrying an original_start and series' ical_uid, section
+// 3.8.4.4. A series with no ical_uid has none, since nothing can name it.
+func OverridesOf(series *eventv1.Event, events []*eventv1.Event) []*eventv1.Event {
+	uid := series.GetIcalUid()
+	if uid == "" || series.GetOriginalStart() != nil {
+		return nil
+	}
+	var out []*eventv1.Event
+	for _, e := range events {
+		if e.GetOriginalStart() != nil && e.GetIcalUid() == uid {
+			out = append(out, e)
+		}
+	}
+	return out
 }

@@ -4,8 +4,12 @@ buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-202608252041
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2/go.mod h1:TCt1lluMFnctISJXvkIQ4x3ABrPuUKCWKyjKdkJNBpw=
 buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20260908111956-0fb3b0591946.1 h1:B1msAuWjSNTBkgXG7JgbPA/PFPk5kZwcfqYQOHIjAKk=
 buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20260908111956-0fb3b0591946.1/go.mod h1:0MLYBQ9GuWmxBNfj5XVxtjfo9BpLMYLeIIKCvlbuzNE=
+buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261021085804-ae1e2acc01d5.1 h1:6u9A8YjWPbn94fcoLZzixBcieP2u6CeKH12hAN74mTE=
+buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261021085804-ae1e2acc01d5.1/go.mod h1:Xm2cSkNERXD59Mk+HcqTFayEIKRMCA7MBpK/SvHp3OE=
 buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20260908111956-0fb3b0591946.2 h1:R5csJZ6ddHZBQ9UWehWsS7JTeu+5GzSPE4I+H+BTzTs=
 buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20260908111956-0fb3b0591946.2/go.mod h1:BgS6YLECIrB3HN5MHkAZHOEuIBYzm+EBm8z+hZX5Q/o=
+buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261021085804-ae1e2acc01d5.2 h1:zyuIRbUZ/vc/9Hke5RJgwQoBR57VfM7nMyXElxYbkVg=
+buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261021085804-ae1e2acc01d5.2/go.mod h1:BgS6YLECIrB3HN5MHkAZHOEuIBYzm+EBm8z+hZX5Q/o=
 github.com/a2aproject/a2a-go/v2 v2.4.0 h1:da0iwA6voxLhXIw1B3GSAdrhs5UIa2v6m+v/Fix5qTw=
 github.com/a2aproject/a2a-go/v2 v2.4.0/go.mod h1:EghJ/rY9OCC6jme1z+otOBf+1YCVVCpMSPZU31t3hKY=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=

@@ -57,6 +57,8 @@ type DeleteEventResourceByIdResponse struct {
 		Name string `graphql:"name"`
 		// OrganizerId selects the "organizerId" field; nil when the column is NULL.
 		OrganizerId *string `graphql:"organizerId"`
+		// OriginalStartId selects the "originalStartId" field; nil when the column is NULL.
+		OriginalStartId *string `graphql:"originalStartId"`
 		// Position selects the "position" field; nil when the column is NULL.
 		Position *string `graphql:"position"`
 		// RecurrenceId selects the "recurrenceId" field; nil when the column is NULL.
@@ -116,6 +118,8 @@ type EventResource struct {
 	Name string `graphql:"name"`
 	// OrganizerId selects the "organizerId" field; nil when the column is NULL.
 	OrganizerId *string `graphql:"organizerId"`
+	// OriginalStartId selects the "originalStartId" field; nil when the column is NULL.
+	OriginalStartId *string `graphql:"originalStartId"`
 	// Position selects the "position" field; nil when the column is NULL.
 	Position *string `graphql:"position"`
 	// RecurrenceId selects the "recurrenceId" field; nil when the column is NULL.
@@ -317,6 +321,17 @@ type EventResourceAggExp struct {
 		// Min selects the "min" field; nil when the column is NULL.
 		Min *string `graphql:"min"`
 	} `graphql:"organizerId"`
+	// OriginalStartId selects the "originalStartId" field.
+	OriginalStartId struct {
+		// Count selects the "_count" field.
+		Count graphql.Int64 `graphql:"_count"`
+		// CountDistinct selects the "_count_distinct" field.
+		CountDistinct graphql.Int64 `graphql:"_count_distinct"`
+		// Max selects the "max" field; nil when the column is NULL.
+		Max *string `graphql:"max"`
+		// Min selects the "min" field; nil when the column is NULL.
+		Min *string `graphql:"min"`
+	} `graphql:"originalStartId"`
 	// Position selects the "position" field.
 	Position struct {
 		// Count selects the "_count" field.
@@ -469,6 +484,8 @@ type InsertEventResourceResponse struct {
 		Name string `graphql:"name"`
 		// OrganizerId selects the "organizerId" field; nil when the column is NULL.
 		OrganizerId *string `graphql:"organizerId"`
+		// OriginalStartId selects the "originalStartId" field; nil when the column is NULL.
+		OriginalStartId *string `graphql:"originalStartId"`
 		// Position selects the "position" field; nil when the column is NULL.
 		Position *string `graphql:"position"`
 		// RecurrenceId selects the "recurrenceId" field; nil when the column is NULL.
@@ -530,6 +547,8 @@ type UpdateEventResourceByIdResponse struct {
 		Name string `graphql:"name"`
 		// OrganizerId selects the "organizerId" field; nil when the column is NULL.
 		OrganizerId *string `graphql:"organizerId"`
+		// OriginalStartId selects the "originalStartId" field; nil when the column is NULL.
+		OriginalStartId *string `graphql:"originalStartId"`
 		// Position selects the "position" field; nil when the column is NULL.
 		Position *string `graphql:"position"`
 		// RecurrenceId selects the "recurrenceId" field; nil when the column is NULL.
