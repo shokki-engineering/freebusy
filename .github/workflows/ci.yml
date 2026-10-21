@@ -117,47 +117,15 @@ jobs:
       # Schemas and tables.
       - run: just migrate
 
-      # The engine serves the committed metadata (hasura/freebusy), built
-      # into engine/build by the DDN CLI -- which will not build without a
-      # login, even locally. HASURA_DDN_PAT is a personal access token, set
-      # as an Actions secret and, for Dependabot's pull requests, a
-      # Dependabot secret too.
-      - name: Install the DDN CLI
-        env:
-          HASURA_DDN_PAT: ${{ secrets.HASURA_DDN_PAT }}
-        run: |
-          if [ -z "$HASURA_DDN_PAT" ]; then
-            echo "::error::The HASURA_DDN_PAT secret is not set; the Hasura suites cannot run."
-            exit 1
-          fi
-          curl -fsSL https://graphql-engine-cdn.hasura.io/ddn/cli/v4/get.sh | VERSION=v3.9.4 bash
-          ddn auth login --access-token "$HASURA_DDN_PAT"
-
-      # The connector's environment. The token is minted per run: the engine
-      # and the connector only need to agree with each other.
-      - name: Build the supergraph
-        working-directory: hasura
-        run: |
-          token=$(openssl rand -hex 24)
-          cat > .env <<EOF
-          FREEBUSY_FREEBUSY_PGSQL_AUTHORIZATION_HEADER="Bearer $token"
-          FREEBUSY_FREEBUSY_PGSQL_HASURA_SERVICE_TOKEN_SECRET="$token"
-          FREEBUSY_FREEBUSY_PGSQL_CONNECTION_URI="postgresql://postgres:postgrespassword@local.hasura.dev:5432/freebusydb"
-          FREEBUSY_FREEBUSY_PGSQL_HASURA_CONNECTOR_PORT=9794
-          FREEBUSY_FREEBUSY_PGSQL_OTEL_EXPORTER_OTLP_ENDPOINT="http://local.hasura.dev:4317"
-          FREEBUSY_FREEBUSY_PGSQL_OTEL_SERVICE_NAME="freebusy_freebusy_pgsql"
-          FREEBUSY_FREEBUSY_PGSQL_READ_URL="http://local.hasura.dev:9794"
-          FREEBUSY_FREEBUSY_PGSQL_WRITE_URL="http://local.hasura.dev:9794"
-          EOF
-          sed -i 's/^ *//' .env
-          ddn supergraph build local
-
-      # As `ddn run docker-start` does locally (hasura/.hasura/context.yaml).
+      # The engine serves the committed build (hasura/engine/build), which
+      # `just hasura regen` makes from the metadata with a developer's DDN
+      # login. Serving it needs none: the engine and the connector are plain
+      # images, and hasura/.env.example holds the connector settings the build
+      # was made with.
       - name: Start the engine and connector
         working-directory: hasura
-        env:
-          HASURA_DDN_PAT: ${{ secrets.HASURA_DDN_PAT }}
         run: |
+          cp .env.example .env
           docker compose -f compose.yaml --env-file .env up -d --build --pull always --wait
           for _ in $(seq 60); do
             curl -fsS -X POST -H 'Content-Type: application/json' \

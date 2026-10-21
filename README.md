@@ -457,26 +457,19 @@ REST on `https://localhost:8080`; edits there apply on the next `just run`.
 ### The Hasura backend
 
 ```sh
-ddn auth login                  # once
-cd hasura                       # create hasura/.env — below
-ddn supergraph build local
-ddn run docker-start            # engine on :3280, connector on :9794
+cd hasura
+cp .env.example .env
+docker compose -f compose.yaml --env-file .env up -d --build   # engine on :3280, connector on :9794
 ```
 
-`hasura/.env` (not committed):
+No Hasura account is needed to run it: the engine serves the committed build
+in `hasura/engine/build`, and `hasura/.env.example` holds the connector
+settings that build was made with (its token is a local-only value, not a
+secret). Then `FREEBUSY_DATABASE__PROVIDER=hasura just run`.
 
-```sh
-FREEBUSY_FREEBUSY_PGSQL_CONNECTION_URI="postgresql://postgres:postgrespassword@local.hasura.dev:5432/freebusydb"
-FREEBUSY_FREEBUSY_PGSQL_HASURA_CONNECTOR_PORT=9794
-FREEBUSY_FREEBUSY_PGSQL_READ_URL="http://local.hasura.dev:9794"
-FREEBUSY_FREEBUSY_PGSQL_WRITE_URL="http://local.hasura.dev:9794"
-FREEBUSY_FREEBUSY_PGSQL_HASURA_SERVICE_TOKEN_SECRET="<a random token>"
-FREEBUSY_FREEBUSY_PGSQL_AUTHORIZATION_HEADER="Bearer <the same token>"
-FREEBUSY_FREEBUSY_PGSQL_OTEL_EXPORTER_OTLP_ENDPOINT="http://local.hasura.dev:4317"
-FREEBUSY_FREEBUSY_PGSQL_OTEL_SERVICE_NAME="freebusy_freebusy_pgsql"
-```
-
-Then `FREEBUSY_DATABASE__PROVIDER=hasura just run`.
+Changing the schema is the one step that needs a DDN login (`ddn auth login`):
+`just hasura regen` rebuilds the metadata and `engine/build` through Hasura's
+build service. Commit both.
 
 ### Code generation
 
@@ -536,10 +529,11 @@ image), and the live suites against Postgres and the Hasura engine — plus
 strict AIP lint. Dependabot's weekly updates merge themselves when every
 check passes. The repository needs:
 
-- a `HASURA_DDN_PAT` secret (Actions and Dependabot): the DDN CLI will not
-  build without a login;
 - branch protection on `main` requiring every job — without it, auto-merge
-  merges at once.
+  merges at once, and Dependabot has already merged two red pull requests
+  that way.
+
+The Hasura job needs no secret: it serves the committed engine build.
 
 ## Repository layout
 
@@ -571,7 +565,7 @@ tools/                  just recipes, buf templates, generator helpers
 | `curl http://localhost:8080` answers 400 in development | the dev profile serves HTTPS: use `https://` |
 | An MCP client finds no service on port 8082+ | every MCP service shares one port; each has its own path |
 | Live tests fail intermittently — deliveries already sent, reservations already reconciled | another freebusy server is running against the same database; its background loops act on the tests' rows |
-| `ddn supergraph build local`: "Not logged in" | `ddn auth login` (CI: the `HASURA_DDN_PAT` secret) |
+| `ddn supergraph build local`: "Not logged in" | `ddn auth login`; only `just hasura regen` needs it — running the committed build does not |
 | `go build` fails on a clean machine fetching a module | a dependency is private or missing from the public Go proxy; every dependency must be fetchable by anyone |
 | `bazel run //:gazelle`: "unknown repo" | run `bazel mod tidy` first |
 | A dependency's own BUILD files break Bazel | add it to the `gazelle_override(build_file_generation = "clean")` list in `MODULE.bazel` |

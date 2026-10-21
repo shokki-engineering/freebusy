@@ -1,6 +1,7 @@
 # Copyright 2026 Srikanth K.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-engine/build
 /.env
 /.env.*
+# The development settings, shared: CI and every developer start from them.
+!/.env.example

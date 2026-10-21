@@ -42,6 +42,11 @@ updates:
       # main this way). Lift when telemetry moves.
       - dependency-name: "github.com/grpc-ecosystem/grpc-gateway/v2"
         versions: [">= 2.31.0"]
+      # OpenTelemetry 1.47 moved otel/log to an API the-protobuf-project's
+      # telemetry and opentelementry libraries do not build against (#7 broke
+      # main this way). Patches still come; lift this when those libraries move.
+      - dependency-name: "go.opentelemetry.io/*"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
 
   # The generated-code module, with its own go.mod.
   - package-ecosystem: gomod
@@ -56,6 +61,8 @@ updates:
       - dependency-name: "buf.build/gen/go/the-protobuf-project/*"
       - dependency-name: "github.com/grpc-ecosystem/grpc-gateway/v2"
         versions: [">= 2.31.0"]
+      - dependency-name: "go.opentelemetry.io/*"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
