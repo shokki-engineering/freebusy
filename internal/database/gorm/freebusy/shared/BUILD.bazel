@@ -1,0 +1,20 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "shared",
+    srcs = [
+        "filters.go",
+        "idempotency_key_store.go",
+        "models.go",
+        "protobuf.go",
+    ],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/gorm/freebusy/shared",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/gorm/filterx",
+        "//internal/database/gorm/gormx",
+        "//protobuf/generated/go/shared/v1/sharedpbv1",
+        "@io_gorm_gorm//:gorm",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+    ],
+)

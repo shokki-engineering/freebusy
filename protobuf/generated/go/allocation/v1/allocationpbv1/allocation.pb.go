@@ -603,8 +603,8 @@ const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	"\x13organizational_unit\x18\x02 \x01(\tB0\xfaA-\n" +
 	"+the-protobuf-project.org/OrganizationalUnitR\x12organizationalUnit\x12-\n" +
 	"\x06window\x18\x03 \x01(\v2\x15.google.type.IntervalR\x06window\x12%\n" +
-	"\x0eresource_types\x18\x04 \x03(\tR\rresourceTypesB\x8b\x02\n" +
-	"\x1acom.freebusy.allocation.v1B\x0fAllocationProtoP\x01Zbgithub.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
+	"\x0eresource_types\x18\x04 \x03(\tR\rresourceTypesB\x91\x02\n" +
+	"\x1acom.freebusy.allocation.v1B\x0fAllocationProtoP\x01Zhgithub.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
 
 var (
 	file_freebusy_allocation_v1_allocation_proto_rawDescOnce sync.Once

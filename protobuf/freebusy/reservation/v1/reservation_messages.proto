@@ -7,10 +7,10 @@ import "freebusy/reservation/v1/reservation.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 
-option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1";
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "ReservationMessagesProto";
-option java_package = "dev.ohtarnished.freebusy.reservation.v1";
+option java_package = "engineering.shokki.freebusy.reservation.v1";
 
 // Request message for ReservationService.CreateReservation, AIP-133.
 //

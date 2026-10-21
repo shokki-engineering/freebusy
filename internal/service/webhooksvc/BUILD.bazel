@@ -8,7 +8,7 @@ go_library(
         "repos.go",
         "server.go",
     ],
-    importpath = "github.com/oh-tarnished/freebusy/internal/service/webhooksvc",
+    importpath = "github.com/shokki-engineering/freebusy/internal/service/webhooksvc",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/database/gorm/filterx",

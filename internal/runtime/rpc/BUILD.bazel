@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "rpc",
     srcs = ["rpc.go"],
-    importpath = "github.com/oh-tarnished/freebusy/internal/runtime/rpc",
+    importpath = "github.com/shokki-engineering/freebusy/internal/runtime/rpc",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/types",

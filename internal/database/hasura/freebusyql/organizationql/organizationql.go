@@ -14,7 +14,7 @@
 package organizationql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/organizationql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/organizationql/resourceql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

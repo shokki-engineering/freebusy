@@ -26,7 +26,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/gormx"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/gormx"
 	"github.com/the-protobuf-project/telemetry/telemetry-go"
 	"gorm.io/gorm"
 )

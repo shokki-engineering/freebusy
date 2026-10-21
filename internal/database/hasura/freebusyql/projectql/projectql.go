@@ -14,7 +14,7 @@
 package projectql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/projectql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/projectql/resourceql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

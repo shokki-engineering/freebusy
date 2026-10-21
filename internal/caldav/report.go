@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/oh-tarnished/freebusy/internal/service/allocation"
-	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
-	"github.com/oh-tarnished/freebusy/internal/service/rfcsvc"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
+	"github.com/shokki-engineering/freebusy/internal/service/rfcsvc"
 )
 
 // report answers REPORT, RFC 4791 section 7: the three reports this server

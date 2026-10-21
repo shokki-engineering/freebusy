@@ -1,8 +1,8 @@
-module github.com/oh-tarnished/freebusy
+module github.com/shokki-engineering/freebusy
 
 go 1.26.5
 
-replace github.com/oh-tarnished/freebusy/protobuf => ./protobuf
+replace github.com/shokki-engineering/freebusy/protobuf => ./protobuf
 
 require (
 	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261021085804-ae1e2acc01d5.1
@@ -10,7 +10,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.12.3
 	github.com/modelcontextprotocol/go-sdk v1.7.0
-	github.com/oh-tarnished/freebusy/protobuf v0.0.0-00010101000000-000000000000
+	github.com/shokki-engineering/freebusy/protobuf v0.0.0-00010101000000-000000000000
 	github.com/oh-tarnished/runtime-go/ulid v0.0.0-20260625174747-ee0fd6e44bef
 	github.com/the-protobuf-project/opentelementry/opentelementry-go v0.0.0-20260722091843-d33763c88e10
 	github.com/the-protobuf-project/runtime-go/cache v0.0.0-20260904124945-28b95e838f2e

@@ -16,11 +16,11 @@
 package webhook
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/webhookql/deliveriesql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/webhookql/feedcursorsql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/webhookql/resourceql"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/webhookql/deliveriesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/webhookql/feedcursorsql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/webhookql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"strings"

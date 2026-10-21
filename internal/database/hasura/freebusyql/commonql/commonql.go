@@ -14,8 +14,8 @@
 package commonql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/commonql/fractionsql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/commonql/timezonesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/commonql/fractionsql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/commonql/timezonesql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

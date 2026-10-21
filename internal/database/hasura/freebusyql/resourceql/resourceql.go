@@ -14,8 +14,8 @@
 package resourceql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/resourceql/entityql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/resourceql/structureddatasql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/resourceql/entityql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/resourceql/structureddatasql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

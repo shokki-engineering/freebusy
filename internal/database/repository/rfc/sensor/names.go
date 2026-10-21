@@ -16,7 +16,7 @@
 package sensor
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
 // FormatSensorName builds "sensors/{sensor}" from bare ids.

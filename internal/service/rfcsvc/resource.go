@@ -5,7 +5,7 @@ import (
 
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc9073/resource/v1/resourcev1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
-	"github.com/oh-tarnished/freebusy/internal/runtime/rpc"
+	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 

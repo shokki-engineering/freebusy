@@ -14,9 +14,9 @@
 package packql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/packql/extensionfieldsql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/packql/recordsql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/packql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/packql/extensionfieldsql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/packql/recordsql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/packql/resourceql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

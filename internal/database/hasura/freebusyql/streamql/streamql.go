@@ -14,10 +14,10 @@
 package streamql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/streamql/extensionfieldsql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/streamql/recordslinkql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/streamql/recordsql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/streamql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/streamql/extensionfieldsql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/streamql/recordslinkql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/streamql/recordsql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/streamql/resourceql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

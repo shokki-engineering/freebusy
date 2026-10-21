@@ -29,8 +29,8 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
-	freebusyql "github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/filterx"
+	freebusyql "github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql"
 )
 
 // Error sentinels the repository interfaces speak. Callers translate them to

@@ -1,9 +1,9 @@
 package internal
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database"
-	"github.com/oh-tarnished/freebusy/internal/service/allocation"
-	"github.com/oh-tarnished/freebusy/internal/service/allocation/db"
+	"github.com/shokki-engineering/freebusy/internal/database"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation/db"
 )
 
 // allocationStore opens the availability engine's store on conn. It lives in

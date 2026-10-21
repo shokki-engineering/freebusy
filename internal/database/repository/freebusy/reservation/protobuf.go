@@ -17,9 +17,9 @@ package reservation
 
 import (
 	"encoding/json"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/reservationql/resourceql"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/reservationql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"

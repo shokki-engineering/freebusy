@@ -1,0 +1,14 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "webhookql",
+    srcs = ["webhookql.go"],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/webhookql",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/hasura/freebusyql/webhookql/deliveriesql",
+        "//internal/database/hasura/freebusyql/webhookql/feedcursorsql",
+        "//internal/database/hasura/freebusyql/webhookql/resourceql",
+        "@com_github_the_protobuf_project_runtime_go_network//runtime",
+    ],
+)

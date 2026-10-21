@@ -9,7 +9,7 @@ go_library(
         "store_allocation.go",
         "store_reservation.go",
     ],
-    importpath = "github.com/oh-tarnished/freebusy/internal",
+    importpath = "github.com/shokki-engineering/freebusy/internal",
     visibility = ["//:__subpackages__"],
     deps = [
         "//config",

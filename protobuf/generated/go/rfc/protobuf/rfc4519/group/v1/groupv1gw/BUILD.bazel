@@ -1,0 +1,20 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "groupv1gw",
+    srcs = ["service.pb.gw.go"],
+    importpath = "github.com/shokki-engineering/freebusy/protobuf/generated/go/rfc/protobuf/rfc4519/group/v1/groupv1gw",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@build_buf_gen_go_the_protobuf_project_rfc_grpc_go//protobuf/rfc4519/group/v1/groupv1grpc",
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc4519/group/v1:group",
+        "@com_github_grpc_ecosystem_grpc_gateway_v2//runtime",
+        "@com_github_grpc_ecosystem_grpc_gateway_v2//utilities",
+        "@org_golang_google_grpc//:grpc",
+        "@org_golang_google_grpc//codes",
+        "@org_golang_google_grpc//grpclog",
+        "@org_golang_google_grpc//metadata",
+        "@org_golang_google_grpc//status",
+        "@org_golang_google_protobuf//proto",
+    ],
+)

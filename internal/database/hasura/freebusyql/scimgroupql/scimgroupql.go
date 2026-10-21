@@ -14,8 +14,8 @@
 package scimgroupql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/scimgroupql/groupsql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/scimgroupql/membersql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/scimgroupql/groupsql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/scimgroupql/membersql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

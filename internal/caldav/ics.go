@@ -7,8 +7,8 @@ import (
 
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
-	"github.com/oh-tarnished/freebusy/internal/service/allocation"
-	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 	"github.com/the-protobuf-project/runtime-go/rfc"
 	"google.golang.org/genproto/googleapis/type/datetime"
 	"google.golang.org/protobuf/proto"
@@ -25,7 +25,7 @@ import (
 const (
 	crlf     = "\r\n"
 	utcStamp = "20060102T150405Z"
-	prodID   = "-//oh-tarnished//freebusy CalDAV//EN"
+	prodID   = "-//shokki-engineering//freebusy CalDAV//EN"
 )
 
 // MediaType is what every calendar object is served as, RFC 5545 section 8.1.

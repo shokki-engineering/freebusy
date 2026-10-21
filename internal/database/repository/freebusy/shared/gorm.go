@@ -18,10 +18,10 @@ package shared
 import (
 	"context"
 	"fmt"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/shared"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/shared/v1/sharedpbv1"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/filterx"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/freebusy/shared"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/shared/v1/sharedpbv1"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
 )

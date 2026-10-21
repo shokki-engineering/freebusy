@@ -13,9 +13,9 @@ import (
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/internal/types"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/filterx"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/types"
 )
 
 // object is one calendar object resource: an event or an availability.

@@ -6,7 +6,7 @@ go_library(
         "reads.go",
         "store.go",
     ],
-    importpath = "github.com/oh-tarnished/freebusy/internal/service/allocation/db",
+    importpath = "github.com/shokki-engineering/freebusy/internal/service/allocation/db",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/database",

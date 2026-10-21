@@ -14,7 +14,7 @@
 package prismaql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/prismaql/migrationsql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/prismaql/migrationsql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

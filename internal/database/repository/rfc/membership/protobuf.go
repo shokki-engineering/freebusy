@@ -17,8 +17,8 @@ package membership
 
 import (
 	membershipv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/membership/v1"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/membershipql/resourceql"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/membershipql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"

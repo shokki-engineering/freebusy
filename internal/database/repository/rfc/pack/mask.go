@@ -17,7 +17,7 @@ package pack
 
 import (
 	packv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc8428/pack/v1"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
 // applyPackMask merges the masked fields of in onto merged. An empty

@@ -17,10 +17,10 @@ package shared
 
 import (
 	"context"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/shared/v1/sharedpbv1"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/filterx"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/shared/v1/sharedpbv1"
 	"gorm.io/gorm"
 )
 

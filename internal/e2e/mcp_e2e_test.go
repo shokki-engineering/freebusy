@@ -20,9 +20,9 @@ import (
 	"time"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
-	"github.com/oh-tarnished/freebusy/internal"
-	"github.com/oh-tarnished/freebusy/internal/database"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
+	"github.com/shokki-engineering/freebusy/internal"
+	"github.com/shokki-engineering/freebusy/internal/database"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/the-protobuf-project/runtime-go/grpc"
 )
 

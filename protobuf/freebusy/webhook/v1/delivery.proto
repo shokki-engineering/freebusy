@@ -8,10 +8,10 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1";
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "DeliveryProto";
-option java_package = "dev.ohtarnished.freebusy.webhook.v1";
+option java_package = "engineering.shokki.freebusy.webhook.v1";
 
 // One event owed to one webhook, and how sending it went.
 //

@@ -8,7 +8,7 @@ go_library(
         "reservation.go",
         "store.go",
     ],
-    importpath = "github.com/oh-tarnished/freebusy/internal/service/reservation",
+    importpath = "github.com/shokki-engineering/freebusy/internal/service/reservation",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/database/repository/repox",

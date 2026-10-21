@@ -7,7 +7,7 @@ go_library(
         "telemetry.go",
     ],
     embedsrcs = ["opentelementry.toml"],
-    importpath = "github.com/oh-tarnished/freebusy/shared",
+    importpath = "github.com/shokki-engineering/freebusy/shared",
     visibility = ["//visibility:public"],
     deps = [
         "@com_github_knadh_koanf_parsers_toml//:toml",

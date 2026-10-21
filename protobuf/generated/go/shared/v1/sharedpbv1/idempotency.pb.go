@@ -233,8 +233,8 @@ const file_freebusy_shared_v1_idempotency_proto_rawDesc = "" +
 	"\x10IdempotencyState\x12!\n" +
 	"\x1dIDEMPOTENCY_STATE_UNSPECIFIED\x10\x00\x12\x1f\n" +
 	"\x1bIDEMPOTENCY_STATE_IN_FLIGHT\x10\x01\x12\x1a\n" +
-	"\x16IDEMPOTENCY_STATE_DONE\x10\x02B\xec\x01\n" +
-	"\x16com.freebusy.shared.v1B\x10IdempotencyProtoP\x01ZVgithub.com/oh-tarnished/freebusy/protobuf/generated/go/shared/v1/sharedpbv1;sharedpbv1\xa2\x02\x03FSX\xaa\x02\x12Freebusy.Shared.V1\xca\x02\x12Freebusy\\Shared\\V1\xe2\x02\x1eFreebusy\\Shared\\V1\\GPBMetadata\xea\x02\x14Freebusy::Shared::V1b\x06proto3"
+	"\x16IDEMPOTENCY_STATE_DONE\x10\x02B\xf2\x01\n" +
+	"\x16com.freebusy.shared.v1B\x10IdempotencyProtoP\x01Z\\github.com/shokki-engineering/freebusy/protobuf/generated/go/shared/v1/sharedpbv1;sharedpbv1\xa2\x02\x03FSX\xaa\x02\x12Freebusy.Shared.V1\xca\x02\x12Freebusy\\Shared\\V1\xe2\x02\x1eFreebusy\\Shared\\V1\\GPBMetadata\xea\x02\x14Freebusy::Shared::V1b\x06proto3"
 
 var (
 	file_freebusy_shared_v1_idempotency_proto_rawDescOnce sync.Once

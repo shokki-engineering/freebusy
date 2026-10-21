@@ -16,7 +16,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/oh-tarnished/freebusy/shared"
+	"github.com/shokki-engineering/freebusy/shared"
 	"github.com/the-protobuf-project/opentelementry/opentelementry-go"
 )
 

@@ -10,21 +10,21 @@ info:
 
     Authentication is performed via bearer tokens unless otherwise noted. All timestamps are RFC 3339 and all monetary amounts follow the associated currency's minor units.
   version: 1.0.0
-  termsOfService: https://freebusy.oh-tarnished.dev/terms
+  termsOfService: https://freebusy.shokki.engineering/terms
   contact:
     name: FreeBusy API Support
-    url: https://freebusy.oh-tarnished.dev/support
-    email: support@oh-tarnished.dev
+    url: https://freebusy.shokki.engineering/support
+    email: support@shokki.engineering
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0
 externalDocs:
   description: FreeBusy API documentation
-  url: https://freebusy.oh-tarnished.dev/docs
+  url: https://freebusy.shokki.engineering/docs
 servers:
-  - url: https://freebusy.oh-tarnished.dev
+  - url: https://freebusy.shokki.engineering
     description: Production
-  - url: https://staging.freebusy.oh-tarnished.dev
+  - url: https://staging.freebusy.shokki.engineering
     description: Staging
   - url: http://localhost:8080
     description: Local development

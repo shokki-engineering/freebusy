@@ -1,0 +1,15 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "streamql",
+    srcs = ["streamql.go"],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/streamql",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/hasura/freebusyql/streamql/extensionfieldsql",
+        "//internal/database/hasura/freebusyql/streamql/recordslinkql",
+        "//internal/database/hasura/freebusyql/streamql/recordsql",
+        "//internal/database/hasura/freebusyql/streamql/resourceql",
+        "@com_github_the_protobuf_project_runtime_go_network//runtime",
+    ],
+)

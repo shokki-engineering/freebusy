@@ -19,7 +19,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/gormx"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/gormx"
 	"gorm.io/gorm"
 )
 

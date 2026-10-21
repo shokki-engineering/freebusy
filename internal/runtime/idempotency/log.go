@@ -1,6 +1,6 @@
 package idempotency
 
-import "github.com/oh-tarnished/freebusy/shared"
+import "github.com/shokki-engineering/freebusy/shared"
 
 // logError reports a failure the interceptor cannot return to the caller. It
 // lives apart from idempotency.go, which imports the generated repository

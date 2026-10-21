@@ -8,10 +8,10 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/protobuf/duration.proto";
 
-option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1";
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "HoldMessagesProto";
-option java_package = "dev.ohtarnished.freebusy.allocation.v1";
+option java_package = "engineering.shokki.freebusy.allocation.v1";
 
 // Request message for HoldService.CreateHold, AIP-133.
 //

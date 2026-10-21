@@ -41,7 +41,7 @@ ARCHS = [
     labels = {
         "org.opencontainers.image.title": "freebusy",
         "org.opencontainers.image.description": "Generic availability and booking engine.",
-        "org.opencontainers.image.source": "https://github.com/oh-tarnished/freebusy",
+        "org.opencontainers.image.source": "https://github.com/shokki-engineering/freebusy",
         "org.opencontainers.image.licenses": "Apache-2.0",
     },
     os = "linux",
@@ -69,5 +69,5 @@ oci_load(
 oci_push(
     name = "push",
     image = ":image",
-    repository = "ghcr.io/oh-tarnished/freebusy",
+    repository = "ghcr.io/shokki-engineering/freebusy",
 )

@@ -8,10 +8,10 @@ import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "mcp/protobuf/annotations.proto";
 
-option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1";
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "ReservationServiceProto";
-option java_package = "dev.ohtarnished.freebusy.reservation.v1";
+option java_package = "engineering.shokki.freebusy.reservation.v1";
 
 // ReservationService turns holds into confirmed bookings and cancels them.
 //
@@ -21,7 +21,7 @@ option java_package = "dev.ohtarnished.freebusy.reservation.v1";
 // hold's, and changing either is a new hold and a new reservation, which is
 // exactly what RescheduleReservation does.
 service ReservationService {
-  option (google.api.default_host) = "freebusy.ohtarnished.dev";
+  option (google.api.default_host) = "freebusy.shokki.engineering";
   option (mcp.service) = {
     app: {
       name: "Reservations"

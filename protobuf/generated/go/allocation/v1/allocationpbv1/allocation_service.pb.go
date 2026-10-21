@@ -26,15 +26,15 @@ var File_freebusy_allocation_v1_allocation_service_proto protoreflect.FileDescri
 
 const file_freebusy_allocation_v1_allocation_service_proto_rawDesc = "" +
 	"\n" +
-	"/freebusy/allocation/v1/allocation_service.proto\x12\x16freebusy.allocation.v1\x1a0freebusy/allocation/v1/allocation_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1emcp/protobuf/annotations.proto2\xb9\t\n" +
+	"/freebusy/allocation/v1/allocation_service.proto\x12\x16freebusy.allocation.v1\x1a0freebusy/allocation/v1/allocation_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1emcp/protobuf/annotations.proto2\xbc\t\n" +
 	"\x11AllocationService\x12\xad\x02\n" +
 	"\x13ComputeAvailability\x122.freebusy.allocation.v1.ComputeAvailabilityRequest\x1a3.freebusy.allocation.v1.ComputeAvailabilityResponse\"\xac\x01\xdaA\rparent,window\xca\xf3\x18W\x12UCompute how many resources are free at a site over a window, bucketed by slot or day.\x82\xd3\xe4\x93\x02;:\x01*\"6/v1/{parent=organizationalUnits/*}:computeAvailability\x12\x93\x02\n" +
 	"\x11CheckAvailability\x120.freebusy.allocation.v1.CheckAvailabilityRequest\x1a1.freebusy.allocation.v1.CheckAvailabilityResponse\"\x98\x01\xdaA\rparent,window\xca\xf3\x18E\x12CCheck whether a specific window can be booked, and if not, why not.\x82\xd3\xe4\x93\x029:\x01*\"4/v1/{parent=organizationalUnits/*}:checkAvailability\x12\xb4\x01\n" +
 	"\x18BatchComputeAvailability\x127.freebusy.allocation.v1.BatchComputeAvailabilityRequest\x1a8.freebusy.allocation.v1.BatchComputeAvailabilityResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/v1/resources:batchCompute\x12\x9c\x02\n" +
-	"\x12SearchAvailability\x121.freebusy.allocation.v1.SearchAvailabilityRequest\x1a2.freebusy.allocation.v1.SearchAvailabilityResponse\"\x9e\x01\xdaA\rparent,window\xca\xf3\x18P\x12NFind bookable resources free across a window, anywhere in an operator's sites.\x82\xd3\xe4\x93\x024:\x01*\"//v1/{parent=organizations/*}:searchAvailability\x1a\x87\x01\xcaA\x18freebusy.ohtarnished.dev\xc2\xf3\x18h\n" +
+	"\x12SearchAvailability\x121.freebusy.allocation.v1.SearchAvailabilityRequest\x1a2.freebusy.allocation.v1.SearchAvailabilityResponse\"\x9e\x01\xdaA\rparent,window\xca\xf3\x18P\x12NFind bookable resources free across a window, anywhere in an operator's sites.\x82\xd3\xe4\x93\x024:\x01*\"//v1/{parent=organizations/*}:searchAvailability\x1a\x8a\x01\xcaA\x1bfreebusy.shokki.engineering\xc2\xf3\x18h\n" +
 	"f\n" +
-	"\x15Resource Availability\x12\x051.0.0\x1aFCompute how many bookable resources are free over a window. Read-only.B\x92\x02\n" +
-	"\x1acom.freebusy.allocation.v1B\x16AllocationServiceProtoP\x01Zbgithub.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
+	"\x15Resource Availability\x12\x051.0.0\x1aFCompute how many bookable resources are free over a window. Read-only.B\x98\x02\n" +
+	"\x1acom.freebusy.allocation.v1B\x16AllocationServiceProtoP\x01Zhgithub.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
 
 var file_freebusy_allocation_v1_allocation_service_proto_goTypes = []any{
 	(*ComputeAvailabilityRequest)(nil),       // 0: freebusy.allocation.v1.ComputeAvailabilityRequest

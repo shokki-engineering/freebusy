@@ -7,10 +7,10 @@ import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "mcp/protobuf/annotations.proto";
 
-option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1";
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "AllocationServiceProto";
-option java_package = "dev.ohtarnished.freebusy.allocation.v1";
+option java_package = "engineering.shokki.freebusy.allocation.v1";
 
 // AllocationService is the read-only half of the engine: it answers how much is
 // free, and never changes anything. HoldService is the half that takes.
@@ -25,7 +25,7 @@ option java_package = "dev.ohtarnished.freebusy.allocation.v1";
 // Every operation is a custom method (AIP-136): they compute rather than fetch,
 // so they take neither the standard-method names nor their shapes.
 service AllocationService {
-  option (google.api.default_host) = "freebusy.ohtarnished.dev";
+  option (google.api.default_host) = "freebusy.shokki.engineering";
   option (mcp.service) = {
     app: {
       name: "Resource Availability"

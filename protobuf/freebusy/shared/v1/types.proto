@@ -8,10 +8,10 @@ import "google/protobuf/timestamp.proto";
 import "google/type/date.proto";
 import "google/type/money.proto";
 
-option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/shared/v1/sharedpbv1;sharedpbv1";
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/shared/v1/sharedpbv1;sharedpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "TypesProto";
-option java_package = "dev.ohtarnished.freebusy.shared.v1";
+option java_package = "engineering.shokki.freebusy.shared.v1";
 
 // A half-open time interval [start_time, end_time). Used for query windows and
 // for a booking's reserved span in both TIME_SLOT and NIGHTLY modes.

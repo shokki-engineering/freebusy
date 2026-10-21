@@ -8,7 +8,7 @@ go_library(
         "recur.go",
         "span.go",
     ],
-    importpath = "github.com/oh-tarnished/freebusy/internal/service/allocation/engine",
+    importpath = "github.com/shokki-engineering/freebusy/internal/service/allocation/engine",
     visibility = ["//:__subpackages__"],
 )
 

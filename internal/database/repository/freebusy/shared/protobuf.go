@@ -16,9 +16,9 @@
 package shared
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/sharedql/idempotencykeysql"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/shared/v1/sharedpbv1"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/sharedql/idempotencykeysql"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/shared/v1/sharedpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"strings"

@@ -14,7 +14,7 @@ info:
          exactly what RescheduleReservation does.
     version: 0.0.1
 servers:
-    - url: https://freebusy.ohtarnished.dev
+    - url: https://freebusy.shokki.engineering
 paths:
     /v1/organizationalUnits/{organizationalUnit}/reservations:
         get:

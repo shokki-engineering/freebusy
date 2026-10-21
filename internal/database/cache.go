@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/oh-tarnished/freebusy/config"
+	"github.com/shokki-engineering/freebusy/config"
 	"github.com/the-protobuf-project/runtime-go/cache"
 	"github.com/the-protobuf-project/runtime-go/cache/redis"
 )

@@ -8,12 +8,12 @@ import (
 	"slices"
 	"time"
 
-	"github.com/oh-tarnished/freebusy/internal/database"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/freebusy/reservation"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/internal/types"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
+	"github.com/shokki-engineering/freebusy/internal/database"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/filterx"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/freebusy/reservation"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/types"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 )
 
 // Store is the reservation Store over the generated repository. Transition,

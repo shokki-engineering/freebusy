@@ -16,7 +16,7 @@
 package journal
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/filterx"
 )
 
 // JournalFilterSpec is Journal's AIP-160 filter / AIP-132 order_by surface,

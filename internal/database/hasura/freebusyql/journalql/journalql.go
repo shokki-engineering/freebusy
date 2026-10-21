@@ -14,9 +14,9 @@
 package journalql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/journalql/calendartimesql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/journalql/extensionpropertiesql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/journalql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/journalql/calendartimesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/journalql/extensionpropertiesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/journalql/resourceql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

@@ -14,7 +14,7 @@
 package sharedql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/sharedql/idempotencykeysql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/sharedql/idempotencykeysql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

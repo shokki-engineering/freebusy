@@ -6,10 +6,10 @@ import (
 
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/calendar/v1/calendarv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
-	"github.com/oh-tarnished/freebusy/internal/runtime/rpc"
-	"github.com/oh-tarnished/freebusy/internal/service/allocation"
-	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
-	"github.com/oh-tarnished/freebusy/internal/types"
+	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
+	"github.com/shokki-engineering/freebusy/internal/types"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 

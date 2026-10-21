@@ -14,8 +14,8 @@
 package allocationql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/allocationql/holdsql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/allocationql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/allocationql/holdsql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/allocationql/resourceql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

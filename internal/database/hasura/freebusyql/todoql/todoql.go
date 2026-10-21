@@ -14,9 +14,9 @@
 package todoql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/todoql/calendartimesql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/todoql/extensionpropertiesql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/todoql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/todoql/calendartimesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/todoql/extensionpropertiesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/todoql/resourceql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

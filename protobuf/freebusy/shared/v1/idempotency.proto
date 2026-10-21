@@ -9,10 +9,10 @@ import "google/api/resource.proto";
 import "google/protobuf/timestamp.proto";
 import "store/v1/annotations.proto";
 
-option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/shared/v1/sharedpbv1;sharedpbv1";
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/shared/v1/sharedpbv1;sharedpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "IdempotencyProto";
-option java_package = "dev.ohtarnished.freebusy.shared.v1";
+option java_package = "engineering.shokki.freebusy.shared.v1";
 
 // The record behind every `request_id` field in this API: it remembers what the
 // first call with a given id returned, so a retry replays that response instead

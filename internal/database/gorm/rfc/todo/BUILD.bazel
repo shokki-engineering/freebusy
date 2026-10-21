@@ -1,0 +1,26 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "todo",
+    srcs = [
+        "calendar_time_store.go",
+        "extension_property_store.go",
+        "filters.go",
+        "models.go",
+        "protobuf.go",
+        "todo_store.go",
+    ],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/todo",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/gorm/filterx",
+        "//internal/database/gorm/gormx",
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc5545/todo/v1:todo",
+        "@com_github_lib_pq//:pq",
+        "@io_gorm_gorm//:gorm",
+        "@org_golang_google_genproto//googleapis/type/date",
+        "@org_golang_google_genproto//googleapis/type/datetime",
+        "@org_golang_google_protobuf//types/known/durationpb",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+    ],
+)

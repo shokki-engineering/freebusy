@@ -4,9 +4,9 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/oh-tarnished/freebusy/internal/database"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
-	"github.com/oh-tarnished/freebusy/internal/livetest"
+	"github.com/shokki-engineering/freebusy/internal/database"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql"
+	"github.com/shokki-engineering/freebusy/internal/livetest"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )

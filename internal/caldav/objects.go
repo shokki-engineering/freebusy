@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
-	"github.com/oh-tarnished/freebusy/internal/service/allocation"
-	"github.com/oh-tarnished/freebusy/internal/service/rfcsvc"
-	"github.com/oh-tarnished/freebusy/internal/types"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation"
+	"github.com/shokki-engineering/freebusy/internal/service/rfcsvc"
+	"github.com/shokki-engineering/freebusy/internal/types"
 )
 
 // get answers GET and HEAD. An object is served as its own VCALENDAR; a

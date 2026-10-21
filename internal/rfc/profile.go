@@ -22,7 +22,7 @@ import (
 // and the reason freebusy needs no field of its own on the resource. A resource
 // may carry several structured-data entries; this URI is how freebusy finds the
 // one that is its.
-const ProfileSchemaURI = "https://freebusy.ohtarnished.dev/schema/booking-profile"
+const ProfileSchemaURI = "https://freebusy.shokki.engineering/schema/booking-profile"
 
 // Profile is the booking-relevant data freebusy reads off a resource's
 // STRUCTURED-DATA. Fields are optional: a resource that never declared one is

@@ -19,7 +19,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/common"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/common"
 )
 
 // Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specification (iCalendar)", section 3.7.1. https://www.rfc-editor.org/rfc/rfc5545.html#section-3.7.1

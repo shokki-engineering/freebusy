@@ -18,7 +18,7 @@ import (
 	"time"
 
 	unitv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc8428/unit/v1"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/common"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/common"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

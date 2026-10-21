@@ -6,7 +6,7 @@ import (
 
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
-	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 	"google.golang.org/genproto/googleapis/type/datetime"
 )
 

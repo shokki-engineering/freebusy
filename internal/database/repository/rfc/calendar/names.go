@@ -16,7 +16,7 @@
 package calendar
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
 // FormatCalendarName builds "calendars/{calendar}" from bare ids.

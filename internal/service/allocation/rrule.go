@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 	"google.golang.org/genproto/googleapis/type/interval"
 )
 

@@ -36,8 +36,8 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/oh-tarnished/freebusy/internal/service/rfcsvc"
-	"github.com/oh-tarnished/freebusy/internal/types"
+	"github.com/shokki-engineering/freebusy/internal/service/rfcsvc"
+	"github.com/shokki-engineering/freebusy/internal/types"
 )
 
 // Prefix is where the CalDAV tree is mounted.

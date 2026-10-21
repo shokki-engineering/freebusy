@@ -2,10 +2,10 @@ syntax = "proto3";
 
 package freebusy.shared.v1;
 
-option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/shared/v1/sharedpbv1;sharedpbv1";
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/shared/v1/sharedpbv1;sharedpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "EnumsProto";
-option java_package = "dev.ohtarnished.freebusy.shared.v1";
+option java_package = "engineering.shokki.freebusy.shared.v1";
 
 // Enums shared across more than one freebusy resource. Resource-specific enums
 // live alongside their resource (e.g. BookingStatus in the booking package), so

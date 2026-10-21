@@ -11,7 +11,7 @@ go_library(
         "rrule.go",
         "store.go",
     ],
-    importpath = "github.com/oh-tarnished/freebusy/internal/service/allocation",
+    importpath = "github.com/shokki-engineering/freebusy/internal/service/allocation",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/database/repository/repox",

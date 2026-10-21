@@ -24,7 +24,8 @@ var configFS embed.FS
 const devOverlayPath = "config/freebusy.dev.toml"
 
 // ProfileVar picks the profile layered over the release defaults: "dev" for
-// the development profile, unset or "release" for none.
+// the development profile, "release" for none. Unset, the development profile
+// applies only when its file is in the working directory -- a checkout.
 const ProfileVar = "FREEBUSY_PROFILE"
 
 // AppConfig is the top-level configuration tree.

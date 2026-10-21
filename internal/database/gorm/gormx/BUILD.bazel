@@ -1,0 +1,12 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "gormx",
+    srcs = ["gormx.go"],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/gorm/gormx",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "@io_gorm_gorm//:gorm",
+        "@io_gorm_gorm//clause",
+    ],
+)

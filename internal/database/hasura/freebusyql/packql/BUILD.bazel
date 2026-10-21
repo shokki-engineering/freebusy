@@ -1,0 +1,14 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "packql",
+    srcs = ["packql.go"],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/packql",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/hasura/freebusyql/packql/extensionfieldsql",
+        "//internal/database/hasura/freebusyql/packql/recordsql",
+        "//internal/database/hasura/freebusyql/packql/resourceql",
+        "@com_github_the_protobuf_project_runtime_go_network//runtime",
+    ],
+)

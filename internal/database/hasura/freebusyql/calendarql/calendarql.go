@@ -14,8 +14,8 @@
 package calendarql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/calendarql/extensionpropertiesql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/calendarql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/calendarql/extensionpropertiesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/calendarql/resourceql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

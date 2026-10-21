@@ -17,7 +17,7 @@ package calendar
 
 import (
 	calendarv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
 // applyCalendarMask merges the masked fields of in onto merged. An empty

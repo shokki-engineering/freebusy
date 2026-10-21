@@ -19,7 +19,7 @@ import (
 
 	calendarv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
 	"github.com/lib/pq"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/common"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/common"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

@@ -17,10 +17,10 @@ package card
 
 import (
 	cardv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9553/card/v1"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/cardql/namesql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/cardql/resourceql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/cardql/speechesql"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/cardql/namesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/cardql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/cardql/speechesql"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"strings"

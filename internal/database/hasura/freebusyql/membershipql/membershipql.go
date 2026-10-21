@@ -14,7 +14,7 @@
 package membershipql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/membershipql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/membershipql/resourceql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

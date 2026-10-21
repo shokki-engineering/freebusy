@@ -16,7 +16,7 @@
 package reservation
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
 // FormatReservationName builds "organizationalUnits/{organizational_unit}/reservations/{reservation}" from bare ids.

@@ -9,10 +9,10 @@ import "google/api/client.proto";
 import "google/protobuf/empty.proto";
 import "mcp/protobuf/annotations.proto";
 
-option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1";
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "HoldServiceProto";
-option java_package = "dev.ohtarnished.freebusy.allocation.v1";
+option java_package = "engineering.shokki.freebusy.allocation.v1";
 
 // HoldService takes and releases expiring claims on resources. It is the only
 // thing in this API that mutates availability.
@@ -26,7 +26,7 @@ option java_package = "dev.ohtarnished.freebusy.allocation.v1";
 // construction -- changing either is a different allocation -- so the only
 // mutations are the two custom methods below.
 service HoldService {
-  option (google.api.default_host) = "freebusy.ohtarnished.dev";
+  option (google.api.default_host) = "freebusy.shokki.engineering";
   option (mcp.service) = {
     app: {
       name: "Resource Holds"

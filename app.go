@@ -6,9 +6,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/oh-tarnished/freebusy/config"
-	"github.com/oh-tarnished/freebusy/internal"
-	"github.com/oh-tarnished/freebusy/shared"
+	"github.com/shokki-engineering/freebusy/config"
+	"github.com/shokki-engineering/freebusy/internal"
+	"github.com/shokki-engineering/freebusy/shared"
 )
 
 // App is the top-level application instance. It owns the gRPC/HTTP server

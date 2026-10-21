@@ -16,7 +16,7 @@
 package unit
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/filterx"
 )
 
 // UnitFilterSpec is Unit's AIP-160 filter / AIP-132 order_by surface,

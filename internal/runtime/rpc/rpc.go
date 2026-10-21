@@ -10,8 +10,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/oh-tarnished/freebusy/internal/types"
-	"github.com/oh-tarnished/freebusy/shared"
+	"github.com/shokki-engineering/freebusy/internal/types"
+	"github.com/shokki-engineering/freebusy/shared"
 	"github.com/the-protobuf-project/runtime-go/grpc"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"

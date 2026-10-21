@@ -9,8 +9,8 @@ import (
 
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
-	"github.com/oh-tarnished/freebusy/internal/rfc"
-	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
+	"github.com/shokki-engineering/freebusy/internal/rfc"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 )
 
 // horizonPad widens the span read around a requested window. The engine only

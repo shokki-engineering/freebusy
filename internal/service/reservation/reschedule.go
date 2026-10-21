@@ -5,9 +5,9 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/oh-tarnished/freebusy/internal/runtime/rpc"
-	"github.com/oh-tarnished/freebusy/internal/types"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
+	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
+	"github.com/shokki-engineering/freebusy/internal/types"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 )
 
 // RescheduleReservation moves a confirmed reservation onto a new hold.

@@ -19,9 +19,9 @@ import (
 	membershipv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/membership/v1"
 	"context"
 	"fmt"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/membership"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/filterx"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/membership"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
 )

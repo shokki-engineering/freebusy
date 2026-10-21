@@ -1,0 +1,33 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "journal",
+    srcs = [
+        "gorm.go",
+        "graphql.go",
+        "mask.go",
+        "names.go",
+        "protobuf.go",
+        "repository.go",
+    ],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/repository/rfc/journal",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/gorm/filterx",
+        "//internal/database/gorm/rfc/journal",
+        "//internal/database/hasura/freebusyql",
+        "//internal/database/hasura/freebusyql/journalql/calendartimesql",
+        "//internal/database/hasura/freebusyql/journalql/extensionpropertiesql",
+        "//internal/database/hasura/freebusyql/journalql/resourceql",
+        "//internal/database/repository/repox",
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc5545/journal/v1:journal",
+        "@com_github_the_protobuf_project_runtime_go_network//graphql",
+        "@io_gorm_gorm//:gorm",
+        "@io_gorm_gorm//clause",
+        "@org_golang_google_genproto//googleapis/type/date",
+        "@org_golang_google_genproto//googleapis/type/datetime",
+        "@org_golang_google_protobuf//proto",
+        "@org_golang_google_protobuf//types/known/durationpb",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+    ],
+)

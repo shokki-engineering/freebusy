@@ -779,8 +779,8 @@ const file_freebusy_webhook_v1_webhook_messages_proto_rawDesc = "" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"x\n" +
 	"\x14RetryDeliveryRequest\x12`\n" +
 	"\x04name\x18\x01 \x01(\tBL\xe0A\x02\xfaA\x1e\n" +
-	"\x1cfreebusy.webhook.v1/Delivery\xbaH%r#2!^webhooks/[^/]+/deliveries/[^/]+$R\x04nameB\xf8\x01\n" +
-	"\x17com.freebusy.webhook.v1B\x14WebhookMessagesProtoP\x01ZYgithub.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1\xa2\x02\x03FWX\xaa\x02\x13Freebusy.Webhook.V1\xca\x02\x13Freebusy\\Webhook\\V1\xe2\x02\x1fFreebusy\\Webhook\\V1\\GPBMetadata\xea\x02\x15Freebusy::Webhook::V1b\x06proto3"
+	"\x1cfreebusy.webhook.v1/Delivery\xbaH%r#2!^webhooks/[^/]+/deliveries/[^/]+$R\x04nameB\xfe\x01\n" +
+	"\x17com.freebusy.webhook.v1B\x14WebhookMessagesProtoP\x01Z_github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1\xa2\x02\x03FWX\xaa\x02\x13Freebusy.Webhook.V1\xca\x02\x13Freebusy\\Webhook\\V1\xe2\x02\x1fFreebusy\\Webhook\\V1\\GPBMetadata\xea\x02\x15Freebusy::Webhook::V1b\x06proto3"
 
 var (
 	file_freebusy_webhook_v1_webhook_messages_proto_rawDescOnce sync.Once

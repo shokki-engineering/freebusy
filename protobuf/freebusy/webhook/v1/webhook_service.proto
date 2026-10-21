@@ -10,15 +10,15 @@ import "google/api/client.proto";
 import "google/protobuf/empty.proto";
 import "mcp/protobuf/annotations.proto";
 
-option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1";
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "WebhookServiceProto";
-option java_package = "dev.ohtarnished.freebusy.webhook.v1";
+option java_package = "engineering.shokki.freebusy.webhook.v1";
 
 // WebhookService subscribes endpoints to changes in holds, reservations and
 // inventory, and shows what was sent to each.
 service WebhookService {
-  option (google.api.default_host) = "freebusy.ohtarnished.dev";
+  option (google.api.default_host) = "freebusy.shokki.engineering";
   option (mcp.service) = {
     app: {
       name: "Webhooks"

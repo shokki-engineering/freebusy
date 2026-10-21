@@ -6,7 +6,7 @@ go_library(
         "store.go",
         "transition.go",
     ],
-    importpath = "github.com/oh-tarnished/freebusy/internal/service/reservation/db",
+    importpath = "github.com/shokki-engineering/freebusy/internal/service/reservation/db",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/database",

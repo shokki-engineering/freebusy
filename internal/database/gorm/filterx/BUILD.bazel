@@ -1,0 +1,18 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "filterx",
+    srcs = [
+        "filterx.go",
+        "gorm.go",
+        "hasura.go",
+        "telemetry.go",
+    ],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/gorm/filterx",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "@com_github_the_protobuf_project_runtime_go_network//graphql",
+        "@com_github_the_protobuf_project_telemetry_telemetry_go//:telemetry-go",
+        "@io_gorm_gorm//:gorm",
+    ],
+)

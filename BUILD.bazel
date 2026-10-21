@@ -6,7 +6,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 #
 # The generated Go in protobuf/generated is committed, so no proto rules: the
 # .proto files are buf's input, not Bazel's.
-# gazelle:prefix github.com/oh-tarnished/freebusy
+# gazelle:prefix github.com/shokki-engineering/freebusy
 # gazelle:proto disable_global
 # gazelle:go_naming_convention import
 # gazelle:exclude hasura
@@ -20,7 +20,7 @@ go_library(
         "app.go",
         "main.go",
     ],
-    importpath = "github.com/oh-tarnished/freebusy",
+    importpath = "github.com/shokki-engineering/freebusy",
     visibility = ["//visibility:private"],
     deps = [
         "//config",

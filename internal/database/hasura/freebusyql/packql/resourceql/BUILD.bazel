@@ -1,0 +1,21 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "resourceql",
+    srcs = [
+        "handlers.go",
+        "inputs.go",
+        "models.go",
+        "mutations.go",
+        "predicates.go",
+        "queries.go",
+        "requests.go",
+        "subscriptions.go",
+    ],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/packql/resourceql",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "@com_github_the_protobuf_project_runtime_go_network//graphql",
+        "@com_github_the_protobuf_project_runtime_go_network//runtime",
+    ],
+)

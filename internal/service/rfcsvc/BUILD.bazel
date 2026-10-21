@@ -10,7 +10,7 @@ go_library(
         "expand.go",
         "resource.go",
     ],
-    importpath = "github.com/oh-tarnished/freebusy/internal/service/rfcsvc",
+    importpath = "github.com/shokki-engineering/freebusy/internal/service/rfcsvc",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/database/gorm/filterx",

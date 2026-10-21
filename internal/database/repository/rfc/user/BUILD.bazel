@@ -1,0 +1,32 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "user",
+    srcs = [
+        "gorm.go",
+        "graphql.go",
+        "mask.go",
+        "names.go",
+        "protobuf.go",
+        "repository.go",
+    ],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/repository/rfc/user",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/gorm/filterx",
+        "//internal/database/gorm/rfc/user",
+        "//internal/database/hasura/freebusyql",
+        "//internal/database/hasura/freebusyql/userql/addressql",
+        "//internal/database/hasura/freebusyql/userql/enterpriseusersql",
+        "//internal/database/hasura/freebusyql/userql/managersql",
+        "//internal/database/hasura/freebusyql/userql/namesql",
+        "//internal/database/hasura/freebusyql/userql/resourceql",
+        "//internal/database/repository/repox",
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc7643/user/v1:user",
+        "@com_github_the_protobuf_project_runtime_go_network//graphql",
+        "@io_gorm_gorm//:gorm",
+        "@io_gorm_gorm//clause",
+        "@org_golang_google_protobuf//proto",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+    ],
+)

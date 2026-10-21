@@ -1,9 +1,9 @@
 package internal
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database"
-	"github.com/oh-tarnished/freebusy/internal/service/reservation"
-	"github.com/oh-tarnished/freebusy/internal/service/reservation/db"
+	"github.com/shokki-engineering/freebusy/internal/database"
+	"github.com/shokki-engineering/freebusy/internal/service/reservation"
+	"github.com/shokki-engineering/freebusy/internal/service/reservation/db"
 )
 
 // reservationStore opens the reservation store on conn. It lives in a file of

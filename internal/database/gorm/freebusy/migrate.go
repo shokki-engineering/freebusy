@@ -19,13 +19,13 @@
 package freebusy
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/allocation"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/reservation"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/shared"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/webhook"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/freebusy/allocation"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/freebusy/reservation"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/freebusy/shared"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/freebusy/webhook"
 
 	"errors"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/telemetry"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/telemetry"
 	"gorm.io/gorm"
 )
 

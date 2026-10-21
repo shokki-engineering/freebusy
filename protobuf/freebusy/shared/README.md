@@ -112,4 +112,4 @@ Lifecycle of a recorded request. A key is claimed IN_FLIGHT before the handler r
 
 ---
 
-© 2026 oh-tarnished | Apache 2.0 License
+© 2026 shokki-engineering | Apache 2.0 License

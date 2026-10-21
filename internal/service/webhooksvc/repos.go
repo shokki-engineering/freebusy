@@ -10,14 +10,14 @@
 package webhooksvc
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/repository/freebusy/allocation"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/freebusy/reservation"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/freebusy/webhook"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/rfc/availability"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/rfc/calendar"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/rfc/event"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/rfc/resource"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/freebusy/allocation"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/freebusy/reservation"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/freebusy/webhook"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/availability"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/calendar"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/event"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/resource"
 )
 
 // Repositories are the generated repositories webhooks read and write.

@@ -11,10 +11,10 @@ import "google/protobuf/timestamp.proto";
 import "google/type/interval.proto";
 import "store/v1/annotations.proto";
 
-option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1";
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "AllocationProto";
-option java_package = "dev.ohtarnished.freebusy.allocation.v1";
+option java_package = "engineering.shokki.freebusy.allocation.v1";
 
 // A Hold is a temporary, expiring claim on one or more bookable resources for a
 // window, taken before payment or confirmation so two callers cannot be sold

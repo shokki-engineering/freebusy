@@ -1,0 +1,24 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "card",
+    srcs = [
+        "card_store.go",
+        "filters.go",
+        "models.go",
+        "name_component_store.go",
+        "name_store.go",
+        "protobuf.go",
+        "speech_store.go",
+    ],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/card",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/gorm/filterx",
+        "//internal/database/gorm/gormx",
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc9553/card/v1:card",
+        "@com_github_lib_pq//:pq",
+        "@io_gorm_gorm//:gorm",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+    ],
+)

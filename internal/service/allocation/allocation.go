@@ -6,10 +6,10 @@ import (
 	"sort"
 	"time"
 
-	"github.com/oh-tarnished/freebusy/internal/runtime/rpc"
-	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
-	"github.com/oh-tarnished/freebusy/internal/types"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
+	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
+	"github.com/shokki-engineering/freebusy/internal/types"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

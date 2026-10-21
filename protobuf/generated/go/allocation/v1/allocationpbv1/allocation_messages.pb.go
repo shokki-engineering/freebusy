@@ -642,8 +642,8 @@ const file_freebusy_allocation_v1_allocation_messages_proto_rawDesc = "" +
 	"page_token\x18\a \x01(\tB\x03\xe0A\x01R\tpageToken\"\x89\x01\n" +
 	"\x1aSearchAvailabilityResponse\x12C\n" +
 	"\amatches\x18\x01 \x03(\v2).freebusy.allocation.v1.AvailabilityMatchR\amatches\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageTokenB\x93\x02\n" +
-	"\x1acom.freebusy.allocation.v1B\x17AllocationMessagesProtoP\x01Zbgithub.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageTokenB\x99\x02\n" +
+	"\x1acom.freebusy.allocation.v1B\x17AllocationMessagesProtoP\x01Zhgithub.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
 
 var (
 	file_freebusy_allocation_v1_allocation_messages_proto_rawDescOnce sync.Once

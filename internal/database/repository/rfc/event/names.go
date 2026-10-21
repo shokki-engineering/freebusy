@@ -16,7 +16,7 @@
 package event
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
 // FormatEventName builds "calendars/{calendar}/events/{event}" from bare ids.

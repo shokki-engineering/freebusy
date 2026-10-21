@@ -6,7 +6,7 @@
 #
 # Without this, orm falls back to its defaults: the database name becomes the
 # last package segment ("v1", the version) and the schema is derived from the AIP
-# resource-type host ("freebusy.ohtarnished.dev"), which is identical for every
+# resource-type host ("freebusy.shokki.engineering"), which is identical for every
 # resource — collapsing all services into one schema. This config fixes both.
 #
 # Passed to the plugin via `opt: [config=tools/protobuf/buf/orm.yaml]` in
@@ -47,5 +47,5 @@ graphql:
 generate:
   - target: graphql
     package: freebusyql
-    go_module: github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql
+    go_module: github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql
     dump_schema: true # keep the introspection snapshot at freebusyql/schema.json

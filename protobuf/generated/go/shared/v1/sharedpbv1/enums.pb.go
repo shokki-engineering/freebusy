@@ -297,9 +297,9 @@ const file_freebusy_shared_v1_enums_proto_rawDesc = "" +
 	"\x10MEDIA_TYPE_VIDEO\x10\x02\x12\x17\n" +
 	"\x13MEDIA_TYPE_DOCUMENT\x10\x03\x12\x18\n" +
 	"\x14MEDIA_TYPE_FLOORPLAN\x10\x04\x12\x1b\n" +
-	"\x17MEDIA_TYPE_VIRTUAL_TOUR\x10\x05B\xe6\x01\n" +
+	"\x17MEDIA_TYPE_VIRTUAL_TOUR\x10\x05B\xec\x01\n" +
 	"\x16com.freebusy.shared.v1B\n" +
-	"EnumsProtoP\x01ZVgithub.com/oh-tarnished/freebusy/protobuf/generated/go/shared/v1/sharedpbv1;sharedpbv1\xa2\x02\x03FSX\xaa\x02\x12Freebusy.Shared.V1\xca\x02\x12Freebusy\\Shared\\V1\xe2\x02\x1eFreebusy\\Shared\\V1\\GPBMetadata\xea\x02\x14Freebusy::Shared::V1b\x06proto3"
+	"EnumsProtoP\x01Z\\github.com/shokki-engineering/freebusy/protobuf/generated/go/shared/v1/sharedpbv1;sharedpbv1\xa2\x02\x03FSX\xaa\x02\x12Freebusy.Shared.V1\xca\x02\x12Freebusy\\Shared\\V1\xe2\x02\x1eFreebusy\\Shared\\V1\\GPBMetadata\xea\x02\x14Freebusy::Shared::V1b\x06proto3"
 
 var (
 	file_freebusy_shared_v1_enums_proto_rawDescOnce sync.Once

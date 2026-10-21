@@ -8,7 +8,7 @@ go_library(
         "render.go",
     ],
     embedsrcs = ["launch.yaml.tmpl"],
-    importpath = "github.com/oh-tarnished/freebusy/tools/protobuf/envoy",
+    importpath = "github.com/shokki-engineering/freebusy/tools/protobuf/envoy",
     visibility = ["//visibility:private"],
     deps = ["@in_gopkg_yaml_v3//:yaml_v3"],
 )

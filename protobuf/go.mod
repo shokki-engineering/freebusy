@@ -1,4 +1,4 @@
-module github.com/oh-tarnished/freebusy/protobuf
+module github.com/shokki-engineering/freebusy/protobuf
 
 go 1.26.5
 

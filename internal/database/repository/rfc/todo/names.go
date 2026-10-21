@@ -16,7 +16,7 @@
 package todo
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
 // FormatTodoName builds "calendars/{calendar}/todos/{todo}" from bare ids.

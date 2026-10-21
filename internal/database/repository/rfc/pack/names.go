@@ -16,7 +16,7 @@
 package pack
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
 // FormatPackName builds "packs/{pack}" from bare ids.

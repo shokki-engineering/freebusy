@@ -308,8 +308,8 @@ const file_freebusy_webhook_v1_delivery_proto_rawDesc = "" +
 	"updateTime\x12\x17\n" +
 	"\x04etag\x18\x04 \x01(\tB\x03\xe0A\x03R\x04etag:[\xeaAT\n" +
 	"\x1efreebusy.webhook.v1/FeedCursor\x12\x19feedCursors/{feed_cursor}*\vfeedCursors2\n" +
-	"feedCursor\xca\xf3\x18\x00B\xf1\x01\n" +
-	"\x17com.freebusy.webhook.v1B\rDeliveryProtoP\x01ZYgithub.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1\xa2\x02\x03FWX\xaa\x02\x13Freebusy.Webhook.V1\xca\x02\x13Freebusy\\Webhook\\V1\xe2\x02\x1fFreebusy\\Webhook\\V1\\GPBMetadata\xea\x02\x15Freebusy::Webhook::V1b\x06proto3"
+	"feedCursor\xca\xf3\x18\x00B\xf7\x01\n" +
+	"\x17com.freebusy.webhook.v1B\rDeliveryProtoP\x01Z_github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1\xa2\x02\x03FWX\xaa\x02\x13Freebusy.Webhook.V1\xca\x02\x13Freebusy\\Webhook\\V1\xe2\x02\x1fFreebusy\\Webhook\\V1\\GPBMetadata\xea\x02\x15Freebusy::Webhook::V1b\x06proto3"
 
 var (
 	file_freebusy_webhook_v1_delivery_proto_rawDescOnce sync.Once

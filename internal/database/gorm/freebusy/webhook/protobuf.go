@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

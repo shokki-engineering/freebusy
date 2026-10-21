@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/oh-tarnished/freebusy/config"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
+	"github.com/shokki-engineering/freebusy/config"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/freebusy"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 	"go.opentelemetry.io/otel/propagation"
 	"gorm.io/gorm"

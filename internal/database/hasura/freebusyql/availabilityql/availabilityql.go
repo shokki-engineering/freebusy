@@ -14,10 +14,10 @@
 package availabilityql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/availabilityql/availabilitiesql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/availabilityql/availableperiodsql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/availabilityql/calendartimesql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/availabilityql/extensionpropertiesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/availabilityql/availabilitiesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/availabilityql/availableperiodsql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/availabilityql/calendartimesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/availabilityql/extensionpropertiesql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

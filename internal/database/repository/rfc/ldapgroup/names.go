@@ -16,7 +16,7 @@
 package ldapgroup
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
 // FormatLdapGroupName builds "ldapGroups/{ldap_group}" from bare ids.

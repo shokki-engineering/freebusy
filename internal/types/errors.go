@@ -3,7 +3,7 @@ package types
 import (
 	"errors"
 
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
 // Sentinel errors returned by repositories. Adapters translate backend-specific

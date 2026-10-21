@@ -16,7 +16,7 @@
 package membership
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
 // FormatMembershipName builds "ldapGroups/{ldap_group}/memberships/{membership}" from bare ids.

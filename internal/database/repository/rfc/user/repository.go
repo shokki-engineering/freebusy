@@ -18,9 +18,9 @@ package user
 import (
 	userv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/user/v1"
 	"context"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/filterx"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 	"gorm.io/gorm"
 )
 

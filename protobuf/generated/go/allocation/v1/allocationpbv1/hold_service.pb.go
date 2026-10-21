@@ -27,7 +27,7 @@ var File_freebusy_allocation_v1_hold_service_proto protoreflect.FileDescriptor
 
 const file_freebusy_allocation_v1_hold_service_proto_rawDesc = "" +
 	"\n" +
-	")freebusy/allocation/v1/hold_service.proto\x12\x16freebusy.allocation.v1\x1a'freebusy/allocation/v1/allocation.proto\x1a*freebusy/allocation/v1/hold_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1emcp/protobuf/annotations.proto2\xe1\t\n" +
+	")freebusy/allocation/v1/hold_service.proto\x12\x16freebusy.allocation.v1\x1a'freebusy/allocation/v1/allocation.proto\x1a*freebusy/allocation/v1/hold_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1emcp/protobuf/annotations.proto2\xe4\t\n" +
 	"\vHoldService\x12\xf8\x01\n" +
 	"\n" +
 	"CreateHold\x12).freebusy.allocation.v1.CreateHoldRequest\x1a\x1c.freebusy.allocation.v1.Hold\"\xa0\x01\xdaA\x13parent,hold,hold_id\xca\xf3\x18P\x12NHold one or more bookable resources for a window. Requires an idempotency key.\x82\xd3\xe4\x93\x020:\x04hold\"(/v1/{parent=organizationalUnits/*}/holds\x12\x88\x01\n" +
@@ -37,10 +37,10 @@ const file_freebusy_allocation_v1_hold_service_proto_rawDesc = "" +
 	"ExtendHold\x12).freebusy.allocation.v1.ExtendHoldRequest\x1a\x1c.freebusy.allocation.v1.Hold\"\x7f\xdaA\rname,duration\xca\xf3\x181\x12/Extend a live hold's expiry, measured from now.\x82\xd3\xe4\x93\x024:\x01*\"//v1/{name=organizationalUnits/*/holds/*}:extend\x12\xcd\x01\n" +
 	"\vReleaseHold\x12*.freebusy.allocation.v1.ReleaseHoldRequest\x1a\x1c.freebusy.allocation.v1.Hold\"t\xdaA\x04name\xca\xf3\x18.\x12,Release a hold early, freeing its resources.\x82\xd3\xe4\x93\x025:\x01*\"0/v1/{name=organizationalUnits/*/holds/*}:release\x12\x88\x01\n" +
 	"\n" +
-	"DeleteHold\x12).freebusy.allocation.v1.DeleteHoldRequest\x1a\x16.google.protobuf.Empty\"7\xdaA\x04name\x82\xd3\xe4\x93\x02**(/v1/{name=organizationalUnits/*/holds/*}\x1az\xcaA\x18freebusy.ohtarnished.dev\xc2\xf3\x18[\n" +
+	"DeleteHold\x12).freebusy.allocation.v1.DeleteHoldRequest\x1a\x16.google.protobuf.Empty\"7\xdaA\x04name\x82\xd3\xe4\x93\x02**(/v1/{name=organizationalUnits/*/holds/*}\x1a}\xcaA\x1bfreebusy.shokki.engineering\xc2\xf3\x18[\n" +
 	"Y\n" +
-	"\x0eResource Holds\x12\x051.0.0\x1a@Take, extend and release temporary claims on bookable resources.B\x8c\x02\n" +
-	"\x1acom.freebusy.allocation.v1B\x10HoldServiceProtoP\x01Zbgithub.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
+	"\x0eResource Holds\x12\x051.0.0\x1a@Take, extend and release temporary claims on bookable resources.B\x92\x02\n" +
+	"\x1acom.freebusy.allocation.v1B\x10HoldServiceProtoP\x01Zhgithub.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
 
 var file_freebusy_allocation_v1_hold_service_proto_goTypes = []any{
 	(*CreateHoldRequest)(nil),  // 0: freebusy.allocation.v1.CreateHoldRequest

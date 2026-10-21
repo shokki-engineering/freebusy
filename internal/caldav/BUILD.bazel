@@ -11,7 +11,7 @@ go_library(
         "store.go",
         "xml.go",
     ],
-    importpath = "github.com/oh-tarnished/freebusy/internal/caldav",
+    importpath = "github.com/shokki-engineering/freebusy/internal/caldav",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/database/gorm/filterx",

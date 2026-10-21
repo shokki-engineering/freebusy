@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "rfcgw_lib",
     srcs = ["main.go"],
-    importpath = "github.com/oh-tarnished/freebusy/tools/protobuf/rfcgw",
+    importpath = "github.com/shokki-engineering/freebusy/tools/protobuf/rfcgw",
     visibility = ["//visibility:private"],
 )
 

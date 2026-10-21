@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "graphqlx",
     srcs = ["graphqlx.go"],
-    importpath = "github.com/oh-tarnished/freebusy/internal/database/hasura/graphqlx",
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/hasura/graphqlx",
     visibility = ["//:__subpackages__"],
     deps = [
         "//shared",

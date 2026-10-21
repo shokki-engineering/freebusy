@@ -1,0 +1,21 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "scimgroup",
+    srcs = [
+        "filters.go",
+        "group_store.go",
+        "member_store.go",
+        "models.go",
+        "protobuf.go",
+    ],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/scimgroup",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/gorm/filterx",
+        "//internal/database/gorm/gormx",
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc7643/group/v1:group",
+        "@io_gorm_gorm//:gorm",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+    ],
+)

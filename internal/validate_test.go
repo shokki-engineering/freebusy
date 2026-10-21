@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"github.com/the-protobuf-project/runtime-go/grpc"
 	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/grpc/codes"

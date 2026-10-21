@@ -11,7 +11,7 @@ go_library(
         "freebusy.release.toml",
         "freebusy.dev.toml",
     ],
-    importpath = "github.com/oh-tarnished/freebusy/config",
+    importpath = "github.com/shokki-engineering/freebusy/config",
     visibility = ["//visibility:public"],
     deps = [
         "//shared",
@@ -21,6 +21,9 @@ go_library(
 
 go_test(
     name = "config_test",
-    srcs = ["config_test.go"],
+    srcs = [
+        "config_test.go",
+        "profile_test.go",
+    ],
     embed = [":config"],
 )

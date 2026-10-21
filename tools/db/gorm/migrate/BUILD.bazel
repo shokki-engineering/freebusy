@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "migrate_lib",
     srcs = ["main.go"],
-    importpath = "github.com/oh-tarnished/freebusy/tools/db/gorm/migrate",
+    importpath = "github.com/shokki-engineering/freebusy/tools/db/gorm/migrate",
     visibility = ["//visibility:private"],
     deps = [
         "//config",

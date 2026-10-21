@@ -27,7 +27,7 @@ var File_freebusy_webhook_v1_webhook_service_proto protoreflect.FileDescriptor
 
 const file_freebusy_webhook_v1_webhook_service_proto_rawDesc = "" +
 	"\n" +
-	")freebusy/webhook/v1/webhook_service.proto\x12\x13freebusy.webhook.v1\x1a\"freebusy/webhook/v1/delivery.proto\x1a!freebusy/webhook/v1/webhook.proto\x1a*freebusy/webhook/v1/webhook_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1emcp/protobuf/annotations.proto2\xe8\x10\n" +
+	")freebusy/webhook/v1/webhook_service.proto\x12\x13freebusy.webhook.v1\x1a\"freebusy/webhook/v1/delivery.proto\x1a!freebusy/webhook/v1/webhook.proto\x1a*freebusy/webhook/v1/webhook_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1emcp/protobuf/annotations.proto2\xeb\x10\n" +
 	"\x0eWebhookService\x12\xd9\x01\n" +
 	"\rCreateWebhook\x12).freebusy.webhook.v1.CreateWebhookRequest\x1a\x1c.freebusy.webhook.v1.Webhook\"\x7f\xdaA\x12webhook,webhook_id\xca\xf3\x18I\x12GSubscribe an HTTPS endpoint to hold, reservation and inventory changes.\x82\xd3\xe4\x93\x02\x17:\awebhook\"\f/v1/webhooks\x12\x8c\x01\n" +
 	"\n" +
@@ -40,10 +40,10 @@ const file_freebusy_webhook_v1_webhook_service_proto_rawDesc = "" +
 	"\x13RotateWebhookSecret\x12/.freebusy.webhook.v1.RotateWebhookSecretRequest\x1a\x1c.freebusy.webhook.v1.Webhook\"\\\xdaA\x04name\xca\xf3\x18$\x12\"Rotate a webhook's signing secret.\x82\xd3\xe4\x93\x02':\x01*\"\"/v1/{name=webhooks/*}:rotateSecret\x12\xac\x01\n" +
 	"\vGetDelivery\x12'.freebusy.webhook.v1.GetDeliveryRequest\x1a\x1d.freebusy.webhook.v1.Delivery\"U\xdaA\x04name\xca\xf3\x18 \x12\x1eGet one delivery of a webhook.\x82\xd3\xe4\x93\x02$\x12\"/v1/{name=webhooks/*/deliveries/*}\x12\xef\x01\n" +
 	"\x0eListDeliveries\x12*.freebusy.webhook.v1.ListDeliveriesRequest\x1a+.freebusy.webhook.v1.ListDeliveriesResponse\"\x83\x01\xdaA\x06parent\xca\xf3\x18L\x12JList a webhook's deliveries, filtered and ordered per AIP-160 and AIP-132.\x82\xd3\xe4\x93\x02$\x12\"/v1/{parent=webhooks/*}/deliveries\x12\xb5\x01\n" +
-	"\rRetryDelivery\x12).freebusy.webhook.v1.RetryDeliveryRequest\x1a\x1d.freebusy.webhook.v1.Delivery\"Z\xdaA\x04name\xca\xf3\x18\x1c\x12\x1aSend a delivery again now.\x82\xd3\xe4\x93\x02-:\x01*\"(/v1/{name=webhooks/*/deliveries/*}:retry\x1a\x8b\x01\xcaA\x18freebusy.ohtarnished.dev\xc2\xf3\x18l\n" +
+	"\rRetryDelivery\x12).freebusy.webhook.v1.RetryDeliveryRequest\x1a\x1d.freebusy.webhook.v1.Delivery\"Z\xdaA\x04name\xca\xf3\x18\x1c\x12\x1aSend a delivery again now.\x82\xd3\xe4\x93\x02-:\x01*\"(/v1/{name=webhooks/*/deliveries/*}:retry\x1a\x8e\x01\xcaA\x1bfreebusy.shokki.engineering\xc2\xf3\x18l\n" +
 	"j\n" +
-	"\bWebhooks\x12\x051.0.0\x1aWSubscribe endpoints to hold, reservation and inventory changes, and inspect deliveries.B\xf7\x01\n" +
-	"\x17com.freebusy.webhook.v1B\x13WebhookServiceProtoP\x01ZYgithub.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1\xa2\x02\x03FWX\xaa\x02\x13Freebusy.Webhook.V1\xca\x02\x13Freebusy\\Webhook\\V1\xe2\x02\x1fFreebusy\\Webhook\\V1\\GPBMetadata\xea\x02\x15Freebusy::Webhook::V1b\x06proto3"
+	"\bWebhooks\x12\x051.0.0\x1aWSubscribe endpoints to hold, reservation and inventory changes, and inspect deliveries.B\xfd\x01\n" +
+	"\x17com.freebusy.webhook.v1B\x13WebhookServiceProtoP\x01Z_github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1\xa2\x02\x03FWX\xaa\x02\x13Freebusy.Webhook.V1\xca\x02\x13Freebusy\\Webhook\\V1\xe2\x02\x1fFreebusy\\Webhook\\V1\\GPBMetadata\xea\x02\x15Freebusy::Webhook::V1b\x06proto3"
 
 var file_freebusy_webhook_v1_webhook_service_proto_goTypes = []any{
 	(*CreateWebhookRequest)(nil),       // 0: freebusy.webhook.v1.CreateWebhookRequest

@@ -247,9 +247,9 @@ const file_freebusy_allocation_v1_enums_proto_rawDesc = "" +
 	"'UNBOOKABLE_REASON_CODE_WINDOW_TOO_SHORT\x10\x05\x12*\n" +
 	"&UNBOOKABLE_REASON_CODE_WINDOW_TOO_LONG\x10\x06\x12$\n" +
 	" UNBOOKABLE_REASON_CODE_LEAD_TIME\x10\a\x12,\n" +
-	"(UNBOOKABLE_REASON_CODE_RESOURCE_INACTIVE\x10\bB\x86\x02\n" +
+	"(UNBOOKABLE_REASON_CODE_RESOURCE_INACTIVE\x10\bB\x8c\x02\n" +
 	"\x1acom.freebusy.allocation.v1B\n" +
-	"EnumsProtoP\x01Zbgithub.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
+	"EnumsProtoP\x01Zhgithub.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
 
 var (
 	file_freebusy_allocation_v1_enums_proto_rawDescOnce sync.Once

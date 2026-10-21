@@ -1,0 +1,21 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "common",
+    srcs = [
+        "filters.go",
+        "fraction_store.go",
+        "models.go",
+        "protobuf.go",
+        "time_zone_store.go",
+    ],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/common",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/gorm/filterx",
+        "//internal/database/gorm/gormx",
+        "@io_gorm_gorm//:gorm",
+        "@org_golang_google_genproto//googleapis/type/datetime",
+        "@org_golang_google_genproto//googleapis/type/fraction",
+    ],
+)

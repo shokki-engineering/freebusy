@@ -17,7 +17,7 @@ package shared
 import (
 	"time"
 
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/shared/v1/sharedpbv1"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/shared/v1/sharedpbv1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

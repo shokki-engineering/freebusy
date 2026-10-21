@@ -3,8 +3,8 @@ package db
 import (
 	"context"
 
-	"github.com/oh-tarnished/freebusy/internal/service/reservation"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
+	"github.com/shokki-engineering/freebusy/internal/service/reservation"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

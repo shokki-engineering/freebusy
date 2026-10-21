@@ -16,7 +16,7 @@
 package webhook
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
 // FormatDeliveryName builds "webhooks/{webhook}/deliveries/{delivery}" from bare ids.

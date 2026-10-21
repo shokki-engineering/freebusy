@@ -13,9 +13,9 @@ package main
 import (
 	"log"
 
-	"github.com/oh-tarnished/freebusy/config"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc"
+	"github.com/shokki-engineering/freebusy/config"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/freebusy"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/rfc"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

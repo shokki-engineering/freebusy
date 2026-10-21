@@ -260,8 +260,8 @@ const file_freebusy_reservation_v1_reservation_proto_rawDesc = "" +
 	"\breplaces\x18\x0f \x01(\tB\x03\xe0A\x03R\breplaces\x12%\n" +
 	"\vreplacement\x18\x10 \x01(\tB\x03\xe0A\x03R\vreplacement:\x9a\x01\xeaA\x86\x01\n" +
 	"#freebusy.reservation.v1/Reservation\x12DorganizationalUnits/{organizational_unit}/reservations/{reservation}*\freservations2\vreservation\xca\xf3\x18\f\x18\x01*\b\n" +
-	"\x04hold\x10\x01B\x94\x02\n" +
-	"\x1bcom.freebusy.reservation.v1B\x10ReservationProtoP\x01Zegithub.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
+	"\x04hold\x10\x01B\x9a\x02\n" +
+	"\x1bcom.freebusy.reservation.v1B\x10ReservationProtoP\x01Zkgithub.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
 
 var (
 	file_freebusy_reservation_v1_reservation_proto_rawDescOnce sync.Once

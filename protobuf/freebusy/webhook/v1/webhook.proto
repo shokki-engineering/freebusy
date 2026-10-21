@@ -10,10 +10,10 @@ import "google/api/resource.proto";
 import "google/protobuf/timestamp.proto";
 import "store/v1/annotations.proto";
 
-option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1";
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "WebhookProto";
-option java_package = "dev.ohtarnished.freebusy.webhook.v1";
+option java_package = "engineering.shokki.freebusy.webhook.v1";
 
 // A Webhook sends an HTTPS endpoint each change to holds, reservations and the
 // inventory they draw on -- resources, calendars, calendar events and

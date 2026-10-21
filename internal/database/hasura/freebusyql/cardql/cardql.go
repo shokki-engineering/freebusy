@@ -14,10 +14,10 @@
 package cardql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/cardql/namecomponentsql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/cardql/namesql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/cardql/resourceql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/cardql/speechesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/cardql/namecomponentsql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/cardql/namesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/cardql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/cardql/speechesql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

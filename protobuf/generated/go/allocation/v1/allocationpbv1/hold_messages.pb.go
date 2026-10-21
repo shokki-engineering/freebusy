@@ -489,8 +489,8 @@ const file_freebusy_allocation_v1_hold_messages_proto_rawDesc = "" +
 	"\x11DeleteHoldRequest\x12e\n" +
 	"\x04name\x18\x01 \x01(\tBQ\xe0A\x02\xfaA\x1d\n" +
 	"\x1bfreebusy.allocation.v1/Hold\xbaH+r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\x04name\x12\x17\n" +
-	"\x04etag\x18\x02 \x01(\tB\x03\xe0A\x01R\x04etagB\x8d\x02\n" +
-	"\x1acom.freebusy.allocation.v1B\x11HoldMessagesProtoP\x01Zbgithub.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
+	"\x04etag\x18\x02 \x01(\tB\x03\xe0A\x01R\x04etagB\x93\x02\n" +
+	"\x1acom.freebusy.allocation.v1B\x11HoldMessagesProtoP\x01Zhgithub.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
 
 var (
 	file_freebusy_allocation_v1_hold_messages_proto_rawDescOnce sync.Once

@@ -16,10 +16,10 @@
 package allocation
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/allocationql/holdsql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/allocationql/resourceql"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/allocationql/holdsql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/allocationql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/protobuf/types/known/timestamppb"

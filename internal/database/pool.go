@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/oh-tarnished/freebusy/shared"
+	"github.com/shokki-engineering/freebusy/shared"
 )
 
 // defaultPoolSampleInterval is how often the pool monitor samples sql.DB.Stats.

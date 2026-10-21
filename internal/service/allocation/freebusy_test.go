@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 )
 
 func TestFreeBusySplitsByFBType(t *testing.T) {

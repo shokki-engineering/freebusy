@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 )
 
 // FreeBusy is one calendar's time over a window, split the way RFC 5545

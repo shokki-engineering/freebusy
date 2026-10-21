@@ -1,0 +1,20 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "membership",
+    srcs = [
+        "filters.go",
+        "membership_store.go",
+        "models.go",
+        "protobuf.go",
+    ],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/membership",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/gorm/filterx",
+        "//internal/database/gorm/gormx",
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc4519/membership/v1:membership",
+        "@io_gorm_gorm//:gorm",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+    ],
+)

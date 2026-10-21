@@ -16,7 +16,7 @@
 package allocation
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
 // FormatAllocationName builds "organizationalUnits/{organizational_unit}/allocations/{allocation}" from bare ids.

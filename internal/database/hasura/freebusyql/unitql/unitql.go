@@ -14,7 +14,7 @@
 package unitql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/unitql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/unitql/resourceql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

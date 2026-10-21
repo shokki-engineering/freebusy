@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/oh-tarnished/freebusy/shared"
+	"github.com/shokki-engineering/freebusy/shared"
 	"github.com/the-protobuf-project/runtime-go/grpc/options"
 )
 
@@ -29,20 +29,23 @@ func init() {
 	// 2. The development profile: config/freebusy.dev.toml from the working
 	// directory when it is there (a checkout, so edits apply without a
 	// rebuild), else the embedded copy when FREEBUSY_PROFILE=dev asks for it.
-	// Keys it defines win; everything else falls through to the release
+	// FREEBUSY_PROFILE=release loads none, even in a checkout -- how a
+	// production migration run from one keeps to the release defaults. Keys
+	// the profile defines win; everything else falls through to the release
 	// defaults.
-	overlay, err := os.ReadFile(devOverlayPath)
-	if err != nil {
-		switch profile := os.Getenv(ProfileVar); profile {
-		case "", "release":
-			overlay = nil
-		case "dev":
-			if overlay, err = configFS.ReadFile("freebusy.dev.toml"); err != nil {
-				panic(fmt.Sprintf("embedded dev profile not found: %v", err))
-			}
-		default:
-			panic(fmt.Sprintf("%s=%q: want dev or release", ProfileVar, profile))
+	var overlay []byte
+	switch profile := os.Getenv(ProfileVar); profile {
+	case "release":
+	case "", "dev":
+		var err error
+		if overlay, err = os.ReadFile(devOverlayPath); err == nil || profile == "" {
+			break
 		}
+		if overlay, err = configFS.ReadFile("freebusy.dev.toml"); err != nil {
+			panic(fmt.Sprintf("embedded dev profile not found: %v", err))
+		}
+	default:
+		panic(fmt.Sprintf("%s=%q: want dev or release", ProfileVar, profile))
 	}
 	if overlay != nil {
 		if err := shared.LoadTomlBytes(overlay); err != nil {

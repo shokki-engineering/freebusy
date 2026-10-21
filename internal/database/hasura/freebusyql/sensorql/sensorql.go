@@ -14,7 +14,7 @@
 package sensorql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/sensorql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/sensorql/resourceql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

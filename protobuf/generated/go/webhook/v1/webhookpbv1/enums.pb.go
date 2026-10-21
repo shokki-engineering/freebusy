@@ -147,9 +147,9 @@ const file_freebusy_webhook_v1_enums_proto_rawDesc = "" +
 	"\x1aDELIVERY_STATE_UNSPECIFIED\x10\x00\x12\x1a\n" +
 	"\x16DELIVERY_STATE_PENDING\x10\x01\x12\x1c\n" +
 	"\x18DELIVERY_STATE_SUCCEEDED\x10\x02\x12\x19\n" +
-	"\x15DELIVERY_STATE_FAILED\x10\x03B\xee\x01\n" +
+	"\x15DELIVERY_STATE_FAILED\x10\x03B\xf4\x01\n" +
 	"\x17com.freebusy.webhook.v1B\n" +
-	"EnumsProtoP\x01ZYgithub.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1\xa2\x02\x03FWX\xaa\x02\x13Freebusy.Webhook.V1\xca\x02\x13Freebusy\\Webhook\\V1\xe2\x02\x1fFreebusy\\Webhook\\V1\\GPBMetadata\xea\x02\x15Freebusy::Webhook::V1b\x06proto3"
+	"EnumsProtoP\x01Z_github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1\xa2\x02\x03FWX\xaa\x02\x13Freebusy.Webhook.V1\xca\x02\x13Freebusy\\Webhook\\V1\xe2\x02\x1fFreebusy\\Webhook\\V1\\GPBMetadata\xea\x02\x15Freebusy::Webhook::V1b\x06proto3"
 
 var (
 	file_freebusy_webhook_v1_enums_proto_rawDescOnce sync.Once

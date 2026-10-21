@@ -1,0 +1,25 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "eventql",
+    srcs = ["eventql.go"],
+    importpath = "github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/eventql",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/hasura/freebusyql/eventql/alarmsql",
+        "//internal/database/hasura/freebusyql/eventql/attendeesql",
+        "//internal/database/hasura/freebusyql/eventql/calendartimesql",
+        "//internal/database/hasura/freebusyql/eventql/extensionpropertiesql",
+        "//internal/database/hasura/freebusyql/eventql/linksql",
+        "//internal/database/hasura/freebusyql/eventql/locationsql",
+        "//internal/database/hasura/freebusyql/eventql/organizersql",
+        "//internal/database/hasura/freebusyql/eventql/participantsql",
+        "//internal/database/hasura/freebusyql/eventql/recurrencesql",
+        "//internal/database/hasura/freebusyql/eventql/resourceql",
+        "//internal/database/hasura/freebusyql/eventql/resourcesql",
+        "//internal/database/hasura/freebusyql/eventql/structureddatasql",
+        "//internal/database/hasura/freebusyql/eventql/styleddescriptionsql",
+        "//internal/database/hasura/freebusyql/eventql/weekdaynumsql",
+        "@com_github_the_protobuf_project_runtime_go_network//runtime",
+    ],
+)

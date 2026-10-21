@@ -14,12 +14,12 @@
 package userql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/addressql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/attributesql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/enterpriseusersql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/managersql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/namesql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/resourceql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/userql/addressql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/userql/attributesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/userql/enterpriseusersql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/userql/managersql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/userql/namesql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/userql/resourceql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

@@ -14,7 +14,7 @@
 package orgunitql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/orgunitql/organizationalunitsql"
+	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/orgunitql/organizationalunitsql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 

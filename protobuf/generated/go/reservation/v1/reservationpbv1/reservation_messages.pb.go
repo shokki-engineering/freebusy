@@ -445,8 +445,8 @@ const file_freebusy_reservation_v1_reservation_messages_proto_rawDesc = "" +
 	"#freebusy.reservation.v1/Reservation\xbaH2r02.^organizationalUnits/[^/]+/reservations/[^/]+$R\x04name\x12e\n" +
 	"\x04hold\x18\x02 \x01(\tBQ\xe0A\x02\xfaA\x1d\n" +
 	"\x1bfreebusy.allocation.v1/Hold\xbaH+r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\x04hold\x12\x17\n" +
-	"\x04etag\x18\x03 \x01(\tB\x03\xe0A\x01R\x04etagB\x9c\x02\n" +
-	"\x1bcom.freebusy.reservation.v1B\x18ReservationMessagesProtoP\x01Zegithub.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
+	"\x04etag\x18\x03 \x01(\tB\x03\xe0A\x01R\x04etagB\xa2\x02\n" +
+	"\x1bcom.freebusy.reservation.v1B\x18ReservationMessagesProtoP\x01Zkgithub.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
 
 var (
 	file_freebusy_reservation_v1_reservation_messages_proto_rawDescOnce sync.Once

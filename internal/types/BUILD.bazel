@@ -7,7 +7,7 @@ go_library(
         "list.go",
         "types.go",
     ],
-    importpath = "github.com/oh-tarnished/freebusy/internal/types",
+    importpath = "github.com/shokki-engineering/freebusy/internal/types",
     visibility = ["//:__subpackages__"],
     deps = ["//internal/database/repository/repox"],
 )

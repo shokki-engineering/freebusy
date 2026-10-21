@@ -16,12 +16,12 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/oh-tarnished/freebusy/internal/caldav"
-	"github.com/oh-tarnished/freebusy/internal/database"
-	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/internal/service/allocation"
-	"github.com/oh-tarnished/freebusy/internal/service/allocation/db"
-	"github.com/oh-tarnished/freebusy/internal/service/rfcsvc"
+	"github.com/shokki-engineering/freebusy/internal/caldav"
+	"github.com/shokki-engineering/freebusy/internal/database"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation/db"
+	"github.com/shokki-engineering/freebusy/internal/service/rfcsvc"
 )
 
 func TestCalDAV_Gorm(t *testing.T) {

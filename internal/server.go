@@ -7,8 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/oh-tarnished/freebusy/config"
-	"github.com/oh-tarnished/freebusy/internal/runtime/idempotency"
+	"github.com/shokki-engineering/freebusy/config"
+	"github.com/shokki-engineering/freebusy/internal/runtime/idempotency"
 	"github.com/the-protobuf-project/runtime-go/grpc"
 	"github.com/the-protobuf-project/runtime-go/grpc/options"
 )

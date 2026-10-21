@@ -121,9 +121,9 @@ const file_freebusy_reservation_v1_enums_proto_rawDesc = "" +
 	"\x1bRESERVATION_STATE_CANCELLED\x10\x04\x12\x1c\n" +
 	"\x18RESERVATION_STATE_FAILED\x10\x05\x12\"\n" +
 	"\x1eRESERVATION_STATE_RESCHEDULING\x10\x06\x12!\n" +
-	"\x1dRESERVATION_STATE_RESCHEDULED\x10\aB\x8e\x02\n" +
+	"\x1dRESERVATION_STATE_RESCHEDULED\x10\aB\x94\x02\n" +
 	"\x1bcom.freebusy.reservation.v1B\n" +
-	"EnumsProtoP\x01Zegithub.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
+	"EnumsProtoP\x01Zkgithub.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
 
 var (
 	file_freebusy_reservation_v1_enums_proto_rawDescOnce sync.Once

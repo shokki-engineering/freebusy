@@ -3,6 +3,6 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "livetest",
     srcs = ["livetest.go"],
-    importpath = "github.com/oh-tarnished/freebusy/internal/livetest",
+    importpath = "github.com/shokki-engineering/freebusy/internal/livetest",
     visibility = ["//:__subpackages__"],
 )
