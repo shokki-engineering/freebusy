@@ -114,9 +114,45 @@ func (s *Store) claimsOverlapping(ctx context.Context, resources []string, windo
 // the way makes the no_overlap constraint refuse the batch: types.ErrConflict.
 func (s *Store) InsertHold(ctx context.Context, parent string, h *allocationpbv1.Hold) (*allocationpbv1.Hold, error) {
 	window := [2]time.Time{h.GetWindow().GetStartTime().AsTime(), h.GetWindow().GetEndTime().AsTime()}
+	for attempt := 1; ; attempt++ {
+		name, err := s.insertHold(ctx, parent, h, window)
+		if err == nil {
+			return s.holds.Get(ctx, name)
+		}
+		if errors.Is(err, types.ErrConflict) || errors.Is(err, types.ErrAlreadyExists) {
+			return nil, err
+		}
+		if rival, ok := s.rivalClaim(ctx, h, window); ok {
+			return nil, fmt.Errorf("%w: %s was taken while this hold was written", types.ErrConflict, rival)
+		}
+		// No rival to be seen: the insert may have been a deadlock victim --
+		// two losers waiting on an uncommitted winner can deadlock with each
+		// other, and a GraphQL engine hides the database's reason. A victim
+		// is retried, which waits on the winner's lock in the database: it
+		// then fails as a plain conflict, or succeeds if the winner gave up.
+		// The batch is atomic, so a failed attempt left nothing behind.
+		if attempt == insertAttempts {
+			return nil, err
+		}
+		select {
+		case <-ctx.Done():
+			return nil, err
+		case <-time.After(time.Duration(attempt) * 25 * time.Millisecond):
+		}
+	}
+}
+
+// insertAttempts bounds InsertHold's retries of an insert that failed with no
+// rival in sight.
+const insertAttempts = 3
+
+// insertHold is one attempt: the hold and its allocations, in one batch with
+// the deletion of lapsed claims in the way, so the exclusion constraint never
+// sees them.
+func (s *Store) insertHold(ctx context.Context, parent string, h *allocationpbv1.Hold, window [2]time.Time) (string, error) {
 	inWay, err := s.claimsOverlapping(ctx, h.GetResources(), window)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	now := time.Now()
 	b := allocation.NewBatch(s.conn)
@@ -127,7 +163,7 @@ func (s *Store) InsertHold(ctx context.Context, parent string, h *allocationpbv1
 	}
 	name, err := b.CreateHold(parent, h)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	for _, r := range h.GetResources() {
 		if _, err := b.CreateAllocation(parent, &allocationpbv1.Allocation{
@@ -137,49 +173,11 @@ func (s *Store) InsertHold(ctx context.Context, parent string, h *allocationpbv1
 			ExpireTime: h.GetExpireTime(),
 			Hold:       name,
 		}); err != nil {
-			return nil, err
+			return "", err
 		}
 	}
-	if err := b.Commit(ctx); err != nil {
-		return nil, s.lostRace(ctx, h, window, err)
-	}
-	return s.holds.Get(ctx, name)
+	return name, b.Commit(ctx)
 }
-
-// lostRace reports a failed hold insert as the conflict it was when another
-// hold now has the time: the backend does not always say so itself -- two
-// inserts racing under the exclusion constraint can deadlock, and a GraphQL
-// engine may hide the database's reason -- but the claims it left behind do.
-//
-// The winner may not have committed yet. Two losers waiting on it can
-// deadlock with each other, and the victim is aborted at once, while the
-// winner's claim is still invisible. So a check that finds no rival looks
-// again, a few times over about a second, before calling the failure what it
-// said it was.
-func (s *Store) lostRace(ctx context.Context, h *allocationpbv1.Hold, window [2]time.Time, err error) error {
-	if errors.Is(err, types.ErrConflict) || errors.Is(err, types.ErrAlreadyExists) {
-		return err
-	}
-	wait := 50 * time.Millisecond
-	for attempt := 0; ; attempt++ {
-		if rival, ok := s.rivalClaim(ctx, h, window); ok {
-			return fmt.Errorf("%w: %s was taken while this hold was written", types.ErrConflict, rival)
-		}
-		if attempt == lostRaceChecks-1 {
-			return err
-		}
-		select {
-		case <-ctx.Done():
-			return err
-		case <-time.After(wait):
-		}
-		wait *= 2
-	}
-}
-
-// lostRaceChecks bounds lostRace's looks: 50+100+200+400 ms of waiting
-// between five checks.
-const lostRaceChecks = 5
 
 // rivalClaim names a resource another hold now claims, live, across window.
 func (s *Store) rivalClaim(ctx context.Context, h *allocationpbv1.Hold, window [2]time.Time) (string, bool) {
