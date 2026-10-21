@@ -11,10 +11,10 @@ require (
 	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261021085804-ae1e2acc01d5.2
 	cloud.google.com/go/longrunning v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0
-	github.com/the-protobuf-project/grpc-mcp-gateway v1.6.0
+	github.com/the-protobuf-project/grpc-mcp-gateway v1.6.1
 	github.com/the-protobuf-project/runtime-go/agents v0.0.0-20260904054035-1f2313e0d64a
 	github.com/the-protobuf-project/store v1.5.4
-	google.golang.org/genproto v0.0.0-20260622175928-b703f567277d
+	google.golang.org/genproto v0.0.0-20260831171406-18b4a7587f8a
 	google.golang.org/genproto/googleapis/api v0.0.0-20261012220534-4341edf3f941
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12
@@ -22,7 +22,7 @@ require (
 
 require (
 	github.com/google/jsonschema-go v0.4.3 // indirect
-	github.com/modelcontextprotocol/go-sdk v1.7.0 // indirect
+	github.com/modelcontextprotocol/go-sdk v1.8.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/segmentio/encoding v0.5.4 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
