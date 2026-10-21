@@ -42,7 +42,7 @@ ARCHS = [
         "org.opencontainers.image.title": "freebusy",
         "org.opencontainers.image.description": "Generic availability and booking engine.",
         "org.opencontainers.image.source": "https://github.com/shokki-engineering/freebusy",
-        "org.opencontainers.image.licenses": "Apache-2.0",
+        "org.opencontainers.image.licenses": "AGPL-3.0-or-later",
     },
     os = "linux",
     tars = [":layer_" + arch],

@@ -4,11 +4,11 @@
 openapi: 3.0.0
 info:
   title: FreeBusy API
-  summary: Scheduling, availability, and booking platform API.
+  summary: A generalized availability and booking engine.
   description: |-
-    FreeBusy is a scheduling platform that exposes resources, schedules, availability windows, bookings, organisations, and promotional codes over a RESTful, OpenAPI-described surface. This document is generated from Protocol Buffer service definitions and merged into a single specification.
+    freebusy decides what can be booked, when it is free, and who is holding it: RFC 9073 resources with RFC 5545 calendars and RFC 7953 availability, searched, held and reserved without double booking, with webhooks for every change. This document is generated from the Protocol Buffer service definitions and merged into a single specification.
 
-    Authentication is performed via bearer tokens unless otherwise noted. All timestamps are RFC 3339 and all monetary amounts follow the associated currency's minor units.
+    All timestamps are RFC 3339. The API carries no authentication yet: serve it on a private network.
   version: 1.0.0
   termsOfService: https://freebusy.shokki.engineering/terms
   contact:

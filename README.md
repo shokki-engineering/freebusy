@@ -34,6 +34,7 @@ flowchart LR
 - [Repository layout](#repository-layout)
 - [Troubleshooting](#troubleshooting)
 - [Status](#status)
+- [Licence](#licence)
 
 ---
 
@@ -613,4 +614,24 @@ Ready to build on. Not built yet:
 
 ---
 
-© 2026 shokki-engineering | Apache 2.0 License
+## Licence
+
+Dual-licensed.
+
+- **[AGPL-3.0-or-later](./LICENSE)** — free for open-source work, forever.
+- **[Commercial](./LICENSE-COMMERCIAL.md)** — for proprietary or closed-source
+  products, and for offering freebusy as a network service without publishing
+  your source.
+
+The `.proto` contract and the code generated from it (everything under
+[`protobuf/`](./protobuf), and the module on the Buf Schema Registry) are
+**[Apache-2.0](./protobuf/LICENSE)**, so a proprietary application that merely
+*talks to* a freebusy server needs no commercial licence. The line is drawn at
+building on, or modifying, the server itself.
+
+Contributions are accepted under the [Contributor Licence Agreement](./CLA.md):
+sign off every commit (`git commit -s`).
+
+---
+
+© 2026 shokki-engineering
