@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"google.golang.org/genproto/googleapis/type/interval"
@@ -23,9 +23,9 @@ func reservationFlow(t *testing.T, c *e2eClients) {
 
 	site := "organizationalUnits/e2e-" + c.suffix
 	resource := "resources/e2e-" + c.suffix
-	if _, err := c.resources.CreateResource(ctx, &resourcepbv1.CreateResourceRequest{
+	if _, err := c.resources.CreateResource(ctx, &resourcev1.CreateResourceRequest{
 		ResourceId: "e2e-" + c.suffix,
-		Resource:   &resourcepbv1.Resource{OrganizationalUnit: site, ResourceTypes: []string{"e2e"}},
+		Resource:   &resourcev1.Resource{OrganizationalUnit: site, ResourceTypes: []string{"e2e"}},
 	}); err != nil {
 		t.Fatalf("seed resource: %v", err)
 	}

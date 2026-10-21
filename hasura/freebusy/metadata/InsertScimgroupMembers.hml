@@ -1,0 +1,132 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertScimgroupMembersObject
+  fields:
+    - name: attributeType
+      type: String_1
+    - name: display
+      type: String_1
+    - name: groupId
+      type: String_1!
+    - name: id
+      type: String_1!
+    - name: referenceUri
+      type: String_1
+    - name: value
+      type: String_1!
+  graphql:
+    typeName: InsertScimgroupMembersObject
+    inputTypeName: InsertScimgroupMembersObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_scimgroup_members_object
+      fieldMapping:
+        attributeType:
+          column:
+            name: attribute_type
+        display:
+          column:
+            name: display
+        groupId:
+          column:
+            name: group_id
+        id:
+          column:
+            name: id
+        referenceUri:
+          column:
+            name: reference_uri
+        value:
+          column:
+            name: value
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertScimgroupMembersObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - attributeType
+          - display
+          - groupId
+          - id
+          - referenceUri
+          - value
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertScimgroupMembersResponse
+  description: Responses from the 'insert_scimgroup_members' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[ScimgroupMembers!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertScimgroupMembersResponse
+    inputTypeName: InsertScimgroupMembersResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_scimgroup_members_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertScimgroupMembersResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertScimgroupMembers
+  outputType: InsertScimgroupMembersResponse!
+  arguments:
+    - name: objects
+      type: "[InsertScimgroupMembersObject!]!"
+    - name: postCheck
+      type: ScimgroupMembersBoolExp
+      description: Insert permission predicate over the 'scimgroup_members' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: insert_scimgroup_members
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertScimgroupMembers
+    rootFieldKind: Mutation
+  description: Insert into the scimgroup_members table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertScimgroupMembers
+  permissions:
+    - role: admin
+      allowExecution: true
+

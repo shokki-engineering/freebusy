@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/oh-tarnished/freebusy/internal/rfc"
 	"github.com/oh-tarnished/freebusy/internal/runtime/rpc"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
@@ -59,16 +59,16 @@ func newFixture(t *testing.T) *fixture {
 // addResource adds a resource on its own calendar, carrying profile as its
 // booking STRUCTURED-DATA when non-empty.
 func (f *fixture) addResource(id, profile string) {
-	res := &resourcepbv1.Resource{
+	res := &resourcev1.Resource{
 		Name:               "resources/" + id,
 		Calendar:           "calendars/club-" + id,
 		OrganizationalUnit: club,
 		ResourceTypes:      []string{"padel-court"},
 	}
 	if profile != "" {
-		res.StructuredData = []*resourcepbv1.StructuredData{{
+		res.StructuredData = []*resourcev1.StructuredData{{
 			Schema: rfc.ProfileSchemaURI,
-			Value:  &resourcepbv1.StructuredData_Text{Text: profile},
+			Value:  &resourcev1.StructuredData_Text{Text: profile},
 		}}
 	}
 	f.store.resources = append(f.store.resources, ResourceRecord{Resource: res})
@@ -353,7 +353,7 @@ func TestDayBucketsInSiteZone(t *testing.T) {
 func TestSearchRequiresQuantityPerSite(t *testing.T) {
 	f := newFixture(t)
 	f.share()
-	other := &resourcepbv1.Resource{Name: "resources/solo", Calendar: "calendars/solo", OrganizationalUnit: "organizationalUnits/annex", ResourceTypes: []string{"padel-court"}}
+	other := &resourcev1.Resource{Name: "resources/solo", Calendar: "calendars/solo", OrganizationalUnit: "organizationalUnits/annex", ResourceTypes: []string{"padel-court"}}
 	f.store.resources = append(f.store.resources, ResourceRecord{Resource: other})
 	res, err := f.srv.SearchAvailability(ctx(), &allocationpbv1.SearchAvailabilityRequest{
 		Parent: "organizations/acme", Window: win(10, 11), Quantity: 2,

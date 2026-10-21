@@ -29,11 +29,10 @@ import (
 	"time"
 
 	"github.com/oh-tarnished/freebusy/internal/database"
-	sharedrepo "github.com/oh-tarnished/freebusy/internal/database/repository/freebusy/shared"
+	"github.com/oh-tarnished/freebusy/internal/database/repository/freebusy/shared"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
 	"github.com/oh-tarnished/freebusy/internal/types"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/shared/v1/sharedpbv1"
-	"github.com/oh-tarnished/freebusy/shared"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -63,14 +62,14 @@ const staleAfter = 10 * time.Minute
 // connection was opened for: the generated shared repository speaks both GORM
 // and GraphQL, so idempotency works identically on either backend.
 func New(conn *database.Connection) grpc.UnaryServerInterceptor {
-	repos := sharedrepo.New(repox.Conn{Gorm: conn.PgSQLConn, GraphQL: conn.Hasura})
+	repos := shared.New(repox.Conn{Gorm: conn.PgSQLConn, GraphQL: conn.Hasura})
 	return Interceptor(repos.IdempotencyKeys)
 }
 
 // Interceptor returns the unary interceptor that enforces request_id semantics
 // against repo. Build repo from the live connection (see New) so it follows the
 // configured provider — the generated repository speaks both GORM and GraphQL.
-func Interceptor(repo sharedrepo.IdempotencyKeyRepository) grpc.UnaryServerInterceptor {
+func Interceptor(repo shared.IdempotencyKeyRepository) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		msg, ok := req.(proto.Message)
 		if !ok {
@@ -102,7 +101,7 @@ func Interceptor(repo sharedrepo.IdempotencyKeyRepository) grpc.UnaryServerInter
 			// The call genuinely failed and wrote nothing worth remembering.
 			// Release the id so the caller may retry it for real.
 			if derr := repo.Delete(ctx, name); derr != nil {
-				_ = shared.Telemetry.Logger.Error("idempotency: release key after handler error",
+				logError("idempotency: release key after handler error",
 					"method", info.FullMethod, "request_id", requestID, "error", derr)
 			}
 			return nil, err
@@ -118,7 +117,7 @@ func Interceptor(repo sharedrepo.IdempotencyKeyRepository) grpc.UnaryServerInter
 // IN_FLIGHT key means the first call is still running, which is a concurrent
 // duplicate we cannot answer without guessing. createErr is the failure that
 // sent us here, returned when the key turns out not to explain it.
-func replay(ctx context.Context, repo sharedrepo.IdempotencyKeyRepository, name string, createErr error) (any, error) {
+func replay(ctx context.Context, repo shared.IdempotencyKeyRepository, name string, createErr error) (any, error) {
 	existing, err := repo.Get(ctx, name)
 	if err != nil {
 		if errors.Is(err, types.ErrNotFound) {
@@ -154,21 +153,21 @@ func replay(ctx context.Context, repo sharedrepo.IdempotencyKeyRepository, name 
 // for has already happened and returning an error would tell them otherwise. The
 // cost is that their retry re-runs the handler and hits the underlying
 // constraint instead of replaying — the pre-existing behaviour, not a new bug.
-func settle(ctx context.Context, repo sharedrepo.IdempotencyKeyRepository, key *sharedpbv1.IdempotencyKey, resp any, method, requestID string) {
+func settle(ctx context.Context, repo shared.IdempotencyKeyRepository, key *sharedpbv1.IdempotencyKey, resp any, method, requestID string) {
 	msg, ok := resp.(proto.Message)
 	if !ok {
 		return
 	}
 	encoded, err := encode(msg)
 	if err != nil {
-		_ = shared.Telemetry.Logger.Error("idempotency: encode response",
+		logError("idempotency: encode response",
 			"method", method, "request_id", requestID, "error", err)
 		return
 	}
 	key.State = sharedpbv1.IdempotencyState_IDEMPOTENCY_STATE_DONE
 	key.Response = encoded
 	if _, err := repo.Update(ctx, key, []string{"state", "response"}); err != nil {
-		_ = shared.Telemetry.Logger.Error("idempotency: settle key",
+		logError("idempotency: settle key",
 			"method", method, "request_id", requestID, "error", err)
 	}
 }

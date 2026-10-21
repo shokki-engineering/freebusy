@@ -66,10 +66,10 @@ func checkID(field, id string) error {
 	return fmt.Errorf("%w: %s %q must match %s", types.ErrInvalidArgument, field, id, resourceID)
 }
 
-// prepareCreate readies m for a create under name: everything the server owns
+// PrepareCreate readies m for a create under name: everything the server owns
 // is cleared, so a client cannot set a create_time, an etag or a delete_time
 // by sending one.
-func prepareCreate(m proto.Message, name string) {
+func PrepareCreate(m proto.Message, name string) {
 	clearOutputOnly(m)
 	m.ProtoReflect().Set(m.ProtoReflect().Descriptor().Fields().ByName("name"), protoreflect.ValueOfString(name))
 }

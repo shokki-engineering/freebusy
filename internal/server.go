@@ -78,7 +78,7 @@ func serviceOptions(svc *Service) ([]grpc.Option, error) {
 		// passed validation cannot claim an idempotency key.
 		grpc.WithUnaryInterceptors(idempotency.New(svc.conn)),
 		registerGRPCServers(svc),
-		registerHTTPGateways(),
+		registerHTTPGateways(svc),
 		registerMCPServices(svc),
 	}
 	tlsCfg := config.Get().Server.TLS

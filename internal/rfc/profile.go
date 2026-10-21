@@ -11,7 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 )
 
 // ProfileSchemaURI identifies the STRUCTURED-DATA payload freebusy reads off a
@@ -53,7 +53,7 @@ type Profile struct {
 // encoding for this schema; both are left unread rather than guessed at. A
 // resource carrying neither returns the zero Profile and no error, because a
 // resource without a booking profile is a perfectly ordinary resource.
-func DecodeProfile(res *resourcepbv1.Resource) (Profile, error) {
+func DecodeProfile(res *resourcev1.Resource) (Profile, error) {
 	var p Profile
 	for _, sd := range res.GetStructuredData() {
 		if sd.GetSchema() != ProfileSchemaURI {

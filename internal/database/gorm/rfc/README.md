@@ -57,10 +57,10 @@ erDiagram
     }
     CalendarTime {
         string id PK
-        string event_id FK
     }
     CalendarTime {
         string id PK
+        string event_id FK
     }
     CalendarTime {
         string id PK
@@ -105,15 +105,11 @@ erDiagram
     }
     ExtensionProperty {
         string id PK
-        string event_id FK
-    }
-    ExtensionProperty {
-        string id PK
-        string todo_id FK
-    }
-    ExtensionProperty {
-        string id PK
         string calendar_id FK
+    }
+    ExtensionProperty {
+        string id PK
+        string event_id FK
     }
     ExtensionProperty {
         string id PK
@@ -127,6 +123,10 @@ erDiagram
     ExtensionProperty {
         string id PK
         string contact_id FK
+    }
+    ExtensionProperty {
+        string id PK
+        string todo_id FK
     }
     Fraction {
         string id PK
@@ -271,13 +271,13 @@ erDiagram
     }
     StructuredData {
         string id PK
+        string event_id FK
+        string participant_id FK
+        string location_id FK
         string resource_id FK
     }
     StructuredData {
         string id PK
-        string event_id FK
-        string participant_id FK
-        string location_id FK
         string resource_id FK
     }
     StyledDescription {
@@ -353,13 +353,13 @@ erDiagram
     Event }o--|| Organizer : "organizer_id"
     ExtensionField }o--|| Record : "record_id"
     ExtensionField }o--|| Record : "record_id"
-    ExtensionProperty }o--|| Event : "event_id"
-    ExtensionProperty }o--|| Todo : "todo_id"
     ExtensionProperty }o--|| Calendar : "calendar_id"
+    ExtensionProperty }o--|| Event : "event_id"
     ExtensionProperty }o--|| Availability : "availability_id"
     ExtensionProperty }o--|| AvailablePeriod : "available_period_id"
     ExtensionProperty }o--|| Journal : "journal_id"
     ExtensionProperty }o--|| Contact : "contact_id"
+    ExtensionProperty }o--|| Todo : "todo_id"
     Geo }o--|| Contact : "contact_id"
     GrammaticalGender }o--|| Contact : "contact_id"
     InstantMessage }o--|| Contact : "contact_id"
@@ -387,10 +387,10 @@ erDiagram
     SocialProfile }o--|| Contact : "contact_id"
     StreamRecord }o--|| Stream : "stream_id"
     StreamRecord }o--|| Record : "record_id"
-    StructuredData }o--|| Resource : "resource_id"
     StructuredData }o--|| Event : "event_id"
     StructuredData }o--|| Participant : "participant_id"
     StructuredData }o--|| Location : "location_id"
+    StructuredData }o--|| Resource : "resource_id"
     StructuredData }o--|| Resource : "resource_id"
     StyledDescription }o--|| Event : "event_id"
     StyledDescription }o--|| Participant : "participant_id"
@@ -420,9 +420,9 @@ erDiagram
 - `telemetry/telemetry.go` — the first-party telemetry adapter: `New(o)` wraps an SDK handle as the `gormx.Telemetry` the stores observe through (`WithTelemetry(telemetry.New(o))`), and `Plugin(o)` is the SQL-level gorm plugin. Emitted with the `telemetry` opt; requires `github.com/the-protobuf-project/telemetry/telemetry-go`.
 - `Registry.Instrument(db, o)` in `migrate.go` — installs the generated telemetry gorm plugin so every query emits a span (and metric) through the SDK handle.
 
-## Schema `group`
+## Schema `ldapgroup`
 
-### `LdapGroup` → `ldap_groups`
+### `LdapGroup` → `resource`
 
 LdapGroup is the LDAP 'groupOfNames' object class, RFC 4519 section 3.5 <https://www.rfc-editor.org/rfc/rfc4519.html#section-3.5>. Section 3.5 makes 'member' a mandatory multi-valued attribute of the group itself. This model deliberately does not: membership is Membership, a resource of its own. A repeated string of DNs cannot carry a role, cannot be created or revoked independently, and cannot be listed with a page token. Externalising it is the difference between a group that records who is in it and one that can answer why. A consequence: 'member' is mandatory in the RFC and absent here, so a LdapGroup with no Membership is representable in this API and is not a valid groupOfNames entry. The rule for an exporter: refuse, not synthesise. Section 3.5 gives no value that could stand in for an absent member -- inventing one (the group's own DN, an owner, a sentinel) asserts a membership nothing in this model states, which misleads every LDAP consumer of the export more than an explicit error would. An exporter targeting LDAP MUST reject a LdapGroup with zero Memberships rather than emit an invalid or fabricated entry. Reference: RFC 4519 "LDAP: Schema for User Applications", section 3.5. https://www.rfc-editor.org/rfc/rfc4519.html#section-3.5
 
@@ -441,36 +441,6 @@ LdapGroup is the LDAP 'groupOfNames' object class, RFC 4519 section 3.5 <https:/
 | `etag` | `VARCHAR(255)` | nullable |
 | `delete_time` | `TIMESTAMPTZ` | nullable |
 | `expire_time` | `TIMESTAMPTZ` | nullable |
-
-### `Group` → `resource`
-
-Group is the SCIM Group resource, RFC 7643 section 4.2 <https://www.rfc-editor.org/rfc/rfc7643.html#section-4.2>. **The canonical group model** under rule 14, holding the plain name RFC 4519's `groupOfNames` gave up when it became `LdapGroup`. Membership is a field here, not a separate resource. That is the opposite of the choice protobuf.rfc4519.membership.v1 made, and deliberately so: section 4.2 defines `members` as an attribute of the Group and RFC 7644 changes it by PATCHing the Group, so a separate Membership resource would invent an addressing scheme SCIM does not have. The LDAP package split it out because `member` there is a bare DN with no room for a role; SCIM's member has `type` and `$ref` and needs no such rescue. The cost is the one rule 6 already names in reverse: creating a group with members is one call here and two in the LDAP package, and the two lineages therefore do not have matching call graphs. Reference: RFC 7643 "System for Cross-domain Identity Management: Core Schema", section 4.2. https://www.rfc-editor.org/rfc/rfc7643.html#section-4.2
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `name` | `VARCHAR(255)` | not null |
-| `uid` | `VARCHAR(255)` | nullable |
-| `external_uid` | `VARCHAR(255)` | nullable |
-| `display_name` | `VARCHAR(255)` | not null |
-| `etag` | `VARCHAR(255)` | nullable |
-| `delete_time` | `TIMESTAMPTZ` | nullable |
-| `expire_time` | `TIMESTAMPTZ` | nullable |
-| `create_time` | `TIMESTAMPTZ` | not null |
-| `update_time` | `TIMESTAMPTZ` | not null |
-
-### `Member` → `members`
-
-Member is one entry of a Group's "members", RFC 7643 section 4.2 <https://www.rfc-editor.org/rfc/rfc7643.html#section-4.2>. Section 4.2 makes every sub-attribute immutable: a membership is added and removed, never edited in place. That is the same reasoning that made protobuf.rfc4519.membership.v1's Membership delete permanently rather than soft-delete -- an edge either exists or it does not. Reference: RFC 7643 "System for Cross-domain Identity Management: Core Schema", section 4.2. https://www.rfc-editor.org/rfc/rfc7643.html#section-4.2
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `value` | `VARCHAR(255)` | not null |
-| `reference_uri` | `VARCHAR(255)` | nullable |
-| `attribute_type` | `VARCHAR(255)` | nullable |
-| `display` | `VARCHAR(255)` | nullable |
-| `group_id` | `CHAR(26)` | not null |
 
 ## Schema `membership`
 
@@ -619,6 +589,7 @@ Confirmation is the STATUS property for a VEVENT, RFC 5545 section 3.8.1.11. Not
 | `id` | `CHAR(26)` | not null |
 | `date` | `DATE` | nullable |
 | `date_time` | `TIMESTAMPTZ` | nullable |
+| `date_time_zone` | `VARCHAR(255)` | nullable |
 | `value_case` | `CalendarTimeValueCase` | nullable |
 | `event_id` | `CHAR(26)` | not null |
 
@@ -872,6 +843,7 @@ Publication is the STATUS property for a VJOURNAL, RFC 5545 section 3.8.1.11 <ht
 | `id` | `CHAR(26)` | not null |
 | `date` | `DATE` | nullable |
 | `date_time` | `TIMESTAMPTZ` | nullable |
+| `date_time_zone` | `VARCHAR(255)` | nullable |
 | `value_case` | `CalendarTimeValueCase` | nullable |
 
 ### `ExtensionProperty` → `extension_properties`
@@ -932,6 +904,7 @@ Completion is the STATUS property for a VTODO, RFC 5545 section 3.8.1.11 <https:
 | `id` | `CHAR(26)` | not null |
 | `date` | `DATE` | nullable |
 | `date_time` | `TIMESTAMPTZ` | nullable |
+| `date_time_zone` | `VARCHAR(255)` | nullable |
 | `value_case` | `CalendarTimeValueCase` | nullable |
 
 ### `ExtensionProperty` → `extension_properties`
@@ -1100,6 +1073,7 @@ DateOrText is vCard's DATE-AND-OR-TIME value type, RFC 6350 section 4.3.4 <https
 | `id` | `CHAR(26)` | not null |
 | `date` | `DATE` | nullable |
 | `date_time` | `TIMESTAMPTZ` | nullable |
+| `date_time_zone` | `VARCHAR(255)` | nullable |
 | `text` | `VARCHAR(255)` | nullable |
 | `value_case` | `DateOrTextValueCase` | nullable |
 
@@ -1255,6 +1229,38 @@ SocialProfile is the SOCIALPROFILE property, RFC 9554 section 3.5 <https://www.r
 - `GrammaticalGenderKind`: ANIMATE, COMMON, FEMININE, INANIMATE, MASCULINE, NEUTER
 - `SocialProfileValueCase`: URI, TEXT
 
+## Schema `scimgroup`
+
+### `Group` → `groups`
+
+Group is the SCIM Group resource, RFC 7643 section 4.2 <https://www.rfc-editor.org/rfc/rfc7643.html#section-4.2>. **The canonical group model** under rule 14, holding the plain name RFC 4519's `groupOfNames` gave up when it became `LdapGroup`. Membership is a field here, not a separate resource. That is the opposite of the choice protobuf.rfc4519.membership.v1 made, and deliberately so: section 4.2 defines `members` as an attribute of the Group and RFC 7644 changes it by PATCHing the Group, so a separate Membership resource would invent an addressing scheme SCIM does not have. The LDAP package split it out because `member` there is a bare DN with no room for a role; SCIM's member has `type` and `$ref` and needs no such rescue. The cost is the one rule 6 already names in reverse: creating a group with members is one call here and two in the LDAP package, and the two lineages therefore do not have matching call graphs. Reference: RFC 7643 "System for Cross-domain Identity Management: Core Schema", section 4.2. https://www.rfc-editor.org/rfc/rfc7643.html#section-4.2
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `name` | `VARCHAR(255)` | not null |
+| `uid` | `VARCHAR(255)` | nullable |
+| `external_uid` | `VARCHAR(255)` | nullable |
+| `display_name` | `VARCHAR(255)` | not null |
+| `etag` | `VARCHAR(255)` | nullable |
+| `delete_time` | `TIMESTAMPTZ` | nullable |
+| `expire_time` | `TIMESTAMPTZ` | nullable |
+| `create_time` | `TIMESTAMPTZ` | not null |
+| `update_time` | `TIMESTAMPTZ` | not null |
+
+### `Member` → `members`
+
+Member is one entry of a Group's "members", RFC 7643 section 4.2 <https://www.rfc-editor.org/rfc/rfc7643.html#section-4.2>. Section 4.2 makes every sub-attribute immutable: a membership is added and removed, never edited in place. That is the same reasoning that made protobuf.rfc4519.membership.v1's Membership delete permanently rather than soft-delete -- an edge either exists or it does not. Reference: RFC 7643 "System for Cross-domain Identity Management: Core Schema", section 4.2. https://www.rfc-editor.org/rfc/rfc7643.html#section-4.2
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `value` | `VARCHAR(255)` | not null |
+| `reference_uri` | `VARCHAR(255)` | nullable |
+| `attribute_type` | `VARCHAR(255)` | nullable |
+| `display` | `VARCHAR(255)` | nullable |
+| `group_id` | `CHAR(26)` | not null |
+
 ## Schema `user`
 
 ### `User` → `resource`
@@ -1394,6 +1400,7 @@ CalendarTime is an iCalendar DATE or DATE-TIME value, RFC 5545 sections 3.3.4 <h
 | `id` | `CHAR(26)` | not null |
 | `date` | `DATE` | nullable |
 | `date_time` | `TIMESTAMPTZ` | nullable |
+| `date_time_zone` | `VARCHAR(255)` | nullable |
 | `value_case` | `CalendarTimeValueCase` | nullable |
 
 ### `AvailablePeriod` → `available_periods`

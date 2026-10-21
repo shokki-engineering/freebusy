@@ -8,6 +8,8 @@ definition:
       type: Date
     - name: dateTime
       type: Timestamptz
+    - name: dateTimeZone
+      type: String_1
     - name: id
       type: String_1!
     - name: text
@@ -27,6 +29,9 @@ definition:
         dateTime:
           column:
             name: date_time
+        dateTimeZone:
+          column:
+            name: date_time_zone
         id:
           column:
             name: id
@@ -48,6 +53,7 @@ definition:
         allowedFields:
           - date
           - dateTime
+          - dateTimeZone
           - id
           - text
           - valueCase
@@ -65,6 +71,8 @@ definition:
           booleanExpressionType: DateBoolExp
         - fieldName: dateTime
           booleanExpressionType: TimestamptzBoolExp
+        - fieldName: dateTimeZone
+          booleanExpressionType: TextBoolExp
         - fieldName: id
           booleanExpressionType: TextBoolExp
         - fieldName: text
@@ -92,6 +100,8 @@ definition:
           aggregateExpression: DateAggExp
         - fieldName: dateTime
           aggregateExpression: TimestamptzAggExp
+        - fieldName: dateTimeZone
+          aggregateExpression: TextAggExp
         - fieldName: id
           aggregateExpression: TextAggExp
         - fieldName: text
@@ -117,6 +127,8 @@ definition:
           orderByExpression: DateOrderByExp
         - fieldName: dateTime
           orderByExpression: TimestamptzOrderByExp
+        - fieldName: dateTimeZone
+          orderByExpression: String1OrderByExp
         - fieldName: id
           orderByExpression: String1OrderByExp
         - fieldName: text

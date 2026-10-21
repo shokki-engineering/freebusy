@@ -37,6 +37,7 @@ Publication is the STATUS property for a VJOURNAL, RFC 5545 section 3.8.1.11 <ht
 | `id` | `CHAR(26)` | not null |
 | `date` | `DATE` | nullable |
 | `date_time` | `TIMESTAMPTZ` | nullable |
+| `date_time_zone` | `VARCHAR(255)` | nullable |
 | `value_case` | `JournalCalendarTimeValueCase` | nullable |
 
 ### `JournalExtensionProperty` → `extension_properties`

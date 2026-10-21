@@ -59,3 +59,7 @@ url = "http://localhost:3280/graphql"
 enabled = true
 address = "127.0.0.1:6379"
 prefix = "freebusy-dev"
+
+[caldav]
+# CalDAV (RFC 4791) under /dav/ on the HTTP port. Unauthenticated: dev only.
+enabled = true

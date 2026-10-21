@@ -19,14 +19,11 @@ import (
 	"testing"
 	"time"
 
-	rfcres "github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/resource"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/resource"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
-	allocgorm "github.com/oh-tarnished/freebusy/internal/service/allocation/db/gorm"
-	allochasura "github.com/oh-tarnished/freebusy/internal/service/allocation/db/hasura"
+	"github.com/oh-tarnished/freebusy/internal/service/allocation/db"
 	"github.com/oh-tarnished/freebusy/internal/service/reservation"
-	resgorm "github.com/oh-tarnished/freebusy/internal/service/reservation/db/gorm"
-	reshasura "github.com/oh-tarnished/freebusy/internal/service/reservation/db/hasura"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"github.com/oh-tarnished/runtime-go/ulid"
@@ -51,11 +48,12 @@ func backends(t *testing.T) (*gorm.DB, map[string]backend) {
 	if dsn == "" {
 		t.Skip("FREEBUSY_TEST_DATABASE_URL not set — live database tests skipped")
 	}
-	db, err := database.OpenGorm(dsn, &gorm.Config{Logger: logger.Discard})
+	gdb, err := database.OpenGorm(dsn, &gorm.Config{Logger: logger.Discard})
 	if err != nil {
 		t.Fatal(err)
 	}
-	out := map[string]backend{"gorm": {alloc: allocgorm.New(db), res: resgorm.New(db)}}
+	gconn := &database.Connection{PgSQLConn: gdb, Provider: database.ProviderGorm}
+	out := map[string]backend{"gorm": {alloc: db.New(gconn), res: New(gconn)}}
 	if raw := os.Getenv("FREEBUSY_TEST_GRAPHQL_URL"); raw != "" {
 		u, err := url.Parse(raw)
 		if err != nil {
@@ -65,9 +63,10 @@ func backends(t *testing.T) (*gorm.DB, map[string]backend) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		out["hasura"] = backend{alloc: allochasura.New(svc), res: reshasura.New(svc)}
+		hconn := &database.Connection{Hasura: svc, Provider: database.ProviderHasura}
+		out["hasura"] = backend{alloc: db.New(hconn), res: New(hconn)}
 	}
-	return db, out
+	return gdb, out
 }
 
 // seed creates one site with one court and no published availability, which
@@ -76,7 +75,7 @@ func seed(t *testing.T, db *gorm.DB) (site, court string) {
 	t.Helper()
 	run := ulid.GenerateString()
 	ou := "it-" + run
-	res := &rfcres.Resource{ID: "court-" + run, Name: "resources/court-" + run, OrganizationalUnitID: &ou, ResourceTypes: []string{"padel-court"}}
+	res := &resource.Resource{ID: "court-" + run, Name: "resources/court-" + run, OrganizationalUnitID: &ou, ResourceTypes: []string{"padel-court"}}
 	if err := db.Omit(clause.Associations).Create(res).Error; err != nil {
 		t.Fatal(err)
 	}

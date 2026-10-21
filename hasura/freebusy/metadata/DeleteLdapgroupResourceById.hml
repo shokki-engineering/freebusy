@@ -1,0 +1,72 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: DeleteLdapgroupResourceByIdResponse
+  description: Responses from the 'delete_ldapgroup_resource_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[LdapgroupResource!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: DeleteLdapgroupResourceByIdResponse
+    inputTypeName: DeleteLdapgroupResourceByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: delete_ldapgroup_resource_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: DeleteLdapgroupResourceByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: DeleteLdapgroupResourceById
+  outputType: DeleteLdapgroupResourceByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: preCheck
+      type: LdapgroupResourceBoolExp
+      description: Delete permission predicate over the 'ldapgroup_resource' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: delete_ldapgroup_resource_by_id
+    argumentMapping:
+      keyId: key_id
+      preCheck: pre_check
+  graphql:
+    rootFieldName: deleteLdapgroupResourceById
+    rootFieldKind: Mutation
+  description: Delete any row on the 'ldapgroup_resource' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: DeleteLdapgroupResourceById
+  permissions:
+    - role: admin
+      allowExecution: true
+

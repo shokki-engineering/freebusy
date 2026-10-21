@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	calendarpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
-	eventpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
-	rfcavailabilitypbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
-	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"google.golang.org/genproto/googleapis/type/datetime"
 	"google.golang.org/genproto/googleapis/type/interval"
@@ -34,12 +34,12 @@ func inventoryFlow(t *testing.T, c *e2eClients) {
 		return &interval.Interval{StartTime: timestamppb.New(a), EndTime: timestamppb.New(b)}
 	}
 
-	_, err := c.resources.CreateResource(ctx, &resourcepbv1.CreateResourceRequest{ResourceId: "Not_An_Id", Resource: &resourcepbv1.Resource{}})
+	_, err := c.resources.CreateResource(ctx, &resourcev1.CreateResourceRequest{ResourceId: "Not_An_Id", Resource: &resourcev1.Resource{}})
 	wantCode(t, err, codes.InvalidArgument, "an id outside AIP-122")
 
-	cal, err := c.calendars.CreateCalendar(ctx, &calendarpbv1.CreateCalendarRequest{
+	cal, err := c.calendars.CreateCalendar(ctx, &calendarv1.CreateCalendarRequest{
 		CalendarId: id,
-		Calendar: &calendarpbv1.Calendar{
+		Calendar: &calendarv1.Calendar{
 			DisplayName: "court " + id, TimeZone: &datetime.TimeZone{Id: "UTC"},
 			Etag: "client-set", // OUTPUT_ONLY: the server's, not the caller's
 		},
@@ -52,22 +52,22 @@ func inventoryFlow(t *testing.T, c *e2eClients) {
 	}
 	t.Cleanup(func() { c.purge(t, c.repos.Calendars.Purge, cal.GetName()) })
 
-	res, err := c.resources.CreateResource(ctx, &resourcepbv1.CreateResourceRequest{
+	res, err := c.resources.CreateResource(ctx, &resourcev1.CreateResourceRequest{
 		ResourceId: id,
-		Resource:   &resourcepbv1.Resource{DisplayName: "court", Calendar: cal.GetName(), OrganizationalUnit: site, ResourceTypes: []string{"court"}},
+		Resource:   &resourcev1.Resource{DisplayName: "court", Calendar: cal.GetName(), OrganizationalUnit: site, ResourceTypes: []string{"court"}},
 	})
 	if err != nil {
 		t.Fatalf("CreateResource: %v", err)
 	}
 	t.Cleanup(func() { c.purge(t, c.repos.Resources.Purge, res.GetName()) })
 
-	av, err := c.availabilities.CreateAvailability(ctx, &rfcavailabilitypbv1.CreateAvailabilityRequest{
+	av, err := c.availabilities.CreateAvailability(ctx, &availabilityv1.CreateAvailabilityRequest{
 		Parent: cal.GetName(),
-		Availability: &rfcavailabilitypbv1.Availability{
-			Start: &rfcavailabilitypbv1.CalendarTime{Value: &rfcavailabilitypbv1.CalendarTime_DateTime{DateTime: utc(day)}},
-			AvailablePeriods: []*rfcavailabilitypbv1.AvailablePeriod{{
-				Start:          &rfcavailabilitypbv1.CalendarTime{Value: &rfcavailabilitypbv1.CalendarTime_DateTime{DateTime: utc(at(8))}},
-				EndForm:        &rfcavailabilitypbv1.AvailablePeriod_Duration{Duration: durationpb.New(10 * time.Hour)},
+		Availability: &availabilityv1.Availability{
+			Start: &availabilityv1.CalendarTime{Value: &availabilityv1.CalendarTime_DateTime{DateTime: utc(day)}},
+			AvailablePeriods: []*availabilityv1.AvailablePeriod{{
+				Start:          &availabilityv1.CalendarTime{Value: &availabilityv1.CalendarTime_DateTime{DateTime: utc(at(8))}},
+				EndForm:        &availabilityv1.AvailablePeriod_Duration{Duration: durationpb.New(10 * time.Hour)},
 				RecurrenceRule: "FREQ=DAILY",
 			}},
 		},
@@ -77,16 +77,16 @@ func inventoryFlow(t *testing.T, c *e2eClients) {
 	}
 	t.Cleanup(func() { c.purge(t, c.repos.Availabilities.Purge, av.GetName()) })
 
-	ev, err := c.events.CreateEvent(ctx, &eventpbv1.CreateEventRequest{
+	ev, err := c.events.CreateEvent(ctx, &eventv1.CreateEventRequest{
 		Parent: cal.GetName(),
-		Event: &eventpbv1.Event{
+		Event: &eventv1.Event{
 			Summary:      "maintenance",
-			Transparency: eventpbv1.Transparency_TRANSPARENCY_OPAQUE,
-			Start:        &eventpbv1.CalendarTime{Value: &eventpbv1.CalendarTime_DateTime{DateTime: utc(at(10))}},
-			Ends:         &eventpbv1.Event_End{End: &eventpbv1.CalendarTime{Value: &eventpbv1.CalendarTime_DateTime{DateTime: utc(at(11))}}},
-			Recurrence: &eventpbv1.Recurrence{
-				Frequency: eventpbv1.Frequency_FREQUENCY_WEEKLY,
-				Bound:     &eventpbv1.Recurrence_Count{Count: 3},
+			Transparency: eventv1.Transparency_TRANSPARENCY_OPAQUE,
+			Start:        &eventv1.CalendarTime{Value: &eventv1.CalendarTime_DateTime{DateTime: utc(at(10))}},
+			Ends:         &eventv1.Event_End{End: &eventv1.CalendarTime{Value: &eventv1.CalendarTime_DateTime{DateTime: utc(at(11))}}},
+			Recurrence: &eventv1.Recurrence{
+				Frequency: eventv1.Frequency_FREQUENCY_WEEKLY,
+				Bound:     &eventv1.Recurrence_Count{Count: 3},
 			},
 		},
 	})
@@ -113,19 +113,19 @@ func inventoryFlow(t *testing.T, c *e2eClients) {
 	if err != nil {
 		t.Fatalf("CreateHold: %v", err)
 	}
-	fb, err := c.calendars.QueryFreeBusy(ctx, &calendarpbv1.QueryFreeBusyRequest{Name: cal.GetName(), Window: span(at(6), at(20))})
+	fb, err := c.calendars.QueryFreeBusy(ctx, &calendarv1.QueryFreeBusyRequest{Name: cal.GetName(), Window: span(at(6), at(20))})
 	if err != nil {
 		t.Fatalf("QueryFreeBusy: %v", err)
 	}
 	type period struct {
 		a, b int
-		kind calendarpbv1.BusyType
+		kind calendarv1.BusyType
 	}
 	want := []period{
-		{6, 8, calendarpbv1.BusyType_BUSY_TYPE_BUSY_UNAVAILABLE},
-		{10, 11, calendarpbv1.BusyType_BUSY_TYPE_BUSY},
-		{12, 13, calendarpbv1.BusyType_BUSY_TYPE_BUSY_TENTATIVE},
-		{18, 20, calendarpbv1.BusyType_BUSY_TYPE_BUSY_UNAVAILABLE},
+		{6, 8, calendarv1.BusyType_BUSY_TYPE_BUSY_UNAVAILABLE},
+		{10, 11, calendarv1.BusyType_BUSY_TYPE_BUSY},
+		{12, 13, calendarv1.BusyType_BUSY_TYPE_BUSY_TENTATIVE},
+		{18, 20, calendarv1.BusyType_BUSY_TYPE_BUSY_UNAVAILABLE},
 	}
 	if len(fb.GetPeriods()) != len(want) {
 		t.Fatalf("free/busy %v, want %v", fb.GetPeriods(), want)
@@ -141,11 +141,11 @@ func inventoryFlow(t *testing.T, c *e2eClients) {
 	}
 
 	// Three weekly instances, two to a page, each in the event's own form.
-	page1, err := c.events.ExpandEvent(ctx, &eventpbv1.ExpandEventRequest{Name: ev.GetName(), Window: span(day, day.AddDate(0, 0, 28)), PageSize: 2})
+	page1, err := c.events.ExpandEvent(ctx, &eventv1.ExpandEventRequest{Name: ev.GetName(), Window: span(day, day.AddDate(0, 0, 28)), PageSize: 2})
 	if err != nil {
 		t.Fatalf("ExpandEvent: %v", err)
 	}
-	page2, err := c.events.ExpandEvent(ctx, &eventpbv1.ExpandEventRequest{Name: ev.GetName(), Window: span(day, day.AddDate(0, 0, 28)), PageSize: 2, PageToken: page1.GetNextPageToken()})
+	page2, err := c.events.ExpandEvent(ctx, &eventv1.ExpandEventRequest{Name: ev.GetName(), Window: span(day, day.AddDate(0, 0, 28)), PageSize: 2, PageToken: page1.GetNextPageToken()})
 	if err != nil {
 		t.Fatalf("ExpandEvent page 2: %v", err)
 	}
@@ -158,32 +158,32 @@ func inventoryFlow(t *testing.T, c *e2eClients) {
 			t.Fatalf("instance %d: start %v, name %q", i, got, inst.GetName())
 		}
 	}
-	_, err = c.events.ExpandEvent(ctx, &eventpbv1.ExpandEventRequest{Name: ev.GetName(), Window: span(at(2), at(1))})
+	_, err = c.events.ExpandEvent(ctx, &eventv1.ExpandEventRequest{Name: ev.GetName(), Window: span(at(2), at(1))})
 	wantCode(t, err, codes.InvalidArgument, "a window ending before it starts")
 
 	// AIP-135: a calendar with children refuses a plain delete; force takes
 	// them with it, softly, and the engine stops reading them at once.
-	_, err = c.calendars.DeleteCalendar(ctx, &calendarpbv1.DeleteCalendarRequest{Name: cal.GetName()})
+	_, err = c.calendars.DeleteCalendar(ctx, &calendarv1.DeleteCalendarRequest{Name: cal.GetName()})
 	wantCode(t, err, codes.FailedPrecondition, "deleting a calendar that has events")
-	if _, err := c.calendars.DeleteCalendar(ctx, &calendarpbv1.DeleteCalendarRequest{Name: cal.GetName(), Force: true}); err != nil {
+	if _, err := c.calendars.DeleteCalendar(ctx, &calendarv1.DeleteCalendarRequest{Name: cal.GetName(), Force: true}); err != nil {
 		t.Fatalf("forced DeleteCalendar: %v", err)
 	}
-	live, err := c.events.ListEvents(ctx, &eventpbv1.ListEventsRequest{Parent: cal.GetName()})
+	live, err := c.events.ListEvents(ctx, &eventv1.ListEventsRequest{Parent: cal.GetName()})
 	if err != nil || len(live.GetEvents()) != 0 {
 		t.Fatalf("live events after delete: %v %v", err, live.GetEvents())
 	}
-	all, err := c.events.ListEvents(ctx, &eventpbv1.ListEventsRequest{Parent: cal.GetName(), ShowDeleted: true})
+	all, err := c.events.ListEvents(ctx, &eventv1.ListEventsRequest{Parent: cal.GetName(), ShowDeleted: true})
 	if err != nil || len(all.GetEvents()) != 1 || all.GetEvents()[0].GetDeleteTime() == nil {
 		t.Fatalf("show_deleted events: %v %v", err, all.GetEvents())
 	}
 	if n := free(at(10), at(11)); n != 1 {
 		t.Fatalf("maintenance still blocks after delete: %d free", n)
 	}
-	_, err = c.calendars.UndeleteCalendar(ctx, &calendarpbv1.UndeleteCalendarRequest{Name: cal.GetName()})
+	_, err = c.calendars.UndeleteCalendar(ctx, &calendarv1.UndeleteCalendarRequest{Name: cal.GetName()})
 	if err != nil {
 		t.Fatalf("UndeleteCalendar: %v", err)
 	}
-	_, err = c.calendars.UndeleteCalendar(ctx, &calendarpbv1.UndeleteCalendarRequest{Name: cal.GetName()})
+	_, err = c.calendars.UndeleteCalendar(ctx, &calendarv1.UndeleteCalendarRequest{Name: cal.GetName()})
 	wantCode(t, err, codes.AlreadyExists, "undeleting a live calendar")
 }
 

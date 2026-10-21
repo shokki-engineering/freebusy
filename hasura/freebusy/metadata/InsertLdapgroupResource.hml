@@ -1,0 +1,174 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertLdapgroupResourceObject
+  fields:
+    - name: businessCategories
+      type: "[String_1]"
+    - name: createTime
+      type: Timestamptz!
+    - name: deleteTime
+      type: Timestamptz
+    - name: descriptions
+      type: "[String_1]"
+    - name: displayNames
+      type: "[String_1]!"
+    - name: etag
+      type: String_1
+    - name: expireTime
+      type: Timestamptz
+    - name: id
+      type: String_1!
+    - name: name
+      type: String_1!
+    - name: organization
+      type: String_1
+    - name: owners
+      type: "[String_1]"
+    - name: uid
+      type: String_1
+    - name: updateTime
+      type: Timestamptz!
+  graphql:
+    typeName: InsertLdapgroupResourceObject
+    inputTypeName: InsertLdapgroupResourceObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_ldapgroup_resource_object
+      fieldMapping:
+        businessCategories:
+          column:
+            name: business_categories
+        createTime:
+          column:
+            name: create_time
+        deleteTime:
+          column:
+            name: delete_time
+        descriptions:
+          column:
+            name: descriptions
+        displayNames:
+          column:
+            name: display_names
+        etag:
+          column:
+            name: etag
+        expireTime:
+          column:
+            name: expire_time
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        organization:
+          column:
+            name: organization
+        owners:
+          column:
+            name: owners
+        uid:
+          column:
+            name: uid
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertLdapgroupResourceObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - businessCategories
+          - createTime
+          - deleteTime
+          - descriptions
+          - displayNames
+          - etag
+          - expireTime
+          - id
+          - name
+          - organization
+          - owners
+          - uid
+          - updateTime
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertLdapgroupResourceResponse
+  description: Responses from the 'insert_ldapgroup_resource' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[LdapgroupResource!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertLdapgroupResourceResponse
+    inputTypeName: InsertLdapgroupResourceResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_ldapgroup_resource_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertLdapgroupResourceResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertLdapgroupResource
+  outputType: InsertLdapgroupResourceResponse!
+  arguments:
+    - name: objects
+      type: "[InsertLdapgroupResourceObject!]!"
+    - name: postCheck
+      type: LdapgroupResourceBoolExp
+      description: Insert permission predicate over the 'ldapgroup_resource' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: insert_ldapgroup_resource
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertLdapgroupResource
+    rootFieldKind: Mutation
+  description: Insert into the ldapgroup_resource table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertLdapgroupResource
+  permissions:
+    - role: admin
+      allowExecution: true
+

@@ -51,6 +51,17 @@ datasources:
     database: rfc
     schema: orgunit
 
+  # RFC 4519 and RFC 7643 both define a group/v1, so {leaf} would put an LDAP
+  # group and a SCIM group in one "group" schema, and one generated Go package
+  # would import two packages both named groupv1 -- which only an import alias
+  # could resolve. Each gets a schema named for what its own RFC calls it.
+  - match: "protobuf.rfc4519.group.**"
+    database: rfc
+    schema: ldapgroup
+  - match: "protobuf.rfc7643.group.**"
+    database: rfc
+    schema: scimgroup
+
   - match: "protobuf.**"
     database: rfc
     schema: "{leaf}" # rfc9073.resource.v1 -> schema "resource"

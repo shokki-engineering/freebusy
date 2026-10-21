@@ -16,83 +16,78 @@ managed:
     # The RFC messages are the BSR SDK's (buf.build/gen/go/the-protobuf-project/
     # rfc/protocolbuffers/go), so the database layer imports them from there --
     # see rfc.buf.gen.yaml for why freebusy no longer generates its own copy.
-    # Each override names the SDK import path and the alias freebusy refers to
-    # the package by: the alias is all ";name" sets, and Go lets an import take
-    # any alias, so generated code keeps freebusy's `<leaf>pbv1` names.
-    #
-    # The aliases also keep apart what the SDK cannot: rfc4519 and rfc7643 both
-    # define a `group/v1`, which the SDK names `groupv1` twice. Where two RFCs
-    # share a leaf, each is named for what its own RFC calls the object: an
-    # LDAP group and a SCIM group.
+    # Each override names the SDK import path and the package's own name
+    # (";resourcev1"), which buf cannot infer from a path ending in a version.
+    # The names are the SDK's, not freebusy's, so no import is ever aliased.
     - file_option: go_package
       path: protobuf/rfc4519/group/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/group/v1;ldapgrouppbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/group/v1;groupv1
     - file_option: go_package
       path: protobuf/rfc4519/membership/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/membership/v1;membershippbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/membership/v1;membershipv1
     - file_option: go_package
       path: protobuf/rfc4519/organization/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organization/v1;organizationpbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organization/v1;organizationv1
     - file_option: go_package
       path: protobuf/rfc4519/organizational_unit/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organizational_unit/v1;orgunitpbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organizational_unit/v1;organizational_unitv1
     - file_option: go_package
       path: protobuf/rfc5545/calendar/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1;calendarpbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1;calendarv1
     - file_option: go_package
       path: protobuf/rfc5545/event/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1;eventpbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1;eventv1
     - file_option: go_package
       path: protobuf/rfc5545/journal/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/journal/v1;journalpbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/journal/v1;journalv1
     - file_option: go_package
       path: protobuf/rfc5545/todo/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/todo/v1;todopbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/todo/v1;todov1
     - file_option: go_package
       path: protobuf/rfc5546/scheduling/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5546/scheduling/v1;itippbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5546/scheduling/v1;schedulingv1
     - file_option: go_package
       path: protobuf/rfc6350/vcard/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc6350/vcard/v1;vcardpbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc6350/vcard/v1;vcardv1
     - file_option: go_package
       path: protobuf/rfc7643/group/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/group/v1;scimgrouppbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/group/v1;groupv1
     - file_option: go_package
       path: protobuf/rfc7643/user/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/user/v1;scimuserpbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/user/v1;userv1
     - file_option: go_package
       path: protobuf/rfc7953/availability/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1;rfcavailabilitypbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1;availabilityv1
     - file_option: go_package
       path: protobuf/rfc8428/pack/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc8428/pack/v1;packpbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc8428/pack/v1;packv1
     - file_option: go_package
       path: protobuf/rfc8428/sensor/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc8428/sensor/v1;sensorpbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc8428/sensor/v1;sensorv1
     - file_option: go_package
       path: protobuf/rfc8428/stream/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc8428/stream/v1;streampbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc8428/stream/v1;streamv1
     - file_option: go_package
       path: protobuf/rfc8428/unit/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc8428/unit/v1;unitpbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc8428/unit/v1;unitv1
     - file_option: go_package
       path: protobuf/rfc9073/resource/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1;resourcepbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1;resourcev1
     - file_option: go_package
       path: protobuf/rfc9553/card/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9553/card/v1;cardpbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9553/card/v1;cardv1
     - file_option: go_package
       path: protobuf/shared/interchange/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/shared/interchange/v1;interchangepbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/shared/interchange/v1;interchangev1
     - file_option: go_package
       path: protobuf/shared/project/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/shared/project/v1;projectpbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/shared/project/v1;projectv1
     - file_option: go_package
       path: protobuf/shared/search/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/shared/search/v1;searchpbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/shared/search/v1;searchv1
     - file_option: go_package
       path: protobuf/shared/sync/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/shared/sync/v1;syncpbv1
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/shared/sync/v1;syncv1
 inputs:
   # freebusy's own protos and the RFC schema module are generated together, in
   # one invocation, so both land in one tree sharing one repox and one gormx.

@@ -16,17 +16,17 @@ import (
 	"testing"
 	"time"
 
-	calendarpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
-	eventpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
-	rfcavailabilitypbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
-	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/oh-tarnished/freebusy/internal/database"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	rfcavail "github.com/oh-tarnished/freebusy/internal/database/repository/rfc/availability"
-	rfccal "github.com/oh-tarnished/freebusy/internal/database/repository/rfc/calendar"
-	rfcevent "github.com/oh-tarnished/freebusy/internal/database/repository/rfc/event"
-	rfcres "github.com/oh-tarnished/freebusy/internal/database/repository/rfc/resource"
+	"github.com/oh-tarnished/freebusy/internal/database/repository/rfc/availability"
+	"github.com/oh-tarnished/freebusy/internal/database/repository/rfc/calendar"
+	"github.com/oh-tarnished/freebusy/internal/database/repository/rfc/event"
+	"github.com/oh-tarnished/freebusy/internal/database/repository/rfc/resource"
 	"github.com/oh-tarnished/runtime-go/ulid"
 	"google.golang.org/genproto/googleapis/type/datetime"
 	"google.golang.org/genproto/googleapis/type/dayofweek"
@@ -82,8 +82,8 @@ func TestLiveRFCRoundTrip(t *testing.T) {
 			run := ulid.GenerateString()
 
 			t.Run("calendar keeps its time zone", func(t *testing.T) {
-				cals := rfccal.New(conn).Calendars
-				c, err := cals.Create(ctx, &calendarpbv1.Calendar{
+				cals := calendar.New(conn).Calendars
+				c, err := cals.Create(ctx, &calendarv1.Calendar{
 					Name: "calendars/rt-" + run, DisplayName: "rt", TimeZone: &datetime.TimeZone{Id: "Asia/Kolkata"},
 				})
 				if err != nil {
@@ -93,7 +93,7 @@ func TestLiveRFCRoundTrip(t *testing.T) {
 					t.Fatalf("time zone %v", c.GetTimeZone())
 				}
 				// A second calendar in the same zone shares the zone row.
-				if _, err := cals.Create(ctx, &calendarpbv1.Calendar{
+				if _, err := cals.Create(ctx, &calendarv1.Calendar{
 					Name: "calendars/rt2-" + run, DisplayName: "rt2", TimeZone: &datetime.TimeZone{Id: "Asia/Kolkata"},
 				}); err != nil {
 					t.Fatalf("second calendar in a known zone: %v", err)
@@ -104,12 +104,12 @@ func TestLiveRFCRoundTrip(t *testing.T) {
 			})
 
 			t.Run("resource keeps structured data in order", func(t *testing.T) {
-				res := rfcres.New(conn).Resources
-				r, err := res.Create(ctx, &resourcepbv1.Resource{
+				res := resource.New(conn).Resources
+				r, err := res.Create(ctx, &resourcev1.Resource{
 					Name: "resources/rt-" + run, OrganizationalUnit: "organizationalUnits/rt-" + run,
-					StructuredData: []*resourcepbv1.StructuredData{
-						{Schema: "https://example.com/a", Value: &resourcepbv1.StructuredData_Text{Text: `{"min_duration":"PT1H"}`}},
-						{Schema: "https://example.com/b", Value: &resourcepbv1.StructuredData_Uri{Uri: "https://example.com/doc"}},
+					StructuredData: []*resourcev1.StructuredData{
+						{Schema: "https://example.com/a", Value: &resourcev1.StructuredData_Text{Text: `{"min_duration":"PT1H"}`}},
+						{Schema: "https://example.com/b", Value: &resourcev1.StructuredData_Uri{Uri: "https://example.com/doc"}},
 					},
 				})
 				if err != nil {
@@ -134,21 +134,21 @@ func TestLiveRFCRoundTrip(t *testing.T) {
 
 			t.Run("availability keeps its periods", func(t *testing.T) {
 				cal := "calendars/rta-" + run
-				if _, err := rfccal.New(conn).Calendars.Create(ctx, &calendarpbv1.Calendar{Name: cal, DisplayName: "rta"}); err != nil {
+				if _, err := calendar.New(conn).Calendars.Create(ctx, &calendarv1.Calendar{Name: cal, DisplayName: "rta"}); err != nil {
 					t.Fatal(err)
 				}
-				avs := rfcavail.New(conn).Availabilities
-				a, err := avs.Create(ctx, cal, &rfcavailabilitypbv1.Availability{
+				avs := availability.New(conn).Availabilities
+				a, err := avs.Create(ctx, cal, &availabilityv1.Availability{
 					Priority: 5,
-					AvailablePeriods: []*rfcavailabilitypbv1.AvailablePeriod{
+					AvailablePeriods: []*availabilityv1.AvailablePeriod{
 						{
-							Start:          &rfcavailabilitypbv1.CalendarTime{Value: &rfcavailabilitypbv1.CalendarTime_DateTime{DateTime: dt(base)}},
-							EndForm:        &rfcavailabilitypbv1.AvailablePeriod_End{End: &rfcavailabilitypbv1.CalendarTime{Value: &rfcavailabilitypbv1.CalendarTime_DateTime{DateTime: dt(base.Add(14 * time.Hour))}}},
+							Start:          &availabilityv1.CalendarTime{Value: &availabilityv1.CalendarTime_DateTime{DateTime: dt(base)}},
+							EndForm:        &availabilityv1.AvailablePeriod_End{End: &availabilityv1.CalendarTime{Value: &availabilityv1.CalendarTime_DateTime{DateTime: dt(base.Add(14 * time.Hour))}}},
 							RecurrenceRule: "FREQ=DAILY",
 						},
 						{
-							Start:          &rfcavailabilitypbv1.CalendarTime{Value: &rfcavailabilitypbv1.CalendarTime_DateTime{DateTime: dt(base.Add(24 * time.Hour))}},
-							EndForm:        &rfcavailabilitypbv1.AvailablePeriod_Duration{Duration: durationpb.New(2 * time.Hour)},
+							Start:          &availabilityv1.CalendarTime{Value: &availabilityv1.CalendarTime_DateTime{DateTime: dt(base.Add(24 * time.Hour))}},
+							EndForm:        &availabilityv1.AvailablePeriod_Duration{Duration: durationpb.New(2 * time.Hour)},
 							RecurrenceRule: "FREQ=WEEKLY;BYDAY=TU",
 						},
 					},
@@ -228,20 +228,20 @@ func TestLiveRFCRoundTrip(t *testing.T) {
 
 			t.Run("event keeps times and recurrence", func(t *testing.T) {
 				cal := "calendars/rte-" + run
-				if _, err := rfccal.New(conn).Calendars.Create(ctx, &calendarpbv1.Calendar{Name: cal, DisplayName: "rte"}); err != nil {
+				if _, err := calendar.New(conn).Calendars.Create(ctx, &calendarv1.Calendar{Name: cal, DisplayName: "rte"}); err != nil {
 					t.Fatal(err)
 				}
-				evs := rfcevent.New(conn).Events
-				e, err := evs.Create(ctx, cal, &eventpbv1.Event{
+				evs := event.New(conn).Events
+				e, err := evs.Create(ctx, cal, &eventv1.Event{
 					Summary:      "maintenance",
-					Transparency: eventpbv1.Transparency_TRANSPARENCY_OPAQUE,
-					Start:        &eventpbv1.CalendarTime{Value: &eventpbv1.CalendarTime_DateTime{DateTime: dt(base)}},
-					Ends:         &eventpbv1.Event_End{End: &eventpbv1.CalendarTime{Value: &eventpbv1.CalendarTime_DateTime{DateTime: dt(base.Add(time.Hour))}}},
-					Recurrence: &eventpbv1.Recurrence{
-						Frequency: eventpbv1.Frequency_FREQUENCY_WEEKLY,
+					Transparency: eventv1.Transparency_TRANSPARENCY_OPAQUE,
+					Start:        &eventv1.CalendarTime{Value: &eventv1.CalendarTime_DateTime{DateTime: dt(base)}},
+					Ends:         &eventv1.Event_End{End: &eventv1.CalendarTime{Value: &eventv1.CalendarTime_DateTime{DateTime: dt(base.Add(time.Hour))}}},
+					Recurrence: &eventv1.Recurrence{
+						Frequency: eventv1.Frequency_FREQUENCY_WEEKLY,
 						Interval:  2,
-						Weekdays:  []*eventpbv1.WeekdayNum{{Day: dayofweek.DayOfWeek_MONDAY}, {Day: dayofweek.DayOfWeek_THURSDAY}},
-						Bound:     &eventpbv1.Recurrence_Until{Until: &eventpbv1.CalendarTime{Value: &eventpbv1.CalendarTime_DateTime{DateTime: dt(base.AddDate(0, 3, 0))}}},
+						Weekdays:  []*eventv1.WeekdayNum{{Day: dayofweek.DayOfWeek_MONDAY}, {Day: dayofweek.DayOfWeek_THURSDAY}},
+						Bound:     &eventv1.Recurrence_Until{Until: &eventv1.CalendarTime{Value: &eventv1.CalendarTime_DateTime{DateTime: dt(base.AddDate(0, 3, 0))}}},
 					},
 				})
 				if err != nil {
@@ -254,7 +254,7 @@ func TestLiveRFCRoundTrip(t *testing.T) {
 					t.Fatalf("end %v", got)
 				}
 				rec := e.GetRecurrence()
-				if rec.GetFrequency() != eventpbv1.Frequency_FREQUENCY_WEEKLY || rec.GetInterval() != 2 || len(rec.GetWeekdays()) != 2 ||
+				if rec.GetFrequency() != eventv1.Frequency_FREQUENCY_WEEKLY || rec.GetInterval() != 2 || len(rec.GetWeekdays()) != 2 ||
 					rec.GetWeekdays()[0].GetDay() != dayofweek.DayOfWeek_MONDAY || rec.GetWeekdays()[1].GetDay() != dayofweek.DayOfWeek_THURSDAY {
 					t.Fatalf("recurrence %v", rec)
 				}

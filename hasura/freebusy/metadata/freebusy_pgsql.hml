@@ -223,27 +223,6 @@ definition:
               unique_columns:
                 - id
         - arguments: {}
-          name: group_ldap_groups
-          type: group_ldap_groups
-          uniqueness_constraints:
-            ldap_groups_pkey:
-              unique_columns:
-                - id
-        - arguments: {}
-          name: group_members
-          type: group_members
-          uniqueness_constraints:
-            members_pkey:
-              unique_columns:
-                - id
-        - arguments: {}
-          name: group_resource
-          type: group_resource
-          uniqueness_constraints:
-            resource_pkey:
-              unique_columns:
-                - id
-        - arguments: {}
           name: guest_foreigner_details
           type: guest_foreigner_details
           uniqueness_constraints:
@@ -288,6 +267,13 @@ definition:
         - arguments: {}
           name: journal_resource
           type: journal_resource
+          uniqueness_constraints:
+            resource_pkey:
+              unique_columns:
+                - id
+        - arguments: {}
+          name: ldapgroup_resource
+          type: ldapgroup_resource
           uniqueness_constraints:
             resource_pkey:
               unique_columns:
@@ -360,6 +346,20 @@ definition:
           type: resource_structured_datas
           uniqueness_constraints:
             structured_datas_pkey:
+              unique_columns:
+                - id
+        - arguments: {}
+          name: scimgroup_groups
+          type: scimgroup_groups
+          uniqueness_constraints:
+            groups_pkey:
+              unique_columns:
+                - id
+        - arguments: {}
+          name: scimgroup_members
+          type: scimgroup_members
+          uniqueness_constraints:
+            members_pkey:
               unique_columns:
                 - id
         - arguments: {}
@@ -990,6 +990,12 @@ definition:
                 type: nullable
                 underlying_type:
                   name: timestamptz
+                  type: named
+            date_time_zone:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
                   type: named
             id:
               type:
@@ -1971,54 +1977,6 @@ definition:
                   type: named
                 type: array
           foreign_keys: {}
-        delete_group_ldap_groups_by_id_response:
-          description: Responses from the 'delete_group_ldap_groups_by_id' procedure
-          fields:
-            affected_rows:
-              description: The number of rows affected by the mutation
-              type:
-                name: int4
-                type: named
-            returning:
-              description: Data from rows affected by the mutation
-              type:
-                element_type:
-                  name: group_ldap_groups
-                  type: named
-                type: array
-          foreign_keys: {}
-        delete_group_members_by_id_response:
-          description: Responses from the 'delete_group_members_by_id' procedure
-          fields:
-            affected_rows:
-              description: The number of rows affected by the mutation
-              type:
-                name: int4
-                type: named
-            returning:
-              description: Data from rows affected by the mutation
-              type:
-                element_type:
-                  name: group_members
-                  type: named
-                type: array
-          foreign_keys: {}
-        delete_group_resource_by_id_response:
-          description: Responses from the 'delete_group_resource_by_id' procedure
-          fields:
-            affected_rows:
-              description: The number of rows affected by the mutation
-              type:
-                name: int4
-                type: named
-            returning:
-              description: Data from rows affected by the mutation
-              type:
-                element_type:
-                  name: group_resource
-                  type: named
-                type: array
-          foreign_keys: {}
         delete_guest_foreigner_details_by_id_response:
           description: Responses from the 'delete_guest_foreigner_details_by_id' procedure
           fields:
@@ -2151,6 +2109,22 @@ definition:
               type:
                 element_type:
                   name: journal_resource
+                  type: named
+                type: array
+          foreign_keys: {}
+        delete_ldapgroup_resource_by_id_response:
+          description: Responses from the 'delete_ldapgroup_resource_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: ldapgroup_resource
                   type: named
                 type: array
           foreign_keys: {}
@@ -2311,6 +2285,38 @@ definition:
               type:
                 element_type:
                   name: resource_structured_datas
+                  type: named
+                type: array
+          foreign_keys: {}
+        delete_scimgroup_groups_by_id_response:
+          description: Responses from the 'delete_scimgroup_groups_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: scimgroup_groups
+                  type: named
+                type: array
+          foreign_keys: {}
+        delete_scimgroup_members_by_id_response:
+          description: Responses from the 'delete_scimgroup_members_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: scimgroup_members
                   type: named
                 type: array
           foreign_keys: {}
@@ -3060,6 +3066,12 @@ definition:
                 underlying_type:
                   name: timestamptz
                   type: named
+            date_time_zone:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
             event_id:
               type:
                 name: text
@@ -3748,179 +3760,6 @@ definition:
             recurrence_id:
               type:
                 name: text
-                type: named
-          foreign_keys: {}
-        group_ldap_groups:
-          fields:
-            business_categories:
-              type:
-                type: nullable
-                underlying_type:
-                  element_type:
-                    type: nullable
-                    underlying_type:
-                      name: text
-                      type: named
-                  type: array
-            create_time:
-              type:
-                name: timestamptz
-                type: named
-            delete_time:
-              type:
-                type: nullable
-                underlying_type:
-                  name: timestamptz
-                  type: named
-            descriptions:
-              type:
-                type: nullable
-                underlying_type:
-                  element_type:
-                    type: nullable
-                    underlying_type:
-                      name: text
-                      type: named
-                  type: array
-            display_names:
-              type:
-                element_type:
-                  type: nullable
-                  underlying_type:
-                    name: text
-                    type: named
-                type: array
-            etag:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            expire_time:
-              type:
-                type: nullable
-                underlying_type:
-                  name: timestamptz
-                  type: named
-            id:
-              type:
-                name: text
-                type: named
-            name:
-              type:
-                name: text
-                type: named
-            organization:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            owners:
-              type:
-                type: nullable
-                underlying_type:
-                  element_type:
-                    type: nullable
-                    underlying_type:
-                      name: text
-                      type: named
-                  type: array
-            uid:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            update_time:
-              type:
-                name: timestamptz
-                type: named
-          foreign_keys: {}
-        group_members:
-          fields:
-            attribute_type:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            display:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            group_id:
-              type:
-                name: text
-                type: named
-            id:
-              type:
-                name: text
-                type: named
-            reference_uri:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            value:
-              type:
-                name: text
-                type: named
-          foreign_keys: {}
-        group_resource:
-          fields:
-            create_time:
-              type:
-                name: timestamptz
-                type: named
-            delete_time:
-              type:
-                type: nullable
-                underlying_type:
-                  name: timestamptz
-                  type: named
-            display_name:
-              type:
-                name: text
-                type: named
-            etag:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            expire_time:
-              type:
-                type: nullable
-                underlying_type:
-                  name: timestamptz
-                  type: named
-            external_uid:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            id:
-              type:
-                name: text
-                type: named
-            name:
-              type:
-                name: text
-                type: named
-            uid:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            update_time:
-              type:
-                name: timestamptz
                 type: named
           foreign_keys: {}
         guest_foreigner_details:
@@ -4647,6 +4486,12 @@ definition:
                 type: nullable
                 underlying_type:
                   name: timestamptz
+                  type: named
+            date_time_zone:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
                   type: named
             id:
               type:
@@ -5529,6 +5374,12 @@ definition:
                 type: nullable
                 underlying_type:
                   name: timestamptz
+                  type: named
+            date_time_zone:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
                   type: named
             event_id:
               type:
@@ -6416,227 +6267,6 @@ definition:
                   type: named
                 type: array
           foreign_keys: {}
-        insert_group_ldap_groups_object:
-          fields:
-            business_categories:
-              type:
-                type: nullable
-                underlying_type:
-                  element_type:
-                    type: nullable
-                    underlying_type:
-                      name: text
-                      type: named
-                  type: array
-            create_time:
-              type:
-                name: timestamptz
-                type: named
-            delete_time:
-              type:
-                type: nullable
-                underlying_type:
-                  name: timestamptz
-                  type: named
-            descriptions:
-              type:
-                type: nullable
-                underlying_type:
-                  element_type:
-                    type: nullable
-                    underlying_type:
-                      name: text
-                      type: named
-                  type: array
-            display_names:
-              type:
-                element_type:
-                  type: nullable
-                  underlying_type:
-                    name: text
-                    type: named
-                type: array
-            etag:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            expire_time:
-              type:
-                type: nullable
-                underlying_type:
-                  name: timestamptz
-                  type: named
-            id:
-              type:
-                name: text
-                type: named
-            name:
-              type:
-                name: text
-                type: named
-            organization:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            owners:
-              type:
-                type: nullable
-                underlying_type:
-                  element_type:
-                    type: nullable
-                    underlying_type:
-                      name: text
-                      type: named
-                  type: array
-            uid:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            update_time:
-              type:
-                name: timestamptz
-                type: named
-          foreign_keys: {}
-        insert_group_ldap_groups_response:
-          description: Responses from the 'insert_group_ldap_groups' procedure
-          fields:
-            affected_rows:
-              description: The number of rows affected by the mutation
-              type:
-                name: int4
-                type: named
-            returning:
-              description: Data from rows affected by the mutation
-              type:
-                element_type:
-                  name: group_ldap_groups
-                  type: named
-                type: array
-          foreign_keys: {}
-        insert_group_members_object:
-          fields:
-            attribute_type:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            display:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            group_id:
-              type:
-                name: text
-                type: named
-            id:
-              type:
-                name: text
-                type: named
-            reference_uri:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            value:
-              type:
-                name: text
-                type: named
-          foreign_keys: {}
-        insert_group_members_response:
-          description: Responses from the 'insert_group_members' procedure
-          fields:
-            affected_rows:
-              description: The number of rows affected by the mutation
-              type:
-                name: int4
-                type: named
-            returning:
-              description: Data from rows affected by the mutation
-              type:
-                element_type:
-                  name: group_members
-                  type: named
-                type: array
-          foreign_keys: {}
-        insert_group_resource_object:
-          fields:
-            create_time:
-              type:
-                name: timestamptz
-                type: named
-            delete_time:
-              type:
-                type: nullable
-                underlying_type:
-                  name: timestamptz
-                  type: named
-            display_name:
-              type:
-                name: text
-                type: named
-            etag:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            expire_time:
-              type:
-                type: nullable
-                underlying_type:
-                  name: timestamptz
-                  type: named
-            external_uid:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            id:
-              type:
-                name: text
-                type: named
-            name:
-              type:
-                name: text
-                type: named
-            uid:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-            update_time:
-              type:
-                name: timestamptz
-                type: named
-          foreign_keys: {}
-        insert_group_resource_response:
-          description: Responses from the 'insert_group_resource' procedure
-          fields:
-            affected_rows:
-              description: The number of rows affected by the mutation
-              type:
-                name: int4
-                type: named
-            returning:
-              description: Data from rows affected by the mutation
-              type:
-                element_type:
-                  name: group_resource
-                  type: named
-                type: array
-          foreign_keys: {}
         insert_guest_foreigner_details_object:
           fields:
             arrival_date:
@@ -6983,6 +6613,12 @@ definition:
                 underlying_type:
                   name: timestamptz
                   type: named
+            date_time_zone:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
             id:
               type:
                 name: text
@@ -7155,6 +6791,109 @@ definition:
               type:
                 element_type:
                   name: journal_resource
+                  type: named
+                type: array
+          foreign_keys: {}
+        insert_ldapgroup_resource_object:
+          fields:
+            business_categories:
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
+            create_time:
+              type:
+                name: timestamptz
+                type: named
+            delete_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            descriptions:
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
+            display_names:
+              type:
+                element_type:
+                  type: nullable
+                  underlying_type:
+                    name: text
+                    type: named
+                type: array
+            etag:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            expire_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            id:
+              type:
+                name: text
+                type: named
+            name:
+              type:
+                name: text
+                type: named
+            organization:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            owners:
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
+            uid:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            update_time:
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        insert_ldapgroup_resource_response:
+          description: Responses from the 'insert_ldapgroup_resource' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: ldapgroup_resource
                   type: named
                 type: array
           foreign_keys: {}
@@ -8048,6 +7787,124 @@ definition:
                   type: named
                 type: array
           foreign_keys: {}
+        insert_scimgroup_groups_object:
+          fields:
+            create_time:
+              type:
+                name: timestamptz
+                type: named
+            delete_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            display_name:
+              type:
+                name: text
+                type: named
+            etag:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            expire_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            external_uid:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            id:
+              type:
+                name: text
+                type: named
+            name:
+              type:
+                name: text
+                type: named
+            uid:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            update_time:
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        insert_scimgroup_groups_response:
+          description: Responses from the 'insert_scimgroup_groups' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: scimgroup_groups
+                  type: named
+                type: array
+          foreign_keys: {}
+        insert_scimgroup_members_object:
+          fields:
+            attribute_type:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            display:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            group_id:
+              type:
+                name: text
+                type: named
+            id:
+              type:
+                name: text
+                type: named
+            reference_uri:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            value:
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        insert_scimgroup_members_response:
+          description: Responses from the 'insert_scimgroup_members' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: scimgroup_members
+                  type: named
+                type: array
+          foreign_keys: {}
         insert_sensor_resource_object:
           fields:
             create_time:
@@ -8515,6 +8372,12 @@ definition:
                 type: nullable
                 underlying_type:
                   name: timestamptz
+                  type: named
+            date_time_zone:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
                   type: named
             id:
               type:
@@ -9604,6 +9467,12 @@ definition:
                 underlying_type:
                   name: timestamptz
                   type: named
+            date_time_zone:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
             id:
               type:
                 name: text
@@ -10576,6 +10445,12 @@ definition:
                 underlying_type:
                   name: timestamptz
                   type: named
+            date_time_zone:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
             id:
               type:
                 name: text
@@ -10692,6 +10567,93 @@ definition:
                 underlying_type:
                   name: text
                   type: named
+            uid:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            update_time:
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        ldapgroup_resource:
+          fields:
+            business_categories:
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
+            create_time:
+              type:
+                name: timestamptz
+                type: named
+            delete_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            descriptions:
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
+            display_names:
+              type:
+                element_type:
+                  type: nullable
+                  underlying_type:
+                    name: text
+                    type: named
+                type: array
+            etag:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            expire_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            id:
+              type:
+                name: text
+                type: named
+            name:
+              type:
+                name: text
+                type: named
+            organization:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            owners:
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
             uid:
               type:
                 type: nullable
@@ -11433,6 +11395,92 @@ definition:
                   name: text
                   type: named
           foreign_keys: {}
+        scimgroup_groups:
+          fields:
+            create_time:
+              type:
+                name: timestamptz
+                type: named
+            delete_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            display_name:
+              type:
+                name: text
+                type: named
+            etag:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            expire_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            external_uid:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            id:
+              type:
+                name: text
+                type: named
+            name:
+              type:
+                name: text
+                type: named
+            uid:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            update_time:
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        scimgroup_members:
+          fields:
+            attribute_type:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            display:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            group_id:
+              type:
+                name: text
+                type: named
+            id:
+              type:
+                name: text
+                type: named
+            reference_uri:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            value:
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
         sensor_resource:
           fields:
             create_time:
@@ -11804,6 +11852,12 @@ definition:
                 type: nullable
                 underlying_type:
                   name: timestamptz
+                  type: named
+            date_time_zone:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
                   type: named
             id:
               type:
@@ -12628,6 +12682,13 @@ definition:
                 type: nullable
                 underlying_type:
                   name: update_column_availability_calendar_times_date_time
+                  type: named
+            date_time_zone:
+              description: Update the 'date_time_zone' column in the 'availability_calendar_times' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_availability_calendar_times_date_time_zone
                   type: named
             id:
               description: Update the 'id' column in the 'availability_calendar_times' collection.
@@ -14027,6 +14088,17 @@ definition:
                   name: timestamptz
                   type: named
           foreign_keys: {}
+        update_column_availability_calendar_times_date_time_zone:
+          description: Update the 'date_time_zone' column in the 'availability_calendar_times' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
         update_column_availability_calendar_times_id:
           description: Update the 'id' column in the 'availability_calendar_times' collection
           fields:
@@ -15250,6 +15322,17 @@ definition:
                 type: nullable
                 underlying_type:
                   name: timestamptz
+                  type: named
+          foreign_keys: {}
+        update_column_event_calendar_times_date_time_zone:
+          description: Update the 'date_time_zone' column in the 'event_calendar_times' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
                   type: named
           foreign_keys: {}
         update_column_event_calendar_times_event_id:
@@ -16478,315 +16561,6 @@ definition:
                 name: text
                 type: named
           foreign_keys: {}
-        update_column_group_ldap_groups_business_categories:
-          description: Update the 'business_categories' column in the 'group_ldap_groups' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  element_type:
-                    type: nullable
-                    underlying_type:
-                      name: text
-                      type: named
-                  type: array
-          foreign_keys: {}
-        update_column_group_ldap_groups_create_time:
-          description: Update the 'create_time' column in the 'group_ldap_groups' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: timestamptz
-                type: named
-          foreign_keys: {}
-        update_column_group_ldap_groups_delete_time:
-          description: Update the 'delete_time' column in the 'group_ldap_groups' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: timestamptz
-                  type: named
-          foreign_keys: {}
-        update_column_group_ldap_groups_descriptions:
-          description: Update the 'descriptions' column in the 'group_ldap_groups' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  element_type:
-                    type: nullable
-                    underlying_type:
-                      name: text
-                      type: named
-                  type: array
-          foreign_keys: {}
-        update_column_group_ldap_groups_display_names:
-          description: Update the 'display_names' column in the 'group_ldap_groups' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                element_type:
-                  type: nullable
-                  underlying_type:
-                    name: text
-                    type: named
-                type: array
-          foreign_keys: {}
-        update_column_group_ldap_groups_etag:
-          description: Update the 'etag' column in the 'group_ldap_groups' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-          foreign_keys: {}
-        update_column_group_ldap_groups_expire_time:
-          description: Update the 'expire_time' column in the 'group_ldap_groups' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: timestamptz
-                  type: named
-          foreign_keys: {}
-        update_column_group_ldap_groups_id:
-          description: Update the 'id' column in the 'group_ldap_groups' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: text
-                type: named
-          foreign_keys: {}
-        update_column_group_ldap_groups_name:
-          description: Update the 'name' column in the 'group_ldap_groups' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: text
-                type: named
-          foreign_keys: {}
-        update_column_group_ldap_groups_organization:
-          description: Update the 'organization' column in the 'group_ldap_groups' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-          foreign_keys: {}
-        update_column_group_ldap_groups_owners:
-          description: Update the 'owners' column in the 'group_ldap_groups' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  element_type:
-                    type: nullable
-                    underlying_type:
-                      name: text
-                      type: named
-                  type: array
-          foreign_keys: {}
-        update_column_group_ldap_groups_uid:
-          description: Update the 'uid' column in the 'group_ldap_groups' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-          foreign_keys: {}
-        update_column_group_ldap_groups_update_time:
-          description: Update the 'update_time' column in the 'group_ldap_groups' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: timestamptz
-                type: named
-          foreign_keys: {}
-        update_column_group_members_attribute_type:
-          description: Update the 'attribute_type' column in the 'group_members' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-          foreign_keys: {}
-        update_column_group_members_display:
-          description: Update the 'display' column in the 'group_members' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-          foreign_keys: {}
-        update_column_group_members_group_id:
-          description: Update the 'group_id' column in the 'group_members' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: text
-                type: named
-          foreign_keys: {}
-        update_column_group_members_id:
-          description: Update the 'id' column in the 'group_members' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: text
-                type: named
-          foreign_keys: {}
-        update_column_group_members_reference_uri:
-          description: Update the 'reference_uri' column in the 'group_members' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-          foreign_keys: {}
-        update_column_group_members_value:
-          description: Update the 'value' column in the 'group_members' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: text
-                type: named
-          foreign_keys: {}
-        update_column_group_resource_create_time:
-          description: Update the 'create_time' column in the 'group_resource' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: timestamptz
-                type: named
-          foreign_keys: {}
-        update_column_group_resource_delete_time:
-          description: Update the 'delete_time' column in the 'group_resource' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: timestamptz
-                  type: named
-          foreign_keys: {}
-        update_column_group_resource_display_name:
-          description: Update the 'display_name' column in the 'group_resource' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: text
-                type: named
-          foreign_keys: {}
-        update_column_group_resource_etag:
-          description: Update the 'etag' column in the 'group_resource' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-          foreign_keys: {}
-        update_column_group_resource_expire_time:
-          description: Update the 'expire_time' column in the 'group_resource' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: timestamptz
-                  type: named
-          foreign_keys: {}
-        update_column_group_resource_external_uid:
-          description: Update the 'external_uid' column in the 'group_resource' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-          foreign_keys: {}
-        update_column_group_resource_id:
-          description: Update the 'id' column in the 'group_resource' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: text
-                type: named
-          foreign_keys: {}
-        update_column_group_resource_name:
-          description: Update the 'name' column in the 'group_resource' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: text
-                type: named
-          foreign_keys: {}
-        update_column_group_resource_uid:
-          description: Update the 'uid' column in the 'group_resource' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-          foreign_keys: {}
-        update_column_group_resource_update_time:
-          description: Update the 'update_time' column in the 'group_resource' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: timestamptz
-                type: named
-          foreign_keys: {}
         update_column_guest_foreigner_details_arrival_date:
           description: Update the 'arrival_date' column in the 'guest_foreigner_details' collection
           fields:
@@ -17278,6 +17052,17 @@ definition:
                   name: timestamptz
                   type: named
           foreign_keys: {}
+        update_column_journal_calendar_times_date_time_zone:
+          description: Update the 'date_time_zone' column in the 'journal_calendar_times' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
         update_column_journal_calendar_times_id:
           description: Update the 'id' column in the 'journal_calendar_times' collection
           fields:
@@ -17501,6 +17286,155 @@ definition:
           foreign_keys: {}
         update_column_journal_resource_update_time:
           description: Update the 'update_time' column in the 'journal_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        update_column_ldapgroup_resource_business_categories:
+          description: Update the 'business_categories' column in the 'ldapgroup_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
+          foreign_keys: {}
+        update_column_ldapgroup_resource_create_time:
+          description: Update the 'create_time' column in the 'ldapgroup_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        update_column_ldapgroup_resource_delete_time:
+          description: Update the 'delete_time' column in the 'ldapgroup_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+          foreign_keys: {}
+        update_column_ldapgroup_resource_descriptions:
+          description: Update the 'descriptions' column in the 'ldapgroup_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
+          foreign_keys: {}
+        update_column_ldapgroup_resource_display_names:
+          description: Update the 'display_names' column in the 'ldapgroup_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                element_type:
+                  type: nullable
+                  underlying_type:
+                    name: text
+                    type: named
+                type: array
+          foreign_keys: {}
+        update_column_ldapgroup_resource_etag:
+          description: Update the 'etag' column in the 'ldapgroup_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_ldapgroup_resource_expire_time:
+          description: Update the 'expire_time' column in the 'ldapgroup_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+          foreign_keys: {}
+        update_column_ldapgroup_resource_id:
+          description: Update the 'id' column in the 'ldapgroup_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_ldapgroup_resource_name:
+          description: Update the 'name' column in the 'ldapgroup_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_ldapgroup_resource_organization:
+          description: Update the 'organization' column in the 'ldapgroup_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_ldapgroup_resource_owners:
+          description: Update the 'owners' column in the 'ldapgroup_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
+          foreign_keys: {}
+        update_column_ldapgroup_resource_uid:
+          description: Update the 'uid' column in the 'ldapgroup_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_ldapgroup_resource_update_time:
+          description: Update the 'update_time' column in the 'ldapgroup_resource' collection
           fields:
             _set:
               description: Set the column to this value
@@ -18828,6 +18762,166 @@ definition:
                   name: text
                   type: named
           foreign_keys: {}
+        update_column_scimgroup_groups_create_time:
+          description: Update the 'create_time' column in the 'scimgroup_groups' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        update_column_scimgroup_groups_delete_time:
+          description: Update the 'delete_time' column in the 'scimgroup_groups' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+          foreign_keys: {}
+        update_column_scimgroup_groups_display_name:
+          description: Update the 'display_name' column in the 'scimgroup_groups' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_scimgroup_groups_etag:
+          description: Update the 'etag' column in the 'scimgroup_groups' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_scimgroup_groups_expire_time:
+          description: Update the 'expire_time' column in the 'scimgroup_groups' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+          foreign_keys: {}
+        update_column_scimgroup_groups_external_uid:
+          description: Update the 'external_uid' column in the 'scimgroup_groups' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_scimgroup_groups_id:
+          description: Update the 'id' column in the 'scimgroup_groups' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_scimgroup_groups_name:
+          description: Update the 'name' column in the 'scimgroup_groups' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_scimgroup_groups_uid:
+          description: Update the 'uid' column in the 'scimgroup_groups' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_scimgroup_groups_update_time:
+          description: Update the 'update_time' column in the 'scimgroup_groups' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        update_column_scimgroup_members_attribute_type:
+          description: Update the 'attribute_type' column in the 'scimgroup_members' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_scimgroup_members_display:
+          description: Update the 'display' column in the 'scimgroup_members' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_scimgroup_members_group_id:
+          description: Update the 'group_id' column in the 'scimgroup_members' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_scimgroup_members_id:
+          description: Update the 'id' column in the 'scimgroup_members' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_scimgroup_members_reference_uri:
+          description: Update the 'reference_uri' column in the 'scimgroup_members' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_scimgroup_members_value:
+          description: Update the 'value' column in the 'scimgroup_members' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
         update_column_sensor_resource_create_time:
           description: Update the 'create_time' column in the 'sensor_resource' collection
           fields:
@@ -19498,6 +19592,17 @@ definition:
                 type: nullable
                 underlying_type:
                   name: timestamptz
+                  type: named
+          foreign_keys: {}
+        update_column_todo_calendar_times_date_time_zone:
+          description: Update the 'date_time_zone' column in the 'todo_calendar_times' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
                   type: named
           foreign_keys: {}
         update_column_todo_calendar_times_id:
@@ -21050,6 +21155,17 @@ definition:
                   name: timestamptz
                   type: named
           foreign_keys: {}
+        update_column_vcard_date_or_texts_date_time_zone:
+          description: Update the 'date_time_zone' column in the 'vcard_date_or_texts' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
         update_column_vcard_date_or_texts_id:
           description: Update the 'id' column in the 'vcard_date_or_texts' collection
           fields:
@@ -22556,6 +22672,13 @@ definition:
                 underlying_type:
                   name: update_column_event_calendar_times_date_time
                   type: named
+            date_time_zone:
+              description: Update the 'date_time_zone' column in the 'event_calendar_times' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_event_calendar_times_date_time_zone
+                  type: named
             event_id:
               description: Update the 'event_id' column in the 'event_calendar_times' collection.
               type:
@@ -23575,269 +23698,6 @@ definition:
                   name: update_column_event_weekday_nums_recurrence_id
                   type: named
           foreign_keys: {}
-        update_group_ldap_groups_by_id_response:
-          description: Responses from the 'update_group_ldap_groups_by_id' procedure
-          fields:
-            affected_rows:
-              description: The number of rows affected by the mutation
-              type:
-                name: int4
-                type: named
-            returning:
-              description: Data from rows affected by the mutation
-              type:
-                element_type:
-                  name: group_ldap_groups
-                  type: named
-                type: array
-          foreign_keys: {}
-        update_group_ldap_groups_by_id_update_columns:
-          description: Update the columns of the 'group_ldap_groups' collection
-          fields:
-            business_categories:
-              description: Update the 'business_categories' column in the 'group_ldap_groups' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_ldap_groups_business_categories
-                  type: named
-            create_time:
-              description: Update the 'create_time' column in the 'group_ldap_groups' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_ldap_groups_create_time
-                  type: named
-            delete_time:
-              description: Update the 'delete_time' column in the 'group_ldap_groups' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_ldap_groups_delete_time
-                  type: named
-            descriptions:
-              description: Update the 'descriptions' column in the 'group_ldap_groups' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_ldap_groups_descriptions
-                  type: named
-            display_names:
-              description: Update the 'display_names' column in the 'group_ldap_groups' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_ldap_groups_display_names
-                  type: named
-            etag:
-              description: Update the 'etag' column in the 'group_ldap_groups' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_ldap_groups_etag
-                  type: named
-            expire_time:
-              description: Update the 'expire_time' column in the 'group_ldap_groups' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_ldap_groups_expire_time
-                  type: named
-            id:
-              description: Update the 'id' column in the 'group_ldap_groups' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_ldap_groups_id
-                  type: named
-            name:
-              description: Update the 'name' column in the 'group_ldap_groups' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_ldap_groups_name
-                  type: named
-            organization:
-              description: Update the 'organization' column in the 'group_ldap_groups' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_ldap_groups_organization
-                  type: named
-            owners:
-              description: Update the 'owners' column in the 'group_ldap_groups' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_ldap_groups_owners
-                  type: named
-            uid:
-              description: Update the 'uid' column in the 'group_ldap_groups' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_ldap_groups_uid
-                  type: named
-            update_time:
-              description: Update the 'update_time' column in the 'group_ldap_groups' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_ldap_groups_update_time
-                  type: named
-          foreign_keys: {}
-        update_group_members_by_id_response:
-          description: Responses from the 'update_group_members_by_id' procedure
-          fields:
-            affected_rows:
-              description: The number of rows affected by the mutation
-              type:
-                name: int4
-                type: named
-            returning:
-              description: Data from rows affected by the mutation
-              type:
-                element_type:
-                  name: group_members
-                  type: named
-                type: array
-          foreign_keys: {}
-        update_group_members_by_id_update_columns:
-          description: Update the columns of the 'group_members' collection
-          fields:
-            attribute_type:
-              description: Update the 'attribute_type' column in the 'group_members' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_members_attribute_type
-                  type: named
-            display:
-              description: Update the 'display' column in the 'group_members' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_members_display
-                  type: named
-            group_id:
-              description: Update the 'group_id' column in the 'group_members' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_members_group_id
-                  type: named
-            id:
-              description: Update the 'id' column in the 'group_members' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_members_id
-                  type: named
-            reference_uri:
-              description: Update the 'reference_uri' column in the 'group_members' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_members_reference_uri
-                  type: named
-            value:
-              description: Update the 'value' column in the 'group_members' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_members_value
-                  type: named
-          foreign_keys: {}
-        update_group_resource_by_id_response:
-          description: Responses from the 'update_group_resource_by_id' procedure
-          fields:
-            affected_rows:
-              description: The number of rows affected by the mutation
-              type:
-                name: int4
-                type: named
-            returning:
-              description: Data from rows affected by the mutation
-              type:
-                element_type:
-                  name: group_resource
-                  type: named
-                type: array
-          foreign_keys: {}
-        update_group_resource_by_id_update_columns:
-          description: Update the columns of the 'group_resource' collection
-          fields:
-            create_time:
-              description: Update the 'create_time' column in the 'group_resource' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_resource_create_time
-                  type: named
-            delete_time:
-              description: Update the 'delete_time' column in the 'group_resource' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_resource_delete_time
-                  type: named
-            display_name:
-              description: Update the 'display_name' column in the 'group_resource' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_resource_display_name
-                  type: named
-            etag:
-              description: Update the 'etag' column in the 'group_resource' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_resource_etag
-                  type: named
-            expire_time:
-              description: Update the 'expire_time' column in the 'group_resource' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_resource_expire_time
-                  type: named
-            external_uid:
-              description: Update the 'external_uid' column in the 'group_resource' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_resource_external_uid
-                  type: named
-            id:
-              description: Update the 'id' column in the 'group_resource' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_resource_id
-                  type: named
-            name:
-              description: Update the 'name' column in the 'group_resource' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_resource_name
-                  type: named
-            uid:
-              description: Update the 'uid' column in the 'group_resource' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_resource_uid
-                  type: named
-            update_time:
-              description: Update the 'update_time' column in the 'group_resource' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_group_resource_update_time
-                  type: named
-          foreign_keys: {}
         update_guest_foreigner_details_by_id_response:
           description: Responses from the 'update_guest_foreigner_details_by_id' procedure
           fields:
@@ -24252,6 +24112,13 @@ definition:
                 underlying_type:
                   name: update_column_journal_calendar_times_date_time
                   type: named
+            date_time_zone:
+              description: Update the 'date_time_zone' column in the 'journal_calendar_times' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_journal_calendar_times_date_time_zone
+                  type: named
             id:
               description: Update the 'id' column in the 'journal_calendar_times' collection.
               type:
@@ -24445,6 +24312,117 @@ definition:
                 type: nullable
                 underlying_type:
                   name: update_column_journal_resource_update_time
+                  type: named
+          foreign_keys: {}
+        update_ldapgroup_resource_by_id_response:
+          description: Responses from the 'update_ldapgroup_resource_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: ldapgroup_resource
+                  type: named
+                type: array
+          foreign_keys: {}
+        update_ldapgroup_resource_by_id_update_columns:
+          description: Update the columns of the 'ldapgroup_resource' collection
+          fields:
+            business_categories:
+              description: Update the 'business_categories' column in the 'ldapgroup_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_ldapgroup_resource_business_categories
+                  type: named
+            create_time:
+              description: Update the 'create_time' column in the 'ldapgroup_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_ldapgroup_resource_create_time
+                  type: named
+            delete_time:
+              description: Update the 'delete_time' column in the 'ldapgroup_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_ldapgroup_resource_delete_time
+                  type: named
+            descriptions:
+              description: Update the 'descriptions' column in the 'ldapgroup_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_ldapgroup_resource_descriptions
+                  type: named
+            display_names:
+              description: Update the 'display_names' column in the 'ldapgroup_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_ldapgroup_resource_display_names
+                  type: named
+            etag:
+              description: Update the 'etag' column in the 'ldapgroup_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_ldapgroup_resource_etag
+                  type: named
+            expire_time:
+              description: Update the 'expire_time' column in the 'ldapgroup_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_ldapgroup_resource_expire_time
+                  type: named
+            id:
+              description: Update the 'id' column in the 'ldapgroup_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_ldapgroup_resource_id
+                  type: named
+            name:
+              description: Update the 'name' column in the 'ldapgroup_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_ldapgroup_resource_name
+                  type: named
+            organization:
+              description: Update the 'organization' column in the 'ldapgroup_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_ldapgroup_resource_organization
+                  type: named
+            owners:
+              description: Update the 'owners' column in the 'ldapgroup_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_ldapgroup_resource_owners
+                  type: named
+            uid:
+              description: Update the 'uid' column in the 'ldapgroup_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_ldapgroup_resource_uid
+                  type: named
+            update_time:
+              description: Update the 'update_time' column in the 'ldapgroup_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_ldapgroup_resource_update_time
                   type: named
           foreign_keys: {}
         update_membership_resource_by_id_response:
@@ -25515,6 +25493,158 @@ definition:
                   name: update_column_resource_structured_datas_value_case
                   type: named
           foreign_keys: {}
+        update_scimgroup_groups_by_id_response:
+          description: Responses from the 'update_scimgroup_groups_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: scimgroup_groups
+                  type: named
+                type: array
+          foreign_keys: {}
+        update_scimgroup_groups_by_id_update_columns:
+          description: Update the columns of the 'scimgroup_groups' collection
+          fields:
+            create_time:
+              description: Update the 'create_time' column in the 'scimgroup_groups' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_groups_create_time
+                  type: named
+            delete_time:
+              description: Update the 'delete_time' column in the 'scimgroup_groups' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_groups_delete_time
+                  type: named
+            display_name:
+              description: Update the 'display_name' column in the 'scimgroup_groups' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_groups_display_name
+                  type: named
+            etag:
+              description: Update the 'etag' column in the 'scimgroup_groups' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_groups_etag
+                  type: named
+            expire_time:
+              description: Update the 'expire_time' column in the 'scimgroup_groups' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_groups_expire_time
+                  type: named
+            external_uid:
+              description: Update the 'external_uid' column in the 'scimgroup_groups' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_groups_external_uid
+                  type: named
+            id:
+              description: Update the 'id' column in the 'scimgroup_groups' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_groups_id
+                  type: named
+            name:
+              description: Update the 'name' column in the 'scimgroup_groups' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_groups_name
+                  type: named
+            uid:
+              description: Update the 'uid' column in the 'scimgroup_groups' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_groups_uid
+                  type: named
+            update_time:
+              description: Update the 'update_time' column in the 'scimgroup_groups' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_groups_update_time
+                  type: named
+          foreign_keys: {}
+        update_scimgroup_members_by_id_response:
+          description: Responses from the 'update_scimgroup_members_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: scimgroup_members
+                  type: named
+                type: array
+          foreign_keys: {}
+        update_scimgroup_members_by_id_update_columns:
+          description: Update the columns of the 'scimgroup_members' collection
+          fields:
+            attribute_type:
+              description: Update the 'attribute_type' column in the 'scimgroup_members' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_members_attribute_type
+                  type: named
+            display:
+              description: Update the 'display' column in the 'scimgroup_members' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_members_display
+                  type: named
+            group_id:
+              description: Update the 'group_id' column in the 'scimgroup_members' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_members_group_id
+                  type: named
+            id:
+              description: Update the 'id' column in the 'scimgroup_members' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_members_id
+                  type: named
+            reference_uri:
+              description: Update the 'reference_uri' column in the 'scimgroup_members' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_members_reference_uri
+                  type: named
+            value:
+              description: Update the 'value' column in the 'scimgroup_members' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_scimgroup_members_value
+                  type: named
+          foreign_keys: {}
         update_sensor_resource_by_id_response:
           description: Responses from the 'update_sensor_resource_by_id' procedure
           fields:
@@ -26101,6 +26231,13 @@ definition:
                 type: nullable
                 underlying_type:
                   name: update_column_todo_calendar_times_date_time
+                  type: named
+            date_time_zone:
+              description: Update the 'date_time_zone' column in the 'todo_calendar_times' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_todo_calendar_times_date_time_zone
                   type: named
             id:
               description: Update the 'id' column in the 'todo_calendar_times' collection.
@@ -27307,6 +27444,13 @@ definition:
                 type: nullable
                 underlying_type:
                   name: update_column_vcard_date_or_texts_date_time
+                  type: named
+            date_time_zone:
+              description: Update the 'date_time_zone' column in the 'vcard_date_or_texts' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_vcard_date_or_texts_date_time_zone
                   type: named
             id:
               description: Update the 'id' column in the 'vcard_date_or_texts' collection.
@@ -29079,6 +29223,12 @@ definition:
                 underlying_type:
                   name: timestamptz
                   type: named
+            date_time_zone:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
             id:
               type:
                 name: text
@@ -30256,57 +30406,6 @@ definition:
                 name: text
                 type: named
             pre_check:
-              description: Delete permission predicate over the 'group_ldap_groups' collection
-              type:
-                type: nullable
-                underlying_type:
-                  object_type_name: group_ldap_groups
-                  type: predicate
-          description: Delete any row on the 'group_ldap_groups' collection using the 'id' key
-          name: delete_group_ldap_groups_by_id
-          result_type:
-            name: delete_group_ldap_groups_by_id_response
-            type: named
-        - arguments:
-            key_id:
-              type:
-                name: text
-                type: named
-            pre_check:
-              description: Delete permission predicate over the 'group_members' collection
-              type:
-                type: nullable
-                underlying_type:
-                  object_type_name: group_members
-                  type: predicate
-          description: Delete any row on the 'group_members' collection using the 'id' key
-          name: delete_group_members_by_id
-          result_type:
-            name: delete_group_members_by_id_response
-            type: named
-        - arguments:
-            key_id:
-              type:
-                name: text
-                type: named
-            pre_check:
-              description: Delete permission predicate over the 'group_resource' collection
-              type:
-                type: nullable
-                underlying_type:
-                  object_type_name: group_resource
-                  type: predicate
-          description: Delete any row on the 'group_resource' collection using the 'id' key
-          name: delete_group_resource_by_id
-          result_type:
-            name: delete_group_resource_by_id_response
-            type: named
-        - arguments:
-            key_id:
-              type:
-                name: text
-                type: named
-            pre_check:
               description: Delete permission predicate over the 'guest_foreigner_details' collection
               type:
                 type: nullable
@@ -30419,6 +30518,23 @@ definition:
           name: delete_journal_resource_by_id
           result_type:
             name: delete_journal_resource_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            pre_check:
+              description: Delete permission predicate over the 'ldapgroup_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: ldapgroup_resource
+                  type: predicate
+          description: Delete any row on the 'ldapgroup_resource' collection using the 'id' key
+          name: delete_ldapgroup_resource_by_id
+          result_type:
+            name: delete_ldapgroup_resource_by_id_response
             type: named
         - arguments:
             key_id:
@@ -30589,6 +30705,40 @@ definition:
           name: delete_resource_structured_datas_by_id
           result_type:
             name: delete_resource_structured_datas_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            pre_check:
+              description: Delete permission predicate over the 'scimgroup_groups' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: scimgroup_groups
+                  type: predicate
+          description: Delete any row on the 'scimgroup_groups' collection using the 'id' key
+          name: delete_scimgroup_groups_by_id
+          result_type:
+            name: delete_scimgroup_groups_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            pre_check:
+              description: Delete permission predicate over the 'scimgroup_members' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: scimgroup_members
+                  type: predicate
+          description: Delete any row on the 'scimgroup_members' collection using the 'id' key
+          name: delete_scimgroup_members_by_id
+          result_type:
+            name: delete_scimgroup_members_by_id_response
             type: named
         - arguments:
             key_id:
@@ -31757,63 +31907,6 @@ definition:
             objects:
               type:
                 element_type:
-                  name: insert_group_ldap_groups_object
-                  type: named
-                type: array
-            post_check:
-              description: Insert permission predicate over the 'group_ldap_groups' collection
-              type:
-                type: nullable
-                underlying_type:
-                  object_type_name: group_ldap_groups
-                  type: predicate
-          description: Insert into the group_ldap_groups table
-          name: insert_group_ldap_groups
-          result_type:
-            name: insert_group_ldap_groups_response
-            type: named
-        - arguments:
-            objects:
-              type:
-                element_type:
-                  name: insert_group_members_object
-                  type: named
-                type: array
-            post_check:
-              description: Insert permission predicate over the 'group_members' collection
-              type:
-                type: nullable
-                underlying_type:
-                  object_type_name: group_members
-                  type: predicate
-          description: Insert into the group_members table
-          name: insert_group_members
-          result_type:
-            name: insert_group_members_response
-            type: named
-        - arguments:
-            objects:
-              type:
-                element_type:
-                  name: insert_group_resource_object
-                  type: named
-                type: array
-            post_check:
-              description: Insert permission predicate over the 'group_resource' collection
-              type:
-                type: nullable
-                underlying_type:
-                  object_type_name: group_resource
-                  type: predicate
-          description: Insert into the group_resource table
-          name: insert_group_resource
-          result_type:
-            name: insert_group_resource_response
-            type: named
-        - arguments:
-            objects:
-              type:
-                element_type:
                   name: insert_guest_foreigner_details_object
                   type: named
                 type: array
@@ -31942,6 +32035,25 @@ definition:
           name: insert_journal_resource
           result_type:
             name: insert_journal_resource_response
+            type: named
+        - arguments:
+            objects:
+              type:
+                element_type:
+                  name: insert_ldapgroup_resource_object
+                  type: named
+                type: array
+            post_check:
+              description: Insert permission predicate over the 'ldapgroup_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: ldapgroup_resource
+                  type: predicate
+          description: Insert into the ldapgroup_resource table
+          name: insert_ldapgroup_resource
+          result_type:
+            name: insert_ldapgroup_resource_response
             type: named
         - arguments:
             objects:
@@ -32132,6 +32244,44 @@ definition:
           name: insert_resource_structured_datas
           result_type:
             name: insert_resource_structured_datas_response
+            type: named
+        - arguments:
+            objects:
+              type:
+                element_type:
+                  name: insert_scimgroup_groups_object
+                  type: named
+                type: array
+            post_check:
+              description: Insert permission predicate over the 'scimgroup_groups' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: scimgroup_groups
+                  type: predicate
+          description: Insert into the scimgroup_groups table
+          name: insert_scimgroup_groups
+          result_type:
+            name: insert_scimgroup_groups_response
+            type: named
+        - arguments:
+            objects:
+              type:
+                element_type:
+                  name: insert_scimgroup_members_object
+                  type: named
+                type: array
+            post_check:
+              description: Insert permission predicate over the 'scimgroup_members' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: scimgroup_members
+                  type: predicate
+          description: Insert into the scimgroup_members table
+          name: insert_scimgroup_members
+          result_type:
+            name: insert_scimgroup_members_response
             type: named
         - arguments:
             objects:
@@ -33635,90 +33785,6 @@ definition:
                 name: text
                 type: named
             post_check:
-              description: Update permission post-condition predicate over the 'group_ldap_groups' collection
-              type:
-                type: nullable
-                underlying_type:
-                  object_type_name: group_ldap_groups
-                  type: predicate
-            pre_check:
-              description: Update permission pre-condition predicate over the 'group_ldap_groups' collection
-              type:
-                type: nullable
-                underlying_type:
-                  object_type_name: group_ldap_groups
-                  type: predicate
-            update_columns:
-              type:
-                name: update_group_ldap_groups_by_id_update_columns
-                type: named
-          description: Update any row on the 'group_ldap_groups' collection using the 'id' key
-          name: update_group_ldap_groups_by_id
-          result_type:
-            name: update_group_ldap_groups_by_id_response
-            type: named
-        - arguments:
-            key_id:
-              type:
-                name: text
-                type: named
-            post_check:
-              description: Update permission post-condition predicate over the 'group_members' collection
-              type:
-                type: nullable
-                underlying_type:
-                  object_type_name: group_members
-                  type: predicate
-            pre_check:
-              description: Update permission pre-condition predicate over the 'group_members' collection
-              type:
-                type: nullable
-                underlying_type:
-                  object_type_name: group_members
-                  type: predicate
-            update_columns:
-              type:
-                name: update_group_members_by_id_update_columns
-                type: named
-          description: Update any row on the 'group_members' collection using the 'id' key
-          name: update_group_members_by_id
-          result_type:
-            name: update_group_members_by_id_response
-            type: named
-        - arguments:
-            key_id:
-              type:
-                name: text
-                type: named
-            post_check:
-              description: Update permission post-condition predicate over the 'group_resource' collection
-              type:
-                type: nullable
-                underlying_type:
-                  object_type_name: group_resource
-                  type: predicate
-            pre_check:
-              description: Update permission pre-condition predicate over the 'group_resource' collection
-              type:
-                type: nullable
-                underlying_type:
-                  object_type_name: group_resource
-                  type: predicate
-            update_columns:
-              type:
-                name: update_group_resource_by_id_update_columns
-                type: named
-          description: Update any row on the 'group_resource' collection using the 'id' key
-          name: update_group_resource_by_id
-          result_type:
-            name: update_group_resource_by_id_response
-            type: named
-        - arguments:
-            key_id:
-              type:
-                name: text
-                type: named
-            post_check:
               description: Update permission post-condition predicate over the 'guest_foreigner_details' collection
               type:
                 type: nullable
@@ -33908,6 +33974,34 @@ definition:
           name: update_journal_resource_by_id
           result_type:
             name: update_journal_resource_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            post_check:
+              description: Update permission post-condition predicate over the 'ldapgroup_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: ldapgroup_resource
+                  type: predicate
+            pre_check:
+              description: Update permission pre-condition predicate over the 'ldapgroup_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: ldapgroup_resource
+                  type: predicate
+            update_columns:
+              type:
+                name: update_ldapgroup_resource_by_id_update_columns
+                type: named
+          description: Update any row on the 'ldapgroup_resource' collection using the 'id' key
+          name: update_ldapgroup_resource_by_id
+          result_type:
+            name: update_ldapgroup_resource_by_id_response
             type: named
         - arguments:
             key_id:
@@ -34188,6 +34282,62 @@ definition:
           name: update_resource_structured_datas_by_id
           result_type:
             name: update_resource_structured_datas_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            post_check:
+              description: Update permission post-condition predicate over the 'scimgroup_groups' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: scimgroup_groups
+                  type: predicate
+            pre_check:
+              description: Update permission pre-condition predicate over the 'scimgroup_groups' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: scimgroup_groups
+                  type: predicate
+            update_columns:
+              type:
+                name: update_scimgroup_groups_by_id_update_columns
+                type: named
+          description: Update any row on the 'scimgroup_groups' collection using the 'id' key
+          name: update_scimgroup_groups_by_id
+          result_type:
+            name: update_scimgroup_groups_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            post_check:
+              description: Update permission post-condition predicate over the 'scimgroup_members' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: scimgroup_members
+                  type: predicate
+            pre_check:
+              description: Update permission pre-condition predicate over the 'scimgroup_members' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: scimgroup_members
+                  type: predicate
+            update_columns:
+              type:
+                name: update_scimgroup_members_by_id_update_columns
+                type: named
+          description: Update any row on the 'scimgroup_members' collection using the 'id' key
+          name: update_scimgroup_members_by_id
+          result_type:
+            name: update_scimgroup_members_by_id_response
             type: named
         - arguments:
             key_id:

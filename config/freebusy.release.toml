@@ -77,3 +77,8 @@ pool_size = 0
 # Separates this deployment's keys from another sharing one server. Set it per
 # environment — it is config, not schema, which is why cache.v1 has no prefix.
 prefix = "freebusy"
+
+[caldav]
+# CalDAV (RFC 4791) under /dav/ on the HTTP port. Off: it has no
+# authentication yet, so it must not face a network.
+enabled = false

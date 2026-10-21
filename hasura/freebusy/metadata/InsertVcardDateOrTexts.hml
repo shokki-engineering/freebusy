@@ -8,6 +8,8 @@ definition:
       type: Date
     - name: dateTime
       type: Timestamptz
+    - name: dateTimeZone
+      type: String_1
     - name: id
       type: String_1!
     - name: text
@@ -27,6 +29,9 @@ definition:
         dateTime:
           column:
             name: date_time
+        dateTimeZone:
+          column:
+            name: date_time_zone
         id:
           column:
             name: id
@@ -48,6 +53,7 @@ definition:
         allowedFields:
           - date
           - dateTime
+          - dateTimeZone
           - id
           - text
           - valueCase

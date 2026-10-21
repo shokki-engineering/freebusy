@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/event/v1/eventv1grpc"
-	eventpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"github.com/oh-tarnished/freebusy/internal/runtime/rpc"
 	"github.com/oh-tarnished/freebusy/internal/types"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -26,8 +26,8 @@ func NewEventServer(repos Repositories) *EventServer {
 
 const eventService = "Events"
 
-func (s *EventServer) GetEvent(ctx context.Context, req *eventpbv1.GetEventRequest) (*eventpbv1.Event, error) {
-	var out *eventpbv1.Event
+func (s *EventServer) GetEvent(ctx context.Context, req *eventv1.GetEventRequest) (*eventv1.Event, error) {
+	var out *eventv1.Event
 	err := rpc.Traced(ctx, eventService, "GetEvent", func(ctx context.Context) (err error) {
 		out, err = s.repos.Events.Get(ctx, req.GetName())
 		return rpc.ToStatusErr(err)
@@ -35,8 +35,8 @@ func (s *EventServer) GetEvent(ctx context.Context, req *eventpbv1.GetEventReque
 	return out, err
 }
 
-func (s *EventServer) ListEvents(ctx context.Context, req *eventpbv1.ListEventsRequest) (*eventpbv1.ListEventsResponse, error) {
-	out := &eventpbv1.ListEventsResponse{}
+func (s *EventServer) ListEvents(ctx context.Context, req *eventv1.ListEventsRequest) (*eventv1.ListEventsResponse, error) {
+	out := &eventv1.ListEventsResponse{}
 	err := rpc.Traced(ctx, eventService, "ListEvents", func(ctx context.Context) (err error) {
 		out.Events, out.NextPageToken, err = s.repos.Events.List(ctx, req.GetParent(),
 			listInput(req.GetPageSize(), req.GetPageToken(), req.GetFilter(), req.GetShowDeleted()))
@@ -47,8 +47,8 @@ func (s *EventServer) ListEvents(ctx context.Context, req *eventpbv1.ListEventsR
 
 // BatchGetEvents returns the named events in request order, all or nothing
 // (AIP-231): one missing name fails the call.
-func (s *EventServer) BatchGetEvents(ctx context.Context, req *eventpbv1.BatchGetEventsRequest) (*eventpbv1.BatchGetEventsResponse, error) {
-	out := &eventpbv1.BatchGetEventsResponse{}
+func (s *EventServer) BatchGetEvents(ctx context.Context, req *eventv1.BatchGetEventsRequest) (*eventv1.BatchGetEventsResponse, error) {
+	out := &eventv1.BatchGetEventsResponse{}
 	err := rpc.Traced(ctx, eventService, "BatchGetEvents", func(ctx context.Context) error {
 		prefix := req.GetParent() + "/events/"
 		for _, name := range req.GetNames() {
@@ -66,8 +66,8 @@ func (s *EventServer) BatchGetEvents(ctx context.Context, req *eventpbv1.BatchGe
 	return out, err
 }
 
-func (s *EventServer) CreateEvent(ctx context.Context, req *eventpbv1.CreateEventRequest) (*eventpbv1.Event, error) {
-	var out *eventpbv1.Event
+func (s *EventServer) CreateEvent(ctx context.Context, req *eventv1.CreateEventRequest) (*eventv1.Event, error) {
+	var out *eventv1.Event
 	err := rpc.Traced(ctx, eventService, "CreateEvent", func(ctx context.Context) error {
 		if err := checkID("event_id", req.GetEventId()); err != nil {
 			return rpc.ToStatusErr(err)
@@ -80,7 +80,7 @@ func (s *EventServer) CreateEvent(ctx context.Context, req *eventpbv1.CreateEven
 		if id := req.GetEventId(); id != "" {
 			name = req.GetParent() + "/events/" + id
 		}
-		prepareCreate(in, name)
+		PrepareCreate(in, name)
 		var err error
 		out, err = s.repos.Events.Create(ctx, req.GetParent(), in)
 		return rpc.ToStatusErr(err)
@@ -88,8 +88,8 @@ func (s *EventServer) CreateEvent(ctx context.Context, req *eventpbv1.CreateEven
 	return out, err
 }
 
-func (s *EventServer) UpdateEvent(ctx context.Context, req *eventpbv1.UpdateEventRequest) (*eventpbv1.Event, error) {
-	var out *eventpbv1.Event
+func (s *EventServer) UpdateEvent(ctx context.Context, req *eventv1.UpdateEventRequest) (*eventv1.Event, error) {
+	var out *eventv1.Event
 	err := rpc.Traced(ctx, eventService, "UpdateEvent", func(ctx context.Context) error {
 		paths, err := updatePaths(req.GetEvent(), req.GetUpdateMask())
 		if err != nil {
@@ -101,7 +101,7 @@ func (s *EventServer) UpdateEvent(ctx context.Context, req *eventpbv1.UpdateEven
 	return out, err
 }
 
-func (s *EventServer) DeleteEvent(ctx context.Context, req *eventpbv1.DeleteEventRequest) (*emptypb.Empty, error) {
+func (s *EventServer) DeleteEvent(ctx context.Context, req *eventv1.DeleteEventRequest) (*emptypb.Empty, error) {
 	err := rpc.Traced(ctx, eventService, "DeleteEvent", func(ctx context.Context) error {
 		return rpc.ToStatusErr(s.repos.Events.Delete(ctx, req.GetName()))
 	})
@@ -111,8 +111,8 @@ func (s *EventServer) DeleteEvent(ctx context.Context, req *eventpbv1.DeleteEven
 	return &emptypb.Empty{}, nil
 }
 
-func (s *EventServer) UndeleteEvent(ctx context.Context, req *eventpbv1.UndeleteEventRequest) (*eventpbv1.Event, error) {
-	var out *eventpbv1.Event
+func (s *EventServer) UndeleteEvent(ctx context.Context, req *eventv1.UndeleteEventRequest) (*eventv1.Event, error) {
+	var out *eventv1.Event
 	err := rpc.Traced(ctx, eventService, "UndeleteEvent", func(ctx context.Context) (err error) {
 		out, err = s.repos.Events.Undelete(ctx, req.GetName())
 		return rpc.ToStatusErr(err)
@@ -126,8 +126,8 @@ const expandPageSize = 250
 
 // ExpandEvent materialises a recurring event's instances in the window, a
 // page at a time.
-func (s *EventServer) ExpandEvent(ctx context.Context, req *eventpbv1.ExpandEventRequest) (*eventpbv1.ExpandEventResponse, error) {
-	out := &eventpbv1.ExpandEventResponse{}
+func (s *EventServer) ExpandEvent(ctx context.Context, req *eventv1.ExpandEventRequest) (*eventv1.ExpandEventResponse, error) {
+	out := &eventv1.ExpandEventResponse{}
 	err := rpc.Traced(ctx, eventService, "ExpandEvent", func(ctx context.Context) error {
 		window, err := windowOf(req.GetWindow())
 		if err != nil {
@@ -141,7 +141,7 @@ func (s *EventServer) ExpandEvent(ctx context.Context, req *eventpbv1.ExpandEven
 		if err != nil {
 			return rpc.ToStatusErr(err)
 		}
-		instances, err := expand(e, zoneOf(cal.GetTimeZone().GetId()), window)
+		instances, err := expand(e, ZoneOf(cal.GetTimeZone().GetId()), window)
 		if err != nil {
 			return rpc.ToStatusErr(err)
 		}

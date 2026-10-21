@@ -66,6 +66,38 @@ definition:
 kind: ObjectType
 version: v1
 definition:
+  name: UpdateColumnJournalCalendarTimesDateTimeZone
+  description: Update the 'date_time_zone' column in the 'journal_calendar_times' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnJournalCalendarTimesDateTimeZone
+    inputTypeName: UpdateColumnJournalCalendarTimesDateTimeZoneInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_journal_calendar_times_date_time_zone
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnJournalCalendarTimesDateTimeZone
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
   name: UpdateColumnJournalCalendarTimesId
   description: Update the 'id' column in the 'journal_calendar_times' collection
   fields:
@@ -139,6 +171,10 @@ definition:
     - name: dateTime
       type: UpdateColumnJournalCalendarTimesDateTime
       description: Update the 'date_time' column in the 'journal_calendar_times' collection.
+    - name: dateTimeZone
+      type: UpdateColumnJournalCalendarTimesDateTimeZone
+      description: Update the 'date_time_zone' column in the 'journal_calendar_times'
+        collection.
     - name: id
       type: UpdateColumnJournalCalendarTimesId
       description: Update the 'id' column in the 'journal_calendar_times' collection.
@@ -159,6 +195,9 @@ definition:
         dateTime:
           column:
             name: date_time
+        dateTimeZone:
+          column:
+            name: date_time_zone
         id:
           column:
             name: id
@@ -177,6 +216,7 @@ definition:
         allowedFields:
           - date
           - dateTime
+          - dateTimeZone
           - id
           - valueCase
 

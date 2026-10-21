@@ -23,16 +23,14 @@ import (
 	"testing"
 	"time"
 
-	rfcavail "github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/availability"
-	rfccal "github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/calendar"
-	rfccommon "github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/common"
-	rfcevent "github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/event"
-	rfcres "github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/resource"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/availability"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/calendar"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/common"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/event"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/resource"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
 	"github.com/oh-tarnished/freebusy/internal/rfc"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
-	gormstore "github.com/oh-tarnished/freebusy/internal/service/allocation/db/gorm"
-	hasurastore "github.com/oh-tarnished/freebusy/internal/service/allocation/db/hasura"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/oh-tarnished/runtime-go/ulid"
 	"google.golang.org/genproto/googleapis/type/interval"
@@ -90,34 +88,34 @@ func seed(t *testing.T, db *gorm.DB) site {
 			t.Fatalf("seed %T: %v", v, err)
 		}
 	}
-	if err := db.Clauses(clause.OnConflict{DoNothing: true}).Create(&rfccommon.TimeZone{ID: "Asia/Kolkata"}).Error; err != nil {
+	if err := db.Clauses(clause.OnConflict{DoNothing: true}).Create(&common.TimeZone{ID: "Asia/Kolkata"}).Error; err != nil {
 		t.Fatalf("seed zone: %v", err)
 	}
-	dt := rfcavail.CalendarTimeValueCaseDateTime
-	endForm := rfcavail.AvailablePeriodEndFormCaseEnd
+	dt := availability.CalendarTimeValueCaseDateTime
+	endForm := availability.AvailablePeriodEndFormCaseEnd
 	for i, n := range []string{"court-1", "court-2", "court-3"} {
 		id := n + "-" + run
 		calID := "cal-" + id
-		create(&rfccal.Calendar{ID: calID, Name: "calendars/" + calID, DisplayName: id, TimeZoneID: ptr("Asia/Kolkata")})
-		res := &rfcres.Resource{
+		create(&calendar.Calendar{ID: calID, Name: "calendars/" + calID, DisplayName: id, TimeZoneID: ptr("Asia/Kolkata")})
+		res := &resource.Resource{
 			ID: id, Name: "resources/" + id, CalendarID: &calID,
 			OrganizationalUnitID: ptr("it-" + run), ResourceTypes: []string{"padel-court"},
 		}
 		create(res)
 		s.courts = append(s.courts, res.Name)
 		if i == 2 {
-			create(&rfcres.StructuredData{
+			create(&resource.StructuredData{
 				ID: ulid.GenerateString(), ResourceID: id, Schema: ptr(rfc.ProfileSchemaURI),
-				Text: ptr(`{"min_duration":"PT1H"}`), ValueCase: ptr(rfcres.StructuredDataValueCaseText),
+				Text: ptr(`{"min_duration":"PT1H"}`), ValueCase: ptr(resource.StructuredDataValueCaseText),
 			})
 		}
 
 		avID, startID, endID := ulid.GenerateString(), ulid.GenerateString(), ulid.GenerateString()
 		opens, closes := at(8).AddDate(0, 0, -7), at(22).AddDate(0, 0, -7)
-		create(&rfcavail.CalendarTime{ID: startID, DateTime: &opens, ValueCase: &dt})
-		create(&rfcavail.CalendarTime{ID: endID, DateTime: &closes, ValueCase: &dt})
-		create(&rfcavail.Availability{ID: avID, Name: "calendars/" + calID + "/availabilities/" + avID, CalendarID: calID})
-		create(&rfcavail.AvailablePeriod{
+		create(&availability.CalendarTime{ID: startID, DateTime: &opens, ValueCase: &dt})
+		create(&availability.CalendarTime{ID: endID, DateTime: &closes, ValueCase: &dt})
+		create(&availability.Availability{ID: avID, Name: "calendars/" + calID + "/availabilities/" + avID, CalendarID: calID})
+		create(&availability.AvailablePeriod{
 			ID: ulid.GenerateString(), AvailabilityID: avID, StartID: startID, EndID: &endID,
 			RecurrenceRule: ptr("FREQ=DAILY"), EndFormCase: &endForm,
 		})
@@ -125,11 +123,11 @@ func seed(t *testing.T, db *gorm.DB) site {
 		if i == 0 {
 			evID, es, ee := ulid.GenerateString(), ulid.GenerateString(), ulid.GenerateString()
 			from, to := at(18), at(19)
-			edt := rfcevent.CalendarTimeValueCaseDateTime
-			create(&rfcevent.CalendarTime{ID: es, DateTime: &from, ValueCase: &edt, EventID: evID})
-			create(&rfcevent.CalendarTime{ID: ee, DateTime: &to, ValueCase: &edt, EventID: evID})
-			opaque, ends := rfcevent.TransparencyOpaque, rfcevent.EventEndsCaseEnd
-			create(&rfcevent.Event{
+			edt := event.CalendarTimeValueCaseDateTime
+			create(&event.CalendarTime{ID: es, DateTime: &from, ValueCase: &edt, EventID: evID})
+			create(&event.CalendarTime{ID: ee, DateTime: &to, ValueCase: &edt, EventID: evID})
+			opaque, ends := event.TransparencyOpaque, event.EventEndsCaseEnd
+			create(&event.Event{
 				ID: evID, Name: "calendars/" + calID + "/events/" + evID, CalendarID: calID,
 				StartID: es, EndID: &ee, Transparency: &opaque, EndsCase: &ends,
 			})
@@ -143,7 +141,9 @@ func ptr[T any](v T) *T { return &v }
 // stores yields each configured backend.
 func stores(t *testing.T) map[string]func(*gorm.DB) allocation.Store {
 	out := map[string]func(*gorm.DB) allocation.Store{
-		"gorm": func(db *gorm.DB) allocation.Store { return gormstore.New(db) },
+		"gorm": func(g *gorm.DB) allocation.Store {
+			return New(&database.Connection{PgSQLConn: g, Provider: database.ProviderGorm})
+		},
 	}
 	if raw := os.Getenv("FREEBUSY_TEST_GRAPHQL_URL"); raw != "" {
 		u, err := url.Parse(raw)
@@ -154,7 +154,9 @@ func stores(t *testing.T) map[string]func(*gorm.DB) allocation.Store {
 		if err != nil {
 			t.Fatal(err)
 		}
-		out["hasura"] = func(*gorm.DB) allocation.Store { return hasurastore.New(svc) }
+		out["hasura"] = func(*gorm.DB) allocation.Store {
+			return New(&database.Connection{Hasura: svc, Provider: database.ProviderHasura})
+		}
 	}
 	return out
 }

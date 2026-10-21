@@ -66,6 +66,38 @@ definition:
 kind: ObjectType
 version: v1
 definition:
+  name: UpdateColumnEventCalendarTimesDateTimeZone
+  description: Update the 'date_time_zone' column in the 'event_calendar_times' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventCalendarTimesDateTimeZone
+    inputTypeName: UpdateColumnEventCalendarTimesDateTimeZoneInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_calendar_times_date_time_zone
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventCalendarTimesDateTimeZone
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
   name: UpdateColumnEventCalendarTimesEventId
   description: Update the 'event_id' column in the 'event_calendar_times' collection
   fields:
@@ -171,6 +203,10 @@ definition:
     - name: dateTime
       type: UpdateColumnEventCalendarTimesDateTime
       description: Update the 'date_time' column in the 'event_calendar_times' collection.
+    - name: dateTimeZone
+      type: UpdateColumnEventCalendarTimesDateTimeZone
+      description: Update the 'date_time_zone' column in the 'event_calendar_times'
+        collection.
     - name: eventId
       type: UpdateColumnEventCalendarTimesEventId
       description: Update the 'event_id' column in the 'event_calendar_times' collection.
@@ -193,6 +229,9 @@ definition:
         dateTime:
           column:
             name: date_time
+        dateTimeZone:
+          column:
+            name: date_time_zone
         eventId:
           column:
             name: event_id
@@ -214,6 +253,7 @@ definition:
         allowedFields:
           - date
           - dateTime
+          - dateTimeZone
           - eventId
           - id
           - valueCase

@@ -7,7 +7,7 @@ import (
 	"slices"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc7953/availability/v1/availabilityv1grpc"
-	rfcavailabilitypbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"github.com/oh-tarnished/freebusy/internal/runtime/rpc"
 	"github.com/oh-tarnished/freebusy/internal/types"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -28,8 +28,8 @@ func NewAvailabilityServer(repos Repositories) *AvailabilityServer {
 
 const availabilityService = "Availabilities"
 
-func (s *AvailabilityServer) GetAvailability(ctx context.Context, req *rfcavailabilitypbv1.GetAvailabilityRequest) (*rfcavailabilitypbv1.Availability, error) {
-	var out *rfcavailabilitypbv1.Availability
+func (s *AvailabilityServer) GetAvailability(ctx context.Context, req *availabilityv1.GetAvailabilityRequest) (*availabilityv1.Availability, error) {
+	var out *availabilityv1.Availability
 	err := rpc.Traced(ctx, availabilityService, "GetAvailability", func(ctx context.Context) (err error) {
 		out, err = s.repos.Availabilities.Get(ctx, req.GetName())
 		return rpc.ToStatusErr(err)
@@ -37,8 +37,8 @@ func (s *AvailabilityServer) GetAvailability(ctx context.Context, req *rfcavaila
 	return out, err
 }
 
-func (s *AvailabilityServer) ListAvailabilities(ctx context.Context, req *rfcavailabilitypbv1.ListAvailabilitiesRequest) (*rfcavailabilitypbv1.ListAvailabilitiesResponse, error) {
-	out := &rfcavailabilitypbv1.ListAvailabilitiesResponse{}
+func (s *AvailabilityServer) ListAvailabilities(ctx context.Context, req *availabilityv1.ListAvailabilitiesRequest) (*availabilityv1.ListAvailabilitiesResponse, error) {
+	out := &availabilityv1.ListAvailabilitiesResponse{}
 	err := rpc.Traced(ctx, availabilityService, "ListAvailabilities", func(ctx context.Context) (err error) {
 		out.Availabilities, out.NextPageToken, err = s.repos.Availabilities.List(ctx, req.GetParent(),
 			listInput(req.GetPageSize(), req.GetPageToken(), req.GetFilter(), req.GetShowDeleted()))
@@ -47,8 +47,8 @@ func (s *AvailabilityServer) ListAvailabilities(ctx context.Context, req *rfcava
 	return out, err
 }
 
-func (s *AvailabilityServer) CreateAvailability(ctx context.Context, req *rfcavailabilitypbv1.CreateAvailabilityRequest) (*rfcavailabilitypbv1.Availability, error) {
-	var out *rfcavailabilitypbv1.Availability
+func (s *AvailabilityServer) CreateAvailability(ctx context.Context, req *availabilityv1.CreateAvailabilityRequest) (*availabilityv1.Availability, error) {
+	var out *availabilityv1.Availability
 	err := rpc.Traced(ctx, availabilityService, "CreateAvailability", func(ctx context.Context) error {
 		if err := checkID("availability_id", req.GetAvailabilityId()); err != nil {
 			return rpc.ToStatusErr(err)
@@ -61,7 +61,7 @@ func (s *AvailabilityServer) CreateAvailability(ctx context.Context, req *rfcava
 		if id := req.GetAvailabilityId(); id != "" {
 			name = req.GetParent() + "/availabilities/" + id
 		}
-		prepareCreate(in, name)
+		PrepareCreate(in, name)
 		var err error
 		out, err = s.repos.Availabilities.Create(ctx, req.GetParent(), in)
 		return rpc.ToStatusErr(err)
@@ -69,8 +69,8 @@ func (s *AvailabilityServer) CreateAvailability(ctx context.Context, req *rfcava
 	return out, err
 }
 
-func (s *AvailabilityServer) UpdateAvailability(ctx context.Context, req *rfcavailabilitypbv1.UpdateAvailabilityRequest) (*rfcavailabilitypbv1.Availability, error) {
-	var out *rfcavailabilitypbv1.Availability
+func (s *AvailabilityServer) UpdateAvailability(ctx context.Context, req *availabilityv1.UpdateAvailabilityRequest) (*availabilityv1.Availability, error) {
+	var out *availabilityv1.Availability
 	err := rpc.Traced(ctx, availabilityService, "UpdateAvailability", func(ctx context.Context) error {
 		paths, err := updatePaths(req.GetAvailability(), req.GetUpdateMask())
 		if err != nil {
@@ -82,7 +82,7 @@ func (s *AvailabilityServer) UpdateAvailability(ctx context.Context, req *rfcava
 	return out, err
 }
 
-func (s *AvailabilityServer) DeleteAvailability(ctx context.Context, req *rfcavailabilitypbv1.DeleteAvailabilityRequest) (*emptypb.Empty, error) {
+func (s *AvailabilityServer) DeleteAvailability(ctx context.Context, req *availabilityv1.DeleteAvailabilityRequest) (*emptypb.Empty, error) {
 	err := rpc.Traced(ctx, availabilityService, "DeleteAvailability", func(ctx context.Context) error {
 		return rpc.ToStatusErr(s.repos.Availabilities.Delete(ctx, req.GetName()))
 	})
@@ -92,8 +92,8 @@ func (s *AvailabilityServer) DeleteAvailability(ctx context.Context, req *rfcava
 	return &emptypb.Empty{}, nil
 }
 
-func (s *AvailabilityServer) UndeleteAvailability(ctx context.Context, req *rfcavailabilitypbv1.UndeleteAvailabilityRequest) (*rfcavailabilitypbv1.Availability, error) {
-	var out *rfcavailabilitypbv1.Availability
+func (s *AvailabilityServer) UndeleteAvailability(ctx context.Context, req *availabilityv1.UndeleteAvailabilityRequest) (*availabilityv1.Availability, error) {
+	var out *availabilityv1.Availability
 	err := rpc.Traced(ctx, availabilityService, "UndeleteAvailability", func(ctx context.Context) (err error) {
 		out, err = s.repos.Availabilities.Undelete(ctx, req.GetName())
 		return rpc.ToStatusErr(err)

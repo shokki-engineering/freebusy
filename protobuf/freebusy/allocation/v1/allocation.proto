@@ -147,6 +147,18 @@ message Allocation {
     ]
   };
 
+  // The engine's one invariant, held by the database rather than by every
+  // writer remembering a lock: no two allocations of one resource may cover
+  // overlapping time. Two holds racing for the last court both reach the
+  // insert; the second fails as a conflict and re-plans.
+  option (store.v1.table) = {
+    no_overlap: {
+      key: ["resource"]
+      start: "start_time"
+      end: "end_time"
+    }
+  };
+
   option (google.api.resource) = {
     type: "freebusy.allocation.v1/Allocation"
     pattern: "organizationalUnits/{organizational_unit}/allocations/{allocation}"

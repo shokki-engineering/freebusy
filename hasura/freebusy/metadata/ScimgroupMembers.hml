@@ -1,0 +1,181 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: ScimgroupMembers
+  fields:
+    - name: attributeType
+      type: String_1
+    - name: display
+      type: String_1
+    - name: groupId
+      type: String_1!
+    - name: id
+      type: String_1!
+    - name: referenceUri
+      type: String_1
+    - name: value
+      type: String_1!
+  graphql:
+    typeName: ScimgroupMembers
+    inputTypeName: ScimgroupMembersInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: scimgroup_members
+      fieldMapping:
+        attributeType:
+          column:
+            name: attribute_type
+        display:
+          column:
+            name: display
+        groupId:
+          column:
+            name: group_id
+        id:
+          column:
+            name: id
+        referenceUri:
+          column:
+            name: reference_uri
+        value:
+          column:
+            name: value
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: ScimgroupMembers
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - attributeType
+          - display
+          - groupId
+          - id
+          - referenceUri
+          - value
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: ScimgroupMembersBoolExp
+  operand:
+    object:
+      type: ScimgroupMembers
+      comparableFields:
+        - fieldName: attributeType
+          booleanExpressionType: TextBoolExp
+        - fieldName: display
+          booleanExpressionType: TextBoolExp
+        - fieldName: groupId
+          booleanExpressionType: TextBoolExp
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: referenceUri
+          booleanExpressionType: TextBoolExp
+        - fieldName: value
+          booleanExpressionType: TextBoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: ScimgroupMembersBoolExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: ScimgroupMembersAggExp
+  operand:
+    object:
+      aggregatedType: ScimgroupMembers
+      aggregatableFields:
+        - fieldName: attributeType
+          aggregateExpression: TextAggExp
+        - fieldName: display
+          aggregateExpression: TextAggExp
+        - fieldName: groupId
+          aggregateExpression: TextAggExp
+        - fieldName: id
+          aggregateExpression: TextAggExp
+        - fieldName: referenceUri
+          aggregateExpression: TextAggExp
+        - fieldName: value
+          aggregateExpression: TextAggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: ScimgroupMembersAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: ScimgroupMembersOrderByExp
+  operand:
+    object:
+      orderedType: ScimgroupMembers
+      orderableFields:
+        - fieldName: attributeType
+          orderByExpression: String1OrderByExp
+        - fieldName: display
+          orderByExpression: String1OrderByExp
+        - fieldName: groupId
+          orderByExpression: String1OrderByExp
+        - fieldName: id
+          orderByExpression: String1OrderByExp
+        - fieldName: referenceUri
+          orderByExpression: String1OrderByExp
+        - fieldName: value
+          orderByExpression: String1OrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: ScimgroupMembersOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: ScimgroupMembers
+  objectType: ScimgroupMembers
+  source:
+    dataConnectorName: freebusy_pgsql
+    collection: scimgroup_members
+  filterExpressionType: ScimgroupMembersBoolExp
+  aggregateExpression: ScimgroupMembersAggExp
+  orderByExpression: ScimgroupMembersOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: scimgroupMembers
+      subscription:
+        rootField: scimgroupMembers
+    selectUniques:
+      - queryRootField: scimgroupMembersById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: scimgroupMembersById
+    filterInputTypeName: ScimgroupMembersFilterInput
+    aggregate:
+      queryRootField: scimgroupMembersAggregate
+      subscription:
+        rootField: scimgroupMembersAggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: ScimgroupMembers
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+

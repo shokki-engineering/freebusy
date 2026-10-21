@@ -13,7 +13,7 @@ import (
 	"context"
 	"time"
 
-	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
@@ -41,7 +41,7 @@ type ResourceQuery struct {
 // ResourceRecord is one RFC 9073 resource as stored, with the one fact about it
 // that lives elsewhere: its calendar's time zone.
 type ResourceRecord struct {
-	Resource *resourcepbv1.Resource
+	Resource *resourcev1.Resource
 	// TimeZone is the IANA zone of the resource's RFC 5545 calendar, empty
 	// when it names no calendar or the calendar names no zone.
 	TimeZone string

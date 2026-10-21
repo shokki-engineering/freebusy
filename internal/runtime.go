@@ -7,21 +7,21 @@ import (
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/event/v1/eventv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc7953/availability/v1/availabilityv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc9073/resource/v1/resourcev1grpc"
+	"github.com/oh-tarnished/freebusy/config"
+	"github.com/oh-tarnished/freebusy/internal/caldav"
 	"github.com/oh-tarnished/freebusy/internal/database"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
-	allocationdb "github.com/oh-tarnished/freebusy/internal/service/allocation/db"
 	"github.com/oh-tarnished/freebusy/internal/service/reservation"
-	reservationdb "github.com/oh-tarnished/freebusy/internal/service/reservation/db"
 	"github.com/oh-tarnished/freebusy/internal/service/rfcsvc"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
-	calendarv1gw "github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc5545/calendar/v1"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc5545/calendar/v1/calendarv1gw"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc5545/calendar/v1/calendarv1mcp"
-	eventv1gw "github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc5545/event/v1"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc5545/event/v1/eventv1gw"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc5545/event/v1/eventv1mcp"
-	availabilityv1gw "github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc7953/availability/v1"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc7953/availability/v1/availabilityv1gw"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc7953/availability/v1/availabilityv1mcp"
-	resourcev1gw "github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc9073/resource/v1"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc9073/resource/v1/resourcev1gw"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc9073/resource/v1/resourcev1mcp"
 	"github.com/the-protobuf-project/runtime-go/grpc"
 )
@@ -38,13 +38,17 @@ func newServiceInstance(conn *database.Connection) (*Service, error) {
 		}
 		conn = opened
 	}
-	engine := allocation.NewServer(allocationdb.New(conn))
+	engine := allocation.NewServer(allocationStore(conn))
+	repos := rfcsvc.NewRepositories(conn.Repox())
 	svc := NewService(
 		engine,
-		reservation.NewServer(reservationdb.New(conn), engine),
-		rfcsvc.NewRepositories(conn.Repox()),
+		reservation.NewServer(reservationStore(conn), engine),
+		repos,
 	)
 	svc.conn = conn
+	if config.Get().CalDAV.Enabled {
+		svc.caldav = caldav.New(repos, engine)
+	}
 	return svc, nil
 }
 
@@ -87,8 +91,9 @@ func NewGRPCServer(conn *database.Connection) (*grpc.GRPCServer, *Service, error
 }
 
 // registerHTTPGateways returns a server option that registers the REST gateways
-// so protobuf RPCs are also reachable over HTTP/JSON.
-func registerHTTPGateways() grpc.Option {
+// so protobuf RPCs are also reachable over HTTP/JSON, and mounts CalDAV on the
+// same mux when it is enabled.
+func registerHTTPGateways(svc *Service) grpc.Option {
 	return grpc.WithHTTPGateways(func(mux *grpc.ServeMux, endpoint string, opts []grpc.DialOption) error {
 		if err := allocationpbv1.RegisterAllocationServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
 			return err
@@ -106,6 +111,9 @@ func registerHTTPGateways() grpc.Option {
 			if err := register(context.Background(), mux, endpoint, opts); err != nil {
 				return err
 			}
+		}
+		if svc.caldav != nil {
+			return svc.caldav.Mount(mux)
 		}
 		return nil
 	})

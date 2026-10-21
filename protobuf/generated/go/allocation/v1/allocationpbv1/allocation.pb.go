@@ -561,7 +561,7 @@ const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	" \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
 	"updateTime\x12\x17\n" +
 	"\x04etag\x18\v \x01(\tB\x03\xe0A\x03R\x04etag:k\xeaAb\n" +
-	"\x1bfreebusy.allocation.v1/Hold\x126organizationalUnits/{organizational_unit}/holds/{hold}*\x05holds2\x04hold\xca\xf3\x18\x02\x18\x01J\x04\b\a\x10\b\"\xd4\x04\n" +
+	"\x1bfreebusy.allocation.v1/Hold\x126organizationalUnits/{organizational_unit}/holds/{hold}*\x05holds2\x04hold\xca\xf3\x18\x02\x18\x01J\x04\b\a\x10\b\"\xfa\x04\n" +
 	"\n" +
 	"Allocation\x12\x17\n" +
 	"\x04name\x18\x01 \x01(\tB\x03\xe0A\bR\x04name\x12E\n" +
@@ -575,9 +575,11 @@ const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	"\vcreate_time\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
 	"createTime\x127\n" +
 	"\x04hold\x18\a \x01(\tB#\xe0A\x03\xfaA\x1d\n" +
-	"\x1bfreebusy.allocation.v1/HoldR\x04hold:\xac\x01\xeaA\x80\x01\n" +
+	"\x1bfreebusy.allocation.v1/HoldR\x04hold:\xd2\x01\xeaA\x80\x01\n" +
 	"!freebusy.allocation.v1/Allocation\x12BorganizationalUnits/{organizational_unit}/allocations/{allocation}*\vallocations2\n" +
-	"allocation\xca\xf3\x18$\x18\x01* \n" +
+	"allocationҵ\x18\"\x12 \n" +
+	"\bresource\x12\n" +
+	"start_time\x1a\bend_time\xca\xf3\x18$\x18\x01* \n" +
 	"\bresource\n" +
 	"\n" +
 	"start_time\n" +

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/calendar/v1/calendarv1grpc"
-	calendarpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
 	"github.com/oh-tarnished/freebusy/internal/runtime/rpc"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
@@ -29,8 +29,8 @@ func NewCalendarServer(repos Repositories, fb FreeBusyQuerier) *CalendarServer {
 
 const calendarService = "Calendars"
 
-func (s *CalendarServer) GetCalendar(ctx context.Context, req *calendarpbv1.GetCalendarRequest) (*calendarpbv1.Calendar, error) {
-	var out *calendarpbv1.Calendar
+func (s *CalendarServer) GetCalendar(ctx context.Context, req *calendarv1.GetCalendarRequest) (*calendarv1.Calendar, error) {
+	var out *calendarv1.Calendar
 	err := rpc.Traced(ctx, calendarService, "GetCalendar", func(ctx context.Context) (err error) {
 		out, err = s.repos.Calendars.Get(ctx, req.GetName())
 		return rpc.ToStatusErr(err)
@@ -38,8 +38,8 @@ func (s *CalendarServer) GetCalendar(ctx context.Context, req *calendarpbv1.GetC
 	return out, err
 }
 
-func (s *CalendarServer) ListCalendars(ctx context.Context, req *calendarpbv1.ListCalendarsRequest) (*calendarpbv1.ListCalendarsResponse, error) {
-	out := &calendarpbv1.ListCalendarsResponse{}
+func (s *CalendarServer) ListCalendars(ctx context.Context, req *calendarv1.ListCalendarsRequest) (*calendarv1.ListCalendarsResponse, error) {
+	out := &calendarv1.ListCalendarsResponse{}
 	err := rpc.Traced(ctx, calendarService, "ListCalendars", func(ctx context.Context) (err error) {
 		out.Calendars, out.NextPageToken, err = s.repos.Calendars.List(ctx,
 			listInput(req.GetPageSize(), req.GetPageToken(), req.GetFilter(), req.GetShowDeleted()))
@@ -48,8 +48,8 @@ func (s *CalendarServer) ListCalendars(ctx context.Context, req *calendarpbv1.Li
 	return out, err
 }
 
-func (s *CalendarServer) CreateCalendar(ctx context.Context, req *calendarpbv1.CreateCalendarRequest) (*calendarpbv1.Calendar, error) {
-	var out *calendarpbv1.Calendar
+func (s *CalendarServer) CreateCalendar(ctx context.Context, req *calendarv1.CreateCalendarRequest) (*calendarv1.Calendar, error) {
+	var out *calendarv1.Calendar
 	err := rpc.Traced(ctx, calendarService, "CreateCalendar", func(ctx context.Context) error {
 		if err := checkID("calendar_id", req.GetCalendarId()); err != nil {
 			return rpc.ToStatusErr(err)
@@ -59,7 +59,7 @@ func (s *CalendarServer) CreateCalendar(ctx context.Context, req *calendarpbv1.C
 		if id := req.GetCalendarId(); id != "" {
 			name = "calendars/" + id
 		}
-		prepareCreate(in, name)
+		PrepareCreate(in, name)
 		var err error
 		out, err = s.repos.Calendars.Create(ctx, in)
 		return rpc.ToStatusErr(err)
@@ -67,8 +67,8 @@ func (s *CalendarServer) CreateCalendar(ctx context.Context, req *calendarpbv1.C
 	return out, err
 }
 
-func (s *CalendarServer) UpdateCalendar(ctx context.Context, req *calendarpbv1.UpdateCalendarRequest) (*calendarpbv1.Calendar, error) {
-	var out *calendarpbv1.Calendar
+func (s *CalendarServer) UpdateCalendar(ctx context.Context, req *calendarv1.UpdateCalendarRequest) (*calendarv1.Calendar, error) {
+	var out *calendarv1.Calendar
 	err := rpc.Traced(ctx, calendarService, "UpdateCalendar", func(ctx context.Context) error {
 		paths, err := updatePaths(req.GetCalendar(), req.GetUpdateMask())
 		if err != nil {
@@ -84,7 +84,7 @@ func (s *CalendarServer) UpdateCalendar(ctx context.Context, req *calendarpbv1.U
 // still has live events or availability, as AIP-135 asks of a parent; with
 // force those children are soft-deleted first, so the engine stops reading
 // them in the same breath. Undelete restores only the calendar itself.
-func (s *CalendarServer) DeleteCalendar(ctx context.Context, req *calendarpbv1.DeleteCalendarRequest) (*emptypb.Empty, error) {
+func (s *CalendarServer) DeleteCalendar(ctx context.Context, req *calendarv1.DeleteCalendarRequest) (*emptypb.Empty, error) {
 	err := rpc.Traced(ctx, calendarService, "DeleteCalendar", func(ctx context.Context) error {
 		name := req.GetName()
 		if _, err := s.repos.Calendars.Get(ctx, name); err != nil {
@@ -135,8 +135,8 @@ func (s *CalendarServer) deleteChildren(ctx context.Context, calendar string, fo
 	}
 }
 
-func (s *CalendarServer) UndeleteCalendar(ctx context.Context, req *calendarpbv1.UndeleteCalendarRequest) (*calendarpbv1.Calendar, error) {
-	var out *calendarpbv1.Calendar
+func (s *CalendarServer) UndeleteCalendar(ctx context.Context, req *calendarv1.UndeleteCalendarRequest) (*calendarv1.Calendar, error) {
+	var out *calendarv1.Calendar
 	err := rpc.Traced(ctx, calendarService, "UndeleteCalendar", func(ctx context.Context) (err error) {
 		out, err = s.repos.Calendars.Undelete(ctx, req.GetName())
 		return rpc.ToStatusErr(err)
@@ -149,8 +149,8 @@ func (s *CalendarServer) UndeleteCalendar(ctx context.Context, req *calendarpbv1
 // BUSY_TENTATIVE, and time its availability does not offer
 // BUSY_UNAVAILABLE. Free time is not listed; it is whatever the periods
 // leave. Periods come back in start order and never overlap.
-func (s *CalendarServer) QueryFreeBusy(ctx context.Context, req *calendarpbv1.QueryFreeBusyRequest) (*calendarpbv1.QueryFreeBusyResponse, error) {
-	out := &calendarpbv1.QueryFreeBusyResponse{}
+func (s *CalendarServer) QueryFreeBusy(ctx context.Context, req *calendarv1.QueryFreeBusyRequest) (*calendarv1.QueryFreeBusyResponse, error) {
+	out := &calendarv1.QueryFreeBusyResponse{}
 	err := rpc.Traced(ctx, calendarService, "QueryFreeBusy", func(ctx context.Context) error {
 		window, err := windowOf(req.GetWindow())
 		if err != nil {
@@ -172,24 +172,24 @@ func (s *CalendarServer) QueryFreeBusy(ctx context.Context, req *calendarpbv1.Qu
 
 // freeBusyPeriods flattens the engine's three disjoint sets into one
 // start-ordered list.
-func freeBusyPeriods(fb allocation.FreeBusy) []*calendarpbv1.FreeBusyPeriod {
+func freeBusyPeriods(fb allocation.FreeBusy) []*calendarv1.FreeBusyPeriod {
 	type typed struct {
 		span engine.Span
-		kind calendarpbv1.BusyType
+		kind calendarv1.BusyType
 	}
 	var all []typed
-	add := func(spans engine.Spans, kind calendarpbv1.BusyType) {
+	add := func(spans engine.Spans, kind calendarv1.BusyType) {
 		for _, sp := range spans {
 			all = append(all, typed{sp, kind})
 		}
 	}
-	add(fb.Busy, calendarpbv1.BusyType_BUSY_TYPE_BUSY)
-	add(fb.Tentative, calendarpbv1.BusyType_BUSY_TYPE_BUSY_TENTATIVE)
-	add(fb.Unavailable, calendarpbv1.BusyType_BUSY_TYPE_BUSY_UNAVAILABLE)
+	add(fb.Busy, calendarv1.BusyType_BUSY_TYPE_BUSY)
+	add(fb.Tentative, calendarv1.BusyType_BUSY_TYPE_BUSY_TENTATIVE)
+	add(fb.Unavailable, calendarv1.BusyType_BUSY_TYPE_BUSY_UNAVAILABLE)
 	sortBy(all, func(a, b typed) bool { return a.span.Start.Before(b.span.Start) })
-	out := make([]*calendarpbv1.FreeBusyPeriod, 0, len(all))
+	out := make([]*calendarv1.FreeBusyPeriod, 0, len(all))
 	for _, t := range all {
-		out = append(out, &calendarpbv1.FreeBusyPeriod{Period: allocation.IntervalOf(t.span), BusyType: t.kind})
+		out = append(out, &calendarv1.FreeBusyPeriod{Period: allocation.IntervalOf(t.span), BusyType: t.kind})
 	}
 	return out
 }

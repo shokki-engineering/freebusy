@@ -1,0 +1,156 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertScimgroupGroupsObject
+  fields:
+    - name: createTime
+      type: Timestamptz!
+    - name: deleteTime
+      type: Timestamptz
+    - name: displayName
+      type: String_1!
+    - name: etag
+      type: String_1
+    - name: expireTime
+      type: Timestamptz
+    - name: externalUid
+      type: String_1
+    - name: id
+      type: String_1!
+    - name: name
+      type: String_1!
+    - name: uid
+      type: String_1
+    - name: updateTime
+      type: Timestamptz!
+  graphql:
+    typeName: InsertScimgroupGroupsObject
+    inputTypeName: InsertScimgroupGroupsObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_scimgroup_groups_object
+      fieldMapping:
+        createTime:
+          column:
+            name: create_time
+        deleteTime:
+          column:
+            name: delete_time
+        displayName:
+          column:
+            name: display_name
+        etag:
+          column:
+            name: etag
+        expireTime:
+          column:
+            name: expire_time
+        externalUid:
+          column:
+            name: external_uid
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        uid:
+          column:
+            name: uid
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertScimgroupGroupsObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createTime
+          - deleteTime
+          - displayName
+          - etag
+          - expireTime
+          - externalUid
+          - id
+          - name
+          - uid
+          - updateTime
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertScimgroupGroupsResponse
+  description: Responses from the 'insert_scimgroup_groups' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[ScimgroupGroups!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertScimgroupGroupsResponse
+    inputTypeName: InsertScimgroupGroupsResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_scimgroup_groups_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertScimgroupGroupsResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertScimgroupGroups
+  outputType: InsertScimgroupGroupsResponse!
+  arguments:
+    - name: objects
+      type: "[InsertScimgroupGroupsObject!]!"
+    - name: postCheck
+      type: ScimgroupGroupsBoolExp
+      description: Insert permission predicate over the 'scimgroup_groups' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: insert_scimgroup_groups
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertScimgroupGroups
+    rootFieldKind: Mutation
+  description: Insert into the scimgroup_groups table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertScimgroupGroups
+  permissions:
+    - role: admin
+      allowExecution: true
+

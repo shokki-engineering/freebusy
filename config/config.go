@@ -36,6 +36,16 @@ type AppConfig struct {
 	// service is correct without it, and a cache that is on before anyone has
 	// measured the read it serves is just another thing that can be stale.
 	Cache CacheConfig `koanf:"cache"`
+	// CalDAV is the RFC 4791 server mounted on the HTTP port.
+	CalDAV CalDAVConfig `koanf:"caldav"`
+}
+
+// CalDAVConfig switches the CalDAV server (internal/caldav) on. It has no
+// authentication yet -- every request acts as one principal -- so it is a
+// development surface: on in freebusy.dev.toml, off in the release defaults.
+type CalDAVConfig struct {
+	// Enabled mounts CalDAV under /dav/ on the HTTP gateway's port.
+	Enabled bool `koanf:"enabled"`
 }
 
 // CacheConfig is the backend behind protoc-gen-cache's generated decorators.

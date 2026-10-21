@@ -11,6 +11,7 @@ import (
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/event/v1/eventv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc7953/availability/v1/availabilityv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc9073/resource/v1/resourcev1grpc"
+	"github.com/oh-tarnished/freebusy/internal/caldav"
 	"github.com/oh-tarnished/freebusy/internal/database"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
 	"github.com/oh-tarnished/freebusy/internal/service/reservation"
@@ -45,6 +46,9 @@ type Service struct {
 	// conn is the shared database connection every domain runs on, retained so
 	// StartBackground can publish its pool health.
 	conn *database.Connection
+	// caldav is the CalDAV server, mounted on the HTTP gateway's mux; nil
+	// unless [caldav] enabled.
+	caldav *caldav.Handler
 }
 
 // NewService wraps the assembled service servers as the registered Service.

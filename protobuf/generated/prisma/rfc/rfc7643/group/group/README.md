@@ -25,7 +25,7 @@ erDiagram
 
 Schema file: [`group.postgres.prisma`](./group.postgres.prisma)
 
-### `Group` → `resource`
+### `Group` → `groups`
 
 Group is the SCIM Group resource, RFC 7643 section 4.2 <https://www.rfc-editor.org/rfc/rfc7643.html#section-4.2>. **The canonical group model** under rule 14, holding the plain name RFC 4519's `groupOfNames` gave up when it became `LdapGroup`. Membership is a field here, not a separate resource. That is the opposite of the choice protobuf.rfc4519.membership.v1 made, and deliberately so: section 4.2 defines `members` as an attribute of the Group and RFC 7644 changes it by PATCHing the Group, so a separate Membership resource would invent an addressing scheme SCIM does not have. The LDAP package split it out because `member` there is a bare DN with no room for a role; SCIM's member has `type` and `$ref` and needs no such rescue. The cost is the one rule 6 already names in reverse: creating a group with members is one call here and two in the LDAP package, and the two lineages therefore do not have matching call graphs. Reference: RFC 7643 "System for Cross-domain Identity Management: Core Schema", section 4.2. https://www.rfc-editor.org/rfc/rfc7643.html#section-4.2
 

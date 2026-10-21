@@ -42,6 +42,7 @@ CalendarTime is an iCalendar DATE or DATE-TIME value, RFC 5545 sections 3.3.4 <h
 | `id` | `CHAR(26)` | not null |
 | `date` | `DATE` | nullable |
 | `date_time` | `TIMESTAMPTZ` | nullable |
+| `date_time_zone` | `VARCHAR(255)` | nullable |
 | `value_case` | `AvailabilityCalendarTimeValueCase` | nullable |
 
 ### `AvailabilityExtensionProperty` → `extension_properties`

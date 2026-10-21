@@ -1,0 +1,496 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnScimgroupGroupsCreateTime
+  description: Update the 'create_time' column in the 'scimgroup_groups' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnScimgroupGroupsCreateTime
+    inputTypeName: UpdateColumnScimgroupGroupsCreateTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_scimgroup_groups_create_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnScimgroupGroupsCreateTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnScimgroupGroupsDeleteTime
+  description: Update the 'delete_time' column in the 'scimgroup_groups' collection
+  fields:
+    - name: set
+      type: Timestamptz
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnScimgroupGroupsDeleteTime
+    inputTypeName: UpdateColumnScimgroupGroupsDeleteTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_scimgroup_groups_delete_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnScimgroupGroupsDeleteTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnScimgroupGroupsDisplayName
+  description: Update the 'display_name' column in the 'scimgroup_groups' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnScimgroupGroupsDisplayName
+    inputTypeName: UpdateColumnScimgroupGroupsDisplayNameInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_scimgroup_groups_display_name
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnScimgroupGroupsDisplayName
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnScimgroupGroupsEtag
+  description: Update the 'etag' column in the 'scimgroup_groups' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnScimgroupGroupsEtag
+    inputTypeName: UpdateColumnScimgroupGroupsEtagInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_scimgroup_groups_etag
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnScimgroupGroupsEtag
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnScimgroupGroupsExpireTime
+  description: Update the 'expire_time' column in the 'scimgroup_groups' collection
+  fields:
+    - name: set
+      type: Timestamptz
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnScimgroupGroupsExpireTime
+    inputTypeName: UpdateColumnScimgroupGroupsExpireTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_scimgroup_groups_expire_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnScimgroupGroupsExpireTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnScimgroupGroupsExternalUid
+  description: Update the 'external_uid' column in the 'scimgroup_groups' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnScimgroupGroupsExternalUid
+    inputTypeName: UpdateColumnScimgroupGroupsExternalUidInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_scimgroup_groups_external_uid
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnScimgroupGroupsExternalUid
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnScimgroupGroupsId
+  description: Update the 'id' column in the 'scimgroup_groups' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnScimgroupGroupsId
+    inputTypeName: UpdateColumnScimgroupGroupsIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_scimgroup_groups_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnScimgroupGroupsId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnScimgroupGroupsName
+  description: Update the 'name' column in the 'scimgroup_groups' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnScimgroupGroupsName
+    inputTypeName: UpdateColumnScimgroupGroupsNameInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_scimgroup_groups_name
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnScimgroupGroupsName
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnScimgroupGroupsUid
+  description: Update the 'uid' column in the 'scimgroup_groups' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnScimgroupGroupsUid
+    inputTypeName: UpdateColumnScimgroupGroupsUidInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_scimgroup_groups_uid
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnScimgroupGroupsUid
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnScimgroupGroupsUpdateTime
+  description: Update the 'update_time' column in the 'scimgroup_groups' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnScimgroupGroupsUpdateTime
+    inputTypeName: UpdateColumnScimgroupGroupsUpdateTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_scimgroup_groups_update_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnScimgroupGroupsUpdateTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateScimgroupGroupsByIdUpdateColumns
+  description: Update the columns of the 'scimgroup_groups' collection
+  fields:
+    - name: createTime
+      type: UpdateColumnScimgroupGroupsCreateTime
+      description: Update the 'create_time' column in the 'scimgroup_groups' collection.
+    - name: deleteTime
+      type: UpdateColumnScimgroupGroupsDeleteTime
+      description: Update the 'delete_time' column in the 'scimgroup_groups' collection.
+    - name: displayName
+      type: UpdateColumnScimgroupGroupsDisplayName
+      description: Update the 'display_name' column in the 'scimgroup_groups' collection.
+    - name: etag
+      type: UpdateColumnScimgroupGroupsEtag
+      description: Update the 'etag' column in the 'scimgroup_groups' collection.
+    - name: expireTime
+      type: UpdateColumnScimgroupGroupsExpireTime
+      description: Update the 'expire_time' column in the 'scimgroup_groups' collection.
+    - name: externalUid
+      type: UpdateColumnScimgroupGroupsExternalUid
+      description: Update the 'external_uid' column in the 'scimgroup_groups' collection.
+    - name: id
+      type: UpdateColumnScimgroupGroupsId
+      description: Update the 'id' column in the 'scimgroup_groups' collection.
+    - name: name
+      type: UpdateColumnScimgroupGroupsName
+      description: Update the 'name' column in the 'scimgroup_groups' collection.
+    - name: uid
+      type: UpdateColumnScimgroupGroupsUid
+      description: Update the 'uid' column in the 'scimgroup_groups' collection.
+    - name: updateTime
+      type: UpdateColumnScimgroupGroupsUpdateTime
+      description: Update the 'update_time' column in the 'scimgroup_groups' collection.
+  graphql:
+    typeName: UpdateScimgroupGroupsByIdUpdateColumns
+    inputTypeName: UpdateScimgroupGroupsByIdUpdateColumnsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_scimgroup_groups_by_id_update_columns
+      fieldMapping:
+        createTime:
+          column:
+            name: create_time
+        deleteTime:
+          column:
+            name: delete_time
+        displayName:
+          column:
+            name: display_name
+        etag:
+          column:
+            name: etag
+        expireTime:
+          column:
+            name: expire_time
+        externalUid:
+          column:
+            name: external_uid
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        uid:
+          column:
+            name: uid
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateScimgroupGroupsByIdUpdateColumns
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createTime
+          - deleteTime
+          - displayName
+          - etag
+          - expireTime
+          - externalUid
+          - id
+          - name
+          - uid
+          - updateTime
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateScimgroupGroupsByIdResponse
+  description: Responses from the 'update_scimgroup_groups_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[ScimgroupGroups!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: UpdateScimgroupGroupsByIdResponse
+    inputTypeName: UpdateScimgroupGroupsByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_scimgroup_groups_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateScimgroupGroupsByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: UpdateScimgroupGroupsById
+  outputType: UpdateScimgroupGroupsByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: postCheck
+      type: ScimgroupGroupsBoolExp
+      description: Update permission post-condition predicate over the
+        'scimgroup_groups' collection
+    - name: preCheck
+      type: ScimgroupGroupsBoolExp
+      description: Update permission pre-condition predicate over the
+        'scimgroup_groups' collection
+    - name: updateColumns
+      type: UpdateScimgroupGroupsByIdUpdateColumns!
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: update_scimgroup_groups_by_id
+    argumentMapping:
+      keyId: key_id
+      postCheck: post_check
+      preCheck: pre_check
+      updateColumns: update_columns
+  graphql:
+    rootFieldName: updateScimgroupGroupsById
+    rootFieldKind: Mutation
+  description: Update any row on the 'scimgroup_groups' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: UpdateScimgroupGroupsById
+  permissions:
+    - role: admin
+      allowExecution: true
+

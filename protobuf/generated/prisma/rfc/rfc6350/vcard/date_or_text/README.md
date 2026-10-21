@@ -29,6 +29,7 @@ DateOrText is vCard's DATE-AND-OR-TIME value type, RFC 6350 section 4.3.4 <https
 | `id` | `CHAR(26)` | not null |
 | `date` | `DATE` | nullable |
 | `date_time` | `TIMESTAMPTZ` | nullable |
+| `date_time_zone` | `VARCHAR(255)` | nullable |
 | `text` | `VARCHAR(255)` | nullable |
 | `value_case` | `DateOrTextValueCase` | nullable |
 

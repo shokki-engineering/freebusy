@@ -5,16 +5,63 @@ import (
 	"strings"
 	"time"
 
-	eventpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
 	"github.com/oh-tarnished/freebusy/internal/types"
 	"google.golang.org/genproto/googleapis/type/date"
 	"google.golang.org/genproto/googleapis/type/datetime"
-	"google.golang.org/genproto/googleapis/type/dayofweek"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
+
+// Instances returns e's occurrences overlapping window: the instances of a
+// recurring event, as expand gives them, or e itself when it is a single
+// occurrence that overlaps. A CalDAV time-range filter and its expand
+// element read the same answer ExpandEvent does.
+func Instances(e *eventv1.Event, loc *time.Location, window engine.Span) ([]*eventv1.Event, error) {
+	if e.GetRecurrence() != nil {
+		return expand(e, loc, window)
+	}
+	sp, err := EventSpan(e, loc)
+	if err != nil {
+		return nil, err
+	}
+	// A zero-length event occupies its instant: it overlaps a window that
+	// contains it, RFC 4791 section 9.9.
+	if sp.Empty() {
+		if !sp.Start.Before(window.Start) && sp.Start.Before(window.End) {
+			return []*eventv1.Event{e}, nil
+		}
+		return nil, nil
+	}
+	if sp.Overlaps(window) {
+		return []*eventv1.Event{e}, nil
+	}
+	return nil, nil
+}
+
+// EventSpan is the time one event occurrence covers, its ends read in the
+// calendar's zone loc: DTEND, or DTSTART plus DURATION, or a whole day for a
+// DATE with neither, RFC 5545 section 3.6.1.
+func EventSpan(e *eventv1.Event, loc *time.Location) (engine.Span, error) {
+	start, f, err := readTime(e.GetStart(), loc)
+	if err != nil {
+		return engine.Span{}, err
+	}
+	end := start
+	switch {
+	case e.GetDuration() != nil:
+		end = start.Add(e.GetDuration().AsDuration())
+	case e.GetEnd() != nil:
+		if end, _, err = readTime(e.GetEnd(), loc); err != nil {
+			return engine.Span{}, err
+		}
+	case f.date:
+		end = start.Add(24 * time.Hour)
+	}
+	return engine.Span{Start: start, End: end}, nil
+}
 
 // expand materialises e's instances overlapping window. It uses the engine's
 // RRULE expander, so an instance listed here is exactly the busy time the
@@ -23,7 +70,7 @@ import (
 //
 // Instances keep the event's own time form -- a DATE stays a DATE, a zoned
 // DATE-TIME keeps its zone -- and carry no name: none is a stored resource.
-func expand(e *eventpbv1.Event, loc *time.Location, window engine.Span) ([]*eventpbv1.Event, error) {
+func expand(e *eventv1.Event, loc *time.Location, window engine.Span) ([]*eventv1.Event, error) {
 	rec := e.GetRecurrence()
 	if rec == nil {
 		return nil, fmt.Errorf("%w: %s has no recurrence rule", types.ErrInvalidState, e.GetName())
@@ -92,14 +139,14 @@ func expand(e *eventpbv1.Event, loc *time.Location, window engine.Span) ([]*even
 	}
 	sortBy(starts, time.Time.Before)
 
-	out := make([]*eventpbv1.Event, 0, len(starts))
+	out := make([]*eventv1.Event, 0, len(starts))
 	for _, t := range starts {
-		inst := proto.Clone(e).(*eventpbv1.Event)
+		inst := proto.Clone(e).(*eventv1.Event)
 		inst.Name, inst.Etag = "", ""
 		inst.Recurrence, inst.ExcludedTimes, inst.AdditionalTimes = nil, nil, nil
 		inst.Start = startForm.render(t)
 		if e.GetEnd() != nil {
-			inst.Ends = &eventpbv1.Event_End{End: endForm.render(t.Add(dur))}
+			inst.Ends = &eventv1.Event_End{End: endForm.render(t.Add(dur))}
 		}
 		out = append(out, inst)
 	}
@@ -120,7 +167,7 @@ type timeForm struct {
 
 // readTime reads a stored time as an instant. A DATE is local midnight in the
 // calendar's zone loc, and so is a floating DATE-TIME's wall clock.
-func readTime(ct *eventpbv1.CalendarTime, loc *time.Location) (time.Time, timeForm, error) {
+func readTime(ct *eventv1.CalendarTime, loc *time.Location) (time.Time, timeForm, error) {
 	if d := ct.GetDate(); d != nil {
 		return time.Date(int(d.GetYear()), time.Month(d.GetMonth()), int(d.GetDay()), 0, 0, 0, 0, loc),
 			timeForm{date: true, loc: loc}, nil
@@ -133,7 +180,7 @@ func readTime(ct *eventpbv1.CalendarTime, loc *time.Location) (time.Time, timeFo
 	switch {
 	case dt.GetTimeZone() != nil:
 		f.zone = dt.GetTimeZone()
-		f.loc = zoneOf(f.zone.GetId())
+		f.loc = ZoneOf(f.zone.GetId())
 	case dt.GetUtcOffset() != nil:
 		f.offset = dt.GetUtcOffset()
 		f.loc = time.FixedZone("", int(f.offset.AsDuration()/time.Second))
@@ -143,10 +190,10 @@ func readTime(ct *eventpbv1.CalendarTime, loc *time.Location) (time.Time, timeFo
 }
 
 // render writes instant t in form f.
-func (f timeForm) render(t time.Time) *eventpbv1.CalendarTime {
+func (f timeForm) render(t time.Time) *eventv1.CalendarTime {
 	l := t.In(f.loc)
 	if f.date {
-		return &eventpbv1.CalendarTime{Value: &eventpbv1.CalendarTime_Date{Date: &date.Date{
+		return &eventv1.CalendarTime{Value: &eventv1.CalendarTime_Date{Date: &date.Date{
 			Year: int32(l.Year()), Month: int32(l.Month()), Day: int32(l.Day()),
 		}}}
 	}
@@ -160,64 +207,23 @@ func (f timeForm) render(t time.Time) *eventpbv1.CalendarTime {
 	case f.offset != nil:
 		dt.TimeOffset = &datetime.DateTime_UtcOffset{UtcOffset: f.offset}
 	}
-	return &eventpbv1.CalendarTime{Value: &eventpbv1.CalendarTime_DateTime{DateTime: dt}}
+	return &eventv1.CalendarTime{Value: &eventv1.CalendarTime_DateTime{DateTime: dt}}
 }
 
 // recurrenceParts maps a stored recurrence onto the engine's rule parts. A
 // part the engine cannot expand is refused rather than ignored: dropping a
 // BYHOUR would list instances the rule never produces.
-func recurrenceParts(r *eventpbv1.Recurrence, loc *time.Location) (allocation.RecurrenceParts, error) {
-	var unsupported []string
-	note := func(cond bool, part string) {
-		if cond {
-			unsupported = append(unsupported, part)
-		}
-	}
-	note(len(r.GetSecondNumbers()) > 0, "BYSECOND")
-	note(len(r.GetMinuteNumbers()) > 0, "BYMINUTE")
-	note(len(r.GetHourNumbers()) > 0, "BYHOUR")
-	note(len(r.GetYearDays()) > 0, "BYYEARDAY")
-	note(len(r.GetWeekNumbers()) > 0, "BYWEEKNO")
-	note(len(r.GetMonths()) > 0, "BYMONTH")
-	note(len(r.GetSetPositions()) > 0, "BYSETPOS")
-	note(r.GetRscale() != "" || len(r.GetLeapMonths()) > 0, "RSCALE")
-	note(r.GetWeekStart() != dayofweek.DayOfWeek_DAY_OF_WEEK_UNSPECIFIED && r.GetWeekStart() != dayofweek.DayOfWeek_MONDAY, "WKST")
+func recurrenceParts(r *eventv1.Recurrence, loc *time.Location) (allocation.RecurrenceParts, error) {
+	p, unsupported := allocation.RecurrenceFromProto(r, loc)
 	if len(unsupported) > 0 {
-		return allocation.RecurrenceParts{}, fmt.Errorf("%w: rule parts %s are not expanded", types.ErrUnimplemented, strings.Join(unsupported, ", "))
+		return p, fmt.Errorf("%w: rule parts %s are not expanded", types.ErrUnimplemented, strings.Join(unsupported, ", "))
 	}
-	p := allocation.RecurrenceParts{Frequency: strings.TrimPrefix(r.GetFrequency().String(), "FREQUENCY_")}
-	if v := r.GetInterval(); v > 0 {
-		p.Interval = &v
-	}
-	switch b := r.GetBound().(type) {
-	case *eventpbv1.Recurrence_Count:
-		v := b.Count
-		p.Count = &v
-	case *eventpbv1.Recurrence_Until:
-		until, f, err := readTime(b.Until, loc)
-		if err != nil {
-			return p, err
-		}
-		if f.date {
-			// UNTIL as a DATE includes that whole day.
-			until = until.AddDate(0, 0, 1).Add(-time.Nanosecond)
-		}
-		p.Until = &until
-	}
-	for _, d := range r.GetWeekdays() {
-		w := allocation.WeekdayPart{Day: d.GetDay().String()}
-		if o := d.GetOrdinal(); o != 0 {
-			w.Ordinal = &o
-		}
-		p.ByDay = append(p.ByDay, w)
-	}
-	p.MonthDays = r.GetMonthDays()
 	return p, nil
 }
 
-// zoneOf loads an IANA zone, falling back to UTC as the engine does: a bad
+// ZoneOf loads an IANA zone, falling back to UTC as the engine does: a bad
 // zone shifts wall clocks by hours, refusing to answer would be worse.
-func zoneOf(name string) *time.Location {
+func ZoneOf(name string) *time.Location {
 	if name == "" {
 		return time.UTC
 	}

@@ -1,0 +1,229 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: ScimgroupGroups
+  fields:
+    - name: createTime
+      type: Timestamptz!
+    - name: deleteTime
+      type: Timestamptz
+    - name: displayName
+      type: String_1!
+    - name: etag
+      type: String_1
+    - name: expireTime
+      type: Timestamptz
+    - name: externalUid
+      type: String_1
+    - name: id
+      type: String_1!
+    - name: name
+      type: String_1!
+    - name: uid
+      type: String_1
+    - name: updateTime
+      type: Timestamptz!
+  graphql:
+    typeName: ScimgroupGroups
+    inputTypeName: ScimgroupGroupsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: scimgroup_groups
+      fieldMapping:
+        createTime:
+          column:
+            name: create_time
+        deleteTime:
+          column:
+            name: delete_time
+        displayName:
+          column:
+            name: display_name
+        etag:
+          column:
+            name: etag
+        expireTime:
+          column:
+            name: expire_time
+        externalUid:
+          column:
+            name: external_uid
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        uid:
+          column:
+            name: uid
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: ScimgroupGroups
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createTime
+          - deleteTime
+          - displayName
+          - etag
+          - expireTime
+          - externalUid
+          - id
+          - name
+          - uid
+          - updateTime
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: ScimgroupGroupsBoolExp
+  operand:
+    object:
+      type: ScimgroupGroups
+      comparableFields:
+        - fieldName: createTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: deleteTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: displayName
+          booleanExpressionType: TextBoolExp
+        - fieldName: etag
+          booleanExpressionType: TextBoolExp
+        - fieldName: expireTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: externalUid
+          booleanExpressionType: TextBoolExp
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: name
+          booleanExpressionType: TextBoolExp
+        - fieldName: uid
+          booleanExpressionType: TextBoolExp
+        - fieldName: updateTime
+          booleanExpressionType: TimestamptzBoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: ScimgroupGroupsBoolExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: ScimgroupGroupsAggExp
+  operand:
+    object:
+      aggregatedType: ScimgroupGroups
+      aggregatableFields:
+        - fieldName: createTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: deleteTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: displayName
+          aggregateExpression: TextAggExp
+        - fieldName: etag
+          aggregateExpression: TextAggExp
+        - fieldName: expireTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: externalUid
+          aggregateExpression: TextAggExp
+        - fieldName: id
+          aggregateExpression: TextAggExp
+        - fieldName: name
+          aggregateExpression: TextAggExp
+        - fieldName: uid
+          aggregateExpression: TextAggExp
+        - fieldName: updateTime
+          aggregateExpression: TimestamptzAggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: ScimgroupGroupsAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: ScimgroupGroupsOrderByExp
+  operand:
+    object:
+      orderedType: ScimgroupGroups
+      orderableFields:
+        - fieldName: createTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: deleteTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: displayName
+          orderByExpression: String1OrderByExp
+        - fieldName: etag
+          orderByExpression: String1OrderByExp
+        - fieldName: expireTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: externalUid
+          orderByExpression: String1OrderByExp
+        - fieldName: id
+          orderByExpression: String1OrderByExp
+        - fieldName: name
+          orderByExpression: String1OrderByExp
+        - fieldName: uid
+          orderByExpression: String1OrderByExp
+        - fieldName: updateTime
+          orderByExpression: TimestamptzOrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: ScimgroupGroupsOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: ScimgroupGroups
+  objectType: ScimgroupGroups
+  source:
+    dataConnectorName: freebusy_pgsql
+    collection: scimgroup_groups
+  filterExpressionType: ScimgroupGroupsBoolExp
+  aggregateExpression: ScimgroupGroupsAggExp
+  orderByExpression: ScimgroupGroupsOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: scimgroupGroups
+      subscription:
+        rootField: scimgroupGroups
+    selectUniques:
+      - queryRootField: scimgroupGroupsById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: scimgroupGroupsById
+    filterInputTypeName: ScimgroupGroupsFilterInput
+    aggregate:
+      queryRootField: scimgroupGroupsAggregate
+      subscription:
+        rootField: scimgroupGroupsAggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: ScimgroupGroups
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+
