@@ -1,0 +1,13 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "telemetry",
+    srcs = ["telemetry.go"],
+    importpath = "github.com/oh-tarnished/freebusy/internal/database/gorm/telemetry",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/gorm/gormx",
+        "@com_github_the_protobuf_project_telemetry_telemetry_go//:telemetry-go",
+        "@io_gorm_gorm//:gorm",
+    ],
+)

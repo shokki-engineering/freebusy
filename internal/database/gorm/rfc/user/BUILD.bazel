@@ -1,0 +1,25 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "user",
+    srcs = [
+        "address_store.go",
+        "attribute_store.go",
+        "enterprise_user_store.go",
+        "filters.go",
+        "manager_store.go",
+        "models.go",
+        "name_store.go",
+        "protobuf.go",
+        "user_store.go",
+    ],
+    importpath = "github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/user",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/gorm/filterx",
+        "//internal/database/gorm/gormx",
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc7643/user/v1:user",
+        "@io_gorm_gorm//:gorm",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+    ],
+)

@@ -1,0 +1,14 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "todoql",
+    srcs = ["todoql.go"],
+    importpath = "github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/todoql",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/hasura/freebusyql/todoql/calendartimesql",
+        "//internal/database/hasura/freebusyql/todoql/extensionpropertiesql",
+        "//internal/database/hasura/freebusyql/todoql/resourceql",
+        "@com_github_the_protobuf_project_runtime_go_network//runtime",
+    ],
+)

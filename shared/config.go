@@ -4,6 +4,8 @@ import (
 	"log"
 	"sync"
 
+	"github.com/knadh/koanf/parsers/toml"
+	"github.com/knadh/koanf/providers/rawbytes"
 	"github.com/oh-tarnished/runtime-go/config"
 )
 
@@ -39,15 +41,19 @@ func Getconfig() *config.Config {
 	return globalconfig
 }
 
-// LoadTomlBytes loads raw TOML bytes into the shared config koanf state
-// by writing them to a temporary file and using config's Toml.Load pipeline.
-// This avoids importing koanf sub-packages directly.
+// LoadTomlBytes loads raw TOML bytes into the shared config's koanf state,
+// with the parser config's own Toml.Load uses. It reads from memory, so it
+// works where the working directory is not writable -- a scratch container
+// running as an unprivileged user.
 func LoadTomlBytes(data []byte) error {
-	const tmpFile = ".embedded_config.toml"
-	sy := Getconfig()
-	if err := sy.IO.WriteFile(tmpFile, data); err != nil {
-		return err
-	}
-	defer sy.IO.DeleteFile(tmpFile) //nolint:errcheck
-	return sy.Toml.Load(tmpFile)
+	return Getconfig().Koanf().Load(rawbytes.Provider(data), toml.Parser())
+}
+
+// LoadEnv overlays every environment variable starting with prefix: double
+// underscores separate the levels and the rest is the key, lower-cased --
+// FREEBUSY_DATABASE__POSTGRES__HOST is database.postgres.host. A variable with
+// no double underscore has each underscore read as a level, so a key that has
+// one of its own, like enable_http, needs the double-underscore form.
+func LoadEnv(prefix string) error {
+	return Getconfig().LoadEnv(prefix)
 }

@@ -1,0 +1,14 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "journalql",
+    srcs = ["journalql.go"],
+    importpath = "github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/journalql",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/hasura/freebusyql/journalql/calendartimesql",
+        "//internal/database/hasura/freebusyql/journalql/extensionpropertiesql",
+        "//internal/database/hasura/freebusyql/journalql/resourceql",
+        "@com_github_the_protobuf_project_runtime_go_network//runtime",
+    ],
+)

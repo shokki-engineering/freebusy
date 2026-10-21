@@ -4,9 +4,13 @@ import (
 	"fmt"
 	"os"
 
+	// The binary carries what an empty filesystem lacks: the IANA zone
+	// database, and root certificates for HTTPS webhook endpoints -- used only
+	// when the host has none, as in a scratch container.
 	_ "time/tzdata"
 
 	_ "github.com/joho/godotenv/autoload"
+	_ "golang.org/x/crypto/x509roots/fallback"
 )
 
 func main() {

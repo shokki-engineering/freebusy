@@ -1,0 +1,21 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "openapi_lib",
+    srcs = [
+        "main.go",
+        "merge.go",
+        "patch.go",
+        "yamlutil.go",
+    ],
+    embedsrcs = ["base.yaml"],
+    importpath = "github.com/oh-tarnished/freebusy/tools/protobuf/openapi",
+    visibility = ["//visibility:private"],
+    deps = ["@in_gopkg_yaml_v3//:yaml_v3"],
+)
+
+go_binary(
+    name = "openapi",
+    embed = [":openapi_lib"],
+    visibility = ["//visibility:public"],
+)

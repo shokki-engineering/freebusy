@@ -1,0 +1,14 @@
+# Bzlmod only; Bazel 9 has no WORKSPACE.
+common --enable_bzlmod
+
+# Pure Go: no cgo anywhere, so every binary is static and cross-compiles with
+# nothing but the Go toolchain.
+build --@rules_go//go/config:pure
+
+# Tests that need Postgres or Hasura read FREEBUSY_TEST_*; pass them through.
+test --test_env=FREEBUSY_TEST_POSTGRES_DSN --test_env=FREEBUSY_TEST_DATABASE_URL
+test --test_env=FREEBUSY_TEST_GRAPHQL_URL --test_env=FREEBUSY_TEST_REQUIRE_LIVE
+test --test_output=errors
+
+# A developer's own flags, never committed.
+try-import %workspace%/.bazelrc.user

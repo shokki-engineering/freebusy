@@ -1,0 +1,17 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "userql",
+    srcs = ["userql.go"],
+    importpath = "github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/hasura/freebusyql/userql/addressql",
+        "//internal/database/hasura/freebusyql/userql/attributesql",
+        "//internal/database/hasura/freebusyql/userql/enterpriseusersql",
+        "//internal/database/hasura/freebusyql/userql/managersql",
+        "//internal/database/hasura/freebusyql/userql/namesql",
+        "//internal/database/hasura/freebusyql/userql/resourceql",
+        "@com_github_the_protobuf_project_runtime_go_network//runtime",
+    ],
+)

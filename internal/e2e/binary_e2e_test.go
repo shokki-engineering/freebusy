@@ -173,8 +173,7 @@ func start(t *testing.T, provider string) *server {
 	cmd := exec.Command(bin)
 	cmd.Dir = dir
 	cmd.Stdout, cmd.Stderr = out, out
-	cmd.Env = append(os.Environ(),
-		fmt.Sprintf("FREEBUSY_GRPC_PORT=%d", grpcPort), fmt.Sprintf("FREEBUSY_HTTP_PORT=%d", httpPort))
+	cmd.Env = os.Environ()
 	if err := cmd.Start(); err != nil {
 		t.Fatal(err)
 	}

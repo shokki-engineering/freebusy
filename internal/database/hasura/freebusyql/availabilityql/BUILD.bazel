@@ -1,0 +1,15 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "availabilityql",
+    srcs = ["availabilityql.go"],
+    importpath = "github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/availabilityql",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/hasura/freebusyql/availabilityql/availabilitiesql",
+        "//internal/database/hasura/freebusyql/availabilityql/availableperiodsql",
+        "//internal/database/hasura/freebusyql/availabilityql/calendartimesql",
+        "//internal/database/hasura/freebusyql/availabilityql/extensionpropertiesql",
+        "@com_github_the_protobuf_project_runtime_go_network//runtime",
+    ],
+)

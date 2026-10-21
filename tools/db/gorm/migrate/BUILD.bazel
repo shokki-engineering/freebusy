@@ -1,0 +1,21 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "migrate_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/oh-tarnished/freebusy/tools/db/gorm/migrate",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//config",
+        "//internal/database/gorm/freebusy",
+        "//internal/database/gorm/rfc",
+        "@io_gorm_driver_postgres//:postgres",
+        "@io_gorm_gorm//:gorm",
+    ],
+)
+
+go_binary(
+    name = "migrate",
+    embed = [":migrate_lib"],
+    visibility = ["//visibility:public"],
+)

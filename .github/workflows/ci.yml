@@ -13,28 +13,22 @@ permissions:
 
 jobs:
   lint:
-    name: Format, vet and staticcheck
+    name: Format, vet, staticcheck and buf lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
-      # Generated code follows its generator, not gofmt -- protoc-gen-mcp's
-      # output is not gofmt-clean -- so only hand-written code is held to it.
-      - name: gofmt
-        run: |
-          unformatted=$(gofmt -l . | grep -v '^protobuf/generated/' || true)
-          if [ -n "$unformatted" ]; then
-            echo "gofmt -w these files:"; echo "$unformatted"; exit 1
-          fi
-      - run: go mod verify
-      - run: (cd protobuf && go mod verify)
-      - run: go vet ./...
-      - run: go run honnef.co/go/tools/cmd/staticcheck@2026.2.2 ./...
+      - uses: extractions/setup-just@v4
+      - uses: bufbuild/buf-action@v1
+        with:
+          setup_only: true
+      # The recipe is the definition; this job only runs it.
+      - run: just lint
 
   proto:
-    name: Protobuf structure and breaking changes
+    name: Protobuf build and breaking changes
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -43,9 +37,6 @@ jobs:
       - uses: bufbuild/buf-action@v1
         with:
           setup_only: true
-      # BASIC structure only; API design is api-lint.yml's, and STANDARD's
-      # naming rules contradict AIP's (see buf.yaml).
-      - run: buf lint
       - run: buf build -o /dev/null
       # A pull request may not break the published API: FILE-level, so a
       # moved or deleted message counts. On main there is nothing to compare
@@ -73,9 +64,10 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
+      - uses: extractions/setup-just@v4
       # Everything that needs no database. The live suites skip here and run
       # in the live job, which requires them.
-      - run: go test -race -count=1 ./...
+      - run: just test
 
   live:
     name: Live suites (Postgres and Hasura DDN)
@@ -92,21 +84,15 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U postgres"
           --health-interval 5s --health-timeout 5s --health-retries 10
-    env:
-      # Every live suite runs, on both backends: an unset variable fails the
-      # job instead of skipping the suite (internal/livetest).
-      FREEBUSY_TEST_REQUIRE_LIVE: "1"
-      FREEBUSY_TEST_POSTGRES_DSN: host=127.0.0.1 port=5432 user=postgres password=postgrespassword dbname=freebusydb sslmode=disable
-      FREEBUSY_TEST_DATABASE_URL: host=127.0.0.1 port=5432 user=postgres password=postgrespassword dbname=freebusydb sslmode=disable
-      FREEBUSY_TEST_GRAPHQL_URL: http://localhost:3280/graphql
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
+      - uses: extractions/setup-just@v4
 
-      # Schemas and tables, as `just migrate` makes them.
-      - run: go run ./tools/db/gorm/migrate
+      # Schemas and tables.
+      - run: just migrate
 
       # The engine serves the committed metadata (hasura/freebusy), built
       # into engine/build by the DDN CLI -- which will not build without a
@@ -152,13 +138,15 @@ jobs:
           docker compose -f compose.yaml --env-file .env up -d --build --pull always --wait
           for _ in $(seq 60); do
             curl -fsS -X POST -H 'Content-Type: application/json' \
-              -d '{"query":"{ __typename }"}' "$FREEBUSY_TEST_GRAPHQL_URL" && exit 0
+              -d '{"query":"{ __typename }"}' http://localhost:3280/graphql && exit 0
             sleep 2
           done
-          echo "::error::the engine never answered at $FREEBUSY_TEST_GRAPHQL_URL"
+          echo "::error::the engine never answered at http://localhost:3280/graphql"
           exit 1
 
-      - run: go test -race -count=1 ./...
+      # Every test on both backends; a suite that cannot reach its backend
+      # fails the job rather than skipping (internal/livetest).
+      - run: just test-live
 
       - name: Engine and connector logs
         if: failure()

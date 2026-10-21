@@ -1,0 +1,23 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "config",
+    srcs = [
+        "config.go",
+        "load.go",
+        "options.go",
+    ],
+    embedsrcs = ["freebusy.release.toml"],
+    importpath = "github.com/oh-tarnished/freebusy/config",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//shared",
+        "@com_github_the_protobuf_project_runtime_go_grpc//options",
+    ],
+)
+
+go_test(
+    name = "config_test",
+    srcs = ["config_test.go"],
+    embed = [":config"],
+)

@@ -30,13 +30,9 @@ prek *args:
 # config/freebusy.release.toml defaults, overlaid by config/freebusy.dev.toml
 # for local development. Switch backends by editing [database].provider there.
 
-# Server ports (exported so the runtime picks them up). Override on the CLI or
-# via the matching FREEBUSY_* env var.
-grpc_port := env_var_or_default("FREEBUSY_GRPC_PORT", "50051")
-http_port := env_var_or_default("FREEBUSY_HTTP_PORT", "8080")
-
-export FREEBUSY_GRPC_PORT := grpc_port
-export FREEBUSY_HTTP_PORT := http_port
+# Ports come from config too. Any key can be overridden from the environment,
+# FREEBUSY_<SECTION>__<KEY> with double underscores between levels:
+#   FREEBUSY_SERVER__GRPC__PORT=50052 just run
 
 # Run the server (DB provider + connection come from config; dev overlay applies).
 [group('app')]
@@ -78,31 +74,39 @@ gotidy:
 clean:
     go clean -cache -testcache
 
-# Run the unit tests (pure-logic packages; no database required).
+# Generated code follows its generator, not gofmt, so only hand-written code
+# is format-checked.
+# Format, vet, staticcheck and buf lint: CI's lint job.
+[group('lint')]
+lint:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    unformatted=$(gofmt -l . | grep -v '^protobuf/generated/' || true)
+    if [ -n "$unformatted" ]; then echo "gofmt -w these files:"; echo "$unformatted"; exit 1; fi
+    go mod verify
+    (cd protobuf && go mod verify)
+    go vet ./...
+    go run honnef.co/go/tools/cmd/staticcheck@2026.2.2 ./...
+    buf lint
+
+# The live suites skip here: they need the variables test-live sets.
+# Unit tests with the race detector.
 [group('test')]
 test:
-    go test ./...
+    go test -race -count=1 ./...
 
-# Verbose unit tests for the pulse-free pure-logic packages.
+# Needs a running Postgres and Hasura DDN engine (`just migrate`, then
+# `ddn run docker-start` in hasura/). A suite that cannot reach its backend
+# fails rather than skips.
+# Every test, live suites included, against Postgres and Hasura.
 [group('test')]
-test-unit:
-    go test -v ./internal/discount/ ./internal/database/repository/ ./internal/service/gorm/
+test-live dsn="host=127.0.0.1 port=5432 user=postgres password=postgrespassword dbname=freebusydb sslmode=disable" url="http://localhost:3280/graphql":
+    FREEBUSY_TEST_REQUIRE_LIVE=1 \
+    FREEBUSY_TEST_POSTGRES_DSN="{{ dsn }}" \
+    FREEBUSY_TEST_DATABASE_URL="{{ dsn }}" \
+    FREEBUSY_TEST_GRAPHQL_URL="{{ url }}" \
+    go test -race -count=1 ./...
 
-# Live Hasura/DDN integration tests — needs the local engine (`ddn run docker-start`).
+# Build, lint and unit tests: what CI runs without a database.
 [group('test')]
-test-hasura url="http://localhost:3280/graphql":
-    FREEBUSY_TEST_GRAPHQL_URL={{ url }} go test ./internal/service/booking/db/hasura/ -run Live -v
-
-# End-to-end server suite over bufconn against live Postgres (run `just migrate` first).
-[group('test')]
-e2e-gorm dsn="host=localhost port=5432 user=postgres password=postgrespassword dbname=freebusydb sslmode=disable":
-    FREEBUSY_TEST_POSTGRES_DSN="{{ dsn }}" go test ./internal/e2e/ -run 'TestE2E_Gorm|TestRepositorySmoke.*Gorm' -count=1 -v
-
-# End-to-end server suite over bufconn against the live DDN engine (`ddn run docker-start`).
-[group('test')]
-e2e-hasura url="http://localhost:3280/graphql":
-    FREEBUSY_TEST_GRAPHQL_URL={{ url }} go test ./internal/e2e/ -run 'TestE2E_Hasura|TestRepositorySmoke.*GraphQL' -count=1 -v
-
-# CI-style gate: build, vet, and test.
-[group('test')]
-check: build vet test
+check: build lint test

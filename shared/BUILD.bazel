@@ -1,0 +1,19 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "shared",
+    srcs = [
+        "config.go",
+        "telemetry.go",
+    ],
+    embedsrcs = ["opentelementry.toml"],
+    importpath = "github.com/oh-tarnished/freebusy/shared",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_knadh_koanf_parsers_toml//:toml",
+        "@com_github_knadh_koanf_providers_rawbytes//:rawbytes",
+        "@com_github_oh_tarnished_runtime_go_config//:config",
+        "@com_github_the_protobuf_project_opentelementry_opentelementry_go//:opentelementry-go",
+        "@com_github_the_protobuf_project_opentelementry_opentelementry_go//options",
+    ],
+)

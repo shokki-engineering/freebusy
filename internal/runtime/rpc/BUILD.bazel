@@ -1,0 +1,16 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "rpc",
+    srcs = ["rpc.go"],
+    importpath = "github.com/oh-tarnished/freebusy/internal/runtime/rpc",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/types",
+        "//shared",
+        "@com_github_the_protobuf_project_runtime_go_grpc//:grpc",
+        "@org_golang_google_genproto_googleapis_rpc//errdetails",
+        "@org_golang_google_grpc//codes",
+        "@org_golang_google_grpc//status",
+    ],
+)

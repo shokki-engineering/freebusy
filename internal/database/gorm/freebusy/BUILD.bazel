@@ -1,0 +1,16 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "freebusy",
+    srcs = ["migrate.go"],
+    importpath = "github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/gorm/freebusy/allocation",
+        "//internal/database/gorm/freebusy/reservation",
+        "//internal/database/gorm/freebusy/shared",
+        "//internal/database/gorm/freebusy/webhook",
+        "//internal/database/gorm/telemetry",
+        "@io_gorm_gorm//:gorm",
+    ],
+)

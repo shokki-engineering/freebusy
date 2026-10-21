@@ -1,0 +1,16 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "rfc",
+    srcs = ["profile.go"],
+    importpath = "github.com/oh-tarnished/freebusy/internal/rfc",
+    visibility = ["//:__subpackages__"],
+    deps = ["@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc9073/resource/v1:resource"],
+)
+
+go_test(
+    name = "rfc_test",
+    srcs = ["profile_test.go"],
+    embed = [":rfc"],
+    deps = ["@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc9073/resource/v1:resource"],
+)

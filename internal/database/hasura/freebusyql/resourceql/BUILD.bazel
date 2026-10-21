@@ -1,0 +1,13 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "resourceql",
+    srcs = ["resourceql.go"],
+    importpath = "github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/resourceql",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/hasura/freebusyql/resourceql/entityql",
+        "//internal/database/hasura/freebusyql/resourceql/structureddatasql",
+        "@com_github_the_protobuf_project_runtime_go_network//runtime",
+    ],
+)

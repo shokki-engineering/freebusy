@@ -1,0 +1,12 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "graphqlx",
+    srcs = ["graphqlx.go"],
+    importpath = "github.com/oh-tarnished/freebusy/internal/database/hasura/graphqlx",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//shared",
+        "@com_github_the_protobuf_project_opentelementry_opentelementry_go//:opentelementry-go",
+    ],
+)

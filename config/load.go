@@ -9,6 +9,10 @@ import (
 	"github.com/the-protobuf-project/runtime-go/grpc/options"
 )
 
+// EnvPrefix starts every environment variable that overrides a configuration
+// key: FREEBUSY_<SECTION>__<KEY>, double underscores between levels.
+const EnvPrefix = "FREEBUSY_"
+
 // loadedConfig holds the parsed configuration singleton.
 var loadedConfig *AppConfig
 
@@ -28,6 +32,12 @@ func init() {
 		if err := shared.LoadTomlBytes(overlay); err != nil {
 			panic(fmt.Sprintf("failed to load dev overlay %q: %v", devOverlayPath, err))
 		}
+	}
+
+	// 3. Environment variables, last so they win: how a container with nothing
+	// but the binary in it is configured. FREEBUSY_DATABASE__POSTGRES__HOST=db.
+	if err := shared.LoadEnv(EnvPrefix); err != nil {
+		panic(fmt.Sprintf("failed to load environment overrides: %v", err))
 	}
 
 	loadedConfig = &AppConfig{}

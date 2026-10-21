@@ -1,0 +1,31 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "vcardql",
+    srcs = ["vcardql.go"],
+    importpath = "github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/hasura/freebusyql/vcardql/addressql",
+        "//internal/database/hasura/freebusyql/vcardql/contactsql",
+        "//internal/database/hasura/freebusyql/vcardql/dateortextsql",
+        "//internal/database/hasura/freebusyql/vcardql/emailsql",
+        "//internal/database/hasura/freebusyql/vcardql/extensionpropertiesql",
+        "//internal/database/hasura/freebusyql/vcardql/geosql",
+        "//internal/database/hasura/freebusyql/vcardql/grammaticalgendersql",
+        "//internal/database/hasura/freebusyql/vcardql/instantmessagesql",
+        "//internal/database/hasura/freebusyql/vcardql/languagesql",
+        "//internal/database/hasura/freebusyql/vcardql/namesql",
+        "//internal/database/hasura/freebusyql/vcardql/nicknamesql",
+        "//internal/database/hasura/freebusyql/vcardql/organizationsql",
+        "//internal/database/hasura/freebusyql/vcardql/pronounsql",
+        "//internal/database/hasura/freebusyql/vcardql/relationsql",
+        "//internal/database/hasura/freebusyql/vcardql/resourceql",
+        "//internal/database/hasura/freebusyql/vcardql/rolesql",
+        "//internal/database/hasura/freebusyql/vcardql/socialprofilesql",
+        "//internal/database/hasura/freebusyql/vcardql/telephonesql",
+        "//internal/database/hasura/freebusyql/vcardql/timezonesql",
+        "//internal/database/hasura/freebusyql/vcardql/urlsql",
+        "@com_github_the_protobuf_project_runtime_go_network//runtime",
+    ],
+)

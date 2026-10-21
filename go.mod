@@ -5,6 +5,8 @@ go 1.26.5
 replace github.com/oh-tarnished/freebusy/protobuf => ./protobuf
 
 require (
+	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261021085804-ae1e2acc01d5.1
+	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261021085804-ae1e2acc01d5.2
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.12.3
 	github.com/modelcontextprotocol/go-sdk v1.7.0
@@ -15,6 +17,7 @@ require (
 	github.com/the-protobuf-project/runtime-go/cache v0.0.0-20260904124945-28b95e838f2e
 	github.com/the-protobuf-project/runtime-go/grpc v0.0.0-20260904124504-3aec40995305
 	github.com/the-protobuf-project/runtime-go/network v0.0.0-20260904124504-3aec40995305
+	github.com/the-protobuf-project/runtime-go/rfc v0.0.0-20261021085950-c238e87067e6
 	github.com/the-protobuf-project/telemetry/telemetry-go v0.0.0-20260817061725-884f94d7858d
 	go.opentelemetry.io/otel v1.46.0
 	google.golang.org/genproto v0.0.0-20260831171406-18b4a7587f8a
@@ -26,11 +29,7 @@ require (
 	gorm.io/gorm v1.31.2
 )
 
-require (
-	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261021085804-ae1e2acc01d5.1 // indirect
-	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261021085804-ae1e2acc01d5.2 // indirect
-	github.com/the-protobuf-project/runtime-go/rfc v0.0.0-20261021085950-c238e87067e6 // indirect
-)
+require golang.org/x/crypto/x509roots/fallback v0.0.0-20261020153306-9f2b28d4331a
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2 // indirect
@@ -67,7 +66,7 @@ require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/grafana/pyroscope-go v1.4.1 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.12 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0
 	github.com/hasura/go-graphql-client v0.16.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
@@ -78,12 +77,12 @@ require (
 	github.com/klauspost/compress v1.19.0 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/knadh/koanf/parsers/json v1.0.0 // indirect
-	github.com/knadh/koanf/parsers/toml v0.1.0 // indirect
+	github.com/knadh/koanf/parsers/toml v0.1.0
 	github.com/knadh/koanf/parsers/yaml v1.1.0 // indirect
 	github.com/knadh/koanf/providers/env v1.1.0 // indirect
 	github.com/knadh/koanf/providers/env/v2 v2.0.0 // indirect
 	github.com/knadh/koanf/providers/file v1.2.1 // indirect
-	github.com/knadh/koanf/providers/rawbytes v1.0.0 // indirect
+	github.com/knadh/koanf/providers/rawbytes v1.0.0
 	github.com/knadh/koanf/providers/structs v1.0.0 // indirect
 	github.com/knadh/koanf/v2 v2.3.5 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
@@ -144,6 +143,6 @@ require (
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/text v0.41.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260831171406-18b4a7587f8a // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260831171406-18b4a7587f8a
 	sigs.k8s.io/yaml v1.6.0 // indirect
 )

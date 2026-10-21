@@ -1,0 +1,12 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "orgunitql",
+    srcs = ["orgunitql.go"],
+    importpath = "github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/orgunitql",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/hasura/freebusyql/orgunitql/organizationalunitsql",
+        "@com_github_the_protobuf_project_runtime_go_network//runtime",
+    ],
+)

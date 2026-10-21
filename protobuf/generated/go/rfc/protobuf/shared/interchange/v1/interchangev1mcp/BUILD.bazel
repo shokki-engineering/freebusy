@@ -1,0 +1,18 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "interchangev1mcp",
+    srcs = [
+        "mcp_shared.pb.mcp.go",
+        "service.pb.mcp.go",
+    ],
+    importpath = "github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/shared/interchange/v1/interchangev1mcp",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/shared/interchange/v1:interchange",
+        "@com_github_the_protobuf_project_runtime_go_agents//mcp",
+        "@com_google_cloud_go_longrunning//autogen/longrunningpb:go_default_library",
+        "@org_golang_google_grpc//:grpc",
+        "@org_golang_google_protobuf//encoding/protojson",
+    ],
+)

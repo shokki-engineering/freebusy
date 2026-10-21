@@ -8,3 +8,7 @@
 orm/
 grpc-mcp-gateway/
 runtime-go/
+
+# Bazel
+/bazel-*
+.bazelrc.user

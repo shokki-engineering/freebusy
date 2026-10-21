@@ -1,0 +1,19 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "engine",
+    srcs = [
+        "compute.go",
+        "offer.go",
+        "recur.go",
+        "span.go",
+    ],
+    importpath = "github.com/oh-tarnished/freebusy/internal/service/allocation/engine",
+    visibility = ["//:__subpackages__"],
+)
+
+go_test(
+    name = "engine_test",
+    srcs = ["engine_test.go"],
+    embed = [":engine"],
+)

@@ -1,0 +1,24 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "stream",
+    srcs = [
+        "extension_field_store.go",
+        "filters.go",
+        "models.go",
+        "protobuf.go",
+        "record_store.go",
+        "stream_record_store.go",
+        "stream_store.go",
+    ],
+    importpath = "github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/stream",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/gorm/filterx",
+        "//internal/database/gorm/gormx",
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc8428/stream/v1:stream",
+        "@io_gorm_gorm//:gorm",
+        "@org_golang_google_protobuf//types/known/durationpb",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+    ],
+)

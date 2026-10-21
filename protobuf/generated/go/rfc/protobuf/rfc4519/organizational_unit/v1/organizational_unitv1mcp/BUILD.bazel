@@ -1,0 +1,18 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "organizational_unitv1mcp",
+    srcs = [
+        "mcp_shared.pb.mcp.go",
+        "service.pb.mcp.go",
+    ],
+    importpath = "github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc4519/organizational_unit/v1/organizational_unitv1mcp",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc4519/organizational_unit/v1:organizational_unit",
+        "@com_github_the_protobuf_project_runtime_go_agents//mcp",
+        "@org_golang_google_grpc//:grpc",
+        "@org_golang_google_protobuf//encoding/protojson",
+        "@org_golang_google_protobuf//types/known/emptypb",
+    ],
+)

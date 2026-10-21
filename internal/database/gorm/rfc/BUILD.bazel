@@ -1,0 +1,32 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "rfc",
+    srcs = ["migrate.go"],
+    importpath = "github.com/oh-tarnished/freebusy/internal/database/gorm/rfc",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/database/gorm/rfc/availability",
+        "//internal/database/gorm/rfc/calendar",
+        "//internal/database/gorm/rfc/card",
+        "//internal/database/gorm/rfc/common",
+        "//internal/database/gorm/rfc/event",
+        "//internal/database/gorm/rfc/journal",
+        "//internal/database/gorm/rfc/ldapgroup",
+        "//internal/database/gorm/rfc/membership",
+        "//internal/database/gorm/rfc/organization",
+        "//internal/database/gorm/rfc/orgunit",
+        "//internal/database/gorm/rfc/pack",
+        "//internal/database/gorm/rfc/project",
+        "//internal/database/gorm/rfc/resource",
+        "//internal/database/gorm/rfc/scimgroup",
+        "//internal/database/gorm/rfc/sensor",
+        "//internal/database/gorm/rfc/stream",
+        "//internal/database/gorm/rfc/todo",
+        "//internal/database/gorm/rfc/unit",
+        "//internal/database/gorm/rfc/user",
+        "//internal/database/gorm/rfc/vcard",
+        "//internal/database/gorm/telemetry",
+        "@io_gorm_gorm//:gorm",
+    ],
+)

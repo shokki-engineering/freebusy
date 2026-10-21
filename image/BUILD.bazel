@@ -1,0 +1,70 @@
+# The server's container image: the static binary and nothing else -- no base
+# image, no shell, no libc, no certificate store. The binary carries what an
+# empty filesystem lacks (time zones and fallback root certificates, see
+# main.go) and is configured entirely by FREEBUSY_* environment variables
+# over the release defaults compiled into it (config/load.go).
+#
+#   bazel run //image:load            # into the local Docker, as freebusy:latest
+#   bazel build //image               # the linux/amd64 + linux/arm64 index
+#   bazel run //image:push -- --tag <tag>
+load("@rules_go//go:def.bzl", "go_cross_binary")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_image_index", "oci_load", "oci_push")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+
+ARCHS = ["amd64", "arm64"]
+
+[go_cross_binary(
+    name = "freebusy_linux_" + arch,
+    platform = "@rules_go//go/toolchain:linux_" + arch,
+    target = "//:freebusy",
+) for arch in ARCHS]
+
+[pkg_tar(
+    name = "layer_" + arch,
+    files = {":freebusy_linux_" + arch: "freebusy"},
+    mode = "0755",
+) for arch in ARCHS]
+
+[oci_image(
+    name = "image_" + arch,
+    architecture = arch,
+    entrypoint = ["/freebusy"],
+    # gRPC, HTTP (REST, health), MCP.
+    exposed_ports = [
+        "50051/tcp",
+        "8080/tcp",
+        "8081/tcp",
+    ],
+    labels = {
+        "org.opencontainers.image.title": "freebusy",
+        "org.opencontainers.image.description": "Generic availability and booking engine.",
+        "org.opencontainers.image.source": "https://github.com/oh-tarnished/freebusy",
+        "org.opencontainers.image.licenses": "Apache-2.0",
+    },
+    os = "linux",
+    tars = [":layer_" + arch],
+    # Not root: the image has no users, so a bare uid:gid.
+    user = "65532:65532",
+) for arch in ARCHS]
+
+oci_image_index(
+    name = "image",
+    images = [":image_" + arch for arch in ARCHS],
+    visibility = ["//visibility:public"],
+)
+
+# Docker loads one platform: the machine's own.
+oci_load(
+    name = "load",
+    image = select({
+        "@platforms//cpu:arm64": ":image_arm64",
+        "//conditions:default": ":image_amd64",
+    }),
+    repo_tags = ["freebusy:latest"],
+)
+
+oci_push(
+    name = "push",
+    image = ":image",
+    repository = "ghcr.io/oh-tarnished/freebusy",
+)
