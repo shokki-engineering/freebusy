@@ -99,18 +99,19 @@ lint:
 test:
     go test -race -count=1 ./...
 
-# Needs a running Postgres and Hasura DDN engine (`just migrate`, then
-# `ddn run docker-start` in hasura/). A suite that cannot reach its backend
-# fails rather than skips. One package at a time (-p 1): the suites share the
+# Needs a running Postgres, Hasura DDN engine and Redis (`just migrate`, then
+# `ddn run docker-start` in hasura/; Redis serves the list cache's suite). A
+# suite that cannot reach its backend fails rather than skips. One package at a time (-p 1): the suites share the
 # database, and the binary suite runs a whole server -- reconciler, sweeper,
 # webhook delivery -- that would act on another package's rows.
-# Every test, live suites included, against Postgres and Hasura.
+# Every test, live suites included, against Postgres, Hasura and Redis.
 [group('test')]
-test-live dsn="host=127.0.0.1 port=5432 user=postgres password=postgrespassword dbname=freebusydb sslmode=disable" url="http://localhost:3280/graphql":
+test-live dsn="host=127.0.0.1 port=5432 user=postgres password=postgrespassword dbname=freebusydb sslmode=disable" url="http://localhost:3280/graphql" redis="127.0.0.1:6379":
     FREEBUSY_TEST_REQUIRE_LIVE=1 \
     FREEBUSY_TEST_POSTGRES_DSN="{{ dsn }}" \
     FREEBUSY_TEST_DATABASE_URL="{{ dsn }}" \
     FREEBUSY_TEST_GRAPHQL_URL="{{ url }}" \
+    FREEBUSY_TEST_REDIS_ADDR="{{ redis }}" \
     go test -race -count=1 -p 1 ./...
 
 # Bazel: the BUILD files are Gazelle's, generated from the Go sources.

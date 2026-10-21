@@ -44,6 +44,7 @@ cloud.google.com/go/bigquery v1.77.0/go.mod h1:J4wuqka/1hEpdJxH2oBrUR0vjTD+r7drG
 cloud.google.com/go/bigquery v1.79.0/go.mod h1:QTt5tgZxqqvZs3dOZKpvriGqy+CdvY9LyetirFZRPOE=
 cloud.google.com/go/bigquery v1.82.0/go.mod h1:cc0XscySNQNuHBxuZSg5yyxFsg/ZHAfViAG49gJbWew=
 cloud.google.com/go/bigquery v1.85.0/go.mod h1:oBma1P5/b1Jtd8xRLKoyTeNIMlACGHbSMLudzxHGHgc=
+cloud.google.com/go/bigtable v1.47.0/go.mod h1:GUM6PdkG3rrDse9kugqvX5+ktwo3ldfLtLi1VFn5Wj4=
 cloud.google.com/go/bigtable v1.50.0/go.mod h1:RTannV5mvoJM8KscLTfRYMPo84u9/j+C3PSyYJGf5Ic=
 cloud.google.com/go/billing v1.26.0/go.mod h1:axqDO1uHegh7u5qngkTfqN1djAeLGsWAFAblERgmgEk=
 cloud.google.com/go/binaryauthorization v1.15.0/go.mod h1:+0CndCJPtcHuVCNok+qQskWvbP5Sp5m6eGL8Vpu5mss=
@@ -60,6 +61,7 @@ cloud.google.com/go/clouddms v1.14.0/go.mod h1:qSwET2Q27cJ4wCDsPsbkagXqQqkWfOy+g
 cloud.google.com/go/cloudtasks v1.18.0/go.mod h1:3KeCxwtGEyaySL7CR3lMmEa2I4mq1ynXdgmfNiO4RYE=
 cloud.google.com/go/cloudtasks v1.19.0/go.mod h1:8q8wNubq0jFvXW5Pz8P3O7QWJBXOmfrY918FqTgIqHA=
 cloud.google.com/go/cloudtasks v1.20.0/go.mod h1:qhHo3AHGV3EDX8OpVR+dEI8tRt/tnWSWAoYE5LlABJk=
+cloud.google.com/go/compute v1.62.0/go.mod h1:Xm6PbsLgBpAg4va77ljbBdpMjzuU+uPp5Ze2dnZq7lw=
 cloud.google.com/go/compute v1.64.0 h1:7MmuzeAxlG5MOG5PQD2NLtyYR6bWjkvGljRu7pByoRU=
 cloud.google.com/go/compute v1.64.0/go.mod h1:eHhcRZ6vf70fQCS3VEsiWSh+nQ+tLvSMb7mwLQskgN0=
 cloud.google.com/go/compute v1.65.0/go.mod h1:vFq+Ztj9Rzhc8zf1t6hGp/6NdrEVG1GakkyVRQPRgKc=
@@ -97,7 +99,9 @@ cloud.google.com/go/deploy v1.32.0/go.mod h1:lUG7maG/NkoTXmQ8G1mtcVymnbizfDJh6ER
 cloud.google.com/go/deploy v1.33.0/go.mod h1:QdF3plD8D5gV2RmkTXBB6cHrq490WlpFr1SChdOJO2Y=
 cloud.google.com/go/dialogflow v1.82.0/go.mod h1:UtuiGOq9gAlTz9u4Vt+q1syMrx9ANQzTk+lC3WDdSOw=
 cloud.google.com/go/dialogflow v1.83.0/go.mod h1:Rr0/YdrUAVQ+CPgt1yq8VpJmVSChfhz+uodykrBP1d0=
+cloud.google.com/go/dialogflow v1.84.0/go.mod h1:OU8Lj1aw5Vr2hl9ifW+vsKnc2b4iJH+41U7nZ4whg3U=
 cloud.google.com/go/dialogflow v1.85.0/go.mod h1:OU8Lj1aw5Vr2hl9ifW+vsKnc2b4iJH+41U7nZ4whg3U=
+cloud.google.com/go/dlp v1.34.0/go.mod h1:+haQd/n0QTv5BK7wZnCk2qctd5sfKL50jjh9E6N0d/Q=
 cloud.google.com/go/dlp v1.36.0/go.mod h1:UW92dBhxvqkSKLct+Ril7Y9B4CanS5VLuDwlTGVA9VQ=
 cloud.google.com/go/documentai v1.48.0/go.mod h1:mGjfbNf0cqCHKgxMZZV7frbfoF9T2hKkU1h88QyOy3c=
 cloud.google.com/go/documentai v1.49.0/go.mod h1:VyQA+SxPnCPlVLSJ5UcFx+LQm8JCzK7uUXdkOaAHvG8=
@@ -126,6 +130,7 @@ cloud.google.com/go/gkehub v0.22.0/go.mod h1:WiXX1w9ZHwKZVUDwL//YQfjfWS7yE0I/ym3
 cloud.google.com/go/gkemulticloud v1.11.0/go.mod h1:OtfHtgqOgDrXfcdFw8eUkCUI154Q51vvdqZYZV4c4qM=
 cloud.google.com/go/gkemulticloud v1.12.0/go.mod h1:vLNCxGah7pPIoNSX4Yx+hb8klqA0lzzXTWBSut9KzRo=
 cloud.google.com/go/grafeas v0.3.17/go.mod h1:MLYFFap01tm1Rbcd0AT6V2NW1ho45dbX+AxNEcprExY=
+cloud.google.com/go/grafeas v0.5.0/go.mod h1:PVk/JyEFYw3A8uyCdyZeZ0S7IZqtb/c5p06QCOHBjN0=
 cloud.google.com/go/gsuiteaddons v1.12.0/go.mod h1:rm/XT7wmwOFGn7jmWtVV65QmZCakzTbHLSojIC4Hskg=
 cloud.google.com/go/iam v1.11.0/go.mod h1:KP+nKGugNJW4LcLx1uEZcq1ok5sQHFaQehQNl4QDgV4=
 cloud.google.com/go/iam v1.12.0/go.mod h1:FEZ4lXpADAC2AIpQY7LANNjjwyQ2jK439CI2VaD+sLY=
@@ -151,6 +156,7 @@ cloud.google.com/go/longrunning v1.2.0/go.mod h1:5KMQALFGOCtFoi2xSOA1u3H7WKlhmck
 cloud.google.com/go/managedidentities v1.12.0/go.mod h1:rm72jf/v//0NG73VQNZM1JlV2E95uhJymmSXlgi6hMA=
 cloud.google.com/go/managedidentities v1.13.0/go.mod h1:lUYH5r6QEJTHqjgga0WFeiieqJ0iRwEuQSk20O41Vj0=
 cloud.google.com/go/maps v1.36.0/go.mod h1:Ly0sd/0G1MgKuWpGc2vCBjNZ+fc8iRHzcBWJqrw7Xao=
+cloud.google.com/go/maps v1.37.0/go.mod h1:oalKFBmf2eHmdr3OvfEiiBlOakNlVitYYEPcM3TTUB4=
 cloud.google.com/go/maps v1.38.0/go.mod h1:oalKFBmf2eHmdr3OvfEiiBlOakNlVitYYEPcM3TTUB4=
 cloud.google.com/go/mediatranslation v0.13.0/go.mod h1:kjZrowuigFr+Bf1HM1TCtp1a3E3kfG1ovPK5VEuaNAQ=
 cloud.google.com/go/memcache v1.16.0/go.mod h1:y/rXhJiieCF742K958dY29fSfM+Y3wh2thRmWspU2Dg=
@@ -293,6 +299,7 @@ github.com/arbovm/levenshtein v0.0.0-20160628152529-48b4e1c0c4d0/go.mod h1:t2tdK
 github.com/aymanbagabas/go-udiff v0.2.0/go.mod h1:RE4Ex0qsGkTAJoQdQQCA0uG+nAzJO/pI/QwceO5fgrA=
 github.com/aymerick/douceur v0.2.0/go.mod h1:wlT5vV2O3h55X9m7iVYN0TBM0NH/MmbLnd30/FjWUq4=
 github.com/bits-and-blooms/bitset v1.24.4/go.mod h1:7hO7Gc7Pp1vODcmWvKMRA9BNmbv6a/7QIWpPxHddWR8=
+github.com/bits-and-blooms/bitset v1.24.6/go.mod h1:7hO7Gc7Pp1vODcmWvKMRA9BNmbv6a/7QIWpPxHddWR8=
 github.com/bmatcuk/doublestar v1.1.1/go.mod h1:UD6OnuiIn0yFxxA2le/rnRU1G4RaI4UvFv1sNto9p6w=
 github.com/bradfitz/gomemcache v0.0.0-20260422231931-4d751bb6e37c/go.mod h1:r5xuitiExdLAJ09PR7vBVENGvp4ZuTBeWTGtxuX3K+c=
 github.com/bufbuild/protocompile v0.14.1/go.mod h1:ppVdAIhbr2H8asPk6k4pY7t9zB1OU5DoEw9xY/FUi1c=
@@ -327,6 +334,7 @@ github.com/docker/go-units v0.5.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDD
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/eapache/go-resiliency v1.7.0/go.mod h1:5yPzW0MIvSe0JDsv0v+DvcjEv2FyD6iZYSs1ZI+iQho=
 github.com/ebitengine/purego v0.10.1/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
+github.com/fatih/structs v1.1.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga6PJ7M=
 github.com/felixge/httpsnoop v1.0.4/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/flosch/pongo2/v4 v4.0.2/go.mod h1:B5ObFANs/36VwxxlgKpdchIJHMvHB562PW+BWPhwZD8=
 github.com/gabriel-vasile/mimetype v1.4.3/go.mod h1:d8uq/6HKRL6CGdk+aubisF/M5GcPfT7nKyLpA0lbSSk=
@@ -512,6 +520,7 @@ github.com/the-protobuf-project/protokit v1.1.0/go.mod h1:RBLZuWMrtD02AlgUzrWXNu
 github.com/the-protobuf-project/protokit v1.2.1/go.mod h1:HODRJtLQhT39oud+Hc7hIxK4PQlhaJ6y8qU11dBpPn4=
 github.com/the-protobuf-project/protokit v1.3.1 h1:Ky0aSjZAem4qDWbsWjaJihI9iqXN0piav9uxnBJLSUg=
 github.com/the-protobuf-project/protokit v1.3.1/go.mod h1:HODRJtLQhT39oud+Hc7hIxK4PQlhaJ6y8qU11dBpPn4=
+github.com/the-protobuf-project/protokit v1.3.2/go.mod h1:352liY5RpOxbfEUjZ20P25j81WCWgCi5OH/lrBttbk4=
 github.com/timandy/routine v1.1.6/go.mod h1:kXslgIosdY8LW0byTyPnenDgn4/azt2euufAq9rK51w=
 github.com/tklauser/go-sysconf v0.3.12/go.mod h1:Ho14jnntGE1fpdOqQEEaiKRpvIavV0hSfmBq8nJbHYI=
 github.com/tklauser/go-sysconf v0.4.0/go.mod h1:8mTNWyog7H+MpKijp4VmKJAd2bbYQ2zuUwkYRbUArPI=

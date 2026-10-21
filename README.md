@@ -496,8 +496,6 @@ After a contract change: `just gen go`, `just gen rfc`, `just gen store`,
 
 - Never edit generated code or Hasura metadata (`hasura/**/*.hml`) by hand.
   When the generated layer cannot express something, extend the generator.
-- `just gen store` deletes the hand-written
-  `internal/database/hasura/graphqlx`; restore it from git afterwards.
 - No Go import aliases; when two packages share a name, split the file.
 - api-linter must pass; only `core::0215::foreign-type-reference` may be
   disabled.
@@ -519,14 +517,14 @@ just image-run           # and run it against the local Postgres
 
 ```sh
 just test         # unit tests, race detector; the live suites skip
-just test-live    # everything, on both backends — needs Postgres and Hasura running
+just test-live    # everything, on both backends — needs Postgres, Hasura and Redis running
 just lint         # gofmt, go mod verify, vet, staticcheck, buf lint
 just check        # build + lint + test
 just bazel-check  # the same through Bazel
 ```
 
-The live suites read `FREEBUSY_TEST_POSTGRES_DSN`, `FREEBUSY_TEST_DATABASE_URL`
-and `FREEBUSY_TEST_GRAPHQL_URL`; `just test-live` sets them, adds
+The live suites read `FREEBUSY_TEST_POSTGRES_DSN`, `FREEBUSY_TEST_DATABASE_URL`,
+`FREEBUSY_TEST_GRAPHQL_URL` and `FREEBUSY_TEST_REDIS_ADDR`; `just test-live` sets them, adds
 `FREEBUSY_TEST_REQUIRE_LIVE=1` (an unset one fails instead of skipping) and runs
 one package at a time, since the suites share the database. One suite builds
 the real binary, starts it, and drives it as a client would — REST, MCP, and
@@ -578,7 +576,6 @@ tools/                  just recipes, buf templates, generator helpers
 | `go build` fails on a clean machine fetching a module | a dependency is private or missing from the public Go proxy; every dependency must be fetchable by anyone |
 | `bazel run //:gazelle`: "unknown repo" | run `bazel mod tidy` first |
 | A dependency's own BUILD files break Bazel | add it to the `gazelle_override(build_file_generation = "clean")` list in `MODULE.bazel` |
-| `internal/database/hasura/graphqlx` disappeared | `just gen store` deletes it; restore it from git |
 | The server prints "failed to start server" and exits 1 | a port is taken, or the configuration is invalid |
 
 ## Status
