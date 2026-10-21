@@ -87,8 +87,9 @@ const supportedReports = "<D:supported-report><D:report><C:calendar-query/></D:r
 	"<D:supported-report><D:report><C:free-busy-query/></D:report></D:supported-report>"
 
 // calendarResource describes a calendar collection. objs are its live
-// members, for getctag; nil skips computing it.
-func (h *Handler) calendarResource(c *calendarv1.Calendar, objs []object) resource {
+// members, for getctag, when read is true; an empty calendar's are none, and
+// still have a ctag. Unread, getctag is not offered.
+func (h *Handler) calendarResource(c *calendarv1.Calendar, objs []object, read bool) resource {
 	id := lastSegment(c.GetName())
 	r := h.collectionResource(calendarHref(id), c.GetDisplayName(), "<C:calendar/>")
 	base := r.props
@@ -132,10 +133,7 @@ func (h *Handler) calendarResource(c *calendarv1.Calendar, objs []object) resour
 		case caldav("supported-calendar-data"):
 			return `<C:calendar-data content-type="text/calendar" version="2.0"/>`, true
 		case cs("getctag"):
-			if objs == nil {
-				return "", false
-			}
-			return ctag(c, objs), true
+			return ctag(c, objs), read
 		}
 		return base(n)
 	}
@@ -286,7 +284,7 @@ func (h *Handler) resources(ctx context.Context, t target, children, wantCtag bo
 						return nil, err
 					}
 				}
-				out = append(out, h.calendarResource(c, objs))
+				out = append(out, h.calendarResource(c, objs, wantCtag))
 			}
 		}
 		return out, nil
@@ -301,7 +299,7 @@ func (h *Handler) resources(ctx context.Context, t target, children, wantCtag bo
 				return nil, err
 			}
 		}
-		out := []resource{h.calendarResource(c, objs)}
+		out := []resource{h.calendarResource(c, objs, wantCtag || children)}
 		if children {
 			for _, o := range objs {
 				out = append(out, h.objectResource(t.calendar, o))

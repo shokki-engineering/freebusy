@@ -125,7 +125,12 @@ func caldavFlow(t *testing.T, conn *database.Connection) {
 	defer func() { _ = repos.Calendars.Purge(context.Background(), calName) }()
 	c.want("MKCALENDAR", cal, "", http.StatusMethodNotAllowed)
 	_, out = c.want("PROPFIND", "/dav/calendars/", `<D:propfind xmlns:D="DAV:" xmlns:CS="http://calendarserver.org/ns/"><D:prop><D:resourcetype/><D:displayname/><CS:getctag/></D:prop></D:propfind>`, http.StatusMultiStatus, "Depth", "1")
-	mustContain(t, "home", out, "<D:href>"+cal+"</D:href>", "<C:calendar/>", "<D:displayname>Court "+suffix+"</D:displayname>", "<CS:getctag>")
+	mustContain(t, "home", out, "<D:href>"+cal+"</D:href>", "<C:calendar/>", "<D:displayname>Court "+suffix+"</D:displayname>")
+	// This calendar's own response carries a ctag, though it has no members
+	// yet: an empty calendar is still one a client syncs.
+	own := out[strings.Index(out, "<D:href>"+cal+"</D:href>"):]
+	own = own[:strings.Index(own, "</D:response>")]
+	mustContain(t, "empty calendar", own, "<CS:getctag>")
 
 	// PUT an Apple-style object: a zoned weekly series with its VTIMEZONE,
 	// under a client-chosen upper-case name. If-None-Match: * is a create.
