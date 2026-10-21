@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Loading and validating the embedded + overlay TOML at process start.
 package config
 

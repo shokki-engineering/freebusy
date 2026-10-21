@@ -1,3 +1,6 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 # Envoy grpc-web proxy runtime. Invoked as `just envoy <recipe>`.
 # Fronts the backend on :8080; admin UI on http://localhost:9901.
 # Regenerate its config with `just gen envoy`; run the freebusy backend first.

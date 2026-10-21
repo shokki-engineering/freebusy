@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package db is the availability engine's Store, written once against the
 // generated repositories so it runs on whichever backend the connection
 // carries -- GORM or Hasura -- with no query of its own.

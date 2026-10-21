@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 package db
 
 // Live test of Events' window: events far before or after the window are not

@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 package database_test
 
 // Live round-trip tests of the generated RFC repositories: each writes a full

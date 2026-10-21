@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 package db
 
 // Live integration tests: the availability engine end to end on a real

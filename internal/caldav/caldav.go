@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package caldav serves freebusy's calendars over CalDAV, RFC 4791, so an
 // operator can block out a resource from any calendar app and the engine sees
 // it at once.

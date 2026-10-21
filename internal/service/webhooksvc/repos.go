@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package webhooksvc serves WebhookService and keeps its promise: a
 // dispatcher reads changes to holds and reservations into deliveries, and a
 // sender POSTs each, signed, until its endpoint accepts it or attempts run out.

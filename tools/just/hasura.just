@@ -1,3 +1,6 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 # Hasura DDN metadata regeneration. Invoked as `just hasura <recipe>`.
 # Recipes run from the repo root so hasura/ + buf template paths resolve unchanged.
 set working-directory := '../..'
@@ -139,6 +142,8 @@ regen domain="":
       ( cd "$REPO_ROOT" && buf generate --template tools/protobuf/buf/store.buf.gen.yaml )
     fi
 
+    # Generated metadata and client carry the copyright header too.
+    ( cd "$REPO_ROOT" && go run ./tools/license -fix )
     log "done — verify with:"
     printf '    curl -s -X POST %s -H '\''content-type: application/json'\'' \\\n' "$GRAPHQL_URL"
     printf '      -d '\''{"query":"{ __type(name:\\"AllocationHolds\\"){ name fields { name } } }"}'\''\n'

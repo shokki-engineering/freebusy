@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // This file end-to-end tests the MCP surface: the generated Serve*MCP path
 // with the server's unary interceptor chain threaded through — the regression
 // test for MCP tool calls bypassing protovalidate. It boots the organisation

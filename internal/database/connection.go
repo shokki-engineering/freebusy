@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package database owns the database connection plumbing: it opens the configured
 // backend and holds the live handles (GORM and/or Hasura), and it selects the
 // provider once from the loaded config ([database].provider; GORM by default,

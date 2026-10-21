@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package config loads the freebusy service configuration and exposes it via
 // Get(). Every configuration file is compiled into the binary, so it runs with
 // nothing beside it: freebusy.release.toml holds production-safe defaults

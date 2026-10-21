@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // summary.go contains the cross-module documentation for protodoc: the
 // top-level README.md that summarises every module and visualises the import
 // relationships between them as a Mermaid graph.

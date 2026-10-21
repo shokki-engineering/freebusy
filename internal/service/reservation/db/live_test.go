@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 package db
 
 // Live integration tests: reservations end to end on a real database, once per

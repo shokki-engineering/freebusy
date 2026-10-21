@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Command envoy generates the Envoy grpc-web proxy config (envoy/launch.yaml)
 // from the generated per-service OpenAPI specs under protobuf/generated/openapi.
 //

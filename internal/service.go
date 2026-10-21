@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package internal is the transport/bootstrap layer: it builds the hybrid
 // gRPC/HTTP/MCP server and registers the freebusy services assembled by
 // internal/runtime. The protobuf/gRPC translation lives under internal/runtime;

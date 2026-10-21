@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package idempotency makes the API's `request_id` field mean what its
 // documentation has always claimed: reusing an id returns what the first call
 // returned, instead of attempting the write a second time.

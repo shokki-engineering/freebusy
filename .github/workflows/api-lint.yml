@@ -1,3 +1,6 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 # Google AIP lint over the schema tree, strictly.
 #
 # The one rule freebusy may disable, core::0215::foreign-type-reference, is

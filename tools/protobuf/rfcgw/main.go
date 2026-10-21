@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Command rfcgw points the generated RFC HTTP gateways at the BSR SDK's gRPC
 // packages, and gives each gateway a package of its own.
 //

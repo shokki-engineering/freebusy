@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Zone suite: a recurring event written in a zone keeps that zone through
 // storage, so its instances stay at the same wall-clock time across a DST
 // change -- on both backends, through ExpandEvent and through CalDAV.

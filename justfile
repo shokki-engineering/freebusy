@@ -1,3 +1,6 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 default:
     @just --list
 
@@ -76,7 +79,7 @@ clean:
 
 # Generated code follows its generator, not gofmt, so only hand-written code
 # is format-checked.
-# Format, vet, staticcheck and buf lint: CI's lint job.
+# Format, vet, staticcheck, buf lint and the copyright headers: CI's lint job.
 [group('lint')]
 lint:
     #!/usr/bin/env bash
@@ -88,6 +91,7 @@ lint:
     go vet ./...
     go run honnef.co/go/tools/cmd/staticcheck@2026.2.2 ./...
     buf lint
+    go run ./tools/license
 
 # The live suites skip here: they need the variables test-live sets.
 # Unit tests with the race detector.
@@ -114,6 +118,7 @@ test-live dsn="host=127.0.0.1 port=5432 user=postgres password=postgrespassword 
 [group('bazel')]
 gazelle:
     bazel run //:gazelle
+    go run ./tools/license -fix
 
 # Everything through Bazel: build, then the tests (live suites skip).
 [group('bazel')]
@@ -136,6 +141,13 @@ image-run: image
       -e FREEBUSY_DATABASE__POSTGRES__PASSWORD=postgrespassword \
       -e FREEBUSY_DATABASE__POSTGRES__SSLMODE=disable \
       freebusy:latest
+
+# Every file's copyright and SPDX header (tools/license); the
+# regeneration recipes run it after the generators.
+# Write any missing copyright and SPDX headers.
+[group('lint')]
+license:
+    go run ./tools/license -fix
 
 # Build, lint and unit tests: what CI runs without a database.
 [group('test')]

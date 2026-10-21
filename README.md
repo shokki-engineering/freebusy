@@ -1,3 +1,6 @@
+<!-- Copyright 2026 Srikanth K. -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+
 # freebusy
 
 **A generalized availability and booking engine.** freebusy knows what can be

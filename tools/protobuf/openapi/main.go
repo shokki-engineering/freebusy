@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Command openapi merges the generated per-service OpenAPI specs under
 // protobuf/generated/openapi into a single openapiv3-spec.yaml.
 //

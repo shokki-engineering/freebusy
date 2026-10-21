@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package rfc reads freebusy's own data off RFC records.
 //
 // A bookable thing is an RFC 9073 VRESOURCE, and freebusy keeps no columns of

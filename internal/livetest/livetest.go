@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package livetest gates the live suites -- the tests that need a running
 // Postgres or Hasura DDN engine -- on the environment variables naming them.
 //

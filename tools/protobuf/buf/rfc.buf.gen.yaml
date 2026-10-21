@@ -1,3 +1,6 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 # Transport bindings for the RFC schema module: the HTTP gateway and MCP
 # servers for the protobuf-rfc services freebusy serves (Resources, Calendars,
 # Availabilities, Events, and the rest the module defines).

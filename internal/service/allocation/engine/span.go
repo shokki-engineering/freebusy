@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package engine is the availability engine's arithmetic: what was offered, what
 // has been taken, and what is left, for any bookable thing over any window.
 //

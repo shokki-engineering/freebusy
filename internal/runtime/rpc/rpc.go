@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package rpc is the boundary between freebusy's gRPC handlers and the
 // platform runtime: Traced hands each handler body to the shared runtime-go
 // Observer (spans, rpc.requests/rpc.errors counters, outcome logs, all emitted

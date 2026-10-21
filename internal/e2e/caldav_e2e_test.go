@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // The CalDAV suite: a calendar client's view of freebusy, driven over real
 // HTTP against the handler mounted exactly as the server mounts it, on both
 // backends.

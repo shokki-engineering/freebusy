@@ -1,3 +1,6 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: Apache-2.0
+
 # The generated-code module (go.work uses it). This file makes protobuf/ a
 # Bazel package, so the go_deps extension can read its go.mod.
 exports_files(["go.mod"])

@@ -1,3 +1,6 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: Apache-2.0
+
 # Base skeleton for the merged OpenAPI spec: everything that is fixed rather than
 # derived from the per-service specs. Key order here is the output order.
 # Embedded into the openapi tool (see main.go); override with `-base <file>`.

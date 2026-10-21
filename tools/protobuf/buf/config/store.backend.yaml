@@ -1,3 +1,6 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 # Backend layout config for protoc-gen-store's prisma / gorm / repository
 # targets. Split from store.graphql.yaml: the backend targets parse into a
 # stricter config type that rejects the `graphql` and `generate` keys.

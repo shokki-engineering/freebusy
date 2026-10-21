@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package reservation is ReservationService: the last step of booking, where a
 // live hold becomes a confirmed reservation, and the step back out again.
 //

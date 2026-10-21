@@ -1,3 +1,6 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 # Exercise the gRPC API via reflection (server must be running; needs grpcurl).
 # Invoked as `just grpc <recipe>`.
 set working-directory := '../..'

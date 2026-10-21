@@ -1,3 +1,6 @@
+<!-- Copyright 2026 Srikanth K. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Freebusy Protobuf APIs
 
 > [!IMPORTANT]

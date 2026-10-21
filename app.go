@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package main provides the application shell for the freebusy service.
 // It wires together configuration, the gRPC/HTTP server, and shared
 // resources (logging, telemetry) behind a simple Start / Wait / Stop API.

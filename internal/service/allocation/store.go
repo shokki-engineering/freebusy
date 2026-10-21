@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package allocation is the availability engine's gRPC layer: AllocationService
 // (how much is free) and HoldService (take it, briefly). The arithmetic lives in
 // the engine subpackage; this package gathers the inputs from a Store, hands

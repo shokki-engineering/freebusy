@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // The webhook suite: a receiver on localhost subscribed to one site's
 // reservations, sent what changes there, signed, on both backends.
 //

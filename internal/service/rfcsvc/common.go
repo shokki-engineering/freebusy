@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package rfcsvc serves the upstream protobuf-rfc resources the availability
 // engine reads -- RFC 9073 resources, RFC 5545 calendars and events, RFC 7953
 // availability -- so an operator publishes what is bookable through the same

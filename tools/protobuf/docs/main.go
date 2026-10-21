@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // protodoc generates documentation for a tree of protobuf definitions.
 //
 // For every module directory (a directory whose version sub-dirs — v1/, v2/ …

@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: Apache-2.0
+
 module github.com/shokki-engineering/freebusy/protobuf
 
 go 1.26.5

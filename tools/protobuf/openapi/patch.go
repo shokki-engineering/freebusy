@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Post-merge spec surgery: operation patches, tag collection, unused-component pruning.
 package main
 

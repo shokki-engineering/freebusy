@@ -1,3 +1,6 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 # Code generation: protobuf -> Go, OpenAPI, database layer + cache, docs.
 # Invoked as `just gen <recipe>` (e.g. `just gen store`). `just gen` runs `all`.
 # Recipes run from the repo root so buf/template paths resolve unchanged.
@@ -16,18 +19,21 @@ deps:
 [group('codegen')]
 go:
     buf generate --template tools/protobuf/buf/go.buf.gen.yaml
+    go run ./tools/license -fix
 
 # Generate the OpenAPI v3 specs and merge them into openapiv3-spec.yaml.
 [group('codegen')]
 openapi:
     buf generate --template tools/protobuf/buf/openapiv3.buf.gen.yaml
     go run ./tools/protobuf/openapi
+    go run ./tools/license -fix
 
 # Generate the Envoy grpc-web proxy config (envoy/launch.yaml) from the OpenAPI
 # specs: one route per gRPC service -> the freebusy backend.
 [group('codegen')]
 envoy:
     go run ./tools/protobuf/envoy
+    go run ./tools/license -fix
 
 # Generate the HTTP gateway and MCP bindings for the RFC schema module
 # (protobuf-rfc's Resources, Calendars and the rest), whose messages and gRPC
@@ -37,6 +43,7 @@ envoy:
 rfc:
     buf generate --template tools/protobuf/buf/rfc.buf.gen.yaml
     go run ./tools/protobuf/rfcgw
+    go run ./tools/license -fix
 
 # Generate the database layer and its cache decorators: prisma + gorm schemas,
 # the proto-facing repositories, the typed Hasura client, and the read-through
@@ -47,8 +54,10 @@ rfc:
 [group('codegen')]
 store:
     buf generate --template tools/protobuf/buf/store.buf.gen.yaml
+    go run ./tools/license -fix
 
 # Generate protobuf docs (per-module + root README.md) via protodoc.
 [group('codegen')]
 docs:
     go run ./tools/protobuf/docs protobuf
+    go run ./tools/license -fix

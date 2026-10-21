@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // The binary suite: the real server, built and started as a process with the
 // dev configuration, driven only through what a client sees -- the REST
 // gateway, an MCP listener, and webhook deliveries arriving at a receiver.

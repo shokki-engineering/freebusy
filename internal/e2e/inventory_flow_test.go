@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // The inventory flow of the server e2e suite: an operator publishing what the
 // engine books from, through the upstream protobuf-rfc services.
 package e2e

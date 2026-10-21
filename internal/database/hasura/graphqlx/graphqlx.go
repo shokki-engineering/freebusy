@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Package graphqlx is the Hasura-side counterpart to gormx: the Telemetry
 // seam a Hasura-backed repository observes through, so
 // freebusy_orm_store_ops_total / freebusy_orm_store_duration_ms carry Hasura

@@ -1,3 +1,6 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Command migrate is a DEV-ONLY helper: it creates the Postgres schemas and runs
 // gorm AutoMigrate for every generated freebusy model (all domains), so `just run`
 // has tables to talk to. It is not a production migration tool — use real,
