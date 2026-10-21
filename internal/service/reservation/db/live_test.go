@@ -39,6 +39,14 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+// holdTTL is short so the suite can watch holds lapse, but long enough that a
+// hold outlives the reservation made from it on a loaded machine: at one
+// second, the race detector and a full parallel run made that a coin toss.
+const (
+	holdTTL = 3 * time.Second
+	pastTTL = holdTTL + 200*time.Millisecond
+)
+
 type backend struct {
 	alloc allocation.Store
 	res   reservation.Store
@@ -92,7 +100,7 @@ func TestLiveReservations(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 			site, _ := seed(t, db)
-			engine := allocation.NewServer(b.alloc, allocation.WithHoldTTL(time.Second))
+			engine := allocation.NewServer(b.alloc, allocation.WithHoldTTL(holdTTL))
 			srv := reservation.NewServer(b.res, engine)
 			hold := func(h int) *allocationpbv1.Hold {
 				t.Helper()
@@ -134,7 +142,7 @@ func TestLiveReservations(t *testing.T) {
 					t.Fatalf("retry: %v %v", again, err)
 				}
 
-				time.Sleep(1200 * time.Millisecond) // past the 1s hold TTL
+				time.Sleep(pastTTL)
 				if n := free(10); n != 0 {
 					t.Fatalf("a confirmed reservation lost its court when the hold TTL passed: %d free", n)
 				}
@@ -163,7 +171,7 @@ func TestLiveReservations(t *testing.T) {
 
 			t.Run("lapsed hold", func(t *testing.T) {
 				h := hold(12)
-				time.Sleep(1200 * time.Millisecond)
+				time.Sleep(pastTTL)
 				if _, err := create(h.GetName()); status.Code(err) != codes.FailedPrecondition {
 					t.Fatalf("got %v", err)
 				}
@@ -211,13 +219,13 @@ func TestLiveReservations(t *testing.T) {
 				if old.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED || old.GetReplacement() != rep.GetName() {
 					t.Fatalf("original %v", old)
 				}
-				time.Sleep(1200 * time.Millisecond) // past the hold TTL: only conversions count now
+				time.Sleep(pastTTL) // only conversions count now
 				if a, b := free(18), free(19); a != 1 || b != 0 {
 					t.Fatalf("after move: old window %d free (want 1), new window %d free (want 0)", a, b)
 				}
 
 				lapsed := hold(20)
-				time.Sleep(1200 * time.Millisecond)
+				time.Sleep(pastTTL)
 				if _, err := srv.RescheduleReservation(ctx, &reservationpbv1.RescheduleReservationRequest{Name: rep.GetName(), Hold: lapsed.GetName()}); status.Code(err) != codes.FailedPrecondition {
 					t.Fatalf("move onto lapsed hold: %v", err)
 				}

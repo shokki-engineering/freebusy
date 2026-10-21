@@ -139,8 +139,14 @@ func Sentence(msg string) string {
 	if msg == "" {
 		return msg
 	}
-	r, n := utf8.DecodeRuneInString(msg)
-	msg = string(unicode.ToUpper(r)) + msg[n:]
+	// Capitalize a plain first word only: a message may open with a field
+	// name (update_mask, organization.display_names) or a resource name,
+	// and those are spelled exactly.
+	first, _, _ := strings.Cut(msg, " ")
+	if strings.IndexFunc(first, func(r rune) bool { return !unicode.IsLower(r) }) < 0 {
+		r, n := utf8.DecodeRuneInString(msg)
+		msg = string(unicode.ToUpper(r)) + msg[n:]
+	}
 	if !strings.HasSuffix(msg, ".") && !strings.HasSuffix(msg, "?") {
 		msg += "."
 	}

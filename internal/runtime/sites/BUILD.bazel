@@ -1,0 +1,33 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "sites",
+    srcs = ["sites.go"],
+    importpath = "github.com/shokki-engineering/freebusy/internal/runtime/sites",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/runtime/rpc",
+        "//internal/service/rfcsvc",
+        "@build_buf_gen_go_the_protobuf_project_rfc_grpc_go//protobuf/rfc4519/organization/v1/organizationv1grpc",
+        "@build_buf_gen_go_the_protobuf_project_rfc_grpc_go//protobuf/rfc4519/organizational_unit/v1/organizational_unitv1grpc",
+        "@org_golang_google_genproto_googleapis_api//annotations",
+        "@org_golang_google_grpc//:grpc",
+        "@org_golang_google_protobuf//proto",
+        "@org_golang_google_protobuf//reflect/protoreflect",
+    ],
+)
+
+go_test(
+    name = "sites_test",
+    srcs = ["sites_test.go"],
+    embed = [":sites"],
+    deps = [
+        "//protobuf/generated/go/allocation/v1/allocationpbv1",
+        "//protobuf/generated/go/reservation/v1/reservationpbv1",
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc9073/resource/v1:resource",
+        "@org_golang_google_protobuf//proto",
+    ],
+)

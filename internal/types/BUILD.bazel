@@ -8,6 +8,7 @@ go_library(
     srcs = [
         "errors.go",
         "list.go",
+        "problem.go",
         "types.go",
     ],
     importpath = "github.com/shokki-engineering/freebusy/internal/types",

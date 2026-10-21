@@ -23,6 +23,7 @@ go_library(
         "//internal/database/repository/rfc/calendar",
         "//internal/database/repository/rfc/event",
         "//internal/database/repository/rfc/resource",
+        "//internal/runtime/hints",
         "//internal/runtime/rpc",
         "//internal/types",
         "//protobuf/generated/go/allocation/v1/allocationpbv1",

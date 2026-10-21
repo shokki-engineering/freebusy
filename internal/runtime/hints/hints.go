@@ -123,7 +123,7 @@ func notDeleted(st *status.Status, name string) error {
 
 // generic is msg when it is a bare sentinel with nothing said about what.
 func generic(msg string) string {
-	switch m := strings.ToLower(strings.TrimSpace(msg)); m {
+	switch m := strings.TrimSuffix(strings.ToLower(strings.TrimSpace(msg)), "."); m {
 	case "not found", "already exists", "conflict":
 		return m
 	}
@@ -131,6 +131,14 @@ func generic(msg string) string {
 }
 
 func notFound(st *status.Status, name string) error {
+	// "organizationalUnits/x:checkAvailability" sent as GET reaches the Get
+	// of organizationalUnits/x, verb and all: the caller meant the custom
+	// method, which is a POST.
+	if base, verb, ok := strings.Cut(name, ":"); ok && verb != "" && !strings.Contains(verb, "/") {
+		r := lookup(base)
+		return with(st, fmt.Sprintf("%q is not a %s name: :%s is a custom method, and custom methods are called with POST, not GET.",
+			name, strings.ToLower(r.label()), verb), &errdetails.ResourceInfo{ResourceType: r.Type, ResourceName: base, Description: "custom method called with GET"})
+	}
 	r := lookup(name)
 	msg := fmt.Sprintf("%s %q does not exist. Check the name", r.label(), name)
 	if l := r.listCall(parentOf(name)); l != "" {

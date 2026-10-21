@@ -15,6 +15,7 @@ go_library(
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/database/repository/repox",
+        "//internal/runtime/hints",
         "//internal/runtime/rpc",
         "//internal/types",
         "//protobuf/generated/go/allocation/v1/allocationpbv1",

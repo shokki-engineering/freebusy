@@ -208,6 +208,21 @@ func updatePaths(m proto.Message, mask *fieldmaskpb.FieldMask) ([]string, error)
 	if len(mask.GetPaths()) == 1 && mask.GetPaths()[0] == "*" {
 		return nil, nil
 	}
+	// A path may be the field's proto name or, as REST clients send it, its
+	// JSON name (AIP-161): displayNames is display_names.
+	fields := m.ProtoReflect().Descriptor().Fields()
+	paths := make([]string, len(mask.GetPaths()))
+	for i, p := range mask.GetPaths() {
+		head, rest, _ := strings.Cut(p, ".")
+		if fd := fields.ByJSONName(head); fd != nil && fields.ByName(protoreflect.Name(head)) == nil {
+			head = string(fd.Name())
+		}
+		paths[i] = head
+		if rest != "" {
+			paths[i] += "." + rest
+		}
+	}
+	mask = &fieldmaskpb.FieldMask{Paths: paths}
 	if !mask.IsValid(m) {
 		return nil, types.BadField("UNKNOWN_MASK_PATH", "update_mask",
 			fmt.Sprintf("update_mask %v names a field %s does not have", mask.GetPaths(), m.ProtoReflect().Descriptor().Name()),

@@ -5,6 +5,7 @@ package e2e
 
 import (
 	"context"
+	"strings"
 	"testing"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -72,11 +74,16 @@ func tenancyFlow(t *testing.T, c *e2eClients) {
 		OrganizationalUnit:   &organizational_unitv1.OrganizationalUnit{DisplayNames: []string{"orphan"}},
 	})
 	wantCode(t, err, codes.InvalidArgument, "a site with no organization")
+	// No organization yet: told to create one, not merely that the field is required.
+	wantHint(t, err, "Create the organization first with CreateOrganization (POST /v1/organizations)")
 	_, err = c.units.CreateOrganizationalUnit(ctx, &organizational_unitv1.CreateOrganizationalUnitRequest{
 		OrganizationalUnitId: id + "-orphan",
 		OrganizationalUnit:   &organizational_unitv1.OrganizationalUnit{DisplayNames: []string{"orphan"}, Organization: "organizations/" + id + "-nobody"},
 	})
 	wantCode(t, err, codes.InvalidArgument, "a site of an organization nobody created")
+	// An organization named but not there: told it was not found, and where to look.
+	wantHint(t, err, `organization "organizations/`+id+`-nobody" does not exist`)
+	wantHint(t, err, "ListOrganizations (GET /v1/organizations)")
 
 	// A resource needs a site.
 	_, err = c.resources.CreateResource(ctx, &resourcev1.CreateResourceRequest{Resource: &resourcev1.Resource{}})
@@ -121,5 +128,13 @@ func tenancyFlow(t *testing.T, c *e2eClients) {
 	}
 	if err := check(site); err != nil {
 		t.Fatalf("a restored site: %v", err)
+	}
+}
+
+// wantHint asserts err's message carries what to do.
+func wantHint(t *testing.T, err error, want string) {
+	t.Helper()
+	if msg := status.Convert(err).Message(); !strings.Contains(strings.ToLower(msg), strings.ToLower(want)) {
+		t.Fatalf("message %q does not say %q", msg, want)
 	}
 }

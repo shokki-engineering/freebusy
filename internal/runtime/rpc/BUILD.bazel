@@ -1,7 +1,7 @@
 # Copyright 2026 Srikanth K.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-load("@rules_go//go:def.bzl", "go_library")
+load("@rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "rpc",
@@ -12,6 +12,19 @@ go_library(
         "//internal/types",
         "//shared",
         "@com_github_the_protobuf_project_runtime_go_grpc//:grpc",
+        "@org_golang_google_genproto_googleapis_rpc//errdetails",
+        "@org_golang_google_grpc//codes",
+        "@org_golang_google_grpc//status",
+        "@org_golang_google_protobuf//protoadapt",
+    ],
+)
+
+go_test(
+    name = "rpc_test",
+    srcs = ["rpc_test.go"],
+    embed = [":rpc"],
+    deps = [
+        "//internal/types",
         "@org_golang_google_genproto_googleapis_rpc//errdetails",
         "@org_golang_google_grpc//codes",
         "@org_golang_google_grpc//status",
