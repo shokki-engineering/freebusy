@@ -22,6 +22,11 @@ updates:
       # repository and expect each other's versions.
       runtime-go:
         patterns: ["github.com/the-protobuf-project/runtime-go/*"]
+      # Every OpenTelemetry module in one pull request: the SDK and API are
+      # released together, and a partial bump does not compile (otel/log and
+      # otel/sdk/log must agree).
+      opentelemetry:
+        patterns: ["go.opentelemetry.io/*"]
       gomod:
         update-types: [minor, patch]
     ignore:
@@ -29,6 +34,11 @@ updates:
       # buf.gen templates, which the generated stores were made from; they
       # move with a regeneration (`just gen`), never alone.
       - dependency-name: "buf.build/gen/go/the-protobuf-project/*"
+      # grpc-gateway 2.31+ requires OpenTelemetry 1.47, whose otel/log API
+      # the-protobuf-project/telemetry does not build against yet (#3 broke
+      # main this way). Lift when telemetry moves.
+      - dependency-name: "github.com/grpc-ecosystem/grpc-gateway/v2"
+        versions: [">= 2.31.0"]
 
   # The generated-code module, with its own go.mod.
   - package-ecosystem: gomod
@@ -41,6 +51,8 @@ updates:
         update-types: [minor, patch]
     ignore:
       - dependency-name: "buf.build/gen/go/the-protobuf-project/*"
+      - dependency-name: "github.com/grpc-ecosystem/grpc-gateway/v2"
+        versions: [">= 2.31.0"]
 
   - package-ecosystem: github-actions
     directory: /

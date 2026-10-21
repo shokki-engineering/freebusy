@@ -11,7 +11,10 @@ load("@rules_go//go:def.bzl", "go_cross_binary")
 load("@rules_oci//oci:defs.bzl", "oci_image", "oci_image_index", "oci_load", "oci_push")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
 
-ARCHS = ["amd64", "arm64"]
+ARCHS = [
+    "amd64",
+    "arm64",
+]
 
 [go_cross_binary(
     name = "freebusy_linux_" + arch,

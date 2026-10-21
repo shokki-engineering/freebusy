@@ -41,7 +41,7 @@ func init() {
 	}
 
 	loadedConfig = &AppConfig{}
-	if err := shared.Getconfig().Toml.Unmarshal("", loadedConfig); err != nil {
+	if err := shared.UnmarshalConfig(loadedConfig); err != nil {
 		panic(fmt.Sprintf("failed to unmarshal config: %v", err))
 	}
 

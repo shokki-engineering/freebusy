@@ -7,7 +7,7 @@ require (
 	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261021085804-ae1e2acc01d5.1
 	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261021085804-ae1e2acc01d5.2
 	cloud.google.com/go/longrunning v1.0.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.32.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0
 	github.com/the-protobuf-project/grpc-mcp-gateway v1.6.0
 	github.com/the-protobuf-project/runtime-go/agents v0.0.0-20260904054035-1f2313e0d64a
 	github.com/the-protobuf-project/store v1.5.1

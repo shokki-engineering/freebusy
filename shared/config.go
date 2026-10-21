@@ -1,52 +1,33 @@
 package shared
 
 import (
-	"log"
+	"strings"
 	"sync"
 
 	"github.com/knadh/koanf/parsers/toml"
+	"github.com/knadh/koanf/providers/env/v2"
 	"github.com/knadh/koanf/providers/rawbytes"
-	"github.com/oh-tarnished/runtime-go/config"
+	"github.com/knadh/koanf/v2"
 )
 
 var (
-	// The global instance is unexported to prevent other packages from modifying it directly.
-	globalconfig *config.Config
-	// Once ensures the initialization function is called exactly one time.
-	configOnce sync.Once
+	// configState is the process's configuration, built in layers by
+	// config/load.go: embedded defaults, the dev overlay, the environment.
+	configState *koanf.Koanf
+	configOnce  sync.Once
 )
 
-// Getconfig returns the single, shared instance of the config session.
-// It initializes the session on the first call. If initialization fails,
-// the program will exit with a fatal error.
-func Getconfig() *config.Config {
-	// once.Do will execute the function only on the very first call to Getconfig.
-	// All subsequent calls will skip the function but still get the result.
-	configOnce.Do(func() {
-		// Initialize the session with a default configuration.
-		// You can customize the BasePath or other options here.
-		sy, err := config.New(config.Options{
-			BasePath:   ".",
-			YamlParser: config.KoanfYamlParser,
-			JsonParser: config.KoanfJsonParser,
-			TomlParser: config.KoanfTomlParser,
-		})
-		if err != nil {
-			// Using log.Fatalf is preferable to panic for initialization errors.
-			log.Fatalf("FATAL: Failed to initialize global config session: %v", err)
-		}
-		globalconfig = sy
-	})
-
-	return globalconfig
+// Config returns the process's configuration state, created on first use.
+func Config() *koanf.Koanf {
+	configOnce.Do(func() { configState = koanf.New(".") })
+	return configState
 }
 
-// LoadTomlBytes loads raw TOML bytes into the shared config's koanf state,
-// with the parser config's own Toml.Load uses. It reads from memory, so it
-// works where the working directory is not writable -- a scratch container
-// running as an unprivileged user.
+// LoadTomlBytes overlays raw TOML onto the configuration. It reads from
+// memory, so it works where the working directory is not writable -- a scratch
+// container running as an unprivileged user.
 func LoadTomlBytes(data []byte) error {
-	return Getconfig().Koanf().Load(rawbytes.Provider(data), toml.Parser())
+	return Config().Load(rawbytes.Provider(data), toml.Parser())
 }
 
 // LoadEnv overlays every environment variable starting with prefix: double
@@ -55,5 +36,21 @@ func LoadTomlBytes(data []byte) error {
 // no double underscore has each underscore read as a level, so a key that has
 // one of its own, like enable_http, needs the double-underscore form.
 func LoadEnv(prefix string) error {
-	return Getconfig().LoadEnv(prefix)
+	return Config().Load(env.Provider(".", env.Opt{
+		Prefix: prefix,
+		TransformFunc: func(k, v string) (string, any) {
+			key := strings.ToLower(strings.TrimPrefix(k, prefix))
+			if strings.Contains(key, "__") {
+				return strings.ReplaceAll(key, "__", "."), v
+			}
+			return strings.ReplaceAll(key, "_", "."), v
+		},
+	}), nil)
+}
+
+// UnmarshalConfig decodes the configuration into out by its koanf tags.
+// Strings convert to the field's type, so an environment variable can set a
+// port or a flag.
+func UnmarshalConfig(out any) error {
+	return Config().UnmarshalWithConf("", out, koanf.UnmarshalConf{Tag: "koanf"})
 }
