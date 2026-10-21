@@ -88,9 +88,11 @@ func (a *App) Stop() error {
 		}
 	}
 
+	// Flushing telemetry can fail -- no collector listening, a network gone --
+	// without the server having stopped any less cleanly, so it is reported,
+	// not returned: a supervisor reading the exit code sees a clean stop.
 	if err := shared.Close(); err != nil {
-		shared.Telemetry.Logger.Warn("Error during shutdown", "error", err)
-		return err
+		shared.Telemetry.Logger.Warn("Telemetry was not flushed on shutdown", "error", err)
 	}
 
 	shared.Telemetry.Logger.Info("Application stopped", "name", a.Name)
