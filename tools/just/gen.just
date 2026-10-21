@@ -19,6 +19,8 @@ deps:
 [group('codegen')]
 go:
     buf generate --template tools/protobuf/buf/go.buf.gen.yaml
+    # The generators clear their output directories, BUILD.bazel included.
+    bazel run //:gazelle
     go run ./tools/license -fix
 
 # Generate the OpenAPI v3 specs and merge them into openapiv3-spec.yaml.
@@ -43,6 +45,8 @@ envoy:
 rfc:
     buf generate --template tools/protobuf/buf/rfc.buf.gen.yaml
     go run ./tools/protobuf/rfcgw
+    # The generators clear their output directories, BUILD.bazel included.
+    bazel run //:gazelle
     go run ./tools/license -fix
 
 # Generate the database layer and its cache decorators: prisma + gorm schemas,
@@ -54,6 +58,8 @@ rfc:
 [group('codegen')]
 store:
     buf generate --template tools/protobuf/buf/store.buf.gen.yaml
+    # The generators clear their output directories, BUILD.bazel included.
+    bazel run //:gazelle
     go run ./tools/license -fix
 
 # Generate protobuf docs (per-module + root README.md) via protodoc.

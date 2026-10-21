@@ -150,22 +150,51 @@ func (s *Store) InsertHold(ctx context.Context, parent string, h *allocationpbv1
 // hold now has the time: the backend does not always say so itself -- two
 // inserts racing under the exclusion constraint can deadlock, and a GraphQL
 // engine may hide the database's reason -- but the claims it left behind do.
+//
+// The winner may not have committed yet. Two losers waiting on it can
+// deadlock with each other, and the victim is aborted at once, while the
+// winner's claim is still invisible. So a check that finds no rival looks
+// again, a few times over about a second, before calling the failure what it
+// said it was.
 func (s *Store) lostRace(ctx context.Context, h *allocationpbv1.Hold, window [2]time.Time, err error) error {
 	if errors.Is(err, types.ErrConflict) || errors.Is(err, types.ErrAlreadyExists) {
 		return err
 	}
+	wait := 50 * time.Millisecond
+	for attempt := 0; ; attempt++ {
+		if rival, ok := s.rivalClaim(ctx, h, window); ok {
+			return fmt.Errorf("%w: %s was taken while this hold was written", types.ErrConflict, rival)
+		}
+		if attempt == lostRaceChecks-1 {
+			return err
+		}
+		select {
+		case <-ctx.Done():
+			return err
+		case <-time.After(wait):
+		}
+		wait *= 2
+	}
+}
+
+// lostRaceChecks bounds lostRace's looks: 50+100+200+400 ms of waiting
+// between five checks.
+const lostRaceChecks = 5
+
+// rivalClaim names a resource another hold now claims, live, across window.
+func (s *Store) rivalClaim(ctx context.Context, h *allocationpbv1.Hold, window [2]time.Time) (string, bool) {
 	now := time.Now()
-	claims, cerr := s.claimsOverlapping(ctx, h.GetResources(), window)
-	if cerr != nil {
-		return err
+	claims, err := s.claimsOverlapping(ctx, h.GetResources(), window)
+	if err != nil {
+		return "", false
 	}
 	for _, a := range claims {
 		live := a.GetExpireTime() == nil || a.GetExpireTime().AsTime().After(now)
 		if live && a.GetHold() != h.GetName() {
-			return fmt.Errorf("%w: %s was taken while this hold was written", types.ErrConflict, a.GetResource())
+			return a.GetResource(), true
 		}
 	}
-	return err
+	return "", false
 }
 
 // GetHold reads one hold, as stored.

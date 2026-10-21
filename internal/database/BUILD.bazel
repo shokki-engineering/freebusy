@@ -34,6 +34,7 @@ go_test(
     name = "database_test",
     srcs = [
         "cache_test.go",
+        "paging_live_test.go",
         "pool_test.go",
         "rfc_roundtrip_live_test.go",
         "translate_test.go",
