@@ -8,7 +8,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 4 | 3 |
+| 7 | 5 |
 
 ## Entity relationships
 
@@ -18,6 +18,13 @@ erDiagram
     Allocation {
         string id PK
         string hold FK
+    }
+    Delivery {
+        string id PK
+        string webhook_id FK
+    }
+    FeedCursor {
+        string id PK
     }
     Hold {
         string id PK
@@ -29,7 +36,11 @@ erDiagram
         string id PK
         string hold FK
     }
+    Webhook {
+        string id PK
+    }
     Allocation }o--|| Hold : "hold"
+    Delivery }o--|| Webhook : "webhook_id"
     Reservation }o--|| Hold : "hold"
 ```
 
@@ -137,3 +148,65 @@ The record behind every `request_id` field in this API: it remembers what the fi
 ### Enums
 
 - `IdempotencyState`: IN_FLIGHT, DONE
+
+## Schema `webhook`
+
+### `Delivery` → `deliveries`
+
+One event owed to one webhook, and how sending it went. The id is derived, not random: a digest of the webhook and the event, so recording the same change twice -- a rescan, or two servers scanning at once -- loses the race on the primary key instead of sending the event twice.
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `name` | `VARCHAR(255)` | not null |
+| `event_id` | `VARCHAR(255)` | nullable |
+| `event_type` | `VARCHAR(255)` | nullable |
+| `subject` | `VARCHAR(255)` | nullable |
+| `payload` | `VARCHAR(255)` | nullable |
+| `state` | `DeliveryState` | nullable |
+| `attempt_count` | `INTEGER` | nullable |
+| `next_attempt_time` | `TIMESTAMPTZ` | nullable |
+| `response_code` | `INTEGER` | nullable |
+| `error_message` | `VARCHAR(255)` | nullable |
+| `create_time` | `TIMESTAMPTZ` | not null |
+| `update_time` | `TIMESTAMPTZ` | not null |
+| `deliver_time` | `TIMESTAMPTZ` | nullable |
+| `etag` | `VARCHAR(255)` | nullable |
+| `webhook_id` | `CHAR(26)` | not null |
+
+### `FeedCursor` → `feed_cursors`
+
+How far the dispatcher has read one change feed: every record of the feed last modified before position_time has been recorded for every webhook. Storage only -- no service exposes it.
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `name` | `VARCHAR(255)` | not null |
+| `position_time` | `TIMESTAMPTZ` | not null |
+| `update_time` | `TIMESTAMPTZ` | not null |
+| `etag` | `VARCHAR(255)` | nullable |
+
+### `Webhook` → `resource`
+
+A Webhook sends an HTTPS endpoint each change to holds, reservations and the inventory they draw on -- resources, calendars, calendar events and availability -- as a signed CloudEvent: how a payment service learns a hold lapsed, or a booking layer that a reservation was confirmed or a court was closed for maintenance, without polling. Changes are read from the records themselves, not announced by the writes, so a change cannot be lost to a crash between a write and its announcement. The price is coalescing: two transitions of one record in quick succession may arrive as one event carrying the later state. Every event carries the whole record, so a receiver acts on what is, not on a diff.
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `name` | `VARCHAR(255)` | not null |
+| `display_name` | `VARCHAR(255)` | nullable |
+| `uri` | `VARCHAR(255)` | not null |
+| `event_types` | `VARCHAR(255)[]` | nullable |
+| `organizational_unit` | `VARCHAR(255)` | nullable |
+| `state` | `WebhookState` | nullable |
+| `secret` | `VARCHAR(255)` | nullable |
+| `previous_secret` | `VARCHAR(255)` | nullable |
+| `rotate_time` | `TIMESTAMPTZ` | nullable |
+| `create_time` | `TIMESTAMPTZ` | not null |
+| `update_time` | `TIMESTAMPTZ` | not null |
+| `etag` | `VARCHAR(255)` | nullable |
+
+### Enums
+
+- `DeliveryState`: PENDING, SUCCEEDED, FAILED
+- `WebhookState`: ACTIVE, PAUSED

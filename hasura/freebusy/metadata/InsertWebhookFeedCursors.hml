@@ -1,0 +1,126 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertWebhookFeedCursorsObject
+  fields:
+    - name: etag
+      type: String_1
+    - name: id
+      type: String_1!
+    - name: name
+      type: String_1!
+    - name: positionTime
+      type: Timestamptz!
+    - name: updateTime
+      type: Timestamptz!
+  graphql:
+    typeName: InsertWebhookFeedCursorsObject
+    inputTypeName: InsertWebhookFeedCursorsObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_webhook_feed_cursors_object
+      fieldMapping:
+        etag:
+          column:
+            name: etag
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        positionTime:
+          column:
+            name: position_time
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertWebhookFeedCursorsObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - etag
+          - id
+          - name
+          - positionTime
+          - updateTime
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertWebhookFeedCursorsResponse
+  description: Responses from the 'insert_webhook_feed_cursors' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[WebhookFeedCursors!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertWebhookFeedCursorsResponse
+    inputTypeName: InsertWebhookFeedCursorsResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_webhook_feed_cursors_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertWebhookFeedCursorsResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertWebhookFeedCursors
+  outputType: InsertWebhookFeedCursorsResponse!
+  arguments:
+    - name: objects
+      type: "[InsertWebhookFeedCursorsObject!]!"
+    - name: postCheck
+      type: WebhookFeedCursorsBoolExp
+      description: Insert permission predicate over the 'webhook_feed_cursors' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: insert_webhook_feed_cursors
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertWebhookFeedCursors
+    rootFieldKind: Mutation
+  description: Insert into the webhook_feed_cursors table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertWebhookFeedCursors
+  permissions:
+    - role: admin
+      allowExecution: true
+

@@ -1,0 +1,73 @@
+components:
+  schemas:
+    freebusy.webhook.v1.Webhook:
+      description: 'A Webhook sends an HTTPS endpoint each change to holds, reservations
+        and the inventory they draw on -- resources, calendars, calendar events and
+        availability -- as a signed CloudEvent: how a payment service learns a hold
+        lapsed, or a booking layer that a reservation was confirmed or a court was
+        closed for maintenance, without polling.'
+      properties:
+        createTime:
+          description: Creation timestamp.
+          format: date-time
+          type: string
+        displayName:
+          description: Human-readable name, for the operator's own reference.
+          type: string
+        etag:
+          description: Opaque version for optimistic concurrency (AIP-154).
+          type: string
+        eventTypes:
+          description: 'The event types sent, e.g. "freebusy.reservation.confirmed"
+            or "freebusy.event.deleted". Empty sends every type. A type is "freebusy.<record>.<what
+            happened>": holds are active, released, expired and converted; reservations
+            pending, confirmed, cancelling, cancelled, failed, rescheduling and rescheduled;
+            resources, calendars, events and availabilities created, updated and deleted.'
+          items:
+            type: string
+          type: array
+        name:
+          description: 'The webhook name. Format: webhooks/{webhook}'
+          type: string
+        organizationalUnit:
+          description: 'Limits events to one site''s holds, reservations and resources.
+            Empty sends every site''s. Calendars, events and availabilities belong
+            to no site, so a webhook limited to one is not sent them. Format: organizationalUnits/{organizational_unit}'
+          type: string
+        previousSecret:
+          description: The key the secret replaced, which also signs deliveries for
+            a day after a rotation so a receiver can switch keys without dropping
+            one. Never returned.
+          type: string
+        rotateTime:
+          description: When the secret was last rotated.
+          format: date-time
+          type: string
+        secret:
+          description: 'The key every delivery is signed with, in the Standard Webhooks
+            form: a "whsec_" prefix and the encoded key. Returned by CreateWebhook
+            and RotateWebhookSecret only; every other read leaves it empty.'
+          type: string
+        state:
+          description: Whether changes are sent. Set by PauseWebhook and ResumeWebhook;
+            pausing keeps the webhook and its history.
+          enum:
+          - WEBHOOK_STATE_UNSPECIFIED
+          - WEBHOOK_STATE_ACTIVE
+          - WEBHOOK_STATE_PAUSED
+          type: string
+        updateTime:
+          description: Last-modification timestamp.
+          format: date-time
+          type: string
+        uri:
+          description: The endpoint each event is POSTed to. HTTPS, except to a loopback
+            host when the server allows insecure endpoints for development. Required
+            on create; an update that leaves it out keeps the current one.
+          type: string
+      type: object
+info:
+  title: OpenAPI Spec for Solo APIs.
+  version: v1
+openapi: 3.0.1
+paths: null

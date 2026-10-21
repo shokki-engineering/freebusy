@@ -40,6 +40,7 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/unitql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/webhookql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 	"net/url"
 )
@@ -79,6 +80,7 @@ type QueryHandler struct {
 	Unit         unitql.QueryHandler
 	User         userql.QueryHandler
 	Vcard        vcardql.QueryHandler
+	Webhook      webhookql.QueryHandler
 }
 
 // QueryRaw runs an arbitrary GraphQL query string with optional variables and returns the decoded
@@ -122,6 +124,7 @@ type MutationHandler struct {
 	Unit         unitql.MutationHandler
 	User         userql.MutationHandler
 	Vcard        vcardql.MutationHandler
+	Webhook      webhookql.MutationHandler
 }
 
 // ExecuteRaw runs an arbitrary GraphQL mutation string with optional variables and returns the decoded
@@ -169,6 +172,7 @@ type SubscriptionHandler struct {
 	Unit         unitql.SubscriptionHandler
 	User         userql.SubscriptionHandler
 	Vcard        vcardql.SubscriptionHandler
+	Webhook      webhookql.SubscriptionHandler
 }
 
 // New connects to the endpoint described by opts and returns a Service.
@@ -211,6 +215,7 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Unit:         unitql.NewQuery(gql),
 			User:         userql.NewQuery(gql),
 			Vcard:        vcardql.NewQuery(gql),
+			Webhook:      webhookql.NewQuery(gql),
 		},
 		Mutation: MutationHandler{
 			gql:          gql,
@@ -238,6 +243,7 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Unit:         unitql.NewMutation(gql),
 			User:         userql.NewMutation(gql),
 			Vcard:        vcardql.NewMutation(gql),
+			Webhook:      webhookql.NewMutation(gql),
 		},
 		Subscription: SubscriptionHandler{
 			Allocation:   allocationql.NewSubscription(gql),
@@ -264,6 +270,7 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Unit:         unitql.NewSubscription(gql),
 			User:         userql.NewSubscription(gql),
 			Vcard:        vcardql.NewSubscription(gql),
+			Webhook:      webhookql.NewSubscription(gql),
 		},
 	}, nil
 }

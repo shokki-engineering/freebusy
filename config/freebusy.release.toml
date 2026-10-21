@@ -82,3 +82,12 @@ prefix = "freebusy"
 # CalDAV (RFC 4791) under /dav/ on the HTTP port. Off: it has no
 # authentication yet, so it must not face a network.
 enabled = false
+
+[webhooks]
+# Webhook delivery of hold and reservation changes. Endpoints must be https.
+enabled = true
+allow_insecure_endpoints = false
+interval_seconds = 5
+max_attempts = 8
+allow_private_networks = false
+retention_days = 30

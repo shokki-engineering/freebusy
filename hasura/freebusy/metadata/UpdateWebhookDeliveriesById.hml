@@ -1,0 +1,731 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesAttemptCount
+  description: Update the 'attempt_count' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: Int32
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesAttemptCount
+    inputTypeName: UpdateColumnWebhookDeliveriesAttemptCountInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_attempt_count
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesAttemptCount
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesCreateTime
+  description: Update the 'create_time' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesCreateTime
+    inputTypeName: UpdateColumnWebhookDeliveriesCreateTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_create_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesCreateTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesDeliverTime
+  description: Update the 'deliver_time' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: Timestamptz
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesDeliverTime
+    inputTypeName: UpdateColumnWebhookDeliveriesDeliverTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_deliver_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesDeliverTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesErrorMessage
+  description: Update the 'error_message' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesErrorMessage
+    inputTypeName: UpdateColumnWebhookDeliveriesErrorMessageInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_error_message
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesErrorMessage
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesEtag
+  description: Update the 'etag' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesEtag
+    inputTypeName: UpdateColumnWebhookDeliveriesEtagInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_etag
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesEtag
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesEventId
+  description: Update the 'event_id' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesEventId
+    inputTypeName: UpdateColumnWebhookDeliveriesEventIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_event_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesEventId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesEventType
+  description: Update the 'event_type' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesEventType
+    inputTypeName: UpdateColumnWebhookDeliveriesEventTypeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_event_type
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesEventType
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesId
+  description: Update the 'id' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesId
+    inputTypeName: UpdateColumnWebhookDeliveriesIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesName
+  description: Update the 'name' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesName
+    inputTypeName: UpdateColumnWebhookDeliveriesNameInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_name
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesName
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesNextAttemptTime
+  description: Update the 'next_attempt_time' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: Timestamptz
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesNextAttemptTime
+    inputTypeName: UpdateColumnWebhookDeliveriesNextAttemptTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_next_attempt_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesNextAttemptTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesPayload
+  description: Update the 'payload' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesPayload
+    inputTypeName: UpdateColumnWebhookDeliveriesPayloadInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_payload
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesPayload
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesResponseCode
+  description: Update the 'response_code' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: Int32
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesResponseCode
+    inputTypeName: UpdateColumnWebhookDeliveriesResponseCodeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_response_code
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesResponseCode
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesState
+  description: Update the 'state' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesState
+    inputTypeName: UpdateColumnWebhookDeliveriesStateInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_state
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesState
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesSubject
+  description: Update the 'subject' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesSubject
+    inputTypeName: UpdateColumnWebhookDeliveriesSubjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_subject
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesSubject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesUpdateTime
+  description: Update the 'update_time' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesUpdateTime
+    inputTypeName: UpdateColumnWebhookDeliveriesUpdateTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_update_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesUpdateTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookDeliveriesWebhookId
+  description: Update the 'webhook_id' column in the 'webhook_deliveries' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookDeliveriesWebhookId
+    inputTypeName: UpdateColumnWebhookDeliveriesWebhookIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_deliveries_webhook_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookDeliveriesWebhookId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateWebhookDeliveriesByIdUpdateColumns
+  description: Update the columns of the 'webhook_deliveries' collection
+  fields:
+    - name: attemptCount
+      type: UpdateColumnWebhookDeliveriesAttemptCount
+      description: Update the 'attempt_count' column in the 'webhook_deliveries' collection.
+    - name: createTime
+      type: UpdateColumnWebhookDeliveriesCreateTime
+      description: Update the 'create_time' column in the 'webhook_deliveries' collection.
+    - name: deliverTime
+      type: UpdateColumnWebhookDeliveriesDeliverTime
+      description: Update the 'deliver_time' column in the 'webhook_deliveries' collection.
+    - name: errorMessage
+      type: UpdateColumnWebhookDeliveriesErrorMessage
+      description: Update the 'error_message' column in the 'webhook_deliveries' collection.
+    - name: etag
+      type: UpdateColumnWebhookDeliveriesEtag
+      description: Update the 'etag' column in the 'webhook_deliveries' collection.
+    - name: eventId
+      type: UpdateColumnWebhookDeliveriesEventId
+      description: Update the 'event_id' column in the 'webhook_deliveries' collection.
+    - name: eventType
+      type: UpdateColumnWebhookDeliveriesEventType
+      description: Update the 'event_type' column in the 'webhook_deliveries' collection.
+    - name: id
+      type: UpdateColumnWebhookDeliveriesId
+      description: Update the 'id' column in the 'webhook_deliveries' collection.
+    - name: name
+      type: UpdateColumnWebhookDeliveriesName
+      description: Update the 'name' column in the 'webhook_deliveries' collection.
+    - name: nextAttemptTime
+      type: UpdateColumnWebhookDeliveriesNextAttemptTime
+      description: Update the 'next_attempt_time' column in the 'webhook_deliveries'
+        collection.
+    - name: payload
+      type: UpdateColumnWebhookDeliveriesPayload
+      description: Update the 'payload' column in the 'webhook_deliveries' collection.
+    - name: responseCode
+      type: UpdateColumnWebhookDeliveriesResponseCode
+      description: Update the 'response_code' column in the 'webhook_deliveries' collection.
+    - name: state
+      type: UpdateColumnWebhookDeliveriesState
+      description: Update the 'state' column in the 'webhook_deliveries' collection.
+    - name: subject
+      type: UpdateColumnWebhookDeliveriesSubject
+      description: Update the 'subject' column in the 'webhook_deliveries' collection.
+    - name: updateTime
+      type: UpdateColumnWebhookDeliveriesUpdateTime
+      description: Update the 'update_time' column in the 'webhook_deliveries' collection.
+    - name: webhookId
+      type: UpdateColumnWebhookDeliveriesWebhookId
+      description: Update the 'webhook_id' column in the 'webhook_deliveries' collection.
+  graphql:
+    typeName: UpdateWebhookDeliveriesByIdUpdateColumns
+    inputTypeName: UpdateWebhookDeliveriesByIdUpdateColumnsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_webhook_deliveries_by_id_update_columns
+      fieldMapping:
+        attemptCount:
+          column:
+            name: attempt_count
+        createTime:
+          column:
+            name: create_time
+        deliverTime:
+          column:
+            name: deliver_time
+        errorMessage:
+          column:
+            name: error_message
+        etag:
+          column:
+            name: etag
+        eventId:
+          column:
+            name: event_id
+        eventType:
+          column:
+            name: event_type
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        nextAttemptTime:
+          column:
+            name: next_attempt_time
+        payload:
+          column:
+            name: payload
+        responseCode:
+          column:
+            name: response_code
+        state:
+          column:
+            name: state
+        subject:
+          column:
+            name: subject
+        updateTime:
+          column:
+            name: update_time
+        webhookId:
+          column:
+            name: webhook_id
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateWebhookDeliveriesByIdUpdateColumns
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - attemptCount
+          - createTime
+          - deliverTime
+          - errorMessage
+          - etag
+          - eventId
+          - eventType
+          - id
+          - name
+          - nextAttemptTime
+          - payload
+          - responseCode
+          - state
+          - subject
+          - updateTime
+          - webhookId
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateWebhookDeliveriesByIdResponse
+  description: Responses from the 'update_webhook_deliveries_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[WebhookDeliveries!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: UpdateWebhookDeliveriesByIdResponse
+    inputTypeName: UpdateWebhookDeliveriesByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_webhook_deliveries_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateWebhookDeliveriesByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: UpdateWebhookDeliveriesById
+  outputType: UpdateWebhookDeliveriesByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: postCheck
+      type: WebhookDeliveriesBoolExp
+      description: Update permission post-condition predicate over the
+        'webhook_deliveries' collection
+    - name: preCheck
+      type: WebhookDeliveriesBoolExp
+      description: Update permission pre-condition predicate over the
+        'webhook_deliveries' collection
+    - name: updateColumns
+      type: UpdateWebhookDeliveriesByIdUpdateColumns!
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: update_webhook_deliveries_by_id
+    argumentMapping:
+      keyId: key_id
+      postCheck: post_check
+      preCheck: pre_check
+      updateColumns: update_columns
+  graphql:
+    rootFieldName: updateWebhookDeliveriesById
+    rootFieldKind: Mutation
+  description: Update any row on the 'webhook_deliveries' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: UpdateWebhookDeliveriesById
+  permissions:
+    - role: admin
+      allowExecution: true
+

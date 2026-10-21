@@ -1,0 +1,658 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: WebhookService API
+    description: |-
+        WebhookService subscribes endpoints to changes in holds, reservations and
+         inventory, and shows what was sent to each.
+    version: 0.0.1
+servers:
+    - url: https://freebusy.ohtarnished.dev
+paths:
+    /v1/webhooks:
+        get:
+            tags:
+                - WebhookService
+            description: Lists webhooks, without their secrets.
+            operationId: WebhookService_ListWebhooks
+            parameters:
+                - name: pageSize
+                  in: query
+                  description: Maximum webhooks to return. Defaults to 50, capped at 1000.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  description: Page token from a previous ListWebhooksResponse.next_page_token.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListWebhooksResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - WebhookService
+            description: |-
+                Creates a webhook. The response carries its signing secret, which no
+                 later read returns.
+            operationId: WebhookService_CreateWebhook
+            parameters:
+                - name: webhookId
+                  in: query
+                  description: |-
+                    Client-assigned id, becoming the last segment of the webhook name.
+                     Server-assigned when empty.
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Webhook'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Webhook'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/webhooks/{webhook}:
+        get:
+            tags:
+                - WebhookService
+            description: Retrieves one webhook, without its secret.
+            operationId: WebhookService_GetWebhook
+            parameters:
+                - name: webhook
+                  in: path
+                  description: The webhook id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Webhook'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - WebhookService
+            description: Deletes a webhook; with force, its deliveries too.
+            operationId: WebhookService_DeleteWebhook
+            parameters:
+                - name: webhook
+                  in: path
+                  description: The webhook id.
+                  required: true
+                  schema:
+                    type: string
+                - name: etag
+                  in: query
+                  description: |-
+                    Opaque version read from the webhook; the delete is rejected if it
+                     changed since (AIP-154).
+                  schema:
+                    type: string
+                - name: force
+                  in: query
+                  description: |-
+                    Deletes the webhook's deliveries with it. Without it, a webhook that has
+                     any is not deleted (AIP-135); pausing it stops new ones.
+                  schema:
+                    type: boolean
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        patch:
+            tags:
+                - WebhookService
+            description: 'Updates a webhook: its endpoint, event types or site.'
+            operationId: WebhookService_UpdateWebhook
+            parameters:
+                - name: webhook
+                  in: path
+                  description: The webhook id.
+                  required: true
+                  schema:
+                    type: string
+                - name: updateMask
+                  in: query
+                  description: |-
+                    Fields to update: display_name, uri, event_types, organizational_unit.
+                     Empty updates every one of them.
+                  schema:
+                    type: string
+                    format: field-mask
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Webhook'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Webhook'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/webhooks/{webhook}/deliveries:
+        get:
+            tags:
+                - WebhookService
+            description: Lists a webhook's deliveries.
+            operationId: WebhookService_ListDeliveries
+            parameters:
+                - name: webhook
+                  in: path
+                  description: The webhook id.
+                  required: true
+                  schema:
+                    type: string
+                - name: pageSize
+                  in: query
+                  description: Maximum deliveries to return. Defaults to 50, capped at 1000.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  description: Page token from a previous ListDeliveriesResponse.next_page_token.
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Filter expression, AIP-160, e.g. `state = DELIVERY_STATE_FAILED`.
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  description: Ordering, AIP-132, e.g. `create_time desc`. Defaults to newest first.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListDeliveriesResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/webhooks/{webhook}/deliveries/{delivery}:
+        get:
+            tags:
+                - WebhookService
+            description: Retrieves one delivery.
+            operationId: WebhookService_GetDelivery
+            parameters:
+                - name: webhook
+                  in: path
+                  description: The webhook id.
+                  required: true
+                  schema:
+                    type: string
+                - name: delivery
+                  in: path
+                  description: The delivery id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Delivery'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/webhooks/{webhook}/deliveries/{delivery}:retry:
+        post:
+            tags:
+                - WebhookService
+            description: |-
+                Sends a delivery again, whatever its state: it goes back to PENDING with
+                 its attempts reset and is attempted at once. The payload is the one
+                 recorded, not the record as it stands now.
+            operationId: WebhookService_RetryDelivery
+            parameters:
+                - name: webhook
+                  in: path
+                  description: The webhook id.
+                  required: true
+                  schema:
+                    type: string
+                - name: delivery
+                  in: path
+                  description: The delivery id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RetryDeliveryRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Delivery'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/webhooks/{webhook}:pause:
+        post:
+            tags:
+                - WebhookService
+            description: |-
+                Stops sending a webhook changes. Changes made while it is paused are not
+                 sent; deliveries already pending wait. Idempotent.
+            operationId: WebhookService_PauseWebhook
+            parameters:
+                - name: webhook
+                  in: path
+                  description: The webhook id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PauseWebhookRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Webhook'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/webhooks/{webhook}:resume:
+        post:
+            tags:
+                - WebhookService
+            description: Starts sending a paused webhook changes again, from now on. Idempotent.
+            operationId: WebhookService_ResumeWebhook
+            parameters:
+                - name: webhook
+                  in: path
+                  description: The webhook id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ResumeWebhookRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Webhook'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/webhooks/{webhook}:rotateSecret:
+        post:
+            tags:
+                - WebhookService
+            description: |-
+                Replaces a webhook's signing secret, returning the new one. For a day the
+                 old secret signs deliveries too -- Standard Webhooks carries several
+                 signatures in one header -- so a receiver can switch without missing one.
+            operationId: WebhookService_RotateWebhookSecret
+            parameters:
+                - name: webhook
+                  in: path
+                  description: The webhook id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RotateWebhookSecretRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Webhook'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        Delivery:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: |-
+                        The delivery name. The final segment is a digest of (webhook, event_id).
+                         Format: webhooks/{webhook}/deliveries/{delivery}
+                eventId:
+                    readOnly: true
+                    type: string
+                    description: |-
+                        The CloudEvents id, the same for every webhook sent this change: a digest
+                         of the record's name and etag. Receivers deduplicate on it.
+                eventType:
+                    readOnly: true
+                    type: string
+                    description: The CloudEvents type, e.g. "freebusy.reservation.confirmed".
+                subject:
+                    readOnly: true
+                    type: string
+                    description: |-
+                        The record that changed.
+                         Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                         or organizationalUnits/{organizational_unit}/holds/{hold}
+                payload:
+                    readOnly: true
+                    type: string
+                    description: |-
+                        The request body sent: a CloudEvents 1.0 JSON document whose data is the
+                         record as it stood.
+                state:
+                    readOnly: true
+                    type: integer
+                    description: Where sending stands.
+                    format: enum
+                attemptCount:
+                    readOnly: true
+                    type: integer
+                    description: Attempts made so far.
+                    format: int32
+                nextAttemptTime:
+                    readOnly: true
+                    type: string
+                    description: When the next attempt is due, while PENDING.
+                    format: date-time
+                responseCode:
+                    readOnly: true
+                    type: integer
+                    description: HTTP status of the last attempt; 0 when it got no response.
+                    format: int32
+                errorMessage:
+                    readOnly: true
+                    type: string
+                    description: Why the last attempt failed, empty after a success.
+                createTime:
+                    readOnly: true
+                    type: string
+                    description: When the change was recorded for this webhook.
+                    format: date-time
+                updateTime:
+                    readOnly: true
+                    type: string
+                    description: Last-modification timestamp.
+                    format: date-time
+                deliverTime:
+                    readOnly: true
+                    type: string
+                    description: When the endpoint accepted it.
+                    format: date-time
+                etag:
+                    readOnly: true
+                    type: string
+                    description: Opaque version for optimistic concurrency (AIP-154).
+            description: |-
+                One event owed to one webhook, and how sending it went.
+
+                 The id is derived, not random: a digest of the webhook and the event, so
+                 recording the same change twice -- a rescan, or two servers scanning at once
+                 -- loses the race on the primary key instead of sending the event twice.
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        ListDeliveriesResponse:
+            type: object
+            properties:
+                deliveries:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Delivery'
+                    description: The deliveries on this page.
+                nextPageToken:
+                    type: string
+                    description: Token for the next page, empty when this is the last page.
+            description: Response message for WebhookService.ListDeliveries, AIP-132.
+        ListWebhooksResponse:
+            type: object
+            properties:
+                webhooks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Webhook'
+                    description: The webhooks on this page.
+                nextPageToken:
+                    type: string
+                    description: Token for the next page, empty when this is the last page.
+            description: Response message for WebhookService.ListWebhooks, AIP-132.
+        PauseWebhookRequest:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: 'Format: webhooks/{webhook}'
+            description: Request message for WebhookService.PauseWebhook.
+        ResumeWebhookRequest:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: 'Format: webhooks/{webhook}'
+            description: Request message for WebhookService.ResumeWebhook.
+        RetryDeliveryRequest:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: 'Format: webhooks/{webhook}/deliveries/{delivery}'
+            description: Request message for WebhookService.RetryDelivery.
+        RotateWebhookSecretRequest:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: 'Format: webhooks/{webhook}'
+            description: Request message for WebhookService.RotateWebhookSecret.
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        Webhook:
+            required:
+                - uri
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: |-
+                        The webhook name.
+                         Format: webhooks/{webhook}
+                displayName:
+                    type: string
+                    description: Human-readable name, for the operator's own reference.
+                uri:
+                    type: string
+                    description: |-
+                        The endpoint each event is POSTed to. HTTPS, except to a loopback host
+                         when the server allows insecure endpoints for development. Required on
+                         create; an update that leaves it out keeps the current one.
+                eventTypes:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        The event types sent, e.g. "freebusy.reservation.confirmed" or
+                         "freebusy.event.deleted". Empty sends every type. A type is
+                         "freebusy.<record>.<what happened>": holds are active, released, expired
+                         and converted; reservations pending, confirmed, cancelling, cancelled,
+                         failed, rescheduling and rescheduled; resources, calendars, events and
+                         availabilities created, updated and deleted.
+                organizationalUnit:
+                    type: string
+                    description: |-
+                        Limits events to one site's holds, reservations and resources. Empty
+                         sends every site's. Calendars, events and availabilities belong to no
+                         site, so a webhook limited to one is not sent them.
+                         Format: organizationalUnits/{organizational_unit}
+                state:
+                    readOnly: true
+                    type: integer
+                    description: |-
+                        Whether changes are sent. Set by PauseWebhook and ResumeWebhook; pausing
+                         keeps the webhook and its history.
+                    format: enum
+                secret:
+                    readOnly: true
+                    type: string
+                    description: |-
+                        The key every delivery is signed with, in the Standard Webhooks form: a
+                         "whsec_" prefix and the encoded key. Returned by CreateWebhook and
+                         RotateWebhookSecret only; every other read leaves it empty.
+                previousSecret:
+                    readOnly: true
+                    type: string
+                    description: |-
+                        The key the secret replaced, which also signs deliveries for a day after
+                         a rotation so a receiver can switch keys without dropping one. Never
+                         returned.
+                rotateTime:
+                    readOnly: true
+                    type: string
+                    description: When the secret was last rotated.
+                    format: date-time
+                createTime:
+                    readOnly: true
+                    type: string
+                    description: Creation timestamp.
+                    format: date-time
+                updateTime:
+                    readOnly: true
+                    type: string
+                    description: Last-modification timestamp.
+                    format: date-time
+                etag:
+                    readOnly: true
+                    type: string
+                    description: Opaque version for optimistic concurrency (AIP-154).
+            description: |-
+                A Webhook sends an HTTPS endpoint each change to holds, reservations and the
+                 inventory they draw on -- resources, calendars, calendar events and
+                 availability -- as a signed CloudEvent: how a payment service learns a hold
+                 lapsed, or a booking layer that a reservation was confirmed or a court was
+                 closed for maintenance, without polling.
+
+                 Changes are read from the records themselves, not announced by the writes,
+                 so a change cannot be lost to a crash between a write and its
+                 announcement. The price is coalescing: two transitions of one record in
+                 quick succession may arrive as one event carrying the later state. Every
+                 event carries the whole record, so a receiver acts on what is, not on a
+                 diff.
+tags:
+    - name: WebhookService

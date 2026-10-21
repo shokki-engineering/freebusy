@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"time"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/calendar/v1/calendarv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/event/v1/eventv1grpc"
@@ -13,6 +14,7 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
 	"github.com/oh-tarnished/freebusy/internal/service/reservation"
 	"github.com/oh-tarnished/freebusy/internal/service/rfcsvc"
+	"github.com/oh-tarnished/freebusy/internal/service/webhooksvc"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc5545/calendar/v1/calendarv1gw"
@@ -23,6 +25,7 @@ import (
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc7953/availability/v1/availabilityv1mcp"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc9073/resource/v1/resourcev1gw"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc9073/resource/v1/resourcev1mcp"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1"
 	"github.com/the-protobuf-project/runtime-go/grpc"
 )
 
@@ -43,6 +46,12 @@ func newServiceInstance(conn *database.Connection) (*Service, error) {
 	svc := NewService(
 		engine,
 		reservation.NewServer(reservationStore(conn), engine),
+		webhooksvc.NewServer(webhooksvc.NewRepositories(conn.Repox()), webhooksvc.Options{
+			AllowInsecureEndpoints: config.Get().Webhooks.AllowInsecureEndpoints,
+			AllowPrivateNetworks:   config.Get().Webhooks.AllowPrivateNetworks,
+			MaxAttempts:            config.Get().Webhooks.MaxAttempts,
+			Retention:              time.Duration(config.Get().Webhooks.RetentionDays) * 24 * time.Hour,
+		}),
 		repos,
 	)
 	svc.conn = conn
@@ -67,6 +76,7 @@ func registerServices(s *grpc.GRPCServer, svc *Service) {
 	allocationpbv1.RegisterAllocationServiceServer(s, svc)
 	allocationpbv1.RegisterHoldServiceServer(s, svc)
 	reservationpbv1.RegisterReservationServiceServer(s, svc)
+	webhookpbv1.RegisterWebhookServiceServer(s, svc)
 	resourcev1grpc.RegisterResourcesServer(s, svc)
 	calendarv1grpc.RegisterCalendarsServer(s, svc)
 	availabilityv1grpc.RegisterAvailabilitiesServer(s, svc)
@@ -103,6 +113,7 @@ func registerHTTPGateways(svc *Service) grpc.Option {
 		}
 		for _, register := range []func(context.Context, *grpc.ServeMux, string, []grpc.DialOption) error{
 			reservationpbv1.RegisterReservationServiceHandlerFromEndpoint,
+			webhookpbv1.RegisterWebhookServiceHandlerFromEndpoint,
 			resourcev1gw.RegisterResourcesHandlerFromEndpoint,
 			calendarv1gw.RegisterCalendarsHandlerFromEndpoint,
 			availabilityv1gw.RegisterAvailabilitiesHandlerFromEndpoint,
@@ -135,6 +146,9 @@ func registerMCPServices(svc *Service) grpc.Option {
 		},
 		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
 			return reservationpbv1.ServeReservationServiceMCP(ctx, svc, cfg)
+		},
+		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
+			return webhookpbv1.ServeWebhookServiceMCP(ctx, svc, cfg)
 		},
 		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
 			return resourcev1mcp.ServeResourcesMCP(ctx, svc, cfg)

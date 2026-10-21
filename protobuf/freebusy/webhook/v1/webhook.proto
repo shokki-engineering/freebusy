@@ -1,0 +1,113 @@
+syntax = "proto3";
+
+package freebusy.webhook.v1;
+
+import "buf/validate/validate.proto";
+import "entity/v1/annotations.proto";
+import "freebusy/webhook/v1/enums.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/protobuf/timestamp.proto";
+import "store/v1/annotations.proto";
+
+option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1";
+option java_multiple_files = true;
+option java_outer_classname = "WebhookProto";
+option java_package = "dev.ohtarnished.freebusy.webhook.v1";
+
+// A Webhook sends an HTTPS endpoint each change to holds, reservations and the
+// inventory they draw on -- resources, calendars, calendar events and
+// availability -- as a signed CloudEvent: how a payment service learns a hold
+// lapsed, or a booking layer that a reservation was confirmed or a court was
+// closed for maintenance, without polling.
+//
+// Changes are read from the records themselves, not announced by the writes,
+// so a change cannot be lost to a crash between a write and its
+// announcement. The price is coalescing: two transitions of one record in
+// quick succession may arrive as one event carrying the later state. Every
+// event carries the whole record, so a receiver acts on what is, not on a
+// diff.
+message Webhook {
+  option (entity.v1.table) = {id: ID_STRATEGY_ULID};
+
+  option (google.api.resource) = {
+    type: "freebusy.webhook.v1/Webhook"
+    pattern: "webhooks/{webhook}"
+    singular: "webhook"
+    plural: "webhooks"
+  };
+
+  // The webhook name.
+  // Format: webhooks/{webhook}
+  string name = 1 [
+    (google.api.field_behavior) = IDENTIFIER,
+    (buf.validate.field).string.pattern = "^webhooks/[^/]+$",
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  // Human-readable name, for the operator's own reference.
+  string display_name = 2 [
+    (google.api.field_behavior) = OPTIONAL,
+    (buf.validate.field).string.max_len = 128
+  ];
+
+  // The endpoint each event is POSTed to. HTTPS, except to a loopback host
+  // when the server allows insecure endpoints for development. Required on
+  // create; an update that leaves it out keeps the current one.
+  string uri = 3 [
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  // The event types sent, e.g. "freebusy.reservation.confirmed" or
+  // "freebusy.event.deleted". Empty sends every type. A type is
+  // "freebusy.<record>.<what happened>": holds are active, released, expired
+  // and converted; reservations pending, confirmed, cancelling, cancelled,
+  // failed, rescheduling and rescheduled; resources, calendars, events and
+  // availabilities created, updated and deleted.
+  repeated string event_types = 4 [
+    (google.api.field_behavior) = OPTIONAL,
+    (buf.validate.field).repeated.items.string.pattern = "^freebusy\\.[a-z]+\\.[a-z]+$"
+  ];
+
+  // Limits events to one site's holds, reservations and resources. Empty
+  // sends every site's. Calendars, events and availabilities belong to no
+  // site, so a webhook limited to one is not sent them.
+  // Format: organizationalUnits/{organizational_unit}
+  string organizational_unit = 5 [
+    (google.api.field_behavior) = OPTIONAL,
+    (google.api.resource_reference).type = "the-protobuf-project.org/OrganizationalUnit",
+    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+$",
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  // Whether changes are sent. Set by PauseWebhook and ResumeWebhook; pausing
+  // keeps the webhook and its history.
+  WebhookState state = 6 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (store.v1.column) = {default_value: "ACTIVE"}
+  ];
+
+  // The key every delivery is signed with, in the Standard Webhooks form: a
+  // "whsec_" prefix and the encoded key. Returned by CreateWebhook and
+  // RotateWebhookSecret only; every other read leaves it empty.
+  string secret = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The key the secret replaced, which also signs deliveries for a day after
+  // a rotation so a receiver can switch keys without dropping one. Never
+  // returned.
+  string previous_secret = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the secret was last rotated.
+  google.protobuf.Timestamp rotate_time = 12 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Creation timestamp.
+  google.protobuf.Timestamp create_time = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Last-modification timestamp.
+  google.protobuf.Timestamp update_time = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Opaque version for optimistic concurrency (AIP-154).
+  string etag = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
+}

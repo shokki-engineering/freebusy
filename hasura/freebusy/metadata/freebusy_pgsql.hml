@@ -586,6 +586,27 @@ definition:
             urls_pkey:
               unique_columns:
                 - id
+        - arguments: {}
+          name: webhook_deliveries
+          type: webhook_deliveries
+          uniqueness_constraints:
+            deliveries_pkey:
+              unique_columns:
+                - id
+        - arguments: {}
+          name: webhook_feed_cursors
+          type: webhook_feed_cursors
+          uniqueness_constraints:
+            feed_cursors_pkey:
+              unique_columns:
+                - id
+        - arguments: {}
+          name: webhook_resource
+          type: webhook_resource
+          uniqueness_constraints:
+            resource_pkey:
+              unique_columns:
+                - id
       functions: []
       object_types:
         _prisma_migrations:
@@ -2778,6 +2799,54 @@ definition:
               type:
                 element_type:
                   name: vcard_urls
+                  type: named
+                type: array
+          foreign_keys: {}
+        delete_webhook_deliveries_by_id_response:
+          description: Responses from the 'delete_webhook_deliveries_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: webhook_deliveries
+                  type: named
+                type: array
+          foreign_keys: {}
+        delete_webhook_feed_cursors_by_id_response:
+          description: Responses from the 'delete_webhook_feed_cursors_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: webhook_feed_cursors
+                  type: named
+                type: array
+          foreign_keys: {}
+        delete_webhook_resource_by_id_response:
+          description: Responses from the 'delete_webhook_resource_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: webhook_resource
                   type: named
                 type: array
           foreign_keys: {}
@@ -9727,6 +9796,243 @@ definition:
               type:
                 element_type:
                   name: vcard_urls
+                  type: named
+                type: array
+          foreign_keys: {}
+        insert_webhook_deliveries_object:
+          fields:
+            attempt_count:
+              type:
+                type: nullable
+                underlying_type:
+                  name: int4
+                  type: named
+            create_time:
+              type:
+                name: timestamptz
+                type: named
+            deliver_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            error_message:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            etag:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            event_id:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            event_type:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            id:
+              type:
+                name: text
+                type: named
+            name:
+              type:
+                name: text
+                type: named
+            next_attempt_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            payload:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            response_code:
+              type:
+                type: nullable
+                underlying_type:
+                  name: int4
+                  type: named
+            state:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            subject:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            update_time:
+              type:
+                name: timestamptz
+                type: named
+            webhook_id:
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        insert_webhook_deliveries_response:
+          description: Responses from the 'insert_webhook_deliveries' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: webhook_deliveries
+                  type: named
+                type: array
+          foreign_keys: {}
+        insert_webhook_feed_cursors_object:
+          fields:
+            etag:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            id:
+              type:
+                name: text
+                type: named
+            name:
+              type:
+                name: text
+                type: named
+            position_time:
+              type:
+                name: timestamptz
+                type: named
+            update_time:
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        insert_webhook_feed_cursors_response:
+          description: Responses from the 'insert_webhook_feed_cursors' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: webhook_feed_cursors
+                  type: named
+                type: array
+          foreign_keys: {}
+        insert_webhook_resource_object:
+          fields:
+            create_time:
+              type:
+                name: timestamptz
+                type: named
+            display_name:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            etag:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            event_types:
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
+            id:
+              type:
+                name: text
+                type: named
+            name:
+              type:
+                name: text
+                type: named
+            organizational_unit:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            previous_secret:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            rotate_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            secret:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            state:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            update_time:
+              type:
+                name: timestamptz
+                type: named
+            uri:
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        insert_webhook_resource_response:
+          description: Responses from the 'insert_webhook_resource' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: webhook_resource
                   type: named
                 type: array
           foreign_keys: {}
@@ -21183,6 +21489,356 @@ definition:
                 name: text
                 type: named
           foreign_keys: {}
+        update_column_webhook_deliveries_attempt_count:
+          description: Update the 'attempt_count' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: int4
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_create_time:
+          description: Update the 'create_time' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_deliver_time:
+          description: Update the 'deliver_time' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_error_message:
+          description: Update the 'error_message' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_etag:
+          description: Update the 'etag' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_event_id:
+          description: Update the 'event_id' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_event_type:
+          description: Update the 'event_type' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_id:
+          description: Update the 'id' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_name:
+          description: Update the 'name' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_next_attempt_time:
+          description: Update the 'next_attempt_time' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_payload:
+          description: Update the 'payload' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_response_code:
+          description: Update the 'response_code' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: int4
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_state:
+          description: Update the 'state' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_subject:
+          description: Update the 'subject' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_update_time:
+          description: Update the 'update_time' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        update_column_webhook_deliveries_webhook_id:
+          description: Update the 'webhook_id' column in the 'webhook_deliveries' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_webhook_feed_cursors_etag:
+          description: Update the 'etag' column in the 'webhook_feed_cursors' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_feed_cursors_id:
+          description: Update the 'id' column in the 'webhook_feed_cursors' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_webhook_feed_cursors_name:
+          description: Update the 'name' column in the 'webhook_feed_cursors' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_webhook_feed_cursors_position_time:
+          description: Update the 'position_time' column in the 'webhook_feed_cursors' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        update_column_webhook_feed_cursors_update_time:
+          description: Update the 'update_time' column in the 'webhook_feed_cursors' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        update_column_webhook_resource_create_time:
+          description: Update the 'create_time' column in the 'webhook_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        update_column_webhook_resource_display_name:
+          description: Update the 'display_name' column in the 'webhook_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_resource_etag:
+          description: Update the 'etag' column in the 'webhook_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_resource_event_types:
+          description: Update the 'event_types' column in the 'webhook_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
+          foreign_keys: {}
+        update_column_webhook_resource_id:
+          description: Update the 'id' column in the 'webhook_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_webhook_resource_name:
+          description: Update the 'name' column in the 'webhook_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        update_column_webhook_resource_organizational_unit:
+          description: Update the 'organizational_unit' column in the 'webhook_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_resource_previous_secret:
+          description: Update the 'previous_secret' column in the 'webhook_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_resource_rotate_time:
+          description: Update the 'rotate_time' column in the 'webhook_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_resource_secret:
+          description: Update the 'secret' column in the 'webhook_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_resource_state:
+          description: Update the 'state' column in the 'webhook_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+          foreign_keys: {}
+        update_column_webhook_resource_update_time:
+          description: Update the 'update_time' column in the 'webhook_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        update_column_webhook_resource_uri:
+          description: Update the 'uri' column in the 'webhook_resource' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
         update_common_fractions_by_id_response:
           description: Responses from the 'update_common_fractions_by_id' procedure
           fields:
@@ -27044,6 +27700,304 @@ definition:
                   name: update_column_vcard_urls_value
                   type: named
           foreign_keys: {}
+        update_webhook_deliveries_by_id_response:
+          description: Responses from the 'update_webhook_deliveries_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: webhook_deliveries
+                  type: named
+                type: array
+          foreign_keys: {}
+        update_webhook_deliveries_by_id_update_columns:
+          description: Update the columns of the 'webhook_deliveries' collection
+          fields:
+            attempt_count:
+              description: Update the 'attempt_count' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_attempt_count
+                  type: named
+            create_time:
+              description: Update the 'create_time' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_create_time
+                  type: named
+            deliver_time:
+              description: Update the 'deliver_time' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_deliver_time
+                  type: named
+            error_message:
+              description: Update the 'error_message' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_error_message
+                  type: named
+            etag:
+              description: Update the 'etag' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_etag
+                  type: named
+            event_id:
+              description: Update the 'event_id' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_event_id
+                  type: named
+            event_type:
+              description: Update the 'event_type' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_event_type
+                  type: named
+            id:
+              description: Update the 'id' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_id
+                  type: named
+            name:
+              description: Update the 'name' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_name
+                  type: named
+            next_attempt_time:
+              description: Update the 'next_attempt_time' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_next_attempt_time
+                  type: named
+            payload:
+              description: Update the 'payload' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_payload
+                  type: named
+            response_code:
+              description: Update the 'response_code' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_response_code
+                  type: named
+            state:
+              description: Update the 'state' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_state
+                  type: named
+            subject:
+              description: Update the 'subject' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_subject
+                  type: named
+            update_time:
+              description: Update the 'update_time' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_update_time
+                  type: named
+            webhook_id:
+              description: Update the 'webhook_id' column in the 'webhook_deliveries' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_deliveries_webhook_id
+                  type: named
+          foreign_keys: {}
+        update_webhook_feed_cursors_by_id_response:
+          description: Responses from the 'update_webhook_feed_cursors_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: webhook_feed_cursors
+                  type: named
+                type: array
+          foreign_keys: {}
+        update_webhook_feed_cursors_by_id_update_columns:
+          description: Update the columns of the 'webhook_feed_cursors' collection
+          fields:
+            etag:
+              description: Update the 'etag' column in the 'webhook_feed_cursors' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_feed_cursors_etag
+                  type: named
+            id:
+              description: Update the 'id' column in the 'webhook_feed_cursors' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_feed_cursors_id
+                  type: named
+            name:
+              description: Update the 'name' column in the 'webhook_feed_cursors' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_feed_cursors_name
+                  type: named
+            position_time:
+              description: Update the 'position_time' column in the 'webhook_feed_cursors' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_feed_cursors_position_time
+                  type: named
+            update_time:
+              description: Update the 'update_time' column in the 'webhook_feed_cursors' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_feed_cursors_update_time
+                  type: named
+          foreign_keys: {}
+        update_webhook_resource_by_id_response:
+          description: Responses from the 'update_webhook_resource_by_id' procedure
+          fields:
+            affected_rows:
+              description: The number of rows affected by the mutation
+              type:
+                name: int4
+                type: named
+            returning:
+              description: Data from rows affected by the mutation
+              type:
+                element_type:
+                  name: webhook_resource
+                  type: named
+                type: array
+          foreign_keys: {}
+        update_webhook_resource_by_id_update_columns:
+          description: Update the columns of the 'webhook_resource' collection
+          fields:
+            create_time:
+              description: Update the 'create_time' column in the 'webhook_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_resource_create_time
+                  type: named
+            display_name:
+              description: Update the 'display_name' column in the 'webhook_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_resource_display_name
+                  type: named
+            etag:
+              description: Update the 'etag' column in the 'webhook_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_resource_etag
+                  type: named
+            event_types:
+              description: Update the 'event_types' column in the 'webhook_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_resource_event_types
+                  type: named
+            id:
+              description: Update the 'id' column in the 'webhook_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_resource_id
+                  type: named
+            name:
+              description: Update the 'name' column in the 'webhook_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_resource_name
+                  type: named
+            organizational_unit:
+              description: Update the 'organizational_unit' column in the 'webhook_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_resource_organizational_unit
+                  type: named
+            previous_secret:
+              description: Update the 'previous_secret' column in the 'webhook_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_resource_previous_secret
+                  type: named
+            rotate_time:
+              description: Update the 'rotate_time' column in the 'webhook_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_resource_rotate_time
+                  type: named
+            secret:
+              description: Update the 'secret' column in the 'webhook_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_resource_secret
+                  type: named
+            state:
+              description: Update the 'state' column in the 'webhook_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_resource_state
+                  type: named
+            update_time:
+              description: Update the 'update_time' column in the 'webhook_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_resource_update_time
+                  type: named
+            uri:
+              description: Update the 'uri' column in the 'webhook_resource' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_webhook_resource_uri
+                  type: named
+          foreign_keys: {}
         user_address:
           fields:
             attribute_type:
@@ -28360,6 +29314,195 @@ definition:
                   name: text
                   type: named
             value:
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        webhook_deliveries:
+          fields:
+            attempt_count:
+              type:
+                type: nullable
+                underlying_type:
+                  name: int4
+                  type: named
+            create_time:
+              type:
+                name: timestamptz
+                type: named
+            deliver_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            error_message:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            etag:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            event_id:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            event_type:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            id:
+              type:
+                name: text
+                type: named
+            name:
+              type:
+                name: text
+                type: named
+            next_attempt_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            payload:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            response_code:
+              type:
+                type: nullable
+                underlying_type:
+                  name: int4
+                  type: named
+            state:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            subject:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            update_time:
+              type:
+                name: timestamptz
+                type: named
+            webhook_id:
+              type:
+                name: text
+                type: named
+          foreign_keys: {}
+        webhook_feed_cursors:
+          fields:
+            etag:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            id:
+              type:
+                name: text
+                type: named
+            name:
+              type:
+                name: text
+                type: named
+            position_time:
+              type:
+                name: timestamptz
+                type: named
+            update_time:
+              type:
+                name: timestamptz
+                type: named
+          foreign_keys: {}
+        webhook_resource:
+          fields:
+            create_time:
+              type:
+                name: timestamptz
+                type: named
+            display_name:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            etag:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            event_types:
+              type:
+                type: nullable
+                underlying_type:
+                  element_type:
+                    type: nullable
+                    underlying_type:
+                      name: text
+                      type: named
+                  type: array
+            id:
+              type:
+                name: text
+                type: named
+            name:
+              type:
+                name: text
+                type: named
+            organizational_unit:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            previous_secret:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            rotate_time:
+              type:
+                type: nullable
+                underlying_type:
+                  name: timestamptz
+                  type: named
+            secret:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            state:
+              type:
+                type: nullable
+                underlying_type:
+                  name: text
+                  type: named
+            update_time:
+              type:
+                name: timestamptz
+                type: named
+            uri:
               type:
                 name: text
                 type: named
@@ -29741,6 +30884,57 @@ definition:
           name: delete_vcard_urls_by_id
           result_type:
             name: delete_vcard_urls_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            pre_check:
+              description: Delete permission predicate over the 'webhook_deliveries' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: webhook_deliveries
+                  type: predicate
+          description: Delete any row on the 'webhook_deliveries' collection using the 'id' key
+          name: delete_webhook_deliveries_by_id
+          result_type:
+            name: delete_webhook_deliveries_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            pre_check:
+              description: Delete permission predicate over the 'webhook_feed_cursors' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: webhook_feed_cursors
+                  type: predicate
+          description: Delete any row on the 'webhook_feed_cursors' collection using the 'id' key
+          name: delete_webhook_feed_cursors_by_id
+          result_type:
+            name: delete_webhook_feed_cursors_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            pre_check:
+              description: Delete permission predicate over the 'webhook_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: webhook_resource
+                  type: predicate
+          description: Delete any row on the 'webhook_resource' collection using the 'id' key
+          name: delete_webhook_resource_by_id
+          result_type:
+            name: delete_webhook_resource_by_id_response
             type: named
         - arguments:
             objects:
@@ -31280,6 +32474,63 @@ definition:
           name: insert_vcard_urls
           result_type:
             name: insert_vcard_urls_response
+            type: named
+        - arguments:
+            objects:
+              type:
+                element_type:
+                  name: insert_webhook_deliveries_object
+                  type: named
+                type: array
+            post_check:
+              description: Insert permission predicate over the 'webhook_deliveries' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: webhook_deliveries
+                  type: predicate
+          description: Insert into the webhook_deliveries table
+          name: insert_webhook_deliveries
+          result_type:
+            name: insert_webhook_deliveries_response
+            type: named
+        - arguments:
+            objects:
+              type:
+                element_type:
+                  name: insert_webhook_feed_cursors_object
+                  type: named
+                type: array
+            post_check:
+              description: Insert permission predicate over the 'webhook_feed_cursors' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: webhook_feed_cursors
+                  type: predicate
+          description: Insert into the webhook_feed_cursors table
+          name: insert_webhook_feed_cursors
+          result_type:
+            name: insert_webhook_feed_cursors_response
+            type: named
+        - arguments:
+            objects:
+              type:
+                element_type:
+                  name: insert_webhook_resource_object
+                  type: named
+                type: array
+            post_check:
+              description: Insert permission predicate over the 'webhook_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: webhook_resource
+                  type: predicate
+          description: Insert into the webhook_resource table
+          name: insert_webhook_resource
+          result_type:
+            name: insert_webhook_resource_response
             type: named
         - arguments:
             key_id:
@@ -33548,6 +34799,90 @@ definition:
           name: update_vcard_urls_by_id
           result_type:
             name: update_vcard_urls_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            post_check:
+              description: Update permission post-condition predicate over the 'webhook_deliveries' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: webhook_deliveries
+                  type: predicate
+            pre_check:
+              description: Update permission pre-condition predicate over the 'webhook_deliveries' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: webhook_deliveries
+                  type: predicate
+            update_columns:
+              type:
+                name: update_webhook_deliveries_by_id_update_columns
+                type: named
+          description: Update any row on the 'webhook_deliveries' collection using the 'id' key
+          name: update_webhook_deliveries_by_id
+          result_type:
+            name: update_webhook_deliveries_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            post_check:
+              description: Update permission post-condition predicate over the 'webhook_feed_cursors' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: webhook_feed_cursors
+                  type: predicate
+            pre_check:
+              description: Update permission pre-condition predicate over the 'webhook_feed_cursors' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: webhook_feed_cursors
+                  type: predicate
+            update_columns:
+              type:
+                name: update_webhook_feed_cursors_by_id_update_columns
+                type: named
+          description: Update any row on the 'webhook_feed_cursors' collection using the 'id' key
+          name: update_webhook_feed_cursors_by_id
+          result_type:
+            name: update_webhook_feed_cursors_by_id_response
+            type: named
+        - arguments:
+            key_id:
+              type:
+                name: text
+                type: named
+            post_check:
+              description: Update permission post-condition predicate over the 'webhook_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: webhook_resource
+                  type: predicate
+            pre_check:
+              description: Update permission pre-condition predicate over the 'webhook_resource' collection
+              type:
+                type: nullable
+                underlying_type:
+                  object_type_name: webhook_resource
+                  type: predicate
+            update_columns:
+              type:
+                name: update_webhook_resource_by_id_update_columns
+                type: named
+          description: Update any row on the 'webhook_resource' collection using the 'id' key
+          name: update_webhook_resource_by_id
+          result_type:
+            name: update_webhook_resource_by_id_response
             type: named
       request_arguments: null
       scalar_types:

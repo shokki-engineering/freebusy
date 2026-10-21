@@ -1,0 +1,259 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: WebhookResource
+  fields:
+    - name: createTime
+      type: Timestamptz!
+    - name: displayName
+      type: String_1
+    - name: etag
+      type: String_1
+    - name: eventTypes
+      type: "[String_1]"
+    - name: id
+      type: String_1!
+    - name: name
+      type: String_1!
+    - name: organizationalUnit
+      type: String_1
+    - name: previousSecret
+      type: String_1
+    - name: rotateTime
+      type: Timestamptz
+    - name: secret
+      type: String_1
+    - name: state
+      type: String_1
+    - name: updateTime
+      type: Timestamptz!
+    - name: uri
+      type: String_1!
+  graphql:
+    typeName: WebhookResource
+    inputTypeName: WebhookResourceInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: webhook_resource
+      fieldMapping:
+        createTime:
+          column:
+            name: create_time
+        displayName:
+          column:
+            name: display_name
+        etag:
+          column:
+            name: etag
+        eventTypes:
+          column:
+            name: event_types
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        organizationalUnit:
+          column:
+            name: organizational_unit
+        previousSecret:
+          column:
+            name: previous_secret
+        rotateTime:
+          column:
+            name: rotate_time
+        secret:
+          column:
+            name: secret
+        state:
+          column:
+            name: state
+        updateTime:
+          column:
+            name: update_time
+        uri:
+          column:
+            name: uri
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: WebhookResource
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createTime
+          - displayName
+          - etag
+          - eventTypes
+          - id
+          - name
+          - organizationalUnit
+          - previousSecret
+          - rotateTime
+          - secret
+          - state
+          - updateTime
+          - uri
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: WebhookResourceBoolExp
+  operand:
+    object:
+      type: WebhookResource
+      comparableFields:
+        - fieldName: createTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: displayName
+          booleanExpressionType: TextBoolExp
+        - fieldName: etag
+          booleanExpressionType: TextBoolExp
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: name
+          booleanExpressionType: TextBoolExp
+        - fieldName: organizationalUnit
+          booleanExpressionType: TextBoolExp
+        - fieldName: previousSecret
+          booleanExpressionType: TextBoolExp
+        - fieldName: rotateTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: secret
+          booleanExpressionType: TextBoolExp
+        - fieldName: state
+          booleanExpressionType: TextBoolExp
+        - fieldName: updateTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: uri
+          booleanExpressionType: TextBoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: WebhookResourceBoolExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: WebhookResourceAggExp
+  operand:
+    object:
+      aggregatedType: WebhookResource
+      aggregatableFields:
+        - fieldName: createTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: displayName
+          aggregateExpression: TextAggExp
+        - fieldName: etag
+          aggregateExpression: TextAggExp
+        - fieldName: id
+          aggregateExpression: TextAggExp
+        - fieldName: name
+          aggregateExpression: TextAggExp
+        - fieldName: organizationalUnit
+          aggregateExpression: TextAggExp
+        - fieldName: previousSecret
+          aggregateExpression: TextAggExp
+        - fieldName: rotateTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: secret
+          aggregateExpression: TextAggExp
+        - fieldName: state
+          aggregateExpression: TextAggExp
+        - fieldName: updateTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: uri
+          aggregateExpression: TextAggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: WebhookResourceAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: WebhookResourceOrderByExp
+  operand:
+    object:
+      orderedType: WebhookResource
+      orderableFields:
+        - fieldName: createTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: displayName
+          orderByExpression: String1OrderByExp
+        - fieldName: etag
+          orderByExpression: String1OrderByExp
+        - fieldName: id
+          orderByExpression: String1OrderByExp
+        - fieldName: name
+          orderByExpression: String1OrderByExp
+        - fieldName: organizationalUnit
+          orderByExpression: String1OrderByExp
+        - fieldName: previousSecret
+          orderByExpression: String1OrderByExp
+        - fieldName: rotateTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: secret
+          orderByExpression: String1OrderByExp
+        - fieldName: state
+          orderByExpression: String1OrderByExp
+        - fieldName: updateTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: uri
+          orderByExpression: String1OrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: WebhookResourceOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: WebhookResource
+  objectType: WebhookResource
+  source:
+    dataConnectorName: freebusy_pgsql
+    collection: webhook_resource
+  filterExpressionType: WebhookResourceBoolExp
+  aggregateExpression: WebhookResourceAggExp
+  orderByExpression: WebhookResourceOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: webhookResource
+      subscription:
+        rootField: webhookResource
+    selectUniques:
+      - queryRootField: webhookResourceById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: webhookResourceById
+    filterInputTypeName: WebhookResourceFilterInput
+    aggregate:
+      queryRootField: webhookResourceAggregate
+      subscription:
+        rootField: webhookResourceAggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: WebhookResource
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+

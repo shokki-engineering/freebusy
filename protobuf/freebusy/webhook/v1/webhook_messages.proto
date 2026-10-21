@@ -1,0 +1,184 @@
+syntax = "proto3";
+
+package freebusy.webhook.v1;
+
+import "buf/validate/validate.proto";
+import "freebusy/webhook/v1/delivery.proto";
+import "freebusy/webhook/v1/webhook.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/protobuf/field_mask.proto";
+
+option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1";
+option java_multiple_files = true;
+option java_outer_classname = "WebhookMessagesProto";
+option java_package = "dev.ohtarnished.freebusy.webhook.v1";
+
+// Request message for WebhookService.CreateWebhook, AIP-133.
+message CreateWebhookRequest {
+  // The webhook to create. `uri` is required.
+  Webhook webhook = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).required = true
+  ];
+
+  // Client-assigned id, becoming the last segment of the webhook name.
+  // Server-assigned when empty.
+  string webhook_id = 2 [
+    (google.api.field_behavior) = OPTIONAL,
+    (buf.validate.field).string.pattern = "^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$",
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+}
+
+// Request message for WebhookService.GetWebhook, AIP-131.
+message GetWebhookRequest {
+  // Format: webhooks/{webhook}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "freebusy.webhook.v1/Webhook",
+    (buf.validate.field).string.pattern = "^webhooks/[^/]+$"
+  ];
+}
+
+// Request message for WebhookService.ListWebhooks, AIP-132.
+message ListWebhooksRequest {
+  // Maximum webhooks to return. Defaults to 50, capped at 1000.
+  int32 page_size = 1 [
+    (google.api.field_behavior) = OPTIONAL,
+    (buf.validate.field).int32 = {
+      gte: 0
+      lte: 1000
+    }
+  ];
+
+  // Page token from a previous ListWebhooksResponse.next_page_token.
+  string page_token = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Response message for WebhookService.ListWebhooks, AIP-132.
+message ListWebhooksResponse {
+  // The webhooks on this page.
+  repeated Webhook webhooks = 1;
+
+  // Token for the next page, empty when this is the last page.
+  string next_page_token = 2;
+}
+
+// Request message for WebhookService.UpdateWebhook, AIP-134.
+message UpdateWebhookRequest {
+  // The webhook, its name identifying which. `etag`, when set, must match.
+  Webhook webhook = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).required = true
+  ];
+
+  // Fields to update: display_name, uri, event_types, organizational_unit.
+  // Empty updates every one of them.
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Request message for WebhookService.DeleteWebhook, AIP-135.
+message DeleteWebhookRequest {
+  // Format: webhooks/{webhook}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "freebusy.webhook.v1/Webhook",
+    (buf.validate.field).string.pattern = "^webhooks/[^/]+$"
+  ];
+
+  // Opaque version read from the webhook; the delete is rejected if it
+  // changed since (AIP-154).
+  string etag = 2 [(google.api.field_behavior) = OPTIONAL];
+
+  // Deletes the webhook's deliveries with it. Without it, a webhook that has
+  // any is not deleted (AIP-135); pausing it stops new ones.
+  bool force = 3 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Request message for WebhookService.PauseWebhook.
+message PauseWebhookRequest {
+  // Format: webhooks/{webhook}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "freebusy.webhook.v1/Webhook",
+    (buf.validate.field).string.pattern = "^webhooks/[^/]+$"
+  ];
+}
+
+// Request message for WebhookService.ResumeWebhook.
+message ResumeWebhookRequest {
+  // Format: webhooks/{webhook}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "freebusy.webhook.v1/Webhook",
+    (buf.validate.field).string.pattern = "^webhooks/[^/]+$"
+  ];
+}
+
+// Request message for WebhookService.RotateWebhookSecret.
+message RotateWebhookSecretRequest {
+  // Format: webhooks/{webhook}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "freebusy.webhook.v1/Webhook",
+    (buf.validate.field).string.pattern = "^webhooks/[^/]+$"
+  ];
+}
+
+// Request message for WebhookService.GetDelivery, AIP-131.
+message GetDeliveryRequest {
+  // Format: webhooks/{webhook}/deliveries/{delivery}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "freebusy.webhook.v1/Delivery",
+    (buf.validate.field).string.pattern = "^webhooks/[^/]+/deliveries/[^/]+$"
+  ];
+}
+
+// Request message for WebhookService.ListDeliveries, AIP-132.
+message ListDeliveriesRequest {
+  // Format: webhooks/{webhook}
+  string parent = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).child_type = "freebusy.webhook.v1/Delivery",
+    (buf.validate.field).string.pattern = "^webhooks/[^/]+$"
+  ];
+
+  // Maximum deliveries to return. Defaults to 50, capped at 1000.
+  int32 page_size = 2 [
+    (google.api.field_behavior) = OPTIONAL,
+    (buf.validate.field).int32 = {
+      gte: 0
+      lte: 1000
+    }
+  ];
+
+  // Page token from a previous ListDeliveriesResponse.next_page_token.
+  string page_token = 3 [(google.api.field_behavior) = OPTIONAL];
+
+  // Filter expression, AIP-160, e.g. `state = DELIVERY_STATE_FAILED`.
+  string filter = 4 [(google.api.field_behavior) = OPTIONAL];
+
+  // Ordering, AIP-132, e.g. `create_time desc`. Defaults to newest first.
+  string order_by = 5 [(google.api.field_behavior) = OPTIONAL];
+}
+
+// Response message for WebhookService.ListDeliveries, AIP-132.
+message ListDeliveriesResponse {
+  // The deliveries on this page.
+  repeated Delivery deliveries = 1;
+
+  // Token for the next page, empty when this is the last page.
+  string next_page_token = 2;
+}
+
+// Request message for WebhookService.RetryDelivery.
+message RetryDeliveryRequest {
+  // Format: webhooks/{webhook}/deliveries/{delivery}
+  string name = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (google.api.resource_reference).type = "freebusy.webhook.v1/Delivery",
+    (buf.validate.field).string.pattern = "^webhooks/[^/]+/deliveries/[^/]+$"
+  ];
+}

@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+package freebusy.webhook.v1;
+
+import "freebusy/webhook/v1/delivery.proto";
+import "freebusy/webhook/v1/webhook.proto";
+import "freebusy/webhook/v1/webhook_messages.proto";
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/protobuf/empty.proto";
+import "mcp/protobuf/annotations.proto";
+
+option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1";
+option java_multiple_files = true;
+option java_outer_classname = "WebhookServiceProto";
+option java_package = "dev.ohtarnished.freebusy.webhook.v1";
+
+// WebhookService subscribes endpoints to changes in holds, reservations and
+// inventory, and shows what was sent to each.
+service WebhookService {
+  option (google.api.default_host) = "freebusy.ohtarnished.dev";
+  option (mcp.service) = {
+    app: {
+      name: "Webhooks"
+      version: "1.0.0"
+      description: "Subscribe endpoints to hold, reservation and inventory changes, and inspect deliveries."
+    }
+  };
+
+  // Creates a webhook. The response carries its signing secret, which no
+  // later read returns.
+  rpc CreateWebhook(CreateWebhookRequest) returns (Webhook) {
+    option (google.api.http) = {
+      post: "/v1/webhooks"
+      body: "webhook"
+    };
+    option (google.api.method_signature) = "webhook,webhook_id";
+    option (mcp.tool) = {description: "Subscribe an HTTPS endpoint to hold, reservation and inventory changes."};
+  }
+
+  // Retrieves one webhook, without its secret.
+  rpc GetWebhook(GetWebhookRequest) returns (Webhook) {
+    option (google.api.http) = {get: "/v1/{name=webhooks/*}"};
+    option (google.api.method_signature) = "name";
+    option (mcp.tool) = {description: "Get a webhook."};
+  }
+
+  // Lists webhooks, without their secrets.
+  rpc ListWebhooks(ListWebhooksRequest) returns (ListWebhooksResponse) {
+    option (google.api.http) = {get: "/v1/webhooks"};
+    option (mcp.tool) = {description: "List webhooks."};
+  }
+
+  // Updates a webhook: its endpoint, event types or site.
+  rpc UpdateWebhook(UpdateWebhookRequest) returns (Webhook) {
+    option (google.api.http) = {
+      patch: "/v1/{webhook.name=webhooks/*}"
+      body: "webhook"
+    };
+    option (google.api.method_signature) = "webhook,update_mask";
+    option (mcp.tool) = {description: "Change a webhook's endpoint, event types or site."};
+  }
+
+  // Stops sending a webhook changes. Changes made while it is paused are not
+  // sent; deliveries already pending wait. Idempotent.
+  rpc PauseWebhook(PauseWebhookRequest) returns (Webhook) {
+    option (google.api.http) = {
+      post: "/v1/{name=webhooks/*}:pause"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name";
+    option (mcp.tool) = {description: "Pause a webhook."};
+  }
+
+  // Starts sending a paused webhook changes again, from now on. Idempotent.
+  rpc ResumeWebhook(ResumeWebhookRequest) returns (Webhook) {
+    option (google.api.http) = {
+      post: "/v1/{name=webhooks/*}:resume"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name";
+    option (mcp.tool) = {description: "Resume a paused webhook."};
+  }
+
+  // Deletes a webhook; with force, its deliveries too.
+  rpc DeleteWebhook(DeleteWebhookRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {delete: "/v1/{name=webhooks/*}"};
+    option (google.api.method_signature) = "name";
+    option (mcp.tool) = {description: "Delete a webhook."};
+  }
+
+  // Replaces a webhook's signing secret, returning the new one. For a day the
+  // old secret signs deliveries too -- Standard Webhooks carries several
+  // signatures in one header -- so a receiver can switch without missing one.
+  rpc RotateWebhookSecret(RotateWebhookSecretRequest) returns (Webhook) {
+    option (google.api.http) = {
+      post: "/v1/{name=webhooks/*}:rotateSecret"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name";
+    option (mcp.tool) = {description: "Rotate a webhook's signing secret."};
+  }
+
+  // Retrieves one delivery.
+  rpc GetDelivery(GetDeliveryRequest) returns (Delivery) {
+    option (google.api.http) = {get: "/v1/{name=webhooks/*/deliveries/*}"};
+    option (google.api.method_signature) = "name";
+    option (mcp.tool) = {description: "Get one delivery of a webhook."};
+  }
+
+  // Lists a webhook's deliveries.
+  rpc ListDeliveries(ListDeliveriesRequest) returns (ListDeliveriesResponse) {
+    option (google.api.http) = {get: "/v1/{parent=webhooks/*}/deliveries"};
+    option (google.api.method_signature) = "parent";
+    option (mcp.tool) = {description: "List a webhook's deliveries, filtered and ordered per AIP-160 and AIP-132."};
+  }
+
+  // Sends a delivery again, whatever its state: it goes back to PENDING with
+  // its attempts reset and is attempted at once. The payload is the one
+  // recorded, not the record as it stands now.
+  rpc RetryDelivery(RetryDeliveryRequest) returns (Delivery) {
+    option (google.api.http) = {
+      post: "/v1/{name=webhooks/*/deliveries/*}:retry"
+      body: "*"
+    };
+    option (google.api.method_signature) = "name";
+    option (mcp.tool) = {description: "Send a delivery again now."};
+  }
+}

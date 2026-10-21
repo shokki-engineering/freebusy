@@ -4,7 +4,7 @@
 // 	protoc (unknown)
 //
 // database: freebusy
-// schemas:  allocation, reservation, shared
+// schemas:  allocation, reservation, shared, webhook
 //
 // Prisma 7 configuration; connection URLs are environment-driven.
 // annotations: entity.v1 1.5.5, store.v1 1.5.5

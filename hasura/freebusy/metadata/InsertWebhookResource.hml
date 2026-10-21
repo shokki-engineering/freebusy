@@ -1,0 +1,174 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertWebhookResourceObject
+  fields:
+    - name: createTime
+      type: Timestamptz!
+    - name: displayName
+      type: String_1
+    - name: etag
+      type: String_1
+    - name: eventTypes
+      type: "[String_1]"
+    - name: id
+      type: String_1!
+    - name: name
+      type: String_1!
+    - name: organizationalUnit
+      type: String_1
+    - name: previousSecret
+      type: String_1
+    - name: rotateTime
+      type: Timestamptz
+    - name: secret
+      type: String_1
+    - name: state
+      type: String_1
+    - name: updateTime
+      type: Timestamptz!
+    - name: uri
+      type: String_1!
+  graphql:
+    typeName: InsertWebhookResourceObject
+    inputTypeName: InsertWebhookResourceObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_webhook_resource_object
+      fieldMapping:
+        createTime:
+          column:
+            name: create_time
+        displayName:
+          column:
+            name: display_name
+        etag:
+          column:
+            name: etag
+        eventTypes:
+          column:
+            name: event_types
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        organizationalUnit:
+          column:
+            name: organizational_unit
+        previousSecret:
+          column:
+            name: previous_secret
+        rotateTime:
+          column:
+            name: rotate_time
+        secret:
+          column:
+            name: secret
+        state:
+          column:
+            name: state
+        updateTime:
+          column:
+            name: update_time
+        uri:
+          column:
+            name: uri
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertWebhookResourceObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createTime
+          - displayName
+          - etag
+          - eventTypes
+          - id
+          - name
+          - organizationalUnit
+          - previousSecret
+          - rotateTime
+          - secret
+          - state
+          - updateTime
+          - uri
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertWebhookResourceResponse
+  description: Responses from the 'insert_webhook_resource' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[WebhookResource!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertWebhookResourceResponse
+    inputTypeName: InsertWebhookResourceResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_webhook_resource_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertWebhookResourceResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertWebhookResource
+  outputType: InsertWebhookResourceResponse!
+  arguments:
+    - name: objects
+      type: "[InsertWebhookResourceObject!]!"
+    - name: postCheck
+      type: WebhookResourceBoolExp
+      description: Insert permission predicate over the 'webhook_resource' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: insert_webhook_resource
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertWebhookResource
+    rootFieldKind: Mutation
+  description: Insert into the webhook_resource table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertWebhookResource
+  permissions:
+    - role: admin
+      allowExecution: true
+

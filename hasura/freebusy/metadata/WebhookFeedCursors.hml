@@ -1,0 +1,169 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: WebhookFeedCursors
+  fields:
+    - name: etag
+      type: String_1
+    - name: id
+      type: String_1!
+    - name: name
+      type: String_1!
+    - name: positionTime
+      type: Timestamptz!
+    - name: updateTime
+      type: Timestamptz!
+  graphql:
+    typeName: WebhookFeedCursors
+    inputTypeName: WebhookFeedCursorsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: webhook_feed_cursors
+      fieldMapping:
+        etag:
+          column:
+            name: etag
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        positionTime:
+          column:
+            name: position_time
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: WebhookFeedCursors
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - etag
+          - id
+          - name
+          - positionTime
+          - updateTime
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: WebhookFeedCursorsBoolExp
+  operand:
+    object:
+      type: WebhookFeedCursors
+      comparableFields:
+        - fieldName: etag
+          booleanExpressionType: TextBoolExp
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: name
+          booleanExpressionType: TextBoolExp
+        - fieldName: positionTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: updateTime
+          booleanExpressionType: TimestamptzBoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: WebhookFeedCursorsBoolExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: WebhookFeedCursorsAggExp
+  operand:
+    object:
+      aggregatedType: WebhookFeedCursors
+      aggregatableFields:
+        - fieldName: etag
+          aggregateExpression: TextAggExp
+        - fieldName: id
+          aggregateExpression: TextAggExp
+        - fieldName: name
+          aggregateExpression: TextAggExp
+        - fieldName: positionTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: updateTime
+          aggregateExpression: TimestamptzAggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: WebhookFeedCursorsAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: WebhookFeedCursorsOrderByExp
+  operand:
+    object:
+      orderedType: WebhookFeedCursors
+      orderableFields:
+        - fieldName: etag
+          orderByExpression: String1OrderByExp
+        - fieldName: id
+          orderByExpression: String1OrderByExp
+        - fieldName: name
+          orderByExpression: String1OrderByExp
+        - fieldName: positionTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: updateTime
+          orderByExpression: TimestamptzOrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: WebhookFeedCursorsOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: WebhookFeedCursors
+  objectType: WebhookFeedCursors
+  source:
+    dataConnectorName: freebusy_pgsql
+    collection: webhook_feed_cursors
+  filterExpressionType: WebhookFeedCursorsBoolExp
+  aggregateExpression: WebhookFeedCursorsAggExp
+  orderByExpression: WebhookFeedCursorsOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: webhookFeedCursors
+      subscription:
+        rootField: webhookFeedCursors
+    selectUniques:
+      - queryRootField: webhookFeedCursorsById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: webhookFeedCursorsById
+    filterInputTypeName: WebhookFeedCursorsFilterInput
+    aggregate:
+      queryRootField: webhookFeedCursorsAggregate
+      subscription:
+        rootField: webhookFeedCursorsAggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: WebhookFeedCursors
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+

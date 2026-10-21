@@ -38,6 +38,31 @@ type AppConfig struct {
 	Cache CacheConfig `koanf:"cache"`
 	// CalDAV is the RFC 4791 server mounted on the HTTP port.
 	CalDAV CalDAVConfig `koanf:"caldav"`
+
+	// Webhooks tunes delivery of hold and reservation changes.
+	Webhooks WebhooksConfig `koanf:"webhooks"`
+}
+
+// WebhooksConfig tunes webhook delivery (internal/service/webhooksvc).
+// WebhookService itself is always served; this decides whether this server
+// also sends what it records.
+type WebhooksConfig struct {
+	// Enabled runs delivery on this server: recording changes and sending
+	// them. Safe on several servers at once.
+	Enabled bool `koanf:"enabled"`
+	// AllowInsecureEndpoints accepts http:// endpoints on loopback hosts, for
+	// a local receiver in development.
+	AllowInsecureEndpoints bool `koanf:"allow_insecure_endpoints"`
+	// AllowPrivateNetworks lets endpoints reach loopback, private and
+	// link-local addresses. Off, only public addresses are dialled, so a
+	// webhook cannot be pointed into this server's own network.
+	AllowPrivateNetworks bool `koanf:"allow_private_networks"`
+	// RetentionDays keeps finished deliveries this long; 0 is 30.
+	RetentionDays int `koanf:"retention_days"`
+	// IntervalSeconds between delivery rounds; 0 is 5.
+	IntervalSeconds int `koanf:"interval_seconds"`
+	// MaxAttempts before a delivery is given up as FAILED; 0 is 8.
+	MaxAttempts int `koanf:"max_attempts"`
 }
 
 // CalDAVConfig switches the CalDAV server (internal/caldav) on. It has no

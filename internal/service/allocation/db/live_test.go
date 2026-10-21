@@ -15,20 +15,19 @@ package db
 
 import (
 	"context"
-
-	"github.com/oh-tarnished/freebusy/internal/database"
 	"net/url"
-	"os"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/oh-tarnished/freebusy/internal/database"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/availability"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/calendar"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/common"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/event"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/resource"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
+	"github.com/oh-tarnished/freebusy/internal/livetest"
 	"github.com/oh-tarnished/freebusy/internal/rfc"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
@@ -59,10 +58,7 @@ func win(a, b float64) *interval.Interval {
 
 func liveDB(t *testing.T) *gorm.DB {
 	t.Helper()
-	dsn := os.Getenv("FREEBUSY_TEST_DATABASE_URL")
-	if dsn == "" {
-		t.Skip("FREEBUSY_TEST_DATABASE_URL not set — live database tests skipped")
-	}
+	dsn := livetest.Env(t, livetest.DatabaseURL)
 	db, err := database.OpenGorm(dsn, &gorm.Config{Logger: logger.Discard})
 	if err != nil {
 		t.Fatalf("open: %v", err)
@@ -145,7 +141,7 @@ func stores(t *testing.T) map[string]func(*gorm.DB) allocation.Store {
 			return New(&database.Connection{PgSQLConn: g, Provider: database.ProviderGorm})
 		},
 	}
-	if raw := os.Getenv("FREEBUSY_TEST_GRAPHQL_URL"); raw != "" {
+	if raw := livetest.Optional(t, livetest.GraphQLURL); raw != "" {
 		u, err := url.Parse(raw)
 		if err != nil {
 			t.Fatal(err)

@@ -49,7 +49,8 @@ func InitializeApp() *App {
 
 // Start creates the hybrid server and begins serving gRPC, HTTP, and MCP
 // traffic. Non-blocking — call Wait() afterwards to keep the process alive.
-func (a *App) Start() string {
+// An error means nothing is being served, and the process should exit.
+func (a *App) Start() (string, error) {
 	shared.Telemetry.Logger.Debug("Starting application",
 		"name", a.Name, "version", a.Version)
 
@@ -58,18 +59,18 @@ func (a *App) Start() string {
 	server, err := internal.NewServer(a.Name, a.Version)
 	if err != nil {
 		_ = shared.Telemetry.Logger.Error("Failed to create server", "error", err)
-		return fmt.Sprintf("Failed to create server: %v", err)
+		return "", fmt.Errorf("failed to create server: %w", err)
 	}
 	a.server = server
 
 	if err := a.server.Start(); err != nil {
 		_ = shared.Telemetry.Logger.Error("Failed to start server", "error", err)
-		return fmt.Sprintf("Failed to start server: %v", err)
+		return "", fmt.Errorf("failed to start server: %w", err)
 	}
 
 	shared.Telemetry.Logger.Info("Application started",
 		"name", a.Name, "version", a.Version)
-	return message
+	return message, nil
 }
 
 // Stop gracefully drains connections, shuts the server down, and releases

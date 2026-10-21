@@ -12,7 +12,8 @@ Every protobuf module under `protobuf/`. Each row links to that module's generat
 | Allocation | `freebusy.allocation.v1` | 2 | 20 | 3 | [README](freebusy/allocation/README.md) |
 | Reservation | `freebusy.reservation.v1` | 1 | 7 | 1 | [README](freebusy/reservation/README.md) |
 | Shared | `freebusy.shared.v1` | 0 | 4 | 5 | [README](freebusy/shared/README.md) |
-| **Total** | _3 modules_ | 3 | 31 | 9 | |
+| Webhook | `freebusy.webhook.v1` | 1 | 16 | 2 | [README](freebusy/webhook/README.md) |
+| **Total** | _4 modules_ | 4 | 47 | 11 | |
 
 ## Dependency graph
 
@@ -23,6 +24,7 @@ graph LR
     freebusy_allocation_v1["Allocation<br/>freebusy.allocation.v1"]
     freebusy_reservation_v1["Reservation<br/>freebusy.reservation.v1"]
     freebusy_shared_v1["Shared<br/>freebusy.shared.v1"]
+    freebusy_webhook_v1["Webhook<br/>freebusy.webhook.v1"]
     %% no local cross-module imports
 ```
 

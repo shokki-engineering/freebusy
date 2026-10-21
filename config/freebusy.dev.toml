@@ -63,3 +63,12 @@ prefix = "freebusy-dev"
 [caldav]
 # CalDAV (RFC 4791) under /dav/ on the HTTP port. Unauthenticated: dev only.
 enabled = true
+
+[webhooks]
+# Webhook delivery. Insecure endpoints: http:// to localhost, for a local receiver.
+enabled = true
+allow_insecure_endpoints = true
+interval_seconds = 5
+max_attempts = 8
+allow_private_networks = true
+retention_days = 30

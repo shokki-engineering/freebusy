@@ -14,7 +14,14 @@ func main() {
 	app := InitializeApp()
 
 	// Start the application and server
-	message := app.Start()
+	message, err := app.Start()
+	if err != nil {
+		// Nothing is serving: exit rather than wait on a server that is not
+		// there.
+		fmt.Println(err)
+		_ = app.Stop()
+		os.Exit(1)
+	}
 	fmt.Println(message)
 
 	// Wait for shutdown signal (SIGINT or SIGTERM)

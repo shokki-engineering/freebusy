@@ -4,7 +4,7 @@
 // 	protoc (unknown)
 //
 // database: freebusy
-// schemas:  allocation, reservation, shared
+// schemas:  allocation, reservation, shared, webhook
 //
 // Migration aggregator: every model in one factory Registry.
 // annotations: entity.v1 1.5.5, store.v1 1.5.5
@@ -22,6 +22,7 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/allocation"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/reservation"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/shared"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/webhook"
 
 	"errors"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/telemetry"
@@ -41,6 +42,7 @@ var schemas = []string{
 	"allocation",
 	"reservation",
 	"shared",
+	"webhook",
 }
 
 // extensions lists the Postgres extensions the models' search indexes are built
@@ -140,6 +142,9 @@ var Default = New().Register(
 	&allocation.Allocation{},
 	&reservation.Reservation{},
 	&shared.IdempotencyKey{},
+	&webhook.Delivery{},
+	&webhook.FeedCursor{},
+	&webhook.Webhook{},
 )
 
 // Instrument installs the generated first-party telemetry GORM plugin on

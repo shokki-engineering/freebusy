@@ -1,0 +1,72 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: DeleteWebhookFeedCursorsByIdResponse
+  description: Responses from the 'delete_webhook_feed_cursors_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[WebhookFeedCursors!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: DeleteWebhookFeedCursorsByIdResponse
+    inputTypeName: DeleteWebhookFeedCursorsByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: delete_webhook_feed_cursors_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: DeleteWebhookFeedCursorsByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: DeleteWebhookFeedCursorsById
+  outputType: DeleteWebhookFeedCursorsByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: preCheck
+      type: WebhookFeedCursorsBoolExp
+      description: Delete permission predicate over the 'webhook_feed_cursors' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: delete_webhook_feed_cursors_by_id
+    argumentMapping:
+      keyId: key_id
+      preCheck: pre_check
+  graphql:
+    rootFieldName: deleteWebhookFeedCursorsById
+    rootFieldKind: Mutation
+  description: Delete any row on the 'webhook_feed_cursors' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: DeleteWebhookFeedCursorsById
+  permissions:
+    - role: admin
+      allowExecution: true
+

@@ -4,7 +4,7 @@
 // 	protoc (unknown)
 //
 // database: freebusy
-// schemas:  allocation, reservation, shared
+// schemas:  allocation, reservation, shared, webhook
 //
 // Connection URLs live in freebusy.config.ts (Prisma 7 convention).
 // annotations: entity.v1 1.5.5, store.v1 1.5.5
@@ -14,7 +14,7 @@
 
 datasource freebusy {
   provider = "postgresql"
-  schemas  = ["allocation", "reservation", "shared"]
+  schemas  = ["allocation", "reservation", "shared", "webhook"]
   // Operator classes the search indexes are built with. Declared here so
   // `prisma migrate` creates the extension before the index that needs it.
   extensions = [pg_trgm]

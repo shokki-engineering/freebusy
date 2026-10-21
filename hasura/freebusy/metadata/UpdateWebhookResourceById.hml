@@ -1,0 +1,614 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookResourceCreateTime
+  description: Update the 'create_time' column in the 'webhook_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookResourceCreateTime
+    inputTypeName: UpdateColumnWebhookResourceCreateTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_resource_create_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookResourceCreateTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookResourceDisplayName
+  description: Update the 'display_name' column in the 'webhook_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookResourceDisplayName
+    inputTypeName: UpdateColumnWebhookResourceDisplayNameInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_resource_display_name
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookResourceDisplayName
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookResourceEtag
+  description: Update the 'etag' column in the 'webhook_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookResourceEtag
+    inputTypeName: UpdateColumnWebhookResourceEtagInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_resource_etag
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookResourceEtag
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookResourceEventTypes
+  description: Update the 'event_types' column in the 'webhook_resource' collection
+  fields:
+    - name: set
+      type: "[String_1]"
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookResourceEventTypes
+    inputTypeName: UpdateColumnWebhookResourceEventTypesInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_resource_event_types
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookResourceEventTypes
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookResourceId
+  description: Update the 'id' column in the 'webhook_resource' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookResourceId
+    inputTypeName: UpdateColumnWebhookResourceIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_resource_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookResourceId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookResourceName
+  description: Update the 'name' column in the 'webhook_resource' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookResourceName
+    inputTypeName: UpdateColumnWebhookResourceNameInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_resource_name
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookResourceName
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookResourceOrganizationalUnit
+  description: Update the 'organizational_unit' column in the 'webhook_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookResourceOrganizationalUnit
+    inputTypeName: UpdateColumnWebhookResourceOrganizationalUnitInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_resource_organizational_unit
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookResourceOrganizationalUnit
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookResourcePreviousSecret
+  description: Update the 'previous_secret' column in the 'webhook_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookResourcePreviousSecret
+    inputTypeName: UpdateColumnWebhookResourcePreviousSecretInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_resource_previous_secret
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookResourcePreviousSecret
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookResourceRotateTime
+  description: Update the 'rotate_time' column in the 'webhook_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookResourceRotateTime
+    inputTypeName: UpdateColumnWebhookResourceRotateTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_resource_rotate_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookResourceRotateTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookResourceSecret
+  description: Update the 'secret' column in the 'webhook_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookResourceSecret
+    inputTypeName: UpdateColumnWebhookResourceSecretInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_resource_secret
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookResourceSecret
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookResourceState
+  description: Update the 'state' column in the 'webhook_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookResourceState
+    inputTypeName: UpdateColumnWebhookResourceStateInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_resource_state
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookResourceState
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookResourceUpdateTime
+  description: Update the 'update_time' column in the 'webhook_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookResourceUpdateTime
+    inputTypeName: UpdateColumnWebhookResourceUpdateTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_resource_update_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookResourceUpdateTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnWebhookResourceUri
+  description: Update the 'uri' column in the 'webhook_resource' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnWebhookResourceUri
+    inputTypeName: UpdateColumnWebhookResourceUriInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_webhook_resource_uri
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnWebhookResourceUri
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateWebhookResourceByIdUpdateColumns
+  description: Update the columns of the 'webhook_resource' collection
+  fields:
+    - name: createTime
+      type: UpdateColumnWebhookResourceCreateTime
+      description: Update the 'create_time' column in the 'webhook_resource' collection.
+    - name: displayName
+      type: UpdateColumnWebhookResourceDisplayName
+      description: Update the 'display_name' column in the 'webhook_resource' collection.
+    - name: etag
+      type: UpdateColumnWebhookResourceEtag
+      description: Update the 'etag' column in the 'webhook_resource' collection.
+    - name: eventTypes
+      type: UpdateColumnWebhookResourceEventTypes
+      description: Update the 'event_types' column in the 'webhook_resource' collection.
+    - name: id
+      type: UpdateColumnWebhookResourceId
+      description: Update the 'id' column in the 'webhook_resource' collection.
+    - name: name
+      type: UpdateColumnWebhookResourceName
+      description: Update the 'name' column in the 'webhook_resource' collection.
+    - name: organizationalUnit
+      type: UpdateColumnWebhookResourceOrganizationalUnit
+      description: Update the 'organizational_unit' column in the 'webhook_resource'
+        collection.
+    - name: previousSecret
+      type: UpdateColumnWebhookResourcePreviousSecret
+      description: Update the 'previous_secret' column in the 'webhook_resource' collection.
+    - name: rotateTime
+      type: UpdateColumnWebhookResourceRotateTime
+      description: Update the 'rotate_time' column in the 'webhook_resource' collection.
+    - name: secret
+      type: UpdateColumnWebhookResourceSecret
+      description: Update the 'secret' column in the 'webhook_resource' collection.
+    - name: state
+      type: UpdateColumnWebhookResourceState
+      description: Update the 'state' column in the 'webhook_resource' collection.
+    - name: updateTime
+      type: UpdateColumnWebhookResourceUpdateTime
+      description: Update the 'update_time' column in the 'webhook_resource' collection.
+    - name: uri
+      type: UpdateColumnWebhookResourceUri
+      description: Update the 'uri' column in the 'webhook_resource' collection.
+  graphql:
+    typeName: UpdateWebhookResourceByIdUpdateColumns
+    inputTypeName: UpdateWebhookResourceByIdUpdateColumnsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_webhook_resource_by_id_update_columns
+      fieldMapping:
+        createTime:
+          column:
+            name: create_time
+        displayName:
+          column:
+            name: display_name
+        etag:
+          column:
+            name: etag
+        eventTypes:
+          column:
+            name: event_types
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        organizationalUnit:
+          column:
+            name: organizational_unit
+        previousSecret:
+          column:
+            name: previous_secret
+        rotateTime:
+          column:
+            name: rotate_time
+        secret:
+          column:
+            name: secret
+        state:
+          column:
+            name: state
+        updateTime:
+          column:
+            name: update_time
+        uri:
+          column:
+            name: uri
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateWebhookResourceByIdUpdateColumns
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createTime
+          - displayName
+          - etag
+          - eventTypes
+          - id
+          - name
+          - organizationalUnit
+          - previousSecret
+          - rotateTime
+          - secret
+          - state
+          - updateTime
+          - uri
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateWebhookResourceByIdResponse
+  description: Responses from the 'update_webhook_resource_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[WebhookResource!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: UpdateWebhookResourceByIdResponse
+    inputTypeName: UpdateWebhookResourceByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_webhook_resource_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateWebhookResourceByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: UpdateWebhookResourceById
+  outputType: UpdateWebhookResourceByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: postCheck
+      type: WebhookResourceBoolExp
+      description: Update permission post-condition predicate over the
+        'webhook_resource' collection
+    - name: preCheck
+      type: WebhookResourceBoolExp
+      description: Update permission pre-condition predicate over the
+        'webhook_resource' collection
+    - name: updateColumns
+      type: UpdateWebhookResourceByIdUpdateColumns!
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: update_webhook_resource_by_id
+    argumentMapping:
+      keyId: key_id
+      postCheck: post_check
+      preCheck: pre_check
+      updateColumns: update_columns
+  graphql:
+    rootFieldName: updateWebhookResourceById
+    rootFieldKind: Mutation
+  description: Update any row on the 'webhook_resource' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: UpdateWebhookResourceById
+  permissions:
+    - role: admin
+      allowExecution: true
+

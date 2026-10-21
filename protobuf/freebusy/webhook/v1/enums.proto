@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package freebusy.webhook.v1;
+
+option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1";
+option java_multiple_files = true;
+option java_outer_classname = "EnumsProto";
+option java_package = "dev.ohtarnished.freebusy.webhook.v1";
+
+// Whether a Webhook is sent changes.
+enum WebhookState {
+  // Default; read as ACTIVE.
+  WEBHOOK_STATE_UNSPECIFIED = 0;
+
+  // Changes are delivered.
+  WEBHOOK_STATE_ACTIVE = 1;
+
+  // Changes are neither recorded nor delivered for this webhook, and pending
+  // deliveries wait. Resuming delivers what was pending, not what changed
+  // while paused.
+  WEBHOOK_STATE_PAUSED = 2;
+}
+
+// Where one Delivery stands.
+enum DeliveryState {
+  // Default; never persisted.
+  DELIVERY_STATE_UNSPECIFIED = 0;
+
+  // Not yet accepted by the endpoint; attempted at next_attempt_time.
+  DELIVERY_STATE_PENDING = 1;
+
+  // The endpoint answered 2xx.
+  DELIVERY_STATE_SUCCEEDED = 2;
+
+  // Every attempt failed and no more are scheduled. RetryDelivery sends it
+  // again.
+  DELIVERY_STATE_FAILED = 3;
+}

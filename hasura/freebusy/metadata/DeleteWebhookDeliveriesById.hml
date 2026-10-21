@@ -1,0 +1,72 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: DeleteWebhookDeliveriesByIdResponse
+  description: Responses from the 'delete_webhook_deliveries_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[WebhookDeliveries!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: DeleteWebhookDeliveriesByIdResponse
+    inputTypeName: DeleteWebhookDeliveriesByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: delete_webhook_deliveries_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: DeleteWebhookDeliveriesByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: DeleteWebhookDeliveriesById
+  outputType: DeleteWebhookDeliveriesByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: preCheck
+      type: WebhookDeliveriesBoolExp
+      description: Delete permission predicate over the 'webhook_deliveries' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: delete_webhook_deliveries_by_id
+    argumentMapping:
+      keyId: key_id
+      preCheck: pre_check
+  graphql:
+    rootFieldName: deleteWebhookDeliveriesById
+    rootFieldKind: Mutation
+  description: Delete any row on the 'webhook_deliveries' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: DeleteWebhookDeliveriesById
+  permissions:
+    - role: admin
+      allowExecution: true
+

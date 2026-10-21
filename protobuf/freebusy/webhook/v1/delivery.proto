@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package freebusy.webhook.v1;
+
+import "entity/v1/annotations.proto";
+import "freebusy/webhook/v1/enums.proto";
+import "google/api/field_behavior.proto";
+import "google/api/resource.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/oh-tarnished/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1";
+option java_multiple_files = true;
+option java_outer_classname = "DeliveryProto";
+option java_package = "dev.ohtarnished.freebusy.webhook.v1";
+
+// One event owed to one webhook, and how sending it went.
+//
+// The id is derived, not random: a digest of the webhook and the event, so
+// recording the same change twice -- a rescan, or two servers scanning at once
+// -- loses the race on the primary key instead of sending the event twice.
+message Delivery {
+  option (google.api.resource) = {
+    type: "freebusy.webhook.v1/Delivery"
+    pattern: "webhooks/{webhook}/deliveries/{delivery}"
+    singular: "delivery"
+    plural: "deliveries"
+  };
+  option (entity.v1.table) = {
+    indexes: [
+      {
+        columns: [
+          "state",
+          "next_attempt_time"
+        ]
+      }
+    ]
+  };
+
+  // The delivery name. The final segment is a digest of (webhook, event_id).
+  // Format: webhooks/{webhook}/deliveries/{delivery}
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
+
+  // The CloudEvents id, the same for every webhook sent this change: a digest
+  // of the record's name and etag. Receivers deduplicate on it.
+  string event_id = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The CloudEvents type, e.g. "freebusy.reservation.confirmed".
+  string event_type = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The record that changed.
+  // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  // or organizationalUnits/{organizational_unit}/holds/{hold}
+  string subject = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The request body sent: a CloudEvents 1.0 JSON document whose data is the
+  // record as it stood.
+  string payload = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Where sending stands.
+  DeliveryState state = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Attempts made so far.
+  int32 attempt_count = 7 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the next attempt is due, while PENDING.
+  google.protobuf.Timestamp next_attempt_time = 8 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // HTTP status of the last attempt; 0 when it got no response.
+  int32 response_code = 9 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Why the last attempt failed, empty after a success.
+  string error_message = 10 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the change was recorded for this webhook.
+  google.protobuf.Timestamp create_time = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Last-modification timestamp.
+  google.protobuf.Timestamp update_time = 12 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // When the endpoint accepted it.
+  google.protobuf.Timestamp deliver_time = 13 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Opaque version for optimistic concurrency (AIP-154).
+  string etag = 14 [(google.api.field_behavior) = OUTPUT_ONLY];
+}
+
+// How far the dispatcher has read one change feed: every record of the feed
+// last modified before position_time has been recorded for every webhook. Storage
+// only -- no service exposes it.
+message FeedCursor {
+  option (google.api.resource) = {
+    type: "freebusy.webhook.v1/FeedCursor"
+    pattern: "feedCursors/{feed_cursor}"
+    singular: "feedCursor"
+    plural: "feedCursors"
+  };
+  option (entity.v1.table) = {};
+
+  // The cursor name; the final segment names the feed, e.g. "reservations".
+  // Format: feedCursors/{feed_cursor}
+  string name = 1 [(google.api.field_behavior) = IDENTIFIER];
+
+  // Records modified before this have been recorded.
+  google.protobuf.Timestamp position_time = 2 [(google.api.field_behavior) = REQUIRED];
+
+  // Last-modification timestamp.
+  google.protobuf.Timestamp update_time = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // Opaque version for optimistic concurrency (AIP-154).
+  string etag = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
+}

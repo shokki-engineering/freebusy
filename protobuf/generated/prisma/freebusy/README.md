@@ -6,7 +6,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 4 | 3 |
+| 7 | 5 |
 
 ## Entity relationships
 
@@ -16,6 +16,13 @@ erDiagram
     Allocation {
         string id PK
         string hold FK
+    }
+    Delivery {
+        string id PK
+        string webhook_id FK
+    }
+    FeedCursor {
+        string id PK
     }
     Hold {
         string id PK
@@ -27,7 +34,11 @@ erDiagram
         string id PK
         string hold FK
     }
+    Webhook {
+        string id PK
+    }
     Allocation }o--|| Hold : "hold"
+    Delivery }o--|| Webhook : "webhook_id"
     Reservation }o--|| Hold : "hold"
 ```
 
@@ -36,3 +47,4 @@ erDiagram
 - [`allocation/`](./allocation/README.md)
 - [`reservation/`](./reservation/README.md)
 - [`shared/`](./shared/README.md)
+- [`webhook/`](./webhook/README.md)
