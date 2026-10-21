@@ -26,11 +26,27 @@ func init() {
 		panic(fmt.Sprintf("failed to load embedded config: %v", err))
 	}
 
-	// 2. Optional local-dev overlay (developer machines only). Keys it defines
-	// win; everything else falls through to the embedded release defaults.
-	if overlay, err := os.ReadFile(devOverlayPath); err == nil {
+	// 2. The development profile: config/freebusy.dev.toml from the working
+	// directory when it is there (a checkout, so edits apply without a
+	// rebuild), else the embedded copy when FREEBUSY_PROFILE=dev asks for it.
+	// Keys it defines win; everything else falls through to the release
+	// defaults.
+	overlay, err := os.ReadFile(devOverlayPath)
+	if err != nil {
+		switch profile := os.Getenv(ProfileVar); profile {
+		case "", "release":
+			overlay = nil
+		case "dev":
+			if overlay, err = configFS.ReadFile("freebusy.dev.toml"); err != nil {
+				panic(fmt.Sprintf("embedded dev profile not found: %v", err))
+			}
+		default:
+			panic(fmt.Sprintf("%s=%q: want dev or release", ProfileVar, profile))
+		}
+	}
+	if overlay != nil {
 		if err := shared.LoadTomlBytes(overlay); err != nil {
-			panic(fmt.Sprintf("failed to load dev overlay %q: %v", devOverlayPath, err))
+			panic(fmt.Sprintf("failed to load the dev profile: %v", err))
 		}
 	}
 

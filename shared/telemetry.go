@@ -9,6 +9,9 @@ import (
 	"strconv"
 	"sync"
 
+	"github.com/knadh/koanf/parsers/toml"
+	"github.com/knadh/koanf/providers/rawbytes"
+	"github.com/knadh/koanf/v2"
 	"github.com/the-protobuf-project/opentelementry/opentelementry-go"
 	"github.com/the-protobuf-project/opentelementry/opentelementry-go/options"
 )
@@ -23,13 +26,23 @@ var (
 
 func init() {
 	once.Do(func() {
-		tmpPath, err := writeTelemetryConfig()
-		if err != nil {
-			panic(fmt.Sprintf("failed to write embedded telemetry config: %v", err))
+		b := opentelementry.New()
+		if tmpPath, err := writeTelemetryConfig(); err == nil {
+			defer os.Remove(tmpPath) //nolint:errcheck
+			b.WithConfig(tmpPath)
+		} else {
+			// No writable temp directory: a scratch or read-only container.
+			// The library reads its configuration only from a file, so the
+			// service is named in code, from the same embedded file, and the
+			// rest is the library's defaults -- OTLP export included, which
+			// FREEBUSY_OTLP_ENDPOINT turns on.
+			name, version, description, err := telemetryService()
+			if err != nil {
+				panic(fmt.Sprintf("failed to read embedded telemetry config: %v", err))
+			}
+			b.WithService(name, version).WithDescription(description)
 		}
-		defer os.Remove(tmpPath) //nolint:errcheck
-
-		b := opentelementry.New().WithConfig(tmpPath).WithTracing()
+		b.WithTracing()
 		applyDeploymentOverrides(b)
 
 		o, err := b.Build()
@@ -104,6 +117,16 @@ func writeTelemetryConfig() (string, error) {
 		return "", fmt.Errorf("close temp file: %w", err)
 	}
 	return f.Name(), nil
+}
+
+// telemetryService reads the service's identity from the embedded
+// opentelementry.toml, for when the library cannot be handed the file.
+func telemetryService() (name, version, description string, err error) {
+	k := koanf.New(".")
+	if err := k.Load(rawbytes.Provider(telemetryConfigData), toml.Parser()); err != nil {
+		return "", "", "", err
+	}
+	return k.String("service.name"), k.String("service.version"), k.String("service.description"), nil
 }
 
 // Close releases resources held by the Telemetry client.

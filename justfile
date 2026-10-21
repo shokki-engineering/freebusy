@@ -97,7 +97,9 @@ test:
 
 # Needs a running Postgres and Hasura DDN engine (`just migrate`, then
 # `ddn run docker-start` in hasura/). A suite that cannot reach its backend
-# fails rather than skips.
+# fails rather than skips. One package at a time (-p 1): the suites share the
+# database, and the binary suite runs a whole server -- reconciler, sweeper,
+# webhook delivery -- that would act on another package's rows.
 # Every test, live suites included, against Postgres and Hasura.
 [group('test')]
 test-live dsn="host=127.0.0.1 port=5432 user=postgres password=postgrespassword dbname=freebusydb sslmode=disable" url="http://localhost:3280/graphql":
@@ -105,7 +107,35 @@ test-live dsn="host=127.0.0.1 port=5432 user=postgres password=postgrespassword 
     FREEBUSY_TEST_POSTGRES_DSN="{{ dsn }}" \
     FREEBUSY_TEST_DATABASE_URL="{{ dsn }}" \
     FREEBUSY_TEST_GRAPHQL_URL="{{ url }}" \
-    go test -race -count=1 ./...
+    go test -race -count=1 -p 1 ./...
+
+# Bazel: the BUILD files are Gazelle's, generated from the Go sources.
+# Regenerate the BUILD.bazel files after adding, moving or importing packages.
+[group('bazel')]
+gazelle:
+    bazel run //:gazelle
+
+# Everything through Bazel: build, then the tests (live suites skip).
+[group('bazel')]
+bazel-check:
+    bazel build //...
+    bazel test //...
+
+# The image -- the static binary and nothing else -- loaded into Docker as freebusy:latest.
+[group('bazel')]
+image:
+    bazel run //image:load
+
+# Run the image against the local Postgres (`just migrate` first), configured
+# only by environment variables, with a read-only filesystem.
+# The image, run against the local Postgres on http://localhost:18080.
+[group('bazel')]
+image-run: image
+    docker run --rm --read-only -p 51051:50051 -p 18080:8080 -p 18081:8081 \
+      -e FREEBUSY_DATABASE__POSTGRES__HOST=host.docker.internal \
+      -e FREEBUSY_DATABASE__POSTGRES__PASSWORD=postgrespassword \
+      -e FREEBUSY_DATABASE__POSTGRES__SSLMODE=disable \
+      freebusy:latest
 
 # Build, lint and unit tests: what CI runs without a database.
 [group('test')]

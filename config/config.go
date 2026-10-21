@@ -1,10 +1,10 @@
-// Package config loads the freebusy service configuration from an embedded TOML
-// file (freebusy.release.toml) and exposes it via Get(). The release file is
-// compiled into the binary with //go:embed and holds production-safe defaults
-// (secrets left blank, to be injected at deploy time). On developer machines an
-// optional, non-embedded config/freebusy.dev.toml is layered on top, so local
-// runs need no environment variables. Configuration is the single source of
-// truth for service identity and database connectivity.
+// Package config loads the freebusy service configuration and exposes it via
+// Get(). Every configuration file is compiled into the binary, so it runs with
+// nothing beside it: freebusy.release.toml holds production-safe defaults
+// (secrets blank, injected at deploy time), and freebusy.dev.toml the
+// development profile, chosen with FREEBUSY_PROFILE=dev. See load.go for the
+// layers. Configuration is the single source of truth for service identity and
+// database connectivity.
 package config
 
 import (
@@ -15,14 +15,17 @@ import (
 	"github.com/the-protobuf-project/runtime-go/grpc/options"
 )
 
-//go:embed freebusy.release.toml
+//go:embed freebusy.release.toml freebusy.dev.toml
 var configFS embed.FS
 
-// devOverlayPath is the optional local-development config layered over the
-// embedded production defaults. It is read from disk (relative to the working
-// directory) only when present, so production builds — which ship just the
-// binary — never load it.
+// devOverlayPath is the development profile's file on disk, relative to the
+// working directory. When present it is read instead of the embedded copy, so
+// a developer's edits apply without a rebuild.
 const devOverlayPath = "config/freebusy.dev.toml"
+
+// ProfileVar picks the profile layered over the release defaults: "dev" for
+// the development profile, unset or "release" for none.
+const ProfileVar = "FREEBUSY_PROFILE"
 
 // AppConfig is the top-level configuration tree.
 type AppConfig struct {

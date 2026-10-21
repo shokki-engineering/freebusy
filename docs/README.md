@@ -120,6 +120,7 @@ Reservation  a hold made permanent
 | Hasura DDN CLI (`ddn`) | v3.9.4 | the Hasura backend; needs `ddn auth login` |
 | mkcert | any | the development TLS certificate |
 | api-linter | 2.3.1 | AIP lint (CI runs it too) |
+| Bazelisk | any (reads `.bazelversion`, Bazel 9.3) | the Bazel build and the container image |
 
 For code generation you also need the plugins The Protobuf Project ships in its
 Homebrew tap:
@@ -153,26 +154,26 @@ mkdir -p .certs && (cd .certs && mkcert freebusy-dev localhost 127.0.0.1)
 just run
 ```
 
-Then:
+Then (set `enable_http = true` in `config/freebusy.dev.toml` for the REST
+calls; the dev profile serves gRPC only by default):
 
 ```sh
 curl -k https://localhost:8080/health
 curl -k https://localhost:8080/v1/webhooks
-grpcurl -plaintext localhost:50051 list
+grpcurl -insecure localhost:50051 list   # TLS with the dev certificate; reflection is on in debug
 ```
 
 ### The Hasura backend
 
 ```sh
 ddn auth login                 # once; the local build will not run without it
-cd hasura
-cp .env.example .env 2>/dev/null || true   # then fill in the connector's values (see below)
+cd hasura                      # then create hasura/.env, below
 ddn supergraph build local
 ddn run docker-start           # engine on :3280, connector on :9794
 ```
 
-`hasura/.env` holds the connector's settings; the connection URI points at
-`local.hasura.dev`, which the containers resolve to your machine:
+`hasura/.env` (gitignored) holds the connector's settings; the connection URI
+points at `local.hasura.dev`, which the containers resolve to your machine:
 
 ```sh
 FREEBUSY_FREEBUSY_PGSQL_CONNECTION_URI="postgresql://postgres:postgrespassword@local.hasura.dev:5432/freebusydb"
@@ -192,36 +193,58 @@ Switch the server to it with `provider = "hasura"` under `[database]` in
 
 ## Configuration
 
-Configuration is layered:
+Every configuration file is compiled into the binary; it runs with nothing
+beside it. The layers, later ones winning:
 
-1. `config/freebusy.release.toml` — the release defaults, **embedded in the
-   binary**. A binary with no files beside it runs on these.
-2. `config/freebusy.dev.toml` — the development overlay, read from the working
-   directory when present.
+1. **Release defaults** — `config/freebusy.release.toml`, embedded.
+   Production-safe; secrets blank.
+2. **The development profile** — `config/freebusy.dev.toml`. Read from the
+   working directory when it is there (a checkout: edit it, no rebuild), or
+   taken from the embedded copy when `FREEBUSY_PROFILE=dev` asks for it.
+3. **Environment variables** — `FREEBUSY_<SECTION>__<KEY>`, double
+   underscores between levels, override any key:
+
+   ```sh
+   FREEBUSY_DATABASE__PROVIDER=hasura
+   FREEBUSY_DATABASE__POSTGRES__HOST=db.internal
+   FREEBUSY_DATABASE__POSTGRES__PASSWORD=…
+   FREEBUSY_SERVER__HTTP__PORT=8443
+   FREEBUSY_WEBHOOKS__ALLOW_PRIVATE_NETWORKS=true
+   ```
+
+   Always use the double-underscore form: a variable without one reads every
+   underscore as a level, so `FREEBUSY_SERVER_ENABLE_HTTP` would mean
+   `server.enable.http`.
 
 | Section | What it sets |
 |---|---|
 | `[app]` | name, version, description |
 | `[server]` | environment, which layers run (`enable_http`, `enable_mcp`, `enable_health`) |
 | `[server.grpc]` / `[server.http]` / `[server.mcp]` | host and port of each layer; MCP's transport |
-| `[server.tls]` | certificate and key for the HTTP layer |
+| `[server.tls]` | certificate and key; when set, gRPC and HTTP both serve TLS |
 | `[database]` | `provider`: `gorm` or `hasura` |
-| `[database.postgres]` | host, port, user, password, database, pool sizes |
+| `[database.postgres]` | host, port, user, password, database, `sslmode`, pool sizes |
 | `[database.hasura]` | the engine's GraphQL URL |
 | `[cache]` | the backend behind the generated cache decorators |
 | `[caldav]` | `enabled` — CalDAV under `/dav/` (development only: unauthenticated) |
 | `[webhooks]` | delivery: `enabled`, `allow_insecure_endpoints`, `allow_private_networks`, `interval_seconds`, `max_attempts`, `retention_days` |
 
-The ports can also be set with `FREEBUSY_GRPC_PORT` and `FREEBUSY_HTTP_PORT`.
-
-Defaults that differ between release and development:
+Defaults that differ between the release defaults and the dev profile:
 
 | Setting | Release | Development |
 |---|---|---|
-| `server.enable_http` | true | false (turn on to use REST) |
+| `server.environment` | production (no gRPC reflection) | debug |
+| `server.enable_http` | true | false |
+| `server.tls` | none — plain gRPC and HTTP | `.certs/` mkcert pair |
+| `database.postgres` | `127.0.0.1`, `sslmode=require`, no password | the local Docker Postgres |
 | `caldav.enabled` | false | true |
 | `webhooks.allow_insecure_endpoints` | false | true (`http://localhost` receivers) |
 | `webhooks.allow_private_networks` | false | true |
+
+Telemetry is configured separately, from the embedded
+`shared/opentelementry.toml`; `FREEBUSY_OTLP_ENDPOINT` (`host:port`) points
+export at a collector, and `FREEBUSY_TELEMETRY_ENVIRONMENT`,
+`FREEBUSY_PROPERTY` and `FREEBUSY_PROPERTY_NAME` label it.
 
 ---
 
@@ -243,6 +266,9 @@ Every service is reachable four ways:
 | REST | `https://localhost:8080/v1/…` (gRPC transcoding; OpenAPI in `protobuf/generated/openapi`) |
 | MCP | `http://localhost:8081/<path>` — one port, one path per service, e.g. `/freebusy/webhook/v1/webhookservice/mcp` |
 | Health | `https://localhost:8080/health` and the gRPC health service |
+
+With the release defaults (no certificate) the same surfaces are plain:
+`grpcurl -plaintext`, `http://…/health`.
 
 Errors follow AIP-193: `INVALID_ARGUMENT` for a bad request (protovalidate runs
 on every surface), `FAILED_PRECONDITION` for a state that forbids the call,
@@ -365,6 +391,7 @@ just test        # unit tests with the race detector; live suites skip
 just test-live   # everything, on both backends — needs Postgres and Hasura running
 just lint        # gofmt, go mod verify, vet, staticcheck, buf lint
 just check       # build + lint + test
+just bazel-check # the same build and tests through Bazel
 ```
 
 The live suites read three variables, which `just test-live` sets:
@@ -383,6 +410,10 @@ cannot pass by testing nothing.
 scratch directory with a copy of the dev config, and drives it as a client
 would: REST, MCP, and webhooks delivered by the server's own background loop.
 
+The live suites share one database, so `just test-live` runs one package at a
+time (`-p 1`): the binary suite's server runs the reconciler, the hold sweeper
+and webhook delivery, and in parallel they would act on another package's rows.
+
 ---
 
 ## Continuous integration
@@ -395,6 +426,7 @@ another:
 | Format, vet, staticcheck and buf lint | `just lint` |
 | Protobuf build and breaking changes | `buf build`; on pull requests `buf breaking` against the base branch |
 | Build | `go build ./...` and the server binary |
+| Bazel build, tests and image | fails if `bazel run //:gazelle` would change a BUILD file; `bazel build //...`, `bazel test //...`, `bazel build //image` |
 | Unit tests | `just test` |
 | Live suites | Postgres 18 service, `just migrate`, the Hasura engine and connector, then `just test-live` |
 
@@ -415,7 +447,66 @@ Repository setup:
 
 ## Building with Bazel and Docker
 
-*(Added with the Bazel build — see below.)*
+`go build` and Bazel build the same thing; Bazel adds reproducible
+cross-compilation and the container image.
+
+- **Bzlmod only** (`MODULE.bazel`; Bazel 9 has no WORKSPACE). rules_go and the
+  Go SDK version come from `go.mod`; every Go dependency comes from `go.work`
+  through Gazelle's `go_deps`, so Bazel resolves exactly what `go build` does.
+- **The BUILD files are Gazelle's.** Run `just gazelle` (`bazel run //:gazelle`)
+  after adding, moving or importing packages; CI fails when one is stale. The
+  only hand-written ones are the root `BUILD.bazel` (Gazelle's directives),
+  `protobuf/BUILD.bazel` (marks the generated-code module) and
+  `image/BUILD.bazel`.
+- **Pure Go** (`.bazelrc`): no cgo anywhere, so every binary is static.
+
+```sh
+just bazel-check          # bazel build //... and bazel test //...
+bazel build //:freebusy   # the server for this machine
+just image                # the image for this machine, into Docker as freebusy:latest
+bazel build //image       # the linux/amd64 + linux/arm64 image index
+bazel run //image:push -- --tag 1.0.0   # to ghcr.io/oh-tarnished/freebusy
+```
+
+### The image
+
+The image has no base layer: its filesystem is one file, `/freebusy`, a
+statically linked binary cross-compiled for each platform. No shell, no libc,
+no certificate store, no configuration files. What an empty filesystem lacks
+the binary carries:
+
+| Needed | Where it comes from |
+|---|---|
+| configuration | the embedded release defaults and dev profile, plus `FREEBUSY_*` variables |
+| time zones | `time/tzdata`, compiled in |
+| root certificates for HTTPS webhooks | `golang.org/x/crypto/x509roots/fallback`, used when the system has none |
+| a writable directory | none needed: configuration loads from memory, and telemetry falls back to configuring itself in code |
+
+It runs as uid 65532, exposes 50051 (gRPC), 8080 (HTTP) and 8081 (MCP), and
+works with a read-only root filesystem:
+
+```sh
+docker run --rm --read-only -p 50051:50051 -p 8080:8080 -p 8081:8081 \
+  -e FREEBUSY_DATABASE__POSTGRES__HOST=host.docker.internal \
+  -e FREEBUSY_DATABASE__POSTGRES__PASSWORD=postgrespassword \
+  -e FREEBUSY_DATABASE__POSTGRES__SSLMODE=disable \
+  freebusy:latest
+```
+
+(`just image-run` does exactly this, on ports 51051, 18080 and 18081.) The
+schema must exist first: run `just migrate` against the database, since the
+image carries the server only.
+
+To run the development profile in a container, select it and blank its
+certificate paths, which point into a checkout's `.certs`:
+
+```sh
+docker run --rm --read-only -p 8080:8080 \
+  -e FREEBUSY_PROFILE=dev -e FREEBUSY_SERVER__ENABLE_HTTP=true \
+  -e FREEBUSY_SERVER__TLS__CERT_FILE= -e FREEBUSY_SERVER__TLS__KEY_FILE= \
+  -e FREEBUSY_DATABASE__POSTGRES__HOST=host.docker.internal \
+  freebusy:latest
+```
 
 ---
 
@@ -425,6 +516,7 @@ Repository setup:
 config/                 configuration: embedded release defaults + dev overlay
 docker/                 local Postgres and the grpc-web Envoy proxy
 docs/                   this guide
+image/                  the container image (Bazel: rules_oci)
 hasura/                 Hasura DDN project: metadata, connector, engine
 internal/
   caldav/               the CalDAV server
@@ -456,6 +548,9 @@ tools/                  just recipes, buf templates, generators' helpers
 | Generated code differs from a colleague's | different plugin versions; check `protoc-gen-store --version` against the generated headers |
 | `internal/database/hasura/graphqlx` disappeared | `just gen store` deletes it; restore it from git |
 | The server prints "failed to start server" and exits 1 | a port is taken, or the configuration is invalid |
+| `go build` fails on a clean machine fetching a module | a dependency is private or missing from the public Go proxy; every dependency must be fetchable by anyone |
+| `bazel run //:gazelle` fails with "unknown repo" | run `bazel mod tidy` first: `MODULE.bazel` still names a removed module |
+| A dependency's own BUILD files break the Bazel build | add it to the `gazelle_override(build_file_generation = "clean")` list in `MODULE.bazel` |
 
 ---
 
