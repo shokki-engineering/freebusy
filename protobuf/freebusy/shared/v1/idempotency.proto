@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package freebusy.shared.v1;
 
-import "buf/validate/validate.proto";
 import "entity/v1/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/api/field_info.proto";

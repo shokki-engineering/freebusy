@@ -107,7 +107,7 @@ type Webhook struct {
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// Human-readable name, for the operator's own reference.
 	DisplayName *string `gorm:"column:display_name" json:"display_name,omitempty"`
-	// The endpoint each event is POSTed to. HTTPS, except to a loopback host when the server allows insecure endpoints for development.
+	// The endpoint each event is POSTed to. HTTPS, except to a loopback host when the server allows insecure endpoints for development. Required on create; an update that leaves it out keeps the current one.
 	URI string `gorm:"column:uri;not null" json:"uri" validate:"required"`
 	// The event types sent, e.g. "freebusy.reservation.confirmed" or "freebusy.event.deleted". Empty sends every type. A type is "freebusy.<record>.<what happened>": holds are active, released, expired and converted; reservations pending, confirmed, cancelling, cancelled, failed, rescheduling and rescheduled; resources, calendars, events and availabilities created, updated and deleted.
 	EventTypes pq.StringArray `gorm:"column:event_types;type:text[];index:idx_resource_event_types_gin,type:gin" json:"event_types,omitempty"`

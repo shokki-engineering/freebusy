@@ -1,9 +1,13 @@
-name: Protobuf API lint
+# Google AIP lint over the schema tree, strictly.
+#
+# The one rule freebusy may disable, core::0215::foreign-type-reference, is
+# not disabled here: the tree has no finding under it, and a rule switched off
+# before it is needed is a rule nobody notices switching back on.
+name: API lint
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   # No `branches` filter: gate every PR, whatever branch it targets.
   pull_request:
 
@@ -11,23 +15,26 @@ permissions:
   contents: read
 
 jobs:
-  lint:
+  aip:
     name: Google AIP lint (strict)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      # Strict: in-proto `(-- api-linter: disable=... --)` comments are ignored,
-      # and any problem at all fails the job.
-      - uses: the-protobuf-project/setup-google-api-linter@f2f9161d0333b3da9e58595f249107fc2cdaa033 # main
+      # working-directory is protobuf so each file's path matches its proto
+      # package. Linting from the repository root instead trips
+      # core::0191::proto-package on every file.
+      #
+      # ignore-comment-disables means a finding cannot be suppressed from
+      # inside the schema. An escape hatch in the file being reviewed is not a
+      # review.
+      - name: Lint
+        uses: the-protobuf-project/setup-google-api-linter@d031174de8de0a2166bc929f24e501b914c4a5e9
         with:
           version: 2.3.1
-          # Lint from the buf module root so each file's path matches its proto
-          # package (`freebusy/booking/v1/...`). Linting from the repo root
-          # instead trips core::0191::proto-package on every file.
           working-directory: protobuf
           paths: "**/*.proto"
-          # Resolve googleapis / protovalidate / mcp / orm imports from the
+          # Resolve googleapis / protovalidate / mcp / store imports from the
           # buf.yaml one level up at the repo root.
           buf: true
           buf-input: ".."

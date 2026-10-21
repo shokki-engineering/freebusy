@@ -7,7 +7,6 @@
 package sharedpbv1
 
 import (
-	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "github.com/the-protobuf-project/store/plugin/entity/pb/entitypbv1"
 	_ "github.com/the-protobuf-project/store/plugin/pb/storepbv1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
@@ -214,7 +213,7 @@ var File_freebusy_shared_v1_idempotency_proto protoreflect.FileDescriptor
 
 const file_freebusy_shared_v1_idempotency_proto_rawDesc = "" +
 	"\n" +
-	"$freebusy/shared/v1/idempotency.proto\x12\x12freebusy.shared.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\xfa\x03\n" +
+	"$freebusy/shared/v1/idempotency.proto\x12\x12freebusy.shared.v1\x1a\x1bentity/v1/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\xfa\x03\n" +
 	"\x0eIdempotencyKey\x12\x17\n" +
 	"\x04name\x18\x01 \x01(\tB\x03\xe0A\bR\x04name\x12\x1b\n" +
 	"\x06method\x18\x02 \x01(\tB\x03\xe0A\x02R\x06method\x12*\n" +

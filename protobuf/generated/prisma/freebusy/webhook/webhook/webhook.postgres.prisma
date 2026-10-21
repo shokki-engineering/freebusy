@@ -23,7 +23,7 @@ model Webhook {
   /// Human-readable name, for the operator's own reference.
   displayName String? @map("display_name")
 
-  /// The endpoint each event is POSTed to. HTTPS, except to a loopback host when the server allows insecure endpoints for development.
+  /// The endpoint each event is POSTed to. HTTPS, except to a loopback host when the server allows insecure endpoints for development. Required on create; an update that leaves it out keeps the current one.
   uri String @map("uri")
 
   /// The event types sent, e.g. "freebusy.reservation.confirmed" or "freebusy.event.deleted". Empty sends every type. A type is "freebusy.<record>.<what happened>": holds are active, released, expired and converted; reservations pending, confirmed, cancelling, cancelled, failed, rescheduling and rescheduled; resources, calendars, events and availabilities created, updated and deleted.

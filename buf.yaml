@@ -2,6 +2,12 @@ version: v2
 modules:
   - path: protobuf
     name: buf.build/oh-tarnished-registry/freebusy
+# BASIC, not STANDARD: STANDARD wants HoldServiceCreateHoldResponse-style
+# wrappers that AIP-131..135 forbid, and api-linter (api-lint.yml) is the
+# authority on API design. buf checks structure; api-linter checks design.
+lint:
+  use:
+    - BASIC
 breaking:
   use:
     - FILE

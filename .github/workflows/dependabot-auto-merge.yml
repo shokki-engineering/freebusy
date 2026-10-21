@@ -1,0 +1,45 @@
+# Merges a Dependabot pull request into main once CI passes.
+#
+# This job does not wait for CI itself: it switches on GitHub's auto-merge,
+# and GitHub merges when every check main's branch protection requires has
+# passed. Those required checks are the gate. Without them auto-merge would
+# merge at once, so they must name every job in ci.yml and api-lint.yml
+# (Settings -> Branches -> main) -- the live job among them, which needs the
+# HASURA_DDN_PAT secret set for Dependabot too. A failing check leaves the pull request
+# open, for a person to read why.
+#
+# Only Dependabot's own pull requests, checked by the author of the event and
+# of the pull request both, so a person's branch named dependabot/... is not
+# merged. Squashed, so main gets one commit per update.
+name: Dependabot auto-merge
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    name: Enable auto-merge
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]' && github.event.pull_request.user.login == 'dependabot[bot]'
+    steps:
+      # What is being updated, for the log: the names, the versions, and
+      # whether it is a major update.
+      - id: metadata
+        uses: dependabot/fetch-metadata@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Merge once the required checks pass
+        env:
+          PR: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEPS: ${{ steps.metadata.outputs.dependency-names }}
+          UPDATE: ${{ steps.metadata.outputs.update-type }}
+        run: |
+          echo "Auto-merging $DEPS ($UPDATE) once CI passes"
+          gh pr merge --auto --squash "$PR"

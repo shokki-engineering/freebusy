@@ -9,7 +9,6 @@ package allocationpbv1
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
-	_ "google.golang.org/genproto/googleapis/type/interval"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
@@ -461,7 +460,7 @@ var File_freebusy_allocation_v1_hold_messages_proto protoreflect.FileDescriptor
 
 const file_freebusy_allocation_v1_hold_messages_proto_rawDesc = "" +
 	"\n" +
-	"*freebusy/allocation/v1/hold_messages.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a'freebusy/allocation/v1/allocation.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1agoogle/type/interval.proto\"\xcd\x01\n" +
+	"*freebusy/allocation/v1/hold_messages.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a'freebusy/allocation/v1/allocation.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\"\xcd\x01\n" +
 	"\x11CreateHoldRequest\x12]\n" +
 	"\x06parent\x18\x01 \x01(\tBE\xe0A\x02\xfaA\x1d\x12\x1bfreebusy.allocation.v1/Hold\xbaH\x1fr\x1d2\x1b^organizationalUnits/[^/]+$R\x06parent\x12;\n" +
 	"\x04hold\x18\x02 \x01(\v2\x1c.freebusy.allocation.v1.HoldB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x04hold\x12\x1c\n" +

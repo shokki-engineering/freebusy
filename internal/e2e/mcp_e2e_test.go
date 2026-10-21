@@ -13,7 +13,6 @@ package e2e
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net"
 	"strings"
@@ -136,15 +135,4 @@ func toolText(res *mcp.CallToolResult) string {
 		}
 	}
 	return b.String()
-}
-
-// extractJSONField pulls a top-level string field out of a JSON text blob
-// without committing to the full response shape.
-func extractJSONField(text, field string) string {
-	var m map[string]any
-	if err := json.Unmarshal([]byte(text), &m); err != nil {
-		return ""
-	}
-	s, _ := m[field].(string)
-	return s
 }

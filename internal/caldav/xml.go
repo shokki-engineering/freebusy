@@ -2,7 +2,6 @@ package caldav
 
 import (
 	"encoding/xml"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -190,6 +189,3 @@ func escapeText(s string) string {
 }
 
 func escapeAttr(s string) string { return strings.ReplaceAll(escapeText(s), `"`, "&quot;") }
-
-// errNoBody marks a request that needed an XML body and sent none.
-var errNoBody = errors.New("missing XML body")

@@ -268,7 +268,7 @@ func caldavFlow(t *testing.T, conn *database.Connection) {
 	}
 
 	// Re-PUT the series without overrides: both instances come back.
-	resp, _ = c.want("PUT", obj, event("Resurfacing"), http.StatusNoContent, "If-Match", editedTag)
+	c.want("PUT", obj, event("Resurfacing"), http.StatusNoContent, "If-Match", editedTag)
 	_, out = c.want("GET", obj, "", http.StatusOK)
 	if n := strings.Count(out, "BEGIN:VEVENT"); n != 1 {
 		t.Fatalf("overrides survived a PUT without them:\n%s", out)

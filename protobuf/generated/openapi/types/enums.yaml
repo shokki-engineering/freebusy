@@ -1,16 +1,47 @@
 components:
   schemas:
-    freebusy.reservation.v1.ReservationState:
-      description: Lifecycle of a Reservation.
+    freebusy.shared.v1.BookingMode:
+      description: How a resource is booked, which decides the availability shape
+        it produces.
       enum:
-      - RESERVATION_STATE_UNSPECIFIED
-      - RESERVATION_STATE_PENDING
-      - RESERVATION_STATE_CONFIRMED
-      - RESERVATION_STATE_CANCELLING
-      - RESERVATION_STATE_CANCELLED
-      - RESERVATION_STATE_FAILED
-      - RESERVATION_STATE_RESCHEDULING
-      - RESERVATION_STATE_RESCHEDULED
+      - BOOKING_MODE_UNSPECIFIED
+      - BOOKING_MODE_TIME_SLOT
+      - BOOKING_MODE_NIGHTLY
+      type: string
+    freebusy.shared.v1.MediaType:
+      description: Kind of media asset a Media reference points at. Documents (PDFs,
+        house rules, fact sheets) are just media with type DOCUMENT — they are not
+        a separate type.
+      enum:
+      - MEDIA_TYPE_UNSPECIFIED
+      - MEDIA_TYPE_IMAGE
+      - MEDIA_TYPE_VIDEO
+      - MEDIA_TYPE_DOCUMENT
+      - MEDIA_TYPE_FLOORPLAN
+      - MEDIA_TYPE_VIRTUAL_TOUR
+      type: string
+    freebusy.shared.v1.OrderDirection:
+      description: Enums shared across more than one freebusy resource. Resource-specific
+        enums live alongside their resource (e.g. BookingStatus in the booking package),
+        so only the genuinely cross-cutting ones are defined here. Sort direction
+        for list endpoints.
+      enum:
+      - ORDER_DIRECTION_UNSPECIFIED
+      - ORDER_DIRECTION_ASC
+      - ORDER_DIRECTION_DESC
+      type: string
+    freebusy.shared.v1.Weekday:
+      description: Day of the week, numbered to match google.type.DayOfWeek (Monday
+        = 1).
+      enum:
+      - WEEKDAY_UNSPECIFIED
+      - WEEKDAY_MONDAY
+      - WEEKDAY_TUESDAY
+      - WEEKDAY_WEDNESDAY
+      - WEEKDAY_THURSDAY
+      - WEEKDAY_FRIDAY
+      - WEEKDAY_SATURDAY
+      - WEEKDAY_SUNDAY
       type: string
 info:
   title: OpenAPI Spec for Solo APIs.
