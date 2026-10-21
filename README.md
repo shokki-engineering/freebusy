@@ -36,8 +36,6 @@ flowchart LR
 - [Status](#status)
 - [Licence](#licence)
 
----
-
 ## What it is for
 
 Anything booked by time, in any quantity, from any number of sites:
@@ -61,8 +59,6 @@ one industry lives elsewhere and refers to freebusy by name:
 | Customers, guests, staff identities | a user service — a reservation names a `users/{user}` |
 | Products, rate plans, channel rules | the vertical built on top |
 | Anything else a booking must remember | the reservation's free-form `attributes` |
-
----
 
 ## How it works
 
@@ -188,8 +184,6 @@ stateDiagram-v2
 describe, so a crash never leaves the books wrong: a background reconciler
 finds any reservation stuck in one and finishes it.
 
----
-
 ## Running in production
 
 The production artifact is a container image holding **one file**: a
@@ -285,8 +279,6 @@ grpc_health_probe -addr=localhost:50051     # the standard gRPC health service
   reachable only by your own services, until it is (see [Status](#status)).
 - **CalDAV** is off by default in production for the same reason.
 
----
-
 ## Configuration
 
 Every configuration file is compiled into the binary. Settings are layered,
@@ -336,8 +328,6 @@ Release defaults versus the development profile:
 | `webhooks.allow_insecure_endpoints` | false | true |
 | `webhooks.allow_private_networks` | false | true |
 
----
-
 ## Using the API
 
 | Service | What it does |
@@ -377,8 +367,6 @@ Errors follow AIP-193: `INVALID_ARGUMENT` for a bad request,
 `FAILED_PRECONDITION` for a state that forbids the call (with a machine
 reason), `ABORTED` for a stale `etag`.
 
----
-
 ## Webhooks
 
 A webhook subscribes an HTTPS endpoint to changes in holds, reservations and
@@ -417,8 +405,6 @@ flowchart LR
   on the address DNS returned — unless `allow_private_networks` is set.
 - Finished deliveries are pruned after `retention_days`.
 
----
-
 ## CalDAV
 
 With `[caldav] enabled = true`, a CalDAV server (RFC 4791) is mounted on the
@@ -427,8 +413,6 @@ Calendar, Thunderbird and DAVx⁵ can add it as an account; calendars, events �
 edited single occurrences included — and availability read and write through
 the same code as the API, and `free-busy-query` is answered by the engine.
 It has no authentication yet, so it is a development surface.
-
----
 
 ## Developing freebusy
 
@@ -526,8 +510,6 @@ just image               # the image for this machine, into Docker
 just image-run           # and run it against the local Postgres
 ```
 
----
-
 ## Testing and CI
 
 ```sh
@@ -556,8 +538,6 @@ check passes. The repository needs:
 - branch protection on `main` requiring every job — without it, auto-merge
   merges at once.
 
----
-
 ## Repository layout
 
 ```
@@ -581,8 +561,6 @@ protobuf/
 tools/                  just recipes, buf templates, generator helpers
 ```
 
----
-
 ## Troubleshooting
 
 | Symptom | Cause |
@@ -597,8 +575,6 @@ tools/                  just recipes, buf templates, generator helpers
 | `internal/database/hasura/graphqlx` disappeared | `just gen store` deletes it; restore it from git |
 | The server prints "failed to start server" and exits 1 | a port is taken, or the configuration is invalid |
 
----
-
 ## Status
 
 Ready to build on. Not built yet:
@@ -611,8 +587,6 @@ Ready to build on. Not built yet:
   refused; calendar apps split the series instead.
 - **Atomic CalDAV writes** of a series together with its edited occurrences.
 - **Encryption at rest** for webhook secrets.
-
----
 
 ## Licence
 

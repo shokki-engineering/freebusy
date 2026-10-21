@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/oh-tarnished/runtime-go/ulid"
 	"github.com/shokki-engineering/freebusy/internal/database"
 	"github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/availability"
 	"github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/calendar"
@@ -31,7 +32,6 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/rfc"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
-	"github.com/oh-tarnished/runtime-go/ulid"
 	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
