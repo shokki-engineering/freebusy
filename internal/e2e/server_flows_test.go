@@ -24,7 +24,7 @@ func reservationFlow(t *testing.T, c *e2eClients) {
 	t.Helper()
 	ctx := context.Background()
 
-	site := "organizationalUnits/e2e-" + c.suffix
+	site := c.site(t, "e2e-"+c.suffix)
 	resource := "resources/e2e-" + c.suffix
 	if _, err := c.resources.CreateResource(ctx, &resourcev1.CreateResourceRequest{
 		ResourceId: "e2e-" + c.suffix,

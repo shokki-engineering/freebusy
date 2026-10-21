@@ -12,6 +12,9 @@ package rpc
 import (
 	"context"
 	"errors"
+	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/shokki-engineering/freebusy/internal/types"
 	"github.com/shokki-engineering/freebusy/shared"
@@ -19,6 +22,7 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/protoadapt"
 )
 
 // observer wraps handler bodies with tracing, metrics, and outcome logging;
@@ -46,39 +50,131 @@ const (
 	ReasonInvalidState = "INVALID_STATE"
 	// ReasonConcurrentModification: an etag/CAS race; the caller may retry.
 	ReasonConcurrentModification = "CONCURRENT_MODIFICATION"
+	// ReasonNotFound, ReasonAlreadyExists, ReasonInvalidArgument and
+	// ReasonUnimplemented are the defaults for errors no Problem names more
+	// precisely.
+	ReasonNotFound        = "NOT_FOUND"
+	ReasonAlreadyExists   = "ALREADY_EXISTS"
+	ReasonInvalidArgument = "INVALID_ARGUMENT"
+	ReasonUnimplemented   = "UNIMPLEMENTED"
 )
 
-// ToStatusErr maps repository sentinel errors onto gRPC status codes. Errors
-// that are already gRPC statuses (e.g. InvalidArgument from request validation)
-// pass through unchanged; anything else becomes Internal.
+// ToStatusErr maps freebusy's errors onto gRPC statuses a developer can act on.
 //
-// The three failure modes that used to share one "conflict" now carry distinct
-// reasons: capacity exhaustion and invalid-state both stay FailedPrecondition
-// (as AIP requires) but are told apart by ErrorInfo.reason, while a CAS race
-// keeps Aborted, the retryable code.
+// A types.Problem becomes its message -- what is wrong, then what to do --
+// with an ErrorInfo carrying its reason and the google.rpc detail its kind
+// calls for: BadRequest for a field, ResourceInfo for a missing resource,
+// PreconditionFailure for a blocked call. Any other error wrapping a sentinel
+// keeps its message, less the sentinel's own text ("invalid argument: ..."),
+// which only repeats the status code. Errors that are already gRPC statuses
+// (request validation) pass through; anything else becomes Internal.
+//
+// Capacity exhaustion and invalid state both stay FailedPrecondition, as AIP
+// requires, and are told apart by ErrorInfo.reason; a CAS race keeps Aborted,
+// the retryable code.
 func ToStatusErr(err error) error {
-	switch {
-	case err == nil:
+	if err == nil {
 		return nil
+	}
+	var p *types.Problem
+	if errors.As(err, &p) {
+		return problemStatus(p)
+	}
+	code, reason, ok := classify(err)
+	if !ok {
+		if _, isStatus := status.FromError(err); isStatus {
+			return err
+		}
+		return status.Error(codes.Internal, err.Error())
+	}
+	return withReason(code, errors.New(Sentence(plain(err))), reason)
+}
+
+// classify is the status code and default reason for err's sentinel.
+func classify(err error) (codes.Code, string, bool) {
+	switch {
 	case errors.Is(err, types.ErrNotFound):
-		return status.Error(codes.NotFound, err.Error())
+		return codes.NotFound, ReasonNotFound, true
 	case errors.Is(err, types.ErrAlreadyExists):
-		return status.Error(codes.AlreadyExists, err.Error())
+		return codes.AlreadyExists, ReasonAlreadyExists, true
 	case errors.Is(err, types.ErrCapacityExhausted):
-		return withReason(codes.FailedPrecondition, err, ReasonCapacityExhausted)
+		return codes.FailedPrecondition, ReasonCapacityExhausted, true
 	case errors.Is(err, types.ErrInvalidState):
-		return withReason(codes.FailedPrecondition, err, ReasonInvalidState)
+		return codes.FailedPrecondition, ReasonInvalidState, true
 	case errors.Is(err, types.ErrConflict):
-		return withReason(codes.Aborted, err, ReasonConcurrentModification)
+		return codes.Aborted, ReasonConcurrentModification, true
 	case errors.Is(err, types.ErrInvalidArgument):
-		return status.Error(codes.InvalidArgument, err.Error())
+		return codes.InvalidArgument, ReasonInvalidArgument, true
 	case errors.Is(err, types.ErrUnimplemented):
-		return status.Error(codes.Unimplemented, err.Error())
+		return codes.Unimplemented, ReasonUnimplemented, true
 	}
-	if _, ok := status.FromError(err); ok {
-		return err
+	return codes.Unknown, "", false
+}
+
+// sentinels are the texts "%w: ..." puts in front of a message.
+var sentinels = []error{
+	types.ErrNotFound, types.ErrAlreadyExists, types.ErrCapacityExhausted,
+	types.ErrInvalidState, types.ErrConflict, types.ErrInvalidArgument, types.ErrUnimplemented,
+}
+
+// plain is err's message without the sentinel texts in front of it.
+func plain(err error) string {
+	msg := err.Error()
+	for again := true; again; {
+		again = false
+		for _, s := range sentinels {
+			if rest, ok := strings.CutPrefix(msg, s.Error()+": "); ok {
+				msg, again = rest, true
+			}
+		}
 	}
-	return status.Error(codes.Internal, err.Error())
+	return msg
+}
+
+// Sentence makes msg read as one: a capital first letter and a closing full
+// stop, so every message the API returns is written the same way whoever wrote
+// it.
+func Sentence(msg string) string {
+	msg = strings.TrimSpace(msg)
+	if msg == "" {
+		return msg
+	}
+	r, n := utf8.DecodeRuneInString(msg)
+	msg = string(unicode.ToUpper(r)) + msg[n:]
+	if !strings.HasSuffix(msg, ".") && !strings.HasSuffix(msg, "?") {
+		msg += "."
+	}
+	return msg
+}
+
+// problemStatus renders a Problem: its message, an ErrorInfo, and the detail
+// its kind calls for.
+func problemStatus(p *types.Problem) error {
+	code, reason, _ := classify(p.Kind)
+	if p.Reason != "" {
+		reason = p.Reason
+	}
+	st := status.New(code, Sentence(p.Error()))
+	details := []protoadapt.MessageV1{&errdetails.ErrorInfo{Reason: reason, Domain: ErrorDomain, Metadata: p.Metadata}}
+	switch {
+	case p.Field != "":
+		details = append(details, &errdetails.BadRequest{FieldViolations: []*errdetails.BadRequest_FieldViolation{
+			{Field: p.Field, Description: p.Error(), Reason: reason},
+		}})
+	case code == codes.FailedPrecondition && p.ResourceName != "":
+		details = append(details, &errdetails.PreconditionFailure{Violations: []*errdetails.PreconditionFailure_Violation{
+			{Type: reason, Subject: p.ResourceName, Description: p.Error()},
+		}})
+	case p.ResourceName != "":
+		details = append(details, &errdetails.ResourceInfo{
+			ResourceType: p.ResourceType, ResourceName: p.ResourceName, Description: p.Fix,
+		})
+	}
+	detailed, err := st.WithDetails(details...)
+	if err != nil {
+		return st.Err()
+	}
+	return detailed.Err()
 }
 
 // withReason attaches an ErrorInfo detail so clients can branch on a stable

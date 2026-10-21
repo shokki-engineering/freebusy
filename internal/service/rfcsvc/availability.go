@@ -10,7 +10,8 @@ import (
 	"slices"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc7953/availability/v1/availabilityv1grpc"
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
+	availabilityv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
+	"github.com/shokki-engineering/freebusy/internal/runtime/hints"
 	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
 	"github.com/shokki-engineering/freebusy/internal/types"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -64,7 +65,9 @@ func (s *AvailabilityServer) CreateAvailability(ctx context.Context, req *availa
 		if id := req.GetAvailabilityId(); id != "" {
 			name = req.GetParent() + "/availabilities/" + id
 		}
-		PrepareCreate(in, name)
+		if err := PrepareCreate(in, name); err != nil {
+			return rpc.ToStatusErr(err)
+		}
 		var err error
 		out, err = s.repos.Availabilities.Create(ctx, req.GetParent(), in)
 		return rpc.ToStatusErr(err)
@@ -109,11 +112,19 @@ func (s *AvailabilityServer) UndeleteAvailability(ctx context.Context, req *avai
 // engine both, and only reappear by surprise on undelete.
 func liveParent(ctx context.Context, repos Repositories, calendar string) error {
 	cal, err := repos.Calendars.Get(ctx, calendar)
+	if errors.Is(err, types.ErrNotFound) {
+		return types.Missing("CALENDAR_NOT_FOUND", hints.TypeOf(calendar), calendar,
+			fmt.Sprintf("calendar %q does not exist", calendar),
+			"Check the parent, or list calendars with "+hints.Call("ListCalendars", nil)+
+				"; create one first with "+hints.Call("CreateCalendar", nil))
+	}
 	if err != nil {
 		return err
 	}
 	if cal.GetDeleteTime() != nil {
-		return fmt.Errorf("%w: %s is deleted", types.ErrInvalidState, calendar)
+		return types.Blocked("CALENDAR_DELETED", hints.TypeOf(calendar), calendar,
+			fmt.Sprintf("calendar %s is deleted, and nothing can be added to it", calendar),
+			"Restore it with "+hints.Call("UndeleteCalendar", map[string]string{"name": calendar})+", or use a live calendar")
 	}
 	return nil
 }

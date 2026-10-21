@@ -120,11 +120,14 @@ func WithStreamGraphQLListOverride(field string, h filterx.GraphQLHandler) Optio
 
 // New picks the adapter set for the live handle in conn: GraphQL when a
 // client connection is present, otherwise GORM.
+//
+// When conn carries a ChangeObserver, every write the returned repositories
+// make is reported to it (see observe).
 func New(conn repox.Conn, opts ...Option) Repositories {
 	if conn.GraphQL != nil {
-		return NewGraphQL(conn.GraphQL, opts...)
+		return observe(NewGraphQL(conn.GraphQL, opts...), conn.Changes)
 	}
-	return NewGorm(conn.Gorm, opts...)
+	return observe(NewGorm(conn.Gorm, opts...), conn.Changes)
 }
 
 // NewGraphQL builds the GraphQL adapter set over svc.
@@ -147,4 +150,80 @@ func NewGorm(db *gorm.DB, opts ...Option) Repositories {
 	return Repositories{
 		Streams: &GormStreamRepository{DB: db, Hooks: o.streamHooks, ListOverrides: o.streamOverrides},
 	}
+}
+
+// observe wraps every repository in repos so its writes are reported to
+// changes. With no observer it returns repos unchanged, so a process that wires
+// none pays nothing.
+//
+// The wrapper sits over the whole interface, not inside the adapters, so the
+// same notification covers GORM and GraphQL alike -- and a Tier-2 adapter that
+// embeds a generated one and overrides a write is covered too.
+func observe(repos Repositories, changes repox.ChangeObserver) Repositories {
+	if changes == nil {
+		return repos
+	}
+	return Repositories{
+		Streams: &observedStreamRepository{StreamRepository: repos.Streams, changes: changes},
+	}
+}
+
+// observedStreamRepository reports every Stream write to a ChangeObserver.
+//
+// It reports a write that returned an error too, whenever the name is known.
+// An error does not prove nothing was written -- the adapters re-read after
+// writing, and that re-read can fail -- and an observer told about a write
+// that did not happen only drops something it did not need to, while one not
+// told about a write that did keeps serving what the write replaced.
+type observedStreamRepository struct {
+	StreamRepository
+	changes repox.ChangeObserver
+}
+
+func (o *observedStreamRepository) Create(ctx context.Context, m *streamv1.Stream) (*streamv1.Stream, error) {
+	out, err := o.StreamRepository.Create(ctx, m)
+	o.created(ctx, m, out)
+	return out, err
+}
+
+// created reports a Create: by the stored record's name, or failing that by
+// the name the caller asked for. A Create that failed before naming anything
+// wrote nothing.
+func (o *observedStreamRepository) created(ctx context.Context, m, out *streamv1.Stream) {
+	switch {
+	case out.GetName() != "":
+		o.changes.Changed(ctx, out.GetName())
+	case m.GetName() != "":
+		o.changes.Changed(ctx, m.GetName())
+	}
+}
+
+func (o *observedStreamRepository) Update(ctx context.Context, m *streamv1.Stream, paths []string) (*streamv1.Stream, error) {
+	out, err := o.StreamRepository.Update(ctx, m, paths)
+	o.changes.Changed(ctx, m.GetName())
+	return out, err
+}
+
+func (o *observedStreamRepository) UpdateOutputOnly(ctx context.Context, m *streamv1.Stream, paths []string) (*streamv1.Stream, error) {
+	out, err := o.StreamRepository.UpdateOutputOnly(ctx, m, paths)
+	o.changes.Changed(ctx, m.GetName())
+	return out, err
+}
+
+func (o *observedStreamRepository) Delete(ctx context.Context, name string) error {
+	err := o.StreamRepository.Delete(ctx, name)
+	o.changes.Changed(ctx, name)
+	return err
+}
+
+func (o *observedStreamRepository) Undelete(ctx context.Context, name string) (*streamv1.Stream, error) {
+	out, err := o.StreamRepository.Undelete(ctx, name)
+	o.changes.Changed(ctx, name)
+	return out, err
+}
+
+func (o *observedStreamRepository) Purge(ctx context.Context, name string) error {
+	err := o.StreamRepository.Purge(ctx, name)
+	o.changes.Changed(ctx, name)
+	return err
 }

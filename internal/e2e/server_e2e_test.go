@@ -22,6 +22,8 @@
 package e2e
 
 import (
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc4519/organization/v1/organizationv1grpc"
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc4519/organizational_unit/v1/organizational_unitv1grpc"
 	"context"
 	"fmt"
 	"net"
@@ -66,6 +68,8 @@ func TestE2E_Hasura(t *testing.T) {
 // a test run should not leave rows behind.
 type e2eClients struct {
 	suffix         string
+	organizations  organizationv1grpc.OrganizationsClient
+	units          organizational_unitv1grpc.OrganizationalUnitsClient
 	availability   allocationpbv1.AllocationServiceClient
 	holds          allocationpbv1.HoldServiceClient
 	reservations   reservationpbv1.ReservationServiceClient
@@ -83,6 +87,8 @@ func serverLifecycle(t *testing.T, cc *grpc.ClientConn, repos rfcsvc.Repositorie
 	t.Helper()
 	c := &e2eClients{
 		suffix:         fmt.Sprintf("%d", time.Now().UnixNano()%1_000_000_000),
+		organizations:  organizationv1grpc.NewOrganizationsClient(cc),
+		units:          organizational_unitv1grpc.NewOrganizationalUnitsClient(cc),
 		availability:   allocationpbv1.NewAllocationServiceClient(cc),
 		holds:          allocationpbv1.NewHoldServiceClient(cc),
 		reservations:   reservationpbv1.NewReservationServiceClient(cc),
@@ -94,6 +100,7 @@ func serverLifecycle(t *testing.T, cc *grpc.ClientConn, repos rfcsvc.Repositorie
 	}
 
 	rejectionFlow(t, c)
+	tenancyFlow(t, c)
 	reservationFlow(t, c)
 	inventoryFlow(t, c)
 }

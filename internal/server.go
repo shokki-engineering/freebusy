@@ -11,7 +11,9 @@ import (
 	"syscall"
 
 	"github.com/shokki-engineering/freebusy/config"
+	"github.com/shokki-engineering/freebusy/internal/runtime/hints"
 	"github.com/shokki-engineering/freebusy/internal/runtime/idempotency"
+	"github.com/shokki-engineering/freebusy/internal/runtime/sites"
 	"github.com/the-protobuf-project/runtime-go/grpc"
 	"github.com/the-protobuf-project/runtime-go/grpc/options"
 )
@@ -76,10 +78,13 @@ func NewServer(name, version string, opts ...options.Options) (*Server, error) {
 func serviceOptions(svc *Service) ([]grpc.Option, error) {
 	opts := []grpc.Option{
 		grpc.WithValidation(),
-		// Honours `request_id` on every RPC that declares it. Runs after
-		// validation (which runtime-go prepends), so a request that never
-		// passed validation cannot claim an idempotency key.
-		grpc.WithUnaryInterceptors(idempotency.New(svc.conn)),
+		// After validation (which runtime-go prepends): hints rewrites the
+		// generic errors anything after it returns into ones naming what to
+		// do; sites refuses a call naming a site or organization that is
+		// missing or deleted; then `request_id` is honoured on every RPC that
+		// declares it -- so a request that was never going to be served
+		// cannot claim an idempotency key.
+		grpc.WithUnaryInterceptors(hints.Interceptor(), sites.Interceptor(svc.sites), idempotency.New(svc.conn)),
 		registerGRPCServers(svc),
 		registerHTTPGateways(svc),
 		registerMCPServices(svc),

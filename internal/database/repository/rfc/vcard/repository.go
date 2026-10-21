@@ -120,11 +120,14 @@ func WithVcardGraphQLListOverride(field string, h filterx.GraphQLHandler) Option
 
 // New picks the adapter set for the live handle in conn: GraphQL when a
 // client connection is present, otherwise GORM.
+//
+// When conn carries a ChangeObserver, every write the returned repositories
+// make is reported to it (see observe).
 func New(conn repox.Conn, opts ...Option) Repositories {
 	if conn.GraphQL != nil {
-		return NewGraphQL(conn.GraphQL, opts...)
+		return observe(NewGraphQL(conn.GraphQL, opts...), conn.Changes)
 	}
-	return NewGorm(conn.Gorm, opts...)
+	return observe(NewGorm(conn.Gorm, opts...), conn.Changes)
 }
 
 // NewGraphQL builds the GraphQL adapter set over svc.
@@ -147,4 +150,80 @@ func NewGorm(db *gorm.DB, opts ...Option) Repositories {
 	return Repositories{
 		Vcards: &GormVcardRepository{DB: db, Hooks: o.vcardHooks, ListOverrides: o.vcardOverrides},
 	}
+}
+
+// observe wraps every repository in repos so its writes are reported to
+// changes. With no observer it returns repos unchanged, so a process that wires
+// none pays nothing.
+//
+// The wrapper sits over the whole interface, not inside the adapters, so the
+// same notification covers GORM and GraphQL alike -- and a Tier-2 adapter that
+// embeds a generated one and overrides a write is covered too.
+func observe(repos Repositories, changes repox.ChangeObserver) Repositories {
+	if changes == nil {
+		return repos
+	}
+	return Repositories{
+		Vcards: &observedVcardRepository{VcardRepository: repos.Vcards, changes: changes},
+	}
+}
+
+// observedVcardRepository reports every Vcard write to a ChangeObserver.
+//
+// It reports a write that returned an error too, whenever the name is known.
+// An error does not prove nothing was written -- the adapters re-read after
+// writing, and that re-read can fail -- and an observer told about a write
+// that did not happen only drops something it did not need to, while one not
+// told about a write that did keeps serving what the write replaced.
+type observedVcardRepository struct {
+	VcardRepository
+	changes repox.ChangeObserver
+}
+
+func (o *observedVcardRepository) Create(ctx context.Context, m *vcardv1.Vcard) (*vcardv1.Vcard, error) {
+	out, err := o.VcardRepository.Create(ctx, m)
+	o.created(ctx, m, out)
+	return out, err
+}
+
+// created reports a Create: by the stored record's name, or failing that by
+// the name the caller asked for. A Create that failed before naming anything
+// wrote nothing.
+func (o *observedVcardRepository) created(ctx context.Context, m, out *vcardv1.Vcard) {
+	switch {
+	case out.GetName() != "":
+		o.changes.Changed(ctx, out.GetName())
+	case m.GetName() != "":
+		o.changes.Changed(ctx, m.GetName())
+	}
+}
+
+func (o *observedVcardRepository) Update(ctx context.Context, m *vcardv1.Vcard, paths []string) (*vcardv1.Vcard, error) {
+	out, err := o.VcardRepository.Update(ctx, m, paths)
+	o.changes.Changed(ctx, m.GetName())
+	return out, err
+}
+
+func (o *observedVcardRepository) UpdateOutputOnly(ctx context.Context, m *vcardv1.Vcard, paths []string) (*vcardv1.Vcard, error) {
+	out, err := o.VcardRepository.UpdateOutputOnly(ctx, m, paths)
+	o.changes.Changed(ctx, m.GetName())
+	return out, err
+}
+
+func (o *observedVcardRepository) Delete(ctx context.Context, name string) error {
+	err := o.VcardRepository.Delete(ctx, name)
+	o.changes.Changed(ctx, name)
+	return err
+}
+
+func (o *observedVcardRepository) Undelete(ctx context.Context, name string) (*vcardv1.Vcard, error) {
+	out, err := o.VcardRepository.Undelete(ctx, name)
+	o.changes.Changed(ctx, name)
+	return out, err
+}
+
+func (o *observedVcardRepository) Purge(ctx context.Context, name string) error {
+	err := o.VcardRepository.Purge(ctx, name)
+	o.changes.Changed(ctx, name)
+	return err
 }

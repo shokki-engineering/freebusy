@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/event/v1/eventv1grpc"
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	eventv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
 	"github.com/shokki-engineering/freebusy/internal/types"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -56,7 +56,9 @@ func (s *EventServer) BatchGetEvents(ctx context.Context, req *eventv1.BatchGetE
 		prefix := req.GetParent() + "/events/"
 		for _, name := range req.GetNames() {
 			if len(name) <= len(prefix) || name[:len(prefix)] != prefix {
-				return rpc.ToStatusErr(fmt.Errorf("%w: %s is not under %s", types.ErrInvalidArgument, name, req.GetParent()))
+				return rpc.ToStatusErr(types.BadField("NAME_NOT_UNDER_PARENT", "names",
+					fmt.Sprintf("%s is not an event of %s", name, req.GetParent()),
+					"Every name must be "+req.GetParent()+"/events/{event}; ask for another calendar's events with its own parent"))
 			}
 			e, err := s.repos.Events.Get(ctx, name)
 			if err != nil {
@@ -83,7 +85,9 @@ func (s *EventServer) CreateEvent(ctx context.Context, req *eventv1.CreateEventR
 		if id := req.GetEventId(); id != "" {
 			name = req.GetParent() + "/events/" + id
 		}
-		PrepareCreate(in, name)
+		if err := PrepareCreate(in, name); err != nil {
+			return rpc.ToStatusErr(err)
+		}
 		var err error
 		out, err = s.repos.Events.Create(ctx, req.GetParent(), in)
 		return rpc.ToStatusErr(err)

@@ -48,7 +48,7 @@ const (
 // A Reservation is a confirmed booking: a hold made permanent. It is the last step of booking, not the first. The caller checks availability, takes a hold, settles whatever its vertical needs settled -- payment, a guest list, a waiver -- and then creates a reservation from the hold. The reservation records the outcome; the engine already holds the resources. Deliberately thin. Price, discount, promo code, refund, guests and occupancy are what would tie it to one vertical, and none of them is here: money belongs to the payment service and people to the user service, both referenced by name (AIP-215), and anything else a vertical needs to remember rides in `attributes`.
 type Reservation struct {
 	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
+	ID string `gorm:"column:id;primaryKey;not null;index:idx_resource_organizational_unit_id_id,priority:2" json:"id"`
 	// The reservation name. Its id is the caller's reservation_id, or else the id of the hold it was made from. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// The hold this reservation was made from, at the same site. Format: organizationalUnits/{organizational_unit}/holds/{hold}
@@ -80,7 +80,7 @@ type Reservation struct {
 	// The reservation replacing this one, set when RescheduleReservation began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
 	Replacement *string `gorm:"column:replacement" json:"replacement,omitempty"`
 	// Parent reference to OrganizationalUnit (from the AIP resource pattern). TODO: unresolved reference to OrganizationalUnit (not in this generation set); kept as a plain indexed column.
-	OrganizationalUnitID string `gorm:"column:organizational_unit_id;not null;index:idx_resource_organizational_unit_id" json:"organizational_unit_id" validate:"required"`
+	OrganizationalUnitID string `gorm:"column:organizational_unit_id;not null;index:idx_resource_organizational_unit_id_id,priority:1" json:"organizational_unit_id" validate:"required"`
 	// The resources taken, copied from the hold. Format: resources/{resource}
 	Resources pq.StringArray `gorm:"column:resources;type:text[];index:idx_resource_resources_gin,type:gin" json:"resources,omitempty"`
 }

@@ -62,8 +62,8 @@ model Hold {
   /// Back-relation: Reservation records that reference this model via hold.
   resource2 Reservation[]
 
-  /// Index on [organizational_unit_id].
-  @@index([organizationalUnitID])
+  /// Composite index on [organizational_unit_id, id].
+  @@index([organizationalUnitID, id])
   /// GIN index: case-insensitive contains (ILIKE '%…%') cannot use a B-tree.
   @@index([idempotencyKey(ops: raw("gin_trgm_ops"))], type: Gin)
   /// GIN index: tag containment (@>) cannot use a B-tree.
@@ -112,8 +112,8 @@ model Allocation {
   @@index([resource, startTime, endTime])
   /// Index on [resource].
   @@index([resource])
-  /// Index on [organizational_unit_id].
-  @@index([organizationalUnitID])
+  /// Composite index on [organizational_unit_id, id].
+  @@index([organizationalUnitID, id])
   /// Index on [hold].
   @@index([holdID])
   /// Maps the model to the "resource" table in the database.

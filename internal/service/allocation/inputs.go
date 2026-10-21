@@ -5,13 +5,12 @@ package allocation
 
 import (
 	"context"
-	"fmt"
 	"regexp"
 	"strconv"
 	"time"
 
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
+	eventv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	availabilityv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"github.com/shokki-engineering/freebusy/internal/rfc"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 )
@@ -218,9 +217,4 @@ func icalDuration(s string) time.Duration {
 // horizon is the span read around window: padded for best fit, see horizonPad.
 func horizon(window engine.Span) engine.Span {
 	return engine.Span{Start: window.Start.Add(-horizonPad), End: window.End.Add(horizonPad)}
-}
-
-// errorf wraps a sentinel with detail, keeping errors.Is working.
-func errorf(sentinel error, format string, args ...any) error {
-	return fmt.Errorf("%w: %s", sentinel, fmt.Sprintf(format, args...))
 }

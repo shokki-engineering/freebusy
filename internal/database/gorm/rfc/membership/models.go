@@ -24,7 +24,7 @@ import (
 // Membership is one entry's presence in a Group. This is the 'member' attribute of section 2.17 <https://www.rfc-editor.org/rfc/rfc4519.html#section-2.17> promoted to a resource. It exists because a membership carries attributes of its own -- at minimum a role -- and an attribute needs something to hang on. Section 3.6 offers 'groupOfUniqueNames' with 'uniqueMember' (section 2.40 <https://www.rfc-editor.org/rfc/rfc4519.html#section-2.40>), which appends an optional UID to the DN so a reused name does not silently inherit an old membership. The uid field below solves that problem more directly, so only 'member' is modelled. Reference: RFC 4519 "LDAP: Schema for User Applications", section 2.17. https://www.rfc-editor.org/rfc/rfc4519.html#section-2.17
 type Membership struct {
 	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
+	ID string `gorm:"column:id;primaryKey;not null;index:idx_resource_ldap_group_id_id,priority:2" json:"id"`
 	// Resource name, "ldapGroups/{ldap_group}/memberships/{membership}".
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// Server-assigned unique id.
@@ -40,7 +40,7 @@ type Membership struct {
 	// Weak validator for optimistic concurrency, AIP-154 <https://aip.dev/154>. Pass it back in an update or delete to make the write conditional: if the resource changed since it was read, the request fails instead of overwriting.
 	Etag *string `gorm:"column:etag" json:"etag,omitempty"`
 	// Parent reference to LdapGroup (from the AIP resource pattern).
-	LdapGroupID string `gorm:"column:ldap_group_id;not null;index:idx_resource_ldap_group_id" json:"ldap_group_id" validate:"required"`
+	LdapGroupID string `gorm:"column:ldap_group_id;not null;index:idx_resource_ldap_group_id_id,priority:1" json:"ldap_group_id" validate:"required"`
 }
 
 func (*Membership) TableName() string { return "membership.resource" }

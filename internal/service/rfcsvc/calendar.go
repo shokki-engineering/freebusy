@@ -8,7 +8,8 @@ import (
 	"fmt"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/calendar/v1/calendarv1grpc"
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
+	calendarv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
+	"github.com/shokki-engineering/freebusy/internal/runtime/hints"
 	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
@@ -62,7 +63,9 @@ func (s *CalendarServer) CreateCalendar(ctx context.Context, req *calendarv1.Cre
 		if id := req.GetCalendarId(); id != "" {
 			name = "calendars/" + id
 		}
-		PrepareCreate(in, name)
+		if err := PrepareCreate(in, name); err != nil {
+			return rpc.ToStatusErr(err)
+		}
 		var err error
 		out, err = s.repos.Calendars.Create(ctx, in)
 		return rpc.ToStatusErr(err)
@@ -121,7 +124,9 @@ func (s *CalendarServer) deleteChildren(ctx context.Context, calendar string, fo
 			return nil
 		}
 		if !force {
-			return fmt.Errorf("%w: %s still has events or availability; set force to delete them with it", types.ErrInvalidState, calendar)
+			return types.Blocked("CALENDAR_NOT_EMPTY", hints.TypeOf(calendar), calendar,
+				fmt.Sprintf("calendar %s still has events or availability", calendar),
+				"Send force=true to soft-delete them with it, or delete them first; UndeleteCalendar restores the calendar alone, so restore its events and availability one by one")
 		}
 		// Each pass deletes what it listed, so the next pass lists what is
 		// left; the loop ends when nothing live remains.

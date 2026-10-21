@@ -6,6 +6,7 @@ syntax = "proto3";
 package freebusy.reservation.v1;
 
 import "buf/validate/validate.proto";
+import "cache/v1/annotations.proto";
 import "entity/v1/annotations.proto";
 import "freebusy/reservation/v1/enums.proto";
 import "google/api/field_behavior.proto";
@@ -43,6 +44,18 @@ message Reservation {
         unique: true
       }
     ]
+  };
+
+  // A site's reservations are listed far more often than any one changes, and
+  // a site with years of them pays for every page. Pages are cached under the
+  // site's version, which every write to one of its reservations moves on, so
+  // a page is never served across a write the repositories made. The ttl bounds
+  // the rest: a write that bypasses them is served stale for at most a minute.
+  option (cache.v1.cache) = {
+    list: {
+      enabled: true
+      ttl: {seconds: 60}
+    }
   };
 
   option (google.api.resource) = {

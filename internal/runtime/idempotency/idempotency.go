@@ -34,8 +34,10 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/database"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/freebusy/shared"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
 	"github.com/shokki-engineering/freebusy/internal/types"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/shared/v1/sharedpbv1"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -146,9 +148,22 @@ func replay(ctx context.Context, repo shared.IdempotencyKeyRepository, name stri
 		if err := repo.Delete(ctx, name); err != nil {
 			return nil, status.Error(codes.Internal, "idempotency: reclaim abandoned key: "+err.Error())
 		}
-		return nil, status.Error(codes.Aborted, "a previous attempt with this request_id was abandoned; retry")
+		return nil, aborted("REQUEST_ABANDONED", "An earlier request with this request_id stopped before it finished, and its claim has now been cleared. "+
+			"Retry the same request with the same request_id: it will run once")
 	}
-	return nil, status.Error(codes.Aborted, "a request with this request_id is already in flight; retry")
+	return nil, aborted("REQUEST_IN_FLIGHT", "A request with this request_id is still running. "+
+		"Wait a moment and retry with the same request_id: once the first finishes, the retry returns its result without running it again")
+}
+
+// aborted is a retryable refusal with its own reason, so a client can tell it
+// from a stale etag -- the other ABORTED this API returns -- without reading
+// the message.
+func aborted(reason, msg string) error {
+	st := status.New(codes.Aborted, msg+".")
+	if detailed, err := st.WithDetails(&errdetails.ErrorInfo{Reason: reason, Domain: rpc.ErrorDomain}); err == nil {
+		return detailed.Err()
+	}
+	return st.Err()
 }
 
 // settle records what the handler returned, so a later retry of this request_id

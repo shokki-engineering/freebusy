@@ -6,6 +6,7 @@ package allocation
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sort"
 	"time"
 
@@ -84,13 +85,17 @@ func (s *Server) compute(ctx context.Context, req *allocationpbv1.ComputeAvailab
 	if tz := req.GetTimeZone(); tz != "" {
 		l, lerr := time.LoadLocation(tz)
 		if lerr != nil {
-			return nil, errorf(types.ErrInvalidArgument, "time_zone %q", tz)
+			return nil, types.BadField("INVALID_TIME_ZONE", "time_zone",
+				fmt.Sprintf("time_zone %q is not a time zone", tz),
+				"Use an IANA zone name such as Europe/London or America/New_York, or leave it empty to read the site's own zone")
 		}
 		loc = l
 	}
 	buckets, err := engine.Buckets(window, granularity(req.GetGranularity()), req.GetSlotDuration().AsDuration(), loc)
 	if errors.Is(err, engine.ErrTooManyBuckets) {
-		return nil, errorf(types.ErrInvalidArgument, "window yields more than %d buckets; use a coarser granularity", engine.MaxBuckets)
+		return nil, types.BadField("TOO_MANY_BUCKETS", "granularity",
+			fmt.Sprintf("this window would be answered in more than %d buckets", engine.MaxBuckets),
+			"Ask for a shorter window, a longer slot_duration, or granularity AVAILABILITY_GRANULARITY_DAY")
 	}
 	if err != nil {
 		return nil, err
@@ -233,11 +238,15 @@ func (s *Server) SearchAvailability(ctx context.Context, req *allocationpbv1.Sea
 // open-ended availability question has no finite answer.
 func spanOf(iv *interval.Interval) (engine.Span, error) {
 	if iv.GetStartTime() == nil || iv.GetEndTime() == nil {
-		return engine.Span{}, errorf(types.ErrInvalidArgument, "window needs both start_time and end_time")
+		return engine.Span{}, types.BadField("WINDOW_INCOMPLETE", "window",
+			"window needs both start_time and end_time",
+			"Send both as RFC 3339 timestamps, e.g. start_time: \"2026-11-02T18:00:00Z\", end_time: \"2026-11-02T19:00:00Z\"")
 	}
 	w := engine.Span{Start: iv.GetStartTime().AsTime(), End: iv.GetEndTime().AsTime()}
 	if w.Empty() {
-		return engine.Span{}, errorf(types.ErrInvalidArgument, "window end_time must be after start_time")
+		return engine.Span{}, types.BadField("WINDOW_BACKWARDS", "window.end_time",
+			"window.end_time must be after window.start_time",
+			"Swap them, or check the offsets: 18:00+01:00 is 17:00Z")
 	}
 	return w, nil
 }

@@ -89,6 +89,11 @@ flowchart TD
 - **Booking rules** — minimum and maximum length, how far ahead, how late —
   come from each resource's RFC 9073 `STRUCTURED-DATA`. freebusy never needs to
   know what a "night" or a "session" means to you.
+- **Nothing is served outside a live organization.** Every site names its
+  organization, every resource its site, and a call naming a site or an
+  organization that does not exist — or is soft-deleted — is answered
+  `NOT_FOUND` on every surface (gRPC, REST, MCP). Deleting an organization
+  that still has sites, or a site that still has resources, is refused.
 - **No double booking, ever.** A Postgres exclusion constraint refuses two
   overlapping claims on one resource, however many servers race for it.
 
@@ -338,6 +343,7 @@ Release defaults versus the development profile:
 | `AllocationService` | `ComputeAvailability`, `CheckAvailability`, `BatchComputeAvailability`, `SearchAvailability` |
 | `HoldService` | `CreateHold`, `GetHold`, `ListHolds`, `ExtendHold`, `ReleaseHold`, `DeleteHold` |
 | `ReservationService` | `CreateReservation`, `GetReservation`, `ListReservations`, `CancelReservation`, `RescheduleReservation` |
+| `Organizations`, `OrganizationalUnits` | the tenants and their sites (RFC 4519): create, get, list, update, and soft delete with `Undelete` (AIP-164) |
 | `WebhookService` | webhooks (create, update, pause, resume, rotate secret, delete) and their deliveries (list, get, retry) |
 | `Resources`, `Calendars`, `Availabilities`, `Events` | the inventory, plus `QueryFreeBusy` and `ExpandEvent` |
 
@@ -346,6 +352,9 @@ The contract is in `protobuf/` (and published to the Buf Schema Registry as
 gRPC transcoding, documented in `protobuf/generated/openapi/`. MCP serves each
 service at its own path on one port, e.g.
 `/freebusy/allocation/v1/allocationservice/mcp`.
+
+**Setting up.** Create an organization, then a site (an organizational unit)
+naming it. Nothing can be published or booked before both exist.
 
 **Publishing inventory.** Create a calendar (with its time zone), a resource
 on it (`resource_types`, `organizational_unit`, and its booking rules in

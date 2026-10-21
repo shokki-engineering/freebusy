@@ -1,0 +1,18 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "layout",
+    srcs = ["doc.go"],
+    importpath = "github.com/shokki-engineering/freebusy/tools/protobuf/layout",
+    visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "layout_test",
+    srcs = ["layout_test.go"],
+    embed = [":layout"],
+    deps = ["@in_gopkg_yaml_v3//:yaml_v3"],
+)

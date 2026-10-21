@@ -123,8 +123,9 @@ func (h *Handler) put(w http.ResponseWriter, r *http.Request, t target) error {
 			d.event.Name, d.event.Etag = existing.event.GetName(), existing.event.GetEtag()
 			_, err = h.repos.Events.Update(ctx, d.event, nil)
 		} else {
-			rfcsvc.PrepareCreate(d.event, parent+"/events/"+t.object)
-			_, err = h.repos.Events.Create(ctx, parent, d.event)
+			if err = rfcsvc.PrepareCreate(d.event, parent+"/events/"+t.object); err == nil {
+				_, err = h.repos.Events.Create(ctx, parent, d.event)
+			}
 		}
 		if err != nil {
 			return err
@@ -146,7 +147,9 @@ func (h *Handler) put(w http.ResponseWriter, r *http.Request, t target) error {
 		}
 		etag = out.GetEtag()
 	default:
-		rfcsvc.PrepareCreate(d.avail, parent+"/availabilities/"+t.object)
+		if err := rfcsvc.PrepareCreate(d.avail, parent+"/availabilities/"+t.object); err != nil {
+			return err
+		}
 		out, err := h.repos.Availabilities.Create(ctx, parent, d.avail)
 		if err != nil {
 			return err
@@ -230,8 +233,9 @@ func (h *Handler) syncOverrides(ctx context.Context, parent string, stored, inco
 			e.Name, e.Etag = old.GetName(), old.GetEtag()
 			_, err = h.repos.Events.Update(ctx, e, nil)
 		} else {
-			rfcsvc.PrepareCreate(e, "")
-			_, err = h.repos.Events.Create(ctx, parent, e)
+			if err = rfcsvc.PrepareCreate(e, ""); err == nil {
+				_, err = h.repos.Events.Create(ctx, parent, e)
+			}
 		}
 		if err != nil {
 			return err

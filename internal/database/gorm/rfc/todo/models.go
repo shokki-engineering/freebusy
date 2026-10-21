@@ -77,7 +77,7 @@ const (
 // Todo is the VTODO component, RFC 5545 section 3.6.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.2>. Same shape as Event: a resource whose calendar properties sit directly on it, parented by a Calendar. What it adds over an event is a notion of finishing -- a due date, a completion instant, and a percentage. Scope note: CLASS is modelled here, and its enum is a copy of the one in protobuf.rfc5545.event.v1 rather than a reference. AIP-215 permits no cross-package message reference, so every value type shared between iCalendar components must be duplicated per component package. RRULE, ATTENDEE, ORGANIZER and VALARM are therefore deliberately absent until a consumer needs them on a todo -- see the AIP-215 duplication tax in docs/decisions.md. Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specification (iCalendar)", section 3.6.2. https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.2
 type Todo struct {
 	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
+	ID string `gorm:"column:id;primaryKey;not null;index:idx_resource_calendar_id_id,priority:2" json:"id"`
 	// Resource name, "calendars/{calendar}/todos/{todo}".
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// Server-assigned unique id.
@@ -113,7 +113,7 @@ type Todo struct {
 	// Discriminator: which deadline oneof member is set (null = none).
 	DeadlineCase *TodoDeadlineCase `gorm:"column:deadline_case;check:chk_resource_deadline_case,deadline_case IN ('DUE','DURATION')" json:"deadline_case,omitempty"`
 	// Parent reference to Calendar (from the AIP resource pattern).
-	CalendarID string `gorm:"column:calendar_id;not null;index:idx_resource_calendar_id" json:"calendar_id" validate:"required"`
+	CalendarID string `gorm:"column:calendar_id;not null;index:idx_resource_calendar_id_id,priority:1" json:"calendar_id" validate:"required"`
 	// Foreign key to CalendarTime.
 	StartID *string       `gorm:"column:start_id;index:idx_resource_start_id" json:"start_id,omitempty"`
 	Start   *CalendarTime `gorm:"foreignKey:StartID;constraint:OnDelete:SET NULL" json:"start,omitempty"`

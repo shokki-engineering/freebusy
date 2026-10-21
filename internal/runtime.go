@@ -7,6 +7,8 @@ import (
 	"context"
 	"time"
 
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc4519/organization/v1/organizationv1grpc"
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc4519/organizational_unit/v1/organizational_unitv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/calendar/v1/calendarv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/event/v1/eventv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc7953/availability/v1/availabilityv1grpc"
@@ -14,12 +16,18 @@ import (
 	"github.com/shokki-engineering/freebusy/config"
 	"github.com/shokki-engineering/freebusy/internal/caldav"
 	"github.com/shokki-engineering/freebusy/internal/database"
+	"github.com/shokki-engineering/freebusy/internal/runtime/hints"
+	"github.com/shokki-engineering/freebusy/internal/runtime/sites"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation"
 	"github.com/shokki-engineering/freebusy/internal/service/reservation"
 	"github.com/shokki-engineering/freebusy/internal/service/rfcsvc"
 	"github.com/shokki-engineering/freebusy/internal/service/webhooksvc"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/rfc/protobuf/rfc4519/organization/v1/organizationv1gw"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/rfc/protobuf/rfc4519/organization/v1/organizationv1mcp"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/rfc/protobuf/rfc4519/organizational_unit/v1/organizational_unitv1gw"
+	"github.com/shokki-engineering/freebusy/protobuf/generated/go/rfc/protobuf/rfc4519/organizational_unit/v1/organizational_unitv1mcp"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/rfc/protobuf/rfc5545/calendar/v1/calendarv1gw"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/rfc/protobuf/rfc5545/calendar/v1/calendarv1mcp"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/rfc/protobuf/rfc5545/event/v1/eventv1gw"
@@ -80,6 +88,8 @@ func registerServices(s *grpc.GRPCServer, svc *Service) {
 	allocationpbv1.RegisterHoldServiceServer(s, svc)
 	reservationpbv1.RegisterReservationServiceServer(s, svc)
 	webhookpbv1.RegisterWebhookServiceServer(s, svc)
+	organizationv1grpc.RegisterOrganizationsServer(s, svc)
+	organizational_unitv1grpc.RegisterOrganizationalUnitsServer(s, svc)
 	resourcev1grpc.RegisterResourcesServer(s, svc)
 	calendarv1grpc.RegisterCalendarsServer(s, svc)
 	availabilityv1grpc.RegisterAvailabilitiesServer(s, svc)
@@ -95,7 +105,7 @@ func NewGRPCServer(conn *database.Connection) (*grpc.GRPCServer, *Service, error
 	if err != nil {
 		return nil, nil, err
 	}
-	srv, err := grpc.NewStandaloneGRPCServer()
+	srv, err := grpc.NewStandaloneGRPCServer(hints.Interceptor(), sites.Interceptor(svc.sites))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -117,6 +127,8 @@ func registerHTTPGateways(svc *Service) grpc.Option {
 		for _, register := range []func(context.Context, *grpc.ServeMux, string, []grpc.DialOption) error{
 			reservationpbv1.RegisterReservationServiceHandlerFromEndpoint,
 			webhookpbv1.RegisterWebhookServiceHandlerFromEndpoint,
+			organizationv1gw.RegisterOrganizationsHandlerFromEndpoint,
+			organizational_unitv1gw.RegisterOrganizationalUnitsHandlerFromEndpoint,
 			resourcev1gw.RegisterResourcesHandlerFromEndpoint,
 			calendarv1gw.RegisterCalendarsHandlerFromEndpoint,
 			availabilityv1gw.RegisterAvailabilitiesHandlerFromEndpoint,
@@ -152,6 +164,12 @@ func registerMCPServices(svc *Service) grpc.Option {
 		},
 		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
 			return webhookpbv1.ServeWebhookServiceMCP(ctx, svc, cfg)
+		},
+		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
+			return organizationv1mcp.ServeOrganizationsMCP(ctx, svc, cfg)
+		},
+		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
+			return organizational_unitv1mcp.ServeOrganizationalUnitsMCP(ctx, svc, cfg)
 		},
 		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
 			return resourcev1mcp.ServeResourcesMCP(ctx, svc, cfg)

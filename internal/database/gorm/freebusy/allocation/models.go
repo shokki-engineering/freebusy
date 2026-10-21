@@ -41,7 +41,7 @@ const (
 // A Hold is a temporary, expiring claim on one or more bookable resources for a window, taken before payment or confirmation so two callers cannot be sold the same thing. Native, with no RFC behind it, and the comment says why (the same trade protobuf.shared.project.v1 records upstream). RFC 5545 section 3.2.12's PARTSTAT=TENTATIVE can express that a claim is provisional, and RFC 5546's iTIP can carry the request that created it, but neither specifies a lapse time, and an expiring claim is the one thing a commercial booking engine cannot do without. The resources held are RFC 9073 VRESOURCEs and the window is measured against their RFC 7953 availability; only the clock is ours. Holds are allocated, not requested: CreateHold names candidate resources and a quantity, and the server decides which concrete resources are taken. That keeps "which bay did I get" a server decision made under a lock, rather than a client guess that races.
 type Hold struct {
 	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
+	ID string `gorm:"column:id;primaryKey;not null;index:idx_holds_organizational_unit_id_id,priority:2" json:"id"`
 	// The hold name. Nested under the site whose resources it takes, so a hold is listed and swept per site without joining through every resource. Format: organizationalUnits/{organizational_unit}/holds/{hold}
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// The window held. Immutable: moving it is a different allocation, so release this hold and take another.
@@ -61,7 +61,7 @@ type Hold struct {
 	// Opaque version for optimistic concurrency (AIP-154); echo on update/delete.
 	Etag *string `gorm:"column:etag" json:"etag,omitempty"`
 	// Parent reference to OrganizationalUnit (from the AIP resource pattern). TODO: unresolved reference to OrganizationalUnit (not in this generation set); kept as a plain indexed column.
-	OrganizationalUnitID string `gorm:"column:organizational_unit_id;not null;index:idx_holds_organizational_unit_id" json:"organizational_unit_id" validate:"required"`
+	OrganizationalUnitID string `gorm:"column:organizational_unit_id;not null;index:idx_holds_organizational_unit_id_id,priority:1" json:"organizational_unit_id" validate:"required"`
 	// The concrete resources this hold has taken, one per unit of `quantity`. Chosen by the server from the candidates the request offered. Format: resources/{resource}
 	Resources pq.StringArray `gorm:"column:resources;type:text[];index:idx_holds_resources_gin,type:gin" json:"resources,omitempty"`
 	// Candidate resources the allocator may choose from, supplied on create. Empty offers every resource the site holds. Immutable: the choice is made once, and re-offering a different set is a different allocation. Format: resources/{resource}
@@ -75,7 +75,7 @@ func (*Hold) TableName() string { return "allocation.holds" }
 // An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it. It sits under the site and names its hold, rather than nesting under the hold: the engine asks about allocations by resource and time across a whole site, never hold by hold, and a hold with child resources would owe DeleteHold a `force` flag guarding rows no caller can see.
 type Allocation struct {
 	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
+	ID string `gorm:"column:id;primaryKey;not null;index:idx_resource_organizational_unit_id_id,priority:2" json:"id"`
 	// The allocation name, under the site whose resource it takes. Format: organizationalUnits/{organizational_unit}/allocations/{allocation}
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// The resource taken. Format: resources/{resource} TODO: unresolved reference to Resource (not in this generation set); kept as a plain indexed column.
@@ -92,7 +92,7 @@ type Allocation struct {
 	HoldID *string `gorm:"column:hold;index:idx_resource_hold" json:"hold,omitempty"`
 	Hold   *Hold   `gorm:"foreignKey:HoldID" json:"hold_rel,omitempty"`
 	// Parent reference to OrganizationalUnit (from the AIP resource pattern). TODO: unresolved reference to OrganizationalUnit (not in this generation set); kept as a plain indexed column.
-	OrganizationalUnitID string `gorm:"column:organizational_unit_id;not null;index:idx_resource_organizational_unit_id" json:"organizational_unit_id" validate:"required"`
+	OrganizationalUnitID string `gorm:"column:organizational_unit_id;not null;index:idx_resource_organizational_unit_id_id,priority:1" json:"organizational_unit_id" validate:"required"`
 }
 
 func (*Allocation) TableName() string { return "allocation.resource" }

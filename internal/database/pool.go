@@ -21,12 +21,12 @@ const defaultPoolSampleInterval = 30 * time.Second
 // delta per interval; a rising wait rate means the pool cap is saturated and
 // requests are queueing — the signal that traffic outgrew the bounds.
 type poolMetrics struct {
-	Open    int64 `opentelementry:"metric:gauge:db.pool.open"`
-	InUse   int64 `opentelementry:"metric:gauge:db.pool.in_use"`
-	Idle    int64 `opentelementry:"metric:gauge:db.pool.idle"`
-	MaxOpen int64 `opentelementry:"metric:gauge:db.pool.max_open"`
-	Waits   int64 `opentelementry:"metric:counter:db.pool.wait_count"`
-	WaitMs  int64 `opentelementry:"metric:counter:db.pool.wait_ms"`
+	Open    int64 `telemetry:"metric:gauge:db.pool.open"`
+	InUse   int64 `telemetry:"metric:gauge:db.pool.in_use"`
+	Idle    int64 `telemetry:"metric:gauge:db.pool.idle"`
+	MaxOpen int64 `telemetry:"metric:gauge:db.pool.max_open"`
+	Waits   int64 `telemetry:"metric:counter:db.pool.wait_count"`
+	WaitMs  int64 `telemetry:"metric:counter:db.pool.wait_ms"`
 }
 
 // StartPoolMonitor launches a background loop publishing the connection-pool

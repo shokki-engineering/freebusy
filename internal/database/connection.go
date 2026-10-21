@@ -37,6 +37,13 @@ type Connection struct {
 	PgSQLConn *gorm.DB
 	Hasura    *freebusyql.Service
 	Provider  Provider
+
+	// Caches are the list caches over this connection's repositories; their
+	// fields are nil when the cache is off. Changes reports every write a
+	// repository built from Repox commits to them, which is what keeps a
+	// cached page from outliving a write.
+	Caches  Caches
+	Changes repox.ChangeObserver
 }
 
 // providerFromConfig resolves the configured provider, defaulting to GORM for an
@@ -56,7 +63,7 @@ func providerFromConfig() Provider {
 // handle is set, so passing both would route a GORM deployment to Hasura.
 func (c *Connection) Repox() repox.Conn {
 	if c.Provider == ProviderHasura {
-		return repox.Conn{GraphQL: c.Hasura}
+		return repox.Conn{GraphQL: c.Hasura, Changes: c.Changes}
 	}
-	return repox.Conn{Gorm: c.PgSQLConn}
+	return repox.Conn{Gorm: c.PgSQLConn, Changes: c.Changes}
 }

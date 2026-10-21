@@ -49,8 +49,8 @@ model Membership {
 
   /// Index on [member].
   @@index([member])
-  /// Index on [ldap_group_id].
-  @@index([ldapGroupID])
+  /// Composite index on [ldap_group_id, id].
+  @@index([ldapGroupID, id])
   /// Maps the model to the "resource" table in the database.
   @@map("resource")
   /// Maps the model to the "membership" schema in the database.

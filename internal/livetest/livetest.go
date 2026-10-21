@@ -23,6 +23,8 @@ const (
 	DatabaseURL = "FREEBUSY_TEST_DATABASE_URL"
 	// GraphQLURL is the Hasura DDN engine's GraphQL endpoint.
 	GraphQLURL = "FREEBUSY_TEST_GRAPHQL_URL"
+	// RedisAddr is the cache suites' Redis, as host:port.
+	RedisAddr = "FREEBUSY_TEST_REDIS_ADDR"
 )
 
 // Required reports whether live suites must run rather than skip.

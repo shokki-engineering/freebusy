@@ -8,11 +8,14 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"math/rand/v2"
+	"strings"
 	"time"
 
 	"github.com/oh-tarnished/runtime-go/ulid"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/runtime/hints"
 	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 	"github.com/shokki-engineering/freebusy/internal/types"
@@ -105,7 +108,13 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 			if prev, err := prior(); prev != nil || err != nil {
 				return prev, err
 			}
-			return nil, errorf(types.ErrCapacityExhausted, "%d of %d requested resources free", len(res.Candidates), quantity)
+			return nil, &types.Problem{
+				Kind: types.ErrCapacityExhausted, Reason: rpc.ReasonCapacityExhausted,
+				ResourceType: hints.TypeOf(parent), ResourceName: parent,
+				What: fmt.Sprintf("only %d of the %d resources asked for are free for that whole window", len(res.Candidates), quantity),
+				Fix: "Ask for fewer, or another window -- " + hints.Call("ComputeAvailability", map[string]string{"parent": parent}) +
+					" shows what is free when, and CheckAvailability says why a window is not",
+			}
 		}
 		hold := &allocationpbv1.Hold{
 			Name:               parent + "/holds/" + id,
@@ -186,7 +195,9 @@ func (s *Server) ExtendHold(ctx context.Context, req *allocationpbv1.ExtendHoldR
 	err := rpc.Traced(ctx, "HoldService", "ExtendHold", func(ctx context.Context) error {
 		d := req.GetDuration().AsDuration()
 		if d <= 0 || d > MaxHoldExtension {
-			return rpc.ToStatusErr(errorf(types.ErrInvalidArgument, "duration must be positive and at most %s", MaxHoldExtension))
+			return rpc.ToStatusErr(types.BadField("INVALID_HOLD_EXTENSION", "duration",
+				fmt.Sprintf("duration must be more than zero and at most %s; got %s", MaxHoldExtension, d),
+				"A hold is meant to be short: extend it again before it expires if settling needs longer"))
 		}
 		h, err := s.live(ctx, req.GetName())
 		if err != nil {
@@ -215,7 +226,11 @@ func (s *Server) ReleaseHold(ctx context.Context, req *allocationpbv1.ReleaseHol
 			out = h
 			return nil
 		case allocationpbv1.HoldState_HOLD_STATE_CONVERTED:
-			return rpc.ToStatusErr(errorf(types.ErrInvalidState, "hold %s was converted to a booking; cancel the booking instead", h.GetName()))
+			return rpc.ToStatusErr(types.Blocked("HOLD_CONVERTED", hints.TypeOf(h.GetName()), h.GetName(),
+				fmt.Sprintf("hold %s became a reservation, and releasing it would free resources that are booked", h.GetName()),
+				"Cancel the reservation instead with CancelReservation; "+
+					hints.Call("ListReservations", map[string]string{"parent": siteOf(h.GetName())})+
+					" with filter hold = \""+h.GetName()+"\" finds it"))
 		}
 		now := s.now()
 		out, err = s.store.UpdateHold(ctx, h.GetName(), etagOr(req.GetEtag(), h), allocationpbv1.HoldState_HOLD_STATE_RELEASED, &now)
@@ -234,7 +249,9 @@ func (s *Server) DeleteHold(ctx context.Context, req *allocationpbv1.DeleteHoldR
 		}
 		h := s.authoritative(stored)
 		if h.GetState() == allocationpbv1.HoldState_HOLD_STATE_ACTIVE {
-			return rpc.ToStatusErr(errorf(types.ErrInvalidState, "hold %s is active; release it first", h.GetName()))
+			return rpc.ToStatusErr(types.Blocked("HOLD_ACTIVE", hints.TypeOf(h.GetName()), h.GetName(),
+				fmt.Sprintf("hold %s is active and still holds its resources", h.GetName()),
+				"Release it first with "+hints.Call("ReleaseHold", map[string]string{"name": h.GetName()})+", then delete it"))
 		}
 		return rpc.ToStatusErr(s.store.DeleteHold(ctx, h.GetName(), etagOr(req.GetEtag(), stored)))
 	})
@@ -268,7 +285,7 @@ func (s *Server) ConvertHold(ctx context.Context, name string) (*allocationpbv1.
 		case allocationpbv1.HoldState_HOLD_STATE_ACTIVE:
 			return s.store.UpdateHold(ctx, name, stored.GetEtag(), allocationpbv1.HoldState_HOLD_STATE_CONVERTED, nil)
 		default:
-			return nil, errorf(types.ErrInvalidState, "hold %s is %s", name, h.GetState())
+			return nil, notActive(name, h.GetState())
 		}
 	})
 }
@@ -333,7 +350,7 @@ func (s *Server) live(ctx context.Context, name string) (*allocationpbv1.Hold, e
 	}
 	h := s.authoritative(stored)
 	if h.GetState() != allocationpbv1.HoldState_HOLD_STATE_ACTIVE {
-		return nil, errorf(types.ErrInvalidState, "hold %s is %s", name, h.GetState())
+		return nil, notActive(name, h.GetState())
 	}
 	return stored, nil
 }
@@ -387,4 +404,27 @@ func (s *Server) StartHoldSweeper(ctx context.Context, interval time.Duration, l
 			}
 		}
 	}()
+}
+
+// notActive is the problem with acting on a hold that no longer holds
+// anything: it expired, was released, or became a reservation.
+func notActive(name string, state allocationpbv1.HoldState) error {
+	word := strings.ToLower(strings.TrimPrefix(state.String(), "HOLD_STATE_"))
+	fix := "A hold that has " + word + " holds nothing: take a new one with " +
+		hints.Call("CreateHold", map[string]string{"parent": siteOf(name)}) +
+		" and act on that; to keep a hold alive while you settle, ExtendHold it before expire_time"
+	if state == allocationpbv1.HoldState_HOLD_STATE_CONVERTED {
+		word, fix = "converted into a reservation", "Act on the reservation it became instead"
+	}
+	return types.Blocked("HOLD_NOT_ACTIVE", hints.TypeOf(name), name, fmt.Sprintf("hold %s is %s, not active", name, word), fix)
+}
+
+// siteOf is the site a hold or reservation name sits under:
+// "organizationalUnits/o/holds/h" is "organizationalUnits/o".
+func siteOf(name string) string {
+	segs := strings.SplitN(name, "/", 3)
+	if len(segs) < 2 {
+		return name
+	}
+	return segs[0] + "/" + segs[1]
 }

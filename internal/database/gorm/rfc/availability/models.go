@@ -73,7 +73,7 @@ const (
 // Availability is the VAVAILABILITY component, RFC 7953 section 3.1 <https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1>. When someone is willing to be scheduled, as distinct from when they happen to be free. An Event says "this time is taken"; this says "this time was never on offer" -- a weekend, or the hours outside a working day. The polarity is inverted from everything else in the calendar, and section 3.1 is explicit about it: the whole range is **busy by default**, and each AvailablePeriod carves out a window that is not. `busy_type` names how the uncarved remainder counts, defaulting to BUSY-UNAVAILABLE. A resource of its own rather than a value object on Calendar, because it has identity and lifecycle: an availability pattern is created, listed, amended and revoked independently of any calendar entry, which is rule 8's test. It sits under a calendar, so the pattern is nested. Free-busy consumers: RFC 7953 section 5 <https://www.rfc-editor.org/rfc/rfc7953.html#section-5> layers these under the events, so a free-busy reply computes availability first and then overlays actual bookings. protobuf.rfc5545.calendar.v1's Calendars.QueryFreeBusy is where that combination surfaces; it does not reference this package, per AIP-215 <https://aip.dev/215>. Reference: RFC 7953 "Calendar Availability", section 3.1. https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1
 type Availability struct {
 	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
+	ID string `gorm:"column:id;primaryKey;not null;index:idx_availabilities_calendar_id_id,priority:2" json:"id"`
 	// Resource name, "calendars/{calendar}/availabilities/{availability}".
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// Server-assigned unique id.
@@ -107,7 +107,7 @@ type Availability struct {
 	// Discriminator: which end_form oneof member is set (null = none).
 	EndFormCase *AvailabilityEndFormCase `gorm:"column:end_form_case;check:chk_availabilities_end_form_case,end_form_case IN ('END','DURATION')" json:"end_form_case,omitempty"`
 	// Parent reference to Calendar (from the AIP resource pattern).
-	CalendarID string `gorm:"column:calendar_id;not null;index:idx_availabilities_calendar_id" json:"calendar_id" validate:"required"`
+	CalendarID string `gorm:"column:calendar_id;not null;index:idx_availabilities_calendar_id_id,priority:1" json:"calendar_id" validate:"required"`
 	// Foreign key to CalendarTime.
 	StartID *string       `gorm:"column:start_id;index:idx_availabilities_start_id" json:"start_id,omitempty"`
 	Start   *CalendarTime `gorm:"foreignKey:StartID;constraint:OnDelete:SET NULL" json:"start,omitempty"`

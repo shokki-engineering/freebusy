@@ -9,7 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	eventv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	"github.com/shokki-engineering/freebusy/internal/runtime/hints"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 	"github.com/shokki-engineering/freebusy/internal/types"
 	"google.golang.org/genproto/googleapis/type/date"
@@ -116,7 +117,7 @@ func instantIn(t calendarTime, loc *time.Location) (at time.Time, allDay, ok boo
 func EventSpan(e *eventv1.Event, loc *time.Location) (engine.Span, error) {
 	start, allDay, ok := instantIn(e.GetStart(), loc)
 	if !ok {
-		return engine.Span{}, fmt.Errorf("%w: %s has no start", types.ErrInvalidState, e.GetName())
+		return engine.Span{}, brokenEvent(e.GetName(), "has no start", "give it a start")
 	}
 	end := start
 	switch {
@@ -124,7 +125,7 @@ func EventSpan(e *eventv1.Event, loc *time.Location) (engine.Span, error) {
 		end = start.Add(e.GetDuration().AsDuration())
 	case e.GetEnd() != nil:
 		if end, _, ok = instantIn(e.GetEnd(), loc); !ok {
-			return engine.Span{}, fmt.Errorf("%w: %s has an empty end", types.ErrInvalidState, e.GetName())
+			return engine.Span{}, brokenEvent(e.GetName(), "has an end with neither a date nor a date_time", "set its end")
 		}
 	case allDay:
 		end = start.Add(24 * time.Hour)
@@ -150,7 +151,7 @@ func Occurrences(e *eventv1.Event, overrides []*eventv1.Event, loc *time.Locatio
 	}
 	dur := first.End.Sub(first.Start)
 	if dur < 0 {
-		return nil, 0, fmt.Errorf("%w: %s ends before it starts", types.ErrInvalidState, e.GetName())
+		return nil, 0, brokenEvent(e.GetName(), "ends before it starts", "correct its start or end")
 	}
 	// The expander skips empty occurrences; probe with a nanosecond so a
 	// zero-length one is still reported.
@@ -165,17 +166,23 @@ func Occurrences(e *eventv1.Event, overrides []*eventv1.Event, loc *time.Locatio
 
 	parts, unsupported := RecurrenceFromProto(e.GetRecurrence(), loc)
 	if len(unsupported) > 0 {
-		return nil, dur, fmt.Errorf("%w: rule parts %s are not expanded", types.ErrUnimplemented, strings.Join(unsupported, ", "))
+		return nil, dur, &types.Problem{Kind: types.ErrUnimplemented, Reason: "UNSUPPORTED_RECURRENCE",
+			ResourceType: hints.TypeOf(e.GetName()), ResourceName: e.GetName(),
+			What: fmt.Sprintf("event %s recurs by %s, which freebusy does not expand", e.GetName(), strings.Join(unsupported, ", ")),
+			Fix:  "Express the recurrence with FREQ, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY and BYMONTH, or list the dates with rdates"}
 	}
 	rule, err := engine.ParseRRule(parts.RRule(), first.Start.Location())
 	if err != nil {
-		return nil, dur, fmt.Errorf("%w: recurrence of %s: %v", types.ErrUnimplemented, e.GetName(), err)
+		return nil, dur, &types.Problem{Kind: types.ErrUnimplemented, Reason: "UNSUPPORTED_RECURRENCE",
+			ResourceType: hints.TypeOf(e.GetName()), ResourceName: e.GetName(),
+			What: fmt.Sprintf("event %s has a recurrence freebusy cannot expand (%v)", e.GetName(), err),
+			Fix:  "Express the recurrence with FREQ, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY and BYMONTH, or list the dates with rdates"}
 	}
 	excluded := map[int64]bool{}
 	for _, x := range e.GetExcludedTimes() {
 		t, _, ok := instantIn(x, loc)
 		if !ok {
-			return nil, dur, fmt.Errorf("%w: %s has an empty EXDATE", types.ErrInvalidState, e.GetName())
+			return nil, dur, brokenEvent(e.GetName(), "has an excluded time with neither a date nor a date_time", "remove it, or give it the date it excludes")
 		}
 		excluded[t.UnixNano()] = true
 	}
@@ -198,7 +205,7 @@ func Occurrences(e *eventv1.Event, overrides []*eventv1.Event, loc *time.Locatio
 	for _, x := range e.GetAdditionalTimes() {
 		t, _, ok := instantIn(x, loc)
 		if !ok {
-			return nil, dur, fmt.Errorf("%w: %s has an empty RDATE", types.ErrInvalidState, e.GetName())
+			return nil, dur, brokenEvent(e.GetName(), "has an added date with neither a date nor a date_time", "remove it, or give it the date it adds")
 		}
 		if occurs(t) {
 			keep(t)
@@ -230,4 +237,13 @@ func OverridesOf(series *eventv1.Event, events []*eventv1.Event) []*eventv1.Even
 		}
 	}
 	return out
+}
+
+// brokenEvent is a stored event the engine cannot read, met while answering
+// about some other request -- availability, a hold. The request is fine; the
+// calendar data is not, and the fix is to the event, so the problem names it.
+func brokenEvent(name, what, fix string) error {
+	return types.Blocked("INVALID_EVENT", hints.TypeOf(name), name,
+		fmt.Sprintf("event %s %s, so its calendar's time cannot be computed", name, what),
+		"Fix the event -- "+fix+" -- with "+hints.Call("UpdateEvent", map[string]string{"event.name": name})+", then ask again")
 }

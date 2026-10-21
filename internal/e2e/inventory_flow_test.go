@@ -30,7 +30,7 @@ func inventoryFlow(t *testing.T, c *e2eClients) {
 	t.Helper()
 	ctx := context.Background()
 	id := "inv-" + c.suffix
-	site := "organizationalUnits/" + id
+	site := c.site(t, id)
 	day := time.Now().UTC().AddDate(0, 0, 40).Truncate(24 * time.Hour)
 	at := func(h int) time.Time { return day.Add(time.Duration(h) * time.Hour) }
 	span := func(a, b time.Time) *interval.Interval {

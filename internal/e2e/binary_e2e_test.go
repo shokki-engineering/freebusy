@@ -333,7 +333,14 @@ func binaryFlow(t *testing.T, provider string) {
 
 	// A resource created over REST reaches the receiver through the server's
 	// own delivery loop, signed.
-	s.call("POST", "/v1/resources?resourceId=bin-court-"+suffix, map[string]any{"displayName": "Court"}, http.StatusOK)
+	// Nothing is booked outside a site, and no site exists outside an
+	// organization: both are created over REST first.
+	org := s.call("POST", "/v1/organizations?organizationId=bin-org-"+suffix,
+		map[string]any{"displayNames": []string{"Binary e2e"}}, http.StatusOK)["name"].(string)
+	site := s.call("POST", "/v1/organizationalUnits?organizationalUnitId=bin-"+suffix,
+		map[string]any{"displayNames": []string{"Binary e2e"}, "organization": org}, http.StatusOK)["name"].(string)
+	s.call("POST", "/v1/resources?resourceId=bin-court-"+suffix,
+		map[string]any{"displayName": "Court", "organizationalUnit": site}, http.StatusOK)
 	arrived := func(eventType string) func() bool {
 		return func() bool {
 			rec.mu.Lock()
@@ -347,9 +354,15 @@ func binaryFlow(t *testing.T, provider string) {
 		}
 	}
 	until(t, 20*time.Second, "freebusy.resource.created at the receiver", arrived("freebusy.resource.created"), s.out)
-	deliveries := s.call("GET", "/v1/"+hook+"/deliveries", nil, http.StatusOK)["deliveries"].([]any)
+	// The receiver answers before the server records the outcome, so the
+	// delivery can still read as claimed for a moment after the event arrived.
+	var deliveries []any
+	until(t, 10*time.Second, "the delivery recorded as succeeded", func() bool {
+		deliveries = s.call("GET", "/v1/"+hook+"/deliveries", nil, http.StatusOK)["deliveries"].([]any)
+		return len(deliveries) == 1 && deliveries[0].(map[string]any)["state"] == "DELIVERY_STATE_SUCCEEDED"
+	}, s.out)
 	first := deliveries[0].(map[string]any)
-	if len(deliveries) != 1 || first["state"] != "DELIVERY_STATE_SUCCEEDED" || first["subject"] != court {
+	if first["subject"] != court {
 		t.Fatalf("deliveries: %v", deliveries)
 	}
 

@@ -50,7 +50,7 @@ const (
 // One event owed to one webhook, and how sending it went. The id is derived, not random: a digest of the webhook and the event, so recording the same change twice -- a rescan, or two servers scanning at once -- loses the race on the primary key instead of sending the event twice.
 type Delivery struct {
 	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
+	ID string `gorm:"column:id;primaryKey;not null;index:idx_deliveries_webhook_id_id,priority:2" json:"id"`
 	// The delivery name. The final segment is a digest of (webhook, event_id). Format: webhooks/{webhook}/deliveries/{delivery}
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// The CloudEvents id, the same for every webhook sent this change: a digest of the record's name and etag. Receivers deduplicate on it.
@@ -80,7 +80,7 @@ type Delivery struct {
 	// Opaque version for optimistic concurrency (AIP-154).
 	Etag *string `gorm:"column:etag" json:"etag,omitempty"`
 	// Parent reference to Webhook (from the AIP resource pattern).
-	WebhookID string   `gorm:"column:webhook_id;not null;index:idx_deliveries_webhook_id" json:"webhook_id" validate:"required"`
+	WebhookID string   `gorm:"column:webhook_id;not null;index:idx_deliveries_webhook_id_id,priority:1" json:"webhook_id" validate:"required"`
 	Webhook   *Webhook `gorm:"foreignKey:WebhookID;constraint:OnDelete:CASCADE" json:"webhook,omitempty"`
 }
 

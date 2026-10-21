@@ -73,8 +73,8 @@ model Journal {
 
   /// Index on [delete_time].
   @@index([deleteTime])
-  /// Index on [calendar_id].
-  @@index([calendarID])
+  /// Composite index on [calendar_id, id].
+  @@index([calendarID, id])
   /// Index on [start_id].
   @@index([startID])
   /// GIN index: tag containment (@>) cannot use a B-tree.

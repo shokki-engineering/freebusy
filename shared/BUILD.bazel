@@ -9,7 +9,7 @@ go_library(
         "config.go",
         "telemetry.go",
     ],
-    embedsrcs = ["opentelementry.toml"],
+    embedsrcs = ["telemetry.toml"],
     importpath = "github.com/shokki-engineering/freebusy/shared",
     visibility = ["//visibility:public"],
     deps = [
@@ -17,7 +17,8 @@ go_library(
         "@com_github_knadh_koanf_providers_env_v2//:env",
         "@com_github_knadh_koanf_providers_rawbytes//:rawbytes",
         "@com_github_knadh_koanf_v2//:koanf",
-        "@com_github_the_protobuf_project_opentelementry_opentelementry_go//:opentelementry-go",
-        "@com_github_the_protobuf_project_opentelementry_opentelementry_go//options",
+        "@com_github_the_protobuf_project_runtime_go_observability//:observability",
+        "@com_github_the_protobuf_project_telemetry_telemetry_go//:telemetry-go",
+        "@com_github_the_protobuf_project_telemetry_telemetry_go//options",
     ],
 )

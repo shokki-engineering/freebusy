@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/runtime/hints"
 	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
 	"github.com/shokki-engineering/freebusy/internal/types"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1"
@@ -184,7 +185,9 @@ func updatePaths(in *webhookpbv1.Webhook, mask *fieldmaskpb.FieldMask) ([]string
 			}
 		}
 		if len(paths) == 0 {
-			return nil, fmt.Errorf("%w: nothing to update: no update_mask and no updatable field set", types.ErrInvalidArgument)
+			return nil, types.BadField("NOTHING_TO_UPDATE", "update_mask",
+				"the request changes nothing: it sets none of the fields a webhook update can change",
+				fmt.Sprintf("Set one of %v and name it in update_mask", updatable))
 		}
 		return paths, nil
 	case len(mask.GetPaths()) == 1 && mask.GetPaths()[0] == "*":
@@ -200,7 +203,9 @@ func updatePaths(in *webhookpbv1.Webhook, mask *fieldmaskpb.FieldMask) ([]string
 			fd = fields.ByJSONName(p)
 		}
 		if fd == nil || !slices.Contains(updatable, string(fd.Name())) {
-			return nil, fmt.Errorf("%w: update_mask names %q; updatable are %v", types.ErrInvalidArgument, p, updatable)
+			return nil, types.BadField("UNKNOWN_MASK_PATH", "update_mask",
+				fmt.Sprintf("update_mask names %q, which a webhook update cannot change", p),
+				fmt.Sprintf("Updatable fields are %v; the secret changes with RotateWebhookSecret", updatable))
 		}
 		paths = append(paths, string(fd.Name()))
 	}
@@ -236,7 +241,12 @@ func (s *Server) DeleteWebhook(ctx context.Context, req *webhookpbv1.DeleteWebho
 			return rpc.ToStatusErr(err)
 		}
 		if e := req.GetEtag(); e != "" && e != cur.GetEtag() {
-			return rpc.ToStatusErr(fmt.Errorf("%w: etag %q is stale", types.ErrConflict, e))
+			return rpc.ToStatusErr(&types.Problem{
+				Kind: types.ErrConflict, Reason: rpc.ReasonConcurrentModification,
+				ResourceType: hints.TypeOf(cur.GetName()), ResourceName: cur.GetName(),
+				What: fmt.Sprintf("webhook %s changed after you read it: etag %q is no longer current", cur.GetName(), e),
+				Fix:  "Read it again with " + hints.Call("GetWebhook", map[string]string{"name": cur.GetName()}) + " and retry with the new etag",
+			})
 		}
 		b := s.repos.NewBatch()
 		for token := ""; ; {
@@ -245,7 +255,10 @@ func (s *Server) DeleteWebhook(ctx context.Context, req *webhookpbv1.DeleteWebho
 				return rpc.ToStatusErr(err)
 			}
 			if len(page) > 0 && !req.GetForce() {
-				return rpc.ToStatusErr(fmt.Errorf("%w: %s has deliveries; delete with force, or pause it", types.ErrInvalidState, cur.GetName()))
+				return rpc.ToStatusErr(types.Blocked("WEBHOOK_HAS_DELIVERIES", hints.TypeOf(cur.GetName()), cur.GetName(),
+					fmt.Sprintf("webhook %s still has deliveries on record", cur.GetName()),
+					"Send force=true to delete them with it, or pause it with "+
+						hints.Call("PauseWebhook", map[string]string{"name": cur.GetName()})+" to stop sending and keep the record"))
 			}
 			for _, d := range page {
 				b.DeleteDelivery(d.GetName())
@@ -328,22 +341,32 @@ func (s *Server) check(w *webhookpbv1.Webhook) error {
 	u, err := url.Parse(w.GetUri())
 	switch {
 	case err != nil || u.Host == "":
-		return fmt.Errorf("%w: uri %q is not an absolute URL", types.ErrInvalidArgument, w.GetUri())
+		return types.BadField("INVALID_URI", "webhook.uri",
+			fmt.Sprintf("uri %q is not an absolute URL", w.GetUri()),
+			"Send the full endpoint, scheme and host included, e.g. https://example.com/hooks/freebusy")
 	case u.User != nil:
-		return fmt.Errorf("%w: uri must not carry credentials; deliveries are signed instead", types.ErrInvalidArgument)
+		return types.BadField("URI_HAS_CREDENTIALS", "webhook.uri",
+			"uri carries a username or password",
+			"Remove them: every delivery is signed with the webhook's secret (Standard Webhooks), so verify that signature instead")
 	case u.Scheme == "https":
 	case u.Scheme == "http" && s.opts.AllowInsecureEndpoints && loopback(u.Hostname()):
 	default:
-		return fmt.Errorf("%w: uri must be https", types.ErrInvalidArgument)
+		return types.BadField("URI_NOT_HTTPS", "webhook.uri",
+			fmt.Sprintf("uri %q is not https", w.GetUri()),
+			"Serve the endpoint over https; plain http is accepted only for localhost, and only when the server allows insecure endpoints (development)")
 	}
 	// A name is checked when it is dialled; an address can be refused now.
 	if ip := net.ParseIP(u.Hostname()); ip != nil && !public(ip) && !s.opts.AllowPrivateNetworks {
-		return fmt.Errorf("%w: uri %s is not a public address", types.ErrInvalidArgument, u.Hostname())
+		return types.BadField("URI_NOT_PUBLIC", "webhook.uri",
+			fmt.Sprintf("uri points at %s, which is not a public address", u.Hostname()),
+			"Deliveries go only to the public internet; expose the endpoint publicly, or allow private networks on the server (development)")
 	}
 	known := EventTypes()
 	for _, t := range w.GetEventTypes() {
 		if !slices.Contains(known, t) {
-			return fmt.Errorf("%w: event type %q does not exist; known types are %v", types.ErrInvalidArgument, t, known)
+			return types.BadField("UNKNOWN_EVENT_TYPE", "webhook.event_types",
+				fmt.Sprintf("event type %q does not exist", t),
+				fmt.Sprintf("Choose from %v, or leave event_types empty to receive every type", known))
 		}
 	}
 	return nil

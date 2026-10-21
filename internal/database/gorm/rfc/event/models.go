@@ -288,7 +288,7 @@ const (
 // Event is the VEVENT component, RFC 5545 section 3.6.1 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.1>. Unlike User, which wraps an RFC-shaped value object, the calendar properties sit directly on the resource. VEVENT has no separable property bag: DTSTART, RRULE and STATUS are what an event *is*, not a payload it carries. Recurrence is the only part with enough structure to be its own type. Scope is the properties a scheduler needs. Section 3.6.1 permits about thirty more -- ATTENDEE, ORGANIZER, ATTACH, CATEGORIES, VALARM sub-components -- added when a consumer needs them. Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specification (iCalendar)", section 3.6.1. https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.1
 type Event struct {
 	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
+	ID string `gorm:"column:id;primaryKey;not null;index:idx_resource_calendar_id_id,priority:2" json:"id"`
 	// Resource name, "calendars/{calendar}/events/{event}".
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// Server-assigned unique id.
@@ -330,7 +330,7 @@ type Event struct {
 	// Discriminator: which ends oneof member is set (null = none).
 	EndsCase *EventEndsCase `gorm:"column:ends_case;check:chk_resource_ends_case,ends_case IN ('END','DURATION')" json:"ends_case,omitempty"`
 	// Parent reference to Calendar (from the AIP resource pattern).
-	CalendarID string `gorm:"column:calendar_id;not null;index:idx_resource_calendar_id" json:"calendar_id" validate:"required"`
+	CalendarID string `gorm:"column:calendar_id;not null;index:idx_resource_calendar_id_id,priority:1" json:"calendar_id" validate:"required"`
 	// Foreign key to CalendarTime.
 	StartID string        `gorm:"column:start_id;not null;index:idx_resource_start_id" json:"start_id" validate:"required"`
 	Start   *CalendarTime `gorm:"foreignKey:StartID;constraint:OnDelete:CASCADE" json:"start,omitempty"`

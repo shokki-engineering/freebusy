@@ -120,11 +120,14 @@ func WithUnitGraphQLListOverride(field string, h filterx.GraphQLHandler) Option 
 
 // New picks the adapter set for the live handle in conn: GraphQL when a
 // client connection is present, otherwise GORM.
+//
+// When conn carries a ChangeObserver, every write the returned repositories
+// make is reported to it (see observe).
 func New(conn repox.Conn, opts ...Option) Repositories {
 	if conn.GraphQL != nil {
-		return NewGraphQL(conn.GraphQL, opts...)
+		return observe(NewGraphQL(conn.GraphQL, opts...), conn.Changes)
 	}
-	return NewGorm(conn.Gorm, opts...)
+	return observe(NewGorm(conn.Gorm, opts...), conn.Changes)
 }
 
 // NewGraphQL builds the GraphQL adapter set over svc.
@@ -147,4 +150,80 @@ func NewGorm(db *gorm.DB, opts ...Option) Repositories {
 	return Repositories{
 		Units: &GormUnitRepository{DB: db, Hooks: o.unitHooks, ListOverrides: o.unitOverrides},
 	}
+}
+
+// observe wraps every repository in repos so its writes are reported to
+// changes. With no observer it returns repos unchanged, so a process that wires
+// none pays nothing.
+//
+// The wrapper sits over the whole interface, not inside the adapters, so the
+// same notification covers GORM and GraphQL alike -- and a Tier-2 adapter that
+// embeds a generated one and overrides a write is covered too.
+func observe(repos Repositories, changes repox.ChangeObserver) Repositories {
+	if changes == nil {
+		return repos
+	}
+	return Repositories{
+		Units: &observedUnitRepository{UnitRepository: repos.Units, changes: changes},
+	}
+}
+
+// observedUnitRepository reports every Unit write to a ChangeObserver.
+//
+// It reports a write that returned an error too, whenever the name is known.
+// An error does not prove nothing was written -- the adapters re-read after
+// writing, and that re-read can fail -- and an observer told about a write
+// that did not happen only drops something it did not need to, while one not
+// told about a write that did keeps serving what the write replaced.
+type observedUnitRepository struct {
+	UnitRepository
+	changes repox.ChangeObserver
+}
+
+func (o *observedUnitRepository) Create(ctx context.Context, m *unitv1.Unit) (*unitv1.Unit, error) {
+	out, err := o.UnitRepository.Create(ctx, m)
+	o.created(ctx, m, out)
+	return out, err
+}
+
+// created reports a Create: by the stored record's name, or failing that by
+// the name the caller asked for. A Create that failed before naming anything
+// wrote nothing.
+func (o *observedUnitRepository) created(ctx context.Context, m, out *unitv1.Unit) {
+	switch {
+	case out.GetName() != "":
+		o.changes.Changed(ctx, out.GetName())
+	case m.GetName() != "":
+		o.changes.Changed(ctx, m.GetName())
+	}
+}
+
+func (o *observedUnitRepository) Update(ctx context.Context, m *unitv1.Unit, paths []string) (*unitv1.Unit, error) {
+	out, err := o.UnitRepository.Update(ctx, m, paths)
+	o.changes.Changed(ctx, m.GetName())
+	return out, err
+}
+
+func (o *observedUnitRepository) UpdateOutputOnly(ctx context.Context, m *unitv1.Unit, paths []string) (*unitv1.Unit, error) {
+	out, err := o.UnitRepository.UpdateOutputOnly(ctx, m, paths)
+	o.changes.Changed(ctx, m.GetName())
+	return out, err
+}
+
+func (o *observedUnitRepository) Delete(ctx context.Context, name string) error {
+	err := o.UnitRepository.Delete(ctx, name)
+	o.changes.Changed(ctx, name)
+	return err
+}
+
+func (o *observedUnitRepository) Undelete(ctx context.Context, name string) (*unitv1.Unit, error) {
+	out, err := o.UnitRepository.Undelete(ctx, name)
+	o.changes.Changed(ctx, name)
+	return out, err
+}
+
+func (o *observedUnitRepository) Purge(ctx context.Context, name string) error {
+	err := o.UnitRepository.Purge(ctx, name)
+	o.changes.Changed(ctx, name)
+	return err
 }

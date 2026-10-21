@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/internal/runtime/hints"
 	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
 	"github.com/shokki-engineering/freebusy/internal/types"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
@@ -84,13 +85,24 @@ func (s *Server) open(ctx context.Context, parent, holdName, id string, tmpl *re
 	}
 
 	h, err := s.holds.LookupHold(ctx, holdName)
+	if errors.Is(err, types.ErrNotFound) {
+		return nil, types.BadField("HOLD_NOT_FOUND", "reservation.hold",
+			fmt.Sprintf("hold %s does not exist", holdName),
+			"A reservation is made from a live hold: take one first with "+
+				hints.Call("CreateHold", map[string]string{"parent": parent})+
+				" and send the name it returns as reservation.hold")
+	}
 	if err != nil {
 		return nil, err
 	}
 	switch h.GetState() {
 	case allocationpbv1.HoldState_HOLD_STATE_ACTIVE, allocationpbv1.HoldState_HOLD_STATE_CONVERTED:
 	default:
-		return nil, errorf(types.ErrInvalidState, "hold %s is %s; take a new hold", holdName, h.GetState())
+		word := strings.ToLower(strings.TrimPrefix(h.GetState().String(), "HOLD_STATE_"))
+		return nil, types.Blocked("HOLD_NOT_ACTIVE", hints.TypeOf(holdName), holdName,
+			fmt.Sprintf("hold %s is %s, so it no longer holds the resources", holdName, word),
+			"Take a new hold with "+hints.Call("CreateHold", map[string]string{"parent": parent})+
+				" and create the reservation from it; if settling takes long, ExtendHold before expire_time")
 	}
 
 	// Record the intent first. If the conversion below never happens -- a
@@ -113,7 +125,12 @@ func (s *Server) open(ctx context.Context, parent, holdName, id string, tmpl *re
 		// that one is the answer -- or the name belongs to another hold.
 		existing, ferr := s.store.FindByHold(ctx, holdName)
 		if ferr != nil {
-			return nil, errorf(types.ErrAlreadyExists, "%s is already taken by another hold", name)
+			return nil, &types.Problem{
+				Kind: types.ErrAlreadyExists, Reason: "RESERVATION_ID_TAKEN", Field: "reservation_id",
+				ResourceType: hints.TypeOf(name), ResourceName: name,
+				What: fmt.Sprintf("reservation %s already exists and was made from another hold", name),
+				Fix:  "Choose another reservation_id, or leave it empty to name the reservation after its hold",
+			}
 		}
 		created, err = existing, nil
 	}
@@ -128,7 +145,11 @@ func (s *Server) open(ctx context.Context, parent, holdName, id string, tmpl *re
 func reservationFor(parent, holdName string) (string, error) {
 	prefix := parent + "/holds/"
 	if !strings.HasPrefix(holdName, prefix) || strings.Contains(holdName[len(prefix):], "/") {
-		return "", errorf(types.ErrInvalidArgument, "hold %q is not a hold at %s", holdName, parent)
+		return "", types.BadField("HOLD_AT_ANOTHER_SITE", "reservation.hold",
+			fmt.Sprintf("hold %q is not a hold at %s", holdName, parent),
+			"A reservation is made at the site its hold is at: send parent = the hold's site ("+
+				parent+"/holds/{hold} for this parent), or take a hold here with "+
+				hints.Call("CreateHold", map[string]string{"parent": parent}))
 	}
 	return parent + "/reservations/" + holdName[len(prefix):], nil
 }
@@ -163,7 +184,10 @@ func (s *Server) confirm(ctx context.Context, r *reservationpbv1.Reservation) (*
 		if _, terr := s.store.Transition(ctx, r.GetName(), "", pending, Change{State: reservationpbv1.ReservationState_RESERVATION_STATE_FAILED}); terr != nil {
 			return s.settled(ctx, r.GetName(), terr)
 		}
-		return nil, errorf(types.ErrInvalidState, "hold %s can no longer be converted; take a new hold", r.GetHold())
+		return nil, types.Blocked("HOLD_LAPSED", hints.TypeOf(r.GetHold()), r.GetHold(),
+			fmt.Sprintf("hold %s lapsed before the reservation could be confirmed, so reservation %s failed", r.GetHold(), r.GetName()),
+			"Take a new hold with "+hints.Call("CreateHold", map[string]string{"parent": siteOf(r.GetName())})+
+				" and create the reservation again; hold for longer, or ExtendHold, if settling takes time")
 	case err != nil:
 		return nil, err
 	}
@@ -276,9 +300,13 @@ func (s *Server) cancel(ctx context.Context, req *reservationpbv1.CancelReservat
 	case reservationpbv1.ReservationState_RESERVATION_STATE_CANCELLING:
 		return s.advance(ctx, r)
 	case reservationpbv1.ReservationState_RESERVATION_STATE_FAILED:
-		return nil, errorf(types.ErrInvalidState, "reservation %s failed and holds nothing to cancel", r.GetName())
+		return nil, types.Blocked("RESERVATION_FAILED", hints.TypeOf(r.GetName()), r.GetName(),
+			fmt.Sprintf("reservation %s failed, so it holds nothing to cancel", r.GetName()),
+			"There is nothing to do: its resources were never taken")
 	case reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED:
-		return nil, errorf(types.ErrInvalidState, "reservation %s was moved to %s; cancel that instead", r.GetName(), r.GetReplacement())
+		return nil, types.Blocked("RESERVATION_MOVED", hints.TypeOf(r.GetName()), r.GetName(),
+			fmt.Sprintf("reservation %s was rescheduled to %s, which now holds the booking", r.GetName(), r.GetReplacement()),
+			"Cancel the replacement instead: "+hints.Call("CancelReservation", map[string]string{"name": r.GetReplacement()}))
 	}
 
 	// Record the cancellation before freeing anything. Freeing first would
@@ -357,7 +385,12 @@ func (s *Server) StartReconciler(ctx context.Context, interval time.Duration, lo
 	}()
 }
 
-// errorf wraps a sentinel with detail, keeping errors.Is working.
-func errorf(sentinel error, format string, args ...any) error {
-	return fmt.Errorf("%w: %s", sentinel, fmt.Sprintf(format, args...))
+// siteOf is the site a reservation or hold name sits under:
+// "organizationalUnits/o/reservations/r" is "organizationalUnits/o".
+func siteOf(name string) string {
+	segs := strings.SplitN(name, "/", 3)
+	if len(segs) < 2 {
+		return name
+	}
+	return segs[0] + "/" + segs[1]
 }

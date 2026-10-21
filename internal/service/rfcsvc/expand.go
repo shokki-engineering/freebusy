@@ -7,7 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	eventv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	"github.com/shokki-engineering/freebusy/internal/runtime/hints"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 	"github.com/shokki-engineering/freebusy/internal/types"
@@ -45,7 +46,9 @@ func Instances(e *eventv1.Event, overrides []*eventv1.Event, loc *time.Location,
 // override keeps its own name, since it is one.
 func expand(e *eventv1.Event, overrides []*eventv1.Event, loc *time.Location, window engine.Span) ([]*eventv1.Event, error) {
 	if e.GetRecurrence() == nil {
-		return nil, fmt.Errorf("%w: %s has no recurrence rule", types.ErrInvalidState, e.GetName())
+		return nil, types.Blocked("NOT_RECURRING", hints.TypeOf(e.GetName()), e.GetName(),
+			fmt.Sprintf("event %s has no recurrence rule, so there is nothing to expand", e.GetName()),
+			"Read it as it is with "+hints.Call("GetEvent", map[string]string{"name": e.GetName()})+"; ExpandEvent is for recurring events")
 	}
 	starts, dur, err := allocation.Occurrences(e, overrides, loc, window)
 	if err != nil {

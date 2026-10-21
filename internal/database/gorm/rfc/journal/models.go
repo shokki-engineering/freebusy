@@ -64,7 +64,7 @@ const (
 // Journal is the VJOURNAL component, RFC 5545 section 3.6.3 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.3>. A dated note attached to a calendar. Unlike Event and Todo it consumes no time -- section 3.6.3 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.3> gives it no DTEND, DURATION or DUE, and it never affects free/busy. Scope note: its Classification enum is a copy of the one in protobuf.rfc5545.event.v1, not a reference. AIP-215 permits no cross-package message reference, so value types shared between iCalendar components are duplicated per component package. Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specification (iCalendar)", section 3.6.3. https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.3
 type Journal struct {
 	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
+	ID string `gorm:"column:id;primaryKey;not null;index:idx_resource_calendar_id_id,priority:2" json:"id"`
 	// Resource name, "calendars/{calendar}/journals/{journal}".
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// Server-assigned unique id.
@@ -90,7 +90,7 @@ type Journal struct {
 	// When the journal was last modified.
 	UpdateTime time.Time `gorm:"column:update_time;type:timestamptz;not null;autoUpdateTime" json:"update_time"`
 	// Parent reference to Calendar (from the AIP resource pattern).
-	CalendarID string `gorm:"column:calendar_id;not null;index:idx_resource_calendar_id" json:"calendar_id" validate:"required"`
+	CalendarID string `gorm:"column:calendar_id;not null;index:idx_resource_calendar_id_id,priority:1" json:"calendar_id" validate:"required"`
 	// Foreign key to CalendarTime.
 	StartID string        `gorm:"column:start_id;not null;index:idx_resource_start_id" json:"start_id" validate:"required"`
 	Start   *CalendarTime `gorm:"foreignKey:StartID;constraint:OnDelete:CASCADE" json:"start,omitempty"`

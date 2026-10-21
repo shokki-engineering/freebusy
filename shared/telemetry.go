@@ -15,21 +15,22 @@ import (
 	"github.com/knadh/koanf/parsers/toml"
 	"github.com/knadh/koanf/providers/rawbytes"
 	"github.com/knadh/koanf/v2"
-	"github.com/the-protobuf-project/opentelementry/opentelementry-go"
-	"github.com/the-protobuf-project/opentelementry/opentelementry-go/options"
+	"github.com/the-protobuf-project/runtime-go/observability"
+	"github.com/the-protobuf-project/telemetry/telemetry-go"
+	"github.com/the-protobuf-project/telemetry/telemetry-go/options"
 )
 
-//go:embed opentelementry.toml
+//go:embed telemetry.toml
 var telemetryConfigData []byte
 
 var (
-	Telemetry *opentelementry.Opentelementry // Telemetry is the singleton client initialised at package load time.
+	Telemetry *telemetry.Telemetry // Telemetry is the singleton client initialised at package load time.
 	once      sync.Once                      // once is used to ensure that the client is initialised only once.
 )
 
 func init() {
 	once.Do(func() {
-		b := opentelementry.New()
+		b := telemetry.New()
 		if tmpPath, err := writeTelemetryConfig(); err == nil {
 			defer os.Remove(tmpPath) //nolint:errcheck
 			b.WithConfig(tmpPath)
@@ -55,11 +56,16 @@ func init() {
 		}
 
 		Telemetry = o
+		// The process's one pipeline: runtime-go's modules (the gRPC server,
+		// its otelgrpc spans and gRPC metrics, the cache) log, trace and
+		// measure through it instead of each standing up an exporter of its
+		// own under its own service name.
+		observability.Adopt(o)
 	})
 }
 
 // applyDeploymentOverrides layers per-deployment values over the embedded
-// opentelementry.toml defaults, so one binary serves every environment and
+// telemetry.toml defaults, so one binary serves every environment and
 // deployment without a rebuild. Each override is optional — an unset
 // variable leaves the embedded default in place.
 //
@@ -67,7 +73,7 @@ func init() {
 //	FREEBUSY_OTLP_ENDPOINT          OTLP collector as host:port
 //	FREEBUSY_SITE                   label slug for what this deployment serves (e.g. "riverside-club")
 //	FREEBUSY_SITE_NAME              human-readable name for it
-func applyDeploymentOverrides(b *opentelementry.Builder) {
+func applyDeploymentOverrides(b *telemetry.Builder) {
 	if env := os.Getenv("FREEBUSY_TELEMETRY_ENVIRONMENT"); env != "" {
 		b.WithEnvironment(options.Environment(env))
 	}
@@ -103,10 +109,10 @@ func splitHostPort(endpoint string) (host string, port int, ok bool) {
 	return h, p, true
 }
 
-// writeTelemetryConfig writes the embedded opentelementry.toml to a temporary
+// writeTelemetryConfig writes the embedded telemetry.toml to a temporary
 // file and returns its path. The caller is responsible for cleanup.
 func writeTelemetryConfig() (string, error) {
-	f, err := os.CreateTemp("", "opentelementry-*.toml")
+	f, err := os.CreateTemp("", "telemetry-*.toml")
 	if err != nil {
 		return "", fmt.Errorf("create temp file: %w", err)
 	}
@@ -123,7 +129,7 @@ func writeTelemetryConfig() (string, error) {
 }
 
 // telemetryService reads the service's identity from the embedded
-// opentelementry.toml, for when the library cannot be handed the file.
+// telemetry.toml, for when the library cannot be handed the file.
 func telemetryService() (name, version, description string, err error) {
 	k := koanf.New(".")
 	if err := k.Load(rawbytes.Provider(telemetryConfigData), toml.Parser()); err != nil {

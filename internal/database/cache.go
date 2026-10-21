@@ -8,9 +8,61 @@ import (
 	"fmt"
 
 	"github.com/shokki-engineering/freebusy/config"
+	"github.com/shokki-engineering/freebusy/internal/database/cache/freebusy/reservationcache"
+	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
+	"github.com/shokki-engineering/freebusy/shared"
 	"github.com/the-protobuf-project/runtime-go/cache"
 	"github.com/the-protobuf-project/runtime-go/cache/redis"
 )
+
+// Caches are the generated list caches ((cache.v1.cache).list) a Connection's
+// repositories are served through. A nil field is a resource read straight
+// from the database.
+type Caches struct {
+	Reservations *reservationcache.ReservationListCache
+}
+
+// attachCaches opens the list caches when [cache] is enabled and makes them
+// the connection's change observer.
+//
+// A cache that cannot be opened is logged and left off rather than failing
+// startup: every read it would have served is still correct from the
+// database, only slower. One consequence is worth knowing when several
+// instances share a cache: an instance running without it moves no versions,
+// so its writes reach the others' cached pages only when those expire -- a
+// minute for reservations.
+func (c *Connection) attachCaches(ctx context.Context) {
+	p, err := OpenCacheProvider(ctx)
+	if err == nil && p != nil {
+		err = c.UseCaches(ctx, p)
+	}
+	if err != nil {
+		shared.Telemetry.Logger.Warn("List caches are off: the cache could not be opened", "error", err)
+	}
+}
+
+// UseCaches opens every list cache on p and observes the connection's writes
+// with them.
+func (c *Connection) UseCaches(ctx context.Context, p cache.Provider) error {
+	db, err := reservationcache.OpenReservationListCache(ctx, p)
+	if err != nil {
+		return err
+	}
+	reservations, err := reservationcache.NewReservationListCache(db, reservationcache.WithListErrors(reportCacheError))
+	if err != nil {
+		return err
+	}
+	c.Caches = Caches{Reservations: reservations}
+	c.Changes = repox.Changes{reservations}
+	return nil
+}
+
+// reportCacheError logs a cache failure a list cache absorbed. None fails a
+// request, but a version that did not move leaves a site's pages stale for
+// their ttl, so each is worth a line.
+func reportCacheError(_ context.Context, resource, op string, err error) {
+	shared.Telemetry.Logger.Warn("List cache failure", "resource", resource, "op", op, "error", err)
+}
 
 // OpenCacheProvider builds the cache.Provider the generated decorators are
 // constructed against, or returns (nil, nil) when [config.CacheConfig.Enabled]

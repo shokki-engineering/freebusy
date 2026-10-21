@@ -12,6 +12,8 @@ import (
 	"context"
 	"time"
 
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc4519/organization/v1/organizationv1grpc"
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc4519/organizational_unit/v1/organizational_unitv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/calendar/v1/calendarv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/event/v1/eventv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc7953/availability/v1/availabilityv1grpc"
@@ -41,6 +43,8 @@ type Service struct {
 	allocationpbv1.HoldServiceServer
 	reservationpbv1.ReservationServiceServer
 	webhookpbv1.WebhookServiceServer
+	organizationv1grpc.OrganizationsServer
+	organizational_unitv1grpc.OrganizationalUnitsServer
 	resourcev1grpc.ResourcesServer
 	calendarv1grpc.CalendarsServer
 	availabilityv1grpc.AvailabilitiesServer
@@ -58,6 +62,9 @@ type Service struct {
 	// conn is the shared database connection every domain runs on, retained so
 	// StartBackground can publish its pool health.
 	conn *database.Connection
+	// sites decides whether a site or an organization a call names is live;
+	// the sites interceptor asks it on every call.
+	sites *rfcsvc.Sites
 	// caldav is the CalDAV server, mounted on the HTTP gateway's mux; nil
 	// unless [caldav] enabled.
 	caldav *caldav.Handler
@@ -74,17 +81,20 @@ func NewService(
 	repos rfcsvc.Repositories,
 ) *Service {
 	return &Service{
-		AllocationServiceServer:  engine,
-		HoldServiceServer:        engine,
-		ReservationServiceServer: reservations,
-		WebhookServiceServer:     webhooks,
-		ResourcesServer:          rfcsvc.NewResourceServer(repos),
-		CalendarsServer:          rfcsvc.NewCalendarServer(repos, engine),
-		AvailabilitiesServer:     rfcsvc.NewAvailabilityServer(repos),
-		EventsServer:             rfcsvc.NewEventServer(repos),
-		allocation:               engine,
-		reservations:             reservations,
-		webhooks:                 webhooks,
+		AllocationServiceServer:   engine,
+		HoldServiceServer:         engine,
+		ReservationServiceServer:  reservations,
+		WebhookServiceServer:      webhooks,
+		OrganizationsServer:       rfcsvc.NewOrganizationServer(repos),
+		OrganizationalUnitsServer: rfcsvc.NewOrganizationalUnitServer(repos),
+		ResourcesServer:           rfcsvc.NewResourceServer(repos),
+		CalendarsServer:           rfcsvc.NewCalendarServer(repos, engine),
+		AvailabilitiesServer:      rfcsvc.NewAvailabilityServer(repos),
+		EventsServer:              rfcsvc.NewEventServer(repos),
+		allocation:                engine,
+		reservations:              reservations,
+		webhooks:                  webhooks,
+		sites:                     rfcsvc.NewSites(repos),
 	}
 }
 

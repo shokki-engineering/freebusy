@@ -23,7 +23,7 @@ description = "Generic availability and booking engine."
 enabled = true
 
 # OpenTelemetry collector. The endpoint below is the local-dev default (the
-# opentelementry-core stack's gateway, OTLP over HTTP); in deployment set
+# telemetry-core stack's gateway, OTLP over HTTP); in deployment set
 # FREEBUSY_OTLP_ENDPOINT=host:port to point at the cluster collector (gRPC).
 [telemetry.otlp]
 enabled = true

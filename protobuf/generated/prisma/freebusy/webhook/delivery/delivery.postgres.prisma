@@ -70,8 +70,8 @@ model Delivery {
 
   /// Composite index on [state, next_attempt_time].
   @@index([state, nextAttemptTime])
-  /// Index on [webhook_id].
-  @@index([webhookID])
+  /// Composite index on [webhook_id, id].
+  @@index([webhookID, id])
   /// Maps the model to the "deliveries" table in the database.
   @@map("deliveries")
   /// Maps the model to the "webhook" schema in the database.

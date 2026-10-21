@@ -24,11 +24,23 @@ import (
 // is named reservation too, so each file imports one of the two.
 type Store struct {
 	reservations reservation.ReservationRepository
+	// lists serves List, the API's ListReservations: through the list cache
+	// when the connection has one. Everything else reads reservations, so the
+	// paths that decide something -- FindByHold, which keeps a retried create
+	// from making a second reservation, and Stuck, which the reconciler acts
+	// on -- always read the database.
+	lists reservation.ReservationRepository
 }
 
-// New returns the Store on conn's backend.
+// New returns the Store on conn's backend, with List served through conn's
+// list cache when it has one.
 func New(conn *database.Connection) *Store {
-	return &Store{reservations: reservation.New(conn.Repox()).Reservations}
+	reservations := reservation.New(conn.Repox()).Reservations
+	s := &Store{reservations: reservations, lists: reservations}
+	if lists := conn.Caches.Reservations; lists != nil {
+		s.lists = lists.Wrap(reservations)
+	}
+	return s
 }
 
 // acrossSites is the AIP-159 wildcard parent: reservations of every site.
@@ -57,7 +69,7 @@ func (s *Store) FindByHold(ctx context.Context, hold string) (*reservationpbv1.R
 
 // List returns a page of a site's reservations.
 func (s *Store) List(ctx context.Context, parent string, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
-	return s.reservations.List(ctx, parent, in)
+	return s.lists.List(ctx, parent, in)
 }
 
 // Insert writes r exactly as given, server-owned fields included; a taken

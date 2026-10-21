@@ -76,8 +76,8 @@ model Reservation {
 
   /// Unique constraint on [hold].
   @@unique([holdID])
-  /// Index on [organizational_unit_id].
-  @@index([organizationalUnitID])
+  /// Composite index on [organizational_unit_id, id].
+  @@index([organizationalUnitID, id])
   /// GIN index: case-insensitive contains (ILIKE '%…%') cannot use a B-tree.
   @@index([customer(ops: raw("gin_trgm_ops"))], type: Gin)
   /// GIN index: tag containment (@>) cannot use a B-tree.
