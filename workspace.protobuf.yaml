@@ -1,8 +1,21 @@
 # Copyright 2026 Srikanth K.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Proto workspace config (Google API Linter)
-# See: https://github.com/machanirobotics/google-api-linter-vscode
+# Proto workspace config (Protobuf AIP Linter)
+# See: https://github.com/the-protobuf-project/google-api-linter-vscode
 
 # Optional: list of directories containing .proto files (default: this directory)
 proto_path: ./protobuf
+
+# Optional: folders and files the linter skips entirely. A bare directory name
+# covers everything under it; * and ** work as usual.
+exclude:
+  - bazel
+  # Bazel's output symlinks (bazel-bin, bazel-out, bazel-testlogs,
+  # bazel-bacnet-rs): each a copy of every proto, as .gitignore skips them.
+  # Spelled `/**` because the extension widens only a bare name to its
+  # contents; `bazel-*` alone matches the symlink and nothing beneath it.
+  - bazel-*/**
+  # Build output: generated and scratch protos (target/agent-protos,
+  # target/scratch-mcp), never the schema.
+  - target
