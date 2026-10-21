@@ -16,9 +16,9 @@
 package group
 
 import (
+	ldapgrouppbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/group/v1"
+	scimgrouppbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/group/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/group/v1/ldapgrouppbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7643/group/v1/scimgrouppbv1"
 )
 
 // applyGroupMask merges the masked fields of in onto merged. An empty
@@ -35,6 +35,9 @@ func applyGroupMask(merged, in *scimgrouppbv1.Group, paths []string) {
 	}
 	if repox.InMask(paths, "display_name") {
 		merged.DisplayName = in.GetDisplayName()
+	}
+	if repox.GroupTouched(paths, "members") {
+		merged.Members = in.GetMembers()
 	}
 }
 

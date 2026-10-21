@@ -16,13 +16,16 @@
 package vcard
 
 import (
+	vcardpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc6350/vcard/v1"
 	"context"
+	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/vcard"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc6350/vcard/v1/vcardpbv1"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"time"
 )
 
 // GormVcardRepository is the GORM adapter of VcardRepository: flat
@@ -65,7 +68,169 @@ func (r *GormVcardRepository) Create(ctx context.Context, in *vcardpbv1.Vcard) (
 	m.ID = id
 	m.Name = in.GetName()
 	m.Etag = repox.Ptr(repox.NewULID())
-	if err := vcard.NewVcardStore(r.DB).Create(ctx, m); err != nil {
+	if err := r.DB.Transaction(func(tx *gorm.DB) error {
+		if v1 := in.GetContact(); v1 != nil {
+			n2 := vcard.ContactFromProto(v1)
+			n2.ID = repox.NewULID()
+			if v3 := v1.GetNameComponents(); v3 != nil {
+				n4 := vcard.NameFromProto(v3)
+				n4.ID = repox.NewULID()
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n4).Error; err != nil {
+					return err
+				}
+				n2.NameComponentsID = repox.Ptr(n4.ID)
+			}
+			if v5 := v1.GetBirthday(); v5 != nil {
+				n6 := vcard.DateOrTextFromProto(v5)
+				n6.ID = repox.NewULID()
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n6).Error; err != nil {
+					return err
+				}
+				n2.BirthdayID = repox.Ptr(n6.ID)
+			}
+			if v7 := v1.GetAnniversary(); v7 != nil {
+				n8 := vcard.DateOrTextFromProto(v7)
+				n8.ID = repox.NewULID()
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n8).Error; err != nil {
+					return err
+				}
+				n2.AnniversaryID = repox.Ptr(n8.ID)
+			}
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n2).Error; err != nil {
+				return err
+			}
+			for _, v9 := range v1.GetEmails() {
+				n10 := vcard.EmailFromProto(v9)
+				n10.ID = repox.NewULID()
+				n10.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n10).Error; err != nil {
+					return err
+				}
+			}
+			for _, v11 := range v1.GetTelephones() {
+				n12 := vcard.TelephoneFromProto(v11)
+				n12.ID = repox.NewULID()
+				n12.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n12).Error; err != nil {
+					return err
+				}
+			}
+			for _, v13 := range v1.GetAddresses() {
+				n14 := vcard.AddressFromProto(v13)
+				n14.ID = repox.NewULID()
+				n14.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n14).Error; err != nil {
+					return err
+				}
+			}
+			for _, v15 := range v1.GetOrganizations() {
+				n16 := vcard.OrganizationFromProto(v15)
+				n16.ID = repox.NewULID()
+				n16.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n16).Error; err != nil {
+					return err
+				}
+			}
+			for _, v17 := range v1.GetExtensions() {
+				n18 := vcard.ExtensionPropertyFromProto(v17)
+				n18.ID = repox.NewULID()
+				n18.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n18).Error; err != nil {
+					return err
+				}
+			}
+			for _, v19 := range v1.GetNicknames() {
+				n20 := vcard.NicknameFromProto(v19)
+				n20.ID = repox.NewULID()
+				n20.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n20).Error; err != nil {
+					return err
+				}
+			}
+			for _, v21 := range v1.GetUrls() {
+				n22 := vcard.UrlFromProto(v21)
+				n22.ID = repox.NewULID()
+				n22.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n22).Error; err != nil {
+					return err
+				}
+			}
+			for _, v23 := range v1.GetRoles() {
+				n24 := vcard.RoleFromProto(v23)
+				n24.ID = repox.NewULID()
+				n24.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n24).Error; err != nil {
+					return err
+				}
+			}
+			for _, v25 := range v1.GetInstantMessages() {
+				n26 := vcard.InstantMessageFromProto(v25)
+				n26.ID = repox.NewULID()
+				n26.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n26).Error; err != nil {
+					return err
+				}
+			}
+			for _, v27 := range v1.GetLanguages() {
+				n28 := vcard.LanguageFromProto(v27)
+				n28.ID = repox.NewULID()
+				n28.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n28).Error; err != nil {
+					return err
+				}
+			}
+			for _, v29 := range v1.GetLocations() {
+				n30 := vcard.GeoFromProto(v29)
+				n30.ID = repox.NewULID()
+				n30.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n30).Error; err != nil {
+					return err
+				}
+			}
+			for _, v31 := range v1.GetTimezones() {
+				n32 := vcard.TimezoneFromProto(v31)
+				n32.ID = repox.NewULID()
+				n32.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n32).Error; err != nil {
+					return err
+				}
+			}
+			for _, v33 := range v1.GetRelations() {
+				n34 := vcard.RelationFromProto(v33)
+				n34.ID = repox.NewULID()
+				n34.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n34).Error; err != nil {
+					return err
+				}
+			}
+			for _, v35 := range v1.GetPronouns() {
+				n36 := vcard.PronounsFromProto(v35)
+				n36.ID = repox.NewULID()
+				n36.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n36).Error; err != nil {
+					return err
+				}
+			}
+			for _, v37 := range v1.GetGrammaticalGenders() {
+				n38 := vcard.GrammaticalGenderFromProto(v37)
+				n38.ID = repox.NewULID()
+				n38.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n38).Error; err != nil {
+					return err
+				}
+			}
+			for _, v39 := range v1.GetSocialProfiles() {
+				n40 := vcard.SocialProfileFromProto(v39)
+				n40.ID = repox.NewULID()
+				n40.ContactID = n2.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n40).Error; err != nil {
+					return err
+				}
+			}
+			m.ContactID = n2.ID
+		}
+		return vcard.NewVcardStore(tx).Create(ctx, m)
+	}); err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.get(ctx, id)
@@ -84,7 +249,7 @@ func (r *GormVcardRepository) Get(ctx context.Context, name string) (*vcardpbv1.
 // through, so Tier-2 overrides of Get never re-enter generated writes.
 func (r *GormVcardRepository) get(ctx context.Context, id string) (*vcardpbv1.Vcard, error) {
 	var m vcard.Vcard
-	if err := r.DB.WithContext(ctx).First(&m, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("Contact").Preload("Contact.NameComponents").Preload("Contact.Birthday").Preload("Contact.Anniversary").Preload("Contact.Emails", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Telephones", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Address", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Organizations", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Nicknames", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Urls", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Roles", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.InstantMessages", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Languages", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Geos", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Timezones", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Relations", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Pronouns", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.GrammaticalGenders", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.SocialProfiles", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&m, "id = ?", id).Error; err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.toProto(ctx, &m)
@@ -108,6 +273,9 @@ func (r *GormVcardRepository) List(ctx context.Context, in repox.ListInput) ([]*
 }
 
 func (r *GormVcardRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*vcardpbv1.Vcard, string, error) {
+	if !in.ShowDeleted {
+		scope = scope.Where("delete_time IS NULL")
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -116,7 +284,7 @@ func (r *GormVcardRepository) list(ctx context.Context, scope *gorm.DB, in repox
 	for f, h := range r.ListOverrides {
 		eng.Override(f, h)
 	}
-	rows, next, err := eng.List(ctx, scope, filterx.ListInput{
+	rows, next, err := eng.List(ctx, scope.Preload("Contact").Preload("Contact.NameComponents").Preload("Contact.Birthday").Preload("Contact.Anniversary").Preload("Contact.Emails", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Telephones", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Address", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Organizations", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Nicknames", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Urls", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Roles", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.InstantMessages", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Languages", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Geos", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Timezones", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Relations", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Pronouns", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.GrammaticalGenders", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.SocialProfiles", func(db *gorm.DB) *gorm.DB { return db.Order("id") }), filterx.ListInput{
 		PageSize:  in.PageSize,
 		PageToken: in.PageToken,
 		OrderBy:   in.OrderBy,
@@ -146,9 +314,10 @@ func (r *GormVcardRepository) Update(ctx context.Context, in *vcardpbv1.Vcard, p
 	id := ids[len(ids)-1]
 	err = r.DB.Transaction(func(tx *gorm.DB) error {
 		var existing vcard.Vcard
-		if err := tx.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+		if err := tx.WithContext(ctx).Preload("Contact").Preload("Contact.NameComponents").Preload("Contact.Birthday").Preload("Contact.Anniversary").Preload("Contact.Emails", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Telephones", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Address", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Organizations", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Nicknames", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Urls", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Roles", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.InstantMessages", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Languages", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Geos", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Timezones", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Relations", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Pronouns", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.GrammaticalGenders", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.SocialProfiles", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 			return err
 		}
+		var staleContact *vcard.Contact
 		if in.GetEtag() != "" && existing.Etag != nil && *existing.Etag != in.GetEtag() {
 			return repox.ErrConflict
 		}
@@ -165,8 +334,292 @@ func (r *GormVcardRepository) Update(ctx context.Context, in *vcardpbv1.Vcard, p
 		existing.Name = next.Name
 		existing.VcardUID = next.VcardUID
 		existing.VcardCreateTime = next.VcardCreateTime
+		if repox.GroupTouched(paths, "contact") {
+			staleContact = existing.Contact
+			existing.ContactID = ""
+			if v113 := merged.GetContact(); v113 != nil {
+				n114 := vcard.ContactFromProto(v113)
+				n114.ID = repox.NewULID()
+				if v115 := v113.GetNameComponents(); v115 != nil {
+					n116 := vcard.NameFromProto(v115)
+					n116.ID = repox.NewULID()
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n116).Error; err != nil {
+						return err
+					}
+					n114.NameComponentsID = repox.Ptr(n116.ID)
+				}
+				if v117 := v113.GetBirthday(); v117 != nil {
+					n118 := vcard.DateOrTextFromProto(v117)
+					n118.ID = repox.NewULID()
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n118).Error; err != nil {
+						return err
+					}
+					n114.BirthdayID = repox.Ptr(n118.ID)
+				}
+				if v119 := v113.GetAnniversary(); v119 != nil {
+					n120 := vcard.DateOrTextFromProto(v119)
+					n120.ID = repox.NewULID()
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n120).Error; err != nil {
+						return err
+					}
+					n114.AnniversaryID = repox.Ptr(n120.ID)
+				}
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n114).Error; err != nil {
+					return err
+				}
+				for _, v121 := range v113.GetEmails() {
+					n122 := vcard.EmailFromProto(v121)
+					n122.ID = repox.NewULID()
+					n122.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n122).Error; err != nil {
+						return err
+					}
+				}
+				for _, v123 := range v113.GetTelephones() {
+					n124 := vcard.TelephoneFromProto(v123)
+					n124.ID = repox.NewULID()
+					n124.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n124).Error; err != nil {
+						return err
+					}
+				}
+				for _, v125 := range v113.GetAddresses() {
+					n126 := vcard.AddressFromProto(v125)
+					n126.ID = repox.NewULID()
+					n126.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n126).Error; err != nil {
+						return err
+					}
+				}
+				for _, v127 := range v113.GetOrganizations() {
+					n128 := vcard.OrganizationFromProto(v127)
+					n128.ID = repox.NewULID()
+					n128.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n128).Error; err != nil {
+						return err
+					}
+				}
+				for _, v129 := range v113.GetExtensions() {
+					n130 := vcard.ExtensionPropertyFromProto(v129)
+					n130.ID = repox.NewULID()
+					n130.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n130).Error; err != nil {
+						return err
+					}
+				}
+				for _, v131 := range v113.GetNicknames() {
+					n132 := vcard.NicknameFromProto(v131)
+					n132.ID = repox.NewULID()
+					n132.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n132).Error; err != nil {
+						return err
+					}
+				}
+				for _, v133 := range v113.GetUrls() {
+					n134 := vcard.UrlFromProto(v133)
+					n134.ID = repox.NewULID()
+					n134.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n134).Error; err != nil {
+						return err
+					}
+				}
+				for _, v135 := range v113.GetRoles() {
+					n136 := vcard.RoleFromProto(v135)
+					n136.ID = repox.NewULID()
+					n136.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n136).Error; err != nil {
+						return err
+					}
+				}
+				for _, v137 := range v113.GetInstantMessages() {
+					n138 := vcard.InstantMessageFromProto(v137)
+					n138.ID = repox.NewULID()
+					n138.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n138).Error; err != nil {
+						return err
+					}
+				}
+				for _, v139 := range v113.GetLanguages() {
+					n140 := vcard.LanguageFromProto(v139)
+					n140.ID = repox.NewULID()
+					n140.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n140).Error; err != nil {
+						return err
+					}
+				}
+				for _, v141 := range v113.GetLocations() {
+					n142 := vcard.GeoFromProto(v141)
+					n142.ID = repox.NewULID()
+					n142.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n142).Error; err != nil {
+						return err
+					}
+				}
+				for _, v143 := range v113.GetTimezones() {
+					n144 := vcard.TimezoneFromProto(v143)
+					n144.ID = repox.NewULID()
+					n144.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n144).Error; err != nil {
+						return err
+					}
+				}
+				for _, v145 := range v113.GetRelations() {
+					n146 := vcard.RelationFromProto(v145)
+					n146.ID = repox.NewULID()
+					n146.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n146).Error; err != nil {
+						return err
+					}
+				}
+				for _, v147 := range v113.GetPronouns() {
+					n148 := vcard.PronounsFromProto(v147)
+					n148.ID = repox.NewULID()
+					n148.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n148).Error; err != nil {
+						return err
+					}
+				}
+				for _, v149 := range v113.GetGrammaticalGenders() {
+					n150 := vcard.GrammaticalGenderFromProto(v149)
+					n150.ID = repox.NewULID()
+					n150.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n150).Error; err != nil {
+						return err
+					}
+				}
+				for _, v151 := range v113.GetSocialProfiles() {
+					n152 := vcard.SocialProfileFromProto(v151)
+					n152.ID = repox.NewULID()
+					n152.ContactID = n114.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n152).Error; err != nil {
+						return err
+					}
+				}
+				existing.ContactID = n114.ID
+			}
+		}
+		existing.Contact = nil
 		existing.Etag = repox.Ptr(repox.NewULID())
-		return vcard.NewVcardStore(tx).Update(ctx, &existing)
+		if err := vcard.NewVcardStore(tx).Update(ctx, &existing); err != nil {
+			return err
+		}
+		if d77 := staleContact; d77 != nil {
+			for i78 := range d77.Emails {
+				d79 := &d77.Emails[i78]
+				if err := tx.WithContext(ctx).Delete(&vcard.Email{}, "id = ?", d79.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i80 := range d77.Telephones {
+				d81 := &d77.Telephones[i80]
+				if err := tx.WithContext(ctx).Delete(&vcard.Telephone{}, "id = ?", d81.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i82 := range d77.Address {
+				d83 := &d77.Address[i82]
+				if err := tx.WithContext(ctx).Delete(&vcard.Address{}, "id = ?", d83.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i84 := range d77.Organizations {
+				d85 := &d77.Organizations[i84]
+				if err := tx.WithContext(ctx).Delete(&vcard.Organization{}, "id = ?", d85.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i86 := range d77.ExtensionProperties {
+				d87 := &d77.ExtensionProperties[i86]
+				if err := tx.WithContext(ctx).Delete(&vcard.ExtensionProperty{}, "id = ?", d87.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i88 := range d77.Nicknames {
+				d89 := &d77.Nicknames[i88]
+				if err := tx.WithContext(ctx).Delete(&vcard.Nickname{}, "id = ?", d89.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i90 := range d77.Urls {
+				d91 := &d77.Urls[i90]
+				if err := tx.WithContext(ctx).Delete(&vcard.Url{}, "id = ?", d91.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i92 := range d77.Roles {
+				d93 := &d77.Roles[i92]
+				if err := tx.WithContext(ctx).Delete(&vcard.Role{}, "id = ?", d93.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i94 := range d77.InstantMessages {
+				d95 := &d77.InstantMessages[i94]
+				if err := tx.WithContext(ctx).Delete(&vcard.InstantMessage{}, "id = ?", d95.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i96 := range d77.Languages {
+				d97 := &d77.Languages[i96]
+				if err := tx.WithContext(ctx).Delete(&vcard.Language{}, "id = ?", d97.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i98 := range d77.Geos {
+				d99 := &d77.Geos[i98]
+				if err := tx.WithContext(ctx).Delete(&vcard.Geo{}, "id = ?", d99.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i100 := range d77.Timezones {
+				d101 := &d77.Timezones[i100]
+				if err := tx.WithContext(ctx).Delete(&vcard.Timezone{}, "id = ?", d101.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i102 := range d77.Relations {
+				d103 := &d77.Relations[i102]
+				if err := tx.WithContext(ctx).Delete(&vcard.Relation{}, "id = ?", d103.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i104 := range d77.Pronouns {
+				d105 := &d77.Pronouns[i104]
+				if err := tx.WithContext(ctx).Delete(&vcard.Pronouns{}, "id = ?", d105.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i106 := range d77.GrammaticalGenders {
+				d107 := &d77.GrammaticalGenders[i106]
+				if err := tx.WithContext(ctx).Delete(&vcard.GrammaticalGender{}, "id = ?", d107.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i108 := range d77.SocialProfiles {
+				d109 := &d77.SocialProfiles[i108]
+				if err := tx.WithContext(ctx).Delete(&vcard.SocialProfile{}, "id = ?", d109.ID).Error; err != nil {
+					return err
+				}
+			}
+			if err := tx.WithContext(ctx).Delete(&vcard.Contact{}, "id = ?", d77.ID).Error; err != nil {
+				return err
+			}
+			if d110 := d77.NameComponents; d110 != nil {
+				if err := tx.WithContext(ctx).Delete(&vcard.Name{}, "id = ?", d110.ID).Error; err != nil {
+					return err
+				}
+			}
+			if d111 := d77.Birthday; d111 != nil {
+				if err := tx.WithContext(ctx).Delete(&vcard.DateOrText{}, "id = ?", d111.ID).Error; err != nil {
+					return err
+				}
+			}
+			if d112 := d77.Anniversary; d112 != nil {
+				if err := tx.WithContext(ctx).Delete(&vcard.DateOrText{}, "id = ?", d112.ID).Error; err != nil {
+					return err
+				}
+			}
+		}
+		return nil
 	})
 	if err != nil {
 		return nil, repox.MapGormErr(err)
@@ -174,8 +627,54 @@ func (r *GormVcardRepository) Update(ctx context.Context, in *vcardpbv1.Vcard, p
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GormVcardRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "vcards")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	res := r.DB.WithContext(ctx).Model(&vcard.Vcard{}).
+		Where("id = ? AND delete_time IS NULL", ids[len(ids)-1]).
+		Updates(map[string]any{"delete_time": time.Now(), "etag": repox.NewULID()})
+	if res.Error != nil {
+		return repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return repox.ErrNotFound
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GormVcardRepository) Undelete(ctx context.Context, name string) (*vcardpbv1.Vcard, error) {
+	ids, err := repox.SplitName(name, "vcards")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	res := r.DB.WithContext(ctx).Model(&vcard.Vcard{}).
+		Where("id = ? AND delete_time IS NOT NULL", id).
+		Updates(map[string]any{"delete_time": nil, "etag": repox.NewULID()})
+	if res.Error != nil {
+		return nil, repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GormVcardRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "vcards")
 	if err != nil {
 		return err
@@ -187,10 +686,131 @@ func (r *GormVcardRepository) Delete(ctx context.Context, name string) error {
 	}
 	id := ids[len(ids)-1]
 	var existing vcard.Vcard
-	if err := r.DB.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("Contact").Preload("Contact.NameComponents").Preload("Contact.Birthday").Preload("Contact.Anniversary").Preload("Contact.Emails", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Telephones", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Address", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Organizations", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Nicknames", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Urls", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Roles", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.InstantMessages", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Languages", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Geos", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Timezones", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Relations", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.Pronouns", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.GrammaticalGenders", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Contact.SocialProfiles", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 		return repox.MapGormErr(err)
 	}
-	return repox.MapGormErr(vcard.NewVcardStore(r.DB).DeleteByID(ctx, id))
+	return repox.MapGormErr(r.DB.Transaction(func(tx *gorm.DB) error {
+		if err := vcard.NewVcardStore(tx).DeleteByID(ctx, id); err != nil {
+			return err
+		}
+		if d41 := existing.Contact; d41 != nil {
+			for i42 := range d41.Emails {
+				d43 := &d41.Emails[i42]
+				if err := tx.WithContext(ctx).Delete(&vcard.Email{}, "id = ?", d43.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i44 := range d41.Telephones {
+				d45 := &d41.Telephones[i44]
+				if err := tx.WithContext(ctx).Delete(&vcard.Telephone{}, "id = ?", d45.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i46 := range d41.Address {
+				d47 := &d41.Address[i46]
+				if err := tx.WithContext(ctx).Delete(&vcard.Address{}, "id = ?", d47.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i48 := range d41.Organizations {
+				d49 := &d41.Organizations[i48]
+				if err := tx.WithContext(ctx).Delete(&vcard.Organization{}, "id = ?", d49.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i50 := range d41.ExtensionProperties {
+				d51 := &d41.ExtensionProperties[i50]
+				if err := tx.WithContext(ctx).Delete(&vcard.ExtensionProperty{}, "id = ?", d51.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i52 := range d41.Nicknames {
+				d53 := &d41.Nicknames[i52]
+				if err := tx.WithContext(ctx).Delete(&vcard.Nickname{}, "id = ?", d53.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i54 := range d41.Urls {
+				d55 := &d41.Urls[i54]
+				if err := tx.WithContext(ctx).Delete(&vcard.Url{}, "id = ?", d55.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i56 := range d41.Roles {
+				d57 := &d41.Roles[i56]
+				if err := tx.WithContext(ctx).Delete(&vcard.Role{}, "id = ?", d57.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i58 := range d41.InstantMessages {
+				d59 := &d41.InstantMessages[i58]
+				if err := tx.WithContext(ctx).Delete(&vcard.InstantMessage{}, "id = ?", d59.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i60 := range d41.Languages {
+				d61 := &d41.Languages[i60]
+				if err := tx.WithContext(ctx).Delete(&vcard.Language{}, "id = ?", d61.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i62 := range d41.Geos {
+				d63 := &d41.Geos[i62]
+				if err := tx.WithContext(ctx).Delete(&vcard.Geo{}, "id = ?", d63.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i64 := range d41.Timezones {
+				d65 := &d41.Timezones[i64]
+				if err := tx.WithContext(ctx).Delete(&vcard.Timezone{}, "id = ?", d65.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i66 := range d41.Relations {
+				d67 := &d41.Relations[i66]
+				if err := tx.WithContext(ctx).Delete(&vcard.Relation{}, "id = ?", d67.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i68 := range d41.Pronouns {
+				d69 := &d41.Pronouns[i68]
+				if err := tx.WithContext(ctx).Delete(&vcard.Pronouns{}, "id = ?", d69.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i70 := range d41.GrammaticalGenders {
+				d71 := &d41.GrammaticalGenders[i70]
+				if err := tx.WithContext(ctx).Delete(&vcard.GrammaticalGender{}, "id = ?", d71.ID).Error; err != nil {
+					return err
+				}
+			}
+			for i72 := range d41.SocialProfiles {
+				d73 := &d41.SocialProfiles[i72]
+				if err := tx.WithContext(ctx).Delete(&vcard.SocialProfile{}, "id = ?", d73.ID).Error; err != nil {
+					return err
+				}
+			}
+			if err := tx.WithContext(ctx).Delete(&vcard.Contact{}, "id = ?", d41.ID).Error; err != nil {
+				return err
+			}
+			if d74 := d41.NameComponents; d74 != nil {
+				if err := tx.WithContext(ctx).Delete(&vcard.Name{}, "id = ?", d74.ID).Error; err != nil {
+					return err
+				}
+			}
+			if d75 := d41.Birthday; d75 != nil {
+				if err := tx.WithContext(ctx).Delete(&vcard.DateOrText{}, "id = ?", d75.ID).Error; err != nil {
+					return err
+				}
+			}
+			if d76 := d41.Anniversary; d76 != nil {
+				if err := tx.WithContext(ctx).Delete(&vcard.DateOrText{}, "id = ?", d76.ID).Error; err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	}))
 }
 
 // Compile-time proof the adapter satisfies the interface.

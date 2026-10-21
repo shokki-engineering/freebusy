@@ -1,0 +1,289 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UnitResource
+  fields:
+    - name: createTime
+      type: Timestamptz!
+    - name: deleteTime
+      type: Timestamptz
+    - name: description
+      type: String_1
+    - name: etag
+      type: String_1
+    - name: expireTime
+      type: Timestamptz
+    - name: id
+      type: String_1!
+    - name: name
+      type: String_1!
+    - name: offsetId
+      type: String_1
+    - name: producingDiscouraged
+      type: Boolean_1
+    - name: reference
+      type: String_1
+    - name: scaleId
+      type: String_1
+    - name: senmlUnit
+      type: String_1
+    - name: symbol
+      type: String_1!
+    - name: uid
+      type: String_1
+    - name: updateTime
+      type: Timestamptz!
+  graphql:
+    typeName: UnitResource
+    inputTypeName: UnitResourceInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: unit_resource
+      fieldMapping:
+        createTime:
+          column:
+            name: create_time
+        deleteTime:
+          column:
+            name: delete_time
+        description:
+          column:
+            name: description
+        etag:
+          column:
+            name: etag
+        expireTime:
+          column:
+            name: expire_time
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        offsetId:
+          column:
+            name: offset_id
+        producingDiscouraged:
+          column:
+            name: producing_discouraged
+        reference:
+          column:
+            name: reference
+        scaleId:
+          column:
+            name: scale_id
+        senmlUnit:
+          column:
+            name: senml_unit
+        symbol:
+          column:
+            name: symbol
+        uid:
+          column:
+            name: uid
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UnitResource
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createTime
+          - deleteTime
+          - description
+          - etag
+          - expireTime
+          - id
+          - name
+          - offsetId
+          - producingDiscouraged
+          - reference
+          - scaleId
+          - senmlUnit
+          - symbol
+          - uid
+          - updateTime
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: UnitResourceBoolExp
+  operand:
+    object:
+      type: UnitResource
+      comparableFields:
+        - fieldName: createTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: deleteTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: description
+          booleanExpressionType: TextBoolExp
+        - fieldName: etag
+          booleanExpressionType: TextBoolExp
+        - fieldName: expireTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: name
+          booleanExpressionType: TextBoolExp
+        - fieldName: offsetId
+          booleanExpressionType: TextBoolExp
+        - fieldName: producingDiscouraged
+          booleanExpressionType: BoolBoolExp
+        - fieldName: reference
+          booleanExpressionType: TextBoolExp
+        - fieldName: scaleId
+          booleanExpressionType: TextBoolExp
+        - fieldName: senmlUnit
+          booleanExpressionType: TextBoolExp
+        - fieldName: symbol
+          booleanExpressionType: TextBoolExp
+        - fieldName: uid
+          booleanExpressionType: TextBoolExp
+        - fieldName: updateTime
+          booleanExpressionType: TimestamptzBoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: UnitResourceBoolExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: UnitResourceAggExp
+  operand:
+    object:
+      aggregatedType: UnitResource
+      aggregatableFields:
+        - fieldName: createTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: deleteTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: description
+          aggregateExpression: TextAggExp
+        - fieldName: etag
+          aggregateExpression: TextAggExp
+        - fieldName: expireTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: id
+          aggregateExpression: TextAggExp
+        - fieldName: name
+          aggregateExpression: TextAggExp
+        - fieldName: offsetId
+          aggregateExpression: TextAggExp
+        - fieldName: producingDiscouraged
+          aggregateExpression: BoolAggExp
+        - fieldName: reference
+          aggregateExpression: TextAggExp
+        - fieldName: scaleId
+          aggregateExpression: TextAggExp
+        - fieldName: senmlUnit
+          aggregateExpression: TextAggExp
+        - fieldName: symbol
+          aggregateExpression: TextAggExp
+        - fieldName: uid
+          aggregateExpression: TextAggExp
+        - fieldName: updateTime
+          aggregateExpression: TimestamptzAggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: UnitResourceAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: UnitResourceOrderByExp
+  operand:
+    object:
+      orderedType: UnitResource
+      orderableFields:
+        - fieldName: createTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: deleteTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: description
+          orderByExpression: String1OrderByExp
+        - fieldName: etag
+          orderByExpression: String1OrderByExp
+        - fieldName: expireTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: id
+          orderByExpression: String1OrderByExp
+        - fieldName: name
+          orderByExpression: String1OrderByExp
+        - fieldName: offsetId
+          orderByExpression: String1OrderByExp
+        - fieldName: producingDiscouraged
+          orderByExpression: Boolean1OrderByExp
+        - fieldName: reference
+          orderByExpression: String1OrderByExp
+        - fieldName: scaleId
+          orderByExpression: String1OrderByExp
+        - fieldName: senmlUnit
+          orderByExpression: String1OrderByExp
+        - fieldName: symbol
+          orderByExpression: String1OrderByExp
+        - fieldName: uid
+          orderByExpression: String1OrderByExp
+        - fieldName: updateTime
+          orderByExpression: TimestamptzOrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: UnitResourceOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: UnitResource
+  objectType: UnitResource
+  source:
+    dataConnectorName: freebusy_pgsql
+    collection: unit_resource
+  filterExpressionType: UnitResourceBoolExp
+  aggregateExpression: UnitResourceAggExp
+  orderByExpression: UnitResourceOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: unitResource
+      subscription:
+        rootField: unitResource
+    selectUniques:
+      - queryRootField: unitResourceById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: unitResourceById
+    filterInputTypeName: UnitResourceFilterInput
+    aggregate:
+      queryRootField: unitResourceAggregate
+      subscription:
+        rootField: unitResourceAggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: UnitResource
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+

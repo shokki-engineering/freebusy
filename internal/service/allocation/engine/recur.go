@@ -174,6 +174,14 @@ const maxOccurrenceScan = 366 * 50
 // The first occurrence is dtstart itself, as RFC 5545 section 3.8.5.3
 // requires, even when dtstart does not match the BY* parts.
 func (r Recurrence) Expand(dtstart time.Time, dur time.Duration, window Span) Spans {
+	return Normalize(r.Occurrences(dtstart, dur, window))
+}
+
+// Occurrences is Expand without the merge: every occurrence overlapping
+// window, in order, each its own span, so back-to-back instances stay two.
+// It is what a caller listing instances needs; busy-time arithmetic wants
+// Expand.
+func (r Recurrence) Occurrences(dtstart time.Time, dur time.Duration, window Span) []Span {
 	if dur <= 0 || window.Empty() {
 		return nil
 	}
@@ -200,7 +208,7 @@ func (r Recurrence) Expand(dtstart time.Time, dur time.Duration, window Span) Sp
 	}
 
 	if !emit(dtstart) {
-		return Normalize(out)
+		return out
 	}
 	first := 1
 	if r.Count == 0 {
@@ -231,7 +239,7 @@ func (r Recurrence) Expand(dtstart time.Time, dur time.Duration, window Span) Sp
 			break
 		}
 	}
-	return Normalize(out)
+	return out
 }
 
 // matches reports whether local day d (midnight) is an occurrence day of a

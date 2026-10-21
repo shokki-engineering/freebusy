@@ -69,6 +69,32 @@ func jsonToStruct(r *json.RawMessage) *structpb.Struct {
 	return s
 }
 
+// strPtrsToSlice / strSliceToPtrs cross the text[] boundary: the client
+// represents array elements as nullable (*string).
+func strPtrsToSlice(in []*string) []string {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(in))
+	for _, p := range in {
+		if p != nil {
+			out = append(out, *p)
+		}
+	}
+	return out
+}
+
+func strSliceToPtrs(in []string) []*string {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]*string, 0, len(in))
+	for i := range in {
+		out = append(out, &in[i])
+	}
+	return out
+}
+
 // reservationToCreateInput maps the proto onto the client's insert input.
 // Identity (id, name resolution), parentage, audit timestamps, and etag are
 // set by the adapter.
@@ -108,6 +134,14 @@ func reservationFromRow(row *resourceql.ReservationResource) *reservationpbv1.Re
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.StartTime = strToTs(repox.Deref(row.StartTime))
+	out.EndTime = strToTs(repox.Deref(row.EndTime))
 	out.State = reservationpbv1.ReservationState(reservationpbv1.ReservationState_value["RESERVATION_STATE_"+repox.Deref(row.State)])
+	out.CancelReason = repox.Deref(row.CancelReason)
+	out.ConfirmTime = strToTs(repox.Deref(row.ConfirmTime))
+	out.CancelTime = strToTs(repox.Deref(row.CancelTime))
+	out.Replaces = repox.Deref(row.Replaces)
+	out.Replacement = repox.Deref(row.Replacement)
+	out.Resources = strPtrsToSlice(row.Resources)
 	return out
 }

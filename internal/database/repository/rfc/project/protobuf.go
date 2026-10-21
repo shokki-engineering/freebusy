@@ -16,9 +16,9 @@
 package project
 
 import (
+	projectpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/shared/project/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/projectql/resourceql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/shared/project/v1/projectpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
@@ -104,6 +104,9 @@ func projectFromRow(row *resourceql.ProjectResource) *projectpbv1.Project {
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.Uid = repox.Deref(row.Uid)
 	out.State = projectpbv1.ProjectState(projectpbv1.ProjectState_value["PROJECT_STATE_"+repox.Deref(row.State)])
+	out.DeleteTime = strToTs(repox.Deref(row.DeleteTime))
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
 	return out
 }

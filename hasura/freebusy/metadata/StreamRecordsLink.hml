@@ -1,0 +1,157 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: StreamRecordsLink
+  fields:
+    - name: id
+      type: String_1!
+    - name: recordId
+      type: String_1!
+    - name: referenceTimeValue
+      type: Float64
+    - name: streamId
+      type: String_1!
+  graphql:
+    typeName: StreamRecordsLink
+    inputTypeName: StreamRecordsLinkInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: stream_records_link
+      fieldMapping:
+        id:
+          column:
+            name: id
+        recordId:
+          column:
+            name: record_id
+        referenceTimeValue:
+          column:
+            name: reference_time_value
+        streamId:
+          column:
+            name: stream_id
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: StreamRecordsLink
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - id
+          - recordId
+          - referenceTimeValue
+          - streamId
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: StreamRecordsLinkBoolExp
+  operand:
+    object:
+      type: StreamRecordsLink
+      comparableFields:
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: recordId
+          booleanExpressionType: TextBoolExp
+        - fieldName: referenceTimeValue
+          booleanExpressionType: Float8BoolExp
+        - fieldName: streamId
+          booleanExpressionType: TextBoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: StreamRecordsLinkBoolExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: StreamRecordsLinkAggExp
+  operand:
+    object:
+      aggregatedType: StreamRecordsLink
+      aggregatableFields:
+        - fieldName: id
+          aggregateExpression: TextAggExp
+        - fieldName: recordId
+          aggregateExpression: TextAggExp
+        - fieldName: referenceTimeValue
+          aggregateExpression: Float8AggExp
+        - fieldName: streamId
+          aggregateExpression: TextAggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: StreamRecordsLinkAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: StreamRecordsLinkOrderByExp
+  operand:
+    object:
+      orderedType: StreamRecordsLink
+      orderableFields:
+        - fieldName: id
+          orderByExpression: String1OrderByExp
+        - fieldName: recordId
+          orderByExpression: String1OrderByExp
+        - fieldName: referenceTimeValue
+          orderByExpression: Float64OrderByExp
+        - fieldName: streamId
+          orderByExpression: String1OrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: StreamRecordsLinkOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: StreamRecordsLink
+  objectType: StreamRecordsLink
+  source:
+    dataConnectorName: freebusy_pgsql
+    collection: stream_records_link
+  filterExpressionType: StreamRecordsLinkBoolExp
+  aggregateExpression: StreamRecordsLinkAggExp
+  orderByExpression: StreamRecordsLinkOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: streamRecordsLink
+      subscription:
+        rootField: streamRecordsLink
+    selectUniques:
+      - queryRootField: streamRecordsLinkById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: streamRecordsLinkById
+    filterInputTypeName: StreamRecordsLinkFilterInput
+    aggregate:
+      queryRootField: streamRecordsLinkAggregate
+      subscription:
+        rootField: streamRecordsLinkAggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: StreamRecordsLink
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+

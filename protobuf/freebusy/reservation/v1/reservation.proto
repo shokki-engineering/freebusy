@@ -72,7 +72,7 @@ message Reservation {
   // Format: resources/{resource}
   repeated string resources = 3 [
     (google.api.field_behavior) = OUTPUT_ONLY,
-    (google.api.resource_reference).type = "protobufrfc.dev/Resource"
+    (google.api.resource_reference).type = "the-protobuf-project.org/Resource"
   ];
 
   // Start of the reserved window, copied from the hold.

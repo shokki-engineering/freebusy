@@ -21,7 +21,7 @@ default:
 # engine restarted. This does that end to end.
 #
 #   domain   Optional. Limits the clean+regen to one domain's models (matched by
-#            the graphql-cased metadata prefix, e.g. "promocode"). Use this for
+#            the graphql-cased metadata prefix, e.g. "reservation"). Use this for
 #            an additive change confined to one service. OMIT it for a full clean
 #            regen of every generated model/command/type — required when the
 #            change is breaking or spans domains (a dropped enum, a shared scalar
@@ -30,7 +30,7 @@ default:
 #            one. The DataConnectorLink is preserved in both modes.
 #
 #   just hasura regen             # FULL clean regen (breaking/multi-domain)
-#   just hasura regen promocode   # only the promocode models (additive)
+#   just hasura regen reservation # only the reservation models (additive)
 #
 # Env toggles:
 #   SKIP_RESTART=1   skip rebuilding/restarting the local engine
@@ -141,4 +141,4 @@ regen domain="":
 
     log "done — verify with:"
     printf '    curl -s -X POST %s -H '\''content-type: application/json'\'' \\\n' "$GRAPHQL_URL"
-    printf '      -d '\''{"query":"{ __type(name:\\"PromocodeDiscounts\\"){ name fields { name } } }"}'\''\n'
+    printf '      -d '\''{"query":"{ __type(name:\\"AllocationHolds\\"){ name fields { name } } }"}'\''\n'

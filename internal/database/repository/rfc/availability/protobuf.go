@@ -16,13 +16,15 @@
 package availability
 
 import (
+	rfcavailabilitypbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/availabilityql/availabilitiesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/availabilityql/availableperiodsql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/availabilityql/calendartimesql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7953/availability/v1/rfcavailabilitypbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/genproto/googleapis/type/date"
+	"google.golang.org/genproto/googleapis/type/datetime"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"strings"
@@ -44,6 +46,44 @@ func strToTs(s string) *timestamppb.Timestamp {
 	for _, layout := range []string{time.RFC3339Nano, time.RFC3339, "2006-01-02T15:04:05.999999Z07:00", "2006-01-02T15:04:05"} {
 		if t, err := time.Parse(layout, s); err == nil {
 			return timestamppb.New(t)
+		}
+	}
+	return nil
+}
+
+// dtToStr / strToDt cross the timestamptz boundary for a google.type.DateTime:
+// written as the instant it denotes (a time zone through the IANA database, a
+// UTC offset as a fixed zone, a floating value as UTC), read back in UTC.
+func dtToStr(d *datetime.DateTime) string {
+	if d == nil {
+		return ""
+	}
+	loc := time.UTC
+	switch {
+	case d.GetTimeZone().GetId() != "":
+		if l, err := time.LoadLocation(d.GetTimeZone().GetId()); err == nil {
+			loc = l
+		}
+	case d.GetUtcOffset() != nil:
+		loc = time.FixedZone("", int(d.GetUtcOffset().AsDuration()/time.Second))
+	}
+	return time.Date(int(d.GetYear()), time.Month(d.GetMonth()), int(d.GetDay()),
+		int(d.GetHours()), int(d.GetMinutes()), int(d.GetSeconds()), int(d.GetNanos()), loc).
+		UTC().Format(time.RFC3339Nano)
+}
+
+func strToDt(s string) *datetime.DateTime {
+	if s == "" {
+		return nil
+	}
+	for _, layout := range []string{time.RFC3339Nano, time.RFC3339, "2006-01-02T15:04:05.999999Z07:00", "2006-01-02T15:04:05"} {
+		if t, err := time.Parse(layout, s); err == nil {
+			u := t.UTC()
+			return &datetime.DateTime{
+				Year: int32(u.Year()), Month: int32(u.Month()), Day: int32(u.Day()),
+				Hours: int32(u.Hour()), Minutes: int32(u.Minute()), Seconds: int32(u.Second()), Nanos: int32(u.Nanosecond()),
+				TimeOffset: &datetime.DateTime_UtcOffset{UtcOffset: durationpb.New(0)},
+			}
 		}
 	}
 	return nil
@@ -128,6 +168,12 @@ func availabilityToCreateInput(in *rfcavailabilitypbv1.Availability) availabilit
 	ci.Organizer = in.GetOrganizer()
 	ci.Priority = int32(in.GetPriority())
 	ci.Categories = strSliceToPtrs(in.GetCategories())
+	switch in.GetEndForm().(type) {
+	case *rfcavailabilitypbv1.Availability_End:
+		ci.EndFormCase = "END"
+	case *rfcavailabilitypbv1.Availability_Duration:
+		ci.EndFormCase = "DURATION"
+	}
 	return ci
 }
 
@@ -173,6 +219,14 @@ func availabilityToUpdatePatch(merged *rfcavailabilitypbv1.Availability) availab
 		patch.Priority = graphql.Null[int32]()
 	}
 	patch.Categories = graphql.Value(strSliceToPtrs(merged.GetCategories()))
+	switch merged.GetEndForm().(type) {
+	case *rfcavailabilitypbv1.Availability_End:
+		patch.EndFormCase = graphql.Value("END")
+	case *rfcavailabilitypbv1.Availability_Duration:
+		patch.EndFormCase = graphql.Value("DURATION")
+	default:
+		patch.EndFormCase = graphql.Null[string]()
+	}
 	return patch
 }
 
@@ -197,6 +251,9 @@ func availabilityFromRow(row *availabilitiesql.AvailabilityAvailabilities) *rfca
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.Uid = repox.Deref(row.Uid)
+	out.DeleteTime = strToTs(repox.Deref(row.DeleteTime))
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
 	return out
 }
 
@@ -207,7 +264,15 @@ func availabilityCalendarTimeToCreateInput(in *rfcavailabilitypbv1.CalendarTime)
 	if v := dateToStr(in.GetDate()); v != "" {
 		ci.Date = v
 	}
-	// not mapped here: date_time (unsupported scalar shape)
+	if v := dtToStr(in.GetDateTime()); v != "" {
+		ci.DateTime = v
+	}
+	switch in.GetValue().(type) {
+	case *rfcavailabilitypbv1.CalendarTime_Date:
+		ci.ValueCase = "DATE"
+	case *rfcavailabilitypbv1.CalendarTime_DateTime:
+		ci.ValueCase = "DATE_TIME"
+	}
 	return ci
 }
 
@@ -220,5 +285,50 @@ func availabilityCalendarTimeFromRow(row *calendartimesql.AvailabilityCalendarTi
 	if v := strToDate(repox.Deref(row.Date)); v != nil {
 		out.Value = &rfcavailabilitypbv1.CalendarTime_Date{Date: v}
 	}
+	if v := strToDt(repox.Deref(row.DateTime)); v != nil {
+		out.Value = &rfcavailabilitypbv1.CalendarTime_DateTime{DateTime: v}
+	}
+	return out
+}
+
+// availabilityAvailablePeriodToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func availabilityAvailablePeriodToCreateInput(in *rfcavailabilitypbv1.AvailablePeriod) availableperiodsql.CreateInput {
+	var ci availableperiodsql.CreateInput
+	ci.IcalUid = in.GetIcalUid()
+	if v := durToStr(in.GetDuration()); v != "" {
+		ci.Duration = v
+	}
+	ci.Summary = in.GetSummary()
+	ci.Description = in.GetDescription()
+	ci.Location = in.GetLocation()
+	ci.RecurrenceRule = in.GetRecurrenceRule()
+	ci.Categories = strSliceToPtrs(in.GetCategories())
+	ci.Comments = strSliceToPtrs(in.GetComments())
+	switch in.GetEndForm().(type) {
+	case *rfcavailabilitypbv1.AvailablePeriod_End:
+		ci.EndFormCase = "END"
+	case *rfcavailabilitypbv1.AvailablePeriod_Duration:
+		ci.EndFormCase = "DURATION"
+	}
+	return ci
+}
+
+// availabilityAvailablePeriodFromRow re-hydrates the value-object proto from a client row.
+func availabilityAvailablePeriodFromRow(row *availableperiodsql.AvailabilityAvailablePeriods) *rfcavailabilitypbv1.AvailablePeriod {
+	if row == nil {
+		return nil
+	}
+	out := &rfcavailabilitypbv1.AvailablePeriod{}
+	out.IcalUid = repox.Deref(row.IcalUid)
+	if v := strToDur(repox.Deref(row.Duration)); v != nil {
+		out.EndForm = &rfcavailabilitypbv1.AvailablePeriod_Duration{Duration: v}
+	}
+	out.Summary = repox.Deref(row.Summary)
+	out.Description = repox.Deref(row.Description)
+	out.Location = repox.Deref(row.Location)
+	out.RecurrenceRule = repox.Deref(row.RecurrenceRule)
+	out.Categories = strPtrsToSlice(row.Categories)
+	out.Comments = strPtrsToSlice(row.Comments)
 	return out
 }

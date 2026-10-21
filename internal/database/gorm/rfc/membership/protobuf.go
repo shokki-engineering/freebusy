@@ -17,7 +17,7 @@ package membership
 import (
 	"time"
 
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/membership/v1/membershippbv1"
+	membershippbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/membership/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

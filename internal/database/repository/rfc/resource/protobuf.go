@@ -16,11 +16,16 @@
 package resource
 
 import (
+	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
+	"encoding/base64"
+	"encoding/hex"
+	"encoding/json"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/resourceql/entityql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/resourceql/structureddatasql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9073/resource/v1/resourcepbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"strings"
 	"time"
 )
 
@@ -42,6 +47,37 @@ func strToTs(s string) *timestamppb.Timestamp {
 		}
 	}
 	return nil
+}
+
+// bytesToRaw / rawToBytes cross the bytea boundary in Postgres hex form
+// ("\x<hex>"), the representation ndc-postgres round-trips.
+func bytesToRaw(b []byte) json.RawMessage {
+	if len(b) == 0 {
+		return nil
+	}
+	out, _ := json.Marshal(`\x` + hex.EncodeToString(b))
+	return out
+}
+
+func rawToBytes(r *json.RawMessage) []byte {
+	if r == nil {
+		return nil
+	}
+	var s string
+	if err := json.Unmarshal(*r, &s); err != nil || s == "" {
+		return nil
+	}
+	if strings.HasPrefix(s, `\x`) {
+		if b, err := hex.DecodeString(s[2:]); err == nil {
+			return b
+		}
+		return nil
+	}
+	b, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		return nil
+	}
+	return b
 }
 
 // strPtrsToSlice / strSliceToPtrs cross the text[] boundary: the client
@@ -146,5 +182,48 @@ func resourceFromRow(row *entityql.ResourceEntity) *resourcepbv1.Resource {
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.Uid = repox.Deref(row.Uid)
+	out.DeleteTime = strToTs(repox.Deref(row.DeleteTime))
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
+	return out
+}
+
+// resourceStructuredDataToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func resourceStructuredDataToCreateInput(in *resourcepbv1.StructuredData) structureddatasql.CreateInput {
+	var ci structureddatasql.CreateInput
+	ci.Text = in.GetText()
+	ci.Uri = in.GetUri()
+	ci.Binary = bytesToRaw(in.GetBinary())
+	ci.FormatType = in.GetFormatType()
+	ci.Schema = in.GetSchema()
+	switch in.GetValue().(type) {
+	case *resourcepbv1.StructuredData_Text:
+		ci.ValueCase = "TEXT"
+	case *resourcepbv1.StructuredData_Uri:
+		ci.ValueCase = "URI"
+	case *resourcepbv1.StructuredData_Binary:
+		ci.ValueCase = "BINARY"
+	}
+	return ci
+}
+
+// resourceStructuredDataFromRow re-hydrates the value-object proto from a client row.
+func resourceStructuredDataFromRow(row *structureddatasql.ResourceStructuredDatas) *resourcepbv1.StructuredData {
+	if row == nil {
+		return nil
+	}
+	out := &resourcepbv1.StructuredData{}
+	if row.Text != nil {
+		out.Value = &resourcepbv1.StructuredData_Text{Text: repox.Deref(row.Text)}
+	}
+	if row.Uri != nil {
+		out.Value = &resourcepbv1.StructuredData_Uri{Uri: repox.Deref(row.Uri)}
+	}
+	if v := rawToBytes(row.Binary); v != nil {
+		out.Value = &resourcepbv1.StructuredData_Binary{Binary: v}
+	}
+	out.FormatType = repox.Deref(row.FormatType)
+	out.Schema = repox.Deref(row.Schema)
 	return out
 }

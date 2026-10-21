@@ -16,12 +16,12 @@
 package group
 
 import (
+	ldapgrouppbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/group/v1"
+	scimgrouppbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/group/v1"
 	"context"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/group/v1/ldapgrouppbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7643/group/v1/scimgrouppbv1"
 	"gorm.io/gorm"
 )
 
@@ -40,8 +40,15 @@ type GroupRepository interface {
 	// mutable field. m.Etag, when set, guards against concurrent writes
 	// (repox.ErrConflict).
 	Update(ctx context.Context, m *scimgrouppbv1.Group, paths []string) (*scimgrouppbv1.Group, error)
-	// Delete removes the record addressed by its resource name.
+	// Delete soft-deletes the record addressed by its resource name (AIP-164):
+	// Get still returns it, with delete_time set; List skips it unless
+	// ShowDeleted. repox.ErrNotFound when absent or already deleted.
 	Delete(ctx context.Context, name string) error
+	// Undelete restores a soft-deleted record and returns it;
+	// repox.ErrAlreadyExists when it is not deleted.
+	Undelete(ctx context.Context, name string) (*scimgrouppbv1.Group, error)
+	// Purge removes the record, deleted or not, for good.
+	Purge(ctx context.Context, name string) error
 }
 
 // GroupHooks lets custom logic run inside the generated Group
@@ -56,7 +63,8 @@ type GroupHooks struct {
 	// BeforeUpdate runs after the mask is applied to the merged record,
 	// before it is written.
 	BeforeUpdate func(ctx context.Context, existing, merged *scimgrouppbv1.Group, paths []string) error
-	// BeforeDelete runs before the row is removed; returning an error vetoes.
+	// BeforeDelete runs before the row is removed (or, with soft delete,
+	// marked deleted); returning an error vetoes.
 	BeforeDelete func(ctx context.Context, name string) error
 }
 
@@ -75,8 +83,15 @@ type LdapGroupRepository interface {
 	// mutable field. m.Etag, when set, guards against concurrent writes
 	// (repox.ErrConflict).
 	Update(ctx context.Context, m *ldapgrouppbv1.LdapGroup, paths []string) (*ldapgrouppbv1.LdapGroup, error)
-	// Delete removes the record addressed by its resource name.
+	// Delete soft-deletes the record addressed by its resource name (AIP-164):
+	// Get still returns it, with delete_time set; List skips it unless
+	// ShowDeleted. repox.ErrNotFound when absent or already deleted.
 	Delete(ctx context.Context, name string) error
+	// Undelete restores a soft-deleted record and returns it;
+	// repox.ErrAlreadyExists when it is not deleted.
+	Undelete(ctx context.Context, name string) (*ldapgrouppbv1.LdapGroup, error)
+	// Purge removes the record, deleted or not, for good.
+	Purge(ctx context.Context, name string) error
 }
 
 // LdapGroupHooks lets custom logic run inside the generated LdapGroup
@@ -91,7 +106,8 @@ type LdapGroupHooks struct {
 	// BeforeUpdate runs after the mask is applied to the merged record,
 	// before it is written.
 	BeforeUpdate func(ctx context.Context, existing, merged *ldapgrouppbv1.LdapGroup, paths []string) error
-	// BeforeDelete runs before the row is removed; returning an error vetoes.
+	// BeforeDelete runs before the row is removed (or, with soft delete,
+	// marked deleted); returning an error vetoes.
 	BeforeDelete func(ctx context.Context, name string) error
 }
 

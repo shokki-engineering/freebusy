@@ -35,8 +35,8 @@ type DeleteSharedIdempotencyKeysByIdResponse struct {
 		RequestId string `graphql:"requestId"`
 		// Response selects the "response" field; nil when the column is NULL.
 		Response *string `graphql:"response"`
-		// State selects the "state" field.
-		State string `graphql:"state"`
+		// State selects the "state" field; nil when the column is NULL.
+		State *string `graphql:"state"`
 		// UpdateTime selects the "updateTime" field.
 		UpdateTime string `graphql:"updateTime"`
 	} `graphql:"returning"`
@@ -60,8 +60,8 @@ type InsertSharedIdempotencyKeysResponse struct {
 		RequestId string `graphql:"requestId"`
 		// Response selects the "response" field; nil when the column is NULL.
 		Response *string `graphql:"response"`
-		// State selects the "state" field.
-		State string `graphql:"state"`
+		// State selects the "state" field; nil when the column is NULL.
+		State *string `graphql:"state"`
 		// UpdateTime selects the "updateTime" field.
 		UpdateTime string `graphql:"updateTime"`
 	} `graphql:"returning"`
@@ -83,8 +83,8 @@ type SharedIdempotencyKeys struct {
 	RequestId string `graphql:"requestId"`
 	// Response selects the "response" field; nil when the column is NULL.
 	Response *string `graphql:"response"`
-	// State selects the "state" field.
-	State string `graphql:"state"`
+	// State selects the "state" field; nil when the column is NULL.
+	State *string `graphql:"state"`
 	// UpdateTime selects the "updateTime" field.
 	UpdateTime string `graphql:"updateTime"`
 }
@@ -202,8 +202,8 @@ type UpdateSharedIdempotencyKeysByIdResponse struct {
 		RequestId string `graphql:"requestId"`
 		// Response selects the "response" field; nil when the column is NULL.
 		Response *string `graphql:"response"`
-		// State selects the "state" field.
-		State string `graphql:"state"`
+		// State selects the "state" field; nil when the column is NULL.
+		State *string `graphql:"state"`
 		// UpdateTime selects the "updateTime" field.
 		UpdateTime string `graphql:"updateTime"`
 	} `graphql:"returning"`

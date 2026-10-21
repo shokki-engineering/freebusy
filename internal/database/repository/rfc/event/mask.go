@@ -16,8 +16,8 @@
 package event
 
 import (
+	eventpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/event/v1/eventpbv1"
 )
 
 // applyEventMask merges the masked fields of in onto merged. An empty
@@ -40,9 +40,6 @@ func applyEventMask(merged, in *eventpbv1.Event, paths []string) {
 	}
 	if repox.InMask(paths, "location") {
 		merged.Location = in.GetLocation()
-	}
-	if repox.GroupTouched(paths, "duration") {
-		merged.Ends = in.Ends
 	}
 	if repox.InMask(paths, "confirmation") {
 		merged.Confirmation = in.GetConfirmation()
@@ -67,5 +64,26 @@ func applyEventMask(merged, in *eventpbv1.Event, paths []string) {
 	}
 	if repox.GroupTouched(paths, "organizer") {
 		merged.Organizer = in.GetOrganizer()
+	}
+	if repox.GroupTouched(paths, "start") {
+		merged.Start = in.GetStart()
+	}
+	if repox.GroupTouched(paths, "duration") || repox.GroupTouched(paths, "end") || repox.GroupTouched(paths, "duration") {
+		merged.Ends = in.Ends
+	}
+	if repox.GroupTouched(paths, "recurrence") {
+		merged.Recurrence = in.GetRecurrence()
+	}
+	if repox.GroupTouched(paths, "alarms") {
+		merged.Alarms = in.GetAlarms()
+	}
+	if repox.GroupTouched(paths, "extensions") {
+		merged.Extensions = in.GetExtensions()
+	}
+	if repox.GroupTouched(paths, "links") {
+		merged.Links = in.GetLinks()
+	}
+	if repox.GroupTouched(paths, "participants") {
+		merged.Participants = in.GetParticipants()
 	}
 }

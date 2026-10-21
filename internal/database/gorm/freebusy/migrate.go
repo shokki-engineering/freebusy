@@ -4,7 +4,7 @@
 // 	protoc (unknown)
 //
 // database: freebusy
-// schemas:  allocation, pricing, promocode, property, reservation, shared, common
+// schemas:  allocation, reservation, shared
 //
 // Migration aggregator: every model in one factory Registry.
 // annotations: entity.v1 1.5.4, store.v1 1.5.4
@@ -20,10 +20,6 @@ package freebusy
 
 import (
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/allocation"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/common"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/pricing"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/promocode"
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/property"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/reservation"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/shared"
 
@@ -42,12 +38,8 @@ type Migrator interface {
 // EnsureSchemas can create them before AutoMigrate builds schema-qualified tables.
 var schemas = []string{
 	"allocation",
-	"pricing",
-	"promocode",
-	"property",
 	"reservation",
 	"shared",
-	"common",
 }
 
 // extensions lists the Postgres extensions the models' search indexes are built
@@ -119,27 +111,8 @@ func (*Registry) EnsureSchemas(db *gorm.DB) error {
 var Default = New().Register(
 	&allocation.Hold{},
 	&allocation.Allocation{},
-	&pricing.RatePlan{},
-	&pricing.RateOverride{},
-	&pricing.LosDiscount{},
-	&pricing.Fee{},
-	&pricing.Tax{},
-	&pricing.DynamicRule{},
-	&pricing.PriceBounds{},
-	&pricing.DateRange{},
-	&pricing.DynamicBand{},
-	&pricing.Adjustment{},
-	&promocode.PromoCode{},
-	&promocode.Redemption{},
-	&promocode.Discount{},
-	&promocode.RedemptionWindow{},
-	&promocode.UsageLimits{},
-	&promocode.Scope{},
-	&property.Licence{},
 	&reservation.Reservation{},
 	&shared.IdempotencyKey{},
-	&shared.Attachment{},
-	&common.Money{},
 )
 
 // Instrument installs the generated first-party telemetry GORM plugin on

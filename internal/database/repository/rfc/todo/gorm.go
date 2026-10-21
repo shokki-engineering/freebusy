@@ -16,14 +16,16 @@
 package todo
 
 import (
+	todopbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/todo/v1"
 	"context"
 	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/todo"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/todo/v1/todopbv1"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"time"
 )
 
 // GormTodoRepository is the GORM adapter of TodoRepository: flat
@@ -103,7 +105,18 @@ func (r *GormTodoRepository) Create(ctx context.Context, parent string, in *todo
 			}
 			m.CompletedID = repox.Ptr(vo.ID)
 		}
-		return todo.NewTodoStore(tx).Create(ctx, m)
+		if err := todo.NewTodoStore(tx).Create(ctx, m); err != nil {
+			return err
+		}
+		for _, v1 := range in.GetExtensions() {
+			n2 := todo.ExtensionPropertyFromProto(v1)
+			n2.ID = repox.NewULID()
+			n2.TodoID = id
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n2).Error; err != nil {
+				return err
+			}
+		}
+		return nil
 	}); err != nil {
 		return nil, repox.MapGormErr(err)
 	}
@@ -123,7 +136,7 @@ func (r *GormTodoRepository) Get(ctx context.Context, name string) (*todopbv1.To
 // through, so Tier-2 overrides of Get never re-enter generated writes.
 func (r *GormTodoRepository) get(ctx context.Context, id string) (*todopbv1.Todo, error) {
 	var m todo.Todo
-	if err := r.DB.WithContext(ctx).Preload("Start").Preload("Due").Preload("Completed").First(&m, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("Start").Preload("Due").Preload("Completed").Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&m, "id = ?", id).Error; err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.toProto(ctx, &m)
@@ -152,6 +165,9 @@ func (r *GormTodoRepository) List(ctx context.Context, parent string, in repox.L
 }
 
 func (r *GormTodoRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*todopbv1.Todo, string, error) {
+	if !in.ShowDeleted {
+		scope = scope.Where("delete_time IS NULL")
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -160,7 +176,7 @@ func (r *GormTodoRepository) list(ctx context.Context, scope *gorm.DB, in repox.
 	for f, h := range r.ListOverrides {
 		eng.Override(f, h)
 	}
-	rows, next, err := eng.List(ctx, scope.Preload("Start").Preload("Due").Preload("Completed"), filterx.ListInput{
+	rows, next, err := eng.List(ctx, scope.Preload("Start").Preload("Due").Preload("Completed").Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }), filterx.ListInput{
 		PageSize:  in.PageSize,
 		PageToken: in.PageToken,
 		OrderBy:   in.OrderBy,
@@ -190,12 +206,13 @@ func (r *GormTodoRepository) Update(ctx context.Context, in *todopbv1.Todo, path
 	id := ids[len(ids)-1]
 	err = r.DB.Transaction(func(tx *gorm.DB) error {
 		var existing todo.Todo
-		if err := tx.WithContext(ctx).Preload("Start").Preload("Due").Preload("Completed").First(&existing, "id = ?", id).Error; err != nil {
+		if err := tx.WithContext(ctx).Preload("Start").Preload("Due").Preload("Completed").Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 			return err
 		}
 		var staleStart string
 		var staleDue string
 		var staleCompleted string
+		var staleExtensions []todo.ExtensionProperty
 		if in.GetEtag() != "" && existing.Etag != nil && *existing.Etag != in.GetEtag() {
 			return repox.ErrConflict
 		}
@@ -219,6 +236,7 @@ func (r *GormTodoRepository) Update(ctx context.Context, in *todopbv1.Todo, path
 		existing.Priority = next.Priority
 		existing.Completion = next.Completion
 		existing.Classification = next.Classification
+		existing.DeadlineCase = next.DeadlineCase
 		if repox.GroupTouched(paths, "start") {
 			if existing.StartID != nil {
 				staleStart = *existing.StartID
@@ -233,12 +251,11 @@ func (r *GormTodoRepository) Update(ctx context.Context, in *todopbv1.Todo, path
 				existing.StartID = repox.Ptr(vo.ID)
 			}
 		}
-		if repox.GroupTouched(paths, "due") {
+		if repox.GroupTouched(paths, "due") || repox.GroupTouched(paths, "duration") {
 			if existing.DueID != nil {
 				staleDue = *existing.DueID
 			}
 			existing.DueID = nil
-			existing.DeadlineCase = nil
 			if v := merged.GetDue(); v != nil {
 				vo := todo.CalendarTimeFromProto(v)
 				vo.ID = repox.NewULID()
@@ -264,6 +281,18 @@ func (r *GormTodoRepository) Update(ctx context.Context, in *todopbv1.Todo, path
 				existing.CompletedID = repox.Ptr(vo.ID)
 			}
 		}
+		if repox.GroupTouched(paths, "extensions") {
+			staleExtensions = existing.ExtensionProperties
+			for _, v7 := range merged.GetExtensions() {
+				n8 := todo.ExtensionPropertyFromProto(v7)
+				n8.ID = repox.NewULID()
+				n8.TodoID = id
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n8).Error; err != nil {
+					return err
+				}
+			}
+		}
+		existing.ExtensionProperties = nil
 		existing.Etag = repox.Ptr(repox.NewULID())
 		if err := todo.NewTodoStore(tx).Update(ctx, &existing); err != nil {
 			return err
@@ -283,6 +312,12 @@ func (r *GormTodoRepository) Update(ctx context.Context, in *todopbv1.Todo, path
 				return err
 			}
 		}
+		for i5 := range staleExtensions {
+			d6 := &staleExtensions[i5]
+			if err := tx.WithContext(ctx).Delete(&todo.ExtensionProperty{}, "id = ?", d6.ID).Error; err != nil {
+				return err
+			}
+		}
 		return nil
 	})
 	if err != nil {
@@ -291,8 +326,54 @@ func (r *GormTodoRepository) Update(ctx context.Context, in *todopbv1.Todo, path
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GormTodoRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "calendars", "todos")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	res := r.DB.WithContext(ctx).Model(&todo.Todo{}).
+		Where("id = ? AND delete_time IS NULL", ids[len(ids)-1]).
+		Updates(map[string]any{"delete_time": time.Now(), "etag": repox.NewULID()})
+	if res.Error != nil {
+		return repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return repox.ErrNotFound
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GormTodoRepository) Undelete(ctx context.Context, name string) (*todopbv1.Todo, error) {
+	ids, err := repox.SplitName(name, "calendars", "todos")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	res := r.DB.WithContext(ctx).Model(&todo.Todo{}).
+		Where("id = ? AND delete_time IS NOT NULL", id).
+		Updates(map[string]any{"delete_time": nil, "etag": repox.NewULID()})
+	if res.Error != nil {
+		return nil, repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GormTodoRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "calendars", "todos")
 	if err != nil {
 		return err
@@ -304,7 +385,7 @@ func (r *GormTodoRepository) Delete(ctx context.Context, name string) error {
 	}
 	id := ids[len(ids)-1]
 	var existing todo.Todo
-	if err := r.DB.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("Start").Preload("Due").Preload("Completed").Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 		return repox.MapGormErr(err)
 	}
 	return repox.MapGormErr(r.DB.Transaction(func(tx *gorm.DB) error {
@@ -323,6 +404,12 @@ func (r *GormTodoRepository) Delete(ctx context.Context, name string) error {
 		}
 		if existing.CompletedID != nil {
 			if err := tx.WithContext(ctx).Delete(&todo.CalendarTime{}, "id = ?", *existing.CompletedID).Error; err != nil {
+				return err
+			}
+		}
+		for i3 := range existing.ExtensionProperties {
+			d4 := &existing.ExtensionProperties[i3]
+			if err := tx.WithContext(ctx).Delete(&todo.ExtensionProperty{}, "id = ?", d4.ID).Error; err != nil {
 				return err
 			}
 		}

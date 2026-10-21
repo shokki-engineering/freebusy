@@ -1,0 +1,205 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: StreamExtensionFields
+  fields:
+    - name: booleanValue
+      type: Boolean_1
+    - name: dataValue
+      type: Json
+    - name: id
+      type: String_1!
+    - name: label
+      type: String_1!
+    - name: numberValue
+      type: Float64
+    - name: recordId
+      type: String_1!
+    - name: stringValue
+      type: String_1
+    - name: valueCase
+      type: String_1
+  graphql:
+    typeName: StreamExtensionFields
+    inputTypeName: StreamExtensionFieldsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: stream_extension_fields
+      fieldMapping:
+        booleanValue:
+          column:
+            name: boolean_value
+        dataValue:
+          column:
+            name: data_value
+        id:
+          column:
+            name: id
+        label:
+          column:
+            name: label
+        numberValue:
+          column:
+            name: number_value
+        recordId:
+          column:
+            name: record_id
+        stringValue:
+          column:
+            name: string_value
+        valueCase:
+          column:
+            name: value_case
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: StreamExtensionFields
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - booleanValue
+          - dataValue
+          - id
+          - label
+          - numberValue
+          - recordId
+          - stringValue
+          - valueCase
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: StreamExtensionFieldsBoolExp
+  operand:
+    object:
+      type: StreamExtensionFields
+      comparableFields:
+        - fieldName: booleanValue
+          booleanExpressionType: BoolBoolExp
+        - fieldName: dataValue
+          booleanExpressionType: ByteaBoolExp
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: label
+          booleanExpressionType: TextBoolExp
+        - fieldName: numberValue
+          booleanExpressionType: Float8BoolExp
+        - fieldName: recordId
+          booleanExpressionType: TextBoolExp
+        - fieldName: stringValue
+          booleanExpressionType: TextBoolExp
+        - fieldName: valueCase
+          booleanExpressionType: TextBoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: StreamExtensionFieldsBoolExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: StreamExtensionFieldsAggExp
+  operand:
+    object:
+      aggregatedType: StreamExtensionFields
+      aggregatableFields:
+        - fieldName: booleanValue
+          aggregateExpression: BoolAggExp
+        - fieldName: dataValue
+          aggregateExpression: ByteaAggExp
+        - fieldName: id
+          aggregateExpression: TextAggExp
+        - fieldName: label
+          aggregateExpression: TextAggExp
+        - fieldName: numberValue
+          aggregateExpression: Float8AggExp
+        - fieldName: recordId
+          aggregateExpression: TextAggExp
+        - fieldName: stringValue
+          aggregateExpression: TextAggExp
+        - fieldName: valueCase
+          aggregateExpression: TextAggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: StreamExtensionFieldsAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: StreamExtensionFieldsOrderByExp
+  operand:
+    object:
+      orderedType: StreamExtensionFields
+      orderableFields:
+        - fieldName: booleanValue
+          orderByExpression: Boolean1OrderByExp
+        - fieldName: dataValue
+          orderByExpression: JsonOrderByExp
+        - fieldName: id
+          orderByExpression: String1OrderByExp
+        - fieldName: label
+          orderByExpression: String1OrderByExp
+        - fieldName: numberValue
+          orderByExpression: Float64OrderByExp
+        - fieldName: recordId
+          orderByExpression: String1OrderByExp
+        - fieldName: stringValue
+          orderByExpression: String1OrderByExp
+        - fieldName: valueCase
+          orderByExpression: String1OrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: StreamExtensionFieldsOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: StreamExtensionFields
+  objectType: StreamExtensionFields
+  source:
+    dataConnectorName: freebusy_pgsql
+    collection: stream_extension_fields
+  filterExpressionType: StreamExtensionFieldsBoolExp
+  aggregateExpression: StreamExtensionFieldsAggExp
+  orderByExpression: StreamExtensionFieldsOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: streamExtensionFields
+      subscription:
+        rootField: streamExtensionFields
+    selectUniques:
+      - queryRootField: streamExtensionFieldsById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: streamExtensionFieldsById
+    filterInputTypeName: StreamExtensionFieldsFilterInput
+    aggregate:
+      queryRootField: streamExtensionFieldsAggregate
+      subscription:
+        rootField: streamExtensionFieldsAggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: StreamExtensionFields
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+

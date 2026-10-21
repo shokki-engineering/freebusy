@@ -5,11 +5,9 @@ import (
 	"testing"
 
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/promocode/v1/promocodepbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"github.com/the-protobuf-project/runtime-go/grpc"
 	"google.golang.org/genproto/googleapis/type/interval"
-	"google.golang.org/genproto/googleapis/type/money"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
@@ -86,14 +84,6 @@ func TestValidationInterceptor_Services(t *testing.T) {
 		req     proto.Message
 		wantErr bool
 	}{
-		// organisation
-		// Stored-field emails are validated at request entry only: a member row
-		// created under looser rules must still accept a role-only update.
-
-		// identity
-
-		// property
-
 		// allocation
 		{"check availability missing window", &allocationpbv1.CheckAvailabilityRequest{Parent: "organizationalUnits/club"}, true},
 		{"check availability bad parent", &allocationpbv1.CheckAvailabilityRequest{Parent: "properties/p1", Window: window}, true},
@@ -101,21 +91,12 @@ func TestValidationInterceptor_Services(t *testing.T) {
 		{"batch compute empty", &allocationpbv1.BatchComputeAvailabilityRequest{}, true},
 		{"hold get bad name", &allocationpbv1.GetHoldRequest{Name: "holds/h1"}, true},
 
-		// promocode
-		{"promocode create no discount", &promocodepbv1.CreatePromoCodeRequest{PromoCode: &promocodepbv1.PromoCode{Code: "X"}}, true},
-		{"promocode create percent out of range", &promocodepbv1.CreatePromoCodeRequest{PromoCode: &promocodepbv1.PromoCode{Code: "X", Discount: &promocodepbv1.Discount{Amount: &promocodepbv1.Discount_PercentOff{PercentOff: 150}}}}, true},
-		{"promocode create ok", &promocodepbv1.CreatePromoCodeRequest{PromoCode: &promocodepbv1.PromoCode{Code: "X", Discount: &promocodepbv1.Discount{Amount: &promocodepbv1.Discount_PercentOff{PercentOff: 25}}}}, false},
-		{"promocode validate missing subtotal", &promocodepbv1.ValidatePromoCodeRequest{Code: "X"}, true},
-		{"promocode validate ok", &promocodepbv1.ValidatePromoCodeRequest{Code: "X", Subtotal: &money.Money{CurrencyCode: "USD", Units: 100}}, false},
-
 		// reservation
 		{"reservation create missing hold", &reservationpbv1.CreateReservationRequest{Parent: "organizationalUnits/club", Reservation: &reservationpbv1.Reservation{}}, true},
 		{"reservation create bad id", &reservationpbv1.CreateReservationRequest{Parent: "organizationalUnits/club", ReservationId: "Not_Valid", Reservation: &reservationpbv1.Reservation{Hold: "organizationalUnits/club/holds/h1"}}, true},
 		{"reservation create ok", &reservationpbv1.CreateReservationRequest{Parent: "organizationalUnits/club", Reservation: &reservationpbv1.Reservation{Hold: "organizationalUnits/club/holds/h1"}}, false},
 		{"reservation reschedule bad hold", &reservationpbv1.RescheduleReservationRequest{Name: "organizationalUnits/club/reservations/r1", Hold: "holds/h2"}, true},
 		{"reservation cancel ok", &reservationpbv1.CancelReservationRequest{Name: "organizationalUnits/club/reservations/r1"}, false},
-
-		// availability
 	}
 
 	for _, tc := range cases {

@@ -232,13 +232,13 @@ var File_freebusy_reservation_v1_reservation_proto protoreflect.FileDescriptor
 
 const file_freebusy_reservation_v1_reservation_proto_rawDesc = "" +
 	"\n" +
-	")freebusy/reservation/v1/reservation.proto\x12\x17freebusy.reservation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a#freebusy/reservation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\x8b\t\n" +
+	")freebusy/reservation/v1/reservation.proto\x12\x17freebusy.reservation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a#freebusy/reservation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\x94\t\n" +
 	"\vReservation\x12O\n" +
 	"\x04name\x18\x01 \x01(\tB;\xe0A\b\xbaH5\xd8\x01\x01r02.^organizationalUnits/[^/]+/reservations/[^/]+$R\x04name\x12n\n" +
 	"\x04hold\x18\x02 \x01(\tBZ\xe0A\x02\xe0A\x05\xfaA\x1d\n" +
-	"\x1bfreebusy.allocation.v1/Hold\xbaH+r)2'^organizationalUnits/[^/]+/holds/[^/]+$\xe2\xb5\x18\x02\x18\x01R\x04hold\x12>\n" +
-	"\tresources\x18\x03 \x03(\tB \xe0A\x03\xfaA\x1a\n" +
-	"\x18protobufrfc.dev/ResourceR\tresources\x12>\n" +
+	"\x1bfreebusy.allocation.v1/Hold\xbaH+r)2'^organizationalUnits/[^/]+/holds/[^/]+$\xe2\xb5\x18\x02\x18\x01R\x04hold\x12G\n" +
+	"\tresources\x18\x03 \x03(\tB)\xe0A\x03\xfaA#\n" +
+	"!the-protobuf-project.org/ResourceR\tresources\x12>\n" +
 	"\n" +
 	"start_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\tstartTime\x12:\n" +
 	"\bend_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\aendTime\x12<\n" +

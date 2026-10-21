@@ -16,8 +16,8 @@
 package orgunit
 
 import (
+	orgunitpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organizational_unit/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/organizational_unit/v1/orgunitpbv1"
 )
 
 // applyOrganizationalUnitMask merges the masked fields of in onto merged. An empty

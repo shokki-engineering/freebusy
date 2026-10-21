@@ -16,10 +16,13 @@
 package calendar
 
 import (
+	calendarpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/calendarql/extensionpropertiesql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/calendarql/resourceql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/commonql/timezonesql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/calendar/v1/calendarpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
+	"google.golang.org/genproto/googleapis/type/datetime"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"strings"
 	"time"
@@ -43,6 +46,32 @@ func strToTs(s string) *timestamppb.Timestamp {
 		}
 	}
 	return nil
+}
+
+// strPtrsToSlice / strSliceToPtrs cross the text[] boundary: the client
+// represents array elements as nullable (*string).
+func strPtrsToSlice(in []*string) []string {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(in))
+	for _, p := range in {
+		if p != nil {
+			out = append(out, *p)
+		}
+	}
+	return out
+}
+
+func strSliceToPtrs(in []string) []*string {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]*string, 0, len(in))
+	for i := range in {
+		out = append(out, &in[i])
+	}
+	return out
 }
 
 // calendarToCreateInput maps the proto onto the client's insert input.
@@ -93,5 +122,54 @@ func calendarFromRow(row *resourceql.CalendarResource) *calendarpbv1.Calendar {
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.Uid = repox.Deref(row.Uid)
+	out.DeleteTime = strToTs(repox.Deref(row.DeleteTime))
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
+	out.MaxResourceSize = int64(repox.Deref(row.MaxResourceSize))
+	out.MinDateTime = strToTs(repox.Deref(row.MinDateTime))
+	out.MaxDateTime = strToTs(repox.Deref(row.MaxDateTime))
+	out.MaxInstances = int32(repox.Deref(row.MaxInstances))
+	out.MaxAttendeesPerInstance = int32(repox.Deref(row.MaxAttendeesPerInstance))
+	return out
+}
+
+// commonTimeZoneToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func commonTimeZoneToCreateInput(in *datetime.TimeZone) timezonesql.CreateInput {
+	var ci timezonesql.CreateInput
+	ci.Id = in.GetId()
+	ci.Version = in.GetVersion()
+	return ci
+}
+
+// commonTimeZoneFromRow re-hydrates the value-object proto from a client row.
+func commonTimeZoneFromRow(row *timezonesql.CommonTimeZones) *datetime.TimeZone {
+	if row == nil {
+		return nil
+	}
+	out := &datetime.TimeZone{}
+	out.Id = row.Id
+	out.Version = repox.Deref(row.Version)
+	return out
+}
+
+// calendarExtensionPropertyToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func calendarExtensionPropertyToCreateInput(in *calendarpbv1.ExtensionProperty) extensionpropertiesql.CreateInput {
+	var ci extensionpropertiesql.CreateInput
+	ci.Key = in.GetKey()
+	ci.Values = strSliceToPtrs(in.GetValues())
+	// not mapped here: parameters (unsupported scalar shape)
+	return ci
+}
+
+// calendarExtensionPropertyFromRow re-hydrates the value-object proto from a client row.
+func calendarExtensionPropertyFromRow(row *extensionpropertiesql.CalendarExtensionProperties) *calendarpbv1.ExtensionProperty {
+	if row == nil {
+		return nil
+	}
+	out := &calendarpbv1.ExtensionProperty{}
+	out.Key = row.Key
+	out.Values = strPtrsToSlice(row.Values)
 	return out
 }

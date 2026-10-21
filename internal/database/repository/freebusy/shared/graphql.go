@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: freebusy/shared/v1/idempotency.proto, freebusy/shared/v1/types.proto
+// source: freebusy/shared/v1/idempotency.proto
 //
 // database: freebusy
 // schema:   shared

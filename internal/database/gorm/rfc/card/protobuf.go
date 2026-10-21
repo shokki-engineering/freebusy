@@ -17,8 +17,8 @@ package card
 import (
 	"time"
 
+	cardpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9553/card/v1"
 	"github.com/lib/pq"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9553/card/v1/cardpbv1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -312,6 +312,9 @@ func NameToProto(m *Name) *cardpbv1.Name {
 	out.DisplayName = fromPtr(m.DisplayName)
 	out.PhoneticScript = fromPtr(m.PhoneticScript)
 	out.PhoneticSystem = PhoneticSystemPtrToProto(m.PhoneticSystem)
+	for i := range m.NameComponents {
+		out.Components = append(out.Components, NameComponentToProto(&m.NameComponents[i]))
+	}
 	return out
 }
 
@@ -323,7 +326,7 @@ func NameFromProto(pb *cardpbv1.Name) *Name {
 		return nil
 	}
 	m := &Name{}
-	// not mapped here: sort_as
+	// not mapped here: sort_as, components (sub-row graph)
 	m.IsOrdered = toPtr(pb.GetIsOrdered())
 	m.DefaultSeparator = toPtr(pb.GetDefaultSeparator())
 	m.DisplayName = toPtr(pb.GetDisplayName())

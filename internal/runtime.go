@@ -2,18 +2,27 @@ package internal
 
 import (
 	"context"
-	"github.com/oh-tarnished/freebusy/internal/service/pricing"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/pricing/v1/pricingpbv1"
 
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/calendar/v1/calendarv1grpc"
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/event/v1/eventv1grpc"
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc7953/availability/v1/availabilityv1grpc"
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc9073/resource/v1/resourcev1grpc"
 	"github.com/oh-tarnished/freebusy/internal/database"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
 	allocationdb "github.com/oh-tarnished/freebusy/internal/service/allocation/db"
-	"github.com/oh-tarnished/freebusy/internal/service/promocode"
 	"github.com/oh-tarnished/freebusy/internal/service/reservation"
 	reservationdb "github.com/oh-tarnished/freebusy/internal/service/reservation/db"
+	"github.com/oh-tarnished/freebusy/internal/service/rfcsvc"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/promocode/v1/promocodepbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
+	calendarv1gw "github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc5545/calendar/v1"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc5545/calendar/v1/calendarv1mcp"
+	eventv1gw "github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc5545/event/v1"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc5545/event/v1/eventv1mcp"
+	availabilityv1gw "github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc7953/availability/v1"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc7953/availability/v1/availabilityv1mcp"
+	resourcev1gw "github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc9073/resource/v1"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/rfc/protobuf/rfc9073/resource/v1/resourcev1mcp"
 	"github.com/the-protobuf-project/runtime-go/grpc"
 )
 
@@ -31,10 +40,9 @@ func newServiceInstance(conn *database.Connection) (*Service, error) {
 	}
 	engine := allocation.NewServer(allocationdb.New(conn))
 	svc := NewService(
-		promocode.New(conn),
-		pricing.New(conn),
 		engine,
 		reservation.NewServer(reservationdb.New(conn), engine),
+		rfcsvc.NewRepositories(conn.Repox()),
 	)
 	svc.conn = conn
 	return svc, nil
@@ -52,11 +60,13 @@ func registerGRPCServers(svc *Service) grpc.Option {
 // hybrid server's multiplexer in production, a standalone server in the e2e
 // suites.
 func registerServices(s *grpc.GRPCServer, svc *Service) {
-	promocodepbv1.RegisterPromoCodeServiceServer(s, svc)
-	pricingpbv1.RegisterRatePlanServiceServer(s, svc)
 	allocationpbv1.RegisterAllocationServiceServer(s, svc)
 	allocationpbv1.RegisterHoldServiceServer(s, svc)
 	reservationpbv1.RegisterReservationServiceServer(s, svc)
+	resourcev1grpc.RegisterResourcesServer(s, svc)
+	calendarv1grpc.RegisterCalendarsServer(s, svc)
+	availabilityv1grpc.RegisterAvailabilitiesServer(s, svc)
+	eventv1grpc.RegisterEventsServer(s, svc)
 }
 
 // NewGRPCServer assembles the freebusy service on conn (opened from config
@@ -80,19 +90,24 @@ func NewGRPCServer(conn *database.Connection) (*grpc.GRPCServer, *Service, error
 // so protobuf RPCs are also reachable over HTTP/JSON.
 func registerHTTPGateways() grpc.Option {
 	return grpc.WithHTTPGateways(func(mux *grpc.ServeMux, endpoint string, opts []grpc.DialOption) error {
-		if err := promocodepbv1.RegisterPromoCodeServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
-			return err
-		}
-		if err := pricingpbv1.RegisterRatePlanServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
-			return err
-		}
 		if err := allocationpbv1.RegisterAllocationServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
 			return err
 		}
 		if err := allocationpbv1.RegisterHoldServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
 			return err
 		}
-		return reservationpbv1.RegisterReservationServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts)
+		for _, register := range []func(context.Context, *grpc.ServeMux, string, []grpc.DialOption) error{
+			reservationpbv1.RegisterReservationServiceHandlerFromEndpoint,
+			resourcev1gw.RegisterResourcesHandlerFromEndpoint,
+			calendarv1gw.RegisterCalendarsHandlerFromEndpoint,
+			availabilityv1gw.RegisterAvailabilitiesHandlerFromEndpoint,
+			eventv1gw.RegisterEventsHandlerFromEndpoint,
+		} {
+			if err := register(context.Background(), mux, endpoint, opts); err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 }
 
@@ -105,9 +120,6 @@ func registerHTTPGateways() grpc.Option {
 func registerMCPServices(svc *Service) grpc.Option {
 	return grpc.WithMCPServices(
 		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
-			return promocodepbv1.ServePromoCodeServiceMCP(ctx, svc, cfg)
-		},
-		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
 			return allocationpbv1.ServeAllocationServiceMCP(ctx, svc, cfg)
 		},
 		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
@@ -115,6 +127,18 @@ func registerMCPServices(svc *Service) grpc.Option {
 		},
 		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
 			return reservationpbv1.ServeReservationServiceMCP(ctx, svc, cfg)
+		},
+		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
+			return resourcev1mcp.ServeResourcesMCP(ctx, svc, cfg)
+		},
+		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
+			return calendarv1mcp.ServeCalendarsMCP(ctx, svc, cfg)
+		},
+		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
+			return availabilityv1mcp.ServeAvailabilitiesMCP(ctx, svc, cfg)
+		},
+		func(ctx context.Context, cfg *grpc.MCPServerConfig) error {
+			return eventv1mcp.ServeEventsMCP(ctx, svc, cfg)
 		},
 	)
 }

@@ -1,0 +1,72 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: DeletePackRecordsByIdResponse
+  description: Responses from the 'delete_pack_records_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[PackRecords!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: DeletePackRecordsByIdResponse
+    inputTypeName: DeletePackRecordsByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: delete_pack_records_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: DeletePackRecordsByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: DeletePackRecordsById
+  outputType: DeletePackRecordsByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: preCheck
+      type: PackRecordsBoolExp
+      description: Delete permission predicate over the 'pack_records' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: delete_pack_records_by_id
+    argumentMapping:
+      keyId: key_id
+      preCheck: pre_check
+  graphql:
+    rootFieldName: deletePackRecordsById
+    rootFieldKind: Mutation
+  description: Delete any row on the 'pack_records' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: DeletePackRecordsById
+  permissions:
+    - role: admin
+      allowExecution: true
+

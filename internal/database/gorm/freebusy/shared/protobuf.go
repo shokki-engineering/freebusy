@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: freebusy/shared/v1/idempotency.proto, freebusy/shared/v1/types.proto
+// source: freebusy/shared/v1/idempotency.proto
 //
 // database: freebusy
 // schema:   shared
@@ -17,9 +17,7 @@ package shared
 import (
 	"time"
 
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/common"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/shared/v1/sharedpbv1"
-	"google.golang.org/genproto/googleapis/type/date"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -64,55 +62,6 @@ func IdempotencyStatePtrToProto(v *IdempotencyState) sharedpbv1.IdempotencyState
 	return IdempotencyStateToProto(*v)
 }
 
-// TypeFromProto maps the proto enum onto its stored form ("" for
-// unspecified or unknown values, so the column is omitted / left to default).
-func TypeFromProto(v sharedpbv1.PriceComponent_Type) Type {
-	switch v {
-	case sharedpbv1.PriceComponent_TYPE_BASE:
-		return TypeBase
-	case sharedpbv1.PriceComponent_TYPE_FEE:
-		return TypeFee
-	case sharedpbv1.PriceComponent_TYPE_TAX:
-		return TypeTax
-	case sharedpbv1.PriceComponent_TYPE_DISCOUNT:
-		return TypeDiscount
-	}
-	return ""
-}
-
-// TypeToProto maps the stored form back onto the proto enum
-// (unspecified for empty or unknown values).
-func TypeToProto(v Type) sharedpbv1.PriceComponent_Type {
-	switch v {
-	case TypeBase:
-		return sharedpbv1.PriceComponent_TYPE_BASE
-	case TypeFee:
-		return sharedpbv1.PriceComponent_TYPE_FEE
-	case TypeTax:
-		return sharedpbv1.PriceComponent_TYPE_TAX
-	case TypeDiscount:
-		return sharedpbv1.PriceComponent_TYPE_DISCOUNT
-	}
-	return 0
-}
-
-// TypePtrFromProto is TypeFromProto for nullable columns:
-// unspecified maps to nil.
-func TypePtrFromProto(v sharedpbv1.PriceComponent_Type) *Type {
-	if s := TypeFromProto(v); s != "" {
-		return &s
-	}
-	return nil
-}
-
-// TypePtrToProto is TypeToProto for nullable columns.
-func TypePtrToProto(v *Type) sharedpbv1.PriceComponent_Type {
-	if v == nil {
-		return 0
-	}
-	return TypeToProto(*v)
-}
-
 // IdempotencyKeyToProto converts the stored row (with its belongs-to associations,
 // when preloaded) to its proto message. Nil in, nil out.
 func IdempotencyKeyToProto(m *IdempotencyKey) *sharedpbv1.IdempotencyKey {
@@ -123,7 +72,7 @@ func IdempotencyKeyToProto(m *IdempotencyKey) *sharedpbv1.IdempotencyKey {
 	out.Name = m.Name
 	out.Method = m.Method
 	out.RequestId = m.RequestID
-	out.State = IdempotencyStateToProto(m.State)
+	out.State = IdempotencyStatePtrToProto(m.State)
 	out.Response = fromPtr(m.Response)
 	out.CreateTime = goValToTs(m.CreateTime)
 	out.UpdateTime = goValToTs(m.UpdateTime)
@@ -141,147 +90,8 @@ func IdempotencyKeyFromProto(pb *sharedpbv1.IdempotencyKey) *IdempotencyKey {
 	m.Name = pb.GetName()
 	m.Method = pb.GetMethod()
 	m.RequestID = pb.GetRequestId()
-	m.State = IdempotencyStateFromProto(pb.GetState())
+	m.State = IdempotencyStatePtrFromProto(pb.GetState())
 	m.Response = toPtr(pb.GetResponse())
-	return m
-}
-
-// AttachmentToProto converts the stored row (with its belongs-to associations,
-// when preloaded) to its proto message. Nil in, nil out.
-func AttachmentToProto(m *Attachment) *sharedpbv1.Attachment {
-	if m == nil {
-		return nil
-	}
-	out := &sharedpbv1.Attachment{}
-	out.Filename = fromPtr(m.Filename)
-	out.MimeType = fromPtr(m.MimeType)
-	out.SizeBytes = fromPtr(m.SizeBytes)
-	out.Content = m.Content
-	out.Uri = fromPtr(m.URI)
-	out.UploadTime = goToTs(m.UploadTime)
-	return out
-}
-
-// AttachmentFromProto maps the proto message's data fields onto a fresh row.
-// It never invents keys or relations: primary keys, resource references, and
-// sub-row graph wiring stay with the caller. Nil in, nil out.
-func AttachmentFromProto(pb *sharedpbv1.Attachment) *Attachment {
-	if pb == nil {
-		return nil
-	}
-	m := &Attachment{}
-	m.Filename = toPtr(pb.GetFilename())
-	m.MimeType = toPtr(pb.GetMimeType())
-	m.SizeBytes = toPtr(pb.GetSizeBytes())
-	m.Content = pb.GetContent()
-	m.URI = toPtr(pb.GetUri())
-	m.UploadTime = tsToGo(pb.GetUploadTime())
-	return m
-}
-
-// TimeWindowToProto converts the stored row (with its belongs-to associations,
-// when preloaded) to its proto message. Nil in, nil out.
-func TimeWindowToProto(m *TimeWindow) *sharedpbv1.TimeWindow {
-	if m == nil {
-		return nil
-	}
-	out := &sharedpbv1.TimeWindow{}
-	out.StartTime = goValToTs(m.StartTime)
-	out.EndTime = goValToTs(m.EndTime)
-	return out
-}
-
-// TimeWindowFromProto maps the proto message's data fields onto a fresh row.
-// It never invents keys or relations: primary keys, resource references, and
-// sub-row graph wiring stay with the caller. Nil in, nil out.
-func TimeWindowFromProto(pb *sharedpbv1.TimeWindow) *TimeWindow {
-	if pb == nil {
-		return nil
-	}
-	m := &TimeWindow{}
-	m.StartTime = tsToGoVal(pb.GetStartTime())
-	m.EndTime = tsToGoVal(pb.GetEndTime())
-	return m
-}
-
-// DateRangeToProto converts the stored row (with its belongs-to associations,
-// when preloaded) to its proto message. Nil in, nil out.
-func DateRangeToProto(m *DateRange) *sharedpbv1.DateRange {
-	if m == nil {
-		return nil
-	}
-	out := &sharedpbv1.DateRange{}
-	out.StartDate = goValToDate(m.StartDate)
-	out.EndDate = goValToDate(m.EndDate)
-	return out
-}
-
-// DateRangeFromProto maps the proto message's data fields onto a fresh row.
-// It never invents keys or relations: primary keys, resource references, and
-// sub-row graph wiring stay with the caller. Nil in, nil out.
-func DateRangeFromProto(pb *sharedpbv1.DateRange) *DateRange {
-	if pb == nil {
-		return nil
-	}
-	m := &DateRange{}
-	m.StartDate = dateToGoVal(pb.GetStartDate())
-	m.EndDate = dateToGoVal(pb.GetEndDate())
-	return m
-}
-
-// ContactToProto converts the stored row (with its belongs-to associations,
-// when preloaded) to its proto message. Nil in, nil out.
-func ContactToProto(m *Contact) *sharedpbv1.Contact {
-	if m == nil {
-		return nil
-	}
-	out := &sharedpbv1.Contact{}
-	out.DisplayName = fromPtr(m.DisplayName)
-	out.Email = fromPtr(m.Email)
-	out.PhoneNumber = fromPtr(m.PhoneNumber)
-	return out
-}
-
-// ContactFromProto maps the proto message's data fields onto a fresh row.
-// It never invents keys or relations: primary keys, resource references, and
-// sub-row graph wiring stay with the caller. Nil in, nil out.
-func ContactFromProto(pb *sharedpbv1.Contact) *Contact {
-	if pb == nil {
-		return nil
-	}
-	m := &Contact{}
-	m.DisplayName = toPtr(pb.GetDisplayName())
-	m.Email = toPtr(pb.GetEmail())
-	m.PhoneNumber = toPtr(pb.GetPhoneNumber())
-	return m
-}
-
-// PriceComponentToProto converts the stored row (with its belongs-to associations,
-// when preloaded) to its proto message. Nil in, nil out.
-func PriceComponentToProto(m *PriceComponent) *sharedpbv1.PriceComponent {
-	if m == nil {
-		return nil
-	}
-	out := &sharedpbv1.PriceComponent{}
-	out.Type = TypePtrToProto(m.Type)
-	out.Code = fromPtr(m.Code)
-	out.DisplayName = fromPtr(m.DisplayName)
-	out.Amount = common.MoneyToProto(m.Amount)
-	return out
-}
-
-// PriceComponentFromProto maps the proto message's data fields onto a fresh row.
-// It never invents keys or relations: primary keys, resource references, and
-// sub-row graph wiring stay with the caller. Nil in, nil out.
-func PriceComponentFromProto(pb *sharedpbv1.PriceComponent) *PriceComponent {
-	if pb == nil {
-		return nil
-	}
-	m := &PriceComponent{}
-	// not mapped here: amount (sub-row graph)
-	m.Type = TypePtrFromProto(pb.GetType())
-	m.Code = toPtr(pb.GetCode())
-	m.DisplayName = toPtr(pb.GetDisplayName())
 	return m
 }
 
@@ -335,20 +145,4 @@ func goValToTs(t time.Time) *timestamppb.Timestamp {
 		return nil
 	}
 	return timestamppb.New(t)
-}
-
-// dateToGoVal maps a proto date onto a NOT NULL DATE value (UTC midnight).
-func dateToGoVal(d *date.Date) time.Time {
-	if d == nil || (d.GetYear() == 0 && d.GetMonth() == 0 && d.GetDay() == 0) {
-		return time.Time{}
-	}
-	return time.Date(int(d.GetYear()), time.Month(d.GetMonth()), int(d.GetDay()), 0, 0, 0, 0, time.UTC)
-}
-
-// goValToDate maps a NOT NULL DATE value back onto a proto date.
-func goValToDate(t time.Time) *date.Date {
-	if t.IsZero() {
-		return nil
-	}
-	return &date.Date{Year: int32(t.Year()), Month: int32(t.Month()), Day: int32(t.Day())}
 }

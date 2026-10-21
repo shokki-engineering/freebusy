@@ -8,7 +8,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 66 | 45 |
+| 76 | 49 |
 
 ## Entity relationships
 
@@ -57,13 +57,13 @@ erDiagram
     }
     CalendarTime {
         string id PK
-    }
-    CalendarTime {
-        string id PK
-    }
-    CalendarTime {
-        string id PK
         string event_id FK
+    }
+    CalendarTime {
+        string id PK
+    }
+    CalendarTime {
+        string id PK
     }
     Card {
         string id PK
@@ -95,6 +95,18 @@ erDiagram
         string recurrence_id FK
         string organizer_id FK
     }
+    ExtensionField {
+        string id PK
+        string record_id FK
+    }
+    ExtensionField {
+        string id PK
+        string record_id FK
+    }
+    ExtensionProperty {
+        string id PK
+        string event_id FK
+    }
     ExtensionProperty {
         string id PK
         string todo_id FK
@@ -116,9 +128,8 @@ erDiagram
         string id PK
         string contact_id FK
     }
-    ExtensionProperty {
+    Fraction {
         string id PK
-        string event_id FK
     }
     Geo {
         string id PK
@@ -186,15 +197,18 @@ erDiagram
     }
     Organization {
         string id PK
-        string contact_id FK
     }
     Organization {
         string id PK
+        string contact_id FK
     }
     OrganizationalUnit {
         string id PK
     }
     Organizer {
+        string id PK
+    }
+    Pack {
         string id PK
     }
     Participant {
@@ -208,6 +222,13 @@ erDiagram
         string id PK
         string contact_id FK
     }
+    Record {
+        string id PK
+        string pack_id FK
+    }
+    Record {
+        string id PK
+    }
     Recurrence {
         string id PK
         string until_id FK
@@ -218,17 +239,20 @@ erDiagram
     }
     Resource {
         string id PK
-        string event_id FK
-        string participant_id FK
+        string calendar FK
+        string organizational_unit FK
     }
     Resource {
         string id PK
-        string calendar FK
-        string organizational_unit FK
+        string event_id FK
+        string participant_id FK
     }
     Role {
         string id PK
         string contact_id FK
+    }
+    Sensor {
+        string id PK
     }
     SocialProfile {
         string id PK
@@ -237,15 +261,23 @@ erDiagram
     Speech {
         string id PK
     }
+    Stream {
+        string id PK
+    }
+    StreamRecord {
+        string id PK
+        string stream_id FK
+        string record_id FK
+    }
+    StructuredData {
+        string id PK
+        string resource_id FK
+    }
     StructuredData {
         string id PK
         string event_id FK
         string participant_id FK
         string location_id FK
-        string resource_id FK
-    }
-    StructuredData {
-        string id PK
         string resource_id FK
     }
     StyledDescription {
@@ -270,6 +302,11 @@ erDiagram
         string start_id FK
         string due_id FK
         string completed_id FK
+    }
+    Unit {
+        string id PK
+        string scale_id FK
+        string offset_id FK
     }
     Url {
         string id PK
@@ -314,13 +351,15 @@ erDiagram
     Event }o--|| CalendarTime : "end_id"
     Event }o--|| Recurrence : "recurrence_id"
     Event }o--|| Organizer : "organizer_id"
+    ExtensionField }o--|| Record : "record_id"
+    ExtensionField }o--|| Record : "record_id"
+    ExtensionProperty }o--|| Event : "event_id"
     ExtensionProperty }o--|| Todo : "todo_id"
     ExtensionProperty }o--|| Calendar : "calendar_id"
     ExtensionProperty }o--|| Availability : "availability_id"
     ExtensionProperty }o--|| AvailablePeriod : "available_period_id"
     ExtensionProperty }o--|| Journal : "journal_id"
     ExtensionProperty }o--|| Contact : "contact_id"
-    ExtensionProperty }o--|| Event : "event_id"
     Geo }o--|| Contact : "contact_id"
     GrammaticalGender }o--|| Contact : "contact_id"
     InstantMessage }o--|| Contact : "contact_id"
@@ -337,18 +376,21 @@ erDiagram
     Organization }o--|| Contact : "contact_id"
     Participant }o--|| Event : "event_id"
     Pronouns }o--|| Contact : "contact_id"
+    Record }o--|| Pack : "pack_id"
     Recurrence }o--|| CalendarTime : "until_id"
     Relation }o--|| Contact : "contact_id"
-    Resource }o--|| Event : "event_id"
-    Resource }o--|| Participant : "participant_id"
     Resource }o--|| Calendar : "calendar"
     Resource }o--|| OrganizationalUnit : "organizational_unit"
+    Resource }o--|| Event : "event_id"
+    Resource }o--|| Participant : "participant_id"
     Role }o--|| Contact : "contact_id"
     SocialProfile }o--|| Contact : "contact_id"
+    StreamRecord }o--|| Stream : "stream_id"
+    StreamRecord }o--|| Record : "record_id"
+    StructuredData }o--|| Resource : "resource_id"
     StructuredData }o--|| Event : "event_id"
     StructuredData }o--|| Participant : "participant_id"
     StructuredData }o--|| Location : "location_id"
-    StructuredData }o--|| Resource : "resource_id"
     StructuredData }o--|| Resource : "resource_id"
     StyledDescription }o--|| Event : "event_id"
     StyledDescription }o--|| Participant : "participant_id"
@@ -358,6 +400,8 @@ erDiagram
     Todo }o--|| CalendarTime : "start_id"
     Todo }o--|| CalendarTime : "due_id"
     Todo }o--|| CalendarTime : "completed_id"
+    Unit }o--|| Fraction : "scale_id"
+    Unit }o--|| Fraction : "offset_id"
     Url }o--|| Contact : "contact_id"
     User }o--|| Name : "name_components_id"
     User }o--|| EnterpriseUser : "enterprise_id"
@@ -1392,6 +1436,191 @@ ExtensionProperty carries an iCalendar property this schema does not model. Not 
 - `CalendarTimeValueCase`: DATE, DATE_TIME
 - `AvailablePeriodEndFormCase`: END, DURATION
 
+## Schema `pack`
+
+### `Pack` → `resource`
+
+Pack is a SenML Pack: one or more SenML Records in an array, RFC 8428 section 4 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4>. The unit a sensor publishes and a consumer fetches. Section 12.3 <https://www.rfc-editor.org/rfc/rfc8428.html#section-12.3> registers four media types for it -- "application/senml+json", "application/senml+cbor", "application/senml+xml" and "application/senml-exi" -- which is the whole point of the format: one data model, four wire encodings, chosen by how constrained the device and the link are. The four are codecs registered against "the-protobuf-project.org/Pack" in `shared/interchange/v1`, not four schemas. A flat collection, "packs/{pack}". Section 4.7 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.7> is explicit that SenML carries the minimum dynamic information and that static metadata about the device or sensor is held **out of band**, by CoRE Link Format, so there is no device or sensor resource in this RFC to nest a pack under. Inventing one would assert a containment RFC 8428 <https://www.rfc-editor.org/rfc/rfc8428.html> deliberately declines to define -- the same reasoning that keeps `Resource` flat in rfc9073. What identifies a sensor is instead a *string*: `base_sensor_id` and `sensor_id` concatenated, which section 4.5.1 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.5.1> requires to be globally unique and constrains to characters usable directly in a URI path. Filter on it with AIP-160 <https://aip.dev/160> rather than looking for a parent in the resource name. Reference: RFC 8428 "Sensor Measurement Lists (SenML)", section 4. https://www.rfc-editor.org/rfc/rfc8428.html#section-4
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `name` | `VARCHAR(255)` | not null |
+| `uid` | `VARCHAR(255)` | nullable |
+| `base_version` | `INTEGER` | nullable |
+| `resolved` | `BOOLEAN` | nullable |
+| `create_time` | `TIMESTAMPTZ` | not null |
+| `update_time` | `TIMESTAMPTZ` | not null |
+| `etag` | `VARCHAR(255)` | nullable |
+| `delete_time` | `TIMESTAMPTZ` | nullable |
+| `expire_time` | `TIMESTAMPTZ` | nullable |
+
+### `Record` → `records`
+
+Record is one SenML Record: a single measurement or configuration instance in time, RFC 8428 section 4 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4>. A record carries two kinds of field. **Base fields** (section 4.1 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.1>, the `base_` prefix here) apply to this record and to every record after it in the Pack, up to but not including the next record carrying that same base field. **Regular fields** (section 4.2 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.2>) apply only to the record they appear in. Both kinds may appear in any record. A record is therefore not self-describing: reading one in isolation gives the wrong sensor, the wrong time and possibly the wrong unit, because the base values that complete it live in an earlier sibling. Section 4.6 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.6> calls a record with the base values already folded in **resolved**, and `Packs.ResolvePack` is that operation. One measurement per record, deliberately: section 4.5.4 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.5.4> says values measured together -- air pressure and altitude, latitude and longitude -- belong in separate records correlated by their time, not in one record with several values. Reference: RFC 8428 "Sensor Measurement Lists (SenML)", section 4. https://www.rfc-editor.org/rfc/rfc8428.html#section-4
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `base_sensor_id` | `VARCHAR(255)` | nullable |
+| `base_time_value` | `DOUBLE PRECISION` | nullable |
+| `base_unit` | `VARCHAR(255)` | nullable |
+| `base_value` | `DOUBLE PRECISION` | nullable |
+| `base_sum` | `DOUBLE PRECISION` | nullable |
+| `sensor_id` | `VARCHAR(255)` | nullable |
+| `unit` | `VARCHAR(255)` | nullable |
+| `sum` | `DOUBLE PRECISION` | nullable |
+| `time_value` | `DOUBLE PRECISION` | nullable |
+| `update_duration` | `INTERVAL` | nullable |
+| `number_value` | `DOUBLE PRECISION` | nullable |
+| `string_value` | `VARCHAR(255)` | nullable |
+| `boolean_value` | `BOOLEAN` | nullable |
+| `data_value` | `BYTEA` | nullable |
+| `value_case` | `RecordValueCase` | nullable |
+| `pack_id` | `CHAR(26)` | not null |
+
+### `ExtensionField` → `extension_fields`
+
+ExtensionField is one custom SenML Field, RFC 8428 section 4.4 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.4>. A label and its value, preserved verbatim. Two conventions ride in the label and neither is enforceable here, because both change what a *reader* must do rather than what a writer may send: a label beginning "b" has base semantics and applies to following records the way `base_unit` does (section 12.2 <https://www.rfc-editor.org/rfc/rfc8428.html#section-12.2>), and a label ending "_" is must-understand -- section 4.4 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.4> says a reader that does not know it MUST raise an error instead of ignoring it. Reference: RFC 8428 "Sensor Measurement Lists (SenML)", section 4.4. https://www.rfc-editor.org/rfc/rfc8428.html#section-4.4
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `label` | `VARCHAR(255)` | not null |
+| `string_value` | `VARCHAR(255)` | nullable |
+| `number_value` | `DOUBLE PRECISION` | nullable |
+| `boolean_value` | `BOOLEAN` | nullable |
+| `data_value` | `BYTEA` | nullable |
+| `value_case` | `ExtensionFieldValueCase` | nullable |
+| `record_id` | `CHAR(26)` | not null |
+
+### Enums
+
+- `RecordValueCase`: NUMBER_VALUE, STRING_VALUE, BOOLEAN_VALUE, DATA_VALUE
+- `ExtensionFieldValueCase`: STRING_VALUE, NUMBER_VALUE, BOOLEAN_VALUE, DATA_VALUE
+
+## Schema `sensor`
+
+### `Sensor` → `resource`
+
+Sensor is the thing a SenML Record names: what is being measured, and where to reach it. **Native: no RFC defines it, and under the rules of this repository that demands a reason rather than a citation.** The reason is that RFC 8428 names this gap and then declines to fill it. Section 4.5.1 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.5.1> requires the concatenated SenML name to be "a globally unique identifier for the resource" -- so the sensor has identity, in the RFC's own words. Section 4.7 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.7> then says SenML deliberately carries no static metadata about the device, object or sensor, "for efficiency reasons", and that such metadata "is carried out of band", pointing at the CoRE Link Format (RFC 6690 <https://www.rfc-editor.org/rfc/rfc6690.html>). A pack therefore tells you a reading came from "urn:dev:ow:10e2073a01080063" and nothing whatever about it. This resource is that out-of-band half, and it is **ours**. RFC 8428 defines a *name format* for a sensor, not a sensor. It sits under `rfc8428/` anyway, which is rule 5's one written exception -- see `CLAUDE.md`. The rule keeps a native type out of an `rfc*/` directory so the path cannot lend it authority it has not earned, and that risk is real here: **nothing on this message comes from RFC 8428.** What outweighs it is that the resource is meaningless apart from SenML. Its identity field is a section 4.5.1 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.5.1> name, its unit is a section 12.1 <https://www.rfc-editor.org/rfc/rfc8428.html#section-12.1> unit, and the gap it fills is one section 4.7 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.7> names. Filed away from the packs it exists to annotate, it reads as a general-purpose sensor registry, which it is not. This comment is the substitute for the path: the authority is borrowed, and the borrowing is stated rather than implied. The fields below are the CoRE Link Format attributes section 4.7 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.7> points at, because inventing a different vocabulary for the same job would be worse than borrowing a specified one. Each cites RFC 6690 <https://www.rfc-editor.org/rfc/rfc6690.html>; none of that makes this message RFC 6690's, which defines a link serialisation and not a resource either. Not linked to `Pack` by a resource reference. A record names a sensor with a *string* -- `base_sensor_id` and `sensor_id` concatenated -- and that string is `senml_id` here. Joining the two is a lookup, not a foreign key, because a pack that arrives for an unregistered sensor is ordinary and must not be rejected.
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `name` | `VARCHAR(255)` | not null |
+| `uid` | `VARCHAR(255)` | nullable |
+| `senml_id` | `VARCHAR(255)` | not null |
+| `display_name` | `VARCHAR(255)` | nullable |
+| `target_uri` | `VARCHAR(255)` | nullable |
+| `resource_types` | `VARCHAR(255)[]` | nullable |
+| `interface_descriptions` | `VARCHAR(255)[]` | nullable |
+| `media_types` | `VARCHAR(255)[]` | nullable |
+| `unit` | `VARCHAR(255)` | nullable |
+| `update_duration` | `INTERVAL` | nullable |
+| `create_time` | `TIMESTAMPTZ` | not null |
+| `update_time` | `TIMESTAMPTZ` | not null |
+| `etag` | `VARCHAR(255)` | nullable |
+| `delete_time` | `TIMESTAMPTZ` | nullable |
+| `expire_time` | `TIMESTAMPTZ` | nullable |
+
+## Schema `stream`
+
+### `Stream` → `resource`
+
+Stream is a Sensor Streaming Measurement List, RFC 8428 section 4.8 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.8>. The same records a Pack holds, collected over time instead of all at once. Section 4.8 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.8> registers four media types of its own for this -- "application/sensml+json", "application/sensml+cbor", "application/sensml+xml" and "application/sensml-exi", section 12.3.2 <https://www.rfc-editor.org/rfc/rfc8428.html#section-12.3.2> onward -- and requires a system using SenML this way to say so, because a consumer may read each record as it arrives rather than waiting for the whole thing to close. **A separate resource from Pack, for one reason that is not cosmetic.** Section 4.8 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.8> resolves a relative time against when *that record* was sent, where a Pack resolves every relative time against when the pack was. A pack is one instant; a stream is one instant per record. Storing a stream as a Pack would collapse those into a single "now" and silently move every reading in it -- section 4.5.3 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.5.3> puts that error at anything from a millisecond to a dozen minutes. `StreamRecord` is where the per-record instant lives, and it is the whole reason this package exists. Reference: RFC 8428 "Sensor Measurement Lists (SenML)", section 4.8. https://www.rfc-editor.org/rfc/rfc8428.html#section-4.8
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `name` | `VARCHAR(255)` | not null |
+| `uid` | `VARCHAR(255)` | nullable |
+| `base_version` | `INTEGER` | nullable |
+| `closed` | `BOOLEAN` | nullable |
+| `create_time` | `TIMESTAMPTZ` | not null |
+| `update_time` | `TIMESTAMPTZ` | not null |
+| `etag` | `VARCHAR(255)` | nullable |
+| `delete_time` | `TIMESTAMPTZ` | nullable |
+| `expire_time` | `TIMESTAMPTZ` | nullable |
+
+### `StreamRecord` → `records_link`
+
+StreamRecord is one record of a stream together with the instant it was sent, RFC 8428 section 4.8 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.8>. The pairing exists because section 4.8 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.8> says a relative time in a stream is read against "the time when the specific Record is sent in the stream". A `Record` alone cannot carry that: its own `time_value` is the offset being interpreted, not the instant to interpret it against. A wrapper rather than a field added to the copied `Record`, so the copy stays byte-identical to `protobuf.rfc8428.pack.v1.Record` and the two cannot drift. The difference between a pack and a stream then lives in exactly one place -- here -- which is where section 4.8 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.8> puts it too. Reference: RFC 8428 "Sensor Measurement Lists (SenML)", section 4.8. https://www.rfc-editor.org/rfc/rfc8428.html#section-4.8
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `reference_time_value` | `DOUBLE PRECISION` | nullable |
+| `stream_id` | `CHAR(26)` | not null |
+| `record_id` | `CHAR(26)` | not null |
+
+### `Record` → `records`
+
+Record is one SenML Record: a single measurement or configuration instance in time, RFC 8428 section 4 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4>. A record carries two kinds of field. **Base fields** (section 4.1 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.1>, the `base_` prefix here) apply to this record and to every record after it in the Pack, up to but not including the next record carrying that same base field. **Regular fields** (section 4.2 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.2>) apply only to the record they appear in. Both kinds may appear in any record. A record is therefore not self-describing: reading one in isolation gives the wrong sensor, the wrong time and possibly the wrong unit, because the base values that complete it live in an earlier sibling. Section 4.6 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.6> calls a record with the base values already folded in **resolved**, and `Streams.ResolveStream` is that operation. One measurement per record, deliberately: section 4.5.4 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.5.4> says values measured together -- air pressure and altitude, latitude and longitude -- belong in separate records correlated by their time, not in one record with several values. A copy of `protobuf.rfc8428.pack.v1.Record`, not a reference to it. AIP-215 <https://aip.dev/215> permits no cross-package message reference and rule 4 forbids a shared wrapper package, so a value type used by two packages is defined in each. SenSML uses the same records as SenML -- section 4.8 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.8> changes only how they are delivered and how their relative times resolve -- so the two definitions must stay byte-identical apart from the package. Keep them in step when either changes. Reference: RFC 8428 "Sensor Measurement Lists (SenML)", section 4. https://www.rfc-editor.org/rfc/rfc8428.html#section-4
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `base_sensor_id` | `VARCHAR(255)` | nullable |
+| `base_time_value` | `DOUBLE PRECISION` | nullable |
+| `base_unit` | `VARCHAR(255)` | nullable |
+| `base_value` | `DOUBLE PRECISION` | nullable |
+| `base_sum` | `DOUBLE PRECISION` | nullable |
+| `sensor_id` | `VARCHAR(255)` | nullable |
+| `unit` | `VARCHAR(255)` | nullable |
+| `sum` | `DOUBLE PRECISION` | nullable |
+| `time_value` | `DOUBLE PRECISION` | nullable |
+| `update_duration` | `INTERVAL` | nullable |
+| `number_value` | `DOUBLE PRECISION` | nullable |
+| `string_value` | `VARCHAR(255)` | nullable |
+| `boolean_value` | `BOOLEAN` | nullable |
+| `data_value` | `BYTEA` | nullable |
+| `value_case` | `RecordValueCase` | nullable |
+
+### `ExtensionField` → `extension_fields`
+
+ExtensionField is one custom SenML Field, RFC 8428 section 4.4 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.4>. A label and its value, preserved verbatim. Two conventions ride in the label and neither is enforceable here, because both change what a *reader* must do rather than what a writer may send: a label beginning "b" has base semantics and applies to following records the way `base_unit` does (section 12.2 <https://www.rfc-editor.org/rfc/rfc8428.html#section-12.2>), and a label ending "_" is must-understand -- section 4.4 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.4> says a reader that does not know it MUST raise an error instead of ignoring it. A copy of `protobuf.rfc8428.pack.v1.ExtensionField`, not a reference to it. AIP-215 <https://aip.dev/215> permits no cross-package message reference and rule 4 forbids a shared wrapper package, so a value type used by two packages is defined in each. SenSML uses the same records as SenML -- section 4.8 <https://www.rfc-editor.org/rfc/rfc8428.html#section-4.8> changes only how they are delivered and how their relative times resolve -- so the two definitions must stay byte-identical apart from the package. Keep them in step when either changes. Reference: RFC 8428 "Sensor Measurement Lists (SenML)", section 4.4. https://www.rfc-editor.org/rfc/rfc8428.html#section-4.4
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `label` | `VARCHAR(255)` | not null |
+| `string_value` | `VARCHAR(255)` | nullable |
+| `number_value` | `DOUBLE PRECISION` | nullable |
+| `boolean_value` | `BOOLEAN` | nullable |
+| `data_value` | `BYTEA` | nullable |
+| `value_case` | `ExtensionFieldValueCase` | nullable |
+| `record_id` | `CHAR(26)` | not null |
+
+### Enums
+
+- `RecordValueCase`: NUMBER_VALUE, STRING_VALUE, BOOLEAN_VALUE, DATA_VALUE
+- `ExtensionFieldValueCase`: STRING_VALUE, NUMBER_VALUE, BOOLEAN_VALUE, DATA_VALUE
+
+## Schema `unit`
+
+### `Unit` → `resource`
+
+Unit is one entry in the SenML Units registry, RFC 8428 section 12.1 <https://www.rfc-editor.org/rfc/rfc8428.html#section-12.1>, or in the Secondary Units subregistry RFC 8798 section 3 <https://www.rfc-editor.org/rfc/rfc8798.html#section-3> adds to it. One resource for both, because RFC 8798 <https://www.rfc-editor.org/rfc/rfc8798.html> says they are one registry: its section 3 <https://www.rfc-editor.org/rfc/rfc8798.html#section-3> opens "IANA has created a 'Secondary Units' subregistry in the 'Sensor Measurement Lists (SenML)' registry defined in RFC 8428". That sentence is also why this package sits under `rfc8428/` and not `rfc8798/`: rule 6 gives a directory to the **defining** RFC, and 8798 refines a registry 8428 created. A primary entry and a secondary one differ by `senml_unit`. A primary unit stands alone -- "Cel" is degrees Celsius and converts to nothing. A secondary unit names the primary it derives from and carries the two numbers that get you there. **Why this is a resource and not a constant table.** RFC 8798 section 4 <https://www.rfc-editor.org/rfc/rfc8798.html#section-4> asks for it in as many words: the subregistry "is expected to grow at a faster pace" than the primary one, it "is amenable to automatic interpretation, by making use of the scale and offset columns", and implementations SHOULD **not** each poll IANA -- they should receive updated registries "via common repositories". A deployment holding its own copy, addressable and updatable, is that common repository. An enum would be the opposite: frozen at the moment this schema shipped, rejecting every unit registered since. Reference: RFC 8428 "Sensor Measurement Lists (SenML)", section 12.1. https://www.rfc-editor.org/rfc/rfc8428.html#section-12.1
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `name` | `VARCHAR(255)` | not null |
+| `uid` | `VARCHAR(255)` | nullable |
+| `symbol` | `VARCHAR(255)` | not null |
+| `description` | `VARCHAR(255)` | nullable |
+| `senml_unit` | `VARCHAR(255)` | nullable |
+| `reference` | `VARCHAR(255)` | nullable |
+| `producing_discouraged` | `BOOLEAN` | nullable |
+| `create_time` | `TIMESTAMPTZ` | not null |
+| `update_time` | `TIMESTAMPTZ` | not null |
+| `etag` | `VARCHAR(255)` | nullable |
+| `delete_time` | `TIMESTAMPTZ` | nullable |
+| `expire_time` | `TIMESTAMPTZ` | nullable |
+| `scale_id` | `CHAR(26)` | nullable |
+| `offset_id` | `CHAR(26)` | nullable |
+
 ## Schema `resource`
 
 ### `Resource` → `entity`
@@ -1561,3 +1790,13 @@ Represents a time zone from the [IANA Time Zone Database](https://www.iana.org/t
 | --- | --- | --- |
 | `id` | `VARCHAR(255)` | not null |
 | `version` | `VARCHAR(255)` | nullable |
+
+### `Fraction` → `fractions`
+
+Represents a fraction in terms of a numerator divided by a denominator.
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `CHAR(26)` | not null |
+| `numerator` | `BIGINT` | nullable |
+| `denominator` | `BIGINT` | nullable |

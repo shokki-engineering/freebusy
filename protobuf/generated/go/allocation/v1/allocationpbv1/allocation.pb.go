@@ -542,14 +542,14 @@ var File_freebusy_allocation_v1_allocation_proto protoreflect.FileDescriptor
 
 const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	"\n" +
-	"'freebusy/allocation/v1/allocation.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a\"freebusy/allocation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1agoogle/type/interval.proto\x1a\x1astore/v1/annotations.proto\"\x9b\x06\n" +
+	"'freebusy/allocation/v1/allocation.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a\"freebusy/allocation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1agoogle/type/interval.proto\x1a\x1astore/v1/annotations.proto\"\xad\x06\n" +
 	"\x04Hold\x12H\n" +
-	"\x04name\x18\x01 \x01(\tB4\xe0A\b\xbaH.\xd8\x01\x01r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\x04name\x12>\n" +
-	"\tresources\x18\x02 \x03(\tB \xe0A\x03\xfaA\x1a\n" +
-	"\x18protobufrfc.dev/ResourceR\tresources\x125\n" +
-	"\x06window\x18\x03 \x01(\v2\x15.google.type.IntervalB\x06\xe0A\x02\xe0A\x05R\x06window\x12T\n" +
-	"\x13candidate_resources\x18\f \x03(\tB#\xe0A\x01\xe0A\x05\xfaA\x1a\n" +
-	"\x18protobufrfc.dev/ResourceR\x12candidateResources\x12)\n" +
+	"\x04name\x18\x01 \x01(\tB4\xe0A\b\xbaH.\xd8\x01\x01r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\x04name\x12G\n" +
+	"\tresources\x18\x02 \x03(\tB)\xe0A\x03\xfaA#\n" +
+	"!the-protobuf-project.org/ResourceR\tresources\x125\n" +
+	"\x06window\x18\x03 \x01(\v2\x15.google.type.IntervalB\x06\xe0A\x02\xe0A\x05R\x06window\x12]\n" +
+	"\x13candidate_resources\x18\f \x03(\tB,\xe0A\x01\xe0A\x05\xfaA#\n" +
+	"!the-protobuf-project.org/ResourceR\x12candidateResources\x12)\n" +
 	"\bquantity\x18\x04 \x01(\x05B\r\xe0A\x01\xe0A\x05\xbaH\x04\x1a\x02(\x00R\bquantity\x12@\n" +
 	"\vexpire_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
 	"expireTime\x12H\n" +
@@ -561,12 +561,12 @@ const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	" \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
 	"updateTime\x12\x17\n" +
 	"\x04etag\x18\v \x01(\tB\x03\xe0A\x03R\x04etag:k\xeaAb\n" +
-	"\x1bfreebusy.allocation.v1/Hold\x126organizationalUnits/{organizational_unit}/holds/{hold}*\x05holds2\x04hold\xca\xf3\x18\x02\x18\x01J\x04\b\a\x10\b\"\xcb\x04\n" +
+	"\x1bfreebusy.allocation.v1/Hold\x126organizationalUnits/{organizational_unit}/holds/{hold}*\x05holds2\x04hold\xca\xf3\x18\x02\x18\x01J\x04\b\a\x10\b\"\xd4\x04\n" +
 	"\n" +
 	"Allocation\x12\x17\n" +
-	"\x04name\x18\x01 \x01(\tB\x03\xe0A\bR\x04name\x12<\n" +
-	"\bresource\x18\x02 \x01(\tB \xe0A\x02\xfaA\x1a\n" +
-	"\x18protobufrfc.dev/ResourceR\bresource\x12>\n" +
+	"\x04name\x18\x01 \x01(\tB\x03\xe0A\bR\x04name\x12E\n" +
+	"\bresource\x18\x02 \x01(\tB)\xe0A\x02\xfaA#\n" +
+	"!the-protobuf-project.org/ResourceR\bresource\x12>\n" +
 	"\n" +
 	"start_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x02R\tstartTime\x12:\n" +
 	"\bend_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x02R\aendTime\x12@\n" +
@@ -581,25 +581,25 @@ const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	"\bresource\n" +
 	"\n" +
 	"start_time\n" +
-	"\bend_time\"\xc9\x01\n" +
+	"\bend_time\"\xd2\x01\n" +
 	"\x12AvailabilityBucket\x12-\n" +
 	"\x06window\x18\x01 \x01(\v2\x15.google.type.IntervalR\x06window\x12\x1d\n" +
 	"\n" +
 	"free_count\x18\x02 \x01(\x05R\tfreeCount\x12\x1f\n" +
 	"\vtotal_count\x18\x03 \x01(\x05R\n" +
-	"totalCount\x12D\n" +
-	"\x0efree_resources\x18\x04 \x03(\tB\x1d\xfaA\x1a\n" +
-	"\x18protobufrfc.dev/ResourceR\rfreeResources\"\xa9\x01\n" +
+	"totalCount\x12M\n" +
+	"\x0efree_resources\x18\x04 \x03(\tB&\xfaA#\n" +
+	"!the-protobuf-project.org/ResourceR\rfreeResources\"\xb2\x01\n" +
 	"\x10UnbookableReason\x12@\n" +
 	"\x04code\x18\x01 \x01(\x0e2,.freebusy.allocation.v1.UnbookableReasonCodeR\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x129\n" +
-	"\bresource\x18\x03 \x01(\tB\x1d\xfaA\x1a\n" +
-	"\x18protobufrfc.dev/ResourceR\bresource\"\xfe\x01\n" +
-	"\x11AvailabilityMatch\x129\n" +
-	"\bresource\x18\x01 \x01(\tB\x1d\xfaA\x1a\n" +
-	"\x18protobufrfc.dev/ResourceR\bresource\x12X\n" +
-	"\x13organizational_unit\x18\x02 \x01(\tB'\xfaA$\n" +
-	"\"protobufrfc.dev/OrganizationalUnitR\x12organizationalUnit\x12-\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12B\n" +
+	"\bresource\x18\x03 \x01(\tB&\xfaA#\n" +
+	"!the-protobuf-project.org/ResourceR\bresource\"\x90\x02\n" +
+	"\x11AvailabilityMatch\x12B\n" +
+	"\bresource\x18\x01 \x01(\tB&\xfaA#\n" +
+	"!the-protobuf-project.org/ResourceR\bresource\x12a\n" +
+	"\x13organizational_unit\x18\x02 \x01(\tB0\xfaA-\n" +
+	"+the-protobuf-project.org/OrganizationalUnitR\x12organizationalUnit\x12-\n" +
 	"\x06window\x18\x03 \x01(\v2\x15.google.type.IntervalR\x06window\x12%\n" +
 	"\x0eresource_types\x18\x04 \x03(\tR\rresourceTypesB\x8b\x02\n" +
 	"\x1acom.freebusy.allocation.v1B\x0fAllocationProtoP\x01Zbgithub.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"

@@ -17,7 +17,7 @@ package project
 import (
 	"time"
 
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/shared/project/v1/projectpbv1"
+	projectpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/shared/project/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

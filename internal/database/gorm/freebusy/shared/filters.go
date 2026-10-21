@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: freebusy/shared/v1/idempotency.proto, freebusy/shared/v1/types.proto
+// source: freebusy/shared/v1/idempotency.proto
 //
 // database: freebusy
 // schema:   shared
@@ -38,93 +38,8 @@ var IdempotencyKeyFilterSpec = filterx.Spec{
 		"name":        {Column: "name", Kind: filterx.KindText, NotNull: true},
 		"request_id":  {Column: "request_id", Kind: filterx.KindText, NotNull: true},
 		"response":    {Column: "response", Kind: filterx.KindText},
-		"state":       {Column: "state", Kind: filterx.KindEnum, NotNull: true},
+		"state":       {Column: "state", Kind: filterx.KindEnum},
 		"update_time": {Column: "update_time", Kind: filterx.KindTimestamp, NotNull: true},
-	},
-	PK: []filterx.SortSpec{{Column: "id", Kind: filterx.KindText, NotNull: true}},
-}
-
-// AttachmentFilterSpec is Attachment's AIP-160 filter / AIP-132 order_by surface,
-// consumed by the filterx.Gorm and filterx.Hasura engines.
-var AttachmentFilterSpec = filterx.Spec{
-	Table: `"shared"."attachments"`,
-	Fields: map[string]filterx.FieldSpec{
-		"filename":    {Column: "filename", Kind: filterx.KindText},
-		"mime_type":   {Column: "mime_type", Kind: filterx.KindText},
-		"size_bytes":  {Column: "size_bytes", Kind: filterx.KindInt},
-		"upload_time": {Column: "upload_time", Kind: filterx.KindTimestamp},
-		"uri":         {Column: "uri", Kind: filterx.KindText},
-	},
-	Sort: map[string]filterx.SortSpec{
-		"filename":    {Column: "filename", Kind: filterx.KindText},
-		"mime_type":   {Column: "mime_type", Kind: filterx.KindText},
-		"size_bytes":  {Column: "size_bytes", Kind: filterx.KindInt},
-		"upload_time": {Column: "upload_time", Kind: filterx.KindTimestamp},
-		"uri":         {Column: "uri", Kind: filterx.KindText},
-	},
-	PK: []filterx.SortSpec{{Column: "id", Kind: filterx.KindText, NotNull: true}},
-}
-
-// TimeWindowFilterSpec is TimeWindow's AIP-160 filter / AIP-132 order_by surface,
-// consumed by the filterx.Gorm and filterx.Hasura engines.
-var TimeWindowFilterSpec = filterx.Spec{
-	Table: `"shared"."time_windows"`,
-	Fields: map[string]filterx.FieldSpec{
-		"end_time":   {Column: "end_time", Kind: filterx.KindTimestamp},
-		"start_time": {Column: "start_time", Kind: filterx.KindTimestamp},
-	},
-	Sort: map[string]filterx.SortSpec{
-		"end_time":   {Column: "end_time", Kind: filterx.KindTimestamp, NotNull: true},
-		"start_time": {Column: "start_time", Kind: filterx.KindTimestamp, NotNull: true},
-	},
-	PK: []filterx.SortSpec{{Column: "id", Kind: filterx.KindText, NotNull: true}},
-}
-
-// DateRangeFilterSpec is DateRange's AIP-160 filter / AIP-132 order_by surface,
-// consumed by the filterx.Gorm and filterx.Hasura engines.
-var DateRangeFilterSpec = filterx.Spec{
-	Table: `"shared"."date_ranges"`,
-	Fields: map[string]filterx.FieldSpec{
-		"end_date":   {Column: "end_date", Kind: filterx.KindDate},
-		"start_date": {Column: "start_date", Kind: filterx.KindDate},
-	},
-	Sort: map[string]filterx.SortSpec{
-		"end_date":   {Column: "end_date", Kind: filterx.KindDate, NotNull: true},
-		"start_date": {Column: "start_date", Kind: filterx.KindDate, NotNull: true},
-	},
-	PK: []filterx.SortSpec{{Column: "id", Kind: filterx.KindText, NotNull: true}},
-}
-
-// ContactFilterSpec is Contact's AIP-160 filter / AIP-132 order_by surface,
-// consumed by the filterx.Gorm and filterx.Hasura engines.
-var ContactFilterSpec = filterx.Spec{
-	Table: `"shared"."contacts"`,
-	Fields: map[string]filterx.FieldSpec{
-		"display_name": {Column: "display_name", Kind: filterx.KindText},
-		"email":        {Column: "email", Kind: filterx.KindText},
-		"phone_number": {Column: "phone_number", Kind: filterx.KindText},
-	},
-	Sort: map[string]filterx.SortSpec{
-		"display_name": {Column: "display_name", Kind: filterx.KindText},
-		"email":        {Column: "email", Kind: filterx.KindText},
-		"phone_number": {Column: "phone_number", Kind: filterx.KindText},
-	},
-	PK: []filterx.SortSpec{{Column: "id", Kind: filterx.KindText, NotNull: true}},
-}
-
-// PriceComponentFilterSpec is PriceComponent's AIP-160 filter / AIP-132 order_by surface,
-// consumed by the filterx.Gorm and filterx.Hasura engines.
-var PriceComponentFilterSpec = filterx.Spec{
-	Table: `"shared"."price_components"`,
-	Fields: map[string]filterx.FieldSpec{
-		"code":         {Column: "code", Kind: filterx.KindText},
-		"display_name": {Column: "display_name", Kind: filterx.KindText},
-		"type":         {Column: "type", Kind: filterx.KindEnum, EnumPrefix: "TYPE_"},
-	},
-	Sort: map[string]filterx.SortSpec{
-		"code":         {Column: "code", Kind: filterx.KindText},
-		"display_name": {Column: "display_name", Kind: filterx.KindText},
-		"type":         {Column: "type", Kind: filterx.KindEnum},
 	},
 	PK: []filterx.SortSpec{{Column: "id", Kind: filterx.KindText, NotNull: true}},
 }

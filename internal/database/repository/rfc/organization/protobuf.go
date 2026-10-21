@@ -16,9 +16,9 @@
 package organization
 
 import (
+	organizationpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organization/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/organizationql/resourceql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/organization/v1/organizationpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
@@ -111,5 +111,8 @@ func organizationFromRow(row *resourceql.OrganizationResource) *organizationpbv1
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.Uid = repox.Deref(row.Uid)
+	out.DeleteTime = strToTs(repox.Deref(row.DeleteTime))
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
 	return out
 }

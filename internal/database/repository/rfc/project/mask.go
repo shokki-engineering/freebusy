@@ -16,8 +16,8 @@
 package project
 
 import (
+	projectpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/shared/project/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/shared/project/v1/projectpbv1"
 )
 
 // applyProjectMask merges the masked fields of in onto merged. An empty

@@ -1383,14 +1383,14 @@
         "foreignRelations": {},
         "description": null
       },
-      "common_moneys": {
+      "common_fractions": {
         "schemaName": "common",
-        "tableName": "moneys",
+        "tableName": "fractions",
         "columns": {
-          "currency_code": {
-            "name": "currency_code",
+          "denominator": {
+            "name": "denominator",
             "type": {
-              "scalarType": "text"
+              "scalarType": "int8"
             },
             "nullable": "nullable",
             "description": null
@@ -1403,16 +1403,8 @@
             "nullable": "nonNullable",
             "description": null
           },
-          "nanos": {
-            "name": "nanos",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "units": {
-            "name": "units",
+          "numerator": {
+            "name": "numerator",
             "type": {
               "scalarType": "int8"
             },
@@ -1421,120 +1413,7 @@
           }
         },
         "uniquenessConstraints": {
-          "moneys_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "common_postal_address": {
-        "schemaName": "common",
-        "tableName": "postal_address",
-        "columns": {
-          "address_lines": {
-            "name": "address_lines",
-            "type": {
-              "arrayType": {
-                "scalarType": "text"
-              }
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "administrative_area": {
-            "name": "administrative_area",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "language_code": {
-            "name": "language_code",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "locality": {
-            "name": "locality",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "organization": {
-            "name": "organization",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "postal_code": {
-            "name": "postal_code",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "recipients": {
-            "name": "recipients",
-            "type": {
-              "arrayType": {
-                "scalarType": "text"
-              }
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "region_code": {
-            "name": "region_code",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "revision": {
-            "name": "revision",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "sorting_code": {
-            "name": "sorting_code",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "sublocality": {
-            "name": "sublocality",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "postal_address_pkey": [
+          "fractions_pkey": [
             "id"
           ]
         },
@@ -4163,264 +4042,22 @@
         "foreignRelations": {},
         "description": null
       },
-      "pricing_adjustments": {
-        "schemaName": "pricing",
-        "tableName": "adjustments",
+      "pack_extension_fields": {
+        "schemaName": "pack",
+        "tableName": "extension_fields",
         "columns": {
-          "amount_delta_id": {
-            "name": "amount_delta_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "percent_delta": {
-            "name": "percent_delta",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "adjustments_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "pricing_date_ranges": {
-        "schemaName": "pricing",
-        "tableName": "date_ranges",
-        "columns": {
-          "end_date": {
-            "name": "end_date",
-            "type": {
-              "scalarType": "date"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "start_date": {
-            "name": "start_date",
-            "type": {
-              "scalarType": "date"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "date_ranges_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "pricing_dynamic_bands": {
-        "schemaName": "pricing",
-        "tableName": "dynamic_bands",
-        "columns": {
-          "adjustment_id": {
-            "name": "adjustment_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "display_name": {
-            "name": "display_name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "dynamic_rule_id": {
-            "name": "dynamic_rule_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "max_threshold": {
-            "name": "max_threshold",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "min_threshold": {
-            "name": "min_threshold",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "dynamic_bands_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "pricing_dynamic_rules": {
-        "schemaName": "pricing",
-        "tableName": "dynamic_rules",
-        "columns": {
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "rate_plan_id": {
-            "name": "rate_plan_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "trigger": {
-            "name": "trigger",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "hasDefault": "hasDefault",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "dynamic_rules_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "pricing_fees": {
-        "schemaName": "pricing",
-        "tableName": "fees",
-        "columns": {
-          "amount_id": {
-            "name": "amount_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "code": {
-            "name": "code",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "display_name": {
-            "name": "display_name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "percent": {
-            "name": "percent",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "pricing_unit": {
-            "name": "pricing_unit",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "rate_plan_id": {
-            "name": "rate_plan_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "taxable": {
-            "name": "taxable",
+          "boolean_value": {
+            "name": "boolean_value",
             "type": {
               "scalarType": "bool"
             },
             "nullable": "nullable",
             "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "fees_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "pricing_los_discounts": {
-        "schemaName": "pricing",
-        "tableName": "los_discounts",
-        "columns": {
-          "amount_off_id": {
-            "name": "amount_off_id",
+          },
+          "data_value": {
+            "name": "data_value",
             "type": {
-              "scalarType": "text"
+              "scalarType": "bytea"
             },
             "nullable": "nullable",
             "description": null
@@ -4433,137 +4070,212 @@
             "nullable": "nonNullable",
             "description": null
           },
-          "min_nights": {
-            "name": "min_nights",
+          "label": {
+            "name": "label",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "number_value": {
+            "name": "number_value",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "record_id": {
+            "name": "record_id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "string_value": {
+            "name": "string_value",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "value_case": {
+            "name": "value_case",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {
+          "extension_fields_pkey": [
+            "id"
+          ]
+        },
+        "foreignRelations": {},
+        "description": null
+      },
+      "pack_records": {
+        "schemaName": "pack",
+        "tableName": "records",
+        "columns": {
+          "base_sensor_id": {
+            "name": "base_sensor_id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "base_sum": {
+            "name": "base_sum",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "base_time_value": {
+            "name": "base_time_value",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "base_unit": {
+            "name": "base_unit",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "base_value": {
+            "name": "base_value",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "boolean_value": {
+            "name": "boolean_value",
+            "type": {
+              "scalarType": "bool"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "data_value": {
+            "name": "data_value",
+            "type": {
+              "scalarType": "bytea"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "id": {
+            "name": "id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "number_value": {
+            "name": "number_value",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "pack_id": {
+            "name": "pack_id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "sensor_id": {
+            "name": "sensor_id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "string_value": {
+            "name": "string_value",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "sum": {
+            "name": "sum",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "time_value": {
+            "name": "time_value",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "unit": {
+            "name": "unit",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "update_duration": {
+            "name": "update_duration",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "value_case": {
+            "name": "value_case",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {
+          "records_pkey": [
+            "id"
+          ]
+        },
+        "foreignRelations": {},
+        "description": null
+      },
+      "pack_resource": {
+        "schemaName": "pack",
+        "tableName": "resource",
+        "columns": {
+          "base_version": {
+            "name": "base_version",
             "type": {
               "scalarType": "int4"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "percent_off": {
-            "name": "percent_off",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "rate_plan_id": {
-            "name": "rate_plan_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "los_discounts_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "pricing_price_bounds": {
-        "schemaName": "pricing",
-        "tableName": "price_bounds",
-        "columns": {
-          "ceiling_id": {
-            "name": "ceiling_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "floor_id": {
-            "name": "floor_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "price_bounds_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "pricing_rate_overrides": {
-        "schemaName": "pricing",
-        "tableName": "rate_overrides",
-        "columns": {
-          "date_range_id": {
-            "name": "date_range_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "price_id": {
-            "name": "price_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "rate_plan_id": {
-            "name": "rate_plan_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "weekdays": {
-            "name": "weekdays",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "rate_overrides_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "pricing_rate_plans": {
-        "schemaName": "pricing",
-        "tableName": "rate_plans",
-        "columns": {
-          "bounds_id": {
-            "name": "bounds_id",
-            "type": {
-              "scalarType": "text"
             },
             "nullable": "nullable",
             "description": null
@@ -4576,26 +4288,26 @@
             "nullable": "nonNullable",
             "description": null
           },
-          "description": {
-            "name": "description",
+          "delete_time": {
+            "name": "delete_time",
             "type": {
-              "scalarType": "text"
+              "scalarType": "timestamptz"
             },
             "nullable": "nullable",
-            "description": null
-          },
-          "display_name": {
-            "name": "display_name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
             "description": null
           },
           "etag": {
             "name": "etag",
             "type": {
               "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "expire_time": {
+            "name": "expire_time",
+            "type": {
+              "scalarType": "timestamptz"
             },
             "nullable": "nullable",
             "description": null
@@ -4616,37 +4328,20 @@
             "nullable": "nonNullable",
             "description": null
           },
-          "price_id": {
-            "name": "price_id",
+          "resolved": {
+            "name": "resolved",
             "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "pricing_unit": {
-            "name": "pricing_unit",
-            "type": {
-              "scalarType": "text"
+              "scalarType": "bool"
             },
             "nullable": "nullable",
             "description": null
           },
-          "resource": {
-            "name": "resource",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "state": {
-            "name": "state",
+          "uid": {
+            "name": "uid",
             "type": {
               "scalarType": "text"
             },
             "nullable": "nullable",
-            "hasDefault": "hasDefault",
             "description": null
           },
           "update_time": {
@@ -4659,60 +4354,7 @@
           }
         },
         "uniquenessConstraints": {
-          "rate_plans_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "pricing_taxes": {
-        "schemaName": "pricing",
-        "tableName": "taxes",
-        "columns": {
-          "code": {
-            "name": "code",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "display_name": {
-            "name": "display_name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "percent": {
-            "name": "percent",
-            "type": {
-              "scalarType": "numeric"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "rate_plan_id": {
-            "name": "rate_plan_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "taxes_pkey": [
+          "resource_pkey": [
             "id"
           ]
         },
@@ -4842,1708 +4484,6 @@
           ]
         },
         "foreignRelations": {},
-        "description": null
-      },
-      "promocode_discounts": {
-        "schemaName": "promocode",
-        "tableName": "discounts",
-        "columns": {
-          "amount_case": {
-            "name": "amount_case",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "amount_off_id": {
-            "name": "amount_off_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "percent_off": {
-            "name": "percent_off",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "discounts_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "discounts_amount_off_id_fkey": {
-            "foreignSchema": "common",
-            "foreignTable": "moneys",
-            "columnMapping": {
-              "amount_off_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "promocode_redemption_windows": {
-        "schemaName": "promocode",
-        "tableName": "redemption_windows",
-        "columns": {
-          "end_time": {
-            "name": "end_time",
-            "type": {
-              "scalarType": "timestamptz"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "start_time": {
-            "name": "start_time",
-            "type": {
-              "scalarType": "timestamptz"
-            },
-            "nullable": "nullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "redemption_windows_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "promocode_redemptions": {
-        "schemaName": "promocode",
-        "tableName": "redemptions",
-        "columns": {
-          "amount_applied_id": {
-            "name": "amount_applied_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "customer": {
-            "name": "customer",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "name": {
-            "name": "name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "promo_code_id": {
-            "name": "promo_code_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "redeemed_time": {
-            "name": "redeemed_time",
-            "type": {
-              "scalarType": "timestamptz"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "reservation": {
-            "name": "reservation",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "redemptions_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "redemptions_amount_applied_id_fkey": {
-            "foreignSchema": "common",
-            "foreignTable": "moneys",
-            "columnMapping": {
-              "amount_applied_id": "id"
-            }
-          },
-          "redemptions_promo_code_id_fkey": {
-            "foreignSchema": "promocode",
-            "foreignTable": "resource",
-            "columnMapping": {
-              "promo_code_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "promocode_resource": {
-        "schemaName": "promocode",
-        "tableName": "resource",
-        "columns": {
-          "code": {
-            "name": "code",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "code_generation": {
-            "name": "code_generation",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "create_time": {
-            "name": "create_time",
-            "type": {
-              "scalarType": "timestamptz"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "description": {
-            "name": "description",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "disabled": {
-            "name": "disabled",
-            "type": {
-              "scalarType": "bool"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "discount_id": {
-            "name": "discount_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "display_name": {
-            "name": "display_name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "etag": {
-            "name": "etag",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "limits_id": {
-            "name": "limits_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "name": {
-            "name": "name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "redemption_count": {
-            "name": "redemption_count",
-            "type": {
-              "scalarType": "int8"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "scope_id": {
-            "name": "scope_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "state": {
-            "name": "state",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "update_time": {
-            "name": "update_time",
-            "type": {
-              "scalarType": "timestamptz"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "window_id": {
-            "name": "window_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "resource_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "resource_discount_id_fkey": {
-            "foreignSchema": "promocode",
-            "foreignTable": "discounts",
-            "columnMapping": {
-              "discount_id": "id"
-            }
-          },
-          "resource_limits_id_fkey": {
-            "foreignSchema": "promocode",
-            "foreignTable": "usage_limits",
-            "columnMapping": {
-              "limits_id": "id"
-            }
-          },
-          "resource_scope_id_fkey": {
-            "foreignSchema": "promocode",
-            "foreignTable": "scopes",
-            "columnMapping": {
-              "scope_id": "id"
-            }
-          },
-          "resource_window_id_fkey": {
-            "foreignSchema": "promocode",
-            "foreignTable": "redemption_windows",
-            "columnMapping": {
-              "window_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "promocode_scope_applicable_properties": {
-        "schemaName": "promocode",
-        "tableName": "scope_applicable_properties",
-        "columns": {
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "property_id": {
-            "name": "property_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "scope_id": {
-            "name": "scope_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "scope_applicable_properties_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "scope_applicable_properties_property_id_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "properties",
-            "columnMapping": {
-              "property_id": "id"
-            }
-          },
-          "scope_applicable_properties_scope_id_fkey": {
-            "foreignSchema": "promocode",
-            "foreignTable": "scopes",
-            "columnMapping": {
-              "scope_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "promocode_scope_applicable_units": {
-        "schemaName": "promocode",
-        "tableName": "scope_applicable_units",
-        "columns": {
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "scope_id": {
-            "name": "scope_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "unit_id": {
-            "name": "unit_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "unit_name": {
-            "name": "unit_name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "scope_applicable_units_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "scope_applicable_units_scope_id_fkey": {
-            "foreignSchema": "promocode",
-            "foreignTable": "scopes",
-            "columnMapping": {
-              "scope_id": "id"
-            }
-          },
-          "scope_applicable_units_unit_id_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "units",
-            "columnMapping": {
-              "unit_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "promocode_scopes": {
-        "schemaName": "promocode",
-        "tableName": "scopes",
-        "columns": {
-          "applicable_properties": {
-            "name": "applicable_properties",
-            "type": {
-              "arrayType": {
-                "scalarType": "text"
-              }
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "applicable_units": {
-            "name": "applicable_units",
-            "type": {
-              "arrayType": {
-                "scalarType": "text"
-              }
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "min_subtotal_id": {
-            "name": "min_subtotal_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "scopes_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "scopes_min_subtotal_id_fkey": {
-            "foreignSchema": "common",
-            "foreignTable": "moneys",
-            "columnMapping": {
-              "min_subtotal_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "promocode_usage_limits": {
-        "schemaName": "promocode",
-        "tableName": "usage_limits",
-        "columns": {
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "max_redemptions": {
-            "name": "max_redemptions",
-            "type": {
-              "scalarType": "int8"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "per_customer_limit": {
-            "name": "per_customer_limit",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "usage_limits_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "property_fees": {
-        "schemaName": "property",
-        "tableName": "fees",
-        "columns": {
-          "amount_id": {
-            "name": "amount_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "code": {
-            "name": "code",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "display_name": {
-            "name": "display_name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "percent": {
-            "name": "percent",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "pricing_unit": {
-            "name": "pricing_unit",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "taxable": {
-            "name": "taxable",
-            "type": {
-              "scalarType": "bool"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "unit_id": {
-            "name": "unit_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "fees_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "fees_amount_id_fkey": {
-            "foreignSchema": "common",
-            "foreignTable": "moneys",
-            "columnMapping": {
-              "amount_id": "id"
-            }
-          },
-          "fees_unit_id_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "units",
-            "columnMapping": {
-              "unit_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "property_licences": {
-        "schemaName": "property",
-        "tableName": "licences",
-        "columns": {
-          "attachment_id": {
-            "name": "attachment_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "create_time": {
-            "name": "create_time",
-            "type": {
-              "scalarType": "timestamptz"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "etag": {
-            "name": "etag",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "expiry_date": {
-            "name": "expiry_date",
-            "type": {
-              "scalarType": "date"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "issue_date": {
-            "name": "issue_date",
-            "type": {
-              "scalarType": "date"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "issuing_authority": {
-            "name": "issuing_authority",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "licence_number": {
-            "name": "licence_number",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "name": {
-            "name": "name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "notes": {
-            "name": "notes",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "organizational_unit_id": {
-            "name": "organizational_unit_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "property_id": {
-            "name": "property_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "state": {
-            "name": "state",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "hasDefault": "hasDefault",
-            "description": null
-          },
-          "target": {
-            "name": "target",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "type": {
-            "name": "type",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "hasDefault": "hasDefault",
-            "description": null
-          },
-          "unit": {
-            "name": "unit",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "update_time": {
-            "name": "update_time",
-            "type": {
-              "scalarType": "timestamptz"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "licences_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "licences_attachment_id_fkey": {
-            "foreignSchema": "shared",
-            "foreignTable": "attachments",
-            "columnMapping": {
-              "attachment_id": "id"
-            }
-          },
-          "licences_property_id_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "properties",
-            "columnMapping": {
-              "property_id": "id"
-            }
-          },
-          "licences_unit_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "units",
-            "columnMapping": {
-              "unit": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "property_los_discounts": {
-        "schemaName": "property",
-        "tableName": "los_discounts",
-        "columns": {
-          "amount_off_id": {
-            "name": "amount_off_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "min_nights": {
-            "name": "min_nights",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "percent_off": {
-            "name": "percent_off",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "unit_id": {
-            "name": "unit_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "los_discounts_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "los_discounts_amount_off_id_fkey": {
-            "foreignSchema": "common",
-            "foreignTable": "moneys",
-            "columnMapping": {
-              "amount_off_id": "id"
-            }
-          },
-          "los_discounts_unit_id_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "units",
-            "columnMapping": {
-              "unit_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "property_medias": {
-        "schemaName": "property",
-        "tableName": "medias",
-        "columns": {
-          "description": {
-            "name": "description",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "mime_type": {
-            "name": "mime_type",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "primary": {
-            "name": "primary",
-            "type": {
-              "scalarType": "bool"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "property_id": {
-            "name": "property_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "sort_order": {
-            "name": "sort_order",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "title": {
-            "name": "title",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "type": {
-            "name": "type",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "hasDefault": "hasDefault",
-            "description": null
-          },
-          "uri": {
-            "name": "uri",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "medias_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "medias_property_id_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "properties",
-            "columnMapping": {
-              "property_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "property_policies": {
-        "schemaName": "property",
-        "tableName": "policies",
-        "columns": {
-          "checkin_time": {
-            "name": "checkin_time",
-            "type": {
-              "scalarType": "time"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "checkout_time": {
-            "name": "checkout_time",
-            "type": {
-              "scalarType": "time"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "house_rules": {
-            "name": "house_rules",
-            "type": {
-              "arrayType": {
-                "scalarType": "text"
-              }
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "notes": {
-            "name": "notes",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "policies_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "property_properties": {
-        "schemaName": "property",
-        "tableName": "properties",
-        "columns": {
-          "address_id": {
-            "name": "address_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "attributes": {
-            "name": "attributes",
-            "type": {
-              "scalarType": "jsonb"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "create_time": {
-            "name": "create_time",
-            "type": {
-              "scalarType": "timestamptz"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "description": {
-            "name": "description",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "display_name": {
-            "name": "display_name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "etag": {
-            "name": "etag",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "name": {
-            "name": "name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "organisation": {
-            "name": "organisation",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "policy_id": {
-            "name": "policy_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "state": {
-            "name": "state",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "hasDefault": "hasDefault",
-            "description": null
-          },
-          "tags": {
-            "name": "tags",
-            "type": {
-              "arrayType": {
-                "scalarType": "text"
-              }
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "time_zone": {
-            "name": "time_zone",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "update_time": {
-            "name": "update_time",
-            "type": {
-              "scalarType": "timestamptz"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "properties_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "properties_address_id_fkey": {
-            "foreignSchema": "common",
-            "foreignTable": "postal_address",
-            "columnMapping": {
-              "address_id": "id"
-            }
-          },
-          "properties_policy_id_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "policies",
-            "columnMapping": {
-              "policy_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "property_rate_overrides": {
-        "schemaName": "property",
-        "tableName": "rate_overrides",
-        "columns": {
-          "date_range_id": {
-            "name": "date_range_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "price_id": {
-            "name": "price_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "unit_id": {
-            "name": "unit_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "weekdays": {
-            "name": "weekdays",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "rate_overrides_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "rate_overrides_date_range_id_fkey": {
-            "foreignSchema": "shared",
-            "foreignTable": "date_ranges",
-            "columnMapping": {
-              "date_range_id": "id"
-            }
-          },
-          "rate_overrides_price_id_fkey": {
-            "foreignSchema": "common",
-            "foreignTable": "moneys",
-            "columnMapping": {
-              "price_id": "id"
-            }
-          },
-          "rate_overrides_unit_id_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "units",
-            "columnMapping": {
-              "unit_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "property_taxes": {
-        "schemaName": "property",
-        "tableName": "taxes",
-        "columns": {
-          "code": {
-            "name": "code",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "display_name": {
-            "name": "display_name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "percent": {
-            "name": "percent",
-            "type": {
-              "scalarType": "numeric"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "unit_id": {
-            "name": "unit_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "taxes_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "taxes_unit_id_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "units",
-            "columnMapping": {
-              "unit_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "property_unit_applicable_promo_codes": {
-        "schemaName": "property",
-        "tableName": "unit_applicable_promo_codes",
-        "columns": {
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "promo_code_id": {
-            "name": "promo_code_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "unit_id": {
-            "name": "unit_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "unit_applicable_promo_codes_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "unit_applicable_promo_codes_promo_code_id_fkey": {
-            "foreignSchema": "promocode",
-            "foreignTable": "resource",
-            "columnMapping": {
-              "promo_code_id": "id"
-            }
-          },
-          "unit_applicable_promo_codes_unit_id_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "units",
-            "columnMapping": {
-              "unit_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "property_unit_medias": {
-        "schemaName": "property",
-        "tableName": "unit_medias",
-        "columns": {
-          "description": {
-            "name": "description",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "mime_type": {
-            "name": "mime_type",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "primary": {
-            "name": "primary",
-            "type": {
-              "scalarType": "bool"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "sort_order": {
-            "name": "sort_order",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "title": {
-            "name": "title",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "type": {
-            "name": "type",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "hasDefault": "hasDefault",
-            "description": null
-          },
-          "unit_id": {
-            "name": "unit_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "uri": {
-            "name": "uri",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "unit_medias_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "unit_medias_unit_id_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "units",
-            "columnMapping": {
-              "unit_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "property_units": {
-        "schemaName": "property",
-        "tableName": "units",
-        "columns": {
-          "attributes": {
-            "name": "attributes",
-            "type": {
-              "scalarType": "jsonb"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "booking_mode": {
-            "name": "booking_mode",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "hasDefault": "hasDefault",
-            "description": null
-          },
-          "capacity": {
-            "name": "capacity",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "create_time": {
-            "name": "create_time",
-            "type": {
-              "scalarType": "timestamptz"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "description": {
-            "name": "description",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "display_name": {
-            "name": "display_name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "duration": {
-            "name": "duration",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "etag": {
-            "name": "etag",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "max_occupancy": {
-            "name": "max_occupancy",
-            "type": {
-              "scalarType": "int4"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "name": {
-            "name": "name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "price_id": {
-            "name": "price_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "pricing_unit": {
-            "name": "pricing_unit",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "property_id": {
-            "name": "property_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "state": {
-            "name": "state",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "hasDefault": "hasDefault",
-            "description": null
-          },
-          "tags": {
-            "name": "tags",
-            "type": {
-              "arrayType": {
-                "scalarType": "text"
-              }
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "time_zone": {
-            "name": "time_zone",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "type": {
-            "name": "type",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "hasDefault": "hasDefault",
-            "description": null
-          },
-          "update_time": {
-            "name": "update_time",
-            "type": {
-              "scalarType": "timestamptz"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "units_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "units_price_id_fkey": {
-            "foreignSchema": "common",
-            "foreignTable": "moneys",
-            "columnMapping": {
-              "price_id": "id"
-            }
-          },
-          "units_property_id_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "properties",
-            "columnMapping": {
-              "property_id": "id"
-            }
-          }
-        },
-        "description": null
-      },
-      "property_units_link": {
-        "schemaName": "property",
-        "tableName": "units_link",
-        "columns": {
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "property_id": {
-            "name": "property_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "unit_id": {
-            "name": "unit_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "unit_name": {
-            "name": "unit_name",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "units_link_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {
-          "units_link_property_id_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "properties",
-            "columnMapping": {
-              "property_id": "id"
-            }
-          },
-          "units_link_unit_id_fkey": {
-            "foreignSchema": "property",
-            "foreignTable": "units",
-            "columnMapping": {
-              "unit_id": "id"
-            }
-          }
-        },
         "description": null
       },
       "reservation_resource": {
@@ -6918,79 +4858,26 @@
         "foreignRelations": {},
         "description": null
       },
-      "shared_attachments": {
-        "schemaName": "shared",
-        "tableName": "attachments",
+      "sensor_resource": {
+        "schemaName": "sensor",
+        "tableName": "resource",
         "columns": {
-          "content": {
-            "name": "content",
+          "create_time": {
+            "name": "create_time",
             "type": {
-              "scalarType": "bytea"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "filename": {
-            "name": "filename",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "id": {
-            "name": "id",
-            "type": {
-              "scalarType": "text"
+              "scalarType": "timestamptz"
             },
             "nullable": "nonNullable",
             "description": null
           },
-          "mime_type": {
-            "name": "mime_type",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "size_bytes": {
-            "name": "size_bytes",
-            "type": {
-              "scalarType": "int8"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "upload_time": {
-            "name": "upload_time",
+          "delete_time": {
+            "name": "delete_time",
             "type": {
               "scalarType": "timestamptz"
             },
             "nullable": "nullable",
             "description": null
           },
-          "uri": {
-            "name": "uri",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "attachments_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "shared_contacts": {
-        "schemaName": "shared",
-        "tableName": "contacts",
-        "columns": {
           "display_name": {
             "name": "display_name",
             "type": {
@@ -6999,10 +4886,18 @@
             "nullable": "nullable",
             "description": null
           },
-          "email": {
-            "name": "email",
+          "etag": {
+            "name": "etag",
             "type": {
               "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "expire_time": {
+            "name": "expire_time",
+            "type": {
+              "scalarType": "timestamptz"
             },
             "nullable": "nullable",
             "description": null
@@ -7015,54 +4910,95 @@
             "nullable": "nonNullable",
             "description": null
           },
-          "phone_number": {
-            "name": "phone_number",
+          "interface_descriptions": {
+            "name": "interface_descriptions",
+            "type": {
+              "arrayType": {
+                "scalarType": "text"
+              }
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "media_types": {
+            "name": "media_types",
+            "type": {
+              "arrayType": {
+                "scalarType": "text"
+              }
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "name": {
+            "name": "name",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "resource_types": {
+            "name": "resource_types",
+            "type": {
+              "arrayType": {
+                "scalarType": "text"
+              }
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "senml_id": {
+            "name": "senml_id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "target_uri": {
+            "name": "target_uri",
             "type": {
               "scalarType": "text"
             },
             "nullable": "nullable",
             "description": null
-          }
-        },
-        "uniquenessConstraints": {
-          "contacts_pkey": [
-            "id"
-          ]
-        },
-        "foreignRelations": {},
-        "description": null
-      },
-      "shared_date_ranges": {
-        "schemaName": "shared",
-        "tableName": "date_ranges",
-        "columns": {
-          "end_date": {
-            "name": "end_date",
-            "type": {
-              "scalarType": "date"
-            },
-            "nullable": "nonNullable",
-            "description": null
           },
-          "id": {
-            "name": "id",
+          "uid": {
+            "name": "uid",
             "type": {
               "scalarType": "text"
             },
-            "nullable": "nonNullable",
+            "nullable": "nullable",
             "description": null
           },
-          "start_date": {
-            "name": "start_date",
+          "unit": {
+            "name": "unit",
             "type": {
-              "scalarType": "date"
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "update_duration": {
+            "name": "update_duration",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "update_time": {
+            "name": "update_time",
+            "type": {
+              "scalarType": "timestamptz"
             },
             "nullable": "nonNullable",
             "description": null
           }
         },
         "uniquenessConstraints": {
-          "date_ranges_pkey": [
+          "resource_pkey": [
             "id"
           ]
         },
@@ -7126,7 +5062,7 @@
             "type": {
               "scalarType": "text"
             },
-            "nullable": "nonNullable",
+            "nullable": "nullable",
             "hasDefault": "hasDefault",
             "description": null
           },
@@ -7147,38 +5083,22 @@
         "foreignRelations": {},
         "description": null
       },
-      "shared_price_components": {
-        "schemaName": "shared",
-        "tableName": "price_components",
+      "stream_extension_fields": {
+        "schemaName": "stream",
+        "tableName": "extension_fields",
         "columns": {
-          "amount_id": {
-            "name": "amount_id",
+          "boolean_value": {
+            "name": "boolean_value",
             "type": {
-              "scalarType": "text"
+              "scalarType": "bool"
             },
             "nullable": "nullable",
             "description": null
           },
-          "booking_id": {
-            "name": "booking_id",
+          "data_value": {
+            "name": "data_value",
             "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
-          "code": {
-            "name": "code",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
-          "display_name": {
-            "name": "display_name",
-            "type": {
-              "scalarType": "text"
+              "scalarType": "bytea"
             },
             "nullable": "nullable",
             "description": null
@@ -7191,8 +5111,40 @@
             "nullable": "nonNullable",
             "description": null
           },
-          "type": {
-            "name": "type",
+          "label": {
+            "name": "label",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "number_value": {
+            "name": "number_value",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "record_id": {
+            "name": "record_id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "string_value": {
+            "name": "string_value",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "value_case": {
+            "name": "value_case",
             "type": {
               "scalarType": "text"
             },
@@ -7201,31 +5153,71 @@
           }
         },
         "uniquenessConstraints": {
-          "price_components_pkey": [
+          "extension_fields_pkey": [
             "id"
           ]
         },
-        "foreignRelations": {
-          "price_components_amount_id_fkey": {
-            "foreignSchema": "common",
-            "foreignTable": "moneys",
-            "columnMapping": {
-              "amount_id": "id"
-            }
-          }
-        },
+        "foreignRelations": {},
         "description": null
       },
-      "shared_time_windows": {
-        "schemaName": "shared",
-        "tableName": "time_windows",
+      "stream_records": {
+        "schemaName": "stream",
+        "tableName": "records",
         "columns": {
-          "end_time": {
-            "name": "end_time",
+          "base_sensor_id": {
+            "name": "base_sensor_id",
             "type": {
-              "scalarType": "timestamptz"
+              "scalarType": "text"
             },
-            "nullable": "nonNullable",
+            "nullable": "nullable",
+            "description": null
+          },
+          "base_sum": {
+            "name": "base_sum",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "base_time_value": {
+            "name": "base_time_value",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "base_unit": {
+            "name": "base_unit",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "base_value": {
+            "name": "base_value",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "boolean_value": {
+            "name": "boolean_value",
+            "type": {
+              "scalarType": "bool"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "data_value": {
+            "name": "data_value",
+            "type": {
+              "scalarType": "bytea"
+            },
+            "nullable": "nullable",
             "description": null
           },
           "id": {
@@ -7236,8 +5228,202 @@
             "nullable": "nonNullable",
             "description": null
           },
-          "start_time": {
-            "name": "start_time",
+          "number_value": {
+            "name": "number_value",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "sensor_id": {
+            "name": "sensor_id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "string_value": {
+            "name": "string_value",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "sum": {
+            "name": "sum",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "time_value": {
+            "name": "time_value",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "unit": {
+            "name": "unit",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "update_duration": {
+            "name": "update_duration",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "value_case": {
+            "name": "value_case",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {
+          "records_pkey": [
+            "id"
+          ]
+        },
+        "foreignRelations": {},
+        "description": null
+      },
+      "stream_records_link": {
+        "schemaName": "stream",
+        "tableName": "records_link",
+        "columns": {
+          "id": {
+            "name": "id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "record_id": {
+            "name": "record_id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "reference_time_value": {
+            "name": "reference_time_value",
+            "type": {
+              "scalarType": "float8"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "stream_id": {
+            "name": "stream_id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {
+          "records_link_pkey": [
+            "id"
+          ]
+        },
+        "foreignRelations": {},
+        "description": null
+      },
+      "stream_resource": {
+        "schemaName": "stream",
+        "tableName": "resource",
+        "columns": {
+          "base_version": {
+            "name": "base_version",
+            "type": {
+              "scalarType": "int4"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "closed": {
+            "name": "closed",
+            "type": {
+              "scalarType": "bool"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "create_time": {
+            "name": "create_time",
+            "type": {
+              "scalarType": "timestamptz"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "delete_time": {
+            "name": "delete_time",
+            "type": {
+              "scalarType": "timestamptz"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "etag": {
+            "name": "etag",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "expire_time": {
+            "name": "expire_time",
+            "type": {
+              "scalarType": "timestamptz"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "id": {
+            "name": "id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "name": {
+            "name": "name",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "uid": {
+            "name": "uid",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "update_time": {
+            "name": "update_time",
             "type": {
               "scalarType": "timestamptz"
             },
@@ -7246,7 +5432,7 @@
           }
         },
         "uniquenessConstraints": {
-          "time_windows_pkey": [
+          "resource_pkey": [
             "id"
           ]
         },
@@ -7515,6 +5701,139 @@
               "scalarType": "text"
             },
             "nullable": "nullable",
+            "description": null
+          },
+          "uid": {
+            "name": "uid",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "update_time": {
+            "name": "update_time",
+            "type": {
+              "scalarType": "timestamptz"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          }
+        },
+        "uniquenessConstraints": {
+          "resource_pkey": [
+            "id"
+          ]
+        },
+        "foreignRelations": {},
+        "description": null
+      },
+      "unit_resource": {
+        "schemaName": "unit",
+        "tableName": "resource",
+        "columns": {
+          "create_time": {
+            "name": "create_time",
+            "type": {
+              "scalarType": "timestamptz"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "delete_time": {
+            "name": "delete_time",
+            "type": {
+              "scalarType": "timestamptz"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "description": {
+            "name": "description",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "etag": {
+            "name": "etag",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "expire_time": {
+            "name": "expire_time",
+            "type": {
+              "scalarType": "timestamptz"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "id": {
+            "name": "id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "name": {
+            "name": "name",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
+            "description": null
+          },
+          "offset_id": {
+            "name": "offset_id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "producing_discouraged": {
+            "name": "producing_discouraged",
+            "type": {
+              "scalarType": "bool"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "reference": {
+            "name": "reference",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "scale_id": {
+            "name": "scale_id",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "senml_unit": {
+            "name": "senml_unit",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nullable",
+            "description": null
+          },
+          "symbol": {
+            "name": "symbol",
+            "type": {
+              "scalarType": "text"
+            },
+            "nullable": "nonNullable",
             "description": null
           },
           "uid": {
@@ -9785,6 +8104,88 @@
           },
           "typeRepresentation": "date"
         },
+        "float8": {
+          "typeName": "float8",
+          "schemaName": "pg_catalog",
+          "description": null,
+          "aggregateFunctions": {
+            "avg": {
+              "returnType": "float8"
+            },
+            "max": {
+              "returnType": "float8"
+            },
+            "min": {
+              "returnType": "float8"
+            },
+            "stddev": {
+              "returnType": "float8"
+            },
+            "stddev_pop": {
+              "returnType": "float8"
+            },
+            "stddev_samp": {
+              "returnType": "float8"
+            },
+            "sum": {
+              "returnType": "float8"
+            },
+            "var_pop": {
+              "returnType": "float8"
+            },
+            "var_samp": {
+              "returnType": "float8"
+            },
+            "variance": {
+              "returnType": "float8"
+            }
+          },
+          "comparisonOperators": {
+            "_eq": {
+              "operatorName": "=",
+              "operatorKind": "equal",
+              "argumentType": "float8",
+              "isInfix": true
+            },
+            "_gt": {
+              "operatorName": ">",
+              "operatorKind": "greaterThan",
+              "argumentType": "float8",
+              "isInfix": true
+            },
+            "_gte": {
+              "operatorName": ">=",
+              "operatorKind": "greaterThanOrEqual",
+              "argumentType": "float8",
+              "isInfix": true
+            },
+            "_in": {
+              "operatorName": "IN",
+              "operatorKind": "in",
+              "argumentType": "float8",
+              "isInfix": true
+            },
+            "_lt": {
+              "operatorName": "<",
+              "operatorKind": "lessThan",
+              "argumentType": "float8",
+              "isInfix": true
+            },
+            "_lte": {
+              "operatorName": "<=",
+              "operatorKind": "lessThanOrEqual",
+              "argumentType": "float8",
+              "isInfix": true
+            },
+            "_neq": {
+              "operatorName": "<>",
+              "operatorKind": "custom",
+              "argumentType": "float8",
+              "isInfix": true
+            }
+          },
+          "typeRepresentation": "float64"
+        },
         "int4": {
           "typeName": "int4",
           "schemaName": "pg_catalog",
@@ -9966,70 +8367,6 @@
             }
           },
           "typeRepresentation": "int64AsString"
-        },
-        "interval": {
-          "typeName": "interval",
-          "schemaName": "pg_catalog",
-          "description": null,
-          "aggregateFunctions": {
-            "avg": {
-              "returnType": "interval"
-            },
-            "max": {
-              "returnType": "interval"
-            },
-            "min": {
-              "returnType": "interval"
-            },
-            "sum": {
-              "returnType": "interval"
-            }
-          },
-          "comparisonOperators": {
-            "_eq": {
-              "operatorName": "=",
-              "operatorKind": "equal",
-              "argumentType": "interval",
-              "isInfix": true
-            },
-            "_gt": {
-              "operatorName": ">",
-              "operatorKind": "greaterThan",
-              "argumentType": "interval",
-              "isInfix": true
-            },
-            "_gte": {
-              "operatorName": ">=",
-              "operatorKind": "greaterThanOrEqual",
-              "argumentType": "interval",
-              "isInfix": true
-            },
-            "_in": {
-              "operatorName": "IN",
-              "operatorKind": "in",
-              "argumentType": "interval",
-              "isInfix": true
-            },
-            "_lt": {
-              "operatorName": "<",
-              "operatorKind": "lessThan",
-              "argumentType": "interval",
-              "isInfix": true
-            },
-            "_lte": {
-              "operatorName": "<=",
-              "operatorKind": "lessThanOrEqual",
-              "argumentType": "interval",
-              "isInfix": true
-            },
-            "_neq": {
-              "operatorName": "<>",
-              "operatorKind": "custom",
-              "argumentType": "interval",
-              "isInfix": true
-            }
-          },
-          "typeRepresentation": null
         },
         "jsonb": {
           "typeName": "jsonb",
@@ -10299,70 +8636,6 @@
             }
           },
           "typeRepresentation": "string"
-        },
-        "time": {
-          "typeName": "time",
-          "schemaName": "pg_catalog",
-          "description": null,
-          "aggregateFunctions": {
-            "avg": {
-              "returnType": "interval"
-            },
-            "max": {
-              "returnType": "time"
-            },
-            "min": {
-              "returnType": "time"
-            },
-            "sum": {
-              "returnType": "interval"
-            }
-          },
-          "comparisonOperators": {
-            "_eq": {
-              "operatorName": "=",
-              "operatorKind": "equal",
-              "argumentType": "time",
-              "isInfix": true
-            },
-            "_gt": {
-              "operatorName": ">",
-              "operatorKind": "greaterThan",
-              "argumentType": "time",
-              "isInfix": true
-            },
-            "_gte": {
-              "operatorName": ">=",
-              "operatorKind": "greaterThanOrEqual",
-              "argumentType": "time",
-              "isInfix": true
-            },
-            "_in": {
-              "operatorName": "IN",
-              "operatorKind": "in",
-              "argumentType": "time",
-              "isInfix": true
-            },
-            "_lt": {
-              "operatorName": "<",
-              "operatorKind": "lessThan",
-              "argumentType": "time",
-              "isInfix": true
-            },
-            "_lte": {
-              "operatorName": "<=",
-              "operatorKind": "lessThanOrEqual",
-              "argumentType": "time",
-              "isInfix": true
-            },
-            "_neq": {
-              "operatorName": "<>",
-              "operatorKind": "custom",
-              "argumentType": "time",
-              "isInfix": true
-            }
-          },
-          "typeRepresentation": "time"
         },
         "timestamptz": {
           "typeName": "timestamptz",

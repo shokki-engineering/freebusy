@@ -198,7 +198,7 @@ definition:
   description: Update the 'state' column in the 'shared_idempotency_keys' collection
   fields:
     - name: set
-      type: String_1!
+      type: String_1
       description: Set the column to this value
   graphql:
     typeName: UpdateColumnSharedIdempotencyKeysState

@@ -14,109 +14,49 @@
 package sharedql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/sharedql/attachmentsql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/sharedql/contactsql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/sharedql/daterangesql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/sharedql/idempotencykeysql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/sharedql/pricecomponentsql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/sharedql/timewindowsql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 
 // Model type aliases for this domain, re-exported from the owning resource packages.
-type DeleteSharedAttachmentsByIdResponse = attachmentsql.DeleteSharedAttachmentsByIdResponse
-type InsertSharedAttachmentsResponse = attachmentsql.InsertSharedAttachmentsResponse
-type SharedAttachments = attachmentsql.SharedAttachments
-type SharedAttachmentsAggExp = attachmentsql.SharedAttachmentsAggExp
-type UpdateSharedAttachmentsByIdResponse = attachmentsql.UpdateSharedAttachmentsByIdResponse
-type DeleteSharedContactsByIdResponse = contactsql.DeleteSharedContactsByIdResponse
-type InsertSharedContactsResponse = contactsql.InsertSharedContactsResponse
-type SharedContacts = contactsql.SharedContacts
-type SharedContactsAggExp = contactsql.SharedContactsAggExp
-type UpdateSharedContactsByIdResponse = contactsql.UpdateSharedContactsByIdResponse
-type DeleteSharedDateRangesByIdResponse = daterangesql.DeleteSharedDateRangesByIdResponse
-type InsertSharedDateRangesResponse = daterangesql.InsertSharedDateRangesResponse
-type SharedDateRanges = daterangesql.SharedDateRanges
-type SharedDateRangesAggExp = daterangesql.SharedDateRangesAggExp
-type UpdateSharedDateRangesByIdResponse = daterangesql.UpdateSharedDateRangesByIdResponse
 type DeleteSharedIdempotencyKeysByIdResponse = idempotencykeysql.DeleteSharedIdempotencyKeysByIdResponse
 type InsertSharedIdempotencyKeysResponse = idempotencykeysql.InsertSharedIdempotencyKeysResponse
 type SharedIdempotencyKeys = idempotencykeysql.SharedIdempotencyKeys
 type SharedIdempotencyKeysAggExp = idempotencykeysql.SharedIdempotencyKeysAggExp
 type UpdateSharedIdempotencyKeysByIdResponse = idempotencykeysql.UpdateSharedIdempotencyKeysByIdResponse
-type DeleteSharedPriceComponentsByIdResponse = pricecomponentsql.DeleteSharedPriceComponentsByIdResponse
-type InsertSharedPriceComponentsResponse = pricecomponentsql.InsertSharedPriceComponentsResponse
-type SharedPriceComponents = pricecomponentsql.SharedPriceComponents
-type SharedPriceComponentsAggExp = pricecomponentsql.SharedPriceComponentsAggExp
-type UpdateSharedPriceComponentsByIdResponse = pricecomponentsql.UpdateSharedPriceComponentsByIdResponse
-type DeleteSharedTimeWindowsByIdResponse = timewindowsql.DeleteSharedTimeWindowsByIdResponse
-type InsertSharedTimeWindowsResponse = timewindowsql.InsertSharedTimeWindowsResponse
-type SharedTimeWindows = timewindowsql.SharedTimeWindows
-type SharedTimeWindowsAggExp = timewindowsql.SharedTimeWindowsAggExp
-type UpdateSharedTimeWindowsByIdResponse = timewindowsql.UpdateSharedTimeWindowsByIdResponse
 
 // QueryHandler aggregates query handlers for the sharedql domain.
 type QueryHandler struct {
-	Attachments     attachmentsql.QueryHandler
-	Contacts        contactsql.QueryHandler
-	DateRanges      daterangesql.QueryHandler
 	IdempotencyKeys idempotencykeysql.QueryHandler
-	PriceComponents pricecomponentsql.QueryHandler
-	TimeWindows     timewindowsql.QueryHandler
 }
 
 // NewQuery wires every query handler in the domain.
 func NewQuery(gql *runtime.GraphQLClient) QueryHandler {
 	return QueryHandler{
-		Attachments:     attachmentsql.NewQuery(gql),
-		Contacts:        contactsql.NewQuery(gql),
-		DateRanges:      daterangesql.NewQuery(gql),
 		IdempotencyKeys: idempotencykeysql.NewQuery(gql),
-		PriceComponents: pricecomponentsql.NewQuery(gql),
-		TimeWindows:     timewindowsql.NewQuery(gql),
 	}
 }
 
 // MutationHandler aggregates mutation handlers for the sharedql domain.
 type MutationHandler struct {
-	Attachments     attachmentsql.MutationHandler
-	Contacts        contactsql.MutationHandler
-	DateRanges      daterangesql.MutationHandler
 	IdempotencyKeys idempotencykeysql.MutationHandler
-	PriceComponents pricecomponentsql.MutationHandler
-	TimeWindows     timewindowsql.MutationHandler
 }
 
 // NewMutation wires every mutation handler in the domain.
 func NewMutation(gql *runtime.GraphQLClient) MutationHandler {
 	return MutationHandler{
-		Attachments:     attachmentsql.NewMutation(gql),
-		Contacts:        contactsql.NewMutation(gql),
-		DateRanges:      daterangesql.NewMutation(gql),
 		IdempotencyKeys: idempotencykeysql.NewMutation(gql),
-		PriceComponents: pricecomponentsql.NewMutation(gql),
-		TimeWindows:     timewindowsql.NewMutation(gql),
 	}
 }
 
 // SubscriptionHandler aggregates subscription handlers for the sharedql domain.
 type SubscriptionHandler struct {
-	Attachments     attachmentsql.SubscriptionHandler
-	Contacts        contactsql.SubscriptionHandler
-	DateRanges      daterangesql.SubscriptionHandler
 	IdempotencyKeys idempotencykeysql.SubscriptionHandler
-	PriceComponents pricecomponentsql.SubscriptionHandler
-	TimeWindows     timewindowsql.SubscriptionHandler
 }
 
 // NewSubscription wires every subscription handler in the domain.
 func NewSubscription(gql *runtime.GraphQLClient) SubscriptionHandler {
 	return SubscriptionHandler{
-		Attachments:     attachmentsql.NewSubscription(gql),
-		Contacts:        contactsql.NewSubscription(gql),
-		DateRanges:      daterangesql.NewSubscription(gql),
 		IdempotencyKeys: idempotencykeysql.NewSubscription(gql),
-		PriceComponents: pricecomponentsql.NewSubscription(gql),
-		TimeWindows:     timewindowsql.NewSubscription(gql),
 	}
 }

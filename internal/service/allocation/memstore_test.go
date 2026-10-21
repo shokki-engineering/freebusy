@@ -51,6 +51,9 @@ func (m *memStore) Resources(_ context.Context, q ResourceQuery) ([]ResourceReco
 		if len(q.OrganizationalUnits) > 0 && !slices.Contains(q.OrganizationalUnits, res.GetOrganizationalUnit()) {
 			continue
 		}
+		if len(q.Calendars) > 0 && !slices.Contains(q.Calendars, res.GetCalendar()) {
+			continue
+		}
 		if len(q.Names) > 0 && !slices.Contains(q.Names, res.GetName()) {
 			continue
 		}

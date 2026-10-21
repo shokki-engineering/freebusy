@@ -16,8 +16,8 @@
 package journal
 
 import (
+	journalpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/journal/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/journal/v1/journalpbv1"
 )
 
 // applyJournalMask merges the masked fields of in onto merged. An empty
@@ -46,5 +46,8 @@ func applyJournalMask(merged, in *journalpbv1.Journal, paths []string) {
 	}
 	if repox.GroupTouched(paths, "start") {
 		merged.Start = in.GetStart()
+	}
+	if repox.GroupTouched(paths, "extensions") {
+		merged.Extensions = in.GetExtensions()
 	}
 }

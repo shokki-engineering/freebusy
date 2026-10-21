@@ -26,7 +26,7 @@ enum IdempotencyState {
   @@schema("shared")
 }
 
-/// The record behind every `request_id` field in this API: it remembers what the first call with a given id returned, so a retry replays that response instead of attempting the write twice. Storage only — no service exposes it, and no caller constructs one. It lives in freebusy.shared.v1 because request_id is API-wide (booking, property, promo code, channel, organisation, schedule) and one interceptor records them all; homing it in any single service's package would make every other service import that service to dedupe its own writes. The id is derived, not random: it is a digest of (method, request_id), so the primary key itself is the uniqueness constraint that makes a concurrent duplicate lose the race rather than double-write.
+/// The record behind every `request_id` field in this API: it remembers what the first call with a given id returned, so a retry replays that response instead of attempting the write twice. Storage only — no service exposes it, and no caller constructs one. It lives in freebusy.shared.v1 because request_id is an API-wide convention any RPC may opt into, and one interceptor records them all; homing it in any single service's package would make every other service import that service to dedupe its own writes. No RPC declares request_id today -- holds and reservations carry their own idempotency. The id is derived, not random: it is a digest of (method, request_id), so the primary key itself is the uniqueness constraint that makes a concurrent duplicate lose the race rather than double-write.
 model IdempotencyKey {
   /// Unique identifier for the record.
   id String @id @default(ulid()) @map("id")
@@ -34,14 +34,14 @@ model IdempotencyKey {
   /// The key name. The final segment is a digest of (method, request_id). Format: idempotencyKeys/{idempotency_key}
   name String @unique @map("name")
 
-  /// Fully-qualified RPC that was called, e.g. "/freebusy.scheduling.v1.SchedulingService/CreateBooking". Part of the key: the same request_id replayed against a different method is a different request.
+  /// Fully-qualified RPC that was called, e.g. "/freebusy.allocation.v1.HoldService/CreateHold". Part of the key: the same request_id replayed against a different method is a different request.
   method String @map("method")
 
   /// The caller-supplied idempotency key, verbatim from the request's `request_id` field.
   requestID String @map("request_id")
 
   /// Whether the first call is still running or has settled. REQUIRED, not OUTPUT_ONLY, and AIP-216's state-field-output-only is knowingly not satisfied here. protoc-gen-orm reads OUTPUT_ONLY as "the repository never writes this column": with it set, GORM's Update stops copying State and the GraphQL create input and update patch both omit it, so settle()'s transition to DONE is silently dropped and every replay re-runs the handler. AIP-216 is about a *client* not setting lifecycle; this record has no client -- no service exposes it and the server is the only writer -- so the rule's premise does not hold while its cost is a broken idempotency mechanism. Revisit if orm gains a writable override.
-  state IdempotencyState @default(IN_FLIGHT) @map("state")
+  state IdempotencyState? @default(IN_FLIGHT) @map("state")
 
   /// What the first call returned: a google.protobuf.Any holding the response message, encoded as protojson. Empty while IN_FLIGHT. Stored as text rather than bytes so it round-trips identically through GORM and through Hasura's GraphQL, and self-describing (the Any carries its @type) so a replay can rebuild the exact response message without knowing which RPC wrote it.
   response String? @map("response")

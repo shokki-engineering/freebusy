@@ -45,7 +45,7 @@ type Project struct {
 	DisplayName string `gorm:"column:display_name;not null" json:"display_name" validate:"required"`
 	// What the project is for.
 	Description *string `gorm:"column:description" json:"description,omitempty"`
-	// Who owns it. Typed as any resource rather than a User, matching Membership.member. An owner may be a person or a group, and naming protobufrfc.dev/Vcard here would make a native package depend on RFC 6350 for its meaning without gaining anything. TODO: unresolved reference to * (not in this generation set); kept as a plain indexed column.
+	// Who owns it. Typed as any resource rather than a User, matching Membership.member. An owner may be a person or a group, and naming the-protobuf-project.org/Vcard here would make a native package depend on RFC 6350 for its meaning without gaining anything. TODO: unresolved reference to * (not in this generation set); kept as a plain indexed column.
 	Owner *string `gorm:"column:owner;index:idx_resource_owner" json:"owner,omitempty"`
 	// When work is scheduled to begin.
 	StartTime *time.Time `gorm:"column:start_time;type:timestamptz" json:"start_time,omitempty"`

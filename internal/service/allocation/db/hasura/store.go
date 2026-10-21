@@ -8,6 +8,7 @@ import (
 	"slices"
 	"time"
 
+	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/allocationql/holdsql"
 	allocsql "github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/allocationql/resourceql"
@@ -29,7 +30,6 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/service/dbutil"
 	"github.com/oh-tarnished/freebusy/internal/types"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9073/resource/v1/resourcepbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -70,6 +70,9 @@ func (s *Store) Resources(ctx context.Context, q svc.ResourceQuery) ([]svc.Resou
 			return nil, nil
 		}
 		preds = append(preds, entityql.OrganizationalUnit.In(ids...))
+	}
+	if len(q.Calendars) > 0 {
+		preds = append(preds, entityql.Calendar.In(lastSegments(q.Calendars)...))
 	}
 	if len(q.Names) > 0 {
 		preds = append(preds, entityql.Name.In(q.Names...))
@@ -197,7 +200,7 @@ func (s *Store) Availability(ctx context.Context, calendars []string) (map[strin
 		start := times[repox.Deref(a.StartId)]
 		end := times[repox.Deref(a.EndId)]
 		if repox.Deref(a.EndFormCase) == "DURATION" && !start.t.IsZero() {
-			end = calTime{t: start.t.Add(svc.ICalDuration(repox.Deref(a.Duration))), day: start.day}
+			end = calTime{t: start.t.Add(svc.StoredDuration(repox.Deref(a.Duration))), day: start.day}
 		}
 		rec := svc.AvailabilityRecord{
 			Range:       engine.Span{Start: start.t, End: end.t},
@@ -208,7 +211,7 @@ func (s *Store) Availability(ctx context.Context, calendars []string) (map[strin
 			ps := times[p.StartId]
 			pe := times[repox.Deref(p.EndId)]
 			if repox.Deref(p.EndFormCase) == "DURATION" || pe.t.IsZero() {
-				pe = calTime{t: ps.t.Add(svc.ICalDuration(repox.Deref(p.Duration)))}
+				pe = calTime{t: ps.t.Add(svc.StoredDuration(repox.Deref(p.Duration)))}
 			}
 			rec.Periods = append(rec.Periods, svc.PeriodRecord{Start: ps.t, End: pe.t, RRule: repox.Deref(p.RecurrenceRule), AllDay: ps.day})
 		}
@@ -273,7 +276,7 @@ func (s *Store) Events(ctx context.Context, calendars []string, window engine.Sp
 		}
 		end := times[repox.Deref(e.EndId)]
 		if repox.Deref(e.EndsCase) == "DURATION" || end.t.IsZero() {
-			d := svc.ICalDuration(repox.Deref(e.Duration))
+			d := svc.StoredDuration(repox.Deref(e.Duration))
 			if d == 0 && start.day {
 				d = 24 * time.Hour // RFC 5545 3.6.1: a DATE event with no end lasts the day
 			}

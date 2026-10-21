@@ -1,0 +1,104 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertCommonFractionsObject
+  fields:
+    - name: denominator
+      type: Int64
+    - name: id
+      type: String_1!
+    - name: numerator
+      type: Int64
+  graphql:
+    typeName: InsertCommonFractionsObject
+    inputTypeName: InsertCommonFractionsObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_common_fractions_object
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertCommonFractionsObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - denominator
+          - id
+          - numerator
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertCommonFractionsResponse
+  description: Responses from the 'insert_common_fractions' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[CommonFractions!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertCommonFractionsResponse
+    inputTypeName: InsertCommonFractionsResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_common_fractions_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertCommonFractionsResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertCommonFractions
+  outputType: InsertCommonFractionsResponse!
+  arguments:
+    - name: objects
+      type: "[InsertCommonFractionsObject!]!"
+    - name: postCheck
+      type: CommonFractionsBoolExp
+      description: Insert permission predicate over the 'common_fractions' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: insert_common_fractions
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertCommonFractions
+    rootFieldKind: Mutation
+  description: Insert into the common_fractions table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertCommonFractions
+  permissions:
+    - role: admin
+      allowExecution: true
+

@@ -49,48 +49,6 @@ static_resources:
                             timeout: 60s
 
                         - match:
-                            prefix: "/freebusy.channel.v1.ChannelService/"
-                          route:
-                            cluster: freebusy_backend
-                            timeout: 60s
-
-                        - match:
-                            prefix: "/freebusy.identity.v1.IdentityService/"
-                          route:
-                            cluster: freebusy_backend
-                            timeout: 60s
-
-                        - match:
-                            prefix: "/freebusy.organisation.v1.OrganisationService/"
-                          route:
-                            cluster: freebusy_backend
-                            timeout: 60s
-
-                        - match:
-                            prefix: "/freebusy.pricing.v1.QuoteService/"
-                          route:
-                            cluster: freebusy_backend
-                            timeout: 60s
-
-                        - match:
-                            prefix: "/freebusy.pricing.v1.RatePlanService/"
-                          route:
-                            cluster: freebusy_backend
-                            timeout: 60s
-
-                        - match:
-                            prefix: "/freebusy.promocode.v1.PromoCodeService/"
-                          route:
-                            cluster: freebusy_backend
-                            timeout: 60s
-
-                        - match:
-                            prefix: "/freebusy.property.v1.LicenceService/"
-                          route:
-                            cluster: freebusy_backend
-                            timeout: 60s
-
-                        - match:
                             prefix: "/freebusy.reservation.v1.ReservationService/"
                           route:
                             cluster: freebusy_backend

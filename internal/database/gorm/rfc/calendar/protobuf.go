@@ -17,9 +17,9 @@ package calendar
 import (
 	"time"
 
+	calendarpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
 	"github.com/lib/pq"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/common"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/calendar/v1/calendarpbv1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -83,6 +83,9 @@ func CalendarToProto(m *Calendar) *calendarpbv1.Calendar {
 	out.MaxInstances = fromPtr(m.MaxInstances)
 	out.MaxAttendeesPerInstance = fromPtr(m.MaxAttendeesPerInstance)
 	out.TimeZone = common.TimeZoneToProto(m.TimeZone)
+	for i := range m.ExtensionProperties {
+		out.Extensions = append(out.Extensions, ExtensionPropertyToProto(&m.ExtensionProperties[i]))
+	}
 	return out
 }
 
@@ -94,7 +97,7 @@ func CalendarFromProto(pb *calendarpbv1.Calendar) *Calendar {
 		return nil
 	}
 	m := &Calendar{}
-	// not mapped here: time_zone (sub-row graph)
+	// not mapped here: time_zone (sub-row graph), extensions (sub-row graph)
 	m.Name = pb.GetName()
 	m.UID = toPtr(pb.GetUid())
 	m.DisplayName = pb.GetDisplayName()

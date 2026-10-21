@@ -16,13 +16,16 @@
 package journal
 
 import (
+	journalpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/journal/v1"
 	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/journalql/calendartimesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/journalql/extensionpropertiesql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/journalql/resourceql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/journal/v1/journalpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/genproto/googleapis/type/date"
+	"google.golang.org/genproto/googleapis/type/datetime"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"strings"
 	"time"
@@ -43,6 +46,44 @@ func strToTs(s string) *timestamppb.Timestamp {
 	for _, layout := range []string{time.RFC3339Nano, time.RFC3339, "2006-01-02T15:04:05.999999Z07:00", "2006-01-02T15:04:05"} {
 		if t, err := time.Parse(layout, s); err == nil {
 			return timestamppb.New(t)
+		}
+	}
+	return nil
+}
+
+// dtToStr / strToDt cross the timestamptz boundary for a google.type.DateTime:
+// written as the instant it denotes (a time zone through the IANA database, a
+// UTC offset as a fixed zone, a floating value as UTC), read back in UTC.
+func dtToStr(d *datetime.DateTime) string {
+	if d == nil {
+		return ""
+	}
+	loc := time.UTC
+	switch {
+	case d.GetTimeZone().GetId() != "":
+		if l, err := time.LoadLocation(d.GetTimeZone().GetId()); err == nil {
+			loc = l
+		}
+	case d.GetUtcOffset() != nil:
+		loc = time.FixedZone("", int(d.GetUtcOffset().AsDuration()/time.Second))
+	}
+	return time.Date(int(d.GetYear()), time.Month(d.GetMonth()), int(d.GetDay()),
+		int(d.GetHours()), int(d.GetMinutes()), int(d.GetSeconds()), int(d.GetNanos()), loc).
+		UTC().Format(time.RFC3339Nano)
+}
+
+func strToDt(s string) *datetime.DateTime {
+	if s == "" {
+		return nil
+	}
+	for _, layout := range []string{time.RFC3339Nano, time.RFC3339, "2006-01-02T15:04:05.999999Z07:00", "2006-01-02T15:04:05"} {
+		if t, err := time.Parse(layout, s); err == nil {
+			u := t.UTC()
+			return &datetime.DateTime{
+				Year: int32(u.Year()), Month: int32(u.Month()), Day: int32(u.Day()),
+				Hours: int32(u.Hour()), Minutes: int32(u.Minute()), Seconds: int32(u.Second()), Nanos: int32(u.Nanosecond()),
+				TimeOffset: &datetime.DateTime_UtcOffset{UtcOffset: durationpb.New(0)},
+			}
 		}
 	}
 	return nil
@@ -154,6 +195,9 @@ func journalFromRow(row *resourceql.JournalResource) *journalpbv1.Journal {
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.Uid = repox.Deref(row.Uid)
+	out.DeleteTime = strToTs(repox.Deref(row.DeleteTime))
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
 	return out
 }
 
@@ -164,7 +208,15 @@ func journalCalendarTimeToCreateInput(in *journalpbv1.CalendarTime) calendartime
 	if v := dateToStr(in.GetDate()); v != "" {
 		ci.Date = v
 	}
-	// not mapped here: date_time (unsupported scalar shape)
+	if v := dtToStr(in.GetDateTime()); v != "" {
+		ci.DateTime = v
+	}
+	switch in.GetValue().(type) {
+	case *journalpbv1.CalendarTime_Date:
+		ci.ValueCase = "DATE"
+	case *journalpbv1.CalendarTime_DateTime:
+		ci.ValueCase = "DATE_TIME"
+	}
 	return ci
 }
 
@@ -177,5 +229,29 @@ func journalCalendarTimeFromRow(row *calendartimesql.JournalCalendarTimes) *jour
 	if v := strToDate(repox.Deref(row.Date)); v != nil {
 		out.Value = &journalpbv1.CalendarTime_Date{Date: v}
 	}
+	if v := strToDt(repox.Deref(row.DateTime)); v != nil {
+		out.Value = &journalpbv1.CalendarTime_DateTime{DateTime: v}
+	}
+	return out
+}
+
+// journalExtensionPropertyToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func journalExtensionPropertyToCreateInput(in *journalpbv1.ExtensionProperty) extensionpropertiesql.CreateInput {
+	var ci extensionpropertiesql.CreateInput
+	ci.Key = in.GetKey()
+	ci.Values = strSliceToPtrs(in.GetValues())
+	// not mapped here: parameters (unsupported scalar shape)
+	return ci
+}
+
+// journalExtensionPropertyFromRow re-hydrates the value-object proto from a client row.
+func journalExtensionPropertyFromRow(row *extensionpropertiesql.JournalExtensionProperties) *journalpbv1.ExtensionProperty {
+	if row == nil {
+		return nil
+	}
+	out := &journalpbv1.ExtensionProperty{}
+	out.Key = row.Key
+	out.Values = strPtrsToSlice(row.Values)
 	return out
 }

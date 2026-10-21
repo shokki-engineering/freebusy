@@ -16,14 +16,16 @@
 package resource
 
 import (
+	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/resource"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/resourceql/entityql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/resourceql/structureddatasql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9073/resource/v1/resourcepbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -80,7 +82,16 @@ func (r *GraphQLResourceRepository) Create(ctx context.Context, in *resourcepbv1
 	now := tsToStr(timestamppb.New(time.Now().UTC()))
 	ci.CreateTime = now
 	ci.UpdateTime = now
-	if _, err := r.Svc.Mutation.Resource.Entity.Create(ctx, ci); err != nil {
+	// One transaction: the graph lands whole or not at all.
+	gtx := r.Svc.Mutation.Tx()
+	gtx.Add(r.Svc.Mutation.Resource.Entity.CreateOp(ci, new(entityql.InsertResourceEntityResponse)))
+	for _, v1 := range in.GetStructuredData() {
+		n2 := resourceStructuredDataToCreateInput(v1)
+		n2.Id = repox.NewULID()
+		n2.ResourceId = id
+		gtx.Add(r.Svc.Mutation.Resource.StructuredDatas.CreateOp(n2, new(structureddatasql.InsertResourceStructuredDatasResponse)))
+	}
+	if err := gtx.Commit(ctx); err != nil {
 		return nil, mapGraphQLErr(err)
 	}
 	return r.get(ctx, id)
@@ -112,6 +123,16 @@ func (r *GraphQLResourceRepository) get(ctx context.Context, id string) (*resour
 // stored references, and runs the AfterRead hook.
 func (r *GraphQLResourceRepository) toProto(ctx context.Context, row *entityql.ResourceEntity) (*resourcepbv1.Resource, error) {
 	out := resourceFromRow(row)
+	{
+		rows3, err := r.Svc.Query.Resource.StructuredDatas.List(ctx, structureddatasql.List().Where(structureddatasql.ResourceId.Eq(row.Id)).OrderBy(structureddatasql.Id.Asc()))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows3 {
+			p4 := resourceStructuredDataFromRow(&rows3[i])
+			out.StructuredData = append(out.StructuredData, p4)
+		}
+	}
 	if h := r.Hooks.AfterRead; h != nil {
 		if err := h(ctx, out); err != nil {
 			return nil, err
@@ -126,6 +147,9 @@ func (r *GraphQLResourceRepository) List(ctx context.Context, in repox.ListInput
 }
 
 func (r *GraphQLResourceRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*resourcepbv1.Resource, string, error) {
+	if !in.ShowDeleted {
+		scope = append(scope, entityql.DeleteTime.IsNull(true))
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -170,6 +194,17 @@ func (r *GraphQLResourceRepository) Update(ctx context.Context, in *resourcepbv1
 	if row == nil {
 		return nil, repox.ErrNotFound
 	}
+	var old7 []string
+	{
+		rows8, err := r.Svc.Query.Resource.StructuredDatas.List(ctx, structureddatasql.List().Where(structureddatasql.ResourceId.Eq(id)))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows8 {
+			old7 = append(old7, rows8[i].Id)
+		}
+	}
+	staleStructuredData := old7
 	existingPB := resourceFromRow(row)
 	merged := proto.Clone(existingPB).(*resourcepbv1.Resource)
 	applyResourceMask(merged, in, paths)
@@ -181,8 +216,38 @@ func (r *GraphQLResourceRepository) Update(ctx context.Context, in *resourcepbv1
 	patch := resourceToUpdatePatch(merged)
 	patch.Etag = graphql.Value(repox.NewULID())
 	patch.UpdateTime = graphql.Value(tsToStr(timestamppb.New(time.Now().UTC())))
+	// New singular value objects land before the guarded row update (a lost
+	// race leaves them unreferenced); new list rows and the removal of
+	// replaced subtrees land only after it succeeds (atx).
+	utx := r.Svc.Mutation.Tx()
+	atx := r.Svc.Mutation.Tx()
+	if repox.GroupTouched(paths, "structured_data") {
+		for _, oid := range staleStructuredData {
+			if id := oid; id != "" {
+				got9, err := r.Svc.Query.Resource.StructuredDatas.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got9 != nil {
+					atx.Add(r.Svc.Mutation.Resource.StructuredDatas.DeleteOp(got9.Id, new(structureddatasql.DeleteResourceStructuredDatasByIdResponse)))
+				}
+			}
+		}
+		for _, v10 := range merged.GetStructuredData() {
+			n11 := resourceStructuredDataToCreateInput(v10)
+			n11.Id = repox.NewULID()
+			n11.ResourceId = id
+			atx.Add(r.Svc.Mutation.Resource.StructuredDatas.CreateOp(n11, new(structureddatasql.InsertResourceStructuredDatasResponse)))
+		}
+	}
+	if err := utx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	if in.GetEtag() != "" {
 		if _, err := r.Svc.Mutation.Resource.Entity.UpdateIfMatch(ctx, id, patch, entityql.Etag.Eq(in.GetEtag())); err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		if err := atx.Commit(ctx); err != nil {
 			return nil, mapGraphQLErr(err)
 		}
 		return r.get(ctx, id)
@@ -194,11 +259,58 @@ func (r *GraphQLResourceRepository) Update(ctx context.Context, in *resourcepbv1
 	if resp.AffectedRows == 0 {
 		return nil, repox.ErrNotFound
 	}
+	if err := atx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GraphQLResourceRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "resources")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	patch := entityql.UpdateInput{DeleteTime: graphql.Value(time.Now().UTC().Format(time.RFC3339Nano))}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Resource.Entity.UpdateIfMatch(ctx, ids[len(ids)-1], patch, entityql.DeleteTime.IsNull(true)); err != nil {
+		if errors.Is(err, graphql.ErrConflict) {
+			return repox.ErrNotFound
+		}
+		return mapGraphQLErr(err)
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GraphQLResourceRepository) Undelete(ctx context.Context, name string) (*resourcepbv1.Resource, error) {
+	ids, err := repox.SplitName(name, "resources")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	patch := entityql.UpdateInput{DeleteTime: graphql.Null[string]()}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Resource.Entity.UpdateIfMatch(ctx, id, patch, entityql.DeleteTime.IsNull(false)); err != nil {
+		if !errors.Is(err, graphql.ErrConflict) {
+			return nil, mapGraphQLErr(err)
+		}
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GraphQLResourceRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "resources")
 	if err != nil {
 		return err
@@ -215,6 +327,27 @@ func (r *GraphQLResourceRepository) Delete(ctx context.Context, name string) err
 	}
 	if resp.AffectedRows == 0 {
 		return repox.ErrNotFound
+	}
+	dtx := r.Svc.Mutation.Tx()
+	{
+		rows5, err := r.Svc.Query.Resource.StructuredDatas.List(ctx, structureddatasql.List().Where(structureddatasql.ResourceId.Eq(id)))
+		if err != nil {
+			return mapGraphQLErr(err)
+		}
+		for i := range rows5 {
+			if id := rows5[i].Id; id != "" {
+				got6, err := r.Svc.Query.Resource.StructuredDatas.Get(ctx, id)
+				if err != nil {
+					return mapGraphQLErr(err)
+				}
+				if got6 != nil {
+					dtx.Add(r.Svc.Mutation.Resource.StructuredDatas.DeleteOp(got6.Id, new(structureddatasql.DeleteResourceStructuredDatasByIdResponse)))
+				}
+			}
+		}
+	}
+	if err := dtx.Commit(ctx); err != nil {
+		return mapGraphQLErr(err)
 	}
 	return nil
 }

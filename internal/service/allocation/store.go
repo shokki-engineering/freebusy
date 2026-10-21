@@ -13,14 +13,15 @@ import (
 	"context"
 	"time"
 
+	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9073/resource/v1/resourcepbv1"
 )
 
 // ResourceQuery selects the resources a request is about. Exactly one of
-// OrganizationalUnits or Organization scopes it; Names and Types narrow it.
+// OrganizationalUnits, Organization or Calendars scopes it; Names and Types
+// narrow it.
 type ResourceQuery struct {
 	// OrganizationalUnits restricts to resources at these sites.
 	// Format: organizationalUnits/{organizational_unit}
@@ -28,6 +29,9 @@ type ResourceQuery struct {
 	// Organization restricts to resources at any site of this operator, used
 	// by SearchAvailability. Format: organizations/{organization}
 	Organization string
+	// Calendars restricts to resources scheduled on these calendars, used by
+	// QueryFreeBusy. Format: calendars/{calendar}
+	Calendars []string
 	// Names restricts to these resources. Format: resources/{resource}
 	Names []string
 	// Types restricts to resources carrying any of these RESOURCE-TYPE values.

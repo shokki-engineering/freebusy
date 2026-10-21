@@ -16,16 +16,18 @@
 package group
 
 import (
+	ldapgrouppbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/group/v1"
+	scimgrouppbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/group/v1"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/group"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/groupql/ldapgroupsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/groupql/membersql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/groupql/resourceql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/group/v1/ldapgrouppbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7643/group/v1/scimgrouppbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -82,7 +84,16 @@ func (r *GraphQLGroupRepository) Create(ctx context.Context, in *scimgrouppbv1.G
 	now := tsToStr(timestamppb.New(time.Now().UTC()))
 	ci.CreateTime = now
 	ci.UpdateTime = now
-	if _, err := r.Svc.Mutation.Group.Resource.Create(ctx, ci); err != nil {
+	// One transaction: the graph lands whole or not at all.
+	gtx := r.Svc.Mutation.Tx()
+	gtx.Add(r.Svc.Mutation.Group.Resource.CreateOp(ci, new(resourceql.InsertGroupResourceResponse)))
+	for _, v1 := range in.GetMembers() {
+		n2 := groupMemberToCreateInput(v1)
+		n2.Id = repox.NewULID()
+		n2.GroupId = id
+		gtx.Add(r.Svc.Mutation.Group.Members.CreateOp(n2, new(membersql.InsertGroupMembersResponse)))
+	}
+	if err := gtx.Commit(ctx); err != nil {
 		return nil, mapGraphQLErr(err)
 	}
 	return r.get(ctx, id)
@@ -114,6 +125,16 @@ func (r *GraphQLGroupRepository) get(ctx context.Context, id string) (*scimgroup
 // stored references, and runs the AfterRead hook.
 func (r *GraphQLGroupRepository) toProto(ctx context.Context, row *resourceql.GroupResource) (*scimgrouppbv1.Group, error) {
 	out := groupFromRow(row)
+	{
+		rows3, err := r.Svc.Query.Group.Members.List(ctx, membersql.List().Where(membersql.GroupId.Eq(row.Id)).OrderBy(membersql.Id.Asc()))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows3 {
+			p4 := groupMemberFromRow(&rows3[i])
+			out.Members = append(out.Members, p4)
+		}
+	}
 	if h := r.Hooks.AfterRead; h != nil {
 		if err := h(ctx, out); err != nil {
 			return nil, err
@@ -128,6 +149,9 @@ func (r *GraphQLGroupRepository) List(ctx context.Context, in repox.ListInput) (
 }
 
 func (r *GraphQLGroupRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*scimgrouppbv1.Group, string, error) {
+	if !in.ShowDeleted {
+		scope = append(scope, resourceql.DeleteTime.IsNull(true))
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -172,6 +196,17 @@ func (r *GraphQLGroupRepository) Update(ctx context.Context, in *scimgrouppbv1.G
 	if row == nil {
 		return nil, repox.ErrNotFound
 	}
+	var old7 []string
+	{
+		rows8, err := r.Svc.Query.Group.Members.List(ctx, membersql.List().Where(membersql.GroupId.Eq(id)))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows8 {
+			old7 = append(old7, rows8[i].Id)
+		}
+	}
+	staleMembers := old7
 	existingPB := groupFromRow(row)
 	merged := proto.Clone(existingPB).(*scimgrouppbv1.Group)
 	applyGroupMask(merged, in, paths)
@@ -183,8 +218,38 @@ func (r *GraphQLGroupRepository) Update(ctx context.Context, in *scimgrouppbv1.G
 	patch := groupToUpdatePatch(merged)
 	patch.Etag = graphql.Value(repox.NewULID())
 	patch.UpdateTime = graphql.Value(tsToStr(timestamppb.New(time.Now().UTC())))
+	// New singular value objects land before the guarded row update (a lost
+	// race leaves them unreferenced); new list rows and the removal of
+	// replaced subtrees land only after it succeeds (atx).
+	utx := r.Svc.Mutation.Tx()
+	atx := r.Svc.Mutation.Tx()
+	if repox.GroupTouched(paths, "members") {
+		for _, oid := range staleMembers {
+			if id := oid; id != "" {
+				got9, err := r.Svc.Query.Group.Members.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got9 != nil {
+					atx.Add(r.Svc.Mutation.Group.Members.DeleteOp(got9.Id, new(membersql.DeleteGroupMembersByIdResponse)))
+				}
+			}
+		}
+		for _, v10 := range merged.GetMembers() {
+			n11 := groupMemberToCreateInput(v10)
+			n11.Id = repox.NewULID()
+			n11.GroupId = id
+			atx.Add(r.Svc.Mutation.Group.Members.CreateOp(n11, new(membersql.InsertGroupMembersResponse)))
+		}
+	}
+	if err := utx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	if in.GetEtag() != "" {
 		if _, err := r.Svc.Mutation.Group.Resource.UpdateIfMatch(ctx, id, patch, resourceql.Etag.Eq(in.GetEtag())); err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		if err := atx.Commit(ctx); err != nil {
 			return nil, mapGraphQLErr(err)
 		}
 		return r.get(ctx, id)
@@ -196,11 +261,58 @@ func (r *GraphQLGroupRepository) Update(ctx context.Context, in *scimgrouppbv1.G
 	if resp.AffectedRows == 0 {
 		return nil, repox.ErrNotFound
 	}
+	if err := atx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GraphQLGroupRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "groups")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	patch := resourceql.UpdateInput{DeleteTime: graphql.Value(time.Now().UTC().Format(time.RFC3339Nano))}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Group.Resource.UpdateIfMatch(ctx, ids[len(ids)-1], patch, resourceql.DeleteTime.IsNull(true)); err != nil {
+		if errors.Is(err, graphql.ErrConflict) {
+			return repox.ErrNotFound
+		}
+		return mapGraphQLErr(err)
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GraphQLGroupRepository) Undelete(ctx context.Context, name string) (*scimgrouppbv1.Group, error) {
+	ids, err := repox.SplitName(name, "groups")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	patch := resourceql.UpdateInput{DeleteTime: graphql.Null[string]()}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Group.Resource.UpdateIfMatch(ctx, id, patch, resourceql.DeleteTime.IsNull(false)); err != nil {
+		if !errors.Is(err, graphql.ErrConflict) {
+			return nil, mapGraphQLErr(err)
+		}
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GraphQLGroupRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "groups")
 	if err != nil {
 		return err
@@ -217,6 +329,27 @@ func (r *GraphQLGroupRepository) Delete(ctx context.Context, name string) error 
 	}
 	if resp.AffectedRows == 0 {
 		return repox.ErrNotFound
+	}
+	dtx := r.Svc.Mutation.Tx()
+	{
+		rows5, err := r.Svc.Query.Group.Members.List(ctx, membersql.List().Where(membersql.GroupId.Eq(id)))
+		if err != nil {
+			return mapGraphQLErr(err)
+		}
+		for i := range rows5 {
+			if id := rows5[i].Id; id != "" {
+				got6, err := r.Svc.Query.Group.Members.Get(ctx, id)
+				if err != nil {
+					return mapGraphQLErr(err)
+				}
+				if got6 != nil {
+					dtx.Add(r.Svc.Mutation.Group.Members.DeleteOp(got6.Id, new(membersql.DeleteGroupMembersByIdResponse)))
+				}
+			}
+		}
+	}
+	if err := dtx.Commit(ctx); err != nil {
+		return mapGraphQLErr(err)
 	}
 	return nil
 }
@@ -308,6 +441,9 @@ func (r *GraphQLLdapGroupRepository) List(ctx context.Context, in repox.ListInpu
 }
 
 func (r *GraphQLLdapGroupRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*ldapgrouppbv1.LdapGroup, string, error) {
+	if !in.ShowDeleted {
+		scope = append(scope, ldapgroupsql.DeleteTime.IsNull(true))
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -379,8 +515,52 @@ func (r *GraphQLLdapGroupRepository) Update(ctx context.Context, in *ldapgrouppb
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GraphQLLdapGroupRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "ldapGroups")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	patch := ldapgroupsql.UpdateInput{DeleteTime: graphql.Value(time.Now().UTC().Format(time.RFC3339Nano))}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Group.LdapGroups.UpdateIfMatch(ctx, ids[len(ids)-1], patch, ldapgroupsql.DeleteTime.IsNull(true)); err != nil {
+		if errors.Is(err, graphql.ErrConflict) {
+			return repox.ErrNotFound
+		}
+		return mapGraphQLErr(err)
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GraphQLLdapGroupRepository) Undelete(ctx context.Context, name string) (*ldapgrouppbv1.LdapGroup, error) {
+	ids, err := repox.SplitName(name, "ldapGroups")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	patch := ldapgroupsql.UpdateInput{DeleteTime: graphql.Null[string]()}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Group.LdapGroups.UpdateIfMatch(ctx, id, patch, ldapgroupsql.DeleteTime.IsNull(false)); err != nil {
+		if !errors.Is(err, graphql.ErrConflict) {
+			return nil, mapGraphQLErr(err)
+		}
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GraphQLLdapGroupRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "ldapGroups")
 	if err != nil {
 		return err

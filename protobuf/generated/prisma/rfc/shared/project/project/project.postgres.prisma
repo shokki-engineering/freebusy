@@ -29,7 +29,7 @@ model Project {
   /// What the project is for.
   description String? @map("description")
 
-  /// Who owns it. Typed as any resource rather than a User, matching Membership.member. An owner may be a person or a group, and naming protobufrfc.dev/Vcard here would make a native package depend on RFC 6350 for its meaning without gaining anything. TODO: unresolved reference to * (not in this generation set); kept as a plain indexed column.
+  /// Who owns it. Typed as any resource rather than a User, matching Membership.member. An owner may be a person or a group, and naming the-protobuf-project.org/Vcard here would make a native package depend on RFC 6350 for its meaning without gaining anything. TODO: unresolved reference to * (not in this generation set); kept as a plain indexed column.
   owner String? @map("owner")
 
   /// When work is scheduled to begin.

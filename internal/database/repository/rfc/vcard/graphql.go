@@ -16,14 +16,34 @@
 package vcard
 
 import (
+	vcardpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc6350/vcard/v1"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/vcard"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/addressql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/contactsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/dateortextsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/emailsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/extensionpropertiesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/geosql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/grammaticalgendersql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/instantmessagesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/languagesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/namesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/nicknamesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/organizationsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/pronounsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/relationsql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/resourceql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/rolesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/socialprofilesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/telephonesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/timezonesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/urlsql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc6350/vcard/v1/vcardpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -80,7 +100,130 @@ func (r *GraphQLVcardRepository) Create(ctx context.Context, in *vcardpbv1.Vcard
 	now := tsToStr(timestamppb.New(time.Now().UTC()))
 	ci.CreateTime = now
 	ci.UpdateTime = now
-	if _, err := r.Svc.Mutation.Vcard.Resource.Create(ctx, ci); err != nil {
+	// One transaction: the graph lands whole or not at all.
+	gtx := r.Svc.Mutation.Tx()
+	if v1 := in.GetContact(); v1 != nil {
+		n2 := vcardContactToCreateInput(v1)
+		n2.Id = repox.NewULID()
+		if v3 := v1.GetNameComponents(); v3 != nil {
+			n4 := vcardNameToCreateInput(v3)
+			n4.Id = repox.NewULID()
+			gtx.Add(r.Svc.Mutation.Vcard.Names.CreateOp(n4, new(namesql.InsertVcardNamesResponse)))
+			n2.NameComponentsId = n4.Id
+		}
+		if v5 := v1.GetBirthday(); v5 != nil {
+			n6 := vcardDateOrTextToCreateInput(v5)
+			n6.Id = repox.NewULID()
+			gtx.Add(r.Svc.Mutation.Vcard.DateOrTexts.CreateOp(n6, new(dateortextsql.InsertVcardDateOrTextsResponse)))
+			n2.BirthdayId = n6.Id
+		}
+		if v7 := v1.GetAnniversary(); v7 != nil {
+			n8 := vcardDateOrTextToCreateInput(v7)
+			n8.Id = repox.NewULID()
+			gtx.Add(r.Svc.Mutation.Vcard.DateOrTexts.CreateOp(n8, new(dateortextsql.InsertVcardDateOrTextsResponse)))
+			n2.AnniversaryId = n8.Id
+		}
+		gtx.Add(r.Svc.Mutation.Vcard.Contacts.CreateOp(n2, new(contactsql.InsertVcardContactsResponse)))
+		for _, v9 := range v1.GetEmails() {
+			n10 := vcardEmailToCreateInput(v9)
+			n10.Id = repox.NewULID()
+			n10.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.Emails.CreateOp(n10, new(emailsql.InsertVcardEmailsResponse)))
+		}
+		for _, v11 := range v1.GetTelephones() {
+			n12 := vcardTelephoneToCreateInput(v11)
+			n12.Id = repox.NewULID()
+			n12.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.Telephones.CreateOp(n12, new(telephonesql.InsertVcardTelephonesResponse)))
+		}
+		for _, v13 := range v1.GetAddresses() {
+			n14 := vcardAddressToCreateInput(v13)
+			n14.Id = repox.NewULID()
+			n14.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.Address.CreateOp(n14, new(addressql.InsertVcardAddressResponse)))
+		}
+		for _, v15 := range v1.GetOrganizations() {
+			n16 := vcardOrganizationToCreateInput(v15)
+			n16.Id = repox.NewULID()
+			n16.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.Organizations.CreateOp(n16, new(organizationsql.InsertVcardOrganizationsResponse)))
+		}
+		for _, v17 := range v1.GetExtensions() {
+			n18 := vcardExtensionPropertyToCreateInput(v17)
+			n18.Id = repox.NewULID()
+			n18.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.ExtensionProperties.CreateOp(n18, new(extensionpropertiesql.InsertVcardExtensionPropertiesResponse)))
+		}
+		for _, v19 := range v1.GetNicknames() {
+			n20 := vcardNicknameToCreateInput(v19)
+			n20.Id = repox.NewULID()
+			n20.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.Nicknames.CreateOp(n20, new(nicknamesql.InsertVcardNicknamesResponse)))
+		}
+		for _, v21 := range v1.GetUrls() {
+			n22 := vcardUrlToCreateInput(v21)
+			n22.Id = repox.NewULID()
+			n22.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.Urls.CreateOp(n22, new(urlsql.InsertVcardUrlsResponse)))
+		}
+		for _, v23 := range v1.GetRoles() {
+			n24 := vcardRoleToCreateInput(v23)
+			n24.Id = repox.NewULID()
+			n24.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.Roles.CreateOp(n24, new(rolesql.InsertVcardRolesResponse)))
+		}
+		for _, v25 := range v1.GetInstantMessages() {
+			n26 := vcardInstantMessageToCreateInput(v25)
+			n26.Id = repox.NewULID()
+			n26.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.InstantMessages.CreateOp(n26, new(instantmessagesql.InsertVcardInstantMessagesResponse)))
+		}
+		for _, v27 := range v1.GetLanguages() {
+			n28 := vcardLanguageToCreateInput(v27)
+			n28.Id = repox.NewULID()
+			n28.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.Languages.CreateOp(n28, new(languagesql.InsertVcardLanguagesResponse)))
+		}
+		for _, v29 := range v1.GetLocations() {
+			n30 := vcardGeoToCreateInput(v29)
+			n30.Id = repox.NewULID()
+			n30.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.Geos.CreateOp(n30, new(geosql.InsertVcardGeosResponse)))
+		}
+		for _, v31 := range v1.GetTimezones() {
+			n32 := vcardTimezoneToCreateInput(v31)
+			n32.Id = repox.NewULID()
+			n32.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.Timezones.CreateOp(n32, new(timezonesql.InsertVcardTimezonesResponse)))
+		}
+		for _, v33 := range v1.GetRelations() {
+			n34 := vcardRelationToCreateInput(v33)
+			n34.Id = repox.NewULID()
+			n34.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.Relations.CreateOp(n34, new(relationsql.InsertVcardRelationsResponse)))
+		}
+		for _, v35 := range v1.GetPronouns() {
+			n36 := vcardPronounsToCreateInput(v35)
+			n36.Id = repox.NewULID()
+			n36.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.Pronouns.CreateOp(n36, new(pronounsql.InsertVcardPronounsResponse)))
+		}
+		for _, v37 := range v1.GetGrammaticalGenders() {
+			n38 := vcardGrammaticalGenderToCreateInput(v37)
+			n38.Id = repox.NewULID()
+			n38.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.GrammaticalGenders.CreateOp(n38, new(grammaticalgendersql.InsertVcardGrammaticalGendersResponse)))
+		}
+		for _, v39 := range v1.GetSocialProfiles() {
+			n40 := vcardSocialProfileToCreateInput(v39)
+			n40.Id = repox.NewULID()
+			n40.ContactId = n2.Id
+			gtx.Add(r.Svc.Mutation.Vcard.SocialProfiles.CreateOp(n40, new(socialprofilesql.InsertVcardSocialProfilesResponse)))
+		}
+		ci.ContactId = n2.Id
+	}
+	gtx.Add(r.Svc.Mutation.Vcard.Resource.CreateOp(ci, new(resourceql.InsertVcardResourceResponse)))
+	if err := gtx.Commit(ctx); err != nil {
 		return nil, mapGraphQLErr(err)
 	}
 	return r.get(ctx, id)
@@ -112,6 +255,206 @@ func (r *GraphQLVcardRepository) get(ctx context.Context, id string) (*vcardpbv1
 // stored references, and runs the AfterRead hook.
 func (r *GraphQLVcardRepository) toProto(ctx context.Context, row *resourceql.VcardResource) (*vcardpbv1.Vcard, error) {
 	out := vcardFromRow(row)
+	if id := row.ContactId; id != "" {
+		got41, err := r.Svc.Query.Vcard.Contacts.Get(ctx, id)
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		if got41 != nil {
+			p42 := vcardContactFromRow(got41)
+			if id := repox.Deref(got41.NameComponentsId); id != "" {
+				got43, err := r.Svc.Query.Vcard.Names.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got43 != nil {
+					p44 := vcardNameFromRow(got43)
+					p42.NameComponents = p44
+				}
+			}
+			if id := repox.Deref(got41.BirthdayId); id != "" {
+				got45, err := r.Svc.Query.Vcard.DateOrTexts.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got45 != nil {
+					p46 := vcardDateOrTextFromRow(got45)
+					p42.Birthday = p46
+				}
+			}
+			if id := repox.Deref(got41.AnniversaryId); id != "" {
+				got47, err := r.Svc.Query.Vcard.DateOrTexts.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got47 != nil {
+					p48 := vcardDateOrTextFromRow(got47)
+					p42.Anniversary = p48
+				}
+			}
+			{
+				rows49, err := r.Svc.Query.Vcard.Emails.List(ctx, emailsql.List().Where(emailsql.ContactId.Eq(got41.Id)).OrderBy(emailsql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows49 {
+					p50 := vcardEmailFromRow(&rows49[i])
+					p42.Emails = append(p42.Emails, p50)
+				}
+			}
+			{
+				rows51, err := r.Svc.Query.Vcard.Telephones.List(ctx, telephonesql.List().Where(telephonesql.ContactId.Eq(got41.Id)).OrderBy(telephonesql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows51 {
+					p52 := vcardTelephoneFromRow(&rows51[i])
+					p42.Telephones = append(p42.Telephones, p52)
+				}
+			}
+			{
+				rows53, err := r.Svc.Query.Vcard.Address.List(ctx, addressql.List().Where(addressql.ContactId.Eq(got41.Id)).OrderBy(addressql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows53 {
+					p54 := vcardAddressFromRow(&rows53[i])
+					p42.Addresses = append(p42.Addresses, p54)
+				}
+			}
+			{
+				rows55, err := r.Svc.Query.Vcard.Organizations.List(ctx, organizationsql.List().Where(organizationsql.ContactId.Eq(got41.Id)).OrderBy(organizationsql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows55 {
+					p56 := vcardOrganizationFromRow(&rows55[i])
+					p42.Organizations = append(p42.Organizations, p56)
+				}
+			}
+			{
+				rows57, err := r.Svc.Query.Vcard.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.ContactId.Eq(got41.Id)).OrderBy(extensionpropertiesql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows57 {
+					p58 := vcardExtensionPropertyFromRow(&rows57[i])
+					p42.Extensions = append(p42.Extensions, p58)
+				}
+			}
+			{
+				rows59, err := r.Svc.Query.Vcard.Nicknames.List(ctx, nicknamesql.List().Where(nicknamesql.ContactId.Eq(got41.Id)).OrderBy(nicknamesql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows59 {
+					p60 := vcardNicknameFromRow(&rows59[i])
+					p42.Nicknames = append(p42.Nicknames, p60)
+				}
+			}
+			{
+				rows61, err := r.Svc.Query.Vcard.Urls.List(ctx, urlsql.List().Where(urlsql.ContactId.Eq(got41.Id)).OrderBy(urlsql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows61 {
+					p62 := vcardUrlFromRow(&rows61[i])
+					p42.Urls = append(p42.Urls, p62)
+				}
+			}
+			{
+				rows63, err := r.Svc.Query.Vcard.Roles.List(ctx, rolesql.List().Where(rolesql.ContactId.Eq(got41.Id)).OrderBy(rolesql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows63 {
+					p64 := vcardRoleFromRow(&rows63[i])
+					p42.Roles = append(p42.Roles, p64)
+				}
+			}
+			{
+				rows65, err := r.Svc.Query.Vcard.InstantMessages.List(ctx, instantmessagesql.List().Where(instantmessagesql.ContactId.Eq(got41.Id)).OrderBy(instantmessagesql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows65 {
+					p66 := vcardInstantMessageFromRow(&rows65[i])
+					p42.InstantMessages = append(p42.InstantMessages, p66)
+				}
+			}
+			{
+				rows67, err := r.Svc.Query.Vcard.Languages.List(ctx, languagesql.List().Where(languagesql.ContactId.Eq(got41.Id)).OrderBy(languagesql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows67 {
+					p68 := vcardLanguageFromRow(&rows67[i])
+					p42.Languages = append(p42.Languages, p68)
+				}
+			}
+			{
+				rows69, err := r.Svc.Query.Vcard.Geos.List(ctx, geosql.List().Where(geosql.ContactId.Eq(got41.Id)).OrderBy(geosql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows69 {
+					p70 := vcardGeoFromRow(&rows69[i])
+					p42.Locations = append(p42.Locations, p70)
+				}
+			}
+			{
+				rows71, err := r.Svc.Query.Vcard.Timezones.List(ctx, timezonesql.List().Where(timezonesql.ContactId.Eq(got41.Id)).OrderBy(timezonesql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows71 {
+					p72 := vcardTimezoneFromRow(&rows71[i])
+					p42.Timezones = append(p42.Timezones, p72)
+				}
+			}
+			{
+				rows73, err := r.Svc.Query.Vcard.Relations.List(ctx, relationsql.List().Where(relationsql.ContactId.Eq(got41.Id)).OrderBy(relationsql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows73 {
+					p74 := vcardRelationFromRow(&rows73[i])
+					p42.Relations = append(p42.Relations, p74)
+				}
+			}
+			{
+				rows75, err := r.Svc.Query.Vcard.Pronouns.List(ctx, pronounsql.List().Where(pronounsql.ContactId.Eq(got41.Id)).OrderBy(pronounsql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows75 {
+					p76 := vcardPronounsFromRow(&rows75[i])
+					p42.Pronouns = append(p42.Pronouns, p76)
+				}
+			}
+			{
+				rows77, err := r.Svc.Query.Vcard.GrammaticalGenders.List(ctx, grammaticalgendersql.List().Where(grammaticalgendersql.ContactId.Eq(got41.Id)).OrderBy(grammaticalgendersql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows77 {
+					p78 := vcardGrammaticalGenderFromRow(&rows77[i])
+					p42.GrammaticalGenders = append(p42.GrammaticalGenders, p78)
+				}
+			}
+			{
+				rows79, err := r.Svc.Query.Vcard.SocialProfiles.List(ctx, socialprofilesql.List().Where(socialprofilesql.ContactId.Eq(got41.Id)).OrderBy(socialprofilesql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows79 {
+					p80 := vcardSocialProfileFromRow(&rows79[i])
+					p42.SocialProfiles = append(p42.SocialProfiles, p80)
+				}
+			}
+			out.Contact = p42
+		}
+	}
 	if h := r.Hooks.AfterRead; h != nil {
 		if err := h(ctx, out); err != nil {
 			return nil, err
@@ -126,6 +469,9 @@ func (r *GraphQLVcardRepository) List(ctx context.Context, in repox.ListInput) (
 }
 
 func (r *GraphQLVcardRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*vcardpbv1.Vcard, string, error) {
+	if !in.ShowDeleted {
+		scope = append(scope, resourceql.DeleteTime.IsNull(true))
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -170,6 +516,7 @@ func (r *GraphQLVcardRepository) Update(ctx context.Context, in *vcardpbv1.Vcard
 	if row == nil {
 		return nil, repox.ErrNotFound
 	}
+	staleContact := row.ContactId
 	existingPB := vcardFromRow(row)
 	merged := proto.Clone(existingPB).(*vcardpbv1.Vcard)
 	applyVcardMask(merged, in, paths)
@@ -181,8 +528,450 @@ func (r *GraphQLVcardRepository) Update(ctx context.Context, in *vcardpbv1.Vcard
 	patch := vcardToUpdatePatch(merged)
 	patch.Etag = graphql.Value(repox.NewULID())
 	patch.UpdateTime = graphql.Value(tsToStr(timestamppb.New(time.Now().UTC())))
+	// New singular value objects land before the guarded row update (a lost
+	// race leaves them unreferenced); new list rows and the removal of
+	// replaced subtrees land only after it succeeds (atx).
+	utx := r.Svc.Mutation.Tx()
+	atx := r.Svc.Mutation.Tx()
+	if repox.GroupTouched(paths, "contact") {
+		if id := staleContact; id != "" {
+			got117, err := r.Svc.Query.Vcard.Contacts.Get(ctx, id)
+			if err != nil {
+				return nil, mapGraphQLErr(err)
+			}
+			if got117 != nil {
+				{
+					rows118, err := r.Svc.Query.Vcard.Emails.List(ctx, emailsql.List().Where(emailsql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows118 {
+						if id := rows118[i].Id; id != "" {
+							got119, err := r.Svc.Query.Vcard.Emails.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got119 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.Emails.DeleteOp(got119.Id, new(emailsql.DeleteVcardEmailsByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows120, err := r.Svc.Query.Vcard.Telephones.List(ctx, telephonesql.List().Where(telephonesql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows120 {
+						if id := rows120[i].Id; id != "" {
+							got121, err := r.Svc.Query.Vcard.Telephones.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got121 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.Telephones.DeleteOp(got121.Id, new(telephonesql.DeleteVcardTelephonesByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows122, err := r.Svc.Query.Vcard.Address.List(ctx, addressql.List().Where(addressql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows122 {
+						if id := rows122[i].Id; id != "" {
+							got123, err := r.Svc.Query.Vcard.Address.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got123 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.Address.DeleteOp(got123.Id, new(addressql.DeleteVcardAddressByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows124, err := r.Svc.Query.Vcard.Organizations.List(ctx, organizationsql.List().Where(organizationsql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows124 {
+						if id := rows124[i].Id; id != "" {
+							got125, err := r.Svc.Query.Vcard.Organizations.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got125 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.Organizations.DeleteOp(got125.Id, new(organizationsql.DeleteVcardOrganizationsByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows126, err := r.Svc.Query.Vcard.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows126 {
+						if id := rows126[i].Id; id != "" {
+							got127, err := r.Svc.Query.Vcard.ExtensionProperties.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got127 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.ExtensionProperties.DeleteOp(got127.Id, new(extensionpropertiesql.DeleteVcardExtensionPropertiesByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows128, err := r.Svc.Query.Vcard.Nicknames.List(ctx, nicknamesql.List().Where(nicknamesql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows128 {
+						if id := rows128[i].Id; id != "" {
+							got129, err := r.Svc.Query.Vcard.Nicknames.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got129 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.Nicknames.DeleteOp(got129.Id, new(nicknamesql.DeleteVcardNicknamesByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows130, err := r.Svc.Query.Vcard.Urls.List(ctx, urlsql.List().Where(urlsql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows130 {
+						if id := rows130[i].Id; id != "" {
+							got131, err := r.Svc.Query.Vcard.Urls.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got131 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.Urls.DeleteOp(got131.Id, new(urlsql.DeleteVcardUrlsByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows132, err := r.Svc.Query.Vcard.Roles.List(ctx, rolesql.List().Where(rolesql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows132 {
+						if id := rows132[i].Id; id != "" {
+							got133, err := r.Svc.Query.Vcard.Roles.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got133 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.Roles.DeleteOp(got133.Id, new(rolesql.DeleteVcardRolesByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows134, err := r.Svc.Query.Vcard.InstantMessages.List(ctx, instantmessagesql.List().Where(instantmessagesql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows134 {
+						if id := rows134[i].Id; id != "" {
+							got135, err := r.Svc.Query.Vcard.InstantMessages.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got135 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.InstantMessages.DeleteOp(got135.Id, new(instantmessagesql.DeleteVcardInstantMessagesByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows136, err := r.Svc.Query.Vcard.Languages.List(ctx, languagesql.List().Where(languagesql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows136 {
+						if id := rows136[i].Id; id != "" {
+							got137, err := r.Svc.Query.Vcard.Languages.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got137 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.Languages.DeleteOp(got137.Id, new(languagesql.DeleteVcardLanguagesByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows138, err := r.Svc.Query.Vcard.Geos.List(ctx, geosql.List().Where(geosql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows138 {
+						if id := rows138[i].Id; id != "" {
+							got139, err := r.Svc.Query.Vcard.Geos.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got139 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.Geos.DeleteOp(got139.Id, new(geosql.DeleteVcardGeosByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows140, err := r.Svc.Query.Vcard.Timezones.List(ctx, timezonesql.List().Where(timezonesql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows140 {
+						if id := rows140[i].Id; id != "" {
+							got141, err := r.Svc.Query.Vcard.Timezones.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got141 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.Timezones.DeleteOp(got141.Id, new(timezonesql.DeleteVcardTimezonesByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows142, err := r.Svc.Query.Vcard.Relations.List(ctx, relationsql.List().Where(relationsql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows142 {
+						if id := rows142[i].Id; id != "" {
+							got143, err := r.Svc.Query.Vcard.Relations.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got143 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.Relations.DeleteOp(got143.Id, new(relationsql.DeleteVcardRelationsByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows144, err := r.Svc.Query.Vcard.Pronouns.List(ctx, pronounsql.List().Where(pronounsql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows144 {
+						if id := rows144[i].Id; id != "" {
+							got145, err := r.Svc.Query.Vcard.Pronouns.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got145 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.Pronouns.DeleteOp(got145.Id, new(pronounsql.DeleteVcardPronounsByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows146, err := r.Svc.Query.Vcard.GrammaticalGenders.List(ctx, grammaticalgendersql.List().Where(grammaticalgendersql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows146 {
+						if id := rows146[i].Id; id != "" {
+							got147, err := r.Svc.Query.Vcard.GrammaticalGenders.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got147 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.GrammaticalGenders.DeleteOp(got147.Id, new(grammaticalgendersql.DeleteVcardGrammaticalGendersByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows148, err := r.Svc.Query.Vcard.SocialProfiles.List(ctx, socialprofilesql.List().Where(socialprofilesql.ContactId.Eq(got117.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows148 {
+						if id := rows148[i].Id; id != "" {
+							got149, err := r.Svc.Query.Vcard.SocialProfiles.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got149 != nil {
+								atx.Add(r.Svc.Mutation.Vcard.SocialProfiles.DeleteOp(got149.Id, new(socialprofilesql.DeleteVcardSocialProfilesByIdResponse)))
+							}
+						}
+					}
+				}
+				atx.Add(r.Svc.Mutation.Vcard.Contacts.DeleteOp(got117.Id, new(contactsql.DeleteVcardContactsByIdResponse)))
+				if id := repox.Deref(got117.NameComponentsId); id != "" {
+					got150, err := r.Svc.Query.Vcard.Names.Get(ctx, id)
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					if got150 != nil {
+						atx.Add(r.Svc.Mutation.Vcard.Names.DeleteOp(got150.Id, new(namesql.DeleteVcardNamesByIdResponse)))
+					}
+				}
+				if id := repox.Deref(got117.BirthdayId); id != "" {
+					got151, err := r.Svc.Query.Vcard.DateOrTexts.Get(ctx, id)
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					if got151 != nil {
+						atx.Add(r.Svc.Mutation.Vcard.DateOrTexts.DeleteOp(got151.Id, new(dateortextsql.DeleteVcardDateOrTextsByIdResponse)))
+					}
+				}
+				if id := repox.Deref(got117.AnniversaryId); id != "" {
+					got152, err := r.Svc.Query.Vcard.DateOrTexts.Get(ctx, id)
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					if got152 != nil {
+						atx.Add(r.Svc.Mutation.Vcard.DateOrTexts.DeleteOp(got152.Id, new(dateortextsql.DeleteVcardDateOrTextsByIdResponse)))
+					}
+				}
+			}
+		}
+		patch.ContactId = graphql.Null[string]()
+		if v153 := merged.GetContact(); v153 != nil {
+			n154 := vcardContactToCreateInput(v153)
+			n154.Id = repox.NewULID()
+			if v155 := v153.GetNameComponents(); v155 != nil {
+				n156 := vcardNameToCreateInput(v155)
+				n156.Id = repox.NewULID()
+				utx.Add(r.Svc.Mutation.Vcard.Names.CreateOp(n156, new(namesql.InsertVcardNamesResponse)))
+				n154.NameComponentsId = n156.Id
+			}
+			if v157 := v153.GetBirthday(); v157 != nil {
+				n158 := vcardDateOrTextToCreateInput(v157)
+				n158.Id = repox.NewULID()
+				utx.Add(r.Svc.Mutation.Vcard.DateOrTexts.CreateOp(n158, new(dateortextsql.InsertVcardDateOrTextsResponse)))
+				n154.BirthdayId = n158.Id
+			}
+			if v159 := v153.GetAnniversary(); v159 != nil {
+				n160 := vcardDateOrTextToCreateInput(v159)
+				n160.Id = repox.NewULID()
+				utx.Add(r.Svc.Mutation.Vcard.DateOrTexts.CreateOp(n160, new(dateortextsql.InsertVcardDateOrTextsResponse)))
+				n154.AnniversaryId = n160.Id
+			}
+			utx.Add(r.Svc.Mutation.Vcard.Contacts.CreateOp(n154, new(contactsql.InsertVcardContactsResponse)))
+			for _, v161 := range v153.GetEmails() {
+				n162 := vcardEmailToCreateInput(v161)
+				n162.Id = repox.NewULID()
+				n162.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.Emails.CreateOp(n162, new(emailsql.InsertVcardEmailsResponse)))
+			}
+			for _, v163 := range v153.GetTelephones() {
+				n164 := vcardTelephoneToCreateInput(v163)
+				n164.Id = repox.NewULID()
+				n164.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.Telephones.CreateOp(n164, new(telephonesql.InsertVcardTelephonesResponse)))
+			}
+			for _, v165 := range v153.GetAddresses() {
+				n166 := vcardAddressToCreateInput(v165)
+				n166.Id = repox.NewULID()
+				n166.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.Address.CreateOp(n166, new(addressql.InsertVcardAddressResponse)))
+			}
+			for _, v167 := range v153.GetOrganizations() {
+				n168 := vcardOrganizationToCreateInput(v167)
+				n168.Id = repox.NewULID()
+				n168.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.Organizations.CreateOp(n168, new(organizationsql.InsertVcardOrganizationsResponse)))
+			}
+			for _, v169 := range v153.GetExtensions() {
+				n170 := vcardExtensionPropertyToCreateInput(v169)
+				n170.Id = repox.NewULID()
+				n170.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.ExtensionProperties.CreateOp(n170, new(extensionpropertiesql.InsertVcardExtensionPropertiesResponse)))
+			}
+			for _, v171 := range v153.GetNicknames() {
+				n172 := vcardNicknameToCreateInput(v171)
+				n172.Id = repox.NewULID()
+				n172.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.Nicknames.CreateOp(n172, new(nicknamesql.InsertVcardNicknamesResponse)))
+			}
+			for _, v173 := range v153.GetUrls() {
+				n174 := vcardUrlToCreateInput(v173)
+				n174.Id = repox.NewULID()
+				n174.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.Urls.CreateOp(n174, new(urlsql.InsertVcardUrlsResponse)))
+			}
+			for _, v175 := range v153.GetRoles() {
+				n176 := vcardRoleToCreateInput(v175)
+				n176.Id = repox.NewULID()
+				n176.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.Roles.CreateOp(n176, new(rolesql.InsertVcardRolesResponse)))
+			}
+			for _, v177 := range v153.GetInstantMessages() {
+				n178 := vcardInstantMessageToCreateInput(v177)
+				n178.Id = repox.NewULID()
+				n178.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.InstantMessages.CreateOp(n178, new(instantmessagesql.InsertVcardInstantMessagesResponse)))
+			}
+			for _, v179 := range v153.GetLanguages() {
+				n180 := vcardLanguageToCreateInput(v179)
+				n180.Id = repox.NewULID()
+				n180.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.Languages.CreateOp(n180, new(languagesql.InsertVcardLanguagesResponse)))
+			}
+			for _, v181 := range v153.GetLocations() {
+				n182 := vcardGeoToCreateInput(v181)
+				n182.Id = repox.NewULID()
+				n182.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.Geos.CreateOp(n182, new(geosql.InsertVcardGeosResponse)))
+			}
+			for _, v183 := range v153.GetTimezones() {
+				n184 := vcardTimezoneToCreateInput(v183)
+				n184.Id = repox.NewULID()
+				n184.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.Timezones.CreateOp(n184, new(timezonesql.InsertVcardTimezonesResponse)))
+			}
+			for _, v185 := range v153.GetRelations() {
+				n186 := vcardRelationToCreateInput(v185)
+				n186.Id = repox.NewULID()
+				n186.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.Relations.CreateOp(n186, new(relationsql.InsertVcardRelationsResponse)))
+			}
+			for _, v187 := range v153.GetPronouns() {
+				n188 := vcardPronounsToCreateInput(v187)
+				n188.Id = repox.NewULID()
+				n188.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.Pronouns.CreateOp(n188, new(pronounsql.InsertVcardPronounsResponse)))
+			}
+			for _, v189 := range v153.GetGrammaticalGenders() {
+				n190 := vcardGrammaticalGenderToCreateInput(v189)
+				n190.Id = repox.NewULID()
+				n190.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.GrammaticalGenders.CreateOp(n190, new(grammaticalgendersql.InsertVcardGrammaticalGendersResponse)))
+			}
+			for _, v191 := range v153.GetSocialProfiles() {
+				n192 := vcardSocialProfileToCreateInput(v191)
+				n192.Id = repox.NewULID()
+				n192.ContactId = n154.Id
+				utx.Add(r.Svc.Mutation.Vcard.SocialProfiles.CreateOp(n192, new(socialprofilesql.InsertVcardSocialProfilesResponse)))
+			}
+			patch.ContactId = graphql.Value(n154.Id)
+		}
+	}
+	if err := utx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	if in.GetEtag() != "" {
 		if _, err := r.Svc.Mutation.Vcard.Resource.UpdateIfMatch(ctx, id, patch, resourceql.Etag.Eq(in.GetEtag())); err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		if err := atx.Commit(ctx); err != nil {
 			return nil, mapGraphQLErr(err)
 		}
 		return r.get(ctx, id)
@@ -194,11 +983,58 @@ func (r *GraphQLVcardRepository) Update(ctx context.Context, in *vcardpbv1.Vcard
 	if resp.AffectedRows == 0 {
 		return nil, repox.ErrNotFound
 	}
+	if err := atx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GraphQLVcardRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "vcards")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	patch := resourceql.UpdateInput{DeleteTime: graphql.Value(time.Now().UTC().Format(time.RFC3339Nano))}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Vcard.Resource.UpdateIfMatch(ctx, ids[len(ids)-1], patch, resourceql.DeleteTime.IsNull(true)); err != nil {
+		if errors.Is(err, graphql.ErrConflict) {
+			return repox.ErrNotFound
+		}
+		return mapGraphQLErr(err)
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GraphQLVcardRepository) Undelete(ctx context.Context, name string) (*vcardpbv1.Vcard, error) {
+	ids, err := repox.SplitName(name, "vcards")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	patch := resourceql.UpdateInput{DeleteTime: graphql.Null[string]()}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Vcard.Resource.UpdateIfMatch(ctx, id, patch, resourceql.DeleteTime.IsNull(false)); err != nil {
+		if !errors.Is(err, graphql.ErrConflict) {
+			return nil, mapGraphQLErr(err)
+		}
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GraphQLVcardRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "vcards")
 	if err != nil {
 		return err
@@ -215,6 +1051,320 @@ func (r *GraphQLVcardRepository) Delete(ctx context.Context, name string) error 
 	}
 	if resp.AffectedRows == 0 {
 		return repox.ErrNotFound
+	}
+	dtx := r.Svc.Mutation.Tx()
+	for i := range resp.Returning {
+		if id := resp.Returning[i].ContactId; id != "" {
+			got81, err := r.Svc.Query.Vcard.Contacts.Get(ctx, id)
+			if err != nil {
+				return mapGraphQLErr(err)
+			}
+			if got81 != nil {
+				{
+					rows82, err := r.Svc.Query.Vcard.Emails.List(ctx, emailsql.List().Where(emailsql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows82 {
+						if id := rows82[i].Id; id != "" {
+							got83, err := r.Svc.Query.Vcard.Emails.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got83 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.Emails.DeleteOp(got83.Id, new(emailsql.DeleteVcardEmailsByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows84, err := r.Svc.Query.Vcard.Telephones.List(ctx, telephonesql.List().Where(telephonesql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows84 {
+						if id := rows84[i].Id; id != "" {
+							got85, err := r.Svc.Query.Vcard.Telephones.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got85 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.Telephones.DeleteOp(got85.Id, new(telephonesql.DeleteVcardTelephonesByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows86, err := r.Svc.Query.Vcard.Address.List(ctx, addressql.List().Where(addressql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows86 {
+						if id := rows86[i].Id; id != "" {
+							got87, err := r.Svc.Query.Vcard.Address.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got87 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.Address.DeleteOp(got87.Id, new(addressql.DeleteVcardAddressByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows88, err := r.Svc.Query.Vcard.Organizations.List(ctx, organizationsql.List().Where(organizationsql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows88 {
+						if id := rows88[i].Id; id != "" {
+							got89, err := r.Svc.Query.Vcard.Organizations.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got89 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.Organizations.DeleteOp(got89.Id, new(organizationsql.DeleteVcardOrganizationsByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows90, err := r.Svc.Query.Vcard.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows90 {
+						if id := rows90[i].Id; id != "" {
+							got91, err := r.Svc.Query.Vcard.ExtensionProperties.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got91 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.ExtensionProperties.DeleteOp(got91.Id, new(extensionpropertiesql.DeleteVcardExtensionPropertiesByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows92, err := r.Svc.Query.Vcard.Nicknames.List(ctx, nicknamesql.List().Where(nicknamesql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows92 {
+						if id := rows92[i].Id; id != "" {
+							got93, err := r.Svc.Query.Vcard.Nicknames.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got93 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.Nicknames.DeleteOp(got93.Id, new(nicknamesql.DeleteVcardNicknamesByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows94, err := r.Svc.Query.Vcard.Urls.List(ctx, urlsql.List().Where(urlsql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows94 {
+						if id := rows94[i].Id; id != "" {
+							got95, err := r.Svc.Query.Vcard.Urls.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got95 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.Urls.DeleteOp(got95.Id, new(urlsql.DeleteVcardUrlsByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows96, err := r.Svc.Query.Vcard.Roles.List(ctx, rolesql.List().Where(rolesql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows96 {
+						if id := rows96[i].Id; id != "" {
+							got97, err := r.Svc.Query.Vcard.Roles.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got97 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.Roles.DeleteOp(got97.Id, new(rolesql.DeleteVcardRolesByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows98, err := r.Svc.Query.Vcard.InstantMessages.List(ctx, instantmessagesql.List().Where(instantmessagesql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows98 {
+						if id := rows98[i].Id; id != "" {
+							got99, err := r.Svc.Query.Vcard.InstantMessages.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got99 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.InstantMessages.DeleteOp(got99.Id, new(instantmessagesql.DeleteVcardInstantMessagesByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows100, err := r.Svc.Query.Vcard.Languages.List(ctx, languagesql.List().Where(languagesql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows100 {
+						if id := rows100[i].Id; id != "" {
+							got101, err := r.Svc.Query.Vcard.Languages.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got101 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.Languages.DeleteOp(got101.Id, new(languagesql.DeleteVcardLanguagesByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows102, err := r.Svc.Query.Vcard.Geos.List(ctx, geosql.List().Where(geosql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows102 {
+						if id := rows102[i].Id; id != "" {
+							got103, err := r.Svc.Query.Vcard.Geos.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got103 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.Geos.DeleteOp(got103.Id, new(geosql.DeleteVcardGeosByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows104, err := r.Svc.Query.Vcard.Timezones.List(ctx, timezonesql.List().Where(timezonesql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows104 {
+						if id := rows104[i].Id; id != "" {
+							got105, err := r.Svc.Query.Vcard.Timezones.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got105 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.Timezones.DeleteOp(got105.Id, new(timezonesql.DeleteVcardTimezonesByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows106, err := r.Svc.Query.Vcard.Relations.List(ctx, relationsql.List().Where(relationsql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows106 {
+						if id := rows106[i].Id; id != "" {
+							got107, err := r.Svc.Query.Vcard.Relations.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got107 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.Relations.DeleteOp(got107.Id, new(relationsql.DeleteVcardRelationsByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows108, err := r.Svc.Query.Vcard.Pronouns.List(ctx, pronounsql.List().Where(pronounsql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows108 {
+						if id := rows108[i].Id; id != "" {
+							got109, err := r.Svc.Query.Vcard.Pronouns.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got109 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.Pronouns.DeleteOp(got109.Id, new(pronounsql.DeleteVcardPronounsByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows110, err := r.Svc.Query.Vcard.GrammaticalGenders.List(ctx, grammaticalgendersql.List().Where(grammaticalgendersql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows110 {
+						if id := rows110[i].Id; id != "" {
+							got111, err := r.Svc.Query.Vcard.GrammaticalGenders.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got111 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.GrammaticalGenders.DeleteOp(got111.Id, new(grammaticalgendersql.DeleteVcardGrammaticalGendersByIdResponse)))
+							}
+						}
+					}
+				}
+				{
+					rows112, err := r.Svc.Query.Vcard.SocialProfiles.List(ctx, socialprofilesql.List().Where(socialprofilesql.ContactId.Eq(got81.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows112 {
+						if id := rows112[i].Id; id != "" {
+							got113, err := r.Svc.Query.Vcard.SocialProfiles.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got113 != nil {
+								dtx.Add(r.Svc.Mutation.Vcard.SocialProfiles.DeleteOp(got113.Id, new(socialprofilesql.DeleteVcardSocialProfilesByIdResponse)))
+							}
+						}
+					}
+				}
+				dtx.Add(r.Svc.Mutation.Vcard.Contacts.DeleteOp(got81.Id, new(contactsql.DeleteVcardContactsByIdResponse)))
+				if id := repox.Deref(got81.NameComponentsId); id != "" {
+					got114, err := r.Svc.Query.Vcard.Names.Get(ctx, id)
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					if got114 != nil {
+						dtx.Add(r.Svc.Mutation.Vcard.Names.DeleteOp(got114.Id, new(namesql.DeleteVcardNamesByIdResponse)))
+					}
+				}
+				if id := repox.Deref(got81.BirthdayId); id != "" {
+					got115, err := r.Svc.Query.Vcard.DateOrTexts.Get(ctx, id)
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					if got115 != nil {
+						dtx.Add(r.Svc.Mutation.Vcard.DateOrTexts.DeleteOp(got115.Id, new(dateortextsql.DeleteVcardDateOrTextsByIdResponse)))
+					}
+				}
+				if id := repox.Deref(got81.AnniversaryId); id != "" {
+					got116, err := r.Svc.Query.Vcard.DateOrTexts.Get(ctx, id)
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					if got116 != nil {
+						dtx.Add(r.Svc.Mutation.Vcard.DateOrTexts.DeleteOp(got116.Id, new(dateortextsql.DeleteVcardDateOrTextsByIdResponse)))
+					}
+				}
+			}
+		}
+	}
+	if err := dtx.Commit(ctx); err != nil {
+		return mapGraphQLErr(err)
 	}
 	return nil
 }

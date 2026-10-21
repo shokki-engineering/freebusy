@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: google/type/datetime.proto
+// source: google/type/datetime.proto, google/type/fraction.proto
 //
 // database: rfc
 // schema:   common
@@ -16,6 +16,7 @@ package common
 
 import (
 	"google.golang.org/genproto/googleapis/type/datetime"
+	"google.golang.org/genproto/googleapis/type/fraction"
 )
 
 // TimeZoneToProto converts the stored row (with its belongs-to associations,
@@ -40,6 +41,31 @@ func TimeZoneFromProto(pb *datetime.TimeZone) *TimeZone {
 	m := &TimeZone{}
 	// not mapped here: id (primary key)
 	m.Version = toPtr(pb.GetVersion())
+	return m
+}
+
+// FractionToProto converts the stored row (with its belongs-to associations,
+// when preloaded) to its proto message. Nil in, nil out.
+func FractionToProto(m *Fraction) *fraction.Fraction {
+	if m == nil {
+		return nil
+	}
+	out := &fraction.Fraction{}
+	out.Numerator = fromPtr(m.Numerator)
+	out.Denominator = fromPtr(m.Denominator)
+	return out
+}
+
+// FractionFromProto maps the proto message's data fields onto a fresh row.
+// It never invents keys or relations: primary keys, resource references, and
+// sub-row graph wiring stay with the caller. Nil in, nil out.
+func FractionFromProto(pb *fraction.Fraction) *Fraction {
+	if pb == nil {
+		return nil
+	}
+	m := &Fraction{}
+	m.Numerator = toPtr(pb.GetNumerator())
+	m.Denominator = toPtr(pb.GetDenominator())
 	return m
 }
 

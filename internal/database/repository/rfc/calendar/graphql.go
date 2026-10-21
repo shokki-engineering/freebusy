@@ -16,14 +16,16 @@
 package calendar
 
 import (
+	calendarpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/calendar"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/calendarql/extensionpropertiesql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/calendarql/resourceql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/calendar/v1/calendarpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -80,7 +82,33 @@ func (r *GraphQLCalendarRepository) Create(ctx context.Context, in *calendarpbv1
 	now := tsToStr(timestamppb.New(time.Now().UTC()))
 	ci.CreateTime = now
 	ci.UpdateTime = now
-	if _, err := r.Svc.Mutation.Calendar.Resource.Create(ctx, ci); err != nil {
+	// One transaction: the graph lands whole or not at all.
+	gtx := r.Svc.Mutation.Tx()
+	if v1 := in.GetTimeZone(); v1 != nil {
+		if key := v1.GetId(); key != "" {
+			got2, err := r.Svc.Query.Common.TimeZones.Get(ctx, key)
+			if err != nil {
+				return nil, mapGraphQLErr(err)
+			}
+			if got2 == nil {
+				if _, err := r.Svc.Mutation.Common.TimeZones.Create(ctx, commonTimeZoneToCreateInput(v1)); err != nil {
+					// Lost a race to insert the shared row: fine if it now exists.
+					if again, gerr := r.Svc.Query.Common.TimeZones.Get(ctx, key); gerr != nil || again == nil {
+						return nil, mapGraphQLErr(err)
+					}
+				}
+			}
+			ci.TimeZoneId = key
+		}
+	}
+	gtx.Add(r.Svc.Mutation.Calendar.Resource.CreateOp(ci, new(resourceql.InsertCalendarResourceResponse)))
+	for _, v5 := range in.GetExtensions() {
+		n6 := calendarExtensionPropertyToCreateInput(v5)
+		n6.Id = repox.NewULID()
+		n6.CalendarId = id
+		gtx.Add(r.Svc.Mutation.Calendar.ExtensionProperties.CreateOp(n6, new(extensionpropertiesql.InsertCalendarExtensionPropertiesResponse)))
+	}
+	if err := gtx.Commit(ctx); err != nil {
 		return nil, mapGraphQLErr(err)
 	}
 	return r.get(ctx, id)
@@ -112,6 +140,26 @@ func (r *GraphQLCalendarRepository) get(ctx context.Context, id string) (*calend
 // stored references, and runs the AfterRead hook.
 func (r *GraphQLCalendarRepository) toProto(ctx context.Context, row *resourceql.CalendarResource) (*calendarpbv1.Calendar, error) {
 	out := calendarFromRow(row)
+	if id := repox.Deref(row.TimeZoneId); id != "" {
+		got3, err := r.Svc.Query.Common.TimeZones.Get(ctx, id)
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		if got3 != nil {
+			p4 := commonTimeZoneFromRow(got3)
+			out.TimeZone = p4
+		}
+	}
+	{
+		rows7, err := r.Svc.Query.Calendar.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.CalendarId.Eq(row.Id)).OrderBy(extensionpropertiesql.Id.Asc()))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows7 {
+			p8 := calendarExtensionPropertyFromRow(&rows7[i])
+			out.Extensions = append(out.Extensions, p8)
+		}
+	}
 	if h := r.Hooks.AfterRead; h != nil {
 		if err := h(ctx, out); err != nil {
 			return nil, err
@@ -126,6 +174,9 @@ func (r *GraphQLCalendarRepository) List(ctx context.Context, in repox.ListInput
 }
 
 func (r *GraphQLCalendarRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*calendarpbv1.Calendar, string, error) {
+	if !in.ShowDeleted {
+		scope = append(scope, resourceql.DeleteTime.IsNull(true))
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -170,6 +221,17 @@ func (r *GraphQLCalendarRepository) Update(ctx context.Context, in *calendarpbv1
 	if row == nil {
 		return nil, repox.ErrNotFound
 	}
+	var old13 []string
+	{
+		rows14, err := r.Svc.Query.Calendar.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.CalendarId.Eq(id)))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows14 {
+			old13 = append(old13, rows14[i].Id)
+		}
+	}
+	staleExtensions := old13
 	existingPB := calendarFromRow(row)
 	merged := proto.Clone(existingPB).(*calendarpbv1.Calendar)
 	applyCalendarMask(merged, in, paths)
@@ -181,8 +243,58 @@ func (r *GraphQLCalendarRepository) Update(ctx context.Context, in *calendarpbv1
 	patch := calendarToUpdatePatch(merged)
 	patch.Etag = graphql.Value(repox.NewULID())
 	patch.UpdateTime = graphql.Value(tsToStr(timestamppb.New(time.Now().UTC())))
+	// New singular value objects land before the guarded row update (a lost
+	// race leaves them unreferenced); new list rows and the removal of
+	// replaced subtrees land only after it succeeds (atx).
+	utx := r.Svc.Mutation.Tx()
+	atx := r.Svc.Mutation.Tx()
+	if repox.GroupTouched(paths, "time_zone") {
+		patch.TimeZoneId = graphql.Null[string]()
+		if v11 := merged.GetTimeZone(); v11 != nil {
+			if key := v11.GetId(); key != "" {
+				got12, err := r.Svc.Query.Common.TimeZones.Get(ctx, key)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got12 == nil {
+					if _, err := r.Svc.Mutation.Common.TimeZones.Create(ctx, commonTimeZoneToCreateInput(v11)); err != nil {
+						// Lost a race to insert the shared row: fine if it now exists.
+						if again, gerr := r.Svc.Query.Common.TimeZones.Get(ctx, key); gerr != nil || again == nil {
+							return nil, mapGraphQLErr(err)
+						}
+					}
+				}
+				patch.TimeZoneId = graphql.Value(key)
+			}
+		}
+	}
+	if repox.GroupTouched(paths, "extensions") {
+		for _, oid := range staleExtensions {
+			if id := oid; id != "" {
+				got15, err := r.Svc.Query.Calendar.ExtensionProperties.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got15 != nil {
+					atx.Add(r.Svc.Mutation.Calendar.ExtensionProperties.DeleteOp(got15.Id, new(extensionpropertiesql.DeleteCalendarExtensionPropertiesByIdResponse)))
+				}
+			}
+		}
+		for _, v16 := range merged.GetExtensions() {
+			n17 := calendarExtensionPropertyToCreateInput(v16)
+			n17.Id = repox.NewULID()
+			n17.CalendarId = id
+			atx.Add(r.Svc.Mutation.Calendar.ExtensionProperties.CreateOp(n17, new(extensionpropertiesql.InsertCalendarExtensionPropertiesResponse)))
+		}
+	}
+	if err := utx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	if in.GetEtag() != "" {
 		if _, err := r.Svc.Mutation.Calendar.Resource.UpdateIfMatch(ctx, id, patch, resourceql.Etag.Eq(in.GetEtag())); err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		if err := atx.Commit(ctx); err != nil {
 			return nil, mapGraphQLErr(err)
 		}
 		return r.get(ctx, id)
@@ -194,11 +306,58 @@ func (r *GraphQLCalendarRepository) Update(ctx context.Context, in *calendarpbv1
 	if resp.AffectedRows == 0 {
 		return nil, repox.ErrNotFound
 	}
+	if err := atx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GraphQLCalendarRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "calendars")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	patch := resourceql.UpdateInput{DeleteTime: graphql.Value(time.Now().UTC().Format(time.RFC3339Nano))}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Calendar.Resource.UpdateIfMatch(ctx, ids[len(ids)-1], patch, resourceql.DeleteTime.IsNull(true)); err != nil {
+		if errors.Is(err, graphql.ErrConflict) {
+			return repox.ErrNotFound
+		}
+		return mapGraphQLErr(err)
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GraphQLCalendarRepository) Undelete(ctx context.Context, name string) (*calendarpbv1.Calendar, error) {
+	ids, err := repox.SplitName(name, "calendars")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	patch := resourceql.UpdateInput{DeleteTime: graphql.Null[string]()}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Calendar.Resource.UpdateIfMatch(ctx, id, patch, resourceql.DeleteTime.IsNull(false)); err != nil {
+		if !errors.Is(err, graphql.ErrConflict) {
+			return nil, mapGraphQLErr(err)
+		}
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GraphQLCalendarRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "calendars")
 	if err != nil {
 		return err
@@ -215,6 +374,30 @@ func (r *GraphQLCalendarRepository) Delete(ctx context.Context, name string) err
 	}
 	if resp.AffectedRows == 0 {
 		return repox.ErrNotFound
+	}
+	dtx := r.Svc.Mutation.Tx()
+	for i := range resp.Returning {
+		_ = repox.Deref(resp.Returning[i].TimeZoneId)
+	}
+	{
+		rows9, err := r.Svc.Query.Calendar.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.CalendarId.Eq(id)))
+		if err != nil {
+			return mapGraphQLErr(err)
+		}
+		for i := range rows9 {
+			if id := rows9[i].Id; id != "" {
+				got10, err := r.Svc.Query.Calendar.ExtensionProperties.Get(ctx, id)
+				if err != nil {
+					return mapGraphQLErr(err)
+				}
+				if got10 != nil {
+					dtx.Add(r.Svc.Mutation.Calendar.ExtensionProperties.DeleteOp(got10.Id, new(extensionpropertiesql.DeleteCalendarExtensionPropertiesByIdResponse)))
+				}
+			}
+		}
+	}
+	if err := dtx.Commit(ctx); err != nil {
+		return mapGraphQLErr(err)
 	}
 	return nil
 }

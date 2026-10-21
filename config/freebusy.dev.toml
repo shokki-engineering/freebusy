@@ -8,7 +8,7 @@
 [app]
 name = "freebusy"
 version = "v1.0.0"
-description = "Promo code service for the freebusy booking platform: create, validate, and redeem discount codes."
+description = "Generic availability and booking engine: compute availability, hold and reserve RFC 9073 resources."
 
 [server]
 # environment: "development", "debug", "staging", or "production".
@@ -53,17 +53,6 @@ timezone = "UTC"
 [database.hasura]
 url = "http://localhost:3280/graphql"
 
-# Dev-only startup seeding. Plants a known organisation so a freshly rebuilt
-# database has a parent to create properties and units under. Idempotent on
-# organisation.id, so restarts reuse organisations/machani-group.
-[seed]
-enabled = true
-
-[seed.organisation]
-id = "machanigroup"
-display_name = "Machani Group"
-slug = "machanigroup"
-billing_email = "billing@machanigroup.com"
 # Dev overlay: the cache is on and points at the local Redis container
 # (docker: my-redis, 6379). Flip enabled=false to read straight through.
 [cache]

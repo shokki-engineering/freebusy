@@ -32,9 +32,6 @@ type AppConfig struct {
 	Server ServerConfig `koanf:"server"`
 	// Database holds the backend selection and per-provider connection settings.
 	Database DatabaseConfig `koanf:"database"`
-	// Seed holds dev-only startup seeding. Disabled in the release defaults; the
-	// dev overlay turns it on to plant a known organisation.
-	Seed SeedConfig `koanf:"seed"`
 	// Cache holds the read-through cache backend. Disabled by default: the
 	// service is correct without it, and a cache that is on before anyone has
 	// measured the read it serves is just another thing that can be stale.
@@ -66,31 +63,6 @@ type CacheConfig struct {
 	// another's sharing one server. It is deliberately not a proto annotation:
 	// a prefix separates deployments, and an annotation travels with the schema.
 	Prefix string `koanf:"prefix"`
-}
-
-// SeedConfig controls the dev-only data planted at startup. It exists so a
-// freshly rebuilt database has a known organisation to hang properties and
-// units off, instead of a first-run that starts with nothing to reference.
-// Never enabled in the release defaults — production data is not seeded.
-type SeedConfig struct {
-	// Enabled gates all startup seeding. False (the release default) is a no-op.
-	Enabled bool `koanf:"enabled"`
-	// Organisation is the organisation planted when Enabled. Seeding is
-	// idempotent on its ID, so restarts reuse the same organisation.
-	Organisation SeedOrganisation `koanf:"organisation"`
-}
-
-// SeedOrganisation is the organisation the seeder ensures exists.
-type SeedOrganisation struct {
-	// ID is the caller-chosen final segment of organisations/{id}; a stable value
-	// makes the resource name predictable across restarts and rebuilds.
-	ID string `koanf:"id"`
-	// DisplayName is the human-friendly name (e.g. "Machani Group").
-	DisplayName string `koanf:"display_name"`
-	// Slug is the URL-safe identifier.
-	Slug string `koanf:"slug"`
-	// BillingEmail is the billing contact address.
-	BillingEmail string `koanf:"billing_email"`
 }
 
 // AppMeta contains service identity fields.

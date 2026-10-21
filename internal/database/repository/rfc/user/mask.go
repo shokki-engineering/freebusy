@@ -16,8 +16,8 @@
 package user
 
 import (
+	scimuserpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/user/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7643/user/v1/scimuserpbv1"
 )
 
 // applyUserMask merges the masked fields of in onto merged. An empty
@@ -67,5 +67,11 @@ func applyUserMask(merged, in *scimuserpbv1.User, paths []string) {
 	}
 	if repox.GroupTouched(paths, "name_components") {
 		merged.NameComponents = in.GetNameComponents()
+	}
+	if repox.GroupTouched(paths, "enterprise") {
+		merged.Enterprise = in.GetEnterprise()
+	}
+	if repox.GroupTouched(paths, "addresses") {
+		merged.Addresses = in.GetAddresses()
 	}
 }

@@ -16,11 +16,22 @@
 package event
 
 import (
+	eventpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	"fmt"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/alarmsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/calendartimesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/extensionpropertiesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/linksql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/organizersql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/participantsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/recurrencesql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/resourceql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/weekdaynumsql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/event/v1/eventpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
+	"google.golang.org/genproto/googleapis/type/date"
+	"google.golang.org/genproto/googleapis/type/datetime"
+	"google.golang.org/genproto/googleapis/type/dayofweek"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"strings"
@@ -45,6 +56,60 @@ func strToTs(s string) *timestamppb.Timestamp {
 		}
 	}
 	return nil
+}
+
+// dtToStr / strToDt cross the timestamptz boundary for a google.type.DateTime:
+// written as the instant it denotes (a time zone through the IANA database, a
+// UTC offset as a fixed zone, a floating value as UTC), read back in UTC.
+func dtToStr(d *datetime.DateTime) string {
+	if d == nil {
+		return ""
+	}
+	loc := time.UTC
+	switch {
+	case d.GetTimeZone().GetId() != "":
+		if l, err := time.LoadLocation(d.GetTimeZone().GetId()); err == nil {
+			loc = l
+		}
+	case d.GetUtcOffset() != nil:
+		loc = time.FixedZone("", int(d.GetUtcOffset().AsDuration()/time.Second))
+	}
+	return time.Date(int(d.GetYear()), time.Month(d.GetMonth()), int(d.GetDay()),
+		int(d.GetHours()), int(d.GetMinutes()), int(d.GetSeconds()), int(d.GetNanos()), loc).
+		UTC().Format(time.RFC3339Nano)
+}
+
+func strToDt(s string) *datetime.DateTime {
+	if s == "" {
+		return nil
+	}
+	for _, layout := range []string{time.RFC3339Nano, time.RFC3339, "2006-01-02T15:04:05.999999Z07:00", "2006-01-02T15:04:05"} {
+		if t, err := time.Parse(layout, s); err == nil {
+			u := t.UTC()
+			return &datetime.DateTime{
+				Year: int32(u.Year()), Month: int32(u.Month()), Day: int32(u.Day()),
+				Hours: int32(u.Hour()), Minutes: int32(u.Minute()), Seconds: int32(u.Second()), Nanos: int32(u.Nanosecond()),
+				TimeOffset: &datetime.DateTime_UtcOffset{UtcOffset: durationpb.New(0)},
+			}
+		}
+	}
+	return nil
+}
+
+// dateToStr / strToDate cross the date boundary as "2006-01-02" strings.
+func dateToStr(d *date.Date) string {
+	if d == nil || (d.GetYear() == 0 && d.GetMonth() == 0 && d.GetDay() == 0) {
+		return ""
+	}
+	return fmt.Sprintf("%04d-%02d-%02d", d.GetYear(), d.GetMonth(), d.GetDay())
+}
+
+func strToDate(s string) *date.Date {
+	t, err := time.Parse("2006-01-02", s)
+	if err != nil {
+		return nil
+	}
+	return &date.Date{Year: int32(t.Year()), Month: int32(t.Month()), Day: int32(t.Day())}
 }
 
 // durToStr / strToDur cross the interval boundary as Go duration strings.
@@ -118,6 +183,12 @@ func eventToCreateInput(in *eventpbv1.Event) resourceql.CreateInput {
 	// not mapped here: position (unsupported scalar shape)
 	ci.Concepts = strSliceToPtrs(in.GetConcepts())
 	ci.Refids = strSliceToPtrs(in.GetRefids())
+	switch in.GetEnds().(type) {
+	case *eventpbv1.Event_End:
+		ci.EndsCase = "END"
+	case *eventpbv1.Event_Duration:
+		ci.EndsCase = "DURATION"
+	}
 	return ci
 }
 
@@ -174,6 +245,14 @@ func eventToUpdatePatch(merged *eventpbv1.Event) resourceql.UpdateInput {
 	}
 	patch.Concepts = graphql.Value(strSliceToPtrs(merged.GetConcepts()))
 	patch.Refids = graphql.Value(strSliceToPtrs(merged.GetRefids()))
+	switch merged.GetEnds().(type) {
+	case *eventpbv1.Event_End:
+		patch.EndsCase = graphql.Value("END")
+	case *eventpbv1.Event_Duration:
+		patch.EndsCase = graphql.Value("DURATION")
+	default:
+		patch.EndsCase = graphql.Null[string]()
+	}
 	return patch
 }
 
@@ -201,6 +280,9 @@ func eventFromRow(row *resourceql.EventResource) *eventpbv1.Event {
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.Uid = repox.Deref(row.Uid)
+	out.DeleteTime = strToTs(repox.Deref(row.DeleteTime))
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
 	return out
 }
 
@@ -223,5 +305,265 @@ func eventOrganizerFromRow(row *organizersql.EventOrganizers) *eventpbv1.Organiz
 	out.Address = row.Address
 	out.DisplayName = repox.Deref(row.DisplayName)
 	out.Sender = repox.Deref(row.Sender)
+	return out
+}
+
+// eventCalendarTimeToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func eventCalendarTimeToCreateInput(in *eventpbv1.CalendarTime) calendartimesql.CreateInput {
+	var ci calendartimesql.CreateInput
+	if v := dateToStr(in.GetDate()); v != "" {
+		ci.Date = v
+	}
+	if v := dtToStr(in.GetDateTime()); v != "" {
+		ci.DateTime = v
+	}
+	switch in.GetValue().(type) {
+	case *eventpbv1.CalendarTime_Date:
+		ci.ValueCase = "DATE"
+	case *eventpbv1.CalendarTime_DateTime:
+		ci.ValueCase = "DATE_TIME"
+	}
+	return ci
+}
+
+// eventCalendarTimeFromRow re-hydrates the value-object proto from a client row.
+func eventCalendarTimeFromRow(row *calendartimesql.EventCalendarTimes) *eventpbv1.CalendarTime {
+	if row == nil {
+		return nil
+	}
+	out := &eventpbv1.CalendarTime{}
+	if v := strToDate(repox.Deref(row.Date)); v != nil {
+		out.Value = &eventpbv1.CalendarTime_Date{Date: v}
+	}
+	if v := strToDt(repox.Deref(row.DateTime)); v != nil {
+		out.Value = &eventpbv1.CalendarTime_DateTime{DateTime: v}
+	}
+	return out
+}
+
+// eventRecurrenceToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func eventRecurrenceToCreateInput(in *eventpbv1.Recurrence) recurrencesql.CreateInput {
+	var ci recurrencesql.CreateInput
+	if v := in.GetFrequency(); v != 0 {
+		ci.Frequency = strings.TrimPrefix(in.GetFrequency().String(), "FREQUENCY_")
+	}
+	ci.Count = int32(in.GetCount())
+	ci.Interval = int32(in.GetInterval())
+	// not mapped here: second_numbers (unsupported scalar shape)
+	// not mapped here: minute_numbers (unsupported scalar shape)
+	// not mapped here: hour_numbers (unsupported scalar shape)
+	// not mapped here: month_days (unsupported scalar shape)
+	// not mapped here: year_days (unsupported scalar shape)
+	// not mapped here: week_numbers (unsupported scalar shape)
+	// not mapped here: months (unsupported scalar shape)
+	// not mapped here: set_positions (unsupported scalar shape)
+	if v := in.GetWeekStart(); v != 0 {
+		ci.WeekStart = strings.TrimPrefix(in.GetWeekStart().String(), "DAY_OF_WEEK_")
+	}
+	ci.Rscale = in.GetRscale()
+	if v := in.GetSkip(); v != 0 {
+		ci.Skip = strings.TrimPrefix(in.GetSkip().String(), "RECURRENCE_SKIP_")
+	}
+	// not mapped here: leap_months (unsupported scalar shape)
+	switch in.GetBound().(type) {
+	case *eventpbv1.Recurrence_Until:
+		ci.BoundCase = "UNTIL"
+	case *eventpbv1.Recurrence_Count:
+		ci.BoundCase = "COUNT"
+	}
+	return ci
+}
+
+// eventRecurrenceFromRow re-hydrates the value-object proto from a client row.
+func eventRecurrenceFromRow(row *recurrencesql.EventRecurrences) *eventpbv1.Recurrence {
+	if row == nil {
+		return nil
+	}
+	out := &eventpbv1.Recurrence{}
+	out.Frequency = eventpbv1.Frequency(eventpbv1.Frequency_value["FREQUENCY_"+row.Frequency])
+	if row.Count != nil {
+		out.Bound = &eventpbv1.Recurrence_Count{Count: int32(repox.Deref(row.Count))}
+	}
+	out.Interval = int32(repox.Deref(row.Interval))
+	out.WeekStart = dayofweek.DayOfWeek(dayofweek.DayOfWeek_value[repox.Deref(row.WeekStart)])
+	out.Rscale = repox.Deref(row.Rscale)
+	out.Skip = eventpbv1.RecurrenceSkip(eventpbv1.RecurrenceSkip_value["RECURRENCE_SKIP_"+repox.Deref(row.Skip)])
+	return out
+}
+
+// eventWeekdayNumToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func eventWeekdayNumToCreateInput(in *eventpbv1.WeekdayNum) weekdaynumsql.CreateInput {
+	var ci weekdaynumsql.CreateInput
+	if v := in.GetDay(); v != 0 {
+		ci.Day = strings.TrimPrefix(in.GetDay().String(), "DAY_OF_WEEK_")
+	}
+	ci.Ordinal = int32(in.GetOrdinal())
+	return ci
+}
+
+// eventWeekdayNumFromRow re-hydrates the value-object proto from a client row.
+func eventWeekdayNumFromRow(row *weekdaynumsql.EventWeekdayNums) *eventpbv1.WeekdayNum {
+	if row == nil {
+		return nil
+	}
+	out := &eventpbv1.WeekdayNum{}
+	out.Day = dayofweek.DayOfWeek(dayofweek.DayOfWeek_value[row.Day])
+	out.Ordinal = int32(repox.Deref(row.Ordinal))
+	return out
+}
+
+// eventAlarmToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func eventAlarmToCreateInput(in *eventpbv1.Alarm) alarmsql.CreateInput {
+	var ci alarmsql.CreateInput
+	if v := in.GetAction(); v != 0 {
+		ci.Action = strings.TrimPrefix(in.GetAction().String(), "ALARM_ACTION_")
+	}
+	if v := durToStr(in.GetTriggerOffset()); v != "" {
+		ci.TriggerOffset = v
+	}
+	ci.TriggerTime = tsToStr(in.GetTriggerTime())
+	if v := in.GetTriggerRelation(); v != 0 {
+		ci.TriggerRelation = strings.TrimPrefix(in.GetTriggerRelation().String(), "TRIGGER_RELATION_")
+	}
+	if v := durToStr(in.GetRepeatInterval()); v != "" {
+		ci.RepeatInterval = v
+	}
+	ci.RepeatCount = int32(in.GetRepeatCount())
+	ci.Description = in.GetDescription()
+	ci.Summary = in.GetSummary()
+	ci.IcalUid = in.GetIcalUid()
+	ci.AcknowledgedTime = tsToStr(in.GetAcknowledgedTime())
+	if v := in.GetProximity(); v != 0 {
+		ci.Proximity = strings.TrimPrefix(in.GetProximity().String(), "PROXIMITY_")
+	}
+	ci.SnoozedAlarmUid = in.GetSnoozedAlarmUid()
+	switch in.GetTrigger().(type) {
+	case *eventpbv1.Alarm_TriggerOffset:
+		ci.TriggerCase = "TRIGGER_OFFSET"
+	case *eventpbv1.Alarm_TriggerTime:
+		ci.TriggerCase = "TRIGGER_TIME"
+	}
+	return ci
+}
+
+// eventAlarmFromRow re-hydrates the value-object proto from a client row.
+func eventAlarmFromRow(row *alarmsql.EventAlarms) *eventpbv1.Alarm {
+	if row == nil {
+		return nil
+	}
+	out := &eventpbv1.Alarm{}
+	out.Action = eventpbv1.AlarmAction(eventpbv1.AlarmAction_value["ALARM_ACTION_"+row.Action])
+	if v := strToDur(repox.Deref(row.TriggerOffset)); v != nil {
+		out.Trigger = &eventpbv1.Alarm_TriggerOffset{TriggerOffset: v}
+	}
+	if v := strToTs(repox.Deref(row.TriggerTime)); v != nil {
+		out.Trigger = &eventpbv1.Alarm_TriggerTime{TriggerTime: v}
+	}
+	out.TriggerRelation = eventpbv1.TriggerRelation(eventpbv1.TriggerRelation_value["TRIGGER_RELATION_"+repox.Deref(row.TriggerRelation)])
+	out.RepeatInterval = strToDur(repox.Deref(row.RepeatInterval))
+	out.RepeatCount = int32(repox.Deref(row.RepeatCount))
+	out.Description = repox.Deref(row.Description)
+	out.Summary = repox.Deref(row.Summary)
+	out.IcalUid = repox.Deref(row.IcalUid)
+	out.AcknowledgedTime = strToTs(repox.Deref(row.AcknowledgedTime))
+	out.Proximity = eventpbv1.Proximity(eventpbv1.Proximity_value["PROXIMITY_"+repox.Deref(row.Proximity)])
+	out.SnoozedAlarmUid = repox.Deref(row.SnoozedAlarmUid)
+	return out
+}
+
+// eventExtensionPropertyToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func eventExtensionPropertyToCreateInput(in *eventpbv1.ExtensionProperty) extensionpropertiesql.CreateInput {
+	var ci extensionpropertiesql.CreateInput
+	ci.Key = in.GetKey()
+	ci.Values = strSliceToPtrs(in.GetValues())
+	// not mapped here: parameters (unsupported scalar shape)
+	return ci
+}
+
+// eventExtensionPropertyFromRow re-hydrates the value-object proto from a client row.
+func eventExtensionPropertyFromRow(row *extensionpropertiesql.EventExtensionProperties) *eventpbv1.ExtensionProperty {
+	if row == nil {
+		return nil
+	}
+	out := &eventpbv1.ExtensionProperty{}
+	out.Key = row.Key
+	out.Values = strPtrsToSlice(row.Values)
+	return out
+}
+
+// eventLinkToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func eventLinkToCreateInput(in *eventpbv1.Link) linksql.CreateInput {
+	var ci linksql.CreateInput
+	ci.Uri = in.GetUri()
+	ci.IcalUid = in.GetIcalUid()
+	ci.XmlReference = in.GetXmlReference()
+	ci.Relation = in.GetRelation()
+	ci.FormatType = in.GetFormatType()
+	ci.Label = in.GetLabel()
+	ci.LanguageCode = in.GetLanguageCode()
+	switch in.GetValue().(type) {
+	case *eventpbv1.Link_Uri:
+		ci.ValueCase = "URI"
+	case *eventpbv1.Link_IcalUid:
+		ci.ValueCase = "ICAL_UID"
+	case *eventpbv1.Link_XmlReference:
+		ci.ValueCase = "XML_REFERENCE"
+	}
+	return ci
+}
+
+// eventLinkFromRow re-hydrates the value-object proto from a client row.
+func eventLinkFromRow(row *linksql.EventLinks) *eventpbv1.Link {
+	if row == nil {
+		return nil
+	}
+	out := &eventpbv1.Link{}
+	if row.Uri != nil {
+		out.Value = &eventpbv1.Link_Uri{Uri: repox.Deref(row.Uri)}
+	}
+	if row.IcalUid != nil {
+		out.Value = &eventpbv1.Link_IcalUid{IcalUid: repox.Deref(row.IcalUid)}
+	}
+	if row.XmlReference != nil {
+		out.Value = &eventpbv1.Link_XmlReference{XmlReference: repox.Deref(row.XmlReference)}
+	}
+	out.Relation = row.Relation
+	out.FormatType = repox.Deref(row.FormatType)
+	out.Label = repox.Deref(row.Label)
+	out.LanguageCode = repox.Deref(row.LanguageCode)
+	return out
+}
+
+// eventParticipantToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func eventParticipantToCreateInput(in *eventpbv1.Participant) participantsql.CreateInput {
+	var ci participantsql.CreateInput
+	ci.IcalUid = in.GetIcalUid()
+	// not mapped here: participant_types (unsupported scalar shape)
+	ci.CalendarAddress = in.GetCalendarAddress()
+	ci.Summary = in.GetSummary()
+	ci.Description = in.GetDescription()
+	ci.Url = in.GetUrl()
+	// not mapped here: position (unsupported scalar shape)
+	return ci
+}
+
+// eventParticipantFromRow re-hydrates the value-object proto from a client row.
+func eventParticipantFromRow(row *participantsql.EventParticipants) *eventpbv1.Participant {
+	if row == nil {
+		return nil
+	}
+	out := &eventpbv1.Participant{}
+	out.IcalUid = repox.Deref(row.IcalUid)
+	out.CalendarAddress = repox.Deref(row.CalendarAddress)
+	out.Summary = repox.Deref(row.Summary)
+	out.Description = repox.Deref(row.Description)
+	out.Url = repox.Deref(row.Url)
 	return out
 }

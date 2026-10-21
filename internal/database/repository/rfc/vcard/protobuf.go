@@ -16,11 +16,35 @@
 package vcard
 
 import (
+	vcardpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc6350/vcard/v1"
+	"fmt"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/addressql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/contactsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/dateortextsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/emailsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/extensionpropertiesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/geosql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/grammaticalgendersql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/instantmessagesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/languagesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/namesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/nicknamesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/organizationsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/pronounsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/relationsql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/resourceql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/rolesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/socialprofilesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/telephonesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/timezonesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql/urlsql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc6350/vcard/v1/vcardpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
+	"google.golang.org/genproto/googleapis/type/date"
+	"google.golang.org/genproto/googleapis/type/datetime"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"strings"
 	"time"
 )
 
@@ -42,6 +66,86 @@ func strToTs(s string) *timestamppb.Timestamp {
 		}
 	}
 	return nil
+}
+
+// dtToStr / strToDt cross the timestamptz boundary for a google.type.DateTime:
+// written as the instant it denotes (a time zone through the IANA database, a
+// UTC offset as a fixed zone, a floating value as UTC), read back in UTC.
+func dtToStr(d *datetime.DateTime) string {
+	if d == nil {
+		return ""
+	}
+	loc := time.UTC
+	switch {
+	case d.GetTimeZone().GetId() != "":
+		if l, err := time.LoadLocation(d.GetTimeZone().GetId()); err == nil {
+			loc = l
+		}
+	case d.GetUtcOffset() != nil:
+		loc = time.FixedZone("", int(d.GetUtcOffset().AsDuration()/time.Second))
+	}
+	return time.Date(int(d.GetYear()), time.Month(d.GetMonth()), int(d.GetDay()),
+		int(d.GetHours()), int(d.GetMinutes()), int(d.GetSeconds()), int(d.GetNanos()), loc).
+		UTC().Format(time.RFC3339Nano)
+}
+
+func strToDt(s string) *datetime.DateTime {
+	if s == "" {
+		return nil
+	}
+	for _, layout := range []string{time.RFC3339Nano, time.RFC3339, "2006-01-02T15:04:05.999999Z07:00", "2006-01-02T15:04:05"} {
+		if t, err := time.Parse(layout, s); err == nil {
+			u := t.UTC()
+			return &datetime.DateTime{
+				Year: int32(u.Year()), Month: int32(u.Month()), Day: int32(u.Day()),
+				Hours: int32(u.Hour()), Minutes: int32(u.Minute()), Seconds: int32(u.Second()), Nanos: int32(u.Nanosecond()),
+				TimeOffset: &datetime.DateTime_UtcOffset{UtcOffset: durationpb.New(0)},
+			}
+		}
+	}
+	return nil
+}
+
+// dateToStr / strToDate cross the date boundary as "2006-01-02" strings.
+func dateToStr(d *date.Date) string {
+	if d == nil || (d.GetYear() == 0 && d.GetMonth() == 0 && d.GetDay() == 0) {
+		return ""
+	}
+	return fmt.Sprintf("%04d-%02d-%02d", d.GetYear(), d.GetMonth(), d.GetDay())
+}
+
+func strToDate(s string) *date.Date {
+	t, err := time.Parse("2006-01-02", s)
+	if err != nil {
+		return nil
+	}
+	return &date.Date{Year: int32(t.Year()), Month: int32(t.Month()), Day: int32(t.Day())}
+}
+
+// strPtrsToSlice / strSliceToPtrs cross the text[] boundary: the client
+// represents array elements as nullable (*string).
+func strPtrsToSlice(in []*string) []string {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(in))
+	for _, p := range in {
+		if p != nil {
+			out = append(out, *p)
+		}
+	}
+	return out
+}
+
+func strSliceToPtrs(in []string) []*string {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]*string, 0, len(in))
+	for i := range in {
+		out = append(out, &in[i])
+	}
+	return out
 }
 
 // vcardToCreateInput maps the proto onto the client's insert input.
@@ -87,5 +191,556 @@ func vcardFromRow(row *resourceql.VcardResource) *vcardpbv1.Vcard {
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.Uid = repox.Deref(row.Uid)
+	out.DeleteTime = strToTs(repox.Deref(row.DeleteTime))
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
+	return out
+}
+
+// vcardContactToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardContactToCreateInput(in *vcardpbv1.Contact) contactsql.CreateInput {
+	var ci contactsql.CreateInput
+	if v := in.GetKind(); v != 0 {
+		ci.Kind = strings.TrimPrefix(in.GetKind().String(), "KIND_")
+	}
+	ci.DisplayNames = strSliceToPtrs(in.GetDisplayNames())
+	ci.Titles = strSliceToPtrs(in.GetTitles())
+	ci.Notes = strSliceToPtrs(in.GetNotes())
+	ci.Categories = strSliceToPtrs(in.GetCategories())
+	ci.DefaultLanguageCode = in.GetDefaultLanguageCode()
+	return ci
+}
+
+// vcardContactFromRow re-hydrates the value-object proto from a client row.
+func vcardContactFromRow(row *contactsql.VcardContacts) *vcardpbv1.Contact {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.Contact{}
+	out.Kind = vcardpbv1.Kind(vcardpbv1.Kind_value["KIND_"+repox.Deref(row.Kind)])
+	out.DisplayNames = strPtrsToSlice(row.DisplayNames)
+	out.Titles = strPtrsToSlice(row.Titles)
+	out.Notes = strPtrsToSlice(row.Notes)
+	out.Categories = strPtrsToSlice(row.Categories)
+	out.DefaultLanguageCode = repox.Deref(row.DefaultLanguageCode)
+	return out
+}
+
+// vcardNameToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardNameToCreateInput(in *vcardpbv1.Name) namesql.CreateInput {
+	var ci namesql.CreateInput
+	ci.FamilyName = strSliceToPtrs(in.GetFamilyName())
+	ci.GivenName = strSliceToPtrs(in.GetGivenName())
+	ci.MiddleNames = strSliceToPtrs(in.GetMiddleNames())
+	ci.HonorificPrefixes = strSliceToPtrs(in.GetHonorificPrefixes())
+	ci.HonorificSuffixes = strSliceToPtrs(in.GetHonorificSuffixes())
+	ci.SecondarySurnames = strSliceToPtrs(in.GetSecondarySurnames())
+	ci.Generations = strSliceToPtrs(in.GetGenerations())
+	if v := in.GetPhonetic(); v != 0 {
+		ci.Phonetic = strings.TrimPrefix(in.GetPhonetic().String(), "PHONETIC_SYSTEM_")
+	}
+	ci.Script = in.GetScript()
+	return ci
+}
+
+// vcardNameFromRow re-hydrates the value-object proto from a client row.
+func vcardNameFromRow(row *namesql.VcardNames) *vcardpbv1.Name {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.Name{}
+	out.FamilyName = strPtrsToSlice(row.FamilyName)
+	out.GivenName = strPtrsToSlice(row.GivenName)
+	out.MiddleNames = strPtrsToSlice(row.MiddleNames)
+	out.HonorificPrefixes = strPtrsToSlice(row.HonorificPrefixes)
+	out.HonorificSuffixes = strPtrsToSlice(row.HonorificSuffixes)
+	out.SecondarySurnames = strPtrsToSlice(row.SecondarySurnames)
+	out.Generations = strPtrsToSlice(row.Generations)
+	out.Phonetic = vcardpbv1.PhoneticSystem(vcardpbv1.PhoneticSystem_value["PHONETIC_SYSTEM_"+repox.Deref(row.Phonetic)])
+	out.Script = repox.Deref(row.Script)
+	return out
+}
+
+// vcardDateOrTextToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardDateOrTextToCreateInput(in *vcardpbv1.DateOrText) dateortextsql.CreateInput {
+	var ci dateortextsql.CreateInput
+	if v := dateToStr(in.GetDate()); v != "" {
+		ci.Date = v
+	}
+	if v := dtToStr(in.GetDateTime()); v != "" {
+		ci.DateTime = v
+	}
+	ci.Text = in.GetText()
+	switch in.GetValue().(type) {
+	case *vcardpbv1.DateOrText_Date:
+		ci.ValueCase = "DATE"
+	case *vcardpbv1.DateOrText_DateTime:
+		ci.ValueCase = "DATE_TIME"
+	case *vcardpbv1.DateOrText_Text:
+		ci.ValueCase = "TEXT"
+	}
+	return ci
+}
+
+// vcardDateOrTextFromRow re-hydrates the value-object proto from a client row.
+func vcardDateOrTextFromRow(row *dateortextsql.VcardDateOrTexts) *vcardpbv1.DateOrText {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.DateOrText{}
+	if v := strToDate(repox.Deref(row.Date)); v != nil {
+		out.Value = &vcardpbv1.DateOrText_Date{Date: v}
+	}
+	if v := strToDt(repox.Deref(row.DateTime)); v != nil {
+		out.Value = &vcardpbv1.DateOrText_DateTime{DateTime: v}
+	}
+	if row.Text != nil {
+		out.Value = &vcardpbv1.DateOrText_Text{Text: repox.Deref(row.Text)}
+	}
+	return out
+}
+
+// vcardEmailToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardEmailToCreateInput(in *vcardpbv1.Email) emailsql.CreateInput {
+	var ci emailsql.CreateInput
+	ci.Value = in.GetValue()
+	// not mapped here: types (unsupported scalar shape)
+	ci.Pref = int32(in.GetPref())
+	return ci
+}
+
+// vcardEmailFromRow re-hydrates the value-object proto from a client row.
+func vcardEmailFromRow(row *emailsql.VcardEmails) *vcardpbv1.Email {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.Email{}
+	out.Value = row.Value
+	out.Pref = int32(repox.Deref(row.Pref))
+	return out
+}
+
+// vcardTelephoneToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardTelephoneToCreateInput(in *vcardpbv1.Telephone) telephonesql.CreateInput {
+	var ci telephonesql.CreateInput
+	ci.Uri = in.GetUri()
+	ci.Text = in.GetText()
+	// not mapped here: types (unsupported scalar shape)
+	// not mapped here: features (unsupported scalar shape)
+	ci.Pref = int32(in.GetPref())
+	switch in.GetValue().(type) {
+	case *vcardpbv1.Telephone_Uri:
+		ci.ValueCase = "URI"
+	case *vcardpbv1.Telephone_Text:
+		ci.ValueCase = "TEXT"
+	}
+	return ci
+}
+
+// vcardTelephoneFromRow re-hydrates the value-object proto from a client row.
+func vcardTelephoneFromRow(row *telephonesql.VcardTelephones) *vcardpbv1.Telephone {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.Telephone{}
+	if row.Uri != nil {
+		out.Value = &vcardpbv1.Telephone_Uri{Uri: repox.Deref(row.Uri)}
+	}
+	if row.Text != nil {
+		out.Value = &vcardpbv1.Telephone_Text{Text: repox.Deref(row.Text)}
+	}
+	out.Pref = int32(repox.Deref(row.Pref))
+	return out
+}
+
+// vcardAddressToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardAddressToCreateInput(in *vcardpbv1.Address) addressql.CreateInput {
+	var ci addressql.CreateInput
+	ci.PostOfficeBox = strSliceToPtrs(in.GetPostOfficeBox())
+	ci.ExtendedAddresses = strSliceToPtrs(in.GetExtendedAddresses())
+	ci.StreetAddresses = strSliceToPtrs(in.GetStreetAddresses())
+	ci.Localities = strSliceToPtrs(in.GetLocalities())
+	ci.Regions = strSliceToPtrs(in.GetRegions())
+	ci.PostalCodes = strSliceToPtrs(in.GetPostalCodes())
+	ci.Countries = strSliceToPtrs(in.GetCountries())
+	// not mapped here: types (unsupported scalar shape)
+	ci.Pref = int32(in.GetPref())
+	ci.Rooms = strSliceToPtrs(in.GetRooms())
+	ci.Apartments = strSliceToPtrs(in.GetApartments())
+	ci.Floors = strSliceToPtrs(in.GetFloors())
+	ci.StreetNumbers = strSliceToPtrs(in.GetStreetNumbers())
+	ci.Streets = strSliceToPtrs(in.GetStreets())
+	ci.Buildings = strSliceToPtrs(in.GetBuildings())
+	ci.Blocks = strSliceToPtrs(in.GetBlocks())
+	ci.Subdistricts = strSliceToPtrs(in.GetSubdistricts())
+	ci.Districts = strSliceToPtrs(in.GetDistricts())
+	ci.Landmarks = strSliceToPtrs(in.GetLandmarks())
+	ci.Directions = strSliceToPtrs(in.GetDirections())
+	ci.Label = in.GetLabel()
+	if v := in.GetPhonetic(); v != 0 {
+		ci.Phonetic = strings.TrimPrefix(in.GetPhonetic().String(), "PHONETIC_SYSTEM_")
+	}
+	ci.Script = in.GetScript()
+	return ci
+}
+
+// vcardAddressFromRow re-hydrates the value-object proto from a client row.
+func vcardAddressFromRow(row *addressql.VcardAddress) *vcardpbv1.Address {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.Address{}
+	out.PostOfficeBox = strPtrsToSlice(row.PostOfficeBox)
+	out.ExtendedAddresses = strPtrsToSlice(row.ExtendedAddresses)
+	out.StreetAddresses = strPtrsToSlice(row.StreetAddresses)
+	out.Localities = strPtrsToSlice(row.Localities)
+	out.Regions = strPtrsToSlice(row.Regions)
+	out.PostalCodes = strPtrsToSlice(row.PostalCodes)
+	out.Countries = strPtrsToSlice(row.Countries)
+	out.Pref = int32(repox.Deref(row.Pref))
+	out.Rooms = strPtrsToSlice(row.Rooms)
+	out.Apartments = strPtrsToSlice(row.Apartments)
+	out.Floors = strPtrsToSlice(row.Floors)
+	out.StreetNumbers = strPtrsToSlice(row.StreetNumbers)
+	out.Streets = strPtrsToSlice(row.Streets)
+	out.Buildings = strPtrsToSlice(row.Buildings)
+	out.Blocks = strPtrsToSlice(row.Blocks)
+	out.Subdistricts = strPtrsToSlice(row.Subdistricts)
+	out.Districts = strPtrsToSlice(row.Districts)
+	out.Landmarks = strPtrsToSlice(row.Landmarks)
+	out.Directions = strPtrsToSlice(row.Directions)
+	out.Label = repox.Deref(row.Label)
+	out.Phonetic = vcardpbv1.PhoneticSystem(vcardpbv1.PhoneticSystem_value["PHONETIC_SYSTEM_"+repox.Deref(row.Phonetic)])
+	out.Script = repox.Deref(row.Script)
+	return out
+}
+
+// vcardOrganizationToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardOrganizationToCreateInput(in *vcardpbv1.Organization) organizationsql.CreateInput {
+	var ci organizationsql.CreateInput
+	ci.Value = in.GetValue()
+	ci.Units = strSliceToPtrs(in.GetUnits())
+	// not mapped here: types (unsupported scalar shape)
+	return ci
+}
+
+// vcardOrganizationFromRow re-hydrates the value-object proto from a client row.
+func vcardOrganizationFromRow(row *organizationsql.VcardOrganizations) *vcardpbv1.Organization {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.Organization{}
+	out.Value = row.Value
+	out.Units = strPtrsToSlice(row.Units)
+	return out
+}
+
+// vcardExtensionPropertyToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardExtensionPropertyToCreateInput(in *vcardpbv1.ExtensionProperty) extensionpropertiesql.CreateInput {
+	var ci extensionpropertiesql.CreateInput
+	ci.Key = in.GetKey()
+	ci.Values = strSliceToPtrs(in.GetValues())
+	// not mapped here: parameters (unsupported scalar shape)
+	ci.Group = in.GetGroup()
+	return ci
+}
+
+// vcardExtensionPropertyFromRow re-hydrates the value-object proto from a client row.
+func vcardExtensionPropertyFromRow(row *extensionpropertiesql.VcardExtensionProperties) *vcardpbv1.ExtensionProperty {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.ExtensionProperty{}
+	out.Key = row.Key
+	out.Values = strPtrsToSlice(row.Values)
+	out.Group = repox.Deref(row.Group)
+	return out
+}
+
+// vcardNicknameToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardNicknameToCreateInput(in *vcardpbv1.Nickname) nicknamesql.CreateInput {
+	var ci nicknamesql.CreateInput
+	ci.Values = strSliceToPtrs(in.GetValues())
+	// not mapped here: types (unsupported scalar shape)
+	ci.Pref = int32(in.GetPref())
+	return ci
+}
+
+// vcardNicknameFromRow re-hydrates the value-object proto from a client row.
+func vcardNicknameFromRow(row *nicknamesql.VcardNicknames) *vcardpbv1.Nickname {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.Nickname{}
+	out.Values = strPtrsToSlice(row.Values)
+	out.Pref = int32(repox.Deref(row.Pref))
+	return out
+}
+
+// vcardUrlToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardUrlToCreateInput(in *vcardpbv1.Url) urlsql.CreateInput {
+	var ci urlsql.CreateInput
+	ci.Value = in.GetValue()
+	// not mapped here: types (unsupported scalar shape)
+	ci.Pref = int32(in.GetPref())
+	return ci
+}
+
+// vcardUrlFromRow re-hydrates the value-object proto from a client row.
+func vcardUrlFromRow(row *urlsql.VcardUrls) *vcardpbv1.Url {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.Url{}
+	out.Value = row.Value
+	out.Pref = int32(repox.Deref(row.Pref))
+	return out
+}
+
+// vcardRoleToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardRoleToCreateInput(in *vcardpbv1.Role) rolesql.CreateInput {
+	var ci rolesql.CreateInput
+	ci.Value = in.GetValue()
+	// not mapped here: types (unsupported scalar shape)
+	ci.Pref = int32(in.GetPref())
+	return ci
+}
+
+// vcardRoleFromRow re-hydrates the value-object proto from a client row.
+func vcardRoleFromRow(row *rolesql.VcardRoles) *vcardpbv1.Role {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.Role{}
+	out.Value = row.Value
+	out.Pref = int32(repox.Deref(row.Pref))
+	return out
+}
+
+// vcardInstantMessageToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardInstantMessageToCreateInput(in *vcardpbv1.InstantMessage) instantmessagesql.CreateInput {
+	var ci instantmessagesql.CreateInput
+	ci.Value = in.GetValue()
+	// not mapped here: types (unsupported scalar shape)
+	ci.Pref = int32(in.GetPref())
+	return ci
+}
+
+// vcardInstantMessageFromRow re-hydrates the value-object proto from a client row.
+func vcardInstantMessageFromRow(row *instantmessagesql.VcardInstantMessages) *vcardpbv1.InstantMessage {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.InstantMessage{}
+	out.Value = row.Value
+	out.Pref = int32(repox.Deref(row.Pref))
+	return out
+}
+
+// vcardLanguageToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardLanguageToCreateInput(in *vcardpbv1.Language) languagesql.CreateInput {
+	var ci languagesql.CreateInput
+	ci.Value = in.GetValue()
+	// not mapped here: types (unsupported scalar shape)
+	ci.Pref = int32(in.GetPref())
+	return ci
+}
+
+// vcardLanguageFromRow re-hydrates the value-object proto from a client row.
+func vcardLanguageFromRow(row *languagesql.VcardLanguages) *vcardpbv1.Language {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.Language{}
+	out.Value = row.Value
+	out.Pref = int32(repox.Deref(row.Pref))
+	return out
+}
+
+// vcardGeoToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardGeoToCreateInput(in *vcardpbv1.Geo) geosql.CreateInput {
+	var ci geosql.CreateInput
+	ci.Value = in.GetValue()
+	// not mapped here: types (unsupported scalar shape)
+	ci.Pref = int32(in.GetPref())
+	return ci
+}
+
+// vcardGeoFromRow re-hydrates the value-object proto from a client row.
+func vcardGeoFromRow(row *geosql.VcardGeos) *vcardpbv1.Geo {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.Geo{}
+	out.Value = row.Value
+	out.Pref = int32(repox.Deref(row.Pref))
+	return out
+}
+
+// vcardTimezoneToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardTimezoneToCreateInput(in *vcardpbv1.Timezone) timezonesql.CreateInput {
+	var ci timezonesql.CreateInput
+	ci.Text = in.GetText()
+	ci.Uri = in.GetUri()
+	ci.UtcOffset = in.GetUtcOffset()
+	// not mapped here: types (unsupported scalar shape)
+	ci.Pref = int32(in.GetPref())
+	switch in.GetValue().(type) {
+	case *vcardpbv1.Timezone_Text:
+		ci.ValueCase = "TEXT"
+	case *vcardpbv1.Timezone_Uri:
+		ci.ValueCase = "URI"
+	case *vcardpbv1.Timezone_UtcOffset:
+		ci.ValueCase = "UTC_OFFSET"
+	}
+	return ci
+}
+
+// vcardTimezoneFromRow re-hydrates the value-object proto from a client row.
+func vcardTimezoneFromRow(row *timezonesql.VcardTimezones) *vcardpbv1.Timezone {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.Timezone{}
+	if row.Text != nil {
+		out.Value = &vcardpbv1.Timezone_Text{Text: repox.Deref(row.Text)}
+	}
+	if row.Uri != nil {
+		out.Value = &vcardpbv1.Timezone_Uri{Uri: repox.Deref(row.Uri)}
+	}
+	if row.UtcOffset != nil {
+		out.Value = &vcardpbv1.Timezone_UtcOffset{UtcOffset: repox.Deref(row.UtcOffset)}
+	}
+	out.Pref = int32(repox.Deref(row.Pref))
+	return out
+}
+
+// vcardRelationToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardRelationToCreateInput(in *vcardpbv1.Relation) relationsql.CreateInput {
+	var ci relationsql.CreateInput
+	ci.Uri = in.GetUri()
+	ci.Text = in.GetText()
+	// not mapped here: relation_types (unsupported scalar shape)
+	ci.Pref = int32(in.GetPref())
+	switch in.GetValue().(type) {
+	case *vcardpbv1.Relation_Uri:
+		ci.ValueCase = "URI"
+	case *vcardpbv1.Relation_Text:
+		ci.ValueCase = "TEXT"
+	}
+	return ci
+}
+
+// vcardRelationFromRow re-hydrates the value-object proto from a client row.
+func vcardRelationFromRow(row *relationsql.VcardRelations) *vcardpbv1.Relation {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.Relation{}
+	if row.Uri != nil {
+		out.Value = &vcardpbv1.Relation_Uri{Uri: repox.Deref(row.Uri)}
+	}
+	if row.Text != nil {
+		out.Value = &vcardpbv1.Relation_Text{Text: repox.Deref(row.Text)}
+	}
+	out.Pref = int32(repox.Deref(row.Pref))
+	return out
+}
+
+// vcardPronounsToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardPronounsToCreateInput(in *vcardpbv1.Pronouns) pronounsql.CreateInput {
+	var ci pronounsql.CreateInput
+	ci.Value = in.GetValue()
+	ci.LanguageCode = in.GetLanguageCode()
+	// not mapped here: types (unsupported scalar shape)
+	ci.Pref = int32(in.GetPref())
+	return ci
+}
+
+// vcardPronounsFromRow re-hydrates the value-object proto from a client row.
+func vcardPronounsFromRow(row *pronounsql.VcardPronouns) *vcardpbv1.Pronouns {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.Pronouns{}
+	out.Value = row.Value
+	out.LanguageCode = repox.Deref(row.LanguageCode)
+	out.Pref = int32(repox.Deref(row.Pref))
+	return out
+}
+
+// vcardGrammaticalGenderToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardGrammaticalGenderToCreateInput(in *vcardpbv1.GrammaticalGender) grammaticalgendersql.CreateInput {
+	var ci grammaticalgendersql.CreateInput
+	if v := in.GetKind(); v != 0 {
+		ci.Kind = strings.TrimPrefix(in.GetKind().String(), "GRAMMATICAL_GENDER_KIND_")
+	}
+	ci.LanguageCode = in.GetLanguageCode()
+	return ci
+}
+
+// vcardGrammaticalGenderFromRow re-hydrates the value-object proto from a client row.
+func vcardGrammaticalGenderFromRow(row *grammaticalgendersql.VcardGrammaticalGenders) *vcardpbv1.GrammaticalGender {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.GrammaticalGender{}
+	out.Kind = vcardpbv1.GrammaticalGenderKind(vcardpbv1.GrammaticalGenderKind_value["GRAMMATICAL_GENDER_KIND_"+row.Kind])
+	out.LanguageCode = repox.Deref(row.LanguageCode)
+	return out
+}
+
+// vcardSocialProfileToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func vcardSocialProfileToCreateInput(in *vcardpbv1.SocialProfile) socialprofilesql.CreateInput {
+	var ci socialprofilesql.CreateInput
+	ci.Uri = in.GetUri()
+	ci.Text = in.GetText()
+	ci.ServiceType = in.GetServiceType()
+	ci.Username = in.GetUsername()
+	// not mapped here: types (unsupported scalar shape)
+	ci.Pref = int32(in.GetPref())
+	switch in.GetValue().(type) {
+	case *vcardpbv1.SocialProfile_Uri:
+		ci.ValueCase = "URI"
+	case *vcardpbv1.SocialProfile_Text:
+		ci.ValueCase = "TEXT"
+	}
+	return ci
+}
+
+// vcardSocialProfileFromRow re-hydrates the value-object proto from a client row.
+func vcardSocialProfileFromRow(row *socialprofilesql.VcardSocialProfiles) *vcardpbv1.SocialProfile {
+	if row == nil {
+		return nil
+	}
+	out := &vcardpbv1.SocialProfile{}
+	if row.Uri != nil {
+		out.Value = &vcardpbv1.SocialProfile_Uri{Uri: repox.Deref(row.Uri)}
+	}
+	if row.Text != nil {
+		out.Value = &vcardpbv1.SocialProfile_Text{Text: repox.Deref(row.Text)}
+	}
+	out.ServiceType = repox.Deref(row.ServiceType)
+	out.Username = repox.Deref(row.Username)
+	out.Pref = int32(repox.Deref(row.Pref))
 	return out
 }

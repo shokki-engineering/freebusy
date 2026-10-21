@@ -16,10 +16,13 @@
 package user
 
 import (
+	scimuserpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/user/v1"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/addressql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/enterpriseusersql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/managersql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/namesql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/resourceql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7643/user/v1/scimuserpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
@@ -154,6 +157,9 @@ func userFromRow(row *resourceql.UserResource) *scimuserpbv1.User {
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.Uid = repox.Deref(row.Uid)
+	out.DeleteTime = strToTs(repox.Deref(row.DeleteTime))
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
 	return out
 }
 
@@ -182,5 +188,85 @@ func userNameFromRow(row *namesql.UserNames) *scimuserpbv1.Name {
 	out.MiddleNames = repox.Deref(row.MiddleNames)
 	out.HonorificPrefix = repox.Deref(row.HonorificPrefix)
 	out.HonorificSuffix = repox.Deref(row.HonorificSuffix)
+	return out
+}
+
+// userEnterpriseUserToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func userEnterpriseUserToCreateInput(in *scimuserpbv1.EnterpriseUser) enterpriseusersql.CreateInput {
+	var ci enterpriseusersql.CreateInput
+	ci.EmployeeNumber = in.GetEmployeeNumber()
+	ci.CostCenter = in.GetCostCenter()
+	ci.Organization = in.GetOrganization()
+	ci.Division = in.GetDivision()
+	ci.Department = in.GetDepartment()
+	return ci
+}
+
+// userEnterpriseUserFromRow re-hydrates the value-object proto from a client row.
+func userEnterpriseUserFromRow(row *enterpriseusersql.UserEnterpriseUsers) *scimuserpbv1.EnterpriseUser {
+	if row == nil {
+		return nil
+	}
+	out := &scimuserpbv1.EnterpriseUser{}
+	out.EmployeeNumber = repox.Deref(row.EmployeeNumber)
+	out.CostCenter = repox.Deref(row.CostCenter)
+	out.Organization = repox.Deref(row.Organization)
+	out.Division = repox.Deref(row.Division)
+	out.Department = repox.Deref(row.Department)
+	return out
+}
+
+// userManagerToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func userManagerToCreateInput(in *scimuserpbv1.Manager) managersql.CreateInput {
+	var ci managersql.CreateInput
+	ci.Value = in.GetValue()
+	ci.ReferenceUri = in.GetReferenceUri()
+	ci.DisplayName = in.GetDisplayName()
+	return ci
+}
+
+// userManagerFromRow re-hydrates the value-object proto from a client row.
+func userManagerFromRow(row *managersql.UserManagers) *scimuserpbv1.Manager {
+	if row == nil {
+		return nil
+	}
+	out := &scimuserpbv1.Manager{}
+	out.Value = repox.Deref(row.Value)
+	out.ReferenceUri = repox.Deref(row.ReferenceUri)
+	out.DisplayName = repox.Deref(row.DisplayName)
+	return out
+}
+
+// userAddressToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func userAddressToCreateInput(in *scimuserpbv1.Address) addressql.CreateInput {
+	var ci addressql.CreateInput
+	ci.FullAddress = in.GetFullAddress()
+	ci.StreetAddress = in.GetStreetAddress()
+	ci.Locality = in.GetLocality()
+	ci.Region = in.GetRegion()
+	ci.PostalCode = in.GetPostalCode()
+	ci.RegionCode = in.GetRegionCode()
+	ci.AttributeType = in.GetAttributeType()
+	ci.Primary = in.GetPrimary()
+	return ci
+}
+
+// userAddressFromRow re-hydrates the value-object proto from a client row.
+func userAddressFromRow(row *addressql.UserAddress) *scimuserpbv1.Address {
+	if row == nil {
+		return nil
+	}
+	out := &scimuserpbv1.Address{}
+	out.FullAddress = repox.Deref(row.FullAddress)
+	out.StreetAddress = repox.Deref(row.StreetAddress)
+	out.Locality = repox.Deref(row.Locality)
+	out.Region = repox.Deref(row.Region)
+	out.PostalCode = repox.Deref(row.PostalCode)
+	out.RegionCode = repox.Deref(row.RegionCode)
+	out.AttributeType = repox.Deref(row.AttributeType)
+	out.Primary = repox.Deref(row.Primary)
 	return out
 }

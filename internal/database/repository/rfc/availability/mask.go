@@ -16,8 +16,8 @@
 package availability
 
 import (
+	rfcavailabilitypbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7953/availability/v1/rfcavailabilitypbv1"
 )
 
 // applyAvailabilityMask merges the masked fields of in onto merged. An empty
@@ -55,5 +55,8 @@ func applyAvailabilityMask(merged, in *rfcavailabilitypbv1.Availability, paths [
 	}
 	if repox.GroupTouched(paths, "duration") || repox.GroupTouched(paths, "end") {
 		merged.EndForm = in.EndForm
+	}
+	if repox.GroupTouched(paths, "available_periods") {
+		merged.AvailablePeriods = in.GetAvailablePeriods()
 	}
 }

@@ -16,14 +16,16 @@
 package journal
 
 import (
+	journalpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/journal/v1"
 	"context"
 	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/journal"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/journal/v1/journalpbv1"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"time"
 )
 
 // GormJournalRepository is the GORM adapter of JournalRepository: flat
@@ -85,7 +87,18 @@ func (r *GormJournalRepository) Create(ctx context.Context, parent string, in *j
 			}
 			m.StartID = vo.ID
 		}
-		return journal.NewJournalStore(tx).Create(ctx, m)
+		if err := journal.NewJournalStore(tx).Create(ctx, m); err != nil {
+			return err
+		}
+		for _, v1 := range in.GetExtensions() {
+			n2 := journal.ExtensionPropertyFromProto(v1)
+			n2.ID = repox.NewULID()
+			n2.JournalID = id
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n2).Error; err != nil {
+				return err
+			}
+		}
+		return nil
 	}); err != nil {
 		return nil, repox.MapGormErr(err)
 	}
@@ -105,7 +118,7 @@ func (r *GormJournalRepository) Get(ctx context.Context, name string) (*journalp
 // through, so Tier-2 overrides of Get never re-enter generated writes.
 func (r *GormJournalRepository) get(ctx context.Context, id string) (*journalpbv1.Journal, error) {
 	var m journal.Journal
-	if err := r.DB.WithContext(ctx).Preload("Start").First(&m, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("Start").Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&m, "id = ?", id).Error; err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.toProto(ctx, &m)
@@ -134,6 +147,9 @@ func (r *GormJournalRepository) List(ctx context.Context, parent string, in repo
 }
 
 func (r *GormJournalRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*journalpbv1.Journal, string, error) {
+	if !in.ShowDeleted {
+		scope = scope.Where("delete_time IS NULL")
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -142,7 +158,7 @@ func (r *GormJournalRepository) list(ctx context.Context, scope *gorm.DB, in rep
 	for f, h := range r.ListOverrides {
 		eng.Override(f, h)
 	}
-	rows, next, err := eng.List(ctx, scope.Preload("Start"), filterx.ListInput{
+	rows, next, err := eng.List(ctx, scope.Preload("Start").Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }), filterx.ListInput{
 		PageSize:  in.PageSize,
 		PageToken: in.PageToken,
 		OrderBy:   in.OrderBy,
@@ -172,10 +188,11 @@ func (r *GormJournalRepository) Update(ctx context.Context, in *journalpbv1.Jour
 	id := ids[len(ids)-1]
 	err = r.DB.Transaction(func(tx *gorm.DB) error {
 		var existing journal.Journal
-		if err := tx.WithContext(ctx).Preload("Start").First(&existing, "id = ?", id).Error; err != nil {
+		if err := tx.WithContext(ctx).Preload("Start").Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 			return err
 		}
 		var staleStart string
+		var staleExtensions []journal.ExtensionProperty
 		if in.GetEtag() != "" && existing.Etag != nil && *existing.Etag != in.GetEtag() {
 			return repox.ErrConflict
 		}
@@ -206,12 +223,30 @@ func (r *GormJournalRepository) Update(ctx context.Context, in *journalpbv1.Jour
 				existing.StartID = vo.ID
 			}
 		}
+		if repox.GroupTouched(paths, "extensions") {
+			staleExtensions = existing.ExtensionProperties
+			for _, v7 := range merged.GetExtensions() {
+				n8 := journal.ExtensionPropertyFromProto(v7)
+				n8.ID = repox.NewULID()
+				n8.JournalID = id
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n8).Error; err != nil {
+					return err
+				}
+			}
+		}
+		existing.ExtensionProperties = nil
 		existing.Etag = repox.Ptr(repox.NewULID())
 		if err := journal.NewJournalStore(tx).Update(ctx, &existing); err != nil {
 			return err
 		}
 		if staleStart != "" {
 			if err := tx.WithContext(ctx).Delete(&journal.CalendarTime{}, "id = ?", staleStart).Error; err != nil {
+				return err
+			}
+		}
+		for i5 := range staleExtensions {
+			d6 := &staleExtensions[i5]
+			if err := tx.WithContext(ctx).Delete(&journal.ExtensionProperty{}, "id = ?", d6.ID).Error; err != nil {
 				return err
 			}
 		}
@@ -223,8 +258,54 @@ func (r *GormJournalRepository) Update(ctx context.Context, in *journalpbv1.Jour
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GormJournalRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "calendars", "journals")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	res := r.DB.WithContext(ctx).Model(&journal.Journal{}).
+		Where("id = ? AND delete_time IS NULL", ids[len(ids)-1]).
+		Updates(map[string]any{"delete_time": time.Now(), "etag": repox.NewULID()})
+	if res.Error != nil {
+		return repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return repox.ErrNotFound
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GormJournalRepository) Undelete(ctx context.Context, name string) (*journalpbv1.Journal, error) {
+	ids, err := repox.SplitName(name, "calendars", "journals")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	res := r.DB.WithContext(ctx).Model(&journal.Journal{}).
+		Where("id = ? AND delete_time IS NOT NULL", id).
+		Updates(map[string]any{"delete_time": nil, "etag": repox.NewULID()})
+	if res.Error != nil {
+		return nil, repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GormJournalRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "calendars", "journals")
 	if err != nil {
 		return err
@@ -236,7 +317,7 @@ func (r *GormJournalRepository) Delete(ctx context.Context, name string) error {
 	}
 	id := ids[len(ids)-1]
 	var existing journal.Journal
-	if err := r.DB.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("Start").Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 		return repox.MapGormErr(err)
 	}
 	return repox.MapGormErr(r.DB.Transaction(func(tx *gorm.DB) error {
@@ -245,6 +326,12 @@ func (r *GormJournalRepository) Delete(ctx context.Context, name string) error {
 		}
 		if existing.StartID != "" {
 			if err := tx.WithContext(ctx).Delete(&journal.CalendarTime{}, "id = ?", existing.StartID).Error; err != nil {
+				return err
+			}
+		}
+		for i3 := range existing.ExtensionProperties {
+			d4 := &existing.ExtensionProperties[i3]
+			if err := tx.WithContext(ctx).Delete(&journal.ExtensionProperty{}, "id = ?", d4.ID).Error; err != nil {
 				return err
 			}
 		}

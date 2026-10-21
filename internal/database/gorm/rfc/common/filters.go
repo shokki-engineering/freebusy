@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: google/type/datetime.proto
+// source: google/type/datetime.proto, google/type/fraction.proto
 //
 // database: rfc
 // schema:   common
@@ -30,6 +30,21 @@ var TimeZoneFilterSpec = filterx.Spec{
 	Sort: map[string]filterx.SortSpec{
 		"id":      {Column: "id", Kind: filterx.KindText, NotNull: true},
 		"version": {Column: "version", Kind: filterx.KindText},
+	},
+	PK: []filterx.SortSpec{{Column: "id", Kind: filterx.KindText, NotNull: true}},
+}
+
+// FractionFilterSpec is Fraction's AIP-160 filter / AIP-132 order_by surface,
+// consumed by the filterx.Gorm and filterx.Hasura engines.
+var FractionFilterSpec = filterx.Spec{
+	Table: `"common"."fractions"`,
+	Fields: map[string]filterx.FieldSpec{
+		"denominator": {Column: "denominator", Kind: filterx.KindInt},
+		"numerator":   {Column: "numerator", Kind: filterx.KindInt},
+	},
+	Sort: map[string]filterx.SortSpec{
+		"denominator": {Column: "denominator", Kind: filterx.KindInt},
+		"numerator":   {Column: "numerator", Kind: filterx.KindInt},
 	},
 	PK: []filterx.SortSpec{{Column: "id", Kind: filterx.KindText, NotNull: true}},
 }

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: google/type/datetime.proto
+// source: google/type/datetime.proto, google/type/fraction.proto
 //
 // database: rfc
 // schema:   common
@@ -23,3 +23,15 @@ type TimeZone struct {
 }
 
 func (*TimeZone) TableName() string { return "common.time_zones" }
+
+// Represents a fraction in terms of a numerator divided by a denominator.
+type Fraction struct {
+	// Unique identifier for the record.
+	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
+	// The numerator in the fraction, e.g. 2 in 2/3.
+	Numerator *int64 `gorm:"column:numerator" json:"numerator,omitempty"`
+	// The value by which the numerator is divided, e.g. 3 in 2/3. Must be positive.
+	Denominator *int64 `gorm:"column:denominator" json:"denominator,omitempty"`
+}
+
+func (*Fraction) TableName() string { return "common.fractions" }

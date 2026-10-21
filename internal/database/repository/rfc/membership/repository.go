@@ -16,11 +16,11 @@
 package membership
 
 import (
+	membershippbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/membership/v1"
 	"context"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/membership/v1/membershippbv1"
 	"gorm.io/gorm"
 )
 
@@ -55,7 +55,8 @@ type MembershipHooks struct {
 	// BeforeUpdate runs after the mask is applied to the merged record,
 	// before it is written.
 	BeforeUpdate func(ctx context.Context, existing, merged *membershippbv1.Membership, paths []string) error
-	// BeforeDelete runs before the row is removed; returning an error vetoes.
+	// BeforeDelete runs before the row is removed (or, with soft delete,
+	// marked deleted); returning an error vetoes.
 	BeforeDelete func(ctx context.Context, name string) error
 }
 

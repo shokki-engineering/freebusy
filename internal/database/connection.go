@@ -11,6 +11,7 @@ import (
 
 	"github.com/oh-tarnished/freebusy/config"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
+	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
 	"gorm.io/gorm"
 )
 
@@ -45,4 +46,14 @@ func providerFromConfig() Provider {
 	default:
 		return ProviderGorm
 	}
+}
+
+// Repox returns the handle the generated repositories take, carrying only
+// the selected provider's connection: repox picks GraphQL whenever that
+// handle is set, so passing both would route a GORM deployment to Hasura.
+func (c *Connection) Repox() repox.Conn {
+	if c.Provider == ProviderHasura {
+		return repox.Conn{GraphQL: c.Hasura}
+	}
+	return repox.Conn{Gorm: c.PgSQLConn}
 }

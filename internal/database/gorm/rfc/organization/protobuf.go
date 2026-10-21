@@ -17,8 +17,8 @@ package organization
 import (
 	"time"
 
+	organizationpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organization/v1"
 	"github.com/lib/pq"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/organization/v1/organizationpbv1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: freebusy/shared/v1/idempotency.proto, freebusy/shared/v1/types.proto
+// source: freebusy/shared/v1/idempotency.proto
 //
 // database: freebusy
 // schema:   shared
@@ -161,7 +161,6 @@ func (r *GormIdempotencyKeyRepository) Update(ctx context.Context, in *sharedpbv
 		existing.Name = next.Name
 		existing.Method = next.Method
 		existing.RequestID = next.RequestID
-		existing.State = next.State
 		existing.Response = next.Response
 		return shared.NewIdempotencyKeyStore(tx).Update(ctx, &existing)
 	})

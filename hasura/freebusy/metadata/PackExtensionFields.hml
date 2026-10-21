@@ -1,0 +1,205 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: PackExtensionFields
+  fields:
+    - name: booleanValue
+      type: Boolean_1
+    - name: dataValue
+      type: Json
+    - name: id
+      type: String_1!
+    - name: label
+      type: String_1!
+    - name: numberValue
+      type: Float64
+    - name: recordId
+      type: String_1!
+    - name: stringValue
+      type: String_1
+    - name: valueCase
+      type: String_1
+  graphql:
+    typeName: PackExtensionFields
+    inputTypeName: PackExtensionFieldsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: pack_extension_fields
+      fieldMapping:
+        booleanValue:
+          column:
+            name: boolean_value
+        dataValue:
+          column:
+            name: data_value
+        id:
+          column:
+            name: id
+        label:
+          column:
+            name: label
+        numberValue:
+          column:
+            name: number_value
+        recordId:
+          column:
+            name: record_id
+        stringValue:
+          column:
+            name: string_value
+        valueCase:
+          column:
+            name: value_case
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: PackExtensionFields
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - booleanValue
+          - dataValue
+          - id
+          - label
+          - numberValue
+          - recordId
+          - stringValue
+          - valueCase
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: PackExtensionFieldsBoolExp
+  operand:
+    object:
+      type: PackExtensionFields
+      comparableFields:
+        - fieldName: booleanValue
+          booleanExpressionType: BoolBoolExp
+        - fieldName: dataValue
+          booleanExpressionType: ByteaBoolExp
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: label
+          booleanExpressionType: TextBoolExp
+        - fieldName: numberValue
+          booleanExpressionType: Float8BoolExp
+        - fieldName: recordId
+          booleanExpressionType: TextBoolExp
+        - fieldName: stringValue
+          booleanExpressionType: TextBoolExp
+        - fieldName: valueCase
+          booleanExpressionType: TextBoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: PackExtensionFieldsBoolExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: PackExtensionFieldsAggExp
+  operand:
+    object:
+      aggregatedType: PackExtensionFields
+      aggregatableFields:
+        - fieldName: booleanValue
+          aggregateExpression: BoolAggExp
+        - fieldName: dataValue
+          aggregateExpression: ByteaAggExp
+        - fieldName: id
+          aggregateExpression: TextAggExp
+        - fieldName: label
+          aggregateExpression: TextAggExp
+        - fieldName: numberValue
+          aggregateExpression: Float8AggExp
+        - fieldName: recordId
+          aggregateExpression: TextAggExp
+        - fieldName: stringValue
+          aggregateExpression: TextAggExp
+        - fieldName: valueCase
+          aggregateExpression: TextAggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: PackExtensionFieldsAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: PackExtensionFieldsOrderByExp
+  operand:
+    object:
+      orderedType: PackExtensionFields
+      orderableFields:
+        - fieldName: booleanValue
+          orderByExpression: Boolean1OrderByExp
+        - fieldName: dataValue
+          orderByExpression: JsonOrderByExp
+        - fieldName: id
+          orderByExpression: String1OrderByExp
+        - fieldName: label
+          orderByExpression: String1OrderByExp
+        - fieldName: numberValue
+          orderByExpression: Float64OrderByExp
+        - fieldName: recordId
+          orderByExpression: String1OrderByExp
+        - fieldName: stringValue
+          orderByExpression: String1OrderByExp
+        - fieldName: valueCase
+          orderByExpression: String1OrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: PackExtensionFieldsOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: PackExtensionFields
+  objectType: PackExtensionFields
+  source:
+    dataConnectorName: freebusy_pgsql
+    collection: pack_extension_fields
+  filterExpressionType: PackExtensionFieldsBoolExp
+  aggregateExpression: PackExtensionFieldsAggExp
+  orderByExpression: PackExtensionFieldsOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: packExtensionFields
+      subscription:
+        rootField: packExtensionFields
+    selectUniques:
+      - queryRootField: packExtensionFieldsById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: packExtensionFieldsById
+    filterInputTypeName: PackExtensionFieldsFilterInput
+    aggregate:
+      queryRootField: packExtensionFieldsAggregate
+      subscription:
+        rootField: packExtensionFieldsAggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: PackExtensionFields
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+

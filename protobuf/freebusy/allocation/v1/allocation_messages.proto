@@ -29,7 +29,7 @@ message ComputeAvailabilityRequest {
   // Format: resources/{resource}
   repeated string resources = 2 [
     (google.api.field_behavior) = OPTIONAL,
-    (google.api.resource_reference).type = "protobufrfc.dev/Resource"
+    (google.api.resource_reference).type = "the-protobuf-project.org/Resource"
   ];
 
   // The window to compute over.
@@ -80,7 +80,7 @@ message CheckAvailabilityRequest {
   // Format: resources/{resource}
   repeated string resources = 2 [
     (google.api.field_behavior) = OPTIONAL,
-    (google.api.resource_reference).type = "protobufrfc.dev/Resource"
+    (google.api.resource_reference).type = "the-protobuf-project.org/Resource"
   ];
 
   // The exact window to check.
@@ -110,7 +110,7 @@ message CheckAvailabilityResponse {
   // Which resources would be taken, in the order the allocator would pick
   // them. Advisory: another caller may take one before a hold is created.
   // Format: resources/{resource}
-  repeated string candidate_resources = 4 [(google.api.resource_reference).type = "protobufrfc.dev/Resource"];
+  repeated string candidate_resources = 4 [(google.api.resource_reference).type = "the-protobuf-project.org/Resource"];
 }
 
 // Request message for AllocationService.BatchComputeAvailability. Each entry is
@@ -155,7 +155,7 @@ message SearchAvailabilityRequest {
   // Format: organizationalUnits/{organizational_unit}
   repeated string organizational_units = 3 [
     (google.api.field_behavior) = OPTIONAL,
-    (google.api.resource_reference).type = "protobufrfc.dev/OrganizationalUnit"
+    (google.api.resource_reference).type = "the-protobuf-project.org/OrganizationalUnit"
   ];
 
   // Restrict to RESOURCE-TYPE values, RFC 9073 section 6.3, e.g. "room" or

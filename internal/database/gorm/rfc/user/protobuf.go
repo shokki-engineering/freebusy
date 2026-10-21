@@ -17,7 +17,7 @@ package user
 import (
 	"time"
 
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7643/user/v1/scimuserpbv1"
+	scimuserpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/user/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -49,6 +49,9 @@ func UserToProto(m *User) *scimuserpbv1.User {
 	out.UpdateTime = goValToTs(m.UpdateTime)
 	out.NameComponents = NameToProto(m.NameComponents)
 	out.Enterprise = EnterpriseUserToProto(m.Enterprise)
+	for i := range m.Address {
+		out.Addresses = append(out.Addresses, AddressToProto(&m.Address[i]))
+	}
 	return out
 }
 
@@ -60,7 +63,7 @@ func UserFromProto(pb *scimuserpbv1.User) *User {
 		return nil
 	}
 	m := &User{}
-	// not mapped here: name_components (sub-row graph), enterprise (sub-row graph)
+	// not mapped here: name_components (sub-row graph), enterprise (sub-row graph), addresses (sub-row graph)
 	m.Name = pb.GetName()
 	m.UID = toPtr(pb.GetUid())
 	m.ExternalUID = toPtr(pb.GetExternalUid())

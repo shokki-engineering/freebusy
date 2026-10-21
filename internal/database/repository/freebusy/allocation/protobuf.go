@@ -107,6 +107,7 @@ func allocationFromRow(row *resourceql.AllocationResource) *allocationpbv1.Alloc
 	out.StartTime = strToTs(row.StartTime)
 	out.EndTime = strToTs(row.EndTime)
 	out.CreateTime = strToTs(row.CreateTime)
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
 	return out
 }
 
@@ -157,6 +158,8 @@ func holdFromRow(row *holdsql.AllocationHolds) *allocationpbv1.Hold {
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
 	out.State = allocationpbv1.HoldState(allocationpbv1.HoldState_value["HOLD_STATE_"+repox.Deref(row.State)])
+	out.Resources = strPtrsToSlice(row.Resources)
 	return out
 }

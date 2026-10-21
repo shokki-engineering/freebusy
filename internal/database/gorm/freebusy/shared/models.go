@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: freebusy/shared/v1/idempotency.proto, freebusy/shared/v1/types.proto
+// source: freebusy/shared/v1/idempotency.proto
 //
 // database: freebusy
 // schema:   shared
@@ -16,8 +16,6 @@ package shared
 
 import (
 	"time"
-
-	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/common"
 )
 
 // Lifecycle of a recorded request. A key is claimed IN_FLIGHT before the handler runs and settles to DONE once its response is recorded; a handler that fails deletes its key, so the caller may genuinely retry.
@@ -31,33 +29,18 @@ const (
 	IdempotencyStateDone IdempotencyState = "DONE"
 )
 
-// What a price line represents.
-type Type string
-
-// Type values as stored in the database.
-const (
-	// The base charge: nightly/slot subtotal before fees, taxes, and discounts.
-	TypeBase Type = "BASE"
-	// A fee added on top of the base (e.g. cleaning, service, resort).
-	TypeFee Type = "FEE"
-	// A tax on the taxable base (e.g. VAT, occupancy/lodging tax).
-	TypeTax Type = "TAX"
-	// A discount (promo code, length-of-stay); `amount` is negative.
-	TypeDiscount Type = "DISCOUNT"
-)
-
-// The record behind every `request_id` field in this API: it remembers what the first call with a given id returned, so a retry replays that response instead of attempting the write twice. Storage only — no service exposes it, and no caller constructs one. It lives in freebusy.shared.v1 because request_id is API-wide (booking, property, promo code, channel, organisation, schedule) and one interceptor records them all; homing it in any single service's package would make every other service import that service to dedupe its own writes. The id is derived, not random: it is a digest of (method, request_id), so the primary key itself is the uniqueness constraint that makes a concurrent duplicate lose the race rather than double-write.
+// The record behind every `request_id` field in this API: it remembers what the first call with a given id returned, so a retry replays that response instead of attempting the write twice. Storage only — no service exposes it, and no caller constructs one. It lives in freebusy.shared.v1 because request_id is an API-wide convention any RPC may opt into, and one interceptor records them all; homing it in any single service's package would make every other service import that service to dedupe its own writes. No RPC declares request_id today -- holds and reservations carry their own idempotency. The id is derived, not random: it is a digest of (method, request_id), so the primary key itself is the uniqueness constraint that makes a concurrent duplicate lose the race rather than double-write.
 type IdempotencyKey struct {
 	// Unique identifier for the record.
 	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
 	// The key name. The final segment is a digest of (method, request_id). Format: idempotencyKeys/{idempotency_key}
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
-	// Fully-qualified RPC that was called, e.g. "/freebusy.scheduling.v1.SchedulingService/CreateBooking". Part of the key: the same request_id replayed against a different method is a different request.
+	// Fully-qualified RPC that was called, e.g. "/freebusy.allocation.v1.HoldService/CreateHold". Part of the key: the same request_id replayed against a different method is a different request.
 	Method string `gorm:"column:method;not null;uniqueIndex:idx_idempotency_keys_method_request_id,priority:1" json:"method" validate:"required"`
 	// The caller-supplied idempotency key, verbatim from the request's `request_id` field.
 	RequestID string `gorm:"column:request_id;not null;uniqueIndex:idx_idempotency_keys_method_request_id,priority:2" json:"request_id" validate:"required"`
 	// Whether the first call is still running or has settled. REQUIRED, not OUTPUT_ONLY, and AIP-216's state-field-output-only is knowingly not satisfied here. protoc-gen-orm reads OUTPUT_ONLY as "the repository never writes this column": with it set, GORM's Update stops copying State and the GraphQL create input and update patch both omit it, so settle()'s transition to DONE is silently dropped and every replay re-runs the handler. AIP-216 is about a *client* not setting lifecycle; this record has no client -- no service exposes it and the server is the only writer -- so the rule's premise does not hold while its cost is a broken idempotency mechanism. Revisit if orm gains a writable override.
-	State IdempotencyState `gorm:"column:state;not null;default:'IN_FLIGHT';check:chk_idempotency_keys_state,state IN ('IN_FLIGHT','DONE')" json:"state" validate:"required"`
+	State *IdempotencyState `gorm:"column:state;default:'IN_FLIGHT';check:chk_idempotency_keys_state,state IN ('IN_FLIGHT','DONE')" json:"state,omitempty"`
 	// What the first call returned: a google.protobuf.Any holding the response message, encoded as protojson. Empty while IN_FLIGHT. Stored as text rather than bytes so it round-trips identically through GORM and through Hasura's GraphQL, and self-describing (the Any carries its @type) so a replay can rebuild the exact response message without knowing which RPC wrote it.
 	Response *string `gorm:"column:response" json:"response,omitempty"`
 	// When the key was claimed.
@@ -67,80 +50,3 @@ type IdempotencyKey struct {
 }
 
 func (*IdempotencyKey) TableName() string { return "shared.idempotency_keys" }
-
-// An uploaded file attached to a document- or licence-carrying record (e.g. a guest's IdDocument scan, or a property/unit licence certificate). The bytes are stored inline in `content` today; `uri` is populated once the file is migrated to object storage (S3 or any CDN-fronted host). At most one of the two is authoritative at a time — prefer `uri` when both are set.
-type Attachment struct {
-	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
-	// Original filename as uploaded.
-	Filename *string `gorm:"column:filename" json:"filename,omitempty"`
-	// MIME type of the file (e.g. "application/pdf", "image/jpeg").
-	MimeType *string `gorm:"column:mime_type" json:"mime_type,omitempty"`
-	// Size of the file in bytes.
-	SizeBytes *int64 `gorm:"column:size_bytes" json:"size_bytes,omitempty"`
-	// Raw file content, stored inline in the database. Cleared once the file is migrated to object storage, at which point `uri` takes over.
-	Content []byte `gorm:"column:content" json:"content,omitempty"`
-	// Location of the file once moved to object storage (e.g. an s3:// or https:// URL). Unset while the file lives inline in `content`.
-	URI *string `gorm:"column:uri" json:"uri,omitempty"`
-	// When the file was uploaded.
-	UploadTime *time.Time `gorm:"column:upload_time;type:timestamptz" json:"upload_time,omitempty"`
-}
-
-func (*Attachment) TableName() string { return "shared.attachments" }
-
-// A half-open time interval [start_time, end_time). Used for query windows and for a booking's reserved span in both TIME_SLOT and NIGHTLY modes.
-type TimeWindow struct {
-	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
-	// Inclusive start of the interval.
-	StartTime time.Time `gorm:"column:start_time;type:timestamptz;not null" json:"start_time" validate:"required"`
-	// Exclusive end of the interval.
-	EndTime time.Time `gorm:"column:end_time;type:timestamptz;not null" json:"end_time" validate:"required"`
-}
-
-func (*TimeWindow) TableName() string { return "shared.time_windows" }
-
-// A half-open range of calendar dates [start_date, end_date), evaluated in the resource's local timezone. The natural query and exception shape for NIGHTLY resources: end_date is the check-out date and is not itself included.
-type DateRange struct {
-	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
-	// Inclusive first date of the range.
-	StartDate time.Time `gorm:"column:start_date;type:date;not null" json:"start_date" validate:"required"`
-	// Exclusive end date of the range.
-	EndDate time.Time `gorm:"column:end_date;type:date;not null" json:"end_date" validate:"required"`
-}
-
-func (*DateRange) TableName() string { return "shared.date_ranges" }
-
-// Contact details for the person a booking is for. When a booking carries a `customer` (a users/{user} reference) these typically mirror the user's profile; for walk-in or email-only bookings made by someone who is not a registered user, this is the only contact information captured. The server requires at least one reachable channel (email or phone) when no customer is set.
-type Contact struct {
-	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
-	// Full name of the guest.
-	DisplayName *string `gorm:"column:display_name" json:"display_name,omitempty"`
-	// Email address for the confirmation and any follow-ups.
-	Email *string `gorm:"column:email" json:"email,omitempty"`
-	// Phone number in E.164 form (e.g. "+14155552671").
-	PhoneNumber *string `gorm:"column:phone_number" json:"phone_number,omitempty"`
-}
-
-func (*Contact) TableName() string { return "shared.contacts" }
-
-// One line in a price breakdown: a base charge, a fee, a tax, or a discount. Clients branch on `type` and `code`; the signed `amount` rolls up to the booking total (charges positive, discounts negative).
-type PriceComponent struct {
-	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
-	// Which kind of line this is.
-	Type *Type `gorm:"column:type;check:chk_price_components_type,type IN ('BASE','FEE','TAX','DISCOUNT')" json:"type,omitempty"`
-	// Stable machine code for the line, e.g. "base", "cleaning_fee", "occupancy_tax", or a promo code. Clients key display and logic off this.
-	Code *string `gorm:"column:code" json:"code,omitempty"`
-	// Human-readable label suitable for display on an itemized receipt.
-	DisplayName *string `gorm:"column:display_name" json:"display_name,omitempty"`
-	// Foreign key to Booking.
-	BookingID string `gorm:"column:booking_id;not null;index:idx_price_components_booking_id" json:"booking_id" validate:"required"`
-	// Foreign key to Money.
-	AmountID *string       `gorm:"column:amount_id;index:idx_price_components_amount_id" json:"amount_id,omitempty"`
-	Amount   *common.Money `gorm:"foreignKey:AmountID;constraint:OnDelete:SET NULL" json:"amount,omitempty"`
-}
-
-func (*PriceComponent) TableName() string { return "shared.price_components" }

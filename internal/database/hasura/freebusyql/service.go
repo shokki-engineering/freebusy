@@ -28,15 +28,16 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/membershipql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/organizationql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/orgunitql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/pricingql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/packql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/prismaql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/projectql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/promocodeql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/propertyql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/reservationql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/resourceql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/sensorql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/sharedql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/streamql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/todoql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/unitql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/vcardql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
@@ -66,15 +67,16 @@ type QueryHandler struct {
 	Membership   membershipql.QueryHandler
 	Organization organizationql.QueryHandler
 	Orgunit      orgunitql.QueryHandler
-	Pricing      pricingql.QueryHandler
+	Pack         packql.QueryHandler
 	Prisma       prismaql.QueryHandler
 	Project      projectql.QueryHandler
-	Promocode    promocodeql.QueryHandler
-	Property     propertyql.QueryHandler
 	Reservation  reservationql.QueryHandler
 	Resource     resourceql.QueryHandler
+	Sensor       sensorql.QueryHandler
 	Shared       sharedql.QueryHandler
+	Stream       streamql.QueryHandler
 	Todo         todoql.QueryHandler
+	Unit         unitql.QueryHandler
 	User         userql.QueryHandler
 	Vcard        vcardql.QueryHandler
 }
@@ -108,15 +110,16 @@ type MutationHandler struct {
 	Membership   membershipql.MutationHandler
 	Organization organizationql.MutationHandler
 	Orgunit      orgunitql.MutationHandler
-	Pricing      pricingql.MutationHandler
+	Pack         packql.MutationHandler
 	Prisma       prismaql.MutationHandler
 	Project      projectql.MutationHandler
-	Promocode    promocodeql.MutationHandler
-	Property     propertyql.MutationHandler
 	Reservation  reservationql.MutationHandler
 	Resource     resourceql.MutationHandler
+	Sensor       sensorql.MutationHandler
 	Shared       sharedql.MutationHandler
+	Stream       streamql.MutationHandler
 	Todo         todoql.MutationHandler
+	Unit         unitql.MutationHandler
 	User         userql.MutationHandler
 	Vcard        vcardql.MutationHandler
 }
@@ -154,15 +157,16 @@ type SubscriptionHandler struct {
 	Membership   membershipql.SubscriptionHandler
 	Organization organizationql.SubscriptionHandler
 	Orgunit      orgunitql.SubscriptionHandler
-	Pricing      pricingql.SubscriptionHandler
+	Pack         packql.SubscriptionHandler
 	Prisma       prismaql.SubscriptionHandler
 	Project      projectql.SubscriptionHandler
-	Promocode    promocodeql.SubscriptionHandler
-	Property     propertyql.SubscriptionHandler
 	Reservation  reservationql.SubscriptionHandler
 	Resource     resourceql.SubscriptionHandler
+	Sensor       sensorql.SubscriptionHandler
 	Shared       sharedql.SubscriptionHandler
+	Stream       streamql.SubscriptionHandler
 	Todo         todoql.SubscriptionHandler
+	Unit         unitql.SubscriptionHandler
 	User         userql.SubscriptionHandler
 	Vcard        vcardql.SubscriptionHandler
 }
@@ -195,15 +199,16 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Membership:   membershipql.NewQuery(gql),
 			Organization: organizationql.NewQuery(gql),
 			Orgunit:      orgunitql.NewQuery(gql),
-			Pricing:      pricingql.NewQuery(gql),
+			Pack:         packql.NewQuery(gql),
 			Prisma:       prismaql.NewQuery(gql),
 			Project:      projectql.NewQuery(gql),
-			Promocode:    promocodeql.NewQuery(gql),
-			Property:     propertyql.NewQuery(gql),
 			Reservation:  reservationql.NewQuery(gql),
 			Resource:     resourceql.NewQuery(gql),
+			Sensor:       sensorql.NewQuery(gql),
 			Shared:       sharedql.NewQuery(gql),
+			Stream:       streamql.NewQuery(gql),
 			Todo:         todoql.NewQuery(gql),
+			Unit:         unitql.NewQuery(gql),
 			User:         userql.NewQuery(gql),
 			Vcard:        vcardql.NewQuery(gql),
 		},
@@ -221,15 +226,16 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Membership:   membershipql.NewMutation(gql),
 			Organization: organizationql.NewMutation(gql),
 			Orgunit:      orgunitql.NewMutation(gql),
-			Pricing:      pricingql.NewMutation(gql),
+			Pack:         packql.NewMutation(gql),
 			Prisma:       prismaql.NewMutation(gql),
 			Project:      projectql.NewMutation(gql),
-			Promocode:    promocodeql.NewMutation(gql),
-			Property:     propertyql.NewMutation(gql),
 			Reservation:  reservationql.NewMutation(gql),
 			Resource:     resourceql.NewMutation(gql),
+			Sensor:       sensorql.NewMutation(gql),
 			Shared:       sharedql.NewMutation(gql),
+			Stream:       streamql.NewMutation(gql),
 			Todo:         todoql.NewMutation(gql),
+			Unit:         unitql.NewMutation(gql),
 			User:         userql.NewMutation(gql),
 			Vcard:        vcardql.NewMutation(gql),
 		},
@@ -246,15 +252,16 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Membership:   membershipql.NewSubscription(gql),
 			Organization: organizationql.NewSubscription(gql),
 			Orgunit:      orgunitql.NewSubscription(gql),
-			Pricing:      pricingql.NewSubscription(gql),
+			Pack:         packql.NewSubscription(gql),
 			Prisma:       prismaql.NewSubscription(gql),
 			Project:      projectql.NewSubscription(gql),
-			Promocode:    promocodeql.NewSubscription(gql),
-			Property:     propertyql.NewSubscription(gql),
 			Reservation:  reservationql.NewSubscription(gql),
 			Resource:     resourceql.NewSubscription(gql),
+			Sensor:       sensorql.NewSubscription(gql),
 			Shared:       sharedql.NewSubscription(gql),
+			Stream:       streamql.NewSubscription(gql),
 			Todo:         todoql.NewSubscription(gql),
+			Unit:         unitql.NewSubscription(gql),
 			User:         userql.NewSubscription(gql),
 			Vcard:        vcardql.NewSubscription(gql),
 		},

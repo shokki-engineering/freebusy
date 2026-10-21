@@ -7,27 +7,34 @@ package internal
 import (
 	"context"
 
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/calendar/v1/calendarv1grpc"
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/event/v1/eventv1grpc"
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc7953/availability/v1/availabilityv1grpc"
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc9073/resource/v1/resourcev1grpc"
 	"github.com/oh-tarnished/freebusy/internal/database"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation"
-	"github.com/oh-tarnished/freebusy/internal/service/pricing"
 	"github.com/oh-tarnished/freebusy/internal/service/reservation"
+	"github.com/oh-tarnished/freebusy/internal/service/rfcsvc"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/pricing/v1/pricingpbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/promocode/v1/promocodepbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"github.com/oh-tarnished/freebusy/shared"
 )
 
 // Service is the registered gRPC adapter. It embeds the assembled service
-// implementations, so it satisfies each of their gRPC server interfaces
-// (promocode, pricing, the availability engine's allocation and hold services,
-// reservations, and any future service interfaces composed in here).
+// implementations, so it satisfies each of their gRPC server interfaces: the
+// availability engine's allocation and hold services, reservations, and the
+// upstream protobuf-rfc services an operator publishes inventory through
+// (Resources, Calendars, Availabilities, Events). Money -- prices, promo
+// codes, payment -- is deliberately absent; it belongs to the payment service,
+// which references bookings here by name.
 type Service struct {
-	promocodepbv1.PromoCodeServiceServer
-	pricingpbv1.RatePlanServiceServer
 	allocationpbv1.AllocationServiceServer
 	allocationpbv1.HoldServiceServer
 	reservationpbv1.ReservationServiceServer
+	resourcev1grpc.ResourcesServer
+	calendarv1grpc.CalendarsServer
+	availabilityv1grpc.AvailabilitiesServer
+	eventv1grpc.EventsServer
 
 	// allocation is the availability engine's server, retained so its hold
 	// sweeper can be started in StartBackground.
@@ -43,19 +50,20 @@ type Service struct {
 // NewService wraps the assembled service servers as the registered Service.
 // The engine and reservation servers are passed as concrete types so their
 // background work can be started; the engine serves both AllocationService and
-// HoldService.
+// HoldService, and answers the Calendars service's QueryFreeBusy.
 func NewService(
-	promoCode promocodepbv1.PromoCodeServiceServer,
-	ratePlans *pricing.Server,
 	engine *allocation.Server,
 	reservations *reservation.Server,
+	repos rfcsvc.Repositories,
 ) *Service {
 	return &Service{
-		PromoCodeServiceServer:   promoCode,
-		RatePlanServiceServer:    ratePlans,
 		AllocationServiceServer:  engine,
 		HoldServiceServer:        engine,
 		ReservationServiceServer: reservations,
+		ResourcesServer:          rfcsvc.NewResourceServer(repos),
+		CalendarsServer:          rfcsvc.NewCalendarServer(repos, engine),
+		AvailabilitiesServer:     rfcsvc.NewAvailabilityServer(repos),
+		EventsServer:             rfcsvc.NewEventServer(repos),
 		allocation:               engine,
 		reservations:             reservations,
 	}

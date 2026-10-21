@@ -3,7 +3,7 @@ module github.com/oh-tarnished/freebusy/protobuf
 go 1.26.5
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20260415201107-50325440f8f2.1
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0
 	github.com/the-protobuf-project/grpc-mcp-gateway v1.6.0
 	github.com/the-protobuf-project/orm v1.2.1
@@ -15,6 +15,8 @@ require (
 )
 
 require (
+	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20260908111956-0fb3b0591946.1 // indirect
+	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20260908111956-0fb3b0591946.2 // indirect
 	github.com/google/jsonschema-go v0.4.3 // indirect
 	github.com/modelcontextprotocol/go-sdk v1.7.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect

@@ -9,6 +9,7 @@ import (
 	"slices"
 	"time"
 
+	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/lib/pq"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/freebusy/allocation"
@@ -23,7 +24,6 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
 	"github.com/oh-tarnished/freebusy/internal/types"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9073/resource/v1/resourcepbv1"
 	"gorm.io/gorm"
 )
 
@@ -50,6 +50,9 @@ func (s *Store) Resources(ctx context.Context, q svc.ResourceQuery) ([]svc.Resou
 	if q.Organization != "" {
 		tx = tx.Where("organizational_unit IN (?)", s.db.Model(&orgunit.OrganizationalUnit{}).
 			Select("id").Where("organization = ?", repox.LastSegment(q.Organization)))
+	}
+	if len(q.Calendars) > 0 {
+		tx = tx.Where("calendar IN ?", lastSegments(q.Calendars))
 	}
 	if len(q.Names) > 0 {
 		tx = tx.Where("name IN ?", q.Names)
@@ -126,7 +129,7 @@ func (s *Store) Availability(ctx context.Context, calendars []string) (map[strin
 		start, startDay := availTime(a.Start)
 		end, _ := availTime(a.End)
 		if repox.Deref(a.EndFormCase) == rfcavail.AvailabilityEndFormCaseDuration && !start.IsZero() {
-			end = start.Add(svc.ICalDuration(repox.Deref(a.Duration)))
+			end = start.Add(svc.StoredDuration(repox.Deref(a.Duration)))
 		}
 		rec := svc.AvailabilityRecord{
 			Range:       engine.Span{Start: start, End: end},
@@ -137,7 +140,7 @@ func (s *Store) Availability(ctx context.Context, calendars []string) (map[strin
 			ps, allDay := availTime(p.Start)
 			pe, _ := availTime(p.End)
 			if repox.Deref(p.EndFormCase) == rfcavail.AvailablePeriodEndFormCaseDuration || pe.IsZero() {
-				pe = ps.Add(svc.ICalDuration(repox.Deref(p.Duration)))
+				pe = ps.Add(svc.StoredDuration(repox.Deref(p.Duration)))
 			}
 			rec.Periods = append(rec.Periods, svc.PeriodRecord{Start: ps, End: pe, RRule: repox.Deref(p.RecurrenceRule), AllDay: allDay})
 		}
@@ -201,7 +204,7 @@ func (s *Store) Events(ctx context.Context, calendars []string, window engine.Sp
 		start, allDay := eventTime(e.Start)
 		end, _ := eventTime(e.End)
 		if repox.Deref(e.EndsCase) == rfcevent.EventEndsCaseDuration || end.IsZero() {
-			d := svc.ICalDuration(repox.Deref(e.Duration))
+			d := svc.StoredDuration(repox.Deref(e.Duration))
 			if d == 0 && allDay {
 				d = 24 * time.Hour // RFC 5545 3.6.1: a DATE event with no end lasts the day
 			}

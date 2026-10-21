@@ -17,9 +17,9 @@ package group
 import (
 	"time"
 
+	ldapgrouppbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/group/v1"
+	scimgrouppbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/group/v1"
 	"github.com/lib/pq"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/group/v1/ldapgrouppbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7643/group/v1/scimgrouppbv1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -82,6 +82,9 @@ func GroupToProto(m *Group) *scimgrouppbv1.Group {
 	out.ExpireTime = goToTs(m.ExpireTime)
 	out.CreateTime = goValToTs(m.CreateTime)
 	out.UpdateTime = goValToTs(m.UpdateTime)
+	for i := range m.Members {
+		out.Members = append(out.Members, MemberToProto(&m.Members[i]))
+	}
 	return out
 }
 
@@ -93,6 +96,7 @@ func GroupFromProto(pb *scimgrouppbv1.Group) *Group {
 		return nil
 	}
 	m := &Group{}
+	// not mapped here: members (sub-row graph)
 	m.Name = pb.GetName()
 	m.UID = toPtr(pb.GetUid())
 	m.ExternalUID = toPtr(pb.GetExternalUid())

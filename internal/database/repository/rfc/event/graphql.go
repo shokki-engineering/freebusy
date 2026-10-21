@@ -16,15 +16,22 @@
 package event
 
 import (
+	eventpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"context"
 	"errors"
 	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/event"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/alarmsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/calendartimesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/extensionpropertiesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/linksql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/participantsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/recurrencesql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/resourceql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/eventql/weekdaynumsql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/event/v1/eventpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -99,7 +106,69 @@ func (r *GraphQLEventRepository) Create(ctx context.Context, parent string, in *
 		}
 		ci.OrganizerId = vi.Id
 	}
-	if _, err := r.Svc.Mutation.Event.Resource.Create(ctx, ci); err != nil {
+	// One transaction: the graph lands whole or not at all.
+	gtx := r.Svc.Mutation.Tx()
+	if v1 := in.GetStart(); v1 != nil {
+		n2 := eventCalendarTimeToCreateInput(v1)
+		n2.Id = repox.NewULID()
+		n2.EventId = id
+		gtx.Add(r.Svc.Mutation.Event.CalendarTimes.CreateOp(n2, new(calendartimesql.InsertEventCalendarTimesResponse)))
+		ci.StartId = n2.Id
+	}
+	if v6 := in.GetEnd(); v6 != nil {
+		n7 := eventCalendarTimeToCreateInput(v6)
+		n7.Id = repox.NewULID()
+		n7.EventId = id
+		gtx.Add(r.Svc.Mutation.Event.CalendarTimes.CreateOp(n7, new(calendartimesql.InsertEventCalendarTimesResponse)))
+		ci.EndId = n7.Id
+		ci.EndsCase = "END"
+	}
+	if v11 := in.GetRecurrence(); v11 != nil {
+		n12 := eventRecurrenceToCreateInput(v11)
+		n12.Id = repox.NewULID()
+		if v13 := v11.GetUntil(); v13 != nil {
+			n14 := eventCalendarTimeToCreateInput(v13)
+			n14.Id = repox.NewULID()
+			n14.EventId = id
+			gtx.Add(r.Svc.Mutation.Event.CalendarTimes.CreateOp(n14, new(calendartimesql.InsertEventCalendarTimesResponse)))
+			n12.UntilId = n14.Id
+			n12.BoundCase = "UNTIL"
+		}
+		gtx.Add(r.Svc.Mutation.Event.Recurrences.CreateOp(n12, new(recurrencesql.InsertEventRecurrencesResponse)))
+		for _, v15 := range v11.GetWeekdays() {
+			n16 := eventWeekdayNumToCreateInput(v15)
+			n16.Id = repox.NewULID()
+			n16.RecurrenceId = n12.Id
+			gtx.Add(r.Svc.Mutation.Event.WeekdayNums.CreateOp(n16, new(weekdaynumsql.InsertEventWeekdayNumsResponse)))
+		}
+		ci.RecurrenceId = n12.Id
+	}
+	gtx.Add(r.Svc.Mutation.Event.Resource.CreateOp(ci, new(resourceql.InsertEventResourceResponse)))
+	for _, v27 := range in.GetAlarms() {
+		n28 := eventAlarmToCreateInput(v27)
+		n28.Id = repox.NewULID()
+		n28.EventId = id
+		gtx.Add(r.Svc.Mutation.Event.Alarms.CreateOp(n28, new(alarmsql.InsertEventAlarmsResponse)))
+	}
+	for _, v33 := range in.GetExtensions() {
+		n34 := eventExtensionPropertyToCreateInput(v33)
+		n34.Id = repox.NewULID()
+		n34.EventId = id
+		gtx.Add(r.Svc.Mutation.Event.ExtensionProperties.CreateOp(n34, new(extensionpropertiesql.InsertEventExtensionPropertiesResponse)))
+	}
+	for _, v39 := range in.GetLinks() {
+		n40 := eventLinkToCreateInput(v39)
+		n40.Id = repox.NewULID()
+		n40.EventId = id
+		gtx.Add(r.Svc.Mutation.Event.Links.CreateOp(n40, new(linksql.InsertEventLinksResponse)))
+	}
+	for _, v45 := range in.GetParticipants() {
+		n46 := eventParticipantToCreateInput(v45)
+		n46.Id = repox.NewULID()
+		n46.EventId = id
+		gtx.Add(r.Svc.Mutation.Event.Participants.CreateOp(n46, new(participantsql.InsertEventParticipantsResponse)))
+	}
+	if err := gtx.Commit(ctx); err != nil {
 		return nil, mapGraphQLErr(err)
 	}
 	return r.get(ctx, id)
@@ -140,6 +209,96 @@ func (r *GraphQLEventRepository) toProto(ctx context.Context, row *resourceql.Ev
 			out.Organizer = eventOrganizerFromRow(w)
 		}
 	}
+	if id := row.StartId; id != "" {
+		got3, err := r.Svc.Query.Event.CalendarTimes.Get(ctx, id)
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		if got3 != nil {
+			p4 := eventCalendarTimeFromRow(got3)
+			out.Start = p4
+		}
+	}
+	if id := repox.Deref(row.EndId); id != "" {
+		got8, err := r.Svc.Query.Event.CalendarTimes.Get(ctx, id)
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		if got8 != nil {
+			p9 := eventCalendarTimeFromRow(got8)
+			out.Ends = &eventpbv1.Event_End{End: p9}
+		}
+	}
+	if id := repox.Deref(row.RecurrenceId); id != "" {
+		got17, err := r.Svc.Query.Event.Recurrences.Get(ctx, id)
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		if got17 != nil {
+			p18 := eventRecurrenceFromRow(got17)
+			if id := repox.Deref(got17.UntilId); id != "" {
+				got19, err := r.Svc.Query.Event.CalendarTimes.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got19 != nil {
+					p20 := eventCalendarTimeFromRow(got19)
+					p18.Bound = &eventpbv1.Recurrence_Until{Until: p20}
+				}
+			}
+			{
+				rows21, err := r.Svc.Query.Event.WeekdayNums.List(ctx, weekdaynumsql.List().Where(weekdaynumsql.RecurrenceId.Eq(got17.Id)).OrderBy(weekdaynumsql.Id.Asc()))
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				for i := range rows21 {
+					p22 := eventWeekdayNumFromRow(&rows21[i])
+					p18.Weekdays = append(p18.Weekdays, p22)
+				}
+			}
+			out.Recurrence = p18
+		}
+	}
+	{
+		rows29, err := r.Svc.Query.Event.Alarms.List(ctx, alarmsql.List().Where(alarmsql.EventId.Eq(row.Id)).OrderBy(alarmsql.Id.Asc()))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows29 {
+			p30 := eventAlarmFromRow(&rows29[i])
+			out.Alarms = append(out.Alarms, p30)
+		}
+	}
+	{
+		rows35, err := r.Svc.Query.Event.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.EventId.Eq(row.Id)).OrderBy(extensionpropertiesql.Id.Asc()))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows35 {
+			p36 := eventExtensionPropertyFromRow(&rows35[i])
+			out.Extensions = append(out.Extensions, p36)
+		}
+	}
+	{
+		rows41, err := r.Svc.Query.Event.Links.List(ctx, linksql.List().Where(linksql.EventId.Eq(row.Id)).OrderBy(linksql.Id.Asc()))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows41 {
+			p42 := eventLinkFromRow(&rows41[i])
+			out.Links = append(out.Links, p42)
+		}
+	}
+	{
+		rows47, err := r.Svc.Query.Event.Participants.List(ctx, participantsql.List().Where(participantsql.EventId.Eq(row.Id)).OrderBy(participantsql.Id.Asc()))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows47 {
+			p48 := eventParticipantFromRow(&rows47[i])
+			out.Participants = append(out.Participants, p48)
+		}
+	}
 	if h := r.Hooks.AfterRead; h != nil {
 		if err := h(ctx, out); err != nil {
 			return nil, err
@@ -158,6 +317,9 @@ func (r *GraphQLEventRepository) List(ctx context.Context, parent string, in rep
 }
 
 func (r *GraphQLEventRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*eventpbv1.Event, string, error) {
+	if !in.ShowDeleted {
+		scope = append(scope, resourceql.DeleteTime.IsNull(true))
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -203,6 +365,53 @@ func (r *GraphQLEventRepository) Update(ctx context.Context, in *eventpbv1.Event
 		return nil, repox.ErrNotFound
 	}
 	var staleOrganizer string
+	staleStart := row.StartId
+	staleEnd := repox.Deref(row.EndId)
+	staleRecurrence := repox.Deref(row.RecurrenceId)
+	var old67 []string
+	{
+		rows68, err := r.Svc.Query.Event.Alarms.List(ctx, alarmsql.List().Where(alarmsql.EventId.Eq(id)))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows68 {
+			old67 = append(old67, rows68[i].Id)
+		}
+	}
+	staleAlarms := old67
+	var old72 []string
+	{
+		rows73, err := r.Svc.Query.Event.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.EventId.Eq(id)))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows73 {
+			old72 = append(old72, rows73[i].Id)
+		}
+	}
+	staleExtensions := old72
+	var old77 []string
+	{
+		rows78, err := r.Svc.Query.Event.Links.List(ctx, linksql.List().Where(linksql.EventId.Eq(id)))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows78 {
+			old77 = append(old77, rows78[i].Id)
+		}
+	}
+	staleLinks := old77
+	var old82 []string
+	{
+		rows83, err := r.Svc.Query.Event.Participants.List(ctx, participantsql.List().Where(participantsql.EventId.Eq(id)))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows83 {
+			old82 = append(old82, rows83[i].Id)
+		}
+	}
+	staleParticipants := old82
 	existingPB := eventFromRow(row)
 	merged := proto.Clone(existingPB).(*eventpbv1.Event)
 	applyEventMask(merged, in, paths)
@@ -226,6 +435,187 @@ func (r *GraphQLEventRepository) Update(ctx context.Context, in *eventpbv1.Event
 			patch.OrganizerId = graphql.Value(vi.Id)
 		}
 	}
+	// New singular value objects land before the guarded row update (a lost
+	// race leaves them unreferenced); new list rows and the removal of
+	// replaced subtrees land only after it succeeds (atx).
+	utx := r.Svc.Mutation.Tx()
+	atx := r.Svc.Mutation.Tx()
+	if repox.GroupTouched(paths, "start") {
+		if id := staleStart; id != "" {
+			got51, err := r.Svc.Query.Event.CalendarTimes.Get(ctx, id)
+			if err != nil {
+				return nil, mapGraphQLErr(err)
+			}
+			if got51 != nil {
+				atx.Add(r.Svc.Mutation.Event.CalendarTimes.DeleteOp(got51.Id, new(calendartimesql.DeleteEventCalendarTimesByIdResponse)))
+			}
+		}
+		patch.StartId = graphql.Null[string]()
+		if v52 := merged.GetStart(); v52 != nil {
+			n53 := eventCalendarTimeToCreateInput(v52)
+			n53.Id = repox.NewULID()
+			n53.EventId = id
+			utx.Add(r.Svc.Mutation.Event.CalendarTimes.CreateOp(n53, new(calendartimesql.InsertEventCalendarTimesResponse)))
+			patch.StartId = graphql.Value(n53.Id)
+		}
+	}
+	if repox.GroupTouched(paths, "end") || repox.GroupTouched(paths, "duration") {
+		if id := staleEnd; id != "" {
+			got54, err := r.Svc.Query.Event.CalendarTimes.Get(ctx, id)
+			if err != nil {
+				return nil, mapGraphQLErr(err)
+			}
+			if got54 != nil {
+				atx.Add(r.Svc.Mutation.Event.CalendarTimes.DeleteOp(got54.Id, new(calendartimesql.DeleteEventCalendarTimesByIdResponse)))
+			}
+		}
+		patch.EndId = graphql.Null[string]()
+		if v55 := merged.GetEnd(); v55 != nil {
+			n56 := eventCalendarTimeToCreateInput(v55)
+			n56.Id = repox.NewULID()
+			n56.EventId = id
+			utx.Add(r.Svc.Mutation.Event.CalendarTimes.CreateOp(n56, new(calendartimesql.InsertEventCalendarTimesResponse)))
+			patch.EndId = graphql.Value(n56.Id)
+			patch.EndsCase = graphql.Value("END")
+		}
+	}
+	if repox.GroupTouched(paths, "recurrence") {
+		if id := staleRecurrence; id != "" {
+			got57, err := r.Svc.Query.Event.Recurrences.Get(ctx, id)
+			if err != nil {
+				return nil, mapGraphQLErr(err)
+			}
+			if got57 != nil {
+				{
+					rows58, err := r.Svc.Query.Event.WeekdayNums.List(ctx, weekdaynumsql.List().Where(weekdaynumsql.RecurrenceId.Eq(got57.Id)))
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					for i := range rows58 {
+						if id := rows58[i].Id; id != "" {
+							got59, err := r.Svc.Query.Event.WeekdayNums.Get(ctx, id)
+							if err != nil {
+								return nil, mapGraphQLErr(err)
+							}
+							if got59 != nil {
+								atx.Add(r.Svc.Mutation.Event.WeekdayNums.DeleteOp(got59.Id, new(weekdaynumsql.DeleteEventWeekdayNumsByIdResponse)))
+							}
+						}
+					}
+				}
+				atx.Add(r.Svc.Mutation.Event.Recurrences.DeleteOp(got57.Id, new(recurrencesql.DeleteEventRecurrencesByIdResponse)))
+				if id := repox.Deref(got57.UntilId); id != "" {
+					got60, err := r.Svc.Query.Event.CalendarTimes.Get(ctx, id)
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					if got60 != nil {
+						atx.Add(r.Svc.Mutation.Event.CalendarTimes.DeleteOp(got60.Id, new(calendartimesql.DeleteEventCalendarTimesByIdResponse)))
+					}
+				}
+			}
+		}
+		patch.RecurrenceId = graphql.Null[string]()
+		if v61 := merged.GetRecurrence(); v61 != nil {
+			n62 := eventRecurrenceToCreateInput(v61)
+			n62.Id = repox.NewULID()
+			if v63 := v61.GetUntil(); v63 != nil {
+				n64 := eventCalendarTimeToCreateInput(v63)
+				n64.Id = repox.NewULID()
+				n64.EventId = id
+				utx.Add(r.Svc.Mutation.Event.CalendarTimes.CreateOp(n64, new(calendartimesql.InsertEventCalendarTimesResponse)))
+				n62.UntilId = n64.Id
+				n62.BoundCase = "UNTIL"
+			}
+			utx.Add(r.Svc.Mutation.Event.Recurrences.CreateOp(n62, new(recurrencesql.InsertEventRecurrencesResponse)))
+			for _, v65 := range v61.GetWeekdays() {
+				n66 := eventWeekdayNumToCreateInput(v65)
+				n66.Id = repox.NewULID()
+				n66.RecurrenceId = n62.Id
+				utx.Add(r.Svc.Mutation.Event.WeekdayNums.CreateOp(n66, new(weekdaynumsql.InsertEventWeekdayNumsResponse)))
+			}
+			patch.RecurrenceId = graphql.Value(n62.Id)
+		}
+	}
+	if repox.GroupTouched(paths, "alarms") {
+		for _, oid := range staleAlarms {
+			if id := oid; id != "" {
+				got69, err := r.Svc.Query.Event.Alarms.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got69 != nil {
+					atx.Add(r.Svc.Mutation.Event.Alarms.DeleteOp(got69.Id, new(alarmsql.DeleteEventAlarmsByIdResponse)))
+				}
+			}
+		}
+		for _, v70 := range merged.GetAlarms() {
+			n71 := eventAlarmToCreateInput(v70)
+			n71.Id = repox.NewULID()
+			n71.EventId = id
+			atx.Add(r.Svc.Mutation.Event.Alarms.CreateOp(n71, new(alarmsql.InsertEventAlarmsResponse)))
+		}
+	}
+	if repox.GroupTouched(paths, "extensions") {
+		for _, oid := range staleExtensions {
+			if id := oid; id != "" {
+				got74, err := r.Svc.Query.Event.ExtensionProperties.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got74 != nil {
+					atx.Add(r.Svc.Mutation.Event.ExtensionProperties.DeleteOp(got74.Id, new(extensionpropertiesql.DeleteEventExtensionPropertiesByIdResponse)))
+				}
+			}
+		}
+		for _, v75 := range merged.GetExtensions() {
+			n76 := eventExtensionPropertyToCreateInput(v75)
+			n76.Id = repox.NewULID()
+			n76.EventId = id
+			atx.Add(r.Svc.Mutation.Event.ExtensionProperties.CreateOp(n76, new(extensionpropertiesql.InsertEventExtensionPropertiesResponse)))
+		}
+	}
+	if repox.GroupTouched(paths, "links") {
+		for _, oid := range staleLinks {
+			if id := oid; id != "" {
+				got79, err := r.Svc.Query.Event.Links.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got79 != nil {
+					atx.Add(r.Svc.Mutation.Event.Links.DeleteOp(got79.Id, new(linksql.DeleteEventLinksByIdResponse)))
+				}
+			}
+		}
+		for _, v80 := range merged.GetLinks() {
+			n81 := eventLinkToCreateInput(v80)
+			n81.Id = repox.NewULID()
+			n81.EventId = id
+			atx.Add(r.Svc.Mutation.Event.Links.CreateOp(n81, new(linksql.InsertEventLinksResponse)))
+		}
+	}
+	if repox.GroupTouched(paths, "participants") {
+		for _, oid := range staleParticipants {
+			if id := oid; id != "" {
+				got84, err := r.Svc.Query.Event.Participants.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got84 != nil {
+					atx.Add(r.Svc.Mutation.Event.Participants.DeleteOp(got84.Id, new(participantsql.DeleteEventParticipantsByIdResponse)))
+				}
+			}
+		}
+		for _, v85 := range merged.GetParticipants() {
+			n86 := eventParticipantToCreateInput(v85)
+			n86.Id = repox.NewULID()
+			n86.EventId = id
+			atx.Add(r.Svc.Mutation.Event.Participants.CreateOp(n86, new(participantsql.InsertEventParticipantsResponse)))
+		}
+	}
+	if err := utx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	if in.GetEtag() != "" {
 		if _, err := r.Svc.Mutation.Event.Resource.UpdateIfMatch(ctx, id, patch, resourceql.Etag.Eq(in.GetEtag())); err != nil {
 			return nil, mapGraphQLErr(err)
@@ -234,6 +624,9 @@ func (r *GraphQLEventRepository) Update(ctx context.Context, in *eventpbv1.Event
 			if _, err := r.Svc.Mutation.Event.Organizers.Delete(ctx, staleOrganizer); err != nil {
 				return nil, mapGraphQLErr(err)
 			}
+		}
+		if err := atx.Commit(ctx); err != nil {
+			return nil, mapGraphQLErr(err)
 		}
 		return r.get(ctx, id)
 	}
@@ -249,11 +642,58 @@ func (r *GraphQLEventRepository) Update(ctx context.Context, in *eventpbv1.Event
 			return nil, mapGraphQLErr(err)
 		}
 	}
+	if err := atx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GraphQLEventRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "calendars", "events")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	patch := resourceql.UpdateInput{DeleteTime: graphql.Value(time.Now().UTC().Format(time.RFC3339Nano))}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Event.Resource.UpdateIfMatch(ctx, ids[len(ids)-1], patch, resourceql.DeleteTime.IsNull(true)); err != nil {
+		if errors.Is(err, graphql.ErrConflict) {
+			return repox.ErrNotFound
+		}
+		return mapGraphQLErr(err)
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GraphQLEventRepository) Undelete(ctx context.Context, name string) (*eventpbv1.Event, error) {
+	ids, err := repox.SplitName(name, "calendars", "events")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	patch := resourceql.UpdateInput{DeleteTime: graphql.Null[string]()}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Event.Resource.UpdateIfMatch(ctx, id, patch, resourceql.DeleteTime.IsNull(false)); err != nil {
+		if !errors.Is(err, graphql.ErrConflict) {
+			return nil, mapGraphQLErr(err)
+		}
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GraphQLEventRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "calendars", "events")
 	if err != nil {
 		return err
@@ -277,6 +717,137 @@ func (r *GraphQLEventRepository) Delete(ctx context.Context, name string) error 
 				return mapGraphQLErr(err)
 			}
 		}
+	}
+	dtx := r.Svc.Mutation.Tx()
+	for i := range resp.Returning {
+		if id := resp.Returning[i].StartId; id != "" {
+			got5, err := r.Svc.Query.Event.CalendarTimes.Get(ctx, id)
+			if err != nil {
+				return mapGraphQLErr(err)
+			}
+			if got5 != nil {
+				dtx.Add(r.Svc.Mutation.Event.CalendarTimes.DeleteOp(got5.Id, new(calendartimesql.DeleteEventCalendarTimesByIdResponse)))
+			}
+		}
+	}
+	for i := range resp.Returning {
+		if id := repox.Deref(resp.Returning[i].EndId); id != "" {
+			got10, err := r.Svc.Query.Event.CalendarTimes.Get(ctx, id)
+			if err != nil {
+				return mapGraphQLErr(err)
+			}
+			if got10 != nil {
+				dtx.Add(r.Svc.Mutation.Event.CalendarTimes.DeleteOp(got10.Id, new(calendartimesql.DeleteEventCalendarTimesByIdResponse)))
+			}
+		}
+	}
+	for i := range resp.Returning {
+		if id := repox.Deref(resp.Returning[i].RecurrenceId); id != "" {
+			got23, err := r.Svc.Query.Event.Recurrences.Get(ctx, id)
+			if err != nil {
+				return mapGraphQLErr(err)
+			}
+			if got23 != nil {
+				{
+					rows24, err := r.Svc.Query.Event.WeekdayNums.List(ctx, weekdaynumsql.List().Where(weekdaynumsql.RecurrenceId.Eq(got23.Id)))
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					for i := range rows24 {
+						if id := rows24[i].Id; id != "" {
+							got25, err := r.Svc.Query.Event.WeekdayNums.Get(ctx, id)
+							if err != nil {
+								return mapGraphQLErr(err)
+							}
+							if got25 != nil {
+								dtx.Add(r.Svc.Mutation.Event.WeekdayNums.DeleteOp(got25.Id, new(weekdaynumsql.DeleteEventWeekdayNumsByIdResponse)))
+							}
+						}
+					}
+				}
+				dtx.Add(r.Svc.Mutation.Event.Recurrences.DeleteOp(got23.Id, new(recurrencesql.DeleteEventRecurrencesByIdResponse)))
+				if id := repox.Deref(got23.UntilId); id != "" {
+					got26, err := r.Svc.Query.Event.CalendarTimes.Get(ctx, id)
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					if got26 != nil {
+						dtx.Add(r.Svc.Mutation.Event.CalendarTimes.DeleteOp(got26.Id, new(calendartimesql.DeleteEventCalendarTimesByIdResponse)))
+					}
+				}
+			}
+		}
+	}
+	{
+		rows31, err := r.Svc.Query.Event.Alarms.List(ctx, alarmsql.List().Where(alarmsql.EventId.Eq(id)))
+		if err != nil {
+			return mapGraphQLErr(err)
+		}
+		for i := range rows31 {
+			if id := rows31[i].Id; id != "" {
+				got32, err := r.Svc.Query.Event.Alarms.Get(ctx, id)
+				if err != nil {
+					return mapGraphQLErr(err)
+				}
+				if got32 != nil {
+					dtx.Add(r.Svc.Mutation.Event.Alarms.DeleteOp(got32.Id, new(alarmsql.DeleteEventAlarmsByIdResponse)))
+				}
+			}
+		}
+	}
+	{
+		rows37, err := r.Svc.Query.Event.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.EventId.Eq(id)))
+		if err != nil {
+			return mapGraphQLErr(err)
+		}
+		for i := range rows37 {
+			if id := rows37[i].Id; id != "" {
+				got38, err := r.Svc.Query.Event.ExtensionProperties.Get(ctx, id)
+				if err != nil {
+					return mapGraphQLErr(err)
+				}
+				if got38 != nil {
+					dtx.Add(r.Svc.Mutation.Event.ExtensionProperties.DeleteOp(got38.Id, new(extensionpropertiesql.DeleteEventExtensionPropertiesByIdResponse)))
+				}
+			}
+		}
+	}
+	{
+		rows43, err := r.Svc.Query.Event.Links.List(ctx, linksql.List().Where(linksql.EventId.Eq(id)))
+		if err != nil {
+			return mapGraphQLErr(err)
+		}
+		for i := range rows43 {
+			if id := rows43[i].Id; id != "" {
+				got44, err := r.Svc.Query.Event.Links.Get(ctx, id)
+				if err != nil {
+					return mapGraphQLErr(err)
+				}
+				if got44 != nil {
+					dtx.Add(r.Svc.Mutation.Event.Links.DeleteOp(got44.Id, new(linksql.DeleteEventLinksByIdResponse)))
+				}
+			}
+		}
+	}
+	{
+		rows49, err := r.Svc.Query.Event.Participants.List(ctx, participantsql.List().Where(participantsql.EventId.Eq(id)))
+		if err != nil {
+			return mapGraphQLErr(err)
+		}
+		for i := range rows49 {
+			if id := rows49[i].Id; id != "" {
+				got50, err := r.Svc.Query.Event.Participants.Get(ctx, id)
+				if err != nil {
+					return mapGraphQLErr(err)
+				}
+				if got50 != nil {
+					dtx.Add(r.Svc.Mutation.Event.Participants.DeleteOp(got50.Id, new(participantsql.DeleteEventParticipantsByIdResponse)))
+				}
+			}
+		}
+	}
+	if err := dtx.Commit(ctx); err != nil {
+		return mapGraphQLErr(err)
 	}
 	return nil
 }

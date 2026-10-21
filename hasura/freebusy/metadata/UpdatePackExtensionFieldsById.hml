@@ -1,0 +1,421 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnPackExtensionFieldsBooleanValue
+  description: Update the 'boolean_value' column in the 'pack_extension_fields' collection
+  fields:
+    - name: set
+      type: Boolean_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnPackExtensionFieldsBooleanValue
+    inputTypeName: UpdateColumnPackExtensionFieldsBooleanValueInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_pack_extension_fields_boolean_value
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnPackExtensionFieldsBooleanValue
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnPackExtensionFieldsDataValue
+  description: Update the 'data_value' column in the 'pack_extension_fields' collection
+  fields:
+    - name: set
+      type: Json
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnPackExtensionFieldsDataValue
+    inputTypeName: UpdateColumnPackExtensionFieldsDataValueInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_pack_extension_fields_data_value
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnPackExtensionFieldsDataValue
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnPackExtensionFieldsId
+  description: Update the 'id' column in the 'pack_extension_fields' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnPackExtensionFieldsId
+    inputTypeName: UpdateColumnPackExtensionFieldsIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_pack_extension_fields_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnPackExtensionFieldsId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnPackExtensionFieldsLabel
+  description: Update the 'label' column in the 'pack_extension_fields' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnPackExtensionFieldsLabel
+    inputTypeName: UpdateColumnPackExtensionFieldsLabelInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_pack_extension_fields_label
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnPackExtensionFieldsLabel
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnPackExtensionFieldsNumberValue
+  description: Update the 'number_value' column in the 'pack_extension_fields' collection
+  fields:
+    - name: set
+      type: Float64
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnPackExtensionFieldsNumberValue
+    inputTypeName: UpdateColumnPackExtensionFieldsNumberValueInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_pack_extension_fields_number_value
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnPackExtensionFieldsNumberValue
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnPackExtensionFieldsRecordId
+  description: Update the 'record_id' column in the 'pack_extension_fields' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnPackExtensionFieldsRecordId
+    inputTypeName: UpdateColumnPackExtensionFieldsRecordIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_pack_extension_fields_record_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnPackExtensionFieldsRecordId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnPackExtensionFieldsStringValue
+  description: Update the 'string_value' column in the 'pack_extension_fields' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnPackExtensionFieldsStringValue
+    inputTypeName: UpdateColumnPackExtensionFieldsStringValueInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_pack_extension_fields_string_value
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnPackExtensionFieldsStringValue
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnPackExtensionFieldsValueCase
+  description: Update the 'value_case' column in the 'pack_extension_fields' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnPackExtensionFieldsValueCase
+    inputTypeName: UpdateColumnPackExtensionFieldsValueCaseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_pack_extension_fields_value_case
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnPackExtensionFieldsValueCase
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdatePackExtensionFieldsByIdUpdateColumns
+  description: Update the columns of the 'pack_extension_fields' collection
+  fields:
+    - name: booleanValue
+      type: UpdateColumnPackExtensionFieldsBooleanValue
+      description: Update the 'boolean_value' column in the 'pack_extension_fields'
+        collection.
+    - name: dataValue
+      type: UpdateColumnPackExtensionFieldsDataValue
+      description: Update the 'data_value' column in the 'pack_extension_fields' collection.
+    - name: id
+      type: UpdateColumnPackExtensionFieldsId
+      description: Update the 'id' column in the 'pack_extension_fields' collection.
+    - name: label
+      type: UpdateColumnPackExtensionFieldsLabel
+      description: Update the 'label' column in the 'pack_extension_fields' collection.
+    - name: numberValue
+      type: UpdateColumnPackExtensionFieldsNumberValue
+      description: Update the 'number_value' column in the 'pack_extension_fields'
+        collection.
+    - name: recordId
+      type: UpdateColumnPackExtensionFieldsRecordId
+      description: Update the 'record_id' column in the 'pack_extension_fields' collection.
+    - name: stringValue
+      type: UpdateColumnPackExtensionFieldsStringValue
+      description: Update the 'string_value' column in the 'pack_extension_fields'
+        collection.
+    - name: valueCase
+      type: UpdateColumnPackExtensionFieldsValueCase
+      description: Update the 'value_case' column in the 'pack_extension_fields' collection.
+  graphql:
+    typeName: UpdatePackExtensionFieldsByIdUpdateColumns
+    inputTypeName: UpdatePackExtensionFieldsByIdUpdateColumnsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_pack_extension_fields_by_id_update_columns
+      fieldMapping:
+        booleanValue:
+          column:
+            name: boolean_value
+        dataValue:
+          column:
+            name: data_value
+        id:
+          column:
+            name: id
+        label:
+          column:
+            name: label
+        numberValue:
+          column:
+            name: number_value
+        recordId:
+          column:
+            name: record_id
+        stringValue:
+          column:
+            name: string_value
+        valueCase:
+          column:
+            name: value_case
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdatePackExtensionFieldsByIdUpdateColumns
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - booleanValue
+          - dataValue
+          - id
+          - label
+          - numberValue
+          - recordId
+          - stringValue
+          - valueCase
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdatePackExtensionFieldsByIdResponse
+  description: Responses from the 'update_pack_extension_fields_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[PackExtensionFields!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: UpdatePackExtensionFieldsByIdResponse
+    inputTypeName: UpdatePackExtensionFieldsByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_pack_extension_fields_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdatePackExtensionFieldsByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: UpdatePackExtensionFieldsById
+  outputType: UpdatePackExtensionFieldsByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: postCheck
+      type: PackExtensionFieldsBoolExp
+      description: Update permission post-condition predicate over the
+        'pack_extension_fields' collection
+    - name: preCheck
+      type: PackExtensionFieldsBoolExp
+      description: Update permission pre-condition predicate over the
+        'pack_extension_fields' collection
+    - name: updateColumns
+      type: UpdatePackExtensionFieldsByIdUpdateColumns!
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: update_pack_extension_fields_by_id
+    argumentMapping:
+      keyId: key_id
+      postCheck: post_check
+      preCheck: pre_check
+      updateColumns: update_columns
+  graphql:
+    rootFieldName: updatePackExtensionFieldsById
+    rootFieldKind: Mutation
+  description: Update any row on the 'pack_extension_fields' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: UpdatePackExtensionFieldsById
+  permissions:
+    - role: admin
+      allowExecution: true
+

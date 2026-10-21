@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: freebusy/shared/v1/idempotency.proto, freebusy/shared/v1/types.proto
+// source: freebusy/shared/v1/idempotency.proto
 //
 // database: freebusy
 // schema:   shared
@@ -21,7 +21,6 @@ import (
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/shared/v1/sharedpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"strings"
 	"time"
 )
 
@@ -53,9 +52,6 @@ func idempotencyKeyToCreateInput(in *sharedpbv1.IdempotencyKey) idempotencykeysq
 	ci.Name = in.GetName()
 	ci.Method = in.GetMethod()
 	ci.RequestId = in.GetRequestId()
-	if v := in.GetState(); v != 0 {
-		ci.State = strings.TrimPrefix(in.GetState().String(), "IDEMPOTENCY_STATE_")
-	}
 	ci.Response = in.GetResponse()
 	return ci
 }
@@ -68,7 +64,6 @@ func idempotencyKeyToUpdatePatch(merged *sharedpbv1.IdempotencyKey) idempotencyk
 	patch.Name = graphql.Value(merged.GetName())
 	patch.Method = graphql.Value(merged.GetMethod())
 	patch.RequestId = graphql.Value(merged.GetRequestId())
-	patch.State = graphql.Value(strings.TrimPrefix(merged.GetState().String(), "IDEMPOTENCY_STATE_"))
 	if v := merged.GetResponse(); v != "" {
 		patch.Response = graphql.Value(v)
 	} else {
@@ -87,9 +82,9 @@ func idempotencyKeyFromRow(row *idempotencykeysql.SharedIdempotencyKeys) *shared
 	out.Name = row.Name
 	out.Method = row.Method
 	out.RequestId = row.RequestId
-	out.State = sharedpbv1.IdempotencyState(sharedpbv1.IdempotencyState_value["IDEMPOTENCY_STATE_"+row.State])
 	out.Response = repox.Deref(row.Response)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.State = sharedpbv1.IdempotencyState(sharedpbv1.IdempotencyState_value["IDEMPOTENCY_STATE_"+repox.Deref(row.State)])
 	return out
 }

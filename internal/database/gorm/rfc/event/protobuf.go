@@ -19,9 +19,10 @@ import (
 	"strings"
 	"time"
 
+	eventpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"github.com/lib/pq"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/event/v1/eventpbv1"
 	"google.golang.org/genproto/googleapis/type/date"
+	"google.golang.org/genproto/googleapis/type/datetime"
 	"google.golang.org/genproto/googleapis/type/dayofweek"
 	"google.golang.org/genproto/googleapis/type/month"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -650,6 +651,18 @@ func EventToProto(m *Event) *eventpbv1.Event {
 	}
 	out.Recurrence = RecurrenceToProto(m.Recurrence)
 	out.Organizer = OrganizerToProto(m.Organizer)
+	for i := range m.Alarms {
+		out.Alarms = append(out.Alarms, AlarmToProto(&m.Alarms[i]))
+	}
+	for i := range m.ExtensionProperties {
+		out.Extensions = append(out.Extensions, ExtensionPropertyToProto(&m.ExtensionProperties[i]))
+	}
+	for i := range m.Links {
+		out.Links = append(out.Links, LinkToProto(&m.Links[i]))
+	}
+	for i := range m.Participants {
+		out.Participants = append(out.Participants, ParticipantToProto(&m.Participants[i]))
+	}
 	return out
 }
 
@@ -661,7 +674,7 @@ func EventFromProto(pb *eventpbv1.Event) *Event {
 		return nil
 	}
 	m := &Event{}
-	// not mapped here: position, start (sub-row graph), end (sub-row graph), recurrence (sub-row graph), organizer (sub-row graph)
+	// not mapped here: position, start (sub-row graph), end (sub-row graph), recurrence (sub-row graph), organizer (sub-row graph), alarms (sub-row graph), extensions (sub-row graph), links (sub-row graph), participants (sub-row graph)
 	m.Name = pb.GetName()
 	m.UID = toPtr(pb.GetUid())
 	m.IcalUID = toPtr(pb.GetIcalUid())
@@ -678,6 +691,14 @@ func EventFromProto(pb *eventpbv1.Event) *Event {
 	m.ExpireTime = tsToGo(pb.GetExpireTime())
 	m.Concepts = pq.StringArray(pb.GetConcepts())
 	m.Refids = pq.StringArray(pb.GetRefids())
+	switch pb.GetEnds().(type) {
+	case *eventpbv1.Event_End:
+		c := EventEndsCaseEnd
+		m.EndsCase = &c
+	case *eventpbv1.Event_Duration:
+		c := EventEndsCaseDuration
+		m.EndsCase = &c
+	}
 	return m
 }
 
@@ -688,9 +709,11 @@ func CalendarTimeToProto(m *CalendarTime) *eventpbv1.CalendarTime {
 		return nil
 	}
 	out := &eventpbv1.CalendarTime{}
-	// not mapped here: date_time
 	if v := goToDate(m.Date); v != nil {
 		out.Value = &eventpbv1.CalendarTime_Date{Date: v}
+	}
+	if v := goToDt(m.DateTime); v != nil {
+		out.Value = &eventpbv1.CalendarTime_DateTime{DateTime: v}
 	}
 	return out
 }
@@ -703,8 +726,16 @@ func CalendarTimeFromProto(pb *eventpbv1.CalendarTime) *CalendarTime {
 		return nil
 	}
 	m := &CalendarTime{}
-	// not mapped here: date_time
 	m.Date = dateToGo(pb.GetDate())
+	m.DateTime = dtToGo(pb.GetDateTime())
+	switch pb.GetValue().(type) {
+	case *eventpbv1.CalendarTime_Date:
+		c := CalendarTimeValueCaseDate
+		m.ValueCase = &c
+	case *eventpbv1.CalendarTime_DateTime:
+		c := CalendarTimeValueCaseDateTime
+		m.ValueCase = &c
+	}
 	return m
 }
 
@@ -735,6 +766,9 @@ func RecurrenceToProto(m *Recurrence) *eventpbv1.Recurrence {
 	if v := CalendarTimeToProto(m.Until); v != nil {
 		out.Bound = &eventpbv1.Recurrence_Until{Until: v}
 	}
+	for i := range m.WeekdayNums {
+		out.Weekdays = append(out.Weekdays, WeekdayNumToProto(&m.WeekdayNums[i]))
+	}
 	return out
 }
 
@@ -746,7 +780,7 @@ func RecurrenceFromProto(pb *eventpbv1.Recurrence) *Recurrence {
 		return nil
 	}
 	m := &Recurrence{}
-	// not mapped here: until (sub-row graph)
+	// not mapped here: until (sub-row graph), weekdays (sub-row graph)
 	m.Frequency = FrequencyFromProto(pb.GetFrequency())
 	m.Count = toPtr(pb.GetCount())
 	m.Interval = toPtr(pb.GetInterval())
@@ -762,6 +796,14 @@ func RecurrenceFromProto(pb *eventpbv1.Recurrence) *Recurrence {
 	m.Rscale = toPtr(pb.GetRscale())
 	m.Skip = RecurrenceSkipPtrFromProto(pb.GetSkip())
 	m.LeapMonths = enumsToCSV(pb.GetLeapMonths())
+	switch pb.GetBound().(type) {
+	case *eventpbv1.Recurrence_Until:
+		c := RecurrenceBoundCaseUntil
+		m.BoundCase = &c
+	case *eventpbv1.Recurrence_Count:
+		c := RecurrenceBoundCaseCount
+		m.BoundCase = &c
+	}
 	return m
 }
 
@@ -875,6 +917,14 @@ func AlarmFromProto(pb *eventpbv1.Alarm) *Alarm {
 	m.AcknowledgedTime = tsToGo(pb.GetAcknowledgedTime())
 	m.Proximity = ProximityPtrFromProto(pb.GetProximity())
 	m.SnoozedAlarmUID = toPtr(pb.GetSnoozedAlarmUid())
+	switch pb.GetTrigger().(type) {
+	case *eventpbv1.Alarm_TriggerOffset:
+		c := AlarmTriggerCaseTriggerOffset
+		m.TriggerCase = &c
+	case *eventpbv1.Alarm_TriggerTime:
+		c := AlarmTriggerCaseTriggerTime
+		m.TriggerCase = &c
+	}
 	return m
 }
 
@@ -943,6 +993,17 @@ func LinkFromProto(pb *eventpbv1.Link) *Link {
 	m.FormatType = toPtr(pb.GetFormatType())
 	m.Label = toPtr(pb.GetLabel())
 	m.LanguageCode = toPtr(pb.GetLanguageCode())
+	switch pb.GetValue().(type) {
+	case *eventpbv1.Link_Uri:
+		c := LinkValueCaseURI
+		m.ValueCase = &c
+	case *eventpbv1.Link_IcalUid:
+		c := LinkValueCaseIcalUID
+		m.ValueCase = &c
+	case *eventpbv1.Link_XmlReference:
+		c := LinkValueCaseXMLReference
+		m.ValueCase = &c
+	}
 	return m
 }
 
@@ -1071,6 +1132,14 @@ func StyledDescriptionFromProto(pb *eventpbv1.StyledDescription) *StyledDescript
 	m.URI = toPtr(pb.GetUri())
 	m.FormatType = toPtr(pb.GetFormatType())
 	m.Derived = toPtr(pb.GetDerived())
+	switch pb.GetValue().(type) {
+	case *eventpbv1.StyledDescription_Text:
+		c := StyledDescriptionValueCaseText
+		m.ValueCase = &c
+	case *eventpbv1.StyledDescription_Uri:
+		c := StyledDescriptionValueCaseURI
+		m.ValueCase = &c
+	}
 	return m
 }
 
@@ -1106,6 +1175,17 @@ func StructuredDataFromProto(pb *eventpbv1.StructuredData) *StructuredData {
 	m.Binary = pb.GetBinary()
 	m.FormatType = toPtr(pb.GetFormatType())
 	m.Schema = toPtr(pb.GetSchema())
+	switch pb.GetValue().(type) {
+	case *eventpbv1.StructuredData_Text:
+		c := StructuredDataValueCaseText
+		m.ValueCase = &c
+	case *eventpbv1.StructuredData_Uri:
+		c := StructuredDataValueCaseURI
+		m.ValueCase = &c
+	case *eventpbv1.StructuredData_Binary:
+		c := StructuredDataValueCaseBinary
+		m.ValueCase = &c
+	}
 	return m
 }
 
@@ -1184,6 +1264,50 @@ func goValToTs(t time.Time) *timestamppb.Timestamp {
 		return nil
 	}
 	return timestamppb.New(t)
+}
+
+// dtToGo maps a google.type.DateTime onto a nullable TIMESTAMPTZ instant. A
+// time zone resolves through the IANA database and a UTC offset as a fixed
+// zone; a floating value (neither) has no instant of its own and is read as
+// UTC.
+func dtToGo(d *datetime.DateTime) *time.Time {
+	if d == nil {
+		return nil
+	}
+	t := dtToGoVal(d)
+	return &t
+}
+
+// dtToGoVal is dtToGo for a NOT NULL column.
+func dtToGoVal(d *datetime.DateTime) time.Time {
+	if d == nil {
+		return time.Time{}
+	}
+	loc := time.UTC
+	switch {
+	case d.GetTimeZone().GetId() != "":
+		if l, err := time.LoadLocation(d.GetTimeZone().GetId()); err == nil {
+			loc = l
+		}
+	case d.GetUtcOffset() != nil:
+		loc = time.FixedZone("", int(d.GetUtcOffset().AsDuration()/time.Second))
+	}
+	return time.Date(int(d.GetYear()), time.Month(d.GetMonth()), int(d.GetDay()),
+		int(d.GetHours()), int(d.GetMinutes()), int(d.GetSeconds()), int(d.GetNanos()), loc)
+}
+
+// goToDt maps a TIMESTAMPTZ instant back onto a DateTime, in UTC: the stored
+// instant is what survives, not the zone it was written in.
+func goToDt(t *time.Time) *datetime.DateTime {
+	if t == nil || t.IsZero() {
+		return nil
+	}
+	u := t.UTC()
+	return &datetime.DateTime{
+		Year: int32(u.Year()), Month: int32(u.Month()), Day: int32(u.Day()),
+		Hours: int32(u.Hour()), Minutes: int32(u.Minute()), Seconds: int32(u.Second()), Nanos: int32(u.Nanosecond()),
+		TimeOffset: &datetime.DateTime_UtcOffset{UtcOffset: durationpb.New(0)},
+	}
 }
 
 // dateToGo maps a proto date onto a nullable DATE value (UTC midnight).

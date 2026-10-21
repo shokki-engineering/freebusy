@@ -16,13 +16,15 @@
 package organization
 
 import (
+	organizationpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organization/v1"
 	"context"
+	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/organization"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/organization/v1/organizationpbv1"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
+	"time"
 )
 
 // GormOrganizationRepository is the GORM adapter of OrganizationRepository: flat
@@ -108,6 +110,9 @@ func (r *GormOrganizationRepository) List(ctx context.Context, in repox.ListInpu
 }
 
 func (r *GormOrganizationRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*organizationpbv1.Organization, string, error) {
+	if !in.ShowDeleted {
+		scope = scope.Where("delete_time IS NULL")
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -176,8 +181,54 @@ func (r *GormOrganizationRepository) Update(ctx context.Context, in *organizatio
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GormOrganizationRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "organizations")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	res := r.DB.WithContext(ctx).Model(&organization.Organization{}).
+		Where("id = ? AND delete_time IS NULL", ids[len(ids)-1]).
+		Updates(map[string]any{"delete_time": time.Now(), "etag": repox.NewULID()})
+	if res.Error != nil {
+		return repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return repox.ErrNotFound
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GormOrganizationRepository) Undelete(ctx context.Context, name string) (*organizationpbv1.Organization, error) {
+	ids, err := repox.SplitName(name, "organizations")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	res := r.DB.WithContext(ctx).Model(&organization.Organization{}).
+		Where("id = ? AND delete_time IS NOT NULL", id).
+		Updates(map[string]any{"delete_time": nil, "etag": repox.NewULID()})
+	if res.Error != nil {
+		return nil, repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GormOrganizationRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "organizations")
 	if err != nil {
 		return err

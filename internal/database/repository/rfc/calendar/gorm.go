@@ -16,13 +16,17 @@
 package calendar
 
 import (
+	calendarpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
 	"context"
+	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/calendar"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/common"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/calendar/v1/calendarpbv1"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"time"
 )
 
 // GormCalendarRepository is the GORM adapter of CalendarRepository: flat
@@ -65,7 +69,30 @@ func (r *GormCalendarRepository) Create(ctx context.Context, in *calendarpbv1.Ca
 	m.ID = id
 	m.Name = in.GetName()
 	m.Etag = repox.Ptr(repox.NewULID())
-	if err := calendar.NewCalendarStore(r.DB).Create(ctx, m); err != nil {
+	if err := r.DB.Transaction(func(tx *gorm.DB) error {
+		if v1 := in.GetTimeZone(); v1 != nil {
+			if v1.GetId() != "" {
+				n2 := common.TimeZoneFromProto(v1)
+				n2.ID = v1.GetId()
+				if err := tx.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(n2).Error; err != nil {
+					return err
+				}
+				m.TimeZoneID = repox.Ptr(n2.ID)
+			}
+		}
+		if err := calendar.NewCalendarStore(tx).Create(ctx, m); err != nil {
+			return err
+		}
+		for _, v4 := range in.GetExtensions() {
+			n5 := calendar.ExtensionPropertyFromProto(v4)
+			n5.ID = repox.NewULID()
+			n5.CalendarID = id
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n5).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.get(ctx, id)
@@ -84,7 +111,7 @@ func (r *GormCalendarRepository) Get(ctx context.Context, name string) (*calenda
 // through, so Tier-2 overrides of Get never re-enter generated writes.
 func (r *GormCalendarRepository) get(ctx context.Context, id string) (*calendarpbv1.Calendar, error) {
 	var m calendar.Calendar
-	if err := r.DB.WithContext(ctx).First(&m, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("TimeZone").Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&m, "id = ?", id).Error; err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.toProto(ctx, &m)
@@ -108,6 +135,9 @@ func (r *GormCalendarRepository) List(ctx context.Context, in repox.ListInput) (
 }
 
 func (r *GormCalendarRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*calendarpbv1.Calendar, string, error) {
+	if !in.ShowDeleted {
+		scope = scope.Where("delete_time IS NULL")
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -116,7 +146,7 @@ func (r *GormCalendarRepository) list(ctx context.Context, scope *gorm.DB, in re
 	for f, h := range r.ListOverrides {
 		eng.Override(f, h)
 	}
-	rows, next, err := eng.List(ctx, scope, filterx.ListInput{
+	rows, next, err := eng.List(ctx, scope.Preload("TimeZone").Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }), filterx.ListInput{
 		PageSize:  in.PageSize,
 		PageToken: in.PageToken,
 		OrderBy:   in.OrderBy,
@@ -146,9 +176,11 @@ func (r *GormCalendarRepository) Update(ctx context.Context, in *calendarpbv1.Ca
 	id := ids[len(ids)-1]
 	err = r.DB.Transaction(func(tx *gorm.DB) error {
 		var existing calendar.Calendar
-		if err := tx.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+		if err := tx.WithContext(ctx).Preload("TimeZone").Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 			return err
 		}
+		var staleTimeZone *common.TimeZone
+		var staleExtensions []calendar.ExtensionProperty
 		if in.GetEtag() != "" && existing.Etag != nil && *existing.Etag != in.GetEtag() {
 			return repox.ErrConflict
 		}
@@ -166,8 +198,47 @@ func (r *GormCalendarRepository) Update(ctx context.Context, in *calendarpbv1.Ca
 		existing.DisplayName = next.DisplayName
 		existing.Description = next.Description
 		existing.Scale = next.Scale
+		if repox.GroupTouched(paths, "time_zone") {
+			staleTimeZone = existing.TimeZone
+			existing.TimeZoneID = nil
+			if v9 := merged.GetTimeZone(); v9 != nil {
+				if v9.GetId() != "" {
+					n10 := common.TimeZoneFromProto(v9)
+					n10.ID = v9.GetId()
+					if err := tx.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(n10).Error; err != nil {
+						return err
+					}
+					existing.TimeZoneID = repox.Ptr(n10.ID)
+				}
+			}
+		}
+		if repox.GroupTouched(paths, "extensions") {
+			staleExtensions = existing.ExtensionProperties
+			for _, v13 := range merged.GetExtensions() {
+				n14 := calendar.ExtensionPropertyFromProto(v13)
+				n14.ID = repox.NewULID()
+				n14.CalendarID = id
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n14).Error; err != nil {
+					return err
+				}
+			}
+		}
+		existing.TimeZone = nil
+		existing.ExtensionProperties = nil
 		existing.Etag = repox.Ptr(repox.NewULID())
-		return calendar.NewCalendarStore(tx).Update(ctx, &existing)
+		if err := calendar.NewCalendarStore(tx).Update(ctx, &existing); err != nil {
+			return err
+		}
+		if d8 := staleTimeZone; d8 != nil {
+			_ = d8
+		}
+		for i11 := range staleExtensions {
+			d12 := &staleExtensions[i11]
+			if err := tx.WithContext(ctx).Delete(&calendar.ExtensionProperty{}, "id = ?", d12.ID).Error; err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 	if err != nil {
 		return nil, repox.MapGormErr(err)
@@ -175,8 +246,54 @@ func (r *GormCalendarRepository) Update(ctx context.Context, in *calendarpbv1.Ca
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GormCalendarRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "calendars")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	res := r.DB.WithContext(ctx).Model(&calendar.Calendar{}).
+		Where("id = ? AND delete_time IS NULL", ids[len(ids)-1]).
+		Updates(map[string]any{"delete_time": time.Now(), "etag": repox.NewULID()})
+	if res.Error != nil {
+		return repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return repox.ErrNotFound
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GormCalendarRepository) Undelete(ctx context.Context, name string) (*calendarpbv1.Calendar, error) {
+	ids, err := repox.SplitName(name, "calendars")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	res := r.DB.WithContext(ctx).Model(&calendar.Calendar{}).
+		Where("id = ? AND delete_time IS NOT NULL", id).
+		Updates(map[string]any{"delete_time": nil, "etag": repox.NewULID()})
+	if res.Error != nil {
+		return nil, repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GormCalendarRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "calendars")
 	if err != nil {
 		return err
@@ -188,10 +305,24 @@ func (r *GormCalendarRepository) Delete(ctx context.Context, name string) error 
 	}
 	id := ids[len(ids)-1]
 	var existing calendar.Calendar
-	if err := r.DB.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("TimeZone").Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 		return repox.MapGormErr(err)
 	}
-	return repox.MapGormErr(calendar.NewCalendarStore(r.DB).DeleteByID(ctx, id))
+	return repox.MapGormErr(r.DB.Transaction(func(tx *gorm.DB) error {
+		if err := calendar.NewCalendarStore(tx).DeleteByID(ctx, id); err != nil {
+			return err
+		}
+		if d3 := existing.TimeZone; d3 != nil {
+			_ = d3
+		}
+		for i6 := range existing.ExtensionProperties {
+			d7 := &existing.ExtensionProperties[i6]
+			if err := tx.WithContext(ctx).Delete(&calendar.ExtensionProperty{}, "id = ?", d7.ID).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	}))
 }
 
 // Compile-time proof the adapter satisfies the interface.

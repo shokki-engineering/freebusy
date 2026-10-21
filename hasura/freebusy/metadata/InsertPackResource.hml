@@ -1,0 +1,156 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertPackResourceObject
+  fields:
+    - name: baseVersion
+      type: Int32
+    - name: createTime
+      type: Timestamptz!
+    - name: deleteTime
+      type: Timestamptz
+    - name: etag
+      type: String_1
+    - name: expireTime
+      type: Timestamptz
+    - name: id
+      type: String_1!
+    - name: name
+      type: String_1!
+    - name: resolved
+      type: Boolean_1
+    - name: uid
+      type: String_1
+    - name: updateTime
+      type: Timestamptz!
+  graphql:
+    typeName: InsertPackResourceObject
+    inputTypeName: InsertPackResourceObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_pack_resource_object
+      fieldMapping:
+        baseVersion:
+          column:
+            name: base_version
+        createTime:
+          column:
+            name: create_time
+        deleteTime:
+          column:
+            name: delete_time
+        etag:
+          column:
+            name: etag
+        expireTime:
+          column:
+            name: expire_time
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        resolved:
+          column:
+            name: resolved
+        uid:
+          column:
+            name: uid
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertPackResourceObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - baseVersion
+          - createTime
+          - deleteTime
+          - etag
+          - expireTime
+          - id
+          - name
+          - resolved
+          - uid
+          - updateTime
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertPackResourceResponse
+  description: Responses from the 'insert_pack_resource' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[PackResource!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertPackResourceResponse
+    inputTypeName: InsertPackResourceResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_pack_resource_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertPackResourceResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertPackResource
+  outputType: InsertPackResourceResponse!
+  arguments:
+    - name: objects
+      type: "[InsertPackResourceObject!]!"
+    - name: postCheck
+      type: PackResourceBoolExp
+      description: Insert permission predicate over the 'pack_resource' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: insert_pack_resource
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertPackResource
+    rootFieldKind: Mutation
+  description: Insert into the pack_resource table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertPackResource
+  permissions:
+    - role: admin
+      allowExecution: true
+

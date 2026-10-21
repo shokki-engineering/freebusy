@@ -17,8 +17,8 @@ package resource
 import (
 	"time"
 
+	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/lib/pq"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9073/resource/v1/resourcepbv1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -41,6 +41,9 @@ func ResourceToProto(m *Resource) *resourcepbv1.Resource {
 	out.Etag = fromPtr(m.Etag)
 	out.DeleteTime = goToTs(m.DeleteTime)
 	out.ExpireTime = goToTs(m.ExpireTime)
+	for i := range m.StructuredDatas {
+		out.StructuredData = append(out.StructuredData, StructuredDataToProto(&m.StructuredDatas[i]))
+	}
 	return out
 }
 
@@ -52,7 +55,7 @@ func ResourceFromProto(pb *resourcepbv1.Resource) *Resource {
 		return nil
 	}
 	m := &Resource{}
-	// not mapped here: position, calendar (resource reference), organizational_unit (resource reference)
+	// not mapped here: position, calendar (resource reference), organizational_unit (resource reference), structured_data (sub-row graph)
 	m.Name = pb.GetName()
 	m.UID = toPtr(pb.GetUid())
 	m.IcalUID = toPtr(pb.GetIcalUid())
@@ -97,6 +100,17 @@ func StructuredDataFromProto(pb *resourcepbv1.StructuredData) *StructuredData {
 	m.Binary = pb.GetBinary()
 	m.FormatType = toPtr(pb.GetFormatType())
 	m.Schema = toPtr(pb.GetSchema())
+	switch pb.GetValue().(type) {
+	case *resourcepbv1.StructuredData_Text:
+		c := StructuredDataValueCaseText
+		m.ValueCase = &c
+	case *resourcepbv1.StructuredData_Uri:
+		c := StructuredDataValueCaseURI
+		m.ValueCase = &c
+	case *resourcepbv1.StructuredData_Binary:
+		c := StructuredDataValueCaseBinary
+		m.ValueCase = &c
+	}
 	return m
 }
 

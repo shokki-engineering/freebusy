@@ -4,7 +4,7 @@
 // 	protoc (unknown)
 //
 // database: rfc
-// schemas:  group, membership, organization, orgunit, calendar, event, journal, todo, vcard, user, availability, resource, card, project, common
+// schemas:  group, membership, organization, orgunit, calendar, event, journal, todo, vcard, user, availability, pack, sensor, stream, unit, resource, card, project, common
 //
 // Migration aggregator: every model in one factory Registry.
 // annotations: entity.v1 1.5.4, store.v1 1.5.4
@@ -29,9 +29,13 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/membership"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/organization"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/orgunit"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/pack"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/project"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/resource"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/sensor"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/stream"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/todo"
+	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/unit"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/user"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/vcard"
 
@@ -60,6 +64,10 @@ var schemas = []string{
 	"vcard",
 	"user",
 	"availability",
+	"pack",
+	"sensor",
+	"stream",
+	"unit",
 	"resource",
 	"card",
 	"project",
@@ -176,6 +184,15 @@ var Default = New().Register(
 	&availability.CalendarTime{},
 	&availability.AvailablePeriod{},
 	&availability.ExtensionProperty{},
+	&pack.Pack{},
+	&pack.Record{},
+	&pack.ExtensionField{},
+	&sensor.Sensor{},
+	&stream.Stream{},
+	&stream.StreamRecord{},
+	&stream.Record{},
+	&stream.ExtensionField{},
+	&unit.Unit{},
 	&resource.Resource{},
 	&resource.StructuredData{},
 	&card.Card{},
@@ -184,6 +201,7 @@ var Default = New().Register(
 	&card.NameComponent{},
 	&project.Project{},
 	&common.TimeZone{},
+	&common.Fraction{},
 )
 
 // Instrument installs the generated first-party telemetry GORM plugin on

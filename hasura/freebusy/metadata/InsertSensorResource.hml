@@ -1,0 +1,192 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertSensorResourceObject
+  fields:
+    - name: createTime
+      type: Timestamptz!
+    - name: deleteTime
+      type: Timestamptz
+    - name: displayName
+      type: String_1
+    - name: etag
+      type: String_1
+    - name: expireTime
+      type: Timestamptz
+    - name: id
+      type: String_1!
+    - name: interfaceDescriptions
+      type: "[String_1]"
+    - name: mediaTypes
+      type: "[String_1]"
+    - name: name
+      type: String_1!
+    - name: resourceTypes
+      type: "[String_1]"
+    - name: senmlId
+      type: String_1!
+    - name: targetUri
+      type: String_1
+    - name: uid
+      type: String_1
+    - name: unit
+      type: String_1
+    - name: updateDuration
+      type: String_1
+    - name: updateTime
+      type: Timestamptz!
+  graphql:
+    typeName: InsertSensorResourceObject
+    inputTypeName: InsertSensorResourceObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_sensor_resource_object
+      fieldMapping:
+        createTime:
+          column:
+            name: create_time
+        deleteTime:
+          column:
+            name: delete_time
+        displayName:
+          column:
+            name: display_name
+        etag:
+          column:
+            name: etag
+        expireTime:
+          column:
+            name: expire_time
+        id:
+          column:
+            name: id
+        interfaceDescriptions:
+          column:
+            name: interface_descriptions
+        mediaTypes:
+          column:
+            name: media_types
+        name:
+          column:
+            name: name
+        resourceTypes:
+          column:
+            name: resource_types
+        senmlId:
+          column:
+            name: senml_id
+        targetUri:
+          column:
+            name: target_uri
+        uid:
+          column:
+            name: uid
+        unit:
+          column:
+            name: unit
+        updateDuration:
+          column:
+            name: update_duration
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertSensorResourceObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createTime
+          - deleteTime
+          - displayName
+          - etag
+          - expireTime
+          - id
+          - interfaceDescriptions
+          - mediaTypes
+          - name
+          - resourceTypes
+          - senmlId
+          - targetUri
+          - uid
+          - unit
+          - updateDuration
+          - updateTime
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertSensorResourceResponse
+  description: Responses from the 'insert_sensor_resource' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[SensorResource!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertSensorResourceResponse
+    inputTypeName: InsertSensorResourceResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_sensor_resource_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertSensorResourceResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertSensorResource
+  outputType: InsertSensorResourceResponse!
+  arguments:
+    - name: objects
+      type: "[InsertSensorResourceObject!]!"
+    - name: postCheck
+      type: SensorResourceBoolExp
+      description: Insert permission predicate over the 'sensor_resource' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: insert_sensor_resource
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertSensorResource
+    rootFieldKind: Mutation
+  description: Insert into the sensor_resource table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertSensorResource
+  permissions:
+    - role: admin
+      allowExecution: true
+

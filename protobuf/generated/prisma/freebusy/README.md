@@ -6,44 +6,16 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 23 | 12 |
+| 4 | 3 |
 
 ## Entity relationships
 
 ```mermaid
 erDiagram
     direction LR
-    Adjustment {
-        string id PK
-        string amount_delta_id FK
-    }
     Allocation {
         string id PK
         string hold FK
-    }
-    Attachment {
-        string id PK
-    }
-    DateRange {
-        string id PK
-    }
-    Discount {
-        string id PK
-        string amount_off_id FK
-    }
-    DynamicBand {
-        string id PK
-        string dynamic_rule_id FK
-        string adjustment_id FK
-    }
-    DynamicRule {
-        string id PK
-        string rate_plan_id FK
-    }
-    Fee {
-        string id PK
-        string rate_plan_id FK
-        string amount_id FK
     }
     Hold {
         string id PK
@@ -51,101 +23,16 @@ erDiagram
     IdempotencyKey {
         string id PK
     }
-    Licence {
-        string id PK
-        string attachment_id FK
-    }
-    LosDiscount {
-        string id PK
-        string rate_plan_id FK
-        string amount_off_id FK
-    }
-    Money {
-        string id PK
-    }
-    PriceBounds {
-        string id PK
-        string floor_id FK
-        string ceiling_id FK
-    }
-    PromoCode {
-        string id PK
-        string discount_id FK
-        string window_id FK
-        string limits_id FK
-        string scope_id FK
-    }
-    RateOverride {
-        string id PK
-        string rate_plan_id FK
-        string date_range_id FK
-        string price_id FK
-    }
-    RatePlan {
-        string id PK
-        string price_id FK
-        string bounds_id FK
-    }
-    Redemption {
-        string id PK
-        string reservation FK
-        string promo_code_id FK
-        string amount_applied_id FK
-    }
-    RedemptionWindow {
-        string id PK
-    }
     Reservation {
         string id PK
         string hold FK
     }
-    Scope {
-        string id PK
-        string min_subtotal_id FK
-    }
-    Tax {
-        string id PK
-        string rate_plan_id FK
-    }
-    UsageLimits {
-        string id PK
-    }
-    Adjustment }o--|| Money : "amount_delta_id"
     Allocation }o--|| Hold : "hold"
-    Discount }o--|| Money : "amount_off_id"
-    DynamicBand }o--|| DynamicRule : "dynamic_rule_id"
-    DynamicBand }o--|| Adjustment : "adjustment_id"
-    DynamicRule }o--|| RatePlan : "rate_plan_id"
-    Fee }o--|| RatePlan : "rate_plan_id"
-    Fee }o--|| Money : "amount_id"
-    Licence }o--|| Attachment : "attachment_id"
-    LosDiscount }o--|| RatePlan : "rate_plan_id"
-    LosDiscount }o--|| Money : "amount_off_id"
-    PriceBounds }o--|| Money : "floor_id"
-    PriceBounds }o--|| Money : "ceiling_id"
-    PromoCode }o--|| Discount : "discount_id"
-    PromoCode }o--|| RedemptionWindow : "window_id"
-    PromoCode }o--|| UsageLimits : "limits_id"
-    PromoCode }o--|| Scope : "scope_id"
-    RateOverride }o--|| RatePlan : "rate_plan_id"
-    RateOverride }o--|| DateRange : "date_range_id"
-    RateOverride }o--|| Money : "price_id"
-    RatePlan }o--|| Money : "price_id"
-    RatePlan }o--|| PriceBounds : "bounds_id"
-    Redemption }o--|| Reservation : "reservation"
-    Redemption }o--|| PromoCode : "promo_code_id"
-    Redemption }o--|| Money : "amount_applied_id"
     Reservation }o--|| Hold : "hold"
-    Scope }o--|| Money : "min_subtotal_id"
-    Tax }o--|| RatePlan : "rate_plan_id"
 ```
 
 ## Subfolders
 
 - [`allocation/`](./allocation/README.md)
-- [`pricing/`](./pricing/README.md)
-- [`promocode/`](./promocode/README.md)
-- [`property/`](./property/README.md)
 - [`reservation/`](./reservation/README.md)
 - [`shared/`](./shared/README.md)
-- [`type/`](./type/README.md)

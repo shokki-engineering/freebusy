@@ -6,16 +6,13 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 2 | 1 |
+| 1 | 1 |
 
 ## Entity relationships
 
 ```mermaid
 erDiagram
     direction LR
-    Attachment {
-        string id PK
-    }
     IdempotencyKey {
         string id PK
     }
@@ -24,4 +21,3 @@ erDiagram
 ## Subfolders
 
 - [`idempotency/`](./idempotency/README.md)
-- [`types/`](./types/README.md)

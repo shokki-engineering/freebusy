@@ -14,23 +14,17 @@
 package commonql
 
 import (
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/commonql/moneysql"
-	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/commonql/postaladdressql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/commonql/fractionsql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/commonql/timezonesql"
 	"github.com/the-protobuf-project/runtime-go/network/runtime"
 )
 
 // Model type aliases for this domain, re-exported from the owning resource packages.
-type CommonMoneys = moneysql.CommonMoneys
-type CommonMoneysAggExp = moneysql.CommonMoneysAggExp
-type DeleteCommonMoneysByIdResponse = moneysql.DeleteCommonMoneysByIdResponse
-type InsertCommonMoneysResponse = moneysql.InsertCommonMoneysResponse
-type UpdateCommonMoneysByIdResponse = moneysql.UpdateCommonMoneysByIdResponse
-type CommonPostalAddress = postaladdressql.CommonPostalAddress
-type CommonPostalAddressAggExp = postaladdressql.CommonPostalAddressAggExp
-type DeleteCommonPostalAddressByIdResponse = postaladdressql.DeleteCommonPostalAddressByIdResponse
-type InsertCommonPostalAddressResponse = postaladdressql.InsertCommonPostalAddressResponse
-type UpdateCommonPostalAddressByIdResponse = postaladdressql.UpdateCommonPostalAddressByIdResponse
+type CommonFractions = fractionsql.CommonFractions
+type CommonFractionsAggExp = fractionsql.CommonFractionsAggExp
+type DeleteCommonFractionsByIdResponse = fractionsql.DeleteCommonFractionsByIdResponse
+type InsertCommonFractionsResponse = fractionsql.InsertCommonFractionsResponse
+type UpdateCommonFractionsByIdResponse = fractionsql.UpdateCommonFractionsByIdResponse
 type CommonTimeZones = timezonesql.CommonTimeZones
 type CommonTimeZonesAggExp = timezonesql.CommonTimeZonesAggExp
 type DeleteCommonTimeZonesByIdResponse = timezonesql.DeleteCommonTimeZonesByIdResponse
@@ -39,48 +33,42 @@ type UpdateCommonTimeZonesByIdResponse = timezonesql.UpdateCommonTimeZonesByIdRe
 
 // QueryHandler aggregates query handlers for the commonql domain.
 type QueryHandler struct {
-	Moneys        moneysql.QueryHandler
-	PostalAddress postaladdressql.QueryHandler
-	TimeZones     timezonesql.QueryHandler
+	Fractions fractionsql.QueryHandler
+	TimeZones timezonesql.QueryHandler
 }
 
 // NewQuery wires every query handler in the domain.
 func NewQuery(gql *runtime.GraphQLClient) QueryHandler {
 	return QueryHandler{
-		Moneys:        moneysql.NewQuery(gql),
-		PostalAddress: postaladdressql.NewQuery(gql),
-		TimeZones:     timezonesql.NewQuery(gql),
+		Fractions: fractionsql.NewQuery(gql),
+		TimeZones: timezonesql.NewQuery(gql),
 	}
 }
 
 // MutationHandler aggregates mutation handlers for the commonql domain.
 type MutationHandler struct {
-	Moneys        moneysql.MutationHandler
-	PostalAddress postaladdressql.MutationHandler
-	TimeZones     timezonesql.MutationHandler
+	Fractions fractionsql.MutationHandler
+	TimeZones timezonesql.MutationHandler
 }
 
 // NewMutation wires every mutation handler in the domain.
 func NewMutation(gql *runtime.GraphQLClient) MutationHandler {
 	return MutationHandler{
-		Moneys:        moneysql.NewMutation(gql),
-		PostalAddress: postaladdressql.NewMutation(gql),
-		TimeZones:     timezonesql.NewMutation(gql),
+		Fractions: fractionsql.NewMutation(gql),
+		TimeZones: timezonesql.NewMutation(gql),
 	}
 }
 
 // SubscriptionHandler aggregates subscription handlers for the commonql domain.
 type SubscriptionHandler struct {
-	Moneys        moneysql.SubscriptionHandler
-	PostalAddress postaladdressql.SubscriptionHandler
-	TimeZones     timezonesql.SubscriptionHandler
+	Fractions fractionsql.SubscriptionHandler
+	TimeZones timezonesql.SubscriptionHandler
 }
 
 // NewSubscription wires every subscription handler in the domain.
 func NewSubscription(gql *runtime.GraphQLClient) SubscriptionHandler {
 	return SubscriptionHandler{
-		Moneys:        moneysql.NewSubscription(gql),
-		PostalAddress: postaladdressql.NewSubscription(gql),
-		TimeZones:     timezonesql.NewSubscription(gql),
+		Fractions: fractionsql.NewSubscription(gql),
+		TimeZones: timezonesql.NewSubscription(gql),
 	}
 }

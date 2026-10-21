@@ -8,7 +8,7 @@
 [app]
 name = "freebusy"
 version = "v1.0.0"
-description = "Promo code service for the freebusy booking platform: create, validate, and redeem discount codes."
+description = "Generic availability and booking engine: compute availability, hold and reserve RFC 9073 resources."
 
 [server]
 # environment: "development", "debug", "staging", or "production".
@@ -59,19 +59,14 @@ conn_max_idle_minutes = 5
 url = ""
 admin_secret = ""
 
-# Startup seeding is a dev convenience; production data is never seeded. The dev
-# overlay turns this on. Left explicit here so the default is documented, not
-# implied by a zero value.
-[seed]
-enabled = false
-
 # Read-through cache behind protoc-gen-cache's generated decorators.
 #
 # Off by default. The service is correct without it, and turning a cache on
 # before the read it serves has been measured only adds a way to be stale.
 #
-# Resources annotated STRATEGY_INDEXED (PromoCode) need server-side sets, so the
-# address must be Redis or Dragonfly; memcached is refused at construction.
+# Resources annotated STRATEGY_INDEXED need server-side sets, so the address
+# must be Redis or Dragonfly; memcached is refused at construction. No resource
+# is annotated for caching today, so nothing is cached even when enabled.
 [cache]
 enabled = false
 address = "127.0.0.1:6379"

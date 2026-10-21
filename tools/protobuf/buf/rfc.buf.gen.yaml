@@ -1,129 +1,49 @@
-# Go client stubs for the RFC schema module.
+# Transport bindings for the RFC schema module: the HTTP gateway and MCP
+# servers for the protobuf-rfc services freebusy serves (Resources, Calendars,
+# Availabilities, Events, and the rest the module defines).
 #
-# Separate from go.buf.gen.yaml on purpose: that template sets clean: true over
-# protobuf/generated/go, so adding a second input there would have the two runs
-# wipe each other's output. This one writes into the same tree with clean: false
-# and lands under protobuf/rfc*/, which cannot collide with freebusy/*.
+# The messages and gRPC stubs are NOT generated here. freebusy uses the SDK
+# the BSR publishes for the module --
 #
-# protobuf-rfc deliberately sets no go_package — the right value depends on where
-# a consumer generates — so managed mode supplies one here, scoped to that module
-# so freebusy's own explicit go_package options are left alone.
+#   buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go   (messages)
+#   buf.build/gen/go/the-protobuf-project/rfc/grpc/go              (gRPC)
+#
+# -- because those are the types runtime-go/rfc's iCalendar and vCard codecs
+# speak. A local copy of the same protos would register the same .proto files
+# a second time, which protobuf-go refuses at init, so the two cannot share a
+# binary. Keep the module pin below on the commit the SDK versions in go.mod
+# were cut from.
+#
+# go_package_prefix reproduces the SDK's own import paths (buf derives the
+# "<leaf>v1" package name from a path ending in a version, as the BSR does), so
+# the bindings below import exactly the SDK packages. Each plugin then writes
+# into a sub-package of its own beside them -- grpc-gateway's standalone mode,
+# protoc-gen-mcp's package_suffix -- since a package of a module freebusy does
+# not own cannot gain files. `module=` strips the SDK prefix so the output lands
+# under protobuf/generated/go/rfc/.
+#
+# clean: false because go.buf.gen.yaml cleans protobuf/generated/go; run this
+# after it (`just gen go rfc`).
 version: v2
 clean: false
 managed:
   enabled: true
   override:
     - file_option: go_package_prefix
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go
+      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go
       module: buf.build/the-protobuf-project/rfc
-    # One go_package per RFC package, so the import path's last segment equals
-    # the Go package name — freebusy's own `<leaf>pbv1` convention.
-    #
-    # Without these the prefix alone yields ".../resource/v1" while protoc-gen-go
-    # names the package "resourcev1" (its rule: a path ending in a version uses
-    # <parent><version>). Every generated import then needs an alias, where
-    # freebusy's own output needs none. Worse, rfc4519 and rfc7643 both define a
-    # `group/v1`, so both derive `groupv1` and collide in any file importing the
-    # two — which no aliasing scheme fixes, only distinct names do.
-    #
-    # Where two RFCs share a leaf, each is named for what its own RFC calls the
-    # object: an LDAP group and a SCIM group.
-    - file_option: go_package
-      path: protobuf/rfc4519/group/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/group/v1/ldapgrouppbv1
-    - file_option: go_package
-      path: protobuf/rfc4519/membership/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/membership/v1/membershippbv1
-    - file_option: go_package
-      path: protobuf/rfc4519/organization/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/organization/v1/organizationpbv1
-    - file_option: go_package
-      path: protobuf/rfc4519/organizational_unit/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/organizational_unit/v1/orgunitpbv1
-    - file_option: go_package
-      path: protobuf/rfc5545/calendar/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/calendar/v1/calendarpbv1
-    - file_option: go_package
-      path: protobuf/rfc5545/event/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/event/v1/eventpbv1
-    - file_option: go_package
-      path: protobuf/rfc5545/journal/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/journal/v1/journalpbv1
-    - file_option: go_package
-      path: protobuf/rfc5545/todo/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/todo/v1/todopbv1
-    - file_option: go_package
-      path: protobuf/rfc5546/scheduling/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5546/scheduling/v1/itippbv1
-    - file_option: go_package
-      path: protobuf/rfc6350/vcard/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc6350/vcard/v1/vcardpbv1
-    - file_option: go_package
-      path: protobuf/rfc7643/group/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7643/group/v1/scimgrouppbv1
-    - file_option: go_package
-      path: protobuf/rfc7643/user/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7643/user/v1/scimuserpbv1
-    - file_option: go_package
-      path: protobuf/rfc7953/availability/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7953/availability/v1/rfcavailabilitypbv1
-    - file_option: go_package
-      path: protobuf/rfc9073/resource/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9073/resource/v1/resourcepbv1
-    - file_option: go_package
-      path: protobuf/rfc9553/card/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9553/card/v1/cardpbv1
-    - file_option: go_package
-      path: protobuf/shared/interchange/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/shared/interchange/v1/interchangepbv1
-    - file_option: go_package
-      path: protobuf/shared/project/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/shared/project/v1/projectpbv1
-    - file_option: go_package
-      path: protobuf/shared/search/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/shared/search/v1/searchpbv1
-    - file_option: go_package
-      path: protobuf/shared/sync/v1
-      value: github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/shared/sync/v1/syncpbv1
 inputs:
-  # Pinned to the commit buf.lock records: an unpinned module input resolves
-  # to the BSR head, and a regen then rewrites every RFC stub to whatever
-  # upstream last pushed.
-  - module: buf.build/the-protobuf-project/rfc:844dfa627e53499ba543aeabdcd2a663
+  # Pinned to the commit buf.lock records, and the SDK versions in go.mod.
+  - module: buf.build/the-protobuf-project/rfc:0fb3b05919464d84a2e18d200f5650c7
 plugins:
-  - remote: buf.build/protocolbuffers/go:v1.36.11
-    out: protobuf/generated/go
-    opt: module=github.com/oh-tarnished/freebusy/protobuf/generated/go
-  - remote: buf.build/grpc/go:v1.6.0
-    out: protobuf/generated/go
-    opt: module=github.com/oh-tarnished/freebusy/protobuf/generated/go
-  # --- Persistence for the RFC catalogue ---
-  #
-  # freebusy serves these resources itself (one binary, own `rfc` database), so
-  # it needs models and stores for them the same way it does for its own tables.
-  # config= is what keeps each RFC in its own schema; see rfc.layout.yaml.
-  - local: protoc-gen-store
-    out: ./internal/database/rfcgorm
-    strategy: all
+  - remote: buf.build/grpc-ecosystem/gateway:v2.27.4
+    out: protobuf/generated/go/rfc
     opt:
-      - target=gorm
-      - stores=true
-      # filterx: the repository target composes it for AIP-160 List filtering.
-      - filters=true
-      - go_module=github.com/oh-tarnished/freebusy/internal/database/rfcgorm
-      - config=tools/protobuf/buf/config/rfc.layout.yaml
-      # Proto<->model converters. Re-enabled on protoc-gen-store 1.5.2, which
-      # fixed the import alias for a package whose path ends in a version
-      # (protoc-gen-go names .../resource/v1 "resourcev1", not "v1").
-      - converters=true
-
-  # Proto-facing repositories: CRUD in protobuf types, so the gRPC servers need
-  # no hand-written conversion for 15 RFC packages.
-  - local: protoc-gen-store
-    out: ./internal/database/rfcrepo
-    strategy: all
+      - module=buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go
+      - standalone=true
+  - local: protoc-gen-mcp
+    out: protobuf/generated/go/rfc
     opt:
-      - target=repository
-      - go_module=github.com/oh-tarnished/freebusy/internal/database/rfcrepo
-      - gorm_module=github.com/oh-tarnished/freebusy/internal/database/rfcgorm
-      - config=tools/protobuf/buf/config/rfc.layout.yaml
+      - lang=go
+      - module=buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go
+      - package_suffix=mcp

@@ -17,9 +17,6 @@ mod envoy 'tools/just/envoy.just'
 [group('api')]
 mod grpc 'tools/just/grpc.just'
 
-# Exercise the PromoCodeService (server must be running).
-[group('api')]
-mod promo 'tools/just/promo.just'
 
 # Run prek hooks (--all-files to force proto lint/generate when no .proto files staged).
 [group('lint')]

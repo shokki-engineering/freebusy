@@ -16,11 +16,11 @@
 package card
 
 import (
+	cardpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9553/card/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/cardql/namesql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/cardql/resourceql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/cardql/speechesql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9553/card/v1/cardpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"strings"
@@ -171,6 +171,9 @@ func cardFromRow(row *resourceql.CardResource) *cardpbv1.Card {
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.Uid = repox.Deref(row.Uid)
+	out.DeleteTime = strToTs(repox.Deref(row.DeleteTime))
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
 	return out
 }
 

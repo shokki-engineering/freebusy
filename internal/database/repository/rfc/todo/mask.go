@@ -16,8 +16,8 @@
 package todo
 
 import (
+	todopbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/todo/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/todo/v1/todopbv1"
 )
 
 // applyTodoMask merges the masked fields of in onto merged. An empty
@@ -61,5 +61,8 @@ func applyTodoMask(merged, in *todopbv1.Todo, paths []string) {
 	}
 	if repox.GroupTouched(paths, "completed") {
 		merged.Completed = in.GetCompleted()
+	}
+	if repox.GroupTouched(paths, "extensions") {
+		merged.Extensions = in.GetExtensions()
 	}
 }

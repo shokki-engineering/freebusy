@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
+	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/oh-tarnished/freebusy/internal/rfc"
 	"github.com/oh-tarnished/freebusy/internal/runtime/rpc"
 	"github.com/oh-tarnished/freebusy/internal/service/allocation/engine"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9073/resource/v1/resourcepbv1"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/grpc/codes"

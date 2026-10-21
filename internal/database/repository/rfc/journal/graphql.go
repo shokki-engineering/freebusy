@@ -16,15 +16,16 @@
 package journal
 
 import (
+	journalpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/journal/v1"
 	"context"
 	"errors"
 	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/journal"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/journalql/extensionpropertiesql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/journalql/resourceql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/journal/v1/journalpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -99,7 +100,16 @@ func (r *GraphQLJournalRepository) Create(ctx context.Context, parent string, in
 		}
 		ci.StartId = vi.Id
 	}
-	if _, err := r.Svc.Mutation.Journal.Resource.Create(ctx, ci); err != nil {
+	// One transaction: the graph lands whole or not at all.
+	gtx := r.Svc.Mutation.Tx()
+	gtx.Add(r.Svc.Mutation.Journal.Resource.CreateOp(ci, new(resourceql.InsertJournalResourceResponse)))
+	for _, v1 := range in.GetExtensions() {
+		n2 := journalExtensionPropertyToCreateInput(v1)
+		n2.Id = repox.NewULID()
+		n2.JournalId = id
+		gtx.Add(r.Svc.Mutation.Journal.ExtensionProperties.CreateOp(n2, new(extensionpropertiesql.InsertJournalExtensionPropertiesResponse)))
+	}
+	if err := gtx.Commit(ctx); err != nil {
 		return nil, mapGraphQLErr(err)
 	}
 	return r.get(ctx, id)
@@ -140,6 +150,16 @@ func (r *GraphQLJournalRepository) toProto(ctx context.Context, row *resourceql.
 			out.Start = journalCalendarTimeFromRow(w)
 		}
 	}
+	{
+		rows3, err := r.Svc.Query.Journal.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.JournalId.Eq(row.Id)).OrderBy(extensionpropertiesql.Id.Asc()))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows3 {
+			p4 := journalExtensionPropertyFromRow(&rows3[i])
+			out.Extensions = append(out.Extensions, p4)
+		}
+	}
 	if h := r.Hooks.AfterRead; h != nil {
 		if err := h(ctx, out); err != nil {
 			return nil, err
@@ -158,6 +178,9 @@ func (r *GraphQLJournalRepository) List(ctx context.Context, parent string, in r
 }
 
 func (r *GraphQLJournalRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*journalpbv1.Journal, string, error) {
+	if !in.ShowDeleted {
+		scope = append(scope, resourceql.DeleteTime.IsNull(true))
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -203,6 +226,17 @@ func (r *GraphQLJournalRepository) Update(ctx context.Context, in *journalpbv1.J
 		return nil, repox.ErrNotFound
 	}
 	var staleStart string
+	var old7 []string
+	{
+		rows8, err := r.Svc.Query.Journal.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.JournalId.Eq(id)))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows8 {
+			old7 = append(old7, rows8[i].Id)
+		}
+	}
+	staleExtensions := old7
 	existingPB := journalFromRow(row)
 	merged := proto.Clone(existingPB).(*journalpbv1.Journal)
 	applyJournalMask(merged, in, paths)
@@ -225,6 +259,33 @@ func (r *GraphQLJournalRepository) Update(ctx context.Context, in *journalpbv1.J
 			patch.StartId = graphql.Value(vi.Id)
 		}
 	}
+	// New singular value objects land before the guarded row update (a lost
+	// race leaves them unreferenced); new list rows and the removal of
+	// replaced subtrees land only after it succeeds (atx).
+	utx := r.Svc.Mutation.Tx()
+	atx := r.Svc.Mutation.Tx()
+	if repox.GroupTouched(paths, "extensions") {
+		for _, oid := range staleExtensions {
+			if id := oid; id != "" {
+				got9, err := r.Svc.Query.Journal.ExtensionProperties.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got9 != nil {
+					atx.Add(r.Svc.Mutation.Journal.ExtensionProperties.DeleteOp(got9.Id, new(extensionpropertiesql.DeleteJournalExtensionPropertiesByIdResponse)))
+				}
+			}
+		}
+		for _, v10 := range merged.GetExtensions() {
+			n11 := journalExtensionPropertyToCreateInput(v10)
+			n11.Id = repox.NewULID()
+			n11.JournalId = id
+			atx.Add(r.Svc.Mutation.Journal.ExtensionProperties.CreateOp(n11, new(extensionpropertiesql.InsertJournalExtensionPropertiesResponse)))
+		}
+	}
+	if err := utx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	if in.GetEtag() != "" {
 		if _, err := r.Svc.Mutation.Journal.Resource.UpdateIfMatch(ctx, id, patch, resourceql.Etag.Eq(in.GetEtag())); err != nil {
 			return nil, mapGraphQLErr(err)
@@ -233,6 +294,9 @@ func (r *GraphQLJournalRepository) Update(ctx context.Context, in *journalpbv1.J
 			if _, err := r.Svc.Mutation.Journal.CalendarTimes.Delete(ctx, staleStart); err != nil {
 				return nil, mapGraphQLErr(err)
 			}
+		}
+		if err := atx.Commit(ctx); err != nil {
+			return nil, mapGraphQLErr(err)
 		}
 		return r.get(ctx, id)
 	}
@@ -248,11 +312,58 @@ func (r *GraphQLJournalRepository) Update(ctx context.Context, in *journalpbv1.J
 			return nil, mapGraphQLErr(err)
 		}
 	}
+	if err := atx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GraphQLJournalRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "calendars", "journals")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	patch := resourceql.UpdateInput{DeleteTime: graphql.Value(time.Now().UTC().Format(time.RFC3339Nano))}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Journal.Resource.UpdateIfMatch(ctx, ids[len(ids)-1], patch, resourceql.DeleteTime.IsNull(true)); err != nil {
+		if errors.Is(err, graphql.ErrConflict) {
+			return repox.ErrNotFound
+		}
+		return mapGraphQLErr(err)
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GraphQLJournalRepository) Undelete(ctx context.Context, name string) (*journalpbv1.Journal, error) {
+	ids, err := repox.SplitName(name, "calendars", "journals")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	patch := resourceql.UpdateInput{DeleteTime: graphql.Null[string]()}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Journal.Resource.UpdateIfMatch(ctx, id, patch, resourceql.DeleteTime.IsNull(false)); err != nil {
+		if !errors.Is(err, graphql.ErrConflict) {
+			return nil, mapGraphQLErr(err)
+		}
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GraphQLJournalRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "calendars", "journals")
 	if err != nil {
 		return err
@@ -276,6 +387,27 @@ func (r *GraphQLJournalRepository) Delete(ctx context.Context, name string) erro
 				return mapGraphQLErr(err)
 			}
 		}
+	}
+	dtx := r.Svc.Mutation.Tx()
+	{
+		rows5, err := r.Svc.Query.Journal.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.JournalId.Eq(id)))
+		if err != nil {
+			return mapGraphQLErr(err)
+		}
+		for i := range rows5 {
+			if id := rows5[i].Id; id != "" {
+				got6, err := r.Svc.Query.Journal.ExtensionProperties.Get(ctx, id)
+				if err != nil {
+					return mapGraphQLErr(err)
+				}
+				if got6 != nil {
+					dtx.Add(r.Svc.Mutation.Journal.ExtensionProperties.DeleteOp(got6.Id, new(extensionpropertiesql.DeleteJournalExtensionPropertiesByIdResponse)))
+				}
+			}
+		}
+	}
+	if err := dtx.Commit(ctx); err != nil {
+		return mapGraphQLErr(err)
 	}
 	return nil
 }

@@ -1,0 +1,213 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnCommonFractionsDenominator
+  description: Update the 'denominator' column in the 'common_fractions' collection
+  fields:
+    - name: set
+      type: Int64
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnCommonFractionsDenominator
+    inputTypeName: UpdateColumnCommonFractionsDenominatorInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_common_fractions_denominator
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnCommonFractionsDenominator
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnCommonFractionsId
+  description: Update the 'id' column in the 'common_fractions' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnCommonFractionsId
+    inputTypeName: UpdateColumnCommonFractionsIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_common_fractions_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnCommonFractionsId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnCommonFractionsNumerator
+  description: Update the 'numerator' column in the 'common_fractions' collection
+  fields:
+    - name: set
+      type: Int64
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnCommonFractionsNumerator
+    inputTypeName: UpdateColumnCommonFractionsNumeratorInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_common_fractions_numerator
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnCommonFractionsNumerator
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateCommonFractionsByIdUpdateColumns
+  description: Update the columns of the 'common_fractions' collection
+  fields:
+    - name: denominator
+      type: UpdateColumnCommonFractionsDenominator
+      description: Update the 'denominator' column in the 'common_fractions' collection.
+    - name: id
+      type: UpdateColumnCommonFractionsId
+      description: Update the 'id' column in the 'common_fractions' collection.
+    - name: numerator
+      type: UpdateColumnCommonFractionsNumerator
+      description: Update the 'numerator' column in the 'common_fractions' collection.
+  graphql:
+    typeName: UpdateCommonFractionsByIdUpdateColumns
+    inputTypeName: UpdateCommonFractionsByIdUpdateColumnsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_common_fractions_by_id_update_columns
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateCommonFractionsByIdUpdateColumns
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - denominator
+          - id
+          - numerator
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateCommonFractionsByIdResponse
+  description: Responses from the 'update_common_fractions_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[CommonFractions!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: UpdateCommonFractionsByIdResponse
+    inputTypeName: UpdateCommonFractionsByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_common_fractions_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateCommonFractionsByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: UpdateCommonFractionsById
+  outputType: UpdateCommonFractionsByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: postCheck
+      type: CommonFractionsBoolExp
+      description: Update permission post-condition predicate over the
+        'common_fractions' collection
+    - name: preCheck
+      type: CommonFractionsBoolExp
+      description: Update permission pre-condition predicate over the
+        'common_fractions' collection
+    - name: updateColumns
+      type: UpdateCommonFractionsByIdUpdateColumns!
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: update_common_fractions_by_id
+    argumentMapping:
+      keyId: key_id
+      postCheck: post_check
+      preCheck: pre_check
+      updateColumns: update_columns
+  graphql:
+    rootFieldName: updateCommonFractionsById
+    rootFieldKind: Mutation
+  description: Update any row on the 'common_fractions' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: UpdateCommonFractionsById
+  permissions:
+    - role: admin
+      allowExecution: true
+

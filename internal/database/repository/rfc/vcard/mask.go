@@ -16,8 +16,8 @@
 package vcard
 
 import (
+	vcardpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc6350/vcard/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc6350/vcard/v1/vcardpbv1"
 )
 
 // applyVcardMask merges the masked fields of in onto merged. An empty
@@ -34,5 +34,8 @@ func applyVcardMask(merged, in *vcardpbv1.Vcard, paths []string) {
 	}
 	if repox.GroupTouched(paths, "vcard_create_time") {
 		merged.VcardCreateTime = in.GetVcardCreateTime()
+	}
+	if repox.GroupTouched(paths, "contact") {
+		merged.Contact = in.GetContact()
 	}
 }

@@ -16,13 +16,15 @@
 package card
 
 import (
+	cardpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9553/card/v1"
 	"context"
+	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/card"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9553/card/v1/cardpbv1"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
+	"time"
 )
 
 // GormCardRepository is the GORM adapter of CardRepository: flat
@@ -126,6 +128,9 @@ func (r *GormCardRepository) List(ctx context.Context, in repox.ListInput) ([]*c
 }
 
 func (r *GormCardRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*cardpbv1.Card, string, error) {
+	if !in.ShowDeleted {
+		scope = scope.Where("delete_time IS NULL")
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -260,8 +265,54 @@ func (r *GormCardRepository) Update(ctx context.Context, in *cardpbv1.Card, path
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GormCardRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "cards")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	res := r.DB.WithContext(ctx).Model(&card.Card{}).
+		Where("id = ? AND delete_time IS NULL", ids[len(ids)-1]).
+		Updates(map[string]any{"delete_time": time.Now(), "etag": repox.NewULID()})
+	if res.Error != nil {
+		return repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return repox.ErrNotFound
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GormCardRepository) Undelete(ctx context.Context, name string) (*cardpbv1.Card, error) {
+	ids, err := repox.SplitName(name, "cards")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	res := r.DB.WithContext(ctx).Model(&card.Card{}).
+		Where("id = ? AND delete_time IS NOT NULL", id).
+		Updates(map[string]any{"delete_time": nil, "etag": repox.NewULID()})
+	if res.Error != nil {
+		return nil, repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GormCardRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "cards")
 	if err != nil {
 		return err

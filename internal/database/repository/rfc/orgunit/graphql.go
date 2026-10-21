@@ -16,14 +16,15 @@
 package orgunit
 
 import (
+	orgunitpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organizational_unit/v1"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/orgunit"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/orgunitql/organizationalunitsql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/organizational_unit/v1/orgunitpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -126,6 +127,9 @@ func (r *GraphQLOrganizationalUnitRepository) List(ctx context.Context, in repox
 }
 
 func (r *GraphQLOrganizationalUnitRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*orgunitpbv1.OrganizationalUnit, string, error) {
+	if !in.ShowDeleted {
+		scope = append(scope, organizationalunitsql.DeleteTime.IsNull(true))
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -197,8 +201,52 @@ func (r *GraphQLOrganizationalUnitRepository) Update(ctx context.Context, in *or
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GraphQLOrganizationalUnitRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "organizationalUnits")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	patch := organizationalunitsql.UpdateInput{DeleteTime: graphql.Value(time.Now().UTC().Format(time.RFC3339Nano))}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Orgunit.OrganizationalUnits.UpdateIfMatch(ctx, ids[len(ids)-1], patch, organizationalunitsql.DeleteTime.IsNull(true)); err != nil {
+		if errors.Is(err, graphql.ErrConflict) {
+			return repox.ErrNotFound
+		}
+		return mapGraphQLErr(err)
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GraphQLOrganizationalUnitRepository) Undelete(ctx context.Context, name string) (*orgunitpbv1.OrganizationalUnit, error) {
+	ids, err := repox.SplitName(name, "organizationalUnits")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	patch := organizationalunitsql.UpdateInput{DeleteTime: graphql.Null[string]()}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Orgunit.OrganizationalUnits.UpdateIfMatch(ctx, id, patch, organizationalunitsql.DeleteTime.IsNull(false)); err != nil {
+		if !errors.Is(err, graphql.ErrConflict) {
+			return nil, mapGraphQLErr(err)
+		}
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GraphQLOrganizationalUnitRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "organizationalUnits")
 	if err != nil {
 		return err

@@ -16,14 +16,18 @@
 package user
 
 import (
+	scimuserpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/user/v1"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/user"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/addressql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/enterpriseusersql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/managersql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/userql/resourceql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7643/user/v1/scimuserpbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -88,7 +92,28 @@ func (r *GraphQLUserRepository) Create(ctx context.Context, in *scimuserpbv1.Use
 		}
 		ci.NameComponentsId = vi.Id
 	}
-	if _, err := r.Svc.Mutation.User.Resource.Create(ctx, ci); err != nil {
+	// One transaction: the graph lands whole or not at all.
+	gtx := r.Svc.Mutation.Tx()
+	if v1 := in.GetEnterprise(); v1 != nil {
+		n2 := userEnterpriseUserToCreateInput(v1)
+		n2.Id = repox.NewULID()
+		if v3 := v1.GetManager(); v3 != nil {
+			n4 := userManagerToCreateInput(v3)
+			n4.Id = repox.NewULID()
+			gtx.Add(r.Svc.Mutation.User.Managers.CreateOp(n4, new(managersql.InsertUserManagersResponse)))
+			n2.ManagerId = n4.Id
+		}
+		gtx.Add(r.Svc.Mutation.User.EnterpriseUsers.CreateOp(n2, new(enterpriseusersql.InsertUserEnterpriseUsersResponse)))
+		ci.EnterpriseId = n2.Id
+	}
+	gtx.Add(r.Svc.Mutation.User.Resource.CreateOp(ci, new(resourceql.InsertUserResourceResponse)))
+	for _, v11 := range in.GetAddresses() {
+		n12 := userAddressToCreateInput(v11)
+		n12.Id = repox.NewULID()
+		n12.UserId = id
+		gtx.Add(r.Svc.Mutation.User.Address.CreateOp(n12, new(addressql.InsertUserAddressResponse)))
+	}
+	if err := gtx.Commit(ctx); err != nil {
 		return nil, mapGraphQLErr(err)
 	}
 	return r.get(ctx, id)
@@ -129,6 +154,36 @@ func (r *GraphQLUserRepository) toProto(ctx context.Context, row *resourceql.Use
 			out.NameComponents = userNameFromRow(w)
 		}
 	}
+	if id := repox.Deref(row.EnterpriseId); id != "" {
+		got5, err := r.Svc.Query.User.EnterpriseUsers.Get(ctx, id)
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		if got5 != nil {
+			p6 := userEnterpriseUserFromRow(got5)
+			if id := repox.Deref(got5.ManagerId); id != "" {
+				got7, err := r.Svc.Query.User.Managers.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got7 != nil {
+					p8 := userManagerFromRow(got7)
+					p6.Manager = p8
+				}
+			}
+			out.Enterprise = p6
+		}
+	}
+	{
+		rows13, err := r.Svc.Query.User.Address.List(ctx, addressql.List().Where(addressql.UserId.Eq(row.Id)).OrderBy(addressql.Id.Asc()))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows13 {
+			p14 := userAddressFromRow(&rows13[i])
+			out.Addresses = append(out.Addresses, p14)
+		}
+	}
 	if h := r.Hooks.AfterRead; h != nil {
 		if err := h(ctx, out); err != nil {
 			return nil, err
@@ -143,6 +198,9 @@ func (r *GraphQLUserRepository) List(ctx context.Context, in repox.ListInput) ([
 }
 
 func (r *GraphQLUserRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*scimuserpbv1.User, string, error) {
+	if !in.ShowDeleted {
+		scope = append(scope, resourceql.DeleteTime.IsNull(true))
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -188,6 +246,18 @@ func (r *GraphQLUserRepository) Update(ctx context.Context, in *scimuserpbv1.Use
 		return nil, repox.ErrNotFound
 	}
 	var staleNameComponents string
+	staleEnterprise := repox.Deref(row.EnterpriseId)
+	var old23 []string
+	{
+		rows24, err := r.Svc.Query.User.Address.List(ctx, addressql.List().Where(addressql.UserId.Eq(id)))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows24 {
+			old23 = append(old23, rows24[i].Id)
+		}
+	}
+	staleAddresses := old23
 	existingPB := userFromRow(row)
 	merged := proto.Clone(existingPB).(*scimuserpbv1.User)
 	applyUserMask(merged, in, paths)
@@ -211,6 +281,66 @@ func (r *GraphQLUserRepository) Update(ctx context.Context, in *scimuserpbv1.Use
 			patch.NameComponentsId = graphql.Value(vi.Id)
 		}
 	}
+	// New singular value objects land before the guarded row update (a lost
+	// race leaves them unreferenced); new list rows and the removal of
+	// replaced subtrees land only after it succeeds (atx).
+	utx := r.Svc.Mutation.Tx()
+	atx := r.Svc.Mutation.Tx()
+	if repox.GroupTouched(paths, "enterprise") {
+		if id := staleEnterprise; id != "" {
+			got17, err := r.Svc.Query.User.EnterpriseUsers.Get(ctx, id)
+			if err != nil {
+				return nil, mapGraphQLErr(err)
+			}
+			if got17 != nil {
+				atx.Add(r.Svc.Mutation.User.EnterpriseUsers.DeleteOp(got17.Id, new(enterpriseusersql.DeleteUserEnterpriseUsersByIdResponse)))
+				if id := repox.Deref(got17.ManagerId); id != "" {
+					got18, err := r.Svc.Query.User.Managers.Get(ctx, id)
+					if err != nil {
+						return nil, mapGraphQLErr(err)
+					}
+					if got18 != nil {
+						atx.Add(r.Svc.Mutation.User.Managers.DeleteOp(got18.Id, new(managersql.DeleteUserManagersByIdResponse)))
+					}
+				}
+			}
+		}
+		patch.EnterpriseId = graphql.Null[string]()
+		if v19 := merged.GetEnterprise(); v19 != nil {
+			n20 := userEnterpriseUserToCreateInput(v19)
+			n20.Id = repox.NewULID()
+			if v21 := v19.GetManager(); v21 != nil {
+				n22 := userManagerToCreateInput(v21)
+				n22.Id = repox.NewULID()
+				utx.Add(r.Svc.Mutation.User.Managers.CreateOp(n22, new(managersql.InsertUserManagersResponse)))
+				n20.ManagerId = n22.Id
+			}
+			utx.Add(r.Svc.Mutation.User.EnterpriseUsers.CreateOp(n20, new(enterpriseusersql.InsertUserEnterpriseUsersResponse)))
+			patch.EnterpriseId = graphql.Value(n20.Id)
+		}
+	}
+	if repox.GroupTouched(paths, "addresses") {
+		for _, oid := range staleAddresses {
+			if id := oid; id != "" {
+				got25, err := r.Svc.Query.User.Address.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got25 != nil {
+					atx.Add(r.Svc.Mutation.User.Address.DeleteOp(got25.Id, new(addressql.DeleteUserAddressByIdResponse)))
+				}
+			}
+		}
+		for _, v26 := range merged.GetAddresses() {
+			n27 := userAddressToCreateInput(v26)
+			n27.Id = repox.NewULID()
+			n27.UserId = id
+			atx.Add(r.Svc.Mutation.User.Address.CreateOp(n27, new(addressql.InsertUserAddressResponse)))
+		}
+	}
+	if err := utx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	if in.GetEtag() != "" {
 		if _, err := r.Svc.Mutation.User.Resource.UpdateIfMatch(ctx, id, patch, resourceql.Etag.Eq(in.GetEtag())); err != nil {
 			return nil, mapGraphQLErr(err)
@@ -219,6 +349,9 @@ func (r *GraphQLUserRepository) Update(ctx context.Context, in *scimuserpbv1.Use
 			if _, err := r.Svc.Mutation.User.Names.Delete(ctx, staleNameComponents); err != nil {
 				return nil, mapGraphQLErr(err)
 			}
+		}
+		if err := atx.Commit(ctx); err != nil {
+			return nil, mapGraphQLErr(err)
 		}
 		return r.get(ctx, id)
 	}
@@ -234,11 +367,58 @@ func (r *GraphQLUserRepository) Update(ctx context.Context, in *scimuserpbv1.Use
 			return nil, mapGraphQLErr(err)
 		}
 	}
+	if err := atx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GraphQLUserRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "users")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	patch := resourceql.UpdateInput{DeleteTime: graphql.Value(time.Now().UTC().Format(time.RFC3339Nano))}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.User.Resource.UpdateIfMatch(ctx, ids[len(ids)-1], patch, resourceql.DeleteTime.IsNull(true)); err != nil {
+		if errors.Is(err, graphql.ErrConflict) {
+			return repox.ErrNotFound
+		}
+		return mapGraphQLErr(err)
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GraphQLUserRepository) Undelete(ctx context.Context, name string) (*scimuserpbv1.User, error) {
+	ids, err := repox.SplitName(name, "users")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	patch := resourceql.UpdateInput{DeleteTime: graphql.Null[string]()}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.User.Resource.UpdateIfMatch(ctx, id, patch, resourceql.DeleteTime.IsNull(false)); err != nil {
+		if !errors.Is(err, graphql.ErrConflict) {
+			return nil, mapGraphQLErr(err)
+		}
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GraphQLUserRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "users")
 	if err != nil {
 		return err
@@ -262,6 +442,47 @@ func (r *GraphQLUserRepository) Delete(ctx context.Context, name string) error {
 				return mapGraphQLErr(err)
 			}
 		}
+	}
+	dtx := r.Svc.Mutation.Tx()
+	for i := range resp.Returning {
+		if id := repox.Deref(resp.Returning[i].EnterpriseId); id != "" {
+			got9, err := r.Svc.Query.User.EnterpriseUsers.Get(ctx, id)
+			if err != nil {
+				return mapGraphQLErr(err)
+			}
+			if got9 != nil {
+				dtx.Add(r.Svc.Mutation.User.EnterpriseUsers.DeleteOp(got9.Id, new(enterpriseusersql.DeleteUserEnterpriseUsersByIdResponse)))
+				if id := repox.Deref(got9.ManagerId); id != "" {
+					got10, err := r.Svc.Query.User.Managers.Get(ctx, id)
+					if err != nil {
+						return mapGraphQLErr(err)
+					}
+					if got10 != nil {
+						dtx.Add(r.Svc.Mutation.User.Managers.DeleteOp(got10.Id, new(managersql.DeleteUserManagersByIdResponse)))
+					}
+				}
+			}
+		}
+	}
+	{
+		rows15, err := r.Svc.Query.User.Address.List(ctx, addressql.List().Where(addressql.UserId.Eq(id)))
+		if err != nil {
+			return mapGraphQLErr(err)
+		}
+		for i := range rows15 {
+			if id := rows15[i].Id; id != "" {
+				got16, err := r.Svc.Query.User.Address.Get(ctx, id)
+				if err != nil {
+					return mapGraphQLErr(err)
+				}
+				if got16 != nil {
+					dtx.Add(r.Svc.Mutation.User.Address.DeleteOp(got16.Id, new(addressql.DeleteUserAddressByIdResponse)))
+				}
+			}
+		}
+	}
+	if err := dtx.Commit(ctx); err != nil {
+		return mapGraphQLErr(err)
 	}
 	return nil
 }

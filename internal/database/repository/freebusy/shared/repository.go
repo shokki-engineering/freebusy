@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: freebusy/shared/v1/idempotency.proto, freebusy/shared/v1/types.proto
+// source: freebusy/shared/v1/idempotency.proto
 //
 // database: freebusy
 // schema:   shared
@@ -55,7 +55,8 @@ type IdempotencyKeyHooks struct {
 	// BeforeUpdate runs after the mask is applied to the merged record,
 	// before it is written.
 	BeforeUpdate func(ctx context.Context, existing, merged *sharedpbv1.IdempotencyKey, paths []string) error
-	// BeforeDelete runs before the row is removed; returning an error vetoes.
+	// BeforeDelete runs before the row is removed (or, with soft delete,
+	// marked deleted); returning an error vetoes.
 	BeforeDelete func(ctx context.Context, name string) error
 }
 

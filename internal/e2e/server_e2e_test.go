@@ -5,9 +5,10 @@
 // production client talks to, minus the TCP socket.
 //
 // The booking flow is the availability engine's: a hold, then a reservation
-// made of it, then a cancellation. The one resource it books is seeded through
-// the generated RFC repository, because the engine books only resources it can
-// find at a site -- the same rows an operator would publish.
+// made of it, then a cancellation. The inventory flow publishes what the engine
+// reads -- a calendar, a resource on it, its opening hours, a recurring
+// closure -- through the RFC services, and reads it back through
+// QueryFreeBusy and ExpandEvent.
 //
 // Two env-gated matrices mirror the live-suite conventions:
 //
@@ -24,13 +25,15 @@ import (
 	"testing"
 	"time"
 
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/calendar/v1/calendarv1grpc"
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/event/v1/eventv1grpc"
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc7953/availability/v1/availabilityv1grpc"
+	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc9073/resource/v1/resourcev1grpc"
 	"github.com/oh-tarnished/freebusy/internal"
 	"github.com/oh-tarnished/freebusy/internal/database"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	rfcresource "github.com/oh-tarnished/freebusy/internal/database/repository/rfc/resource"
+	"github.com/oh-tarnished/freebusy/internal/service/rfcsvc"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/pricing/v1/pricingpbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/promocode/v1/promocodepbv1"
 	"github.com/oh-tarnished/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -43,7 +46,7 @@ func TestE2E_Gorm(t *testing.T) {
 	gdb := openTestGorm(t)
 	conn := &database.Connection{PgSQLConn: gdb, Provider: database.ProviderGorm}
 	cc := dialServer(t, conn)
-	serverLifecycle(t, cc, conn, rfcresource.New(repox.Conn{Gorm: gdb}))
+	serverLifecycle(t, cc, rfcsvc.NewRepositories(repox.Conn{Gorm: gdb}))
 }
 
 // TestE2E_Hasura runs the identical client-visible lifecycle with the server
@@ -52,42 +55,44 @@ func TestE2E_Hasura(t *testing.T) {
 	svc := connectTestGraphQL(t)
 	conn := &database.Connection{Hasura: svc, Provider: database.ProviderHasura}
 	cc := dialServer(t, conn)
-	serverLifecycle(t, cc, conn, rfcresource.New(repox.Conn{GraphQL: svc}))
+	serverLifecycle(t, cc, rfcsvc.NewRepositories(repox.Conn{GraphQL: svc}))
 }
 
-// e2eClients bundles the per-service gRPC clients plus the RFC repository used
-// to seed and remove the resource the booking flow books -- freebusy serves no
-// API for RFC resources, so the test writes them the way an operator's tooling
-// would.
+// e2eClients bundles the per-service gRPC clients plus the RFC repositories,
+// which the flows use only to purge what they wrote: the API soft-deletes, and
+// a test run should not leave rows behind.
 type e2eClients struct {
-	suffix       string
-	promos       promocodepbv1.PromoCodeServiceClient
-	ratePlans    pricingpbv1.RatePlanServiceClient
-	availability allocationpbv1.AllocationServiceClient
-	holds        allocationpbv1.HoldServiceClient
-	reservations reservationpbv1.ReservationServiceClient
-	resources    rfcresource.Repositories
+	suffix         string
+	availability   allocationpbv1.AllocationServiceClient
+	holds          allocationpbv1.HoldServiceClient
+	reservations   reservationpbv1.ReservationServiceClient
+	resources      resourcev1grpc.ResourcesClient
+	calendars      calendarv1grpc.CalendarsClient
+	availabilities availabilityv1grpc.AvailabilitiesClient
+	events         eventv1grpc.EventsClient
+	repos          rfcsvc.Repositories
 }
 
-// serverLifecycle drives the services through the wire: interceptor rejections,
-// promo validation, rate plans, and the hold-to-reservation flow. Each flow
-// registers its own t.Cleanup, so teardown runs LIFO in dependency order.
-func serverLifecycle(t *testing.T, cc *grpc.ClientConn, conn *database.Connection, resources rfcresource.Repositories) {
+// serverLifecycle drives the services through the wire: interceptor rejections
+// and the hold-to-reservation flow. Each flow registers its own t.Cleanup, so
+// teardown runs LIFO in dependency order.
+func serverLifecycle(t *testing.T, cc *grpc.ClientConn, repos rfcsvc.Repositories) {
 	t.Helper()
 	c := &e2eClients{
-		suffix:       fmt.Sprintf("%d", time.Now().UnixNano()%1_000_000_000),
-		promos:       promocodepbv1.NewPromoCodeServiceClient(cc),
-		ratePlans:    pricingpbv1.NewRatePlanServiceClient(cc),
-		availability: allocationpbv1.NewAllocationServiceClient(cc),
-		holds:        allocationpbv1.NewHoldServiceClient(cc),
-		reservations: reservationpbv1.NewReservationServiceClient(cc),
-		resources:    resources,
+		suffix:         fmt.Sprintf("%d", time.Now().UnixNano()%1_000_000_000),
+		availability:   allocationpbv1.NewAllocationServiceClient(cc),
+		holds:          allocationpbv1.NewHoldServiceClient(cc),
+		reservations:   reservationpbv1.NewReservationServiceClient(cc),
+		resources:      resourcev1grpc.NewResourcesClient(cc),
+		calendars:      calendarv1grpc.NewCalendarsClient(cc),
+		availabilities: availabilityv1grpc.NewAvailabilitiesClient(cc),
+		events:         eventv1grpc.NewEventsClient(cc),
+		repos:          repos,
 	}
 
 	rejectionFlow(t, c)
-	promoFlow(t, c, conn.Provider)
-	ratePlanFlow(t, c)
 	reservationFlow(t, c)
+	inventoryFlow(t, c)
 }
 
 // rejectionFlow pins that the protovalidate interceptor runs in the assembled

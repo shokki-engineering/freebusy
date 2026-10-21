@@ -29,12 +29,14 @@ openapi:
 envoy:
     go run ./tools/protobuf/envoy
 
-# Generate Go client stubs for the RFC schema module (protobuf-rfc's Resources,
-# Calendars and the rest). Separate from `go` because that template cleans its
-# output directory, so the two runs would wipe each other.
+# Generate the HTTP gateway and MCP bindings for the RFC schema module
+# (protobuf-rfc's Resources, Calendars and the rest), whose messages and gRPC
+# stubs come from the BSR SDK. Separate from `go` because that template cleans
+# its output directory, so the two runs would wipe each other.
 [group('codegen')]
 rfc:
     buf generate --template tools/protobuf/buf/rfc.buf.gen.yaml
+    go run ./tools/protobuf/rfcgw
 
 # Generate the database layer and its cache decorators: prisma + gorm schemas,
 # the proto-facing repositories, the typed Hasura client, and the read-through

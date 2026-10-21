@@ -16,13 +16,16 @@
 package user
 
 import (
+	scimuserpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/user/v1"
 	"context"
+	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/user"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7643/user/v1/scimuserpbv1"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"time"
 )
 
 // GormUserRepository is the GORM adapter of UserRepository: flat
@@ -74,7 +77,34 @@ func (r *GormUserRepository) Create(ctx context.Context, in *scimuserpbv1.User) 
 			}
 			m.NameComponentsID = repox.Ptr(vo.ID)
 		}
-		return user.NewUserStore(tx).Create(ctx, m)
+		if v1 := in.GetEnterprise(); v1 != nil {
+			n2 := user.EnterpriseUserFromProto(v1)
+			n2.ID = repox.NewULID()
+			if v3 := v1.GetManager(); v3 != nil {
+				n4 := user.ManagerFromProto(v3)
+				n4.ID = repox.NewULID()
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n4).Error; err != nil {
+					return err
+				}
+				n2.ManagerID = repox.Ptr(n4.ID)
+			}
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n2).Error; err != nil {
+				return err
+			}
+			m.EnterpriseID = repox.Ptr(n2.ID)
+		}
+		if err := user.NewUserStore(tx).Create(ctx, m); err != nil {
+			return err
+		}
+		for _, v7 := range in.GetAddresses() {
+			n8 := user.AddressFromProto(v7)
+			n8.ID = repox.NewULID()
+			n8.UserID = id
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n8).Error; err != nil {
+				return err
+			}
+		}
+		return nil
 	}); err != nil {
 		return nil, repox.MapGormErr(err)
 	}
@@ -94,7 +124,7 @@ func (r *GormUserRepository) Get(ctx context.Context, name string) (*scimuserpbv
 // through, so Tier-2 overrides of Get never re-enter generated writes.
 func (r *GormUserRepository) get(ctx context.Context, id string) (*scimuserpbv1.User, error) {
 	var m user.User
-	if err := r.DB.WithContext(ctx).Preload("NameComponents").First(&m, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("NameComponents").Preload("Enterprise").Preload("Enterprise.Manager").Preload("Address", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&m, "id = ?", id).Error; err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.toProto(ctx, &m)
@@ -118,6 +148,9 @@ func (r *GormUserRepository) List(ctx context.Context, in repox.ListInput) ([]*s
 }
 
 func (r *GormUserRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*scimuserpbv1.User, string, error) {
+	if !in.ShowDeleted {
+		scope = scope.Where("delete_time IS NULL")
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -126,7 +159,7 @@ func (r *GormUserRepository) list(ctx context.Context, scope *gorm.DB, in repox.
 	for f, h := range r.ListOverrides {
 		eng.Override(f, h)
 	}
-	rows, next, err := eng.List(ctx, scope.Preload("NameComponents"), filterx.ListInput{
+	rows, next, err := eng.List(ctx, scope.Preload("NameComponents").Preload("Enterprise").Preload("Enterprise.Manager").Preload("Address", func(db *gorm.DB) *gorm.DB { return db.Order("id") }), filterx.ListInput{
 		PageSize:  in.PageSize,
 		PageToken: in.PageToken,
 		OrderBy:   in.OrderBy,
@@ -156,10 +189,12 @@ func (r *GormUserRepository) Update(ctx context.Context, in *scimuserpbv1.User, 
 	id := ids[len(ids)-1]
 	err = r.DB.Transaction(func(tx *gorm.DB) error {
 		var existing user.User
-		if err := tx.WithContext(ctx).Preload("NameComponents").First(&existing, "id = ?", id).Error; err != nil {
+		if err := tx.WithContext(ctx).Preload("NameComponents").Preload("Enterprise").Preload("Enterprise.Manager").Preload("Address", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 			return err
 		}
 		var staleNameComponents string
+		var staleEnterprise *user.EnterpriseUser
+		var staleAddresses []user.Address
 		if in.GetEtag() != "" && existing.Etag != nil && *existing.Etag != in.GetEtag() {
 			return repox.ErrConflict
 		}
@@ -200,12 +235,61 @@ func (r *GormUserRepository) Update(ctx context.Context, in *scimuserpbv1.User, 
 				existing.NameComponentsID = repox.Ptr(vo.ID)
 			}
 		}
+		if repox.GroupTouched(paths, "enterprise") {
+			staleEnterprise = existing.Enterprise
+			existing.EnterpriseID = nil
+			if v13 := merged.GetEnterprise(); v13 != nil {
+				n14 := user.EnterpriseUserFromProto(v13)
+				n14.ID = repox.NewULID()
+				if v15 := v13.GetManager(); v15 != nil {
+					n16 := user.ManagerFromProto(v15)
+					n16.ID = repox.NewULID()
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n16).Error; err != nil {
+						return err
+					}
+					n14.ManagerID = repox.Ptr(n16.ID)
+				}
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n14).Error; err != nil {
+					return err
+				}
+				existing.EnterpriseID = repox.Ptr(n14.ID)
+			}
+		}
+		if repox.GroupTouched(paths, "addresses") {
+			staleAddresses = existing.Address
+			for _, v19 := range merged.GetAddresses() {
+				n20 := user.AddressFromProto(v19)
+				n20.ID = repox.NewULID()
+				n20.UserID = id
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n20).Error; err != nil {
+					return err
+				}
+			}
+		}
+		existing.Enterprise = nil
+		existing.Address = nil
 		existing.Etag = repox.Ptr(repox.NewULID())
 		if err := user.NewUserStore(tx).Update(ctx, &existing); err != nil {
 			return err
 		}
 		if staleNameComponents != "" {
 			if err := tx.WithContext(ctx).Delete(&user.Name{}, "id = ?", staleNameComponents).Error; err != nil {
+				return err
+			}
+		}
+		if d11 := staleEnterprise; d11 != nil {
+			if err := tx.WithContext(ctx).Delete(&user.EnterpriseUser{}, "id = ?", d11.ID).Error; err != nil {
+				return err
+			}
+			if d12 := d11.Manager; d12 != nil {
+				if err := tx.WithContext(ctx).Delete(&user.Manager{}, "id = ?", d12.ID).Error; err != nil {
+					return err
+				}
+			}
+		}
+		for i17 := range staleAddresses {
+			d18 := &staleAddresses[i17]
+			if err := tx.WithContext(ctx).Delete(&user.Address{}, "id = ?", d18.ID).Error; err != nil {
 				return err
 			}
 		}
@@ -217,8 +301,54 @@ func (r *GormUserRepository) Update(ctx context.Context, in *scimuserpbv1.User, 
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GormUserRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "users")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	res := r.DB.WithContext(ctx).Model(&user.User{}).
+		Where("id = ? AND delete_time IS NULL", ids[len(ids)-1]).
+		Updates(map[string]any{"delete_time": time.Now(), "etag": repox.NewULID()})
+	if res.Error != nil {
+		return repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return repox.ErrNotFound
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GormUserRepository) Undelete(ctx context.Context, name string) (*scimuserpbv1.User, error) {
+	ids, err := repox.SplitName(name, "users")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	res := r.DB.WithContext(ctx).Model(&user.User{}).
+		Where("id = ? AND delete_time IS NOT NULL", id).
+		Updates(map[string]any{"delete_time": nil, "etag": repox.NewULID()})
+	if res.Error != nil {
+		return nil, repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GormUserRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "users")
 	if err != nil {
 		return err
@@ -230,7 +360,7 @@ func (r *GormUserRepository) Delete(ctx context.Context, name string) error {
 	}
 	id := ids[len(ids)-1]
 	var existing user.User
-	if err := r.DB.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("NameComponents").Preload("Enterprise").Preload("Enterprise.Manager").Preload("Address", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 		return repox.MapGormErr(err)
 	}
 	return repox.MapGormErr(r.DB.Transaction(func(tx *gorm.DB) error {
@@ -239,6 +369,22 @@ func (r *GormUserRepository) Delete(ctx context.Context, name string) error {
 		}
 		if existing.NameComponentsID != nil {
 			if err := tx.WithContext(ctx).Delete(&user.Name{}, "id = ?", *existing.NameComponentsID).Error; err != nil {
+				return err
+			}
+		}
+		if d5 := existing.Enterprise; d5 != nil {
+			if err := tx.WithContext(ctx).Delete(&user.EnterpriseUser{}, "id = ?", d5.ID).Error; err != nil {
+				return err
+			}
+			if d6 := d5.Manager; d6 != nil {
+				if err := tx.WithContext(ctx).Delete(&user.Manager{}, "id = ?", d6.ID).Error; err != nil {
+					return err
+				}
+			}
+		}
+		for i9 := range existing.Address {
+			d10 := &existing.Address[i9]
+			if err := tx.WithContext(ctx).Delete(&user.Address{}, "id = ?", d10.ID).Error; err != nil {
 				return err
 			}
 		}

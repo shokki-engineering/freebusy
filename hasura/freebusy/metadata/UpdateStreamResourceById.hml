@@ -1,0 +1,496 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnStreamResourceBaseVersion
+  description: Update the 'base_version' column in the 'stream_resource' collection
+  fields:
+    - name: set
+      type: Int32
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnStreamResourceBaseVersion
+    inputTypeName: UpdateColumnStreamResourceBaseVersionInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_stream_resource_base_version
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnStreamResourceBaseVersion
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnStreamResourceClosed
+  description: Update the 'closed' column in the 'stream_resource' collection
+  fields:
+    - name: set
+      type: Boolean_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnStreamResourceClosed
+    inputTypeName: UpdateColumnStreamResourceClosedInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_stream_resource_closed
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnStreamResourceClosed
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnStreamResourceCreateTime
+  description: Update the 'create_time' column in the 'stream_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnStreamResourceCreateTime
+    inputTypeName: UpdateColumnStreamResourceCreateTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_stream_resource_create_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnStreamResourceCreateTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnStreamResourceDeleteTime
+  description: Update the 'delete_time' column in the 'stream_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnStreamResourceDeleteTime
+    inputTypeName: UpdateColumnStreamResourceDeleteTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_stream_resource_delete_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnStreamResourceDeleteTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnStreamResourceEtag
+  description: Update the 'etag' column in the 'stream_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnStreamResourceEtag
+    inputTypeName: UpdateColumnStreamResourceEtagInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_stream_resource_etag
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnStreamResourceEtag
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnStreamResourceExpireTime
+  description: Update the 'expire_time' column in the 'stream_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnStreamResourceExpireTime
+    inputTypeName: UpdateColumnStreamResourceExpireTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_stream_resource_expire_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnStreamResourceExpireTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnStreamResourceId
+  description: Update the 'id' column in the 'stream_resource' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnStreamResourceId
+    inputTypeName: UpdateColumnStreamResourceIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_stream_resource_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnStreamResourceId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnStreamResourceName
+  description: Update the 'name' column in the 'stream_resource' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnStreamResourceName
+    inputTypeName: UpdateColumnStreamResourceNameInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_stream_resource_name
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnStreamResourceName
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnStreamResourceUid
+  description: Update the 'uid' column in the 'stream_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnStreamResourceUid
+    inputTypeName: UpdateColumnStreamResourceUidInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_stream_resource_uid
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnStreamResourceUid
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnStreamResourceUpdateTime
+  description: Update the 'update_time' column in the 'stream_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnStreamResourceUpdateTime
+    inputTypeName: UpdateColumnStreamResourceUpdateTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_stream_resource_update_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnStreamResourceUpdateTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateStreamResourceByIdUpdateColumns
+  description: Update the columns of the 'stream_resource' collection
+  fields:
+    - name: baseVersion
+      type: UpdateColumnStreamResourceBaseVersion
+      description: Update the 'base_version' column in the 'stream_resource' collection.
+    - name: closed
+      type: UpdateColumnStreamResourceClosed
+      description: Update the 'closed' column in the 'stream_resource' collection.
+    - name: createTime
+      type: UpdateColumnStreamResourceCreateTime
+      description: Update the 'create_time' column in the 'stream_resource' collection.
+    - name: deleteTime
+      type: UpdateColumnStreamResourceDeleteTime
+      description: Update the 'delete_time' column in the 'stream_resource' collection.
+    - name: etag
+      type: UpdateColumnStreamResourceEtag
+      description: Update the 'etag' column in the 'stream_resource' collection.
+    - name: expireTime
+      type: UpdateColumnStreamResourceExpireTime
+      description: Update the 'expire_time' column in the 'stream_resource' collection.
+    - name: id
+      type: UpdateColumnStreamResourceId
+      description: Update the 'id' column in the 'stream_resource' collection.
+    - name: name
+      type: UpdateColumnStreamResourceName
+      description: Update the 'name' column in the 'stream_resource' collection.
+    - name: uid
+      type: UpdateColumnStreamResourceUid
+      description: Update the 'uid' column in the 'stream_resource' collection.
+    - name: updateTime
+      type: UpdateColumnStreamResourceUpdateTime
+      description: Update the 'update_time' column in the 'stream_resource' collection.
+  graphql:
+    typeName: UpdateStreamResourceByIdUpdateColumns
+    inputTypeName: UpdateStreamResourceByIdUpdateColumnsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_stream_resource_by_id_update_columns
+      fieldMapping:
+        baseVersion:
+          column:
+            name: base_version
+        closed:
+          column:
+            name: closed
+        createTime:
+          column:
+            name: create_time
+        deleteTime:
+          column:
+            name: delete_time
+        etag:
+          column:
+            name: etag
+        expireTime:
+          column:
+            name: expire_time
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        uid:
+          column:
+            name: uid
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateStreamResourceByIdUpdateColumns
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - baseVersion
+          - closed
+          - createTime
+          - deleteTime
+          - etag
+          - expireTime
+          - id
+          - name
+          - uid
+          - updateTime
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateStreamResourceByIdResponse
+  description: Responses from the 'update_stream_resource_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[StreamResource!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: UpdateStreamResourceByIdResponse
+    inputTypeName: UpdateStreamResourceByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_stream_resource_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateStreamResourceByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: UpdateStreamResourceById
+  outputType: UpdateStreamResourceByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: postCheck
+      type: StreamResourceBoolExp
+      description: Update permission post-condition predicate over the
+        'stream_resource' collection
+    - name: preCheck
+      type: StreamResourceBoolExp
+      description: Update permission pre-condition predicate over the
+        'stream_resource' collection
+    - name: updateColumns
+      type: UpdateStreamResourceByIdUpdateColumns!
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: update_stream_resource_by_id
+    argumentMapping:
+      keyId: key_id
+      postCheck: post_check
+      preCheck: pre_check
+      updateColumns: update_columns
+  graphql:
+    rootFieldName: updateStreamResourceById
+    rootFieldKind: Mutation
+  description: Update any row on the 'stream_resource' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: UpdateStreamResourceById
+  permissions:
+    - role: admin
+      allowExecution: true
+

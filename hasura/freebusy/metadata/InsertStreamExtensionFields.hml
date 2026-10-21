@@ -1,0 +1,144 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertStreamExtensionFieldsObject
+  fields:
+    - name: booleanValue
+      type: Boolean_1
+    - name: dataValue
+      type: Json
+    - name: id
+      type: String_1!
+    - name: label
+      type: String_1!
+    - name: numberValue
+      type: Float64
+    - name: recordId
+      type: String_1!
+    - name: stringValue
+      type: String_1
+    - name: valueCase
+      type: String_1
+  graphql:
+    typeName: InsertStreamExtensionFieldsObject
+    inputTypeName: InsertStreamExtensionFieldsObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_stream_extension_fields_object
+      fieldMapping:
+        booleanValue:
+          column:
+            name: boolean_value
+        dataValue:
+          column:
+            name: data_value
+        id:
+          column:
+            name: id
+        label:
+          column:
+            name: label
+        numberValue:
+          column:
+            name: number_value
+        recordId:
+          column:
+            name: record_id
+        stringValue:
+          column:
+            name: string_value
+        valueCase:
+          column:
+            name: value_case
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertStreamExtensionFieldsObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - booleanValue
+          - dataValue
+          - id
+          - label
+          - numberValue
+          - recordId
+          - stringValue
+          - valueCase
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertStreamExtensionFieldsResponse
+  description: Responses from the 'insert_stream_extension_fields' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[StreamExtensionFields!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertStreamExtensionFieldsResponse
+    inputTypeName: InsertStreamExtensionFieldsResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_stream_extension_fields_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertStreamExtensionFieldsResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertStreamExtensionFields
+  outputType: InsertStreamExtensionFieldsResponse!
+  arguments:
+    - name: objects
+      type: "[InsertStreamExtensionFieldsObject!]!"
+    - name: postCheck
+      type: StreamExtensionFieldsBoolExp
+      description: Insert permission predicate over the 'stream_extension_fields' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: insert_stream_extension_fields
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertStreamExtensionFields
+    rootFieldKind: Mutation
+  description: Insert into the stream_extension_fields table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertStreamExtensionFields
+  permissions:
+    - role: admin
+      allowExecution: true
+

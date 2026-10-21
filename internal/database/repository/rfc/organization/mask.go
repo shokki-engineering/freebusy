@@ -16,8 +16,8 @@
 package organization
 
 import (
+	organizationpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organization/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/organization/v1/organizationpbv1"
 )
 
 // applyOrganizationMask merges the masked fields of in onto merged. An empty

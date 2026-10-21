@@ -2,7 +2,7 @@
 #
 # Without this every RFC resource lands in one schema. protoc-gen-store derives a
 # schema from the AIP resource-type host when no datasource rule matches, and
-# every protobuf-rfc resource declares the same host ("protobufrfc.dev") — so
+# every protobuf-rfc resource declares the same host ("the-protobuf-project.org") — so
 # Resource, Calendar, Event and the rest all collapse together, and the generator
 # drops colliding files (address_store.go appears in three RFC packages).
 #

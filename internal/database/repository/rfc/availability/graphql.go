@@ -16,6 +16,7 @@
 package availability
 
 import (
+	rfcavailabilitypbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"context"
 	"errors"
 	"fmt"
@@ -23,8 +24,9 @@ import (
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/availability"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/availabilityql/availabilitiesql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/availabilityql/availableperiodsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/availabilityql/calendartimesql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7953/availability/v1/rfcavailabilitypbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -108,7 +110,29 @@ func (r *GraphQLAvailabilityRepository) Create(ctx context.Context, parent strin
 		ci.EndId = vi.Id
 		ci.EndFormCase = "END"
 	}
-	if _, err := r.Svc.Mutation.Availability.Availabilities.Create(ctx, ci); err != nil {
+	// One transaction: the graph lands whole or not at all.
+	gtx := r.Svc.Mutation.Tx()
+	gtx.Add(r.Svc.Mutation.Availability.Availabilities.CreateOp(ci, new(availabilitiesql.InsertAvailabilityAvailabilitiesResponse)))
+	for _, v1 := range in.GetAvailablePeriods() {
+		n2 := availabilityAvailablePeriodToCreateInput(v1)
+		n2.Id = repox.NewULID()
+		n2.AvailabilityId = id
+		if v3 := v1.GetStart(); v3 != nil {
+			n4 := availabilityCalendarTimeToCreateInput(v3)
+			n4.Id = repox.NewULID()
+			gtx.Add(r.Svc.Mutation.Availability.CalendarTimes.CreateOp(n4, new(calendartimesql.InsertAvailabilityCalendarTimesResponse)))
+			n2.StartId = n4.Id
+		}
+		if v5 := v1.GetEnd(); v5 != nil {
+			n6 := availabilityCalendarTimeToCreateInput(v5)
+			n6.Id = repox.NewULID()
+			gtx.Add(r.Svc.Mutation.Availability.CalendarTimes.CreateOp(n6, new(calendartimesql.InsertAvailabilityCalendarTimesResponse)))
+			n2.EndId = n6.Id
+			n2.EndFormCase = "END"
+		}
+		gtx.Add(r.Svc.Mutation.Availability.AvailablePeriods.CreateOp(n2, new(availableperiodsql.InsertAvailabilityAvailablePeriodsResponse)))
+	}
+	if err := gtx.Commit(ctx); err != nil {
 		return nil, mapGraphQLErr(err)
 	}
 	return r.get(ctx, id)
@@ -158,6 +182,36 @@ func (r *GraphQLAvailabilityRepository) toProto(ctx context.Context, row *availa
 			out.EndForm = &rfcavailabilitypbv1.Availability_End{End: availabilityCalendarTimeFromRow(w)}
 		}
 	}
+	{
+		rows7, err := r.Svc.Query.Availability.AvailablePeriods.List(ctx, availableperiodsql.List().Where(availableperiodsql.AvailabilityId.Eq(row.Id)).OrderBy(availableperiodsql.Id.Asc()))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows7 {
+			p8 := availabilityAvailablePeriodFromRow(&rows7[i])
+			if id := (&rows7[i]).StartId; id != "" {
+				got9, err := r.Svc.Query.Availability.CalendarTimes.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got9 != nil {
+					p10 := availabilityCalendarTimeFromRow(got9)
+					p8.Start = p10
+				}
+			}
+			if id := repox.Deref((&rows7[i]).EndId); id != "" {
+				got11, err := r.Svc.Query.Availability.CalendarTimes.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got11 != nil {
+					p12 := availabilityCalendarTimeFromRow(got11)
+					p8.EndForm = &rfcavailabilitypbv1.AvailablePeriod_End{End: p12}
+				}
+			}
+			out.AvailablePeriods = append(out.AvailablePeriods, p8)
+		}
+	}
 	if h := r.Hooks.AfterRead; h != nil {
 		if err := h(ctx, out); err != nil {
 			return nil, err
@@ -176,6 +230,9 @@ func (r *GraphQLAvailabilityRepository) List(ctx context.Context, parent string,
 }
 
 func (r *GraphQLAvailabilityRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*rfcavailabilitypbv1.Availability, string, error) {
+	if !in.ShowDeleted {
+		scope = append(scope, availabilitiesql.DeleteTime.IsNull(true))
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -222,6 +279,17 @@ func (r *GraphQLAvailabilityRepository) Update(ctx context.Context, in *rfcavail
 	}
 	var staleStart string
 	var staleEnd string
+	var old17 []string
+	{
+		rows18, err := r.Svc.Query.Availability.AvailablePeriods.List(ctx, availableperiodsql.List().Where(availableperiodsql.AvailabilityId.Eq(id)))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows18 {
+			old17 = append(old17, rows18[i].Id)
+		}
+	}
+	staleAvailablePeriods := old17
 	existingPB := availabilityFromRow(row)
 	merged := proto.Clone(existingPB).(*rfcavailabilitypbv1.Availability)
 	applyAvailabilityMask(merged, in, paths)
@@ -245,10 +313,9 @@ func (r *GraphQLAvailabilityRepository) Update(ctx context.Context, in *rfcavail
 			patch.StartId = graphql.Value(vi.Id)
 		}
 	}
-	if repox.GroupTouched(paths, "end") {
+	if repox.GroupTouched(paths, "end") || repox.GroupTouched(paths, "duration") {
 		staleEnd = repox.Deref(row.EndId)
 		patch.EndId = graphql.Null[string]()
-		patch.EndFormCase = graphql.Null[string]()
 		if v := merged.GetEnd(); v != nil {
 			vi := availabilityCalendarTimeToCreateInput(v)
 			vi.Id = repox.NewULID()
@@ -258,6 +325,64 @@ func (r *GraphQLAvailabilityRepository) Update(ctx context.Context, in *rfcavail
 			patch.EndId = graphql.Value(vi.Id)
 			patch.EndFormCase = graphql.Value("END")
 		}
+	}
+	// New singular value objects land before the guarded row update (a lost
+	// race leaves them unreferenced); new list rows and the removal of
+	// replaced subtrees land only after it succeeds (atx).
+	utx := r.Svc.Mutation.Tx()
+	atx := r.Svc.Mutation.Tx()
+	if repox.GroupTouched(paths, "available_periods") {
+		for _, oid := range staleAvailablePeriods {
+			if id := oid; id != "" {
+				got19, err := r.Svc.Query.Availability.AvailablePeriods.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got19 != nil {
+					atx.Add(r.Svc.Mutation.Availability.AvailablePeriods.DeleteOp(got19.Id, new(availableperiodsql.DeleteAvailabilityAvailablePeriodsByIdResponse)))
+					if id := got19.StartId; id != "" {
+						got20, err := r.Svc.Query.Availability.CalendarTimes.Get(ctx, id)
+						if err != nil {
+							return nil, mapGraphQLErr(err)
+						}
+						if got20 != nil {
+							atx.Add(r.Svc.Mutation.Availability.CalendarTimes.DeleteOp(got20.Id, new(calendartimesql.DeleteAvailabilityCalendarTimesByIdResponse)))
+						}
+					}
+					if id := repox.Deref(got19.EndId); id != "" {
+						got21, err := r.Svc.Query.Availability.CalendarTimes.Get(ctx, id)
+						if err != nil {
+							return nil, mapGraphQLErr(err)
+						}
+						if got21 != nil {
+							atx.Add(r.Svc.Mutation.Availability.CalendarTimes.DeleteOp(got21.Id, new(calendartimesql.DeleteAvailabilityCalendarTimesByIdResponse)))
+						}
+					}
+				}
+			}
+		}
+		for _, v22 := range merged.GetAvailablePeriods() {
+			n23 := availabilityAvailablePeriodToCreateInput(v22)
+			n23.Id = repox.NewULID()
+			n23.AvailabilityId = id
+			if v24 := v22.GetStart(); v24 != nil {
+				n25 := availabilityCalendarTimeToCreateInput(v24)
+				n25.Id = repox.NewULID()
+				atx.Add(r.Svc.Mutation.Availability.CalendarTimes.CreateOp(n25, new(calendartimesql.InsertAvailabilityCalendarTimesResponse)))
+				n23.StartId = n25.Id
+			}
+			if v26 := v22.GetEnd(); v26 != nil {
+				n27 := availabilityCalendarTimeToCreateInput(v26)
+				n27.Id = repox.NewULID()
+				atx.Add(r.Svc.Mutation.Availability.CalendarTimes.CreateOp(n27, new(calendartimesql.InsertAvailabilityCalendarTimesResponse)))
+				n23.EndId = n27.Id
+				n23.EndFormCase = "END"
+			}
+			atx.Add(r.Svc.Mutation.Availability.AvailablePeriods.CreateOp(n23, new(availableperiodsql.InsertAvailabilityAvailablePeriodsResponse)))
+		}
+	}
+	if err := utx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
 	}
 	if in.GetEtag() != "" {
 		if _, err := r.Svc.Mutation.Availability.Availabilities.UpdateIfMatch(ctx, id, patch, availabilitiesql.Etag.Eq(in.GetEtag())); err != nil {
@@ -272,6 +397,9 @@ func (r *GraphQLAvailabilityRepository) Update(ctx context.Context, in *rfcavail
 			if _, err := r.Svc.Mutation.Availability.CalendarTimes.Delete(ctx, staleEnd); err != nil {
 				return nil, mapGraphQLErr(err)
 			}
+		}
+		if err := atx.Commit(ctx); err != nil {
+			return nil, mapGraphQLErr(err)
 		}
 		return r.get(ctx, id)
 	}
@@ -292,11 +420,58 @@ func (r *GraphQLAvailabilityRepository) Update(ctx context.Context, in *rfcavail
 			return nil, mapGraphQLErr(err)
 		}
 	}
+	if err := atx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GraphQLAvailabilityRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "calendars", "availabilities")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	patch := availabilitiesql.UpdateInput{DeleteTime: graphql.Value(time.Now().UTC().Format(time.RFC3339Nano))}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Availability.Availabilities.UpdateIfMatch(ctx, ids[len(ids)-1], patch, availabilitiesql.DeleteTime.IsNull(true)); err != nil {
+		if errors.Is(err, graphql.ErrConflict) {
+			return repox.ErrNotFound
+		}
+		return mapGraphQLErr(err)
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GraphQLAvailabilityRepository) Undelete(ctx context.Context, name string) (*rfcavailabilitypbv1.Availability, error) {
+	ids, err := repox.SplitName(name, "calendars", "availabilities")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	patch := availabilitiesql.UpdateInput{DeleteTime: graphql.Null[string]()}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Availability.Availabilities.UpdateIfMatch(ctx, id, patch, availabilitiesql.DeleteTime.IsNull(false)); err != nil {
+		if !errors.Is(err, graphql.ErrConflict) {
+			return nil, mapGraphQLErr(err)
+		}
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GraphQLAvailabilityRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "calendars", "availabilities")
 	if err != nil {
 		return err
@@ -327,6 +502,45 @@ func (r *GraphQLAvailabilityRepository) Delete(ctx context.Context, name string)
 				return mapGraphQLErr(err)
 			}
 		}
+	}
+	dtx := r.Svc.Mutation.Tx()
+	{
+		rows13, err := r.Svc.Query.Availability.AvailablePeriods.List(ctx, availableperiodsql.List().Where(availableperiodsql.AvailabilityId.Eq(id)))
+		if err != nil {
+			return mapGraphQLErr(err)
+		}
+		for i := range rows13 {
+			if id := rows13[i].Id; id != "" {
+				got14, err := r.Svc.Query.Availability.AvailablePeriods.Get(ctx, id)
+				if err != nil {
+					return mapGraphQLErr(err)
+				}
+				if got14 != nil {
+					dtx.Add(r.Svc.Mutation.Availability.AvailablePeriods.DeleteOp(got14.Id, new(availableperiodsql.DeleteAvailabilityAvailablePeriodsByIdResponse)))
+					if id := got14.StartId; id != "" {
+						got15, err := r.Svc.Query.Availability.CalendarTimes.Get(ctx, id)
+						if err != nil {
+							return mapGraphQLErr(err)
+						}
+						if got15 != nil {
+							dtx.Add(r.Svc.Mutation.Availability.CalendarTimes.DeleteOp(got15.Id, new(calendartimesql.DeleteAvailabilityCalendarTimesByIdResponse)))
+						}
+					}
+					if id := repox.Deref(got14.EndId); id != "" {
+						got16, err := r.Svc.Query.Availability.CalendarTimes.Get(ctx, id)
+						if err != nil {
+							return mapGraphQLErr(err)
+						}
+						if got16 != nil {
+							dtx.Add(r.Svc.Mutation.Availability.CalendarTimes.DeleteOp(got16.Id, new(calendartimesql.DeleteAvailabilityCalendarTimesByIdResponse)))
+						}
+					}
+				}
+			}
+		}
+	}
+	if err := dtx.Commit(ctx); err != nil {
+		return mapGraphQLErr(err)
 	}
 	return nil
 }

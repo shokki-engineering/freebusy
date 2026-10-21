@@ -16,14 +16,16 @@
 package event
 
 import (
+	eventpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"context"
 	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/event"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/event/v1/eventpbv1"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"time"
 )
 
 // GormEventRepository is the GORM adapter of EventRepository: flat
@@ -85,7 +87,89 @@ func (r *GormEventRepository) Create(ctx context.Context, parent string, in *eve
 			}
 			m.OrganizerID = repox.Ptr(vo.ID)
 		}
-		return event.NewEventStore(tx).Create(ctx, m)
+		if v1 := in.GetStart(); v1 != nil {
+			n2 := event.CalendarTimeFromProto(v1)
+			n2.ID = repox.NewULID()
+			n2.EventID = id
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n2).Error; err != nil {
+				return err
+			}
+			m.StartID = n2.ID
+		}
+		if v4 := in.GetEnd(); v4 != nil {
+			n5 := event.CalendarTimeFromProto(v4)
+			n5.ID = repox.NewULID()
+			n5.EventID = id
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n5).Error; err != nil {
+				return err
+			}
+			m.EndID = repox.Ptr(n5.ID)
+			c := event.EventEndsCaseEnd
+			m.EndsCase = &c
+		}
+		if v7 := in.GetRecurrence(); v7 != nil {
+			n8 := event.RecurrenceFromProto(v7)
+			n8.ID = repox.NewULID()
+			if v9 := v7.GetUntil(); v9 != nil {
+				n10 := event.CalendarTimeFromProto(v9)
+				n10.ID = repox.NewULID()
+				n10.EventID = id
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n10).Error; err != nil {
+					return err
+				}
+				n8.UntilID = repox.Ptr(n10.ID)
+				c := event.RecurrenceBoundCaseUntil
+				n8.BoundCase = &c
+			}
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n8).Error; err != nil {
+				return err
+			}
+			for _, v11 := range v7.GetWeekdays() {
+				n12 := event.WeekdayNumFromProto(v11)
+				n12.ID = repox.NewULID()
+				n12.RecurrenceID = n8.ID
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n12).Error; err != nil {
+					return err
+				}
+			}
+			m.RecurrenceID = repox.Ptr(n8.ID)
+		}
+		if err := event.NewEventStore(tx).Create(ctx, m); err != nil {
+			return err
+		}
+		for _, v17 := range in.GetAlarms() {
+			n18 := event.AlarmFromProto(v17)
+			n18.ID = repox.NewULID()
+			n18.EventID = id
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n18).Error; err != nil {
+				return err
+			}
+		}
+		for _, v21 := range in.GetExtensions() {
+			n22 := event.ExtensionPropertyFromProto(v21)
+			n22.ID = repox.NewULID()
+			n22.EventID = id
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n22).Error; err != nil {
+				return err
+			}
+		}
+		for _, v25 := range in.GetLinks() {
+			n26 := event.LinkFromProto(v25)
+			n26.ID = repox.NewULID()
+			n26.EventID = id
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n26).Error; err != nil {
+				return err
+			}
+		}
+		for _, v29 := range in.GetParticipants() {
+			n30 := event.ParticipantFromProto(v29)
+			n30.ID = repox.NewULID()
+			n30.EventID = id
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n30).Error; err != nil {
+				return err
+			}
+		}
+		return nil
 	}); err != nil {
 		return nil, repox.MapGormErr(err)
 	}
@@ -105,7 +189,7 @@ func (r *GormEventRepository) Get(ctx context.Context, name string) (*eventpbv1.
 // through, so Tier-2 overrides of Get never re-enter generated writes.
 func (r *GormEventRepository) get(ctx context.Context, id string) (*eventpbv1.Event, error) {
 	var m event.Event
-	if err := r.DB.WithContext(ctx).Preload("Organizer").First(&m, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("Organizer").Preload("Start").Preload("End").Preload("Recurrence").Preload("Recurrence.Until").Preload("Recurrence.WeekdayNums", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Alarms", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Links", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Participants", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&m, "id = ?", id).Error; err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.toProto(ctx, &m)
@@ -134,6 +218,9 @@ func (r *GormEventRepository) List(ctx context.Context, parent string, in repox.
 }
 
 func (r *GormEventRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*eventpbv1.Event, string, error) {
+	if !in.ShowDeleted {
+		scope = scope.Where("delete_time IS NULL")
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -142,7 +229,7 @@ func (r *GormEventRepository) list(ctx context.Context, scope *gorm.DB, in repox
 	for f, h := range r.ListOverrides {
 		eng.Override(f, h)
 	}
-	rows, next, err := eng.List(ctx, scope.Preload("Organizer"), filterx.ListInput{
+	rows, next, err := eng.List(ctx, scope.Preload("Organizer").Preload("Start").Preload("End").Preload("Recurrence").Preload("Recurrence.Until").Preload("Recurrence.WeekdayNums", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Alarms", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Links", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Participants", func(db *gorm.DB) *gorm.DB { return db.Order("id") }), filterx.ListInput{
 		PageSize:  in.PageSize,
 		PageToken: in.PageToken,
 		OrderBy:   in.OrderBy,
@@ -172,10 +259,17 @@ func (r *GormEventRepository) Update(ctx context.Context, in *eventpbv1.Event, p
 	id := ids[len(ids)-1]
 	err = r.DB.Transaction(func(tx *gorm.DB) error {
 		var existing event.Event
-		if err := tx.WithContext(ctx).Preload("Organizer").First(&existing, "id = ?", id).Error; err != nil {
+		if err := tx.WithContext(ctx).Preload("Organizer").Preload("Start").Preload("End").Preload("Recurrence").Preload("Recurrence.Until").Preload("Recurrence.WeekdayNums", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Alarms", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Links", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Participants", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 			return err
 		}
 		var staleOrganizer string
+		var staleStart *event.CalendarTime
+		var staleEnd *event.CalendarTime
+		var staleRecurrence *event.Recurrence
+		var staleAlarms []event.Alarm
+		var staleExtensions []event.ExtensionProperty
+		var staleLinks []event.Link
+		var staleParticipants []event.Participant
 		if in.GetEtag() != "" && existing.Etag != nil && *existing.Etag != in.GetEtag() {
 			return repox.ErrConflict
 		}
@@ -202,6 +296,7 @@ func (r *GormEventRepository) Update(ctx context.Context, in *eventpbv1.Event, p
 		existing.Position = next.Position
 		existing.Concepts = next.Concepts
 		existing.Refids = next.Refids
+		existing.EndsCase = next.EndsCase
 		if repox.GroupTouched(paths, "organizer") {
 			if existing.OrganizerID != nil {
 				staleOrganizer = *existing.OrganizerID
@@ -216,12 +311,172 @@ func (r *GormEventRepository) Update(ctx context.Context, in *eventpbv1.Event, p
 				existing.OrganizerID = repox.Ptr(vo.ID)
 			}
 		}
+		if repox.GroupTouched(paths, "start") {
+			staleStart = existing.Start
+			existing.StartID = ""
+			if v34 := merged.GetStart(); v34 != nil {
+				n35 := event.CalendarTimeFromProto(v34)
+				n35.ID = repox.NewULID()
+				n35.EventID = id
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n35).Error; err != nil {
+					return err
+				}
+				existing.StartID = n35.ID
+			}
+		}
+		if repox.GroupTouched(paths, "end") || repox.GroupTouched(paths, "duration") {
+			staleEnd = existing.End
+			existing.EndID = nil
+			if v37 := merged.GetEnd(); v37 != nil {
+				n38 := event.CalendarTimeFromProto(v37)
+				n38.ID = repox.NewULID()
+				n38.EventID = id
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n38).Error; err != nil {
+					return err
+				}
+				existing.EndID = repox.Ptr(n38.ID)
+				c := event.EventEndsCaseEnd
+				existing.EndsCase = &c
+			}
+		}
+		if repox.GroupTouched(paths, "recurrence") {
+			staleRecurrence = existing.Recurrence
+			existing.RecurrenceID = nil
+			if v43 := merged.GetRecurrence(); v43 != nil {
+				n44 := event.RecurrenceFromProto(v43)
+				n44.ID = repox.NewULID()
+				if v45 := v43.GetUntil(); v45 != nil {
+					n46 := event.CalendarTimeFromProto(v45)
+					n46.ID = repox.NewULID()
+					n46.EventID = id
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n46).Error; err != nil {
+						return err
+					}
+					n44.UntilID = repox.Ptr(n46.ID)
+					c := event.RecurrenceBoundCaseUntil
+					n44.BoundCase = &c
+				}
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n44).Error; err != nil {
+					return err
+				}
+				for _, v47 := range v43.GetWeekdays() {
+					n48 := event.WeekdayNumFromProto(v47)
+					n48.ID = repox.NewULID()
+					n48.RecurrenceID = n44.ID
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n48).Error; err != nil {
+						return err
+					}
+				}
+				existing.RecurrenceID = repox.Ptr(n44.ID)
+			}
+		}
+		if repox.GroupTouched(paths, "alarms") {
+			staleAlarms = existing.Alarms
+			for _, v51 := range merged.GetAlarms() {
+				n52 := event.AlarmFromProto(v51)
+				n52.ID = repox.NewULID()
+				n52.EventID = id
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n52).Error; err != nil {
+					return err
+				}
+			}
+		}
+		if repox.GroupTouched(paths, "extensions") {
+			staleExtensions = existing.ExtensionProperties
+			for _, v55 := range merged.GetExtensions() {
+				n56 := event.ExtensionPropertyFromProto(v55)
+				n56.ID = repox.NewULID()
+				n56.EventID = id
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n56).Error; err != nil {
+					return err
+				}
+			}
+		}
+		if repox.GroupTouched(paths, "links") {
+			staleLinks = existing.Links
+			for _, v59 := range merged.GetLinks() {
+				n60 := event.LinkFromProto(v59)
+				n60.ID = repox.NewULID()
+				n60.EventID = id
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n60).Error; err != nil {
+					return err
+				}
+			}
+		}
+		if repox.GroupTouched(paths, "participants") {
+			staleParticipants = existing.Participants
+			for _, v63 := range merged.GetParticipants() {
+				n64 := event.ParticipantFromProto(v63)
+				n64.ID = repox.NewULID()
+				n64.EventID = id
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n64).Error; err != nil {
+					return err
+				}
+			}
+		}
+		existing.Start = nil
+		existing.End = nil
+		existing.Recurrence = nil
+		existing.Alarms = nil
+		existing.ExtensionProperties = nil
+		existing.Links = nil
+		existing.Participants = nil
 		existing.Etag = repox.Ptr(repox.NewULID())
 		if err := event.NewEventStore(tx).Update(ctx, &existing); err != nil {
 			return err
 		}
 		if staleOrganizer != "" {
 			if err := tx.WithContext(ctx).Delete(&event.Organizer{}, "id = ?", staleOrganizer).Error; err != nil {
+				return err
+			}
+		}
+		if d33 := staleStart; d33 != nil {
+			if err := tx.WithContext(ctx).Delete(&event.CalendarTime{}, "id = ?", d33.ID).Error; err != nil {
+				return err
+			}
+		}
+		if d36 := staleEnd; d36 != nil {
+			if err := tx.WithContext(ctx).Delete(&event.CalendarTime{}, "id = ?", d36.ID).Error; err != nil {
+				return err
+			}
+		}
+		if d39 := staleRecurrence; d39 != nil {
+			for i40 := range d39.WeekdayNums {
+				d41 := &d39.WeekdayNums[i40]
+				if err := tx.WithContext(ctx).Delete(&event.WeekdayNum{}, "id = ?", d41.ID).Error; err != nil {
+					return err
+				}
+			}
+			if err := tx.WithContext(ctx).Delete(&event.Recurrence{}, "id = ?", d39.ID).Error; err != nil {
+				return err
+			}
+			if d42 := d39.Until; d42 != nil {
+				if err := tx.WithContext(ctx).Delete(&event.CalendarTime{}, "id = ?", d42.ID).Error; err != nil {
+					return err
+				}
+			}
+		}
+		for i49 := range staleAlarms {
+			d50 := &staleAlarms[i49]
+			if err := tx.WithContext(ctx).Delete(&event.Alarm{}, "id = ?", d50.ID).Error; err != nil {
+				return err
+			}
+		}
+		for i53 := range staleExtensions {
+			d54 := &staleExtensions[i53]
+			if err := tx.WithContext(ctx).Delete(&event.ExtensionProperty{}, "id = ?", d54.ID).Error; err != nil {
+				return err
+			}
+		}
+		for i57 := range staleLinks {
+			d58 := &staleLinks[i57]
+			if err := tx.WithContext(ctx).Delete(&event.Link{}, "id = ?", d58.ID).Error; err != nil {
+				return err
+			}
+		}
+		for i61 := range staleParticipants {
+			d62 := &staleParticipants[i61]
+			if err := tx.WithContext(ctx).Delete(&event.Participant{}, "id = ?", d62.ID).Error; err != nil {
 				return err
 			}
 		}
@@ -233,8 +488,54 @@ func (r *GormEventRepository) Update(ctx context.Context, in *eventpbv1.Event, p
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GormEventRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "calendars", "events")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	res := r.DB.WithContext(ctx).Model(&event.Event{}).
+		Where("id = ? AND delete_time IS NULL", ids[len(ids)-1]).
+		Updates(map[string]any{"delete_time": time.Now(), "etag": repox.NewULID()})
+	if res.Error != nil {
+		return repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return repox.ErrNotFound
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GormEventRepository) Undelete(ctx context.Context, name string) (*eventpbv1.Event, error) {
+	ids, err := repox.SplitName(name, "calendars", "events")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	res := r.DB.WithContext(ctx).Model(&event.Event{}).
+		Where("id = ? AND delete_time IS NOT NULL", id).
+		Updates(map[string]any{"delete_time": nil, "etag": repox.NewULID()})
+	if res.Error != nil {
+		return nil, repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GormEventRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "calendars", "events")
 	if err != nil {
 		return err
@@ -246,7 +547,7 @@ func (r *GormEventRepository) Delete(ctx context.Context, name string) error {
 	}
 	id := ids[len(ids)-1]
 	var existing event.Event
-	if err := r.DB.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("Organizer").Preload("Start").Preload("End").Preload("Recurrence").Preload("Recurrence.Until").Preload("Recurrence.WeekdayNums", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Alarms", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("ExtensionProperties", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Links", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("Participants", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 		return repox.MapGormErr(err)
 	}
 	return repox.MapGormErr(r.DB.Transaction(func(tx *gorm.DB) error {
@@ -255,6 +556,56 @@ func (r *GormEventRepository) Delete(ctx context.Context, name string) error {
 		}
 		if existing.OrganizerID != nil {
 			if err := tx.WithContext(ctx).Delete(&event.Organizer{}, "id = ?", *existing.OrganizerID).Error; err != nil {
+				return err
+			}
+		}
+		if d3 := existing.Start; d3 != nil {
+			if err := tx.WithContext(ctx).Delete(&event.CalendarTime{}, "id = ?", d3.ID).Error; err != nil {
+				return err
+			}
+		}
+		if d6 := existing.End; d6 != nil {
+			if err := tx.WithContext(ctx).Delete(&event.CalendarTime{}, "id = ?", d6.ID).Error; err != nil {
+				return err
+			}
+		}
+		if d13 := existing.Recurrence; d13 != nil {
+			for i14 := range d13.WeekdayNums {
+				d15 := &d13.WeekdayNums[i14]
+				if err := tx.WithContext(ctx).Delete(&event.WeekdayNum{}, "id = ?", d15.ID).Error; err != nil {
+					return err
+				}
+			}
+			if err := tx.WithContext(ctx).Delete(&event.Recurrence{}, "id = ?", d13.ID).Error; err != nil {
+				return err
+			}
+			if d16 := d13.Until; d16 != nil {
+				if err := tx.WithContext(ctx).Delete(&event.CalendarTime{}, "id = ?", d16.ID).Error; err != nil {
+					return err
+				}
+			}
+		}
+		for i19 := range existing.Alarms {
+			d20 := &existing.Alarms[i19]
+			if err := tx.WithContext(ctx).Delete(&event.Alarm{}, "id = ?", d20.ID).Error; err != nil {
+				return err
+			}
+		}
+		for i23 := range existing.ExtensionProperties {
+			d24 := &existing.ExtensionProperties[i23]
+			if err := tx.WithContext(ctx).Delete(&event.ExtensionProperty{}, "id = ?", d24.ID).Error; err != nil {
+				return err
+			}
+		}
+		for i27 := range existing.Links {
+			d28 := &existing.Links[i27]
+			if err := tx.WithContext(ctx).Delete(&event.Link{}, "id = ?", d28.ID).Error; err != nil {
+				return err
+			}
+		}
+		for i31 := range existing.Participants {
+			d32 := &existing.Participants[i31]
+			if err := tx.WithContext(ctx).Delete(&event.Participant{}, "id = ?", d32.ID).Error; err != nil {
 				return err
 			}
 		}

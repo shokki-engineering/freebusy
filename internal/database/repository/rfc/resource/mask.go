@@ -16,8 +16,8 @@
 package resource
 
 import (
+	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9073/resource/v1/resourcepbv1"
 )
 
 // applyResourceMask merges the masked fields of in onto merged. An empty
@@ -49,5 +49,8 @@ func applyResourceMask(merged, in *resourcepbv1.Resource, paths []string) {
 	}
 	if repox.InMask(paths, "organizational_unit") {
 		merged.OrganizationalUnit = in.GetOrganizationalUnit()
+	}
+	if repox.GroupTouched(paths, "structured_data") {
+		merged.StructuredData = in.GetStructuredData()
 	}
 }

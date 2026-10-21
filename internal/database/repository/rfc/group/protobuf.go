@@ -16,11 +16,12 @@
 package group
 
 import (
+	ldapgrouppbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/group/v1"
+	scimgrouppbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/group/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/groupql/ldapgroupsql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/groupql/membersql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/groupql/resourceql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/group/v1/ldapgrouppbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7643/group/v1/scimgrouppbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
@@ -111,6 +112,9 @@ func groupFromRow(row *resourceql.GroupResource) *scimgrouppbv1.Group {
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.Uid = repox.Deref(row.Uid)
+	out.DeleteTime = strToTs(repox.Deref(row.DeleteTime))
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
 	return out
 }
 
@@ -162,5 +166,32 @@ func ldapGroupFromRow(row *ldapgroupsql.GroupLdapGroups) *ldapgrouppbv1.LdapGrou
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)
+	out.Uid = repox.Deref(row.Uid)
+	out.DeleteTime = strToTs(repox.Deref(row.DeleteTime))
+	out.ExpireTime = strToTs(repox.Deref(row.ExpireTime))
+	return out
+}
+
+// groupMemberToCreateInput maps the value-object proto onto its client
+// insert input; the adapter mints the id and wires the reference.
+func groupMemberToCreateInput(in *scimgrouppbv1.Member) membersql.CreateInput {
+	var ci membersql.CreateInput
+	ci.Value = in.GetValue()
+	ci.ReferenceUri = in.GetReferenceUri()
+	ci.AttributeType = in.GetAttributeType()
+	ci.Display = in.GetDisplay()
+	return ci
+}
+
+// groupMemberFromRow re-hydrates the value-object proto from a client row.
+func groupMemberFromRow(row *membersql.GroupMembers) *scimgrouppbv1.Member {
+	if row == nil {
+		return nil
+	}
+	out := &scimgrouppbv1.Member{}
+	out.Value = row.Value
+	out.ReferenceUri = repox.Deref(row.ReferenceUri)
+	out.AttributeType = repox.Deref(row.AttributeType)
+	out.Display = repox.Deref(row.Display)
 	return out
 }

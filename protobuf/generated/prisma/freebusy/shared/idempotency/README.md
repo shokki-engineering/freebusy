@@ -22,7 +22,7 @@ Schema file: [`idempotency.postgres.prisma`](./idempotency.postgres.prisma)
 
 ### `IdempotencyKey` → `idempotency_keys`
 
-The record behind every `request_id` field in this API: it remembers what the first call with a given id returned, so a retry replays that response instead of attempting the write twice. Storage only — no service exposes it, and no caller constructs one. It lives in freebusy.shared.v1 because request_id is API-wide (booking, property, promo code, channel, organisation, schedule) and one interceptor records them all; homing it in any single service's package would make every other service import that service to dedupe its own writes. The id is derived, not random: it is a digest of (method, request_id), so the primary key itself is the uniqueness constraint that makes a concurrent duplicate lose the race rather than double-write.
+The record behind every `request_id` field in this API: it remembers what the first call with a given id returned, so a retry replays that response instead of attempting the write twice. Storage only — no service exposes it, and no caller constructs one. It lives in freebusy.shared.v1 because request_id is an API-wide convention any RPC may opt into, and one interceptor records them all; homing it in any single service's package would make every other service import that service to dedupe its own writes. No RPC declares request_id today -- holds and reservations carry their own idempotency. The id is derived, not random: it is a digest of (method, request_id), so the primary key itself is the uniqueness constraint that makes a concurrent duplicate lose the race rather than double-write.
 
 | Column | Type | Null |
 | --- | --- | --- |
@@ -30,7 +30,7 @@ The record behind every `request_id` field in this API: it remembers what the fi
 | `name` | `VARCHAR(255)` | not null |
 | `method` | `VARCHAR(255)` | not null |
 | `request_id` | `VARCHAR(255)` | not null |
-| `state` | `IdempotencyState` | not null |
+| `state` | `IdempotencyState` | nullable |
 | `response` | `TEXT` | nullable |
 | `create_time` | `TIMESTAMPTZ` | not null |
 | `update_time` | `TIMESTAMPTZ` | not null |

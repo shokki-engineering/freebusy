@@ -4,7 +4,7 @@
 // 	protoc (unknown)
 //
 // database: freebusy
-// schemas:  allocation, pricing, promocode, property, reservation, shared, common
+// schemas:  allocation, reservation, shared
 //
 // Prisma 7 configuration; connection URLs are environment-driven.
 // annotations: entity.v1 1.5.4, store.v1 1.5.4
@@ -28,7 +28,6 @@ export default defineConfig({
 	},
 	datasource: {
 		// Single database URL for all schemas.
-		// Declared in proto: postgresql://localhost:5432/freebusydb
 		url: env("FREEBUSY_DATABASE_URL"),
 	},
 });

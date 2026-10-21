@@ -6,13 +6,16 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 1 | 1 |
+| 2 | 1 |
 
 ## Entity relationships
 
 ```mermaid
 erDiagram
     direction LR
+    Fraction {
+        string id PK
+    }
     TimeZone {
         string id PK
     }
@@ -22,3 +25,4 @@ erDiagram
 
 - [`datetime/`](./datetime/README.md)
 - [`dayofweek/`](./dayofweek/README.md)
+- [`fraction/`](./fraction/README.md)

@@ -12,19 +12,24 @@ require (
 	github.com/oh-tarnished/runtime-go/config v0.0.0-20260625174747-ee0fd6e44bef
 	github.com/oh-tarnished/runtime-go/ulid v0.0.0-20260625174747-ee0fd6e44bef
 	github.com/the-protobuf-project/opentelementry/opentelementry-go v0.0.0-20260722091843-d33763c88e10
-	github.com/the-protobuf-project/resourcename v0.0.0-20260616190751-3e187a5d3da5
 	github.com/the-protobuf-project/runtime-go/cache v0.0.0-20260904124945-28b95e838f2e
 	github.com/the-protobuf-project/runtime-go/grpc v0.0.0-20260904124504-3aec40995305
 	github.com/the-protobuf-project/runtime-go/network v0.0.0-20260904124504-3aec40995305
 	github.com/the-protobuf-project/telemetry/telemetry-go v0.0.0-20260817061725-884f94d7858d
 	go.opentelemetry.io/otel v1.46.0
-	google.golang.org/genproto v0.0.0-20260720211330-0afa2a65878a
+	google.golang.org/genproto v0.0.0-20260831171406-18b4a7587f8a
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260825221802-da73d73af1c5
 	google.golang.org/grpc v1.83.2
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.2
+)
+
+require (
+	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20260908111956-0fb3b0591946.1 // indirect
+	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20260908111956-0fb3b0591946.2 // indirect
+	github.com/the-protobuf-project/runtime-go/rfc v0.0.0-20261019152637-a91d78dbb831 // indirect
 )
 
 require (
@@ -103,7 +108,6 @@ require (
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/segmentio/encoding v0.5.4 // indirect
 	github.com/stretchr/testify v1.12.1 // indirect
-	github.com/the-protobuf-project/cache v0.0.0-20260902115713-8fbb865fa57f // indirect
 	github.com/the-protobuf-project/grpc-mcp-gateway v1.6.1 // indirect
 	github.com/the-protobuf-project/runtime-go/agents v0.0.0-20260904054035-1f2313e0d64a // indirect
 	github.com/the-protobuf-project/runtime-go/observability v0.0.0-20260904124504-3aec40995305 // indirect

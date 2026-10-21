@@ -19,9 +19,11 @@ import (
 	"strings"
 	"time"
 
+	vcardpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc6350/vcard/v1"
 	"github.com/lib/pq"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc6350/vcard/v1/vcardpbv1"
 	"google.golang.org/genproto/googleapis/type/date"
+	"google.golang.org/genproto/googleapis/type/datetime"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -235,6 +237,54 @@ func ContactToProto(m *Contact) *vcardpbv1.Contact {
 	out.NameComponents = NameToProto(m.NameComponents)
 	out.Birthday = DateOrTextToProto(m.Birthday)
 	out.Anniversary = DateOrTextToProto(m.Anniversary)
+	for i := range m.Emails {
+		out.Emails = append(out.Emails, EmailToProto(&m.Emails[i]))
+	}
+	for i := range m.Telephones {
+		out.Telephones = append(out.Telephones, TelephoneToProto(&m.Telephones[i]))
+	}
+	for i := range m.Address {
+		out.Addresses = append(out.Addresses, AddressToProto(&m.Address[i]))
+	}
+	for i := range m.Organizations {
+		out.Organizations = append(out.Organizations, OrganizationToProto(&m.Organizations[i]))
+	}
+	for i := range m.ExtensionProperties {
+		out.Extensions = append(out.Extensions, ExtensionPropertyToProto(&m.ExtensionProperties[i]))
+	}
+	for i := range m.Nicknames {
+		out.Nicknames = append(out.Nicknames, NicknameToProto(&m.Nicknames[i]))
+	}
+	for i := range m.Urls {
+		out.Urls = append(out.Urls, UrlToProto(&m.Urls[i]))
+	}
+	for i := range m.Roles {
+		out.Roles = append(out.Roles, RoleToProto(&m.Roles[i]))
+	}
+	for i := range m.InstantMessages {
+		out.InstantMessages = append(out.InstantMessages, InstantMessageToProto(&m.InstantMessages[i]))
+	}
+	for i := range m.Languages {
+		out.Languages = append(out.Languages, LanguageToProto(&m.Languages[i]))
+	}
+	for i := range m.Geos {
+		out.Locations = append(out.Locations, GeoToProto(&m.Geos[i]))
+	}
+	for i := range m.Timezones {
+		out.Timezones = append(out.Timezones, TimezoneToProto(&m.Timezones[i]))
+	}
+	for i := range m.Relations {
+		out.Relations = append(out.Relations, RelationToProto(&m.Relations[i]))
+	}
+	for i := range m.Pronouns {
+		out.Pronouns = append(out.Pronouns, PronounsToProto(&m.Pronouns[i]))
+	}
+	for i := range m.GrammaticalGenders {
+		out.GrammaticalGenders = append(out.GrammaticalGenders, GrammaticalGenderToProto(&m.GrammaticalGenders[i]))
+	}
+	for i := range m.SocialProfiles {
+		out.SocialProfiles = append(out.SocialProfiles, SocialProfileToProto(&m.SocialProfiles[i]))
+	}
 	return out
 }
 
@@ -246,7 +296,7 @@ func ContactFromProto(pb *vcardpbv1.Contact) *Contact {
 		return nil
 	}
 	m := &Contact{}
-	// not mapped here: name_components (sub-row graph), birthday (sub-row graph), anniversary (sub-row graph)
+	// not mapped here: name_components (sub-row graph), birthday (sub-row graph), anniversary (sub-row graph), emails (sub-row graph), telephones (sub-row graph), addresses (sub-row graph), organizations (sub-row graph), extensions (sub-row graph), nicknames (sub-row graph), urls (sub-row graph), roles (sub-row graph), instant_messages (sub-row graph), languages (sub-row graph), locations (sub-row graph), timezones (sub-row graph), relations (sub-row graph), pronouns (sub-row graph), grammatical_genders (sub-row graph), social_profiles (sub-row graph)
 	m.Kind = KindPtrFromProto(pb.GetKind())
 	m.DisplayNames = pq.StringArray(pb.GetDisplayNames())
 	m.Titles = pq.StringArray(pb.GetTitles())
@@ -354,6 +404,14 @@ func TelephoneFromProto(pb *vcardpbv1.Telephone) *Telephone {
 	m.Types = enumsToCSV(pb.GetTypes())
 	m.Features = enumsToCSV(pb.GetFeatures())
 	m.Pref = toPtr(pb.GetPref())
+	switch pb.GetValue().(type) {
+	case *vcardpbv1.Telephone_Uri:
+		c := TelephoneValueCaseURI
+		m.ValueCase = &c
+	case *vcardpbv1.Telephone_Text:
+		c := TelephoneValueCaseText
+		m.ValueCase = &c
+	}
 	return m
 }
 
@@ -487,9 +545,11 @@ func DateOrTextToProto(m *DateOrText) *vcardpbv1.DateOrText {
 		return nil
 	}
 	out := &vcardpbv1.DateOrText{}
-	// not mapped here: date_time
 	if v := goToDate(m.Date); v != nil {
 		out.Value = &vcardpbv1.DateOrText_Date{Date: v}
+	}
+	if v := goToDt(m.DateTime); v != nil {
+		out.Value = &vcardpbv1.DateOrText_DateTime{DateTime: v}
 	}
 	if v := fromPtr(m.Text); v != "" {
 		out.Value = &vcardpbv1.DateOrText_Text{Text: v}
@@ -505,9 +565,20 @@ func DateOrTextFromProto(pb *vcardpbv1.DateOrText) *DateOrText {
 		return nil
 	}
 	m := &DateOrText{}
-	// not mapped here: date_time
 	m.Date = dateToGo(pb.GetDate())
+	m.DateTime = dtToGo(pb.GetDateTime())
 	m.Text = toPtr(pb.GetText())
+	switch pb.GetValue().(type) {
+	case *vcardpbv1.DateOrText_Date:
+		c := DateOrTextValueCaseDate
+		m.ValueCase = &c
+	case *vcardpbv1.DateOrText_DateTime:
+		c := DateOrTextValueCaseDateTime
+		m.ValueCase = &c
+	case *vcardpbv1.DateOrText_Text:
+		c := DateOrTextValueCaseText
+		m.ValueCase = &c
+	}
 	return m
 }
 
@@ -707,6 +778,17 @@ func TimezoneFromProto(pb *vcardpbv1.Timezone) *Timezone {
 	m.UtcOffset = toPtr(pb.GetUtcOffset())
 	m.Types = enumsToCSV(pb.GetTypes())
 	m.Pref = toPtr(pb.GetPref())
+	switch pb.GetValue().(type) {
+	case *vcardpbv1.Timezone_Text:
+		c := TimezoneValueCaseText
+		m.ValueCase = &c
+	case *vcardpbv1.Timezone_Uri:
+		c := TimezoneValueCaseURI
+		m.ValueCase = &c
+	case *vcardpbv1.Timezone_UtcOffset:
+		c := TimezoneValueCaseUtcOffset
+		m.ValueCase = &c
+	}
 	return m
 }
 
@@ -740,6 +822,14 @@ func RelationFromProto(pb *vcardpbv1.Relation) *Relation {
 	m.Text = toPtr(pb.GetText())
 	m.RelationTypes = enumsToCSV(pb.GetRelationTypes())
 	m.Pref = toPtr(pb.GetPref())
+	switch pb.GetValue().(type) {
+	case *vcardpbv1.Relation_Uri:
+		c := RelationValueCaseURI
+		m.ValueCase = &c
+	case *vcardpbv1.Relation_Text:
+		c := RelationValueCaseText
+		m.ValueCase = &c
+	}
 	return m
 }
 
@@ -831,6 +921,14 @@ func SocialProfileFromProto(pb *vcardpbv1.SocialProfile) *SocialProfile {
 	m.Username = toPtr(pb.GetUsername())
 	m.Types = enumsToCSV(pb.GetTypes())
 	m.Pref = toPtr(pb.GetPref())
+	switch pb.GetValue().(type) {
+	case *vcardpbv1.SocialProfile_Uri:
+		c := SocialProfileValueCaseURI
+		m.ValueCase = &c
+	case *vcardpbv1.SocialProfile_Text:
+		c := SocialProfileValueCaseText
+		m.ValueCase = &c
+	}
 	return m
 }
 
@@ -884,6 +982,50 @@ func goValToTs(t time.Time) *timestamppb.Timestamp {
 		return nil
 	}
 	return timestamppb.New(t)
+}
+
+// dtToGo maps a google.type.DateTime onto a nullable TIMESTAMPTZ instant. A
+// time zone resolves through the IANA database and a UTC offset as a fixed
+// zone; a floating value (neither) has no instant of its own and is read as
+// UTC.
+func dtToGo(d *datetime.DateTime) *time.Time {
+	if d == nil {
+		return nil
+	}
+	t := dtToGoVal(d)
+	return &t
+}
+
+// dtToGoVal is dtToGo for a NOT NULL column.
+func dtToGoVal(d *datetime.DateTime) time.Time {
+	if d == nil {
+		return time.Time{}
+	}
+	loc := time.UTC
+	switch {
+	case d.GetTimeZone().GetId() != "":
+		if l, err := time.LoadLocation(d.GetTimeZone().GetId()); err == nil {
+			loc = l
+		}
+	case d.GetUtcOffset() != nil:
+		loc = time.FixedZone("", int(d.GetUtcOffset().AsDuration()/time.Second))
+	}
+	return time.Date(int(d.GetYear()), time.Month(d.GetMonth()), int(d.GetDay()),
+		int(d.GetHours()), int(d.GetMinutes()), int(d.GetSeconds()), int(d.GetNanos()), loc)
+}
+
+// goToDt maps a TIMESTAMPTZ instant back onto a DateTime, in UTC: the stored
+// instant is what survives, not the zone it was written in.
+func goToDt(t *time.Time) *datetime.DateTime {
+	if t == nil || t.IsZero() {
+		return nil
+	}
+	u := t.UTC()
+	return &datetime.DateTime{
+		Year: int32(u.Year()), Month: int32(u.Month()), Day: int32(u.Day()),
+		Hours: int32(u.Hour()), Minutes: int32(u.Minute()), Seconds: int32(u.Second()), Nanos: int32(u.Nanosecond()),
+		TimeOffset: &datetime.DateTime_UtcOffset{UtcOffset: durationpb.New(0)},
+	}
 }
 
 // dateToGo maps a proto date onto a nullable DATE value (UTC midnight).

@@ -55,7 +55,8 @@ type ReservationHooks struct {
 	// BeforeUpdate runs after the mask is applied to the merged record,
 	// before it is written.
 	BeforeUpdate func(ctx context.Context, existing, merged *reservationpbv1.Reservation, paths []string) error
-	// BeforeDelete runs before the row is removed; returning an error vetoes.
+	// BeforeDelete runs before the row is removed (or, with soft delete,
+	// marked deleted); returning an error vetoes.
 	BeforeDelete func(ctx context.Context, name string) error
 }
 

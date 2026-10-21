@@ -16,11 +16,11 @@
 package project
 
 import (
+	projectpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/shared/project/v1"
 	"context"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/shared/project/v1/projectpbv1"
 	"gorm.io/gorm"
 )
 
@@ -39,8 +39,15 @@ type ProjectRepository interface {
 	// mutable field. m.Etag, when set, guards against concurrent writes
 	// (repox.ErrConflict).
 	Update(ctx context.Context, m *projectpbv1.Project, paths []string) (*projectpbv1.Project, error)
-	// Delete removes the record addressed by its resource name.
+	// Delete soft-deletes the record addressed by its resource name (AIP-164):
+	// Get still returns it, with delete_time set; List skips it unless
+	// ShowDeleted. repox.ErrNotFound when absent or already deleted.
 	Delete(ctx context.Context, name string) error
+	// Undelete restores a soft-deleted record and returns it;
+	// repox.ErrAlreadyExists when it is not deleted.
+	Undelete(ctx context.Context, name string) (*projectpbv1.Project, error)
+	// Purge removes the record, deleted or not, for good.
+	Purge(ctx context.Context, name string) error
 }
 
 // ProjectHooks lets custom logic run inside the generated Project
@@ -55,7 +62,8 @@ type ProjectHooks struct {
 	// BeforeUpdate runs after the mask is applied to the merged record,
 	// before it is written.
 	BeforeUpdate func(ctx context.Context, existing, merged *projectpbv1.Project, paths []string) error
-	// BeforeDelete runs before the row is removed; returning an error vetoes.
+	// BeforeDelete runs before the row is removed (or, with soft delete,
+	// marked deleted); returning an error vetoes.
 	BeforeDelete func(ctx context.Context, name string) error
 }
 

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: google/type/datetime.proto
+// source: google/type/datetime.proto, google/type/fraction.proto
 //
 // database: rfc
 // schema:   common

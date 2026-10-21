@@ -6,7 +6,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 66 | 45 |
+| 76 | 49 |
 
 ## Entity relationships
 
@@ -107,6 +107,9 @@ erDiagram
         string location_id FK
         string resource_id FK
     }
+    Fraction {
+        string id PK
+    }
     Geo {
         string id PK
         string contact_id FK
@@ -178,6 +181,17 @@ erDiagram
     Organizer {
         string id PK
     }
+    Pack {
+        string id PK
+    }
+    PackExtensionField {
+        string id PK
+        string record_id FK
+    }
+    PackRecord {
+        string id PK
+        string pack_id FK
+    }
     Participant {
         string id PK
         string event_id FK
@@ -210,11 +224,29 @@ erDiagram
         string id PK
         string contact_id FK
     }
+    Sensor {
+        string id PK
+    }
     SocialProfile {
         string id PK
         string contact_id FK
     }
     Speech {
+        string id PK
+    }
+    Stream {
+        string id PK
+    }
+    StreamExtensionField {
+        string id PK
+        string record_id FK
+    }
+    StreamRecord {
+        string id PK
+        string stream_id FK
+        string record_id FK
+    }
+    StreamRecord2 {
         string id PK
     }
     StyledDescription {
@@ -246,6 +278,11 @@ erDiagram
     TodoExtensionProperty {
         string id PK
         string todo_id FK
+    }
+    Unit {
+        string id PK
+        string scale_id FK
+        string offset_id FK
     }
     Url {
         string id PK
@@ -334,6 +371,8 @@ erDiagram
     Membership }o--|| LdapGroup : "ldap_group_id"
     NameComponent }o--|| CardName : "name_id"
     Nickname }o--|| Contact : "contact_id"
+    PackExtensionField }o--|| PackRecord : "record_id"
+    PackRecord }o--|| Pack : "pack_id"
     Participant }o--|| Event : "event_id"
     Pronouns }o--|| Contact : "contact_id"
     Recurrence }o--|| EventCalendarTime : "until_id"
@@ -343,6 +382,9 @@ erDiagram
     ResourceStructuredData }o--|| ResourceResource : "resource_id"
     Role }o--|| Contact : "contact_id"
     SocialProfile }o--|| Contact : "contact_id"
+    StreamExtensionField }o--|| StreamRecord2 : "record_id"
+    StreamRecord }o--|| Stream : "stream_id"
+    StreamRecord }o--|| StreamRecord2 : "record_id"
     StyledDescription }o--|| Event : "event_id"
     StyledDescription }o--|| Participant : "participant_id"
     Telephone }o--|| Contact : "contact_id"
@@ -352,6 +394,8 @@ erDiagram
     Todo }o--|| TodoCalendarTime : "due_id"
     Todo }o--|| TodoCalendarTime : "completed_id"
     TodoExtensionProperty }o--|| Todo : "todo_id"
+    Unit }o--|| Fraction : "scale_id"
+    Unit }o--|| Fraction : "offset_id"
     Url }o--|| Contact : "contact_id"
     User }o--|| UserName : "name_components_id"
     User }o--|| EnterpriseUser : "enterprise_id"
@@ -370,6 +414,7 @@ erDiagram
 - [`rfc6350/`](./rfc6350/README.md)
 - [`rfc7643/`](./rfc7643/README.md)
 - [`rfc7953/`](./rfc7953/README.md)
+- [`rfc8428/`](./rfc8428/README.md)
 - [`rfc9073/`](./rfc9073/README.md)
 - [`rfc9553/`](./rfc9553/README.md)
 - [`shared/`](./shared/README.md)

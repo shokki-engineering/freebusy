@@ -23,7 +23,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/oh-tarnished/freebusy/internal"
 	"github.com/oh-tarnished/freebusy/internal/database"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/promocode/v1/promocodepbv1"
+	"github.com/oh-tarnished/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/the-protobuf-project/runtime-go/grpc"
 )
 
@@ -55,54 +55,46 @@ func TestMCP_ValidationAndLifecycle_Gorm(t *testing.T) {
 		Addr:             addr,
 		UnaryInterceptor: validate, // what buildMCPConfigForPort threads through
 	}
-	go func() { served <- promocodepbv1.ServePromoCodeServiceMCP(ctx, svc, cfg) }()
+	go func() { served <- allocationpbv1.ServeAllocationServiceMCP(ctx, svc, cfg) }()
 
-	endpoint := fmt.Sprintf("http://%s%s", addr, promocodepbv1.PromoCodeServiceMCPDefaultBasePath)
+	endpoint := fmt.Sprintf("http://%s%s", addr, allocationpbv1.AllocationServiceMCPDefaultBasePath)
 	session := dialMCP(t, endpoint)
 
-	// Invalid create — the interceptor must reject it before the handler runs
-	// (this used to panic or write an unvalidated row).
-	//
-	// Driven through PromoCodeService since OrganisationService was retired to
-	// RFC 4519; the subject is the MCP surface and the interceptor, not the
-	// particular service.
+	// An invalid call -- no site, no window -- must be rejected by the
+	// interceptor before the handler runs. The subject is the MCP surface and
+	// the interceptor, not the particular service.
 	res, err := session.CallTool(context.Background(), &mcp.CallToolParams{
-		Name:      "promo_code_service-create_promo_code_v1",
+		Name:      "allocation_service-check_availability_v1",
 		Arguments: map[string]any{},
 	})
 	if err != nil {
-		t.Fatalf("invalid create transport error: %v", err)
+		t.Fatalf("invalid call transport error: %v", err)
 	}
 	if !res.IsError {
-		t.Fatalf("invalid create was accepted: %v", res.Content)
+		t.Fatalf("invalid call was accepted: %v", res.Content)
 	}
-	if text := toolText(res); !strings.Contains(text, "promo_code") {
+	if text := toolText(res); !strings.Contains(text, "parent") {
 		t.Fatalf("rejection does not read as a validation error: %q", text)
 	}
 
-	// Valid create round-trips, and the row is cleaned up over the same surface.
+	// A valid call round-trips. A site with no resources is a valid question
+	// with a definite answer: nothing is free.
+	start := time.Now().UTC().AddDate(0, 0, 7).Truncate(time.Hour)
 	res, err = session.CallTool(context.Background(), &mcp.CallToolParams{
-		Name: "promo_code_service-create_promo_code_v1",
+		Name: "allocation_service-check_availability_v1",
 		Arguments: map[string]any{
-			"promo_code": map[string]any{
-				"code":     fmt.Sprintf("MCPE2E%d", time.Now().UnixNano()%1_000_000_000),
-				"discount": map[string]any{"percent_off": 10},
+			"parent": fmt.Sprintf("organizationalUnits/mcp-e2e-%d", time.Now().UnixNano()%1_000_000_000),
+			"window": map[string]any{
+				"start_time": start.Format(time.RFC3339),
+				"end_time":   start.Add(time.Hour).Format(time.RFC3339),
 			},
 		},
 	})
 	if err != nil || res.IsError {
-		t.Fatalf("valid create failed: err=%v content=%v", err, res.Content)
+		t.Fatalf("valid call failed: err=%v content=%v", err, res.Content)
 	}
-	name := extractJSONField(toolText(res), "name")
-	if !strings.HasPrefix(name, "promoCodes/") {
-		t.Fatalf("created name = %q", name)
-	}
-	res, err = session.CallTool(context.Background(), &mcp.CallToolParams{
-		Name:      "promo_code_service-delete_promo_code_v1",
-		Arguments: map[string]any{"name": name, "force": true},
-	})
-	if err != nil || res.IsError {
-		t.Fatalf("delete failed: err=%v content=%v", err, res.Content)
+	if text := toolText(res); strings.Contains(text, `"bookable": true`) || strings.Contains(text, `"bookable":true`) {
+		t.Fatalf("an empty site reported bookable: %s", text)
 	}
 	_ = session.Close()
 
@@ -112,7 +104,7 @@ func TestMCP_ValidationAndLifecycle_Gorm(t *testing.T) {
 	select {
 	case <-served:
 	case <-time.After(5 * time.Second):
-		t.Fatal("ServePromoCodeServiceMCP did not return after context cancellation")
+		t.Fatal("ServeAllocationServiceMCP did not return after context cancellation")
 	}
 }
 

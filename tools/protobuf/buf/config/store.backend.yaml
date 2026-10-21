@@ -39,7 +39,7 @@ datasources:
   # regenerated when protobuf-rfc releases, not when freebusy changes. Without a
   # rule here every RFC resource collapses into one schema: protoc-gen-store
   # falls back to the AIP resource-type host, and every protobuf-rfc resource
-  # declares the same one ("protobufrfc.dev").
+  # declares the same one ("the-protobuf-project.org").
   # organizational_unit is the only multi-word schema in either database, and a
   # multi-word schema breaks the graphql target: DDN names a model by
   # concatenating schema and table in PascalCase ("OrganizationalUnitResource"),

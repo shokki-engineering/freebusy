@@ -1,0 +1,283 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: SensorResource
+  fields:
+    - name: createTime
+      type: Timestamptz!
+    - name: deleteTime
+      type: Timestamptz
+    - name: displayName
+      type: String_1
+    - name: etag
+      type: String_1
+    - name: expireTime
+      type: Timestamptz
+    - name: id
+      type: String_1!
+    - name: interfaceDescriptions
+      type: "[String_1]"
+    - name: mediaTypes
+      type: "[String_1]"
+    - name: name
+      type: String_1!
+    - name: resourceTypes
+      type: "[String_1]"
+    - name: senmlId
+      type: String_1!
+    - name: targetUri
+      type: String_1
+    - name: uid
+      type: String_1
+    - name: unit
+      type: String_1
+    - name: updateDuration
+      type: String_1
+    - name: updateTime
+      type: Timestamptz!
+  graphql:
+    typeName: SensorResource
+    inputTypeName: SensorResourceInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: sensor_resource
+      fieldMapping:
+        createTime:
+          column:
+            name: create_time
+        deleteTime:
+          column:
+            name: delete_time
+        displayName:
+          column:
+            name: display_name
+        etag:
+          column:
+            name: etag
+        expireTime:
+          column:
+            name: expire_time
+        id:
+          column:
+            name: id
+        interfaceDescriptions:
+          column:
+            name: interface_descriptions
+        mediaTypes:
+          column:
+            name: media_types
+        name:
+          column:
+            name: name
+        resourceTypes:
+          column:
+            name: resource_types
+        senmlId:
+          column:
+            name: senml_id
+        targetUri:
+          column:
+            name: target_uri
+        uid:
+          column:
+            name: uid
+        unit:
+          column:
+            name: unit
+        updateDuration:
+          column:
+            name: update_duration
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: SensorResource
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createTime
+          - deleteTime
+          - displayName
+          - etag
+          - expireTime
+          - id
+          - interfaceDescriptions
+          - mediaTypes
+          - name
+          - resourceTypes
+          - senmlId
+          - targetUri
+          - uid
+          - unit
+          - updateDuration
+          - updateTime
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: SensorResourceBoolExp
+  operand:
+    object:
+      type: SensorResource
+      comparableFields:
+        - fieldName: createTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: deleteTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: displayName
+          booleanExpressionType: TextBoolExp
+        - fieldName: etag
+          booleanExpressionType: TextBoolExp
+        - fieldName: expireTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: name
+          booleanExpressionType: TextBoolExp
+        - fieldName: senmlId
+          booleanExpressionType: TextBoolExp
+        - fieldName: targetUri
+          booleanExpressionType: TextBoolExp
+        - fieldName: uid
+          booleanExpressionType: TextBoolExp
+        - fieldName: unit
+          booleanExpressionType: TextBoolExp
+        - fieldName: updateDuration
+          booleanExpressionType: TextBoolExp
+        - fieldName: updateTime
+          booleanExpressionType: TimestamptzBoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: SensorResourceBoolExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: SensorResourceAggExp
+  operand:
+    object:
+      aggregatedType: SensorResource
+      aggregatableFields:
+        - fieldName: createTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: deleteTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: displayName
+          aggregateExpression: TextAggExp
+        - fieldName: etag
+          aggregateExpression: TextAggExp
+        - fieldName: expireTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: id
+          aggregateExpression: TextAggExp
+        - fieldName: name
+          aggregateExpression: TextAggExp
+        - fieldName: senmlId
+          aggregateExpression: TextAggExp
+        - fieldName: targetUri
+          aggregateExpression: TextAggExp
+        - fieldName: uid
+          aggregateExpression: TextAggExp
+        - fieldName: unit
+          aggregateExpression: TextAggExp
+        - fieldName: updateDuration
+          aggregateExpression: TextAggExp
+        - fieldName: updateTime
+          aggregateExpression: TimestamptzAggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: SensorResourceAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: SensorResourceOrderByExp
+  operand:
+    object:
+      orderedType: SensorResource
+      orderableFields:
+        - fieldName: createTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: deleteTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: displayName
+          orderByExpression: String1OrderByExp
+        - fieldName: etag
+          orderByExpression: String1OrderByExp
+        - fieldName: expireTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: id
+          orderByExpression: String1OrderByExp
+        - fieldName: name
+          orderByExpression: String1OrderByExp
+        - fieldName: senmlId
+          orderByExpression: String1OrderByExp
+        - fieldName: targetUri
+          orderByExpression: String1OrderByExp
+        - fieldName: uid
+          orderByExpression: String1OrderByExp
+        - fieldName: unit
+          orderByExpression: String1OrderByExp
+        - fieldName: updateDuration
+          orderByExpression: String1OrderByExp
+        - fieldName: updateTime
+          orderByExpression: TimestamptzOrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: SensorResourceOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: SensorResource
+  objectType: SensorResource
+  source:
+    dataConnectorName: freebusy_pgsql
+    collection: sensor_resource
+  filterExpressionType: SensorResourceBoolExp
+  aggregateExpression: SensorResourceAggExp
+  orderByExpression: SensorResourceOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: sensorResource
+      subscription:
+        rootField: sensorResource
+    selectUniques:
+      - queryRootField: sensorResourceById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: sensorResourceById
+    filterInputTypeName: SensorResourceFilterInput
+    aggregate:
+      queryRootField: sensorResourceAggregate
+      subscription:
+        rootField: sensorResourceAggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: SensorResource
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+

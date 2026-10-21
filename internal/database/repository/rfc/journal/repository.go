@@ -16,11 +16,11 @@
 package journal
 
 import (
+	journalpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/journal/v1"
 	"context"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/journal/v1/journalpbv1"
 	"gorm.io/gorm"
 )
 
@@ -39,8 +39,15 @@ type JournalRepository interface {
 	// mutable field. m.Etag, when set, guards against concurrent writes
 	// (repox.ErrConflict).
 	Update(ctx context.Context, m *journalpbv1.Journal, paths []string) (*journalpbv1.Journal, error)
-	// Delete removes the record addressed by its resource name.
+	// Delete soft-deletes the record addressed by its resource name (AIP-164):
+	// Get still returns it, with delete_time set; List skips it unless
+	// ShowDeleted. repox.ErrNotFound when absent or already deleted.
 	Delete(ctx context.Context, name string) error
+	// Undelete restores a soft-deleted record and returns it;
+	// repox.ErrAlreadyExists when it is not deleted.
+	Undelete(ctx context.Context, name string) (*journalpbv1.Journal, error)
+	// Purge removes the record, deleted or not, for good.
+	Purge(ctx context.Context, name string) error
 }
 
 // JournalHooks lets custom logic run inside the generated Journal
@@ -55,7 +62,8 @@ type JournalHooks struct {
 	// BeforeUpdate runs after the mask is applied to the merged record,
 	// before it is written.
 	BeforeUpdate func(ctx context.Context, existing, merged *journalpbv1.Journal, paths []string) error
-	// BeforeDelete runs before the row is removed; returning an error vetoes.
+	// BeforeDelete runs before the row is removed (or, with soft delete,
+	// marked deleted); returning an error vetoes.
 	BeforeDelete func(ctx context.Context, name string) error
 }
 

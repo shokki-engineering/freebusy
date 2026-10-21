@@ -16,13 +16,16 @@
 package resource
 
 import (
+	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"context"
+	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/resource"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9073/resource/v1/resourcepbv1"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"time"
 )
 
 // GormResourceRepository is the GORM adapter of ResourceRepository: flat
@@ -71,7 +74,20 @@ func (r *GormResourceRepository) Create(ctx context.Context, in *resourcepbv1.Re
 		m.OrganizationalUnitID = repox.Ptr(repox.LastSegment(v))
 	}
 	m.Etag = repox.Ptr(repox.NewULID())
-	if err := resource.NewResourceStore(r.DB).Create(ctx, m); err != nil {
+	if err := r.DB.Transaction(func(tx *gorm.DB) error {
+		if err := resource.NewResourceStore(tx).Create(ctx, m); err != nil {
+			return err
+		}
+		for _, v1 := range in.GetStructuredData() {
+			n2 := resource.StructuredDataFromProto(v1)
+			n2.ID = repox.NewULID()
+			n2.ResourceID = id
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n2).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.get(ctx, id)
@@ -90,7 +106,7 @@ func (r *GormResourceRepository) Get(ctx context.Context, name string) (*resourc
 // through, so Tier-2 overrides of Get never re-enter generated writes.
 func (r *GormResourceRepository) get(ctx context.Context, id string) (*resourcepbv1.Resource, error) {
 	var m resource.Resource
-	if err := r.DB.WithContext(ctx).First(&m, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("StructuredDatas", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&m, "id = ?", id).Error; err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.toProto(ctx, &m)
@@ -120,6 +136,9 @@ func (r *GormResourceRepository) List(ctx context.Context, in repox.ListInput) (
 }
 
 func (r *GormResourceRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*resourcepbv1.Resource, string, error) {
+	if !in.ShowDeleted {
+		scope = scope.Where("delete_time IS NULL")
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -128,7 +147,7 @@ func (r *GormResourceRepository) list(ctx context.Context, scope *gorm.DB, in re
 	for f, h := range r.ListOverrides {
 		eng.Override(f, h)
 	}
-	rows, next, err := eng.List(ctx, scope, filterx.ListInput{
+	rows, next, err := eng.List(ctx, scope.Preload("StructuredDatas", func(db *gorm.DB) *gorm.DB { return db.Order("id") }), filterx.ListInput{
 		PageSize:  in.PageSize,
 		PageToken: in.PageToken,
 		OrderBy:   in.OrderBy,
@@ -158,9 +177,10 @@ func (r *GormResourceRepository) Update(ctx context.Context, in *resourcepbv1.Re
 	id := ids[len(ids)-1]
 	err = r.DB.Transaction(func(tx *gorm.DB) error {
 		var existing resource.Resource
-		if err := tx.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+		if err := tx.WithContext(ctx).Preload("StructuredDatas", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 			return err
 		}
+		var staleStructuredData []resource.StructuredData
 		if in.GetEtag() != "" && existing.Etag != nil && *existing.Etag != in.GetEtag() {
 			return repox.ErrConflict
 		}
@@ -199,8 +219,29 @@ func (r *GormResourceRepository) Update(ctx context.Context, in *resourcepbv1.Re
 		} else {
 			existing.OrganizationalUnitID = nil
 		}
+		if repox.GroupTouched(paths, "structured_data") {
+			staleStructuredData = existing.StructuredDatas
+			for _, v7 := range merged.GetStructuredData() {
+				n8 := resource.StructuredDataFromProto(v7)
+				n8.ID = repox.NewULID()
+				n8.ResourceID = id
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n8).Error; err != nil {
+					return err
+				}
+			}
+		}
+		existing.StructuredDatas = nil
 		existing.Etag = repox.Ptr(repox.NewULID())
-		return resource.NewResourceStore(tx).Update(ctx, &existing)
+		if err := resource.NewResourceStore(tx).Update(ctx, &existing); err != nil {
+			return err
+		}
+		for i5 := range staleStructuredData {
+			d6 := &staleStructuredData[i5]
+			if err := tx.WithContext(ctx).Delete(&resource.StructuredData{}, "id = ?", d6.ID).Error; err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 	if err != nil {
 		return nil, repox.MapGormErr(err)
@@ -208,8 +249,54 @@ func (r *GormResourceRepository) Update(ctx context.Context, in *resourcepbv1.Re
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GormResourceRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "resources")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	res := r.DB.WithContext(ctx).Model(&resource.Resource{}).
+		Where("id = ? AND delete_time IS NULL", ids[len(ids)-1]).
+		Updates(map[string]any{"delete_time": time.Now(), "etag": repox.NewULID()})
+	if res.Error != nil {
+		return repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return repox.ErrNotFound
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GormResourceRepository) Undelete(ctx context.Context, name string) (*resourcepbv1.Resource, error) {
+	ids, err := repox.SplitName(name, "resources")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	res := r.DB.WithContext(ctx).Model(&resource.Resource{}).
+		Where("id = ? AND delete_time IS NOT NULL", id).
+		Updates(map[string]any{"delete_time": nil, "etag": repox.NewULID()})
+	if res.Error != nil {
+		return nil, repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GormResourceRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "resources")
 	if err != nil {
 		return err
@@ -221,10 +308,21 @@ func (r *GormResourceRepository) Delete(ctx context.Context, name string) error 
 	}
 	id := ids[len(ids)-1]
 	var existing resource.Resource
-	if err := r.DB.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("StructuredDatas", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 		return repox.MapGormErr(err)
 	}
-	return repox.MapGormErr(resource.NewResourceStore(r.DB).DeleteByID(ctx, id))
+	return repox.MapGormErr(r.DB.Transaction(func(tx *gorm.DB) error {
+		if err := resource.NewResourceStore(tx).DeleteByID(ctx, id); err != nil {
+			return err
+		}
+		for i3 := range existing.StructuredDatas {
+			d4 := &existing.StructuredDatas[i3]
+			if err := tx.WithContext(ctx).Delete(&resource.StructuredData{}, "id = ?", d4.ID).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	}))
 }
 
 // Compile-time proof the adapter satisfies the interface.

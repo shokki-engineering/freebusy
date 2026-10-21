@@ -17,8 +17,8 @@ package orgunit
 import (
 	"time"
 
+	orgunitpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organizational_unit/v1"
 	"github.com/lib/pq"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/organizational_unit/v1/orgunitpbv1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

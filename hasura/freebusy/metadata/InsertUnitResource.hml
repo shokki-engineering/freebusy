@@ -1,0 +1,186 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertUnitResourceObject
+  fields:
+    - name: createTime
+      type: Timestamptz!
+    - name: deleteTime
+      type: Timestamptz
+    - name: description
+      type: String_1
+    - name: etag
+      type: String_1
+    - name: expireTime
+      type: Timestamptz
+    - name: id
+      type: String_1!
+    - name: name
+      type: String_1!
+    - name: offsetId
+      type: String_1
+    - name: producingDiscouraged
+      type: Boolean_1
+    - name: reference
+      type: String_1
+    - name: scaleId
+      type: String_1
+    - name: senmlUnit
+      type: String_1
+    - name: symbol
+      type: String_1!
+    - name: uid
+      type: String_1
+    - name: updateTime
+      type: Timestamptz!
+  graphql:
+    typeName: InsertUnitResourceObject
+    inputTypeName: InsertUnitResourceObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_unit_resource_object
+      fieldMapping:
+        createTime:
+          column:
+            name: create_time
+        deleteTime:
+          column:
+            name: delete_time
+        description:
+          column:
+            name: description
+        etag:
+          column:
+            name: etag
+        expireTime:
+          column:
+            name: expire_time
+        id:
+          column:
+            name: id
+        name:
+          column:
+            name: name
+        offsetId:
+          column:
+            name: offset_id
+        producingDiscouraged:
+          column:
+            name: producing_discouraged
+        reference:
+          column:
+            name: reference
+        scaleId:
+          column:
+            name: scale_id
+        senmlUnit:
+          column:
+            name: senml_unit
+        symbol:
+          column:
+            name: symbol
+        uid:
+          column:
+            name: uid
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertUnitResourceObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createTime
+          - deleteTime
+          - description
+          - etag
+          - expireTime
+          - id
+          - name
+          - offsetId
+          - producingDiscouraged
+          - reference
+          - scaleId
+          - senmlUnit
+          - symbol
+          - uid
+          - updateTime
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertUnitResourceResponse
+  description: Responses from the 'insert_unit_resource' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[UnitResource!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertUnitResourceResponse
+    inputTypeName: InsertUnitResourceResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_unit_resource_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertUnitResourceResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertUnitResource
+  outputType: InsertUnitResourceResponse!
+  arguments:
+    - name: objects
+      type: "[InsertUnitResourceObject!]!"
+    - name: postCheck
+      type: UnitResourceBoolExp
+      description: Insert permission predicate over the 'unit_resource' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: insert_unit_resource
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertUnitResource
+    rootFieldKind: Mutation
+  description: Insert into the unit_resource table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertUnitResource
+  permissions:
+    - role: admin
+      allowExecution: true
+

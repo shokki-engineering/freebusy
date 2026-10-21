@@ -16,8 +16,8 @@
 package calendar
 
 import (
+	calendarpbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/calendar/v1/calendarpbv1"
 )
 
 // applyCalendarMask merges the masked fields of in onto merged. An empty
@@ -37,5 +37,11 @@ func applyCalendarMask(merged, in *calendarpbv1.Calendar, paths []string) {
 	}
 	if repox.InMask(paths, "scale") {
 		merged.Scale = in.GetScale()
+	}
+	if repox.GroupTouched(paths, "time_zone") {
+		merged.TimeZone = in.GetTimeZone()
+	}
+	if repox.GroupTouched(paths, "extensions") {
+		merged.Extensions = in.GetExtensions()
 	}
 }

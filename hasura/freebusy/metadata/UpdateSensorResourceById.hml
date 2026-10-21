@@ -1,0 +1,732 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceCreateTime
+  description: Update the 'create_time' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceCreateTime
+    inputTypeName: UpdateColumnSensorResourceCreateTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_create_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceCreateTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceDeleteTime
+  description: Update the 'delete_time' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceDeleteTime
+    inputTypeName: UpdateColumnSensorResourceDeleteTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_delete_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceDeleteTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceDisplayName
+  description: Update the 'display_name' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceDisplayName
+    inputTypeName: UpdateColumnSensorResourceDisplayNameInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_display_name
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceDisplayName
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceEtag
+  description: Update the 'etag' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceEtag
+    inputTypeName: UpdateColumnSensorResourceEtagInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_etag
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceEtag
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceExpireTime
+  description: Update the 'expire_time' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceExpireTime
+    inputTypeName: UpdateColumnSensorResourceExpireTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_expire_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceExpireTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceId
+  description: Update the 'id' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceId
+    inputTypeName: UpdateColumnSensorResourceIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceInterfaceDescriptions
+  description: Update the 'interface_descriptions' column in the 'sensor_resource'
+    collection
+  fields:
+    - name: set
+      type: "[String_1]"
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceInterfaceDescriptions
+    inputTypeName: UpdateColumnSensorResourceInterfaceDescriptionsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_interface_descriptions
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceInterfaceDescriptions
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceMediaTypes
+  description: Update the 'media_types' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: "[String_1]"
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceMediaTypes
+    inputTypeName: UpdateColumnSensorResourceMediaTypesInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_media_types
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceMediaTypes
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceName
+  description: Update the 'name' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceName
+    inputTypeName: UpdateColumnSensorResourceNameInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_name
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceName
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceResourceTypes
+  description: Update the 'resource_types' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: "[String_1]"
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceResourceTypes
+    inputTypeName: UpdateColumnSensorResourceResourceTypesInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_resource_types
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceResourceTypes
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceSenmlId
+  description: Update the 'senml_id' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceSenmlId
+    inputTypeName: UpdateColumnSensorResourceSenmlIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_senml_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceSenmlId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceTargetUri
+  description: Update the 'target_uri' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceTargetUri
+    inputTypeName: UpdateColumnSensorResourceTargetUriInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_target_uri
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceTargetUri
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceUid
+  description: Update the 'uid' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceUid
+    inputTypeName: UpdateColumnSensorResourceUidInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_uid
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceUid
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceUnit
+  description: Update the 'unit' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceUnit
+    inputTypeName: UpdateColumnSensorResourceUnitInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_unit
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceUnit
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceUpdateDuration
+  description: Update the 'update_duration' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceUpdateDuration
+    inputTypeName: UpdateColumnSensorResourceUpdateDurationInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_update_duration
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceUpdateDuration
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnSensorResourceUpdateTime
+  description: Update the 'update_time' column in the 'sensor_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnSensorResourceUpdateTime
+    inputTypeName: UpdateColumnSensorResourceUpdateTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_sensor_resource_update_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnSensorResourceUpdateTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateSensorResourceByIdUpdateColumns
+  description: Update the columns of the 'sensor_resource' collection
+  fields:
+    - name: createTime
+      type: UpdateColumnSensorResourceCreateTime
+      description: Update the 'create_time' column in the 'sensor_resource' collection.
+    - name: deleteTime
+      type: UpdateColumnSensorResourceDeleteTime
+      description: Update the 'delete_time' column in the 'sensor_resource' collection.
+    - name: displayName
+      type: UpdateColumnSensorResourceDisplayName
+      description: Update the 'display_name' column in the 'sensor_resource' collection.
+    - name: etag
+      type: UpdateColumnSensorResourceEtag
+      description: Update the 'etag' column in the 'sensor_resource' collection.
+    - name: expireTime
+      type: UpdateColumnSensorResourceExpireTime
+      description: Update the 'expire_time' column in the 'sensor_resource' collection.
+    - name: id
+      type: UpdateColumnSensorResourceId
+      description: Update the 'id' column in the 'sensor_resource' collection.
+    - name: interfaceDescriptions
+      type: UpdateColumnSensorResourceInterfaceDescriptions
+      description: Update the 'interface_descriptions' column in the 'sensor_resource'
+        collection.
+    - name: mediaTypes
+      type: UpdateColumnSensorResourceMediaTypes
+      description: Update the 'media_types' column in the 'sensor_resource' collection.
+    - name: name
+      type: UpdateColumnSensorResourceName
+      description: Update the 'name' column in the 'sensor_resource' collection.
+    - name: resourceTypes
+      type: UpdateColumnSensorResourceResourceTypes
+      description: Update the 'resource_types' column in the 'sensor_resource' collection.
+    - name: senmlId
+      type: UpdateColumnSensorResourceSenmlId
+      description: Update the 'senml_id' column in the 'sensor_resource' collection.
+    - name: targetUri
+      type: UpdateColumnSensorResourceTargetUri
+      description: Update the 'target_uri' column in the 'sensor_resource' collection.
+    - name: uid
+      type: UpdateColumnSensorResourceUid
+      description: Update the 'uid' column in the 'sensor_resource' collection.
+    - name: unit
+      type: UpdateColumnSensorResourceUnit
+      description: Update the 'unit' column in the 'sensor_resource' collection.
+    - name: updateDuration
+      type: UpdateColumnSensorResourceUpdateDuration
+      description: Update the 'update_duration' column in the 'sensor_resource' collection.
+    - name: updateTime
+      type: UpdateColumnSensorResourceUpdateTime
+      description: Update the 'update_time' column in the 'sensor_resource' collection.
+  graphql:
+    typeName: UpdateSensorResourceByIdUpdateColumns
+    inputTypeName: UpdateSensorResourceByIdUpdateColumnsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_sensor_resource_by_id_update_columns
+      fieldMapping:
+        createTime:
+          column:
+            name: create_time
+        deleteTime:
+          column:
+            name: delete_time
+        displayName:
+          column:
+            name: display_name
+        etag:
+          column:
+            name: etag
+        expireTime:
+          column:
+            name: expire_time
+        id:
+          column:
+            name: id
+        interfaceDescriptions:
+          column:
+            name: interface_descriptions
+        mediaTypes:
+          column:
+            name: media_types
+        name:
+          column:
+            name: name
+        resourceTypes:
+          column:
+            name: resource_types
+        senmlId:
+          column:
+            name: senml_id
+        targetUri:
+          column:
+            name: target_uri
+        uid:
+          column:
+            name: uid
+        unit:
+          column:
+            name: unit
+        updateDuration:
+          column:
+            name: update_duration
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateSensorResourceByIdUpdateColumns
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - createTime
+          - deleteTime
+          - displayName
+          - etag
+          - expireTime
+          - id
+          - interfaceDescriptions
+          - mediaTypes
+          - name
+          - resourceTypes
+          - senmlId
+          - targetUri
+          - uid
+          - unit
+          - updateDuration
+          - updateTime
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateSensorResourceByIdResponse
+  description: Responses from the 'update_sensor_resource_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[SensorResource!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: UpdateSensorResourceByIdResponse
+    inputTypeName: UpdateSensorResourceByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_sensor_resource_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateSensorResourceByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: UpdateSensorResourceById
+  outputType: UpdateSensorResourceByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: postCheck
+      type: SensorResourceBoolExp
+      description: Update permission post-condition predicate over the
+        'sensor_resource' collection
+    - name: preCheck
+      type: SensorResourceBoolExp
+      description: Update permission pre-condition predicate over the
+        'sensor_resource' collection
+    - name: updateColumns
+      type: UpdateSensorResourceByIdUpdateColumns!
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: update_sensor_resource_by_id
+    argumentMapping:
+      keyId: key_id
+      postCheck: post_check
+      preCheck: pre_check
+      updateColumns: update_columns
+  graphql:
+    rootFieldName: updateSensorResourceById
+    rootFieldKind: Mutation
+  description: Update any row on the 'sensor_resource' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: UpdateSensorResourceById
+  permissions:
+    - role: admin
+      allowExecution: true
+

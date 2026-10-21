@@ -16,14 +16,16 @@
 package availability
 
 import (
+	rfcavailabilitypbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"context"
 	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/availability"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7953/availability/v1/rfcavailabilitypbv1"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"time"
 )
 
 // GormAvailabilityRepository is the GORM adapter of AvailabilityRepository: flat
@@ -95,7 +97,36 @@ func (r *GormAvailabilityRepository) Create(ctx context.Context, parent string, 
 			c := availability.AvailabilityEndFormCaseEnd
 			m.EndFormCase = &c
 		}
-		return availability.NewAvailabilityStore(tx).Create(ctx, m)
+		if err := availability.NewAvailabilityStore(tx).Create(ctx, m); err != nil {
+			return err
+		}
+		for _, v1 := range in.GetAvailablePeriods() {
+			n2 := availability.AvailablePeriodFromProto(v1)
+			n2.ID = repox.NewULID()
+			n2.AvailabilityID = id
+			if v3 := v1.GetStart(); v3 != nil {
+				n4 := availability.CalendarTimeFromProto(v3)
+				n4.ID = repox.NewULID()
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n4).Error; err != nil {
+					return err
+				}
+				n2.StartID = n4.ID
+			}
+			if v5 := v1.GetEnd(); v5 != nil {
+				n6 := availability.CalendarTimeFromProto(v5)
+				n6.ID = repox.NewULID()
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n6).Error; err != nil {
+					return err
+				}
+				n2.EndID = repox.Ptr(n6.ID)
+				c := availability.AvailablePeriodEndFormCaseEnd
+				n2.EndFormCase = &c
+			}
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n2).Error; err != nil {
+				return err
+			}
+		}
+		return nil
 	}); err != nil {
 		return nil, repox.MapGormErr(err)
 	}
@@ -115,7 +146,7 @@ func (r *GormAvailabilityRepository) Get(ctx context.Context, name string) (*rfc
 // through, so Tier-2 overrides of Get never re-enter generated writes.
 func (r *GormAvailabilityRepository) get(ctx context.Context, id string) (*rfcavailabilitypbv1.Availability, error) {
 	var m availability.Availability
-	if err := r.DB.WithContext(ctx).Preload("Start").Preload("End").First(&m, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("Start").Preload("End").Preload("AvailablePeriods", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("AvailablePeriods.Start").Preload("AvailablePeriods.End").First(&m, "id = ?", id).Error; err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.toProto(ctx, &m)
@@ -144,6 +175,9 @@ func (r *GormAvailabilityRepository) List(ctx context.Context, parent string, in
 }
 
 func (r *GormAvailabilityRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*rfcavailabilitypbv1.Availability, string, error) {
+	if !in.ShowDeleted {
+		scope = scope.Where("delete_time IS NULL")
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -152,7 +186,7 @@ func (r *GormAvailabilityRepository) list(ctx context.Context, scope *gorm.DB, i
 	for f, h := range r.ListOverrides {
 		eng.Override(f, h)
 	}
-	rows, next, err := eng.List(ctx, scope.Preload("Start").Preload("End"), filterx.ListInput{
+	rows, next, err := eng.List(ctx, scope.Preload("Start").Preload("End").Preload("AvailablePeriods", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("AvailablePeriods.Start").Preload("AvailablePeriods.End"), filterx.ListInput{
 		PageSize:  in.PageSize,
 		PageToken: in.PageToken,
 		OrderBy:   in.OrderBy,
@@ -182,11 +216,12 @@ func (r *GormAvailabilityRepository) Update(ctx context.Context, in *rfcavailabi
 	id := ids[len(ids)-1]
 	err = r.DB.Transaction(func(tx *gorm.DB) error {
 		var existing availability.Availability
-		if err := tx.WithContext(ctx).Preload("Start").Preload("End").First(&existing, "id = ?", id).Error; err != nil {
+		if err := tx.WithContext(ctx).Preload("Start").Preload("End").Preload("AvailablePeriods", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("AvailablePeriods.Start").Preload("AvailablePeriods.End").First(&existing, "id = ?", id).Error; err != nil {
 			return err
 		}
 		var staleStart string
 		var staleEnd string
+		var staleAvailablePeriods []availability.AvailablePeriod
 		if in.GetEtag() != "" && existing.Etag != nil && *existing.Etag != in.GetEtag() {
 			return repox.ErrConflict
 		}
@@ -209,6 +244,7 @@ func (r *GormAvailabilityRepository) Update(ctx context.Context, in *rfcavailabi
 		existing.Organizer = next.Organizer
 		existing.Priority = next.Priority
 		existing.Categories = next.Categories
+		existing.EndFormCase = next.EndFormCase
 		if repox.GroupTouched(paths, "start") {
 			if existing.StartID != nil {
 				staleStart = *existing.StartID
@@ -223,12 +259,11 @@ func (r *GormAvailabilityRepository) Update(ctx context.Context, in *rfcavailabi
 				existing.StartID = repox.Ptr(vo.ID)
 			}
 		}
-		if repox.GroupTouched(paths, "end") {
+		if repox.GroupTouched(paths, "end") || repox.GroupTouched(paths, "duration") {
 			if existing.EndID != nil {
 				staleEnd = *existing.EndID
 			}
 			existing.EndID = nil
-			existing.EndFormCase = nil
 			if v := merged.GetEnd(); v != nil {
 				vo := availability.CalendarTimeFromProto(v)
 				vo.ID = repox.NewULID()
@@ -240,6 +275,36 @@ func (r *GormAvailabilityRepository) Update(ctx context.Context, in *rfcavailabi
 				existing.EndFormCase = &c
 			}
 		}
+		if repox.GroupTouched(paths, "available_periods") {
+			staleAvailablePeriods = existing.AvailablePeriods
+			for _, v15 := range merged.GetAvailablePeriods() {
+				n16 := availability.AvailablePeriodFromProto(v15)
+				n16.ID = repox.NewULID()
+				n16.AvailabilityID = id
+				if v17 := v15.GetStart(); v17 != nil {
+					n18 := availability.CalendarTimeFromProto(v17)
+					n18.ID = repox.NewULID()
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n18).Error; err != nil {
+						return err
+					}
+					n16.StartID = n18.ID
+				}
+				if v19 := v15.GetEnd(); v19 != nil {
+					n20 := availability.CalendarTimeFromProto(v19)
+					n20.ID = repox.NewULID()
+					if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n20).Error; err != nil {
+						return err
+					}
+					n16.EndID = repox.Ptr(n20.ID)
+					c := availability.AvailablePeriodEndFormCaseEnd
+					n16.EndFormCase = &c
+				}
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n16).Error; err != nil {
+					return err
+				}
+			}
+		}
+		existing.AvailablePeriods = nil
 		existing.Etag = repox.Ptr(repox.NewULID())
 		if err := availability.NewAvailabilityStore(tx).Update(ctx, &existing); err != nil {
 			return err
@@ -254,6 +319,22 @@ func (r *GormAvailabilityRepository) Update(ctx context.Context, in *rfcavailabi
 				return err
 			}
 		}
+		for i11 := range staleAvailablePeriods {
+			d12 := &staleAvailablePeriods[i11]
+			if err := tx.WithContext(ctx).Delete(&availability.AvailablePeriod{}, "id = ?", d12.ID).Error; err != nil {
+				return err
+			}
+			if d13 := d12.Start; d13 != nil {
+				if err := tx.WithContext(ctx).Delete(&availability.CalendarTime{}, "id = ?", d13.ID).Error; err != nil {
+					return err
+				}
+			}
+			if d14 := d12.End; d14 != nil {
+				if err := tx.WithContext(ctx).Delete(&availability.CalendarTime{}, "id = ?", d14.ID).Error; err != nil {
+					return err
+				}
+			}
+		}
 		return nil
 	})
 	if err != nil {
@@ -262,8 +343,54 @@ func (r *GormAvailabilityRepository) Update(ctx context.Context, in *rfcavailabi
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GormAvailabilityRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "calendars", "availabilities")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	res := r.DB.WithContext(ctx).Model(&availability.Availability{}).
+		Where("id = ? AND delete_time IS NULL", ids[len(ids)-1]).
+		Updates(map[string]any{"delete_time": time.Now(), "etag": repox.NewULID()})
+	if res.Error != nil {
+		return repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return repox.ErrNotFound
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GormAvailabilityRepository) Undelete(ctx context.Context, name string) (*rfcavailabilitypbv1.Availability, error) {
+	ids, err := repox.SplitName(name, "calendars", "availabilities")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	res := r.DB.WithContext(ctx).Model(&availability.Availability{}).
+		Where("id = ? AND delete_time IS NOT NULL", id).
+		Updates(map[string]any{"delete_time": nil, "etag": repox.NewULID()})
+	if res.Error != nil {
+		return nil, repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GormAvailabilityRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "calendars", "availabilities")
 	if err != nil {
 		return err
@@ -275,7 +402,7 @@ func (r *GormAvailabilityRepository) Delete(ctx context.Context, name string) er
 	}
 	id := ids[len(ids)-1]
 	var existing availability.Availability
-	if err := r.DB.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("Start").Preload("End").Preload("AvailablePeriods", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).Preload("AvailablePeriods.Start").Preload("AvailablePeriods.End").First(&existing, "id = ?", id).Error; err != nil {
 		return repox.MapGormErr(err)
 	}
 	return repox.MapGormErr(r.DB.Transaction(func(tx *gorm.DB) error {
@@ -290,6 +417,22 @@ func (r *GormAvailabilityRepository) Delete(ctx context.Context, name string) er
 		if existing.EndID != nil {
 			if err := tx.WithContext(ctx).Delete(&availability.CalendarTime{}, "id = ?", *existing.EndID).Error; err != nil {
 				return err
+			}
+		}
+		for i7 := range existing.AvailablePeriods {
+			d8 := &existing.AvailablePeriods[i7]
+			if err := tx.WithContext(ctx).Delete(&availability.AvailablePeriod{}, "id = ?", d8.ID).Error; err != nil {
+				return err
+			}
+			if d9 := d8.Start; d9 != nil {
+				if err := tx.WithContext(ctx).Delete(&availability.CalendarTime{}, "id = ?", d9.ID).Error; err != nil {
+					return err
+				}
+			}
+			if d10 := d8.End; d10 != nil {
+				if err := tx.WithContext(ctx).Delete(&availability.CalendarTime{}, "id = ?", d10.ID).Error; err != nil {
+					return err
+				}
 			}
 		}
 		return nil

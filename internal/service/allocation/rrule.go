@@ -77,9 +77,18 @@ func (p RecurrenceParts) RRule() string {
 	return strings.Join(parts, ";")
 }
 
-// ICalDuration exposes the DURATION parser to the storage adapters, which need
-// it to resolve an event or period stored with DURATION instead of DTEND.
-func ICalDuration(s string) time.Duration { return icalDuration(s) }
+// StoredDuration reads a DURATION column of the rfc schema, for the storage
+// adapters resolving an event or period stored with DURATION instead of DTEND. Those columns
+// hold a google.protobuf.Duration, which the generated converters write in
+// Go's form ("10h0m0s"); rows written before them, or by hand, may hold RFC
+// 5545 text ("PT10H"). Either reads; anything else, or a negative value, is
+// zero.
+func StoredDuration(s string) time.Duration {
+	if d, err := time.ParseDuration(s); err == nil {
+		return max(d, 0)
+	}
+	return icalDuration(s)
+}
 
 // EncodeWindow renders a hold's window for its text column, as an ISO 8601
 // interval of two RFC 3339 instants. The column predates a typed mapping for

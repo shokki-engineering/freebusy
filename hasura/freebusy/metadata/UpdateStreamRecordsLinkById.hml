@@ -1,0 +1,264 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnStreamRecordsLinkId
+  description: Update the 'id' column in the 'stream_records_link' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnStreamRecordsLinkId
+    inputTypeName: UpdateColumnStreamRecordsLinkIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_stream_records_link_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnStreamRecordsLinkId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnStreamRecordsLinkRecordId
+  description: Update the 'record_id' column in the 'stream_records_link' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnStreamRecordsLinkRecordId
+    inputTypeName: UpdateColumnStreamRecordsLinkRecordIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_stream_records_link_record_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnStreamRecordsLinkRecordId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnStreamRecordsLinkReferenceTimeValue
+  description: Update the 'reference_time_value' column in the
+    'stream_records_link' collection
+  fields:
+    - name: set
+      type: Float64
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnStreamRecordsLinkReferenceTimeValue
+    inputTypeName: UpdateColumnStreamRecordsLinkReferenceTimeValueInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_stream_records_link_reference_time_value
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnStreamRecordsLinkReferenceTimeValue
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnStreamRecordsLinkStreamId
+  description: Update the 'stream_id' column in the 'stream_records_link' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnStreamRecordsLinkStreamId
+    inputTypeName: UpdateColumnStreamRecordsLinkStreamIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_stream_records_link_stream_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnStreamRecordsLinkStreamId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateStreamRecordsLinkByIdUpdateColumns
+  description: Update the columns of the 'stream_records_link' collection
+  fields:
+    - name: id
+      type: UpdateColumnStreamRecordsLinkId
+      description: Update the 'id' column in the 'stream_records_link' collection.
+    - name: recordId
+      type: UpdateColumnStreamRecordsLinkRecordId
+      description: Update the 'record_id' column in the 'stream_records_link' collection.
+    - name: referenceTimeValue
+      type: UpdateColumnStreamRecordsLinkReferenceTimeValue
+      description: Update the 'reference_time_value' column in the
+        'stream_records_link' collection.
+    - name: streamId
+      type: UpdateColumnStreamRecordsLinkStreamId
+      description: Update the 'stream_id' column in the 'stream_records_link' collection.
+  graphql:
+    typeName: UpdateStreamRecordsLinkByIdUpdateColumns
+    inputTypeName: UpdateStreamRecordsLinkByIdUpdateColumnsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_stream_records_link_by_id_update_columns
+      fieldMapping:
+        id:
+          column:
+            name: id
+        recordId:
+          column:
+            name: record_id
+        referenceTimeValue:
+          column:
+            name: reference_time_value
+        streamId:
+          column:
+            name: stream_id
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateStreamRecordsLinkByIdUpdateColumns
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - id
+          - recordId
+          - referenceTimeValue
+          - streamId
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateStreamRecordsLinkByIdResponse
+  description: Responses from the 'update_stream_records_link_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[StreamRecordsLink!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: UpdateStreamRecordsLinkByIdResponse
+    inputTypeName: UpdateStreamRecordsLinkByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_stream_records_link_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateStreamRecordsLinkByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: UpdateStreamRecordsLinkById
+  outputType: UpdateStreamRecordsLinkByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: postCheck
+      type: StreamRecordsLinkBoolExp
+      description: Update permission post-condition predicate over the
+        'stream_records_link' collection
+    - name: preCheck
+      type: StreamRecordsLinkBoolExp
+      description: Update permission pre-condition predicate over the
+        'stream_records_link' collection
+    - name: updateColumns
+      type: UpdateStreamRecordsLinkByIdUpdateColumns!
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: update_stream_records_link_by_id
+    argumentMapping:
+      keyId: key_id
+      postCheck: post_check
+      preCheck: pre_check
+      updateColumns: update_columns
+  graphql:
+    rootFieldName: updateStreamRecordsLinkById
+    rootFieldKind: Mutation
+  description: Update any row on the 'stream_records_link' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: UpdateStreamRecordsLinkById
+  permissions:
+    - role: admin
+      allowExecution: true
+

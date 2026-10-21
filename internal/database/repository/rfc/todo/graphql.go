@@ -16,15 +16,16 @@
 package todo
 
 import (
+	todopbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/todo/v1"
 	"context"
 	"errors"
 	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/todo"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql"
+	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/todoql/extensionpropertiesql"
 	"github.com/oh-tarnished/freebusy/internal/database/hasura/freebusyql/todoql/resourceql"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc5545/todo/v1/todopbv1"
 	"github.com/the-protobuf-project/runtime-go/network/graphql"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -116,7 +117,16 @@ func (r *GraphQLTodoRepository) Create(ctx context.Context, parent string, in *t
 		}
 		ci.CompletedId = vi.Id
 	}
-	if _, err := r.Svc.Mutation.Todo.Resource.Create(ctx, ci); err != nil {
+	// One transaction: the graph lands whole or not at all.
+	gtx := r.Svc.Mutation.Tx()
+	gtx.Add(r.Svc.Mutation.Todo.Resource.CreateOp(ci, new(resourceql.InsertTodoResourceResponse)))
+	for _, v1 := range in.GetExtensions() {
+		n2 := todoExtensionPropertyToCreateInput(v1)
+		n2.Id = repox.NewULID()
+		n2.TodoId = id
+		gtx.Add(r.Svc.Mutation.Todo.ExtensionProperties.CreateOp(n2, new(extensionpropertiesql.InsertTodoExtensionPropertiesResponse)))
+	}
+	if err := gtx.Commit(ctx); err != nil {
 		return nil, mapGraphQLErr(err)
 	}
 	return r.get(ctx, id)
@@ -175,6 +185,16 @@ func (r *GraphQLTodoRepository) toProto(ctx context.Context, row *resourceql.Tod
 			out.Completed = todoCalendarTimeFromRow(w)
 		}
 	}
+	{
+		rows3, err := r.Svc.Query.Todo.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.TodoId.Eq(row.Id)).OrderBy(extensionpropertiesql.Id.Asc()))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows3 {
+			p4 := todoExtensionPropertyFromRow(&rows3[i])
+			out.Extensions = append(out.Extensions, p4)
+		}
+	}
 	if h := r.Hooks.AfterRead; h != nil {
 		if err := h(ctx, out); err != nil {
 			return nil, err
@@ -193,6 +213,9 @@ func (r *GraphQLTodoRepository) List(ctx context.Context, parent string, in repo
 }
 
 func (r *GraphQLTodoRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*todopbv1.Todo, string, error) {
+	if !in.ShowDeleted {
+		scope = append(scope, resourceql.DeleteTime.IsNull(true))
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -240,6 +263,17 @@ func (r *GraphQLTodoRepository) Update(ctx context.Context, in *todopbv1.Todo, p
 	var staleStart string
 	var staleDue string
 	var staleCompleted string
+	var old7 []string
+	{
+		rows8, err := r.Svc.Query.Todo.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.TodoId.Eq(id)))
+		if err != nil {
+			return nil, mapGraphQLErr(err)
+		}
+		for i := range rows8 {
+			old7 = append(old7, rows8[i].Id)
+		}
+	}
+	staleExtensions := old7
 	existingPB := todoFromRow(row)
 	merged := proto.Clone(existingPB).(*todopbv1.Todo)
 	applyTodoMask(merged, in, paths)
@@ -263,10 +297,9 @@ func (r *GraphQLTodoRepository) Update(ctx context.Context, in *todopbv1.Todo, p
 			patch.StartId = graphql.Value(vi.Id)
 		}
 	}
-	if repox.GroupTouched(paths, "due") {
+	if repox.GroupTouched(paths, "due") || repox.GroupTouched(paths, "duration") {
 		staleDue = repox.Deref(row.DueId)
 		patch.DueId = graphql.Null[string]()
-		patch.DeadlineCase = graphql.Null[string]()
 		if v := merged.GetDue(); v != nil {
 			vi := todoCalendarTimeToCreateInput(v)
 			vi.Id = repox.NewULID()
@@ -289,6 +322,33 @@ func (r *GraphQLTodoRepository) Update(ctx context.Context, in *todopbv1.Todo, p
 			patch.CompletedId = graphql.Value(vi.Id)
 		}
 	}
+	// New singular value objects land before the guarded row update (a lost
+	// race leaves them unreferenced); new list rows and the removal of
+	// replaced subtrees land only after it succeeds (atx).
+	utx := r.Svc.Mutation.Tx()
+	atx := r.Svc.Mutation.Tx()
+	if repox.GroupTouched(paths, "extensions") {
+		for _, oid := range staleExtensions {
+			if id := oid; id != "" {
+				got9, err := r.Svc.Query.Todo.ExtensionProperties.Get(ctx, id)
+				if err != nil {
+					return nil, mapGraphQLErr(err)
+				}
+				if got9 != nil {
+					atx.Add(r.Svc.Mutation.Todo.ExtensionProperties.DeleteOp(got9.Id, new(extensionpropertiesql.DeleteTodoExtensionPropertiesByIdResponse)))
+				}
+			}
+		}
+		for _, v10 := range merged.GetExtensions() {
+			n11 := todoExtensionPropertyToCreateInput(v10)
+			n11.Id = repox.NewULID()
+			n11.TodoId = id
+			atx.Add(r.Svc.Mutation.Todo.ExtensionProperties.CreateOp(n11, new(extensionpropertiesql.InsertTodoExtensionPropertiesResponse)))
+		}
+	}
+	if err := utx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	if in.GetEtag() != "" {
 		if _, err := r.Svc.Mutation.Todo.Resource.UpdateIfMatch(ctx, id, patch, resourceql.Etag.Eq(in.GetEtag())); err != nil {
 			return nil, mapGraphQLErr(err)
@@ -307,6 +367,9 @@ func (r *GraphQLTodoRepository) Update(ctx context.Context, in *todopbv1.Todo, p
 			if _, err := r.Svc.Mutation.Todo.CalendarTimes.Delete(ctx, staleCompleted); err != nil {
 				return nil, mapGraphQLErr(err)
 			}
+		}
+		if err := atx.Commit(ctx); err != nil {
+			return nil, mapGraphQLErr(err)
 		}
 		return r.get(ctx, id)
 	}
@@ -332,11 +395,58 @@ func (r *GraphQLTodoRepository) Update(ctx context.Context, in *todopbv1.Todo, p
 			return nil, mapGraphQLErr(err)
 		}
 	}
+	if err := atx.Commit(ctx); err != nil {
+		return nil, mapGraphQLErr(err)
+	}
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GraphQLTodoRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "calendars", "todos")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	patch := resourceql.UpdateInput{DeleteTime: graphql.Value(time.Now().UTC().Format(time.RFC3339Nano))}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Todo.Resource.UpdateIfMatch(ctx, ids[len(ids)-1], patch, resourceql.DeleteTime.IsNull(true)); err != nil {
+		if errors.Is(err, graphql.ErrConflict) {
+			return repox.ErrNotFound
+		}
+		return mapGraphQLErr(err)
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GraphQLTodoRepository) Undelete(ctx context.Context, name string) (*todopbv1.Todo, error) {
+	ids, err := repox.SplitName(name, "calendars", "todos")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	patch := resourceql.UpdateInput{DeleteTime: graphql.Null[string]()}
+	patch.Etag = graphql.Value(repox.NewULID())
+	if _, err := r.Svc.Mutation.Todo.Resource.UpdateIfMatch(ctx, id, patch, resourceql.DeleteTime.IsNull(false)); err != nil {
+		if !errors.Is(err, graphql.ErrConflict) {
+			return nil, mapGraphQLErr(err)
+		}
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GraphQLTodoRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "calendars", "todos")
 	if err != nil {
 		return err
@@ -374,6 +484,27 @@ func (r *GraphQLTodoRepository) Delete(ctx context.Context, name string) error {
 				return mapGraphQLErr(err)
 			}
 		}
+	}
+	dtx := r.Svc.Mutation.Tx()
+	{
+		rows5, err := r.Svc.Query.Todo.ExtensionProperties.List(ctx, extensionpropertiesql.List().Where(extensionpropertiesql.TodoId.Eq(id)))
+		if err != nil {
+			return mapGraphQLErr(err)
+		}
+		for i := range rows5 {
+			if id := rows5[i].Id; id != "" {
+				got6, err := r.Svc.Query.Todo.ExtensionProperties.Get(ctx, id)
+				if err != nil {
+					return mapGraphQLErr(err)
+				}
+				if got6 != nil {
+					dtx.Add(r.Svc.Mutation.Todo.ExtensionProperties.DeleteOp(got6.Id, new(extensionpropertiesql.DeleteTodoExtensionPropertiesByIdResponse)))
+				}
+			}
+		}
+	}
+	if err := dtx.Commit(ctx); err != nil {
+		return mapGraphQLErr(err)
 	}
 	return nil
 }

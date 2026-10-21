@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-store 1.5.4
 // 	protoc (unknown)
-// source: freebusy/shared/v1/idempotency.proto, freebusy/shared/v1/types.proto
+// source: freebusy/shared/v1/idempotency.proto
 //
 // database: freebusy
 // schema:   shared
@@ -34,9 +34,6 @@ func applyIdempotencyKeyMask(merged, in *sharedpbv1.IdempotencyKey, paths []stri
 	}
 	if repox.InMask(paths, "request_id") {
 		merged.RequestId = in.GetRequestId()
-	}
-	if repox.InMask(paths, "state") {
-		merged.State = in.GetState()
 	}
 	if repox.InMask(paths, "response") {
 		merged.Response = in.GetResponse()

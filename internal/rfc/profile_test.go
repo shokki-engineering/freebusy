@@ -3,7 +3,7 @@ package rfc
 import (
 	"testing"
 
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc9073/resource/v1/resourcepbv1"
+	resourcepbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 )
 
 // A resource carrying freebusy's STRUCTURED-DATA yields the profile in it.

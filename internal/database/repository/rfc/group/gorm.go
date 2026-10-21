@@ -16,14 +16,17 @@
 package group
 
 import (
+	ldapgrouppbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/group/v1"
+	scimgrouppbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/group/v1"
 	"context"
+	"fmt"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/filterx"
 	"github.com/oh-tarnished/freebusy/internal/database/gorm/rfc/group"
 	"github.com/oh-tarnished/freebusy/internal/database/repository/repox"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc4519/group/v1/ldapgrouppbv1"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7643/group/v1/scimgrouppbv1"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"time"
 )
 
 // GormGroupRepository is the GORM adapter of GroupRepository: flat
@@ -66,7 +69,20 @@ func (r *GormGroupRepository) Create(ctx context.Context, in *scimgrouppbv1.Grou
 	m.ID = id
 	m.Name = in.GetName()
 	m.Etag = repox.Ptr(repox.NewULID())
-	if err := group.NewGroupStore(r.DB).Create(ctx, m); err != nil {
+	if err := r.DB.Transaction(func(tx *gorm.DB) error {
+		if err := group.NewGroupStore(tx).Create(ctx, m); err != nil {
+			return err
+		}
+		for _, v1 := range in.GetMembers() {
+			n2 := group.MemberFromProto(v1)
+			n2.ID = repox.NewULID()
+			n2.GroupID = id
+			if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n2).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.get(ctx, id)
@@ -85,7 +101,7 @@ func (r *GormGroupRepository) Get(ctx context.Context, name string) (*scimgroupp
 // through, so Tier-2 overrides of Get never re-enter generated writes.
 func (r *GormGroupRepository) get(ctx context.Context, id string) (*scimgrouppbv1.Group, error) {
 	var m group.Group
-	if err := r.DB.WithContext(ctx).First(&m, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("Members", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&m, "id = ?", id).Error; err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.toProto(ctx, &m)
@@ -109,6 +125,9 @@ func (r *GormGroupRepository) List(ctx context.Context, in repox.ListInput) ([]*
 }
 
 func (r *GormGroupRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*scimgrouppbv1.Group, string, error) {
+	if !in.ShowDeleted {
+		scope = scope.Where("delete_time IS NULL")
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -117,7 +136,7 @@ func (r *GormGroupRepository) list(ctx context.Context, scope *gorm.DB, in repox
 	for f, h := range r.ListOverrides {
 		eng.Override(f, h)
 	}
-	rows, next, err := eng.List(ctx, scope, filterx.ListInput{
+	rows, next, err := eng.List(ctx, scope.Preload("Members", func(db *gorm.DB) *gorm.DB { return db.Order("id") }), filterx.ListInput{
 		PageSize:  in.PageSize,
 		PageToken: in.PageToken,
 		OrderBy:   in.OrderBy,
@@ -147,9 +166,10 @@ func (r *GormGroupRepository) Update(ctx context.Context, in *scimgrouppbv1.Grou
 	id := ids[len(ids)-1]
 	err = r.DB.Transaction(func(tx *gorm.DB) error {
 		var existing group.Group
-		if err := tx.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+		if err := tx.WithContext(ctx).Preload("Members", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 			return err
 		}
+		var staleMembers []group.Member
 		if in.GetEtag() != "" && existing.Etag != nil && *existing.Etag != in.GetEtag() {
 			return repox.ErrConflict
 		}
@@ -166,8 +186,29 @@ func (r *GormGroupRepository) Update(ctx context.Context, in *scimgrouppbv1.Grou
 		existing.Name = next.Name
 		existing.ExternalUID = next.ExternalUID
 		existing.DisplayName = next.DisplayName
+		if repox.GroupTouched(paths, "members") {
+			staleMembers = existing.Members
+			for _, v7 := range merged.GetMembers() {
+				n8 := group.MemberFromProto(v7)
+				n8.ID = repox.NewULID()
+				n8.GroupID = id
+				if err := tx.WithContext(ctx).Omit(clause.Associations).Create(n8).Error; err != nil {
+					return err
+				}
+			}
+		}
+		existing.Members = nil
 		existing.Etag = repox.Ptr(repox.NewULID())
-		return group.NewGroupStore(tx).Update(ctx, &existing)
+		if err := group.NewGroupStore(tx).Update(ctx, &existing); err != nil {
+			return err
+		}
+		for i5 := range staleMembers {
+			d6 := &staleMembers[i5]
+			if err := tx.WithContext(ctx).Delete(&group.Member{}, "id = ?", d6.ID).Error; err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 	if err != nil {
 		return nil, repox.MapGormErr(err)
@@ -175,8 +216,54 @@ func (r *GormGroupRepository) Update(ctx context.Context, in *scimgrouppbv1.Grou
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GormGroupRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "groups")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	res := r.DB.WithContext(ctx).Model(&group.Group{}).
+		Where("id = ? AND delete_time IS NULL", ids[len(ids)-1]).
+		Updates(map[string]any{"delete_time": time.Now(), "etag": repox.NewULID()})
+	if res.Error != nil {
+		return repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return repox.ErrNotFound
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GormGroupRepository) Undelete(ctx context.Context, name string) (*scimgrouppbv1.Group, error) {
+	ids, err := repox.SplitName(name, "groups")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	res := r.DB.WithContext(ctx).Model(&group.Group{}).
+		Where("id = ? AND delete_time IS NOT NULL", id).
+		Updates(map[string]any{"delete_time": nil, "etag": repox.NewULID()})
+	if res.Error != nil {
+		return nil, repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GormGroupRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "groups")
 	if err != nil {
 		return err
@@ -188,10 +275,21 @@ func (r *GormGroupRepository) Delete(ctx context.Context, name string) error {
 	}
 	id := ids[len(ids)-1]
 	var existing group.Group
-	if err := r.DB.WithContext(ctx).First(&existing, "id = ?", id).Error; err != nil {
+	if err := r.DB.WithContext(ctx).Preload("Members", func(db *gorm.DB) *gorm.DB { return db.Order("id") }).First(&existing, "id = ?", id).Error; err != nil {
 		return repox.MapGormErr(err)
 	}
-	return repox.MapGormErr(group.NewGroupStore(r.DB).DeleteByID(ctx, id))
+	return repox.MapGormErr(r.DB.Transaction(func(tx *gorm.DB) error {
+		if err := group.NewGroupStore(tx).DeleteByID(ctx, id); err != nil {
+			return err
+		}
+		for i3 := range existing.Members {
+			d4 := &existing.Members[i3]
+			if err := tx.WithContext(ctx).Delete(&group.Member{}, "id = ?", d4.ID).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	}))
 }
 
 // Compile-time proof the adapter satisfies the interface.
@@ -280,6 +378,9 @@ func (r *GormLdapGroupRepository) List(ctx context.Context, in repox.ListInput) 
 }
 
 func (r *GormLdapGroupRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*ldapgrouppbv1.LdapGroup, string, error) {
+	if !in.ShowDeleted {
+		scope = scope.Where("delete_time IS NULL")
+	}
 	conds, err := filterx.Parse(in.Filter)
 	if err != nil {
 		return nil, "", repox.MapFilterxErr(err)
@@ -349,8 +450,54 @@ func (r *GormLdapGroupRepository) Update(ctx context.Context, in *ldapgrouppbv1.
 	return r.get(ctx, id)
 }
 
-// Delete removes the record addressed by its resource name.
+// Delete soft-deletes the record addressed by its resource name: delete_time
+// is set, the row stays.
 func (r *GormLdapGroupRepository) Delete(ctx context.Context, name string) error {
+	ids, err := repox.SplitName(name, "ldapGroups")
+	if err != nil {
+		return err
+	}
+	if h := r.Hooks.BeforeDelete; h != nil {
+		if err := h(ctx, name); err != nil {
+			return err
+		}
+	}
+	res := r.DB.WithContext(ctx).Model(&group.LdapGroup{}).
+		Where("id = ? AND delete_time IS NULL", ids[len(ids)-1]).
+		Updates(map[string]any{"delete_time": time.Now(), "etag": repox.NewULID()})
+	if res.Error != nil {
+		return repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		return repox.ErrNotFound
+	}
+	return nil
+}
+
+// Undelete clears the soft-delete mark and returns the restored record.
+func (r *GormLdapGroupRepository) Undelete(ctx context.Context, name string) (*ldapgrouppbv1.LdapGroup, error) {
+	ids, err := repox.SplitName(name, "ldapGroups")
+	if err != nil {
+		return nil, err
+	}
+	id := ids[len(ids)-1]
+	res := r.DB.WithContext(ctx).Model(&group.LdapGroup{}).
+		Where("id = ? AND delete_time IS NOT NULL", id).
+		Updates(map[string]any{"delete_time": nil, "etag": repox.NewULID()})
+	if res.Error != nil {
+		return nil, repox.MapGormErr(res.Error)
+	}
+	if res.RowsAffected == 0 {
+		if _, err := r.get(ctx, id); err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("%w: %s is not deleted", repox.ErrAlreadyExists, name)
+	}
+	return r.get(ctx, id)
+}
+
+// Purge removes the record addressed by its resource name for good.
+func (r *GormLdapGroupRepository) Purge(ctx context.Context, name string) error {
 	ids, err := repox.SplitName(name, "ldapGroups")
 	if err != nil {
 		return err

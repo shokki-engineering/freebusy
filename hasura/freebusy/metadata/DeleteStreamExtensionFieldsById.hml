@@ -1,0 +1,72 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: DeleteStreamExtensionFieldsByIdResponse
+  description: Responses from the 'delete_stream_extension_fields_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[StreamExtensionFields!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: DeleteStreamExtensionFieldsByIdResponse
+    inputTypeName: DeleteStreamExtensionFieldsByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: delete_stream_extension_fields_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: DeleteStreamExtensionFieldsByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: DeleteStreamExtensionFieldsById
+  outputType: DeleteStreamExtensionFieldsByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: preCheck
+      type: StreamExtensionFieldsBoolExp
+      description: Delete permission predicate over the 'stream_extension_fields' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: delete_stream_extension_fields_by_id
+    argumentMapping:
+      keyId: key_id
+      preCheck: pre_check
+  graphql:
+    rootFieldName: deleteStreamExtensionFieldsById
+    rootFieldKind: Mutation
+  description: Delete any row on the 'stream_extension_fields' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: DeleteStreamExtensionFieldsById
+  permissions:
+    - role: admin
+      allowExecution: true
+

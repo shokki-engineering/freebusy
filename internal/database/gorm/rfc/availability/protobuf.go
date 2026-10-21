@@ -17,9 +17,10 @@ package availability
 import (
 	"time"
 
+	rfcavailabilitypbv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"github.com/lib/pq"
-	"github.com/oh-tarnished/freebusy/protobuf/generated/go/protobuf/rfc7953/availability/v1/rfcavailabilitypbv1"
 	"google.golang.org/genproto/googleapis/type/date"
+	"google.golang.org/genproto/googleapis/type/datetime"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -97,6 +98,9 @@ func AvailabilityToProto(m *Availability) *rfcavailabilitypbv1.Availability {
 	if v := CalendarTimeToProto(m.End); v != nil {
 		out.EndForm = &rfcavailabilitypbv1.Availability_End{End: v}
 	}
+	for i := range m.AvailablePeriods {
+		out.AvailablePeriods = append(out.AvailablePeriods, AvailablePeriodToProto(&m.AvailablePeriods[i]))
+	}
 	return out
 }
 
@@ -108,7 +112,7 @@ func AvailabilityFromProto(pb *rfcavailabilitypbv1.Availability) *Availability {
 		return nil
 	}
 	m := &Availability{}
-	// not mapped here: start (sub-row graph), end (sub-row graph)
+	// not mapped here: start (sub-row graph), end (sub-row graph), available_periods (sub-row graph)
 	m.Name = pb.GetName()
 	m.UID = toPtr(pb.GetUid())
 	m.IcalUID = toPtr(pb.GetIcalUid())
@@ -122,6 +126,14 @@ func AvailabilityFromProto(pb *rfcavailabilitypbv1.Availability) *Availability {
 	m.Etag = toPtr(pb.GetEtag())
 	m.DeleteTime = tsToGo(pb.GetDeleteTime())
 	m.ExpireTime = tsToGo(pb.GetExpireTime())
+	switch pb.GetEndForm().(type) {
+	case *rfcavailabilitypbv1.Availability_End:
+		c := AvailabilityEndFormCaseEnd
+		m.EndFormCase = &c
+	case *rfcavailabilitypbv1.Availability_Duration:
+		c := AvailabilityEndFormCaseDuration
+		m.EndFormCase = &c
+	}
 	return m
 }
 
@@ -132,9 +144,11 @@ func CalendarTimeToProto(m *CalendarTime) *rfcavailabilitypbv1.CalendarTime {
 		return nil
 	}
 	out := &rfcavailabilitypbv1.CalendarTime{}
-	// not mapped here: date_time
 	if v := goToDate(m.Date); v != nil {
 		out.Value = &rfcavailabilitypbv1.CalendarTime_Date{Date: v}
+	}
+	if v := goToDt(m.DateTime); v != nil {
+		out.Value = &rfcavailabilitypbv1.CalendarTime_DateTime{DateTime: v}
 	}
 	return out
 }
@@ -147,8 +161,16 @@ func CalendarTimeFromProto(pb *rfcavailabilitypbv1.CalendarTime) *CalendarTime {
 		return nil
 	}
 	m := &CalendarTime{}
-	// not mapped here: date_time
 	m.Date = dateToGo(pb.GetDate())
+	m.DateTime = dtToGo(pb.GetDateTime())
+	switch pb.GetValue().(type) {
+	case *rfcavailabilitypbv1.CalendarTime_Date:
+		c := CalendarTimeValueCaseDate
+		m.ValueCase = &c
+	case *rfcavailabilitypbv1.CalendarTime_DateTime:
+		c := CalendarTimeValueCaseDateTime
+		m.ValueCase = &c
+	}
 	return m
 }
 
@@ -193,6 +215,14 @@ func AvailablePeriodFromProto(pb *rfcavailabilitypbv1.AvailablePeriod) *Availabl
 	m.RecurrenceRule = toPtr(pb.GetRecurrenceRule())
 	m.Categories = pq.StringArray(pb.GetCategories())
 	m.Comments = pq.StringArray(pb.GetComments())
+	switch pb.GetEndForm().(type) {
+	case *rfcavailabilitypbv1.AvailablePeriod_End:
+		c := AvailablePeriodEndFormCaseEnd
+		m.EndFormCase = &c
+	case *rfcavailabilitypbv1.AvailablePeriod_Duration:
+		c := AvailablePeriodEndFormCaseDuration
+		m.EndFormCase = &c
+	}
 	return m
 }
 
@@ -273,6 +303,50 @@ func goValToTs(t time.Time) *timestamppb.Timestamp {
 		return nil
 	}
 	return timestamppb.New(t)
+}
+
+// dtToGo maps a google.type.DateTime onto a nullable TIMESTAMPTZ instant. A
+// time zone resolves through the IANA database and a UTC offset as a fixed
+// zone; a floating value (neither) has no instant of its own and is read as
+// UTC.
+func dtToGo(d *datetime.DateTime) *time.Time {
+	if d == nil {
+		return nil
+	}
+	t := dtToGoVal(d)
+	return &t
+}
+
+// dtToGoVal is dtToGo for a NOT NULL column.
+func dtToGoVal(d *datetime.DateTime) time.Time {
+	if d == nil {
+		return time.Time{}
+	}
+	loc := time.UTC
+	switch {
+	case d.GetTimeZone().GetId() != "":
+		if l, err := time.LoadLocation(d.GetTimeZone().GetId()); err == nil {
+			loc = l
+		}
+	case d.GetUtcOffset() != nil:
+		loc = time.FixedZone("", int(d.GetUtcOffset().AsDuration()/time.Second))
+	}
+	return time.Date(int(d.GetYear()), time.Month(d.GetMonth()), int(d.GetDay()),
+		int(d.GetHours()), int(d.GetMinutes()), int(d.GetSeconds()), int(d.GetNanos()), loc)
+}
+
+// goToDt maps a TIMESTAMPTZ instant back onto a DateTime, in UTC: the stored
+// instant is what survives, not the zone it was written in.
+func goToDt(t *time.Time) *datetime.DateTime {
+	if t == nil || t.IsZero() {
+		return nil
+	}
+	u := t.UTC()
+	return &datetime.DateTime{
+		Year: int32(u.Year()), Month: int32(u.Month()), Day: int32(u.Day()),
+		Hours: int32(u.Hour()), Minutes: int32(u.Minute()), Seconds: int32(u.Second()), Nanos: int32(u.Nanosecond()),
+		TimeOffset: &datetime.DateTime_UtcOffset{UtcOffset: durationpb.New(0)},
+	}
 }
 
 // dateToGo maps a proto date onto a nullable DATE value (UTC midnight).

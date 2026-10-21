@@ -17,7 +17,7 @@ definition:
     - name: response
       type: String_1
     - name: state
-      type: String_1!
+      type: String_1
     - name: updateTime
       type: Timestamptz!
   graphql:
