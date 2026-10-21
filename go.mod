@@ -12,26 +12,31 @@ require (
 	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261021085804-ae1e2acc01d5.2
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.12.3
-	github.com/modelcontextprotocol/go-sdk v1.7.0
-	github.com/shokki-engineering/freebusy/protobuf v0.0.0-00010101000000-000000000000
+	github.com/modelcontextprotocol/go-sdk v1.8.0
 	github.com/oh-tarnished/runtime-go/ulid v0.0.0-20260625174747-ee0fd6e44bef
+	github.com/shokki-engineering/freebusy/protobuf v0.0.0-00010101000000-000000000000
 	github.com/the-protobuf-project/opentelementry/opentelementry-go v0.0.0-20260722091843-d33763c88e10
 	github.com/the-protobuf-project/runtime-go/cache v0.0.0-20260904124945-28b95e838f2e
 	github.com/the-protobuf-project/runtime-go/grpc v0.0.0-20260904124504-3aec40995305
 	github.com/the-protobuf-project/runtime-go/network v0.0.0-20260904124504-3aec40995305
 	github.com/the-protobuf-project/runtime-go/rfc v0.0.0-20261021085950-c238e87067e6
 	github.com/the-protobuf-project/telemetry/telemetry-go v0.0.0-20260817061725-884f94d7858d
-	go.opentelemetry.io/otel v1.46.0
+	go.opentelemetry.io/otel v1.47.0
 	google.golang.org/genproto v0.0.0-20260831171406-18b4a7587f8a
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261005182115-fad411399dd8
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v3 v3.0.1
-	gorm.io/driver/postgres v1.6.0
+	gorm.io/driver/postgres v1.6.3
 	gorm.io/gorm v1.31.2
 )
 
 require golang.org/x/crypto/x509roots/fallback v0.0.0-20261020153306-9f2b28d4331a
+
+require (
+	github.com/googleapis/enterprise-certificate-proxy v0.3.17 // indirect
+	github.com/googleapis/gax-go/v2 v2.23.0 // indirect
+)
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2 // indirect
@@ -70,7 +75,7 @@ require (
 	github.com/hasura/go-graphql-client v0.16.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.6.0
+	github.com/jackc/pgx/v5 v5.10.0
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
@@ -80,10 +85,10 @@ require (
 	github.com/knadh/koanf/parsers/toml v0.1.0
 	github.com/knadh/koanf/parsers/yaml v1.1.0 // indirect
 	github.com/knadh/koanf/providers/env v1.1.0 // indirect
-	github.com/knadh/koanf/providers/env/v2 v2.0.0
+	github.com/knadh/koanf/providers/env/v2 v2.0.2
 	github.com/knadh/koanf/providers/file v1.2.1 // indirect
-	github.com/knadh/koanf/providers/rawbytes v1.0.0
-	github.com/knadh/koanf/v2 v2.3.5
+	github.com/knadh/koanf/providers/rawbytes v1.0.1
+	github.com/knadh/koanf/v2 v2.4.1
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.22 // indirect
@@ -105,12 +110,12 @@ require (
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/segmentio/encoding v0.5.4 // indirect
 	github.com/stretchr/testify v1.12.1 // indirect
-	github.com/the-protobuf-project/grpc-mcp-gateway v1.6.1
+	github.com/the-protobuf-project/grpc-mcp-gateway v1.6.1 // indirect
 	github.com/the-protobuf-project/runtime-go/agents v0.0.0-20260904054035-1f2313e0d64a // indirect
 	github.com/the-protobuf-project/runtime-go/observability v0.0.0-20260904124504-3aec40995305 // indirect
 	github.com/the-protobuf-project/runtime-go/telemetry v0.0.0-20260904124504-3aec40995305 // indirect
 	github.com/the-protobuf-project/runtime-go/ulid v0.0.0-20260905053038-c759cd76211f // indirect
-	github.com/the-protobuf-project/store v1.5.1 // indirect
+	github.com/the-protobuf-project/store v1.5.4 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
@@ -122,12 +127,12 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.44.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.44.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.44.0 // indirect
-	go.opentelemetry.io/otel/log v0.20.0 // indirect
-	go.opentelemetry.io/otel/metric v1.46.0 // indirect
+	go.opentelemetry.io/otel/log v1.47.0 // indirect
+	go.opentelemetry.io/otel/metric v1.47.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.46.0 // indirect
 	go.opentelemetry.io/otel/sdk/log v0.20.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.46.0 // indirect
-	go.opentelemetry.io/otel/trace v1.46.0 // indirect
+	go.opentelemetry.io/otel/trace v1.47.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.11.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
