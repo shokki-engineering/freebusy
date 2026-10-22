@@ -284,16 +284,20 @@ var File_freebusy_shared_v1_types_proto protoreflect.FileDescriptor
 
 const file_freebusy_shared_v1_types_proto_rawDesc = "" +
 	"\n" +
-	"\x1efreebusy/shared/v1/types.proto\x12\x12freebusy.shared.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16google/type/date.proto\x1a\x17google/type/money.proto\"\x94\x01\n" +
+	"\x1efreebusy/shared/v1/types.proto\x12\x12freebusy.shared.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16google/type/date.proto\x1a\x17google/type/money.proto\"\x96\x01\n" +
 	"\n" +
-	"TimeWindow\x12D\n" +
+	"TimeWindow\x12E\n" +
 	"\n" +
-	"start_time\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\tstartTime\x12@\n" +
-	"\bend_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\aendTime\"\x81\x01\n" +
-	"\tDateRange\x12;\n" +
+	"start_time\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampB\n" +
+	"\xe2A\x01\x02\xbaH\x03\xc8\x01\x01R\tstartTime\x12A\n" +
+	"\bend_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\n" +
+	"\xe2A\x01\x02\xbaH\x03\xc8\x01\x01R\aendTime\"\x83\x01\n" +
+	"\tDateRange\x12<\n" +
 	"\n" +
-	"start_date\x18\x01 \x01(\v2\x11.google.type.DateB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\tstartDate\x127\n" +
-	"\bend_date\x18\x02 \x01(\v2\x11.google.type.DateB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\aendDate\"\x8c\x02\n" +
+	"start_date\x18\x01 \x01(\v2\x11.google.type.DateB\n" +
+	"\xe2A\x01\x02\xbaH\x03\xc8\x01\x01R\tstartDate\x128\n" +
+	"\bend_date\x18\x02 \x01(\v2\x11.google.type.DateB\n" +
+	"\xe2A\x01\x02\xbaH\x03\xc8\x01\x01R\aendDate\"\x8c\x02\n" +
 	"\x0ePriceComponent\x12;\n" +
 	"\x04type\x18\x01 \x01(\x0e2'.freebusy.shared.v1.PriceComponent.TypeR\x04type\x12\x12\n" +
 	"\x04code\x18\x02 \x01(\tR\x04code\x12!\n" +

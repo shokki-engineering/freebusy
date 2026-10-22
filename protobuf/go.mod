@@ -11,9 +11,10 @@ require (
 	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261021085804-ae1e2acc01d5.2
 	cloud.google.com/go/longrunning v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0
+	github.com/the-protobuf-project/cache v0.3.0
 	github.com/the-protobuf-project/grpc-mcp-gateway v1.6.1
 	github.com/the-protobuf-project/runtime-go/agents v0.0.0-20261021172408-4a614accbb1c
-	github.com/the-protobuf-project/store v1.5.4
+	github.com/the-protobuf-project/store v1.5.7
 	google.golang.org/genproto v0.0.0-20260831171406-18b4a7587f8a
 	google.golang.org/genproto/googleapis/api v0.0.0-20261019180522-ce908d29299b
 	google.golang.org/grpc v1.84.0

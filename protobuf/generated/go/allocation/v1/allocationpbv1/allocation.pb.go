@@ -545,39 +545,42 @@ var File_freebusy_allocation_v1_allocation_proto protoreflect.FileDescriptor
 
 const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	"\n" +
-	"'freebusy/allocation/v1/allocation.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a\"freebusy/allocation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1agoogle/type/interval.proto\x1a\x1astore/v1/annotations.proto\"\xad\x06\n" +
-	"\x04Hold\x12H\n" +
-	"\x04name\x18\x01 \x01(\tB4\xe0A\b\xbaH.\xd8\x01\x01r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\x04name\x12G\n" +
-	"\tresources\x18\x02 \x03(\tB)\xe0A\x03\xfaA#\n" +
-	"!the-protobuf-project.org/ResourceR\tresources\x125\n" +
-	"\x06window\x18\x03 \x01(\v2\x15.google.type.IntervalB\x06\xe0A\x02\xe0A\x05R\x06window\x12]\n" +
-	"\x13candidate_resources\x18\f \x03(\tB,\xe0A\x01\xe0A\x05\xfaA#\n" +
-	"!the-protobuf-project.org/ResourceR\x12candidateResources\x12)\n" +
-	"\bquantity\x18\x04 \x01(\x05B\r\xe0A\x01\xe0A\x05\xbaH\x04\x1a\x02(\x00R\bquantity\x12@\n" +
-	"\vexpire_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
-	"expireTime\x12H\n" +
-	"\x05state\x18\x06 \x01(\x0e2!.freebusy.allocation.v1.HoldStateB\x0f\xe0A\x03ڵ\x18\b\x12\x06ACTIVER\x05state\x125\n" +
-	"\x0fidempotency_key\x18\b \x01(\tB\f\xe0A\x01\xe0A\x05\xe2\xb5\x18\x02\x18\x01R\x0eidempotencyKey\x12@\n" +
-	"\vcreate_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
-	"createTime\x12@\n" +
+	"'freebusy/allocation/v1/allocation.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a\"freebusy/allocation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1agoogle/type/interval.proto\x1a\x1astore/v1/annotations.proto\"\xd6\x06\n" +
+	"\x04Hold\x12I\n" +
+	"\x04name\x18\x01 \x01(\tB5\xe2A\x01\b\xbaH.\xd8\x01\x01r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\x04name\x12H\n" +
+	"\tresources\x18\x02 \x03(\tB*\xe2A\x01\x03\xfaA#\n" +
+	"!the-protobuf-project.org/ResourceR\tresources\x124\n" +
+	"\x06window\x18\x03 \x01(\v2\x15.google.type.IntervalB\x05\xe2A\x02\x02\x05R\x06window\x12\\\n" +
+	"\x13candidate_resources\x18\f \x03(\tB+\xe2A\x02\x01\x05\xfaA#\n" +
+	"!the-protobuf-project.org/ResourceR\x12candidateResources\x12(\n" +
+	"\bquantity\x18\x04 \x01(\x05B\f\xe2A\x02\x01\x05\xbaH\x04\x1a\x02(\x00R\bquantity\x12A\n" +
+	"\vexpire_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
+	"expireTime\x12I\n" +
+	"\x05state\x18\x06 \x01(\x0e2!.freebusy.allocation.v1.HoldStateB\x10\xe2A\x01\x03ڵ\x18\b\x12\x06ACTIVER\x05state\x124\n" +
+	"\x0fidempotency_key\x18\b \x01(\tB\v\xe2A\x02\x01\x05\xe2\xb5\x18\x02\x18\x01R\x0eidempotencyKey\x12A\n" +
+	"\vcreate_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
+	"createTime\x12A\n" +
 	"\vupdate_time\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
-	"updateTime\x12\x17\n" +
-	"\x04etag\x18\v \x01(\tB\x03\xe0A\x03R\x04etag:k\xeaAb\n" +
-	"\x1bfreebusy.allocation.v1/Hold\x126organizationalUnits/{organizational_unit}/holds/{hold}*\x05holds2\x04hold\xca\xf3\x18\x02\x18\x01J\x04\b\a\x10\b\"\xfa\x04\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
+	"updateTime\x12\x18\n" +
+	"\x04etag\x18\v \x01(\tB\x04\xe2A\x01\x03R\x04etag:\x90\x01\xeaAb\n" +
+	"\x1bfreebusy.allocation.v1/Hold\x126organizationalUnits/{organizational_unit}/holds/{hold}*\x05holds2\x04hold\xca\xf3\x18'\x18\x01*\x14\n" +
+	"\x05state\n" +
+	"\vexpire_time*\r\n" +
+	"\vupdate_timeJ\x04\b\a\x10\b\"\x81\x05\n" +
 	"\n" +
-	"Allocation\x12\x17\n" +
-	"\x04name\x18\x01 \x01(\tB\x03\xe0A\bR\x04name\x12E\n" +
-	"\bresource\x18\x02 \x01(\tB)\xe0A\x02\xfaA#\n" +
-	"!the-protobuf-project.org/ResourceR\bresource\x12>\n" +
+	"Allocation\x12\x18\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12F\n" +
+	"\bresource\x18\x02 \x01(\tB*\xe2A\x01\x02\xfaA#\n" +
+	"!the-protobuf-project.org/ResourceR\bresource\x12?\n" +
 	"\n" +
-	"start_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x02R\tstartTime\x12:\n" +
-	"\bend_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x02R\aendTime\x12@\n" +
-	"\vexpire_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
-	"expireTime\x12@\n" +
-	"\vcreate_time\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
-	"createTime\x127\n" +
-	"\x04hold\x18\a \x01(\tB#\xe0A\x03\xfaA\x1d\n" +
+	"start_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x02R\tstartTime\x12;\n" +
+	"\bend_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x02R\aendTime\x12A\n" +
+	"\vexpire_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
+	"expireTime\x12A\n" +
+	"\vcreate_time\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
+	"createTime\x128\n" +
+	"\x04hold\x18\a \x01(\tB$\xe2A\x01\x03\xfaA\x1d\n" +
 	"\x1bfreebusy.allocation.v1/HoldR\x04hold:\xd2\x01\xeaA\x80\x01\n" +
 	"!freebusy.allocation.v1/Allocation\x12BorganizationalUnits/{organizational_unit}/allocations/{allocation}*\vallocations2\n" +
 	"allocationҵ\x18\"\x12 \n" +

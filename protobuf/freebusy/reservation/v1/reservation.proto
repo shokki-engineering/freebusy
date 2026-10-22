@@ -33,15 +33,26 @@ option java_package = "engineering.shokki.freebusy.reservation.v1";
 // service, both referenced by name (AIP-215), and anything else a vertical
 // needs to remember rides in `attributes`.
 message Reservation {
-  // A hold backs at most one reservation: the index is what makes a retried
-  // or concurrent CreateReservation find the first one instead of making a
-  // second.
+  // A hold backs at most one reservation: the unique index is what makes a
+  // retried or concurrent CreateReservation find the first one instead of
+  // making a second. (state, update_time) serves the reconciler, which looks
+  // for reservations stuck in a state since before a cutoff; update_time the
+  // webhook change feed, which reads them in update order.
   option (entity.v1.table) = {
     id: ID_STRATEGY_ULID
     indexes: [
       {
         columns: ["hold"]
         unique: true
+      },
+      {
+        columns: [
+          "state",
+          "update_time"
+        ]
+      },
+      {
+        columns: ["update_time"]
       }
     ]
   };

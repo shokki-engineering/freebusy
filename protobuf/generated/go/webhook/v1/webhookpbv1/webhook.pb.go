@@ -205,26 +205,26 @@ var File_freebusy_webhook_v1_webhook_proto protoreflect.FileDescriptor
 
 const file_freebusy_webhook_v1_webhook_proto_rawDesc = "" +
 	"\n" +
-	"!freebusy/webhook/v1/webhook.proto\x12\x13freebusy.webhook.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a\x1ffreebusy/webhook/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\xa9\x06\n" +
-	"\aWebhook\x121\n" +
-	"\x04name\x18\x01 \x01(\tB\x1d\xe0A\b\xbaH\x17\xd8\x01\x01r\x122\x10^webhooks/[^/]+$R\x04name\x12.\n" +
-	"\fdisplay_name\x18\x02 \x01(\tB\v\xe0A\x01\xbaH\x05r\x03\x18\x80\x01R\vdisplayName\x12 \n" +
-	"\x03uri\x18\x03 \x01(\tB\x0e\xe0A\x02\xbaH\b\xd8\x01\x01r\x03\x88\x01\x01R\x03uri\x12J\n" +
-	"\vevent_types\x18\x04 \x03(\tB)\xe0A\x01\xbaH#\x92\x01 \"\x1er\x1c2\x1a^freebusy\\.[a-z]+\\.[a-z]+$R\n" +
-	"eventTypes\x12\x89\x01\n" +
-	"\x13organizational_unit\x18\x05 \x01(\tBX\xe0A\x01\xfaA-\n" +
-	"+the-protobuf-project.org/OrganizationalUnit\xbaH\"\xd8\x01\x01r\x1d2\x1b^organizationalUnits/[^/]+$R\x12organizationalUnit\x12H\n" +
-	"\x05state\x18\x06 \x01(\x0e2!.freebusy.webhook.v1.WebhookStateB\x0f\xe0A\x03ڵ\x18\b\x12\x06ACTIVER\x05state\x12\x1b\n" +
-	"\x06secret\x18\a \x01(\tB\x03\xe0A\x03R\x06secret\x12,\n" +
-	"\x0fprevious_secret\x18\v \x01(\tB\x03\xe0A\x03R\x0epreviousSecret\x12@\n" +
-	"\vrotate_time\x18\f \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
-	"rotateTime\x12@\n" +
-	"\vcreate_time\x18\b \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
-	"createTime\x12@\n" +
-	"\vupdate_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
-	"updateTime\x12\x17\n" +
+	"!freebusy/webhook/v1/webhook.proto\x12\x13freebusy.webhook.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a\x1ffreebusy/webhook/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\xb5\x06\n" +
+	"\aWebhook\x122\n" +
+	"\x04name\x18\x01 \x01(\tB\x1e\xe2A\x01\b\xbaH\x17\xd8\x01\x01r\x122\x10^webhooks/[^/]+$R\x04name\x12/\n" +
+	"\fdisplay_name\x18\x02 \x01(\tB\f\xe2A\x01\x01\xbaH\x05r\x03\x18\x80\x01R\vdisplayName\x12!\n" +
+	"\x03uri\x18\x03 \x01(\tB\x0f\xe2A\x01\x02\xbaH\b\xd8\x01\x01r\x03\x88\x01\x01R\x03uri\x12K\n" +
+	"\vevent_types\x18\x04 \x03(\tB*\xe2A\x01\x01\xbaH#\x92\x01 \"\x1er\x1c2\x1a^freebusy\\.[a-z]+\\.[a-z]+$R\n" +
+	"eventTypes\x12\x8a\x01\n" +
+	"\x13organizational_unit\x18\x05 \x01(\tBY\xe2A\x01\x01\xfaA-\n" +
+	"+the-protobuf-project.org/OrganizationalUnit\xbaH\"\xd8\x01\x01r\x1d2\x1b^organizationalUnits/[^/]+$R\x12organizationalUnit\x12I\n" +
+	"\x05state\x18\x06 \x01(\x0e2!.freebusy.webhook.v1.WebhookStateB\x10\xe2A\x01\x03ڵ\x18\b\x12\x06ACTIVER\x05state\x12\x1c\n" +
+	"\x06secret\x18\a \x01(\tB\x04\xe2A\x01\x03R\x06secret\x12-\n" +
+	"\x0fprevious_secret\x18\v \x01(\tB\x04\xe2A\x01\x03R\x0epreviousSecret\x12A\n" +
+	"\vrotate_time\x18\f \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
+	"rotateTime\x12A\n" +
+	"\vcreate_time\x18\b \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
+	"createTime\x12A\n" +
+	"\vupdate_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
+	"updateTime\x12\x18\n" +
 	"\x04etag\x18\n" +
-	" \x01(\tB\x03\xe0A\x03R\x04etag:M\xeaAD\n" +
+	" \x01(\tB\x04\xe2A\x01\x03R\x04etag:M\xeaAD\n" +
 	"\x1bfreebusy.webhook.v1/Webhook\x12\x12webhooks/{webhook}*\bwebhooks2\awebhook\xca\xf3\x18\x02\x18\x01B\xf6\x01\n" +
 	"\x17com.freebusy.webhook.v1B\fWebhookProtoP\x01Z_github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1\xa2\x02\x03FWX\xaa\x02\x13Freebusy.Webhook.V1\xca\x02\x13Freebusy\\Webhook\\V1\xe2\x02\x1fFreebusy\\Webhook\\V1\\GPBMetadata\xea\x02\x15Freebusy::Webhook::V1b\x06proto3"
 

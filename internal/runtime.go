@@ -5,6 +5,7 @@ package internal
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc4519/organization/v1/organizationv1grpc"
@@ -37,6 +38,7 @@ import (
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/rfc/protobuf/rfc9073/resource/v1/resourcev1gw"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/rfc/protobuf/rfc9073/resource/v1/resourcev1mcp"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1"
+	"github.com/shokki-engineering/freebusy/shared"
 	"github.com/the-protobuf-project/runtime-go/grpc"
 )
 
@@ -45,6 +47,20 @@ import (
 // registered Service adapter. Called at startup, on every Restart, and — with
 // an injected connection — by the e2e suites.
 func newServiceInstance(conn *database.Connection) (*Service, error) {
+	hooks := config.Get().Webhooks
+	var previous []string
+	for k := range strings.SplitSeq(hooks.PreviousSecretKeys, ",") {
+		if k = strings.TrimSpace(k); k != "" {
+			previous = append(previous, k)
+		}
+	}
+	sealer, err := webhooksvc.NewSealer(hooks.SecretKey, previous)
+	if err != nil {
+		return nil, err
+	}
+	if sealer == nil && config.Get().Server.Environment == "production" {
+		shared.Telemetry.Logger.Warn("Webhook signing secrets are stored unsealed: set FREEBUSY_WEBHOOKS__SECRET_KEY to the output of `openssl rand -base64 32`")
+	}
 	if conn == nil {
 		opened, err := database.Open()
 		if err != nil {
@@ -62,6 +78,7 @@ func newServiceInstance(conn *database.Connection) (*Service, error) {
 			AllowPrivateNetworks:   config.Get().Webhooks.AllowPrivateNetworks,
 			MaxAttempts:            config.Get().Webhooks.MaxAttempts,
 			Retention:              time.Duration(config.Get().Webhooks.RetentionDays) * 24 * time.Hour,
+			Sealer:                 sealer,
 		}),
 		repos,
 	)

@@ -49,15 +49,15 @@ type Hold struct {
 	// How many resources to take, supplied on create; defaults to 1. Once the hold is ACTIVE this equals the length of `resources`.
 	Quantity *int32 `gorm:"column:quantity" json:"quantity,omitempty"`
 	// When the hold lapses if nothing confirms it. Extend it with ExtendHold; past this instant the hold no longer reserves anything, whether or not the sweeper has yet marked it EXPIRED.
-	ExpireTime *time.Time `gorm:"column:expire_time;type:timestamptz" json:"expire_time,omitempty"`
+	ExpireTime *time.Time `gorm:"column:expire_time;type:timestamptz;index:idx_holds_state_expire_time,priority:2" json:"expire_time,omitempty"`
 	// Lifecycle state. New holds start ACTIVE.
-	State *HoldState `gorm:"column:state;default:'ACTIVE';check:chk_holds_state,state IN ('ACTIVE','RELEASED','EXPIRED','CONVERTED')" json:"state,omitempty"`
+	State *HoldState `gorm:"column:state;default:'ACTIVE';index:idx_holds_state_expire_time,priority:1;check:chk_holds_state,state IN ('ACTIVE','RELEASED','EXPIRED','CONVERTED')" json:"state,omitempty"`
 	// Caller-supplied key making CreateHold safe to retry. A repeat with the same key returns the original hold rather than taking a second one.
 	IdempotencyKey *string `gorm:"column:idempotency_key;index:idx_holds_idempotency_key_trgm,type:gin,expression:idempotency_key gin_trgm_ops" json:"idempotency_key,omitempty"`
 	// Creation timestamp.
 	CreateTime time.Time `gorm:"column:create_time;type:timestamptz;not null;autoCreateTime" json:"create_time"`
 	// Last-modification timestamp.
-	UpdateTime time.Time `gorm:"column:update_time;type:timestamptz;not null;autoUpdateTime" json:"update_time"`
+	UpdateTime time.Time `gorm:"column:update_time;type:timestamptz;not null;autoUpdateTime;index:idx_holds_update_time" json:"update_time"`
 	// Opaque version for optimistic concurrency (AIP-154); echo on update/delete.
 	Etag *string `gorm:"column:etag" json:"etag,omitempty"`
 	// Parent reference to OrganizationalUnit (from the AIP resource pattern). TODO: unresolved reference to OrganizationalUnit (not in this generation set); kept as a plain indexed column.

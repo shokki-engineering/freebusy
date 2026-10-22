@@ -11,6 +11,7 @@ package reservationpbv1
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	_ "github.com/the-protobuf-project/cache/plugin/pb/cachepbv1"
 	_ "github.com/the-protobuf-project/store/plugin/entity/pb/entitypbv1"
 	_ "github.com/the-protobuf-project/store/plugin/pb/storepbv1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
@@ -235,35 +236,38 @@ var File_freebusy_reservation_v1_reservation_proto protoreflect.FileDescriptor
 
 const file_freebusy_reservation_v1_reservation_proto_rawDesc = "" +
 	"\n" +
-	")freebusy/reservation/v1/reservation.proto\x12\x17freebusy.reservation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a#freebusy/reservation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\x94\t\n" +
-	"\vReservation\x12O\n" +
-	"\x04name\x18\x01 \x01(\tB;\xe0A\b\xbaH5\xd8\x01\x01r02.^organizationalUnits/[^/]+/reservations/[^/]+$R\x04name\x12n\n" +
-	"\x04hold\x18\x02 \x01(\tBZ\xe0A\x02\xe0A\x05\xfaA\x1d\n" +
-	"\x1bfreebusy.allocation.v1/Hold\xbaH+r)2'^organizationalUnits/[^/]+/holds/[^/]+$\xe2\xb5\x18\x02\x18\x01R\x04hold\x12G\n" +
-	"\tresources\x18\x03 \x03(\tB)\xe0A\x03\xfaA#\n" +
-	"!the-protobuf-project.org/ResourceR\tresources\x12>\n" +
+	")freebusy/reservation/v1/reservation.proto\x12\x17freebusy.reservation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acache/v1/annotations.proto\x1a\x1bentity/v1/annotations.proto\x1a#freebusy/reservation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\xd3\t\n" +
+	"\vReservation\x12P\n" +
+	"\x04name\x18\x01 \x01(\tB<\xe2A\x01\b\xbaH5\xd8\x01\x01r02.^organizationalUnits/[^/]+/reservations/[^/]+$R\x04name\x12m\n" +
+	"\x04hold\x18\x02 \x01(\tBY\xe2A\x02\x02\x05\xfaA\x1d\n" +
+	"\x1bfreebusy.allocation.v1/Hold\xbaH+r)2'^organizationalUnits/[^/]+/holds/[^/]+$\xe2\xb5\x18\x02\x18\x01R\x04hold\x12H\n" +
+	"\tresources\x18\x03 \x03(\tB*\xe2A\x01\x03\xfaA#\n" +
+	"!the-protobuf-project.org/ResourceR\tresources\x12?\n" +
 	"\n" +
-	"start_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\tstartTime\x12:\n" +
-	"\bend_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\aendTime\x12<\n" +
-	"\bcustomer\x18\x06 \x01(\tB \xe0A\x01\xbaH\x14\xd8\x01\x01r\x0f2\r^users/[^/]+$\xe2\xb5\x18\x02\x18\x01R\bcustomer\x12Q\n" +
-	"\x05state\x18\a \x01(\x0e2).freebusy.reservation.v1.ReservationStateB\x10\xe0A\x03ڵ\x18\t\x12\aPENDINGR\x05state\x12<\n" +
+	"start_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\tstartTime\x12;\n" +
+	"\bend_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\aendTime\x12=\n" +
+	"\bcustomer\x18\x06 \x01(\tB!\xe2A\x01\x01\xbaH\x14\xd8\x01\x01r\x0f2\r^users/[^/]+$\xe2\xb5\x18\x02\x18\x01R\bcustomer\x12R\n" +
+	"\x05state\x18\a \x01(\x0e2).freebusy.reservation.v1.ReservationStateB\x11\xe2A\x01\x03ڵ\x18\t\x12\aPENDINGR\x05state\x12=\n" +
 	"\n" +
-	"attributes\x18\b \x01(\v2\x17.google.protobuf.StructB\x03\xe0A\x01R\n" +
-	"attributes\x12(\n" +
-	"\rcancel_reason\x18\t \x01(\tB\x03\xe0A\x03R\fcancelReason\x12@\n" +
+	"attributes\x18\b \x01(\v2\x17.google.protobuf.StructB\x04\xe2A\x01\x01R\n" +
+	"attributes\x12)\n" +
+	"\rcancel_reason\x18\t \x01(\tB\x04\xe2A\x01\x03R\fcancelReason\x12A\n" +
 	"\vcreate_time\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
-	"createTime\x12@\n" +
-	"\vupdate_time\x18\v \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
-	"updateTime\x12B\n" +
-	"\fconfirm_time\x18\f \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\vconfirmTime\x12@\n" +
-	"\vcancel_time\x18\r \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
-	"cancelTime\x12\x17\n" +
-	"\x04etag\x18\x0e \x01(\tB\x03\xe0A\x03R\x04etag\x12\x1f\n" +
-	"\breplaces\x18\x0f \x01(\tB\x03\xe0A\x03R\breplaces\x12%\n" +
-	"\vreplacement\x18\x10 \x01(\tB\x03\xe0A\x03R\vreplacement:\x9a\x01\xeaA\x86\x01\n" +
-	"#freebusy.reservation.v1/Reservation\x12DorganizationalUnits/{organizational_unit}/reservations/{reservation}*\freservations2\vreservation\xca\xf3\x18\f\x18\x01*\b\n" +
-	"\x04hold\x10\x01B\x9a\x02\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
+	"createTime\x12A\n" +
+	"\vupdate_time\x18\v \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
+	"updateTime\x12C\n" +
+	"\fconfirm_time\x18\f \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\vconfirmTime\x12A\n" +
+	"\vcancel_time\x18\r \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
+	"cancelTime\x12\x18\n" +
+	"\x04etag\x18\x0e \x01(\tB\x04\xe2A\x01\x03R\x04etag\x12 \n" +
+	"\breplaces\x18\x0f \x01(\tB\x04\xe2A\x01\x03R\breplaces\x12&\n" +
+	"\vreplacement\x18\x10 \x01(\tB\x04\xe2A\x01\x03R\vreplacement:\xcb\x01\xeaA\x86\x01\n" +
+	"#freebusy.reservation.v1/Reservation\x12DorganizationalUnits/{organizational_unit}/reservations/{reservation}*\freservations2\vreservation\xca\xf3\x181\x18\x01*\b\n" +
+	"\x04hold\x10\x01*\x14\n" +
+	"\x05state\n" +
+	"\vupdate_time*\r\n" +
+	"\vupdate_time\x8a\xb2\x19\b:\x06\b\x01\x12\x02\b<B\x9a\x02\n" +
 	"\x1bcom.freebusy.reservation.v1B\x10ReservationProtoP\x01Zkgithub.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
 
 var (

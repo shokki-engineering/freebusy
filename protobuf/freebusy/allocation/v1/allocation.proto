@@ -36,7 +36,23 @@ option java_package = "engineering.shokki.freebusy.allocation.v1";
 // keeps "which bay did I get" a server decision made under a lock, rather than
 // a client guess that races.
 message Hold {
-  option (entity.v1.table) = {id: ID_STRATEGY_ULID};
+  // The sweeper looks for active holds past expire_time every few seconds,
+  // and the webhook change feed reads holds by update_time; without these,
+  // both scan every hold ever taken.
+  option (entity.v1.table) = {
+    id: ID_STRATEGY_ULID
+    indexes: [
+      {
+        columns: [
+          "state",
+          "expire_time"
+        ]
+      },
+      {
+        columns: ["update_time"]
+      }
+    ]
+  };
 
   option (google.api.resource) = {
     type: "freebusy.allocation.v1/Hold"

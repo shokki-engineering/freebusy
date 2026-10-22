@@ -121,8 +121,14 @@ jobs:
           go-version-file: go.mod
       - uses: extractions/setup-just@v4
 
-      # Schemas and tables.
-      - run: just migrate
+      # Schemas and tables, through the versioned migrations production
+      # applies, and a check that they still match the generated models.
+      - name: Install atlas
+        run: |
+          curl -sSfL -o /usr/local/bin/atlas https://release.ariga.io/atlas/atlas-community-linux-amd64-v1.3.0
+          chmod +x /usr/local/bin/atlas
+      - run: just db apply
+      - run: just db check
 
       # The engine serves the committed build (hasura/engine/build), which
       # `just hasura regen` makes from the metadata with a developer's DDN

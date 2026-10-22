@@ -84,7 +84,12 @@ func (r *receiver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 func webhookFlow(t *testing.T, conn *database.Connection) {
 	ctx := context.Background()
 	repos := webhooksvc.NewRepositories(conn.Repox())
-	opts := webhooksvc.Options{AllowInsecureEndpoints: true, AllowPrivateNetworks: true, Lag: 5 * time.Second}
+	// Secrets are sealed at rest: every server below that signs holds the key.
+	sealer, err := webhooksvc.NewSealer(base64.StdEncoding.EncodeToString(make([]byte, 32)), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	opts := webhooksvc.Options{AllowInsecureEndpoints: true, AllowPrivateNetworks: true, Lag: 5 * time.Second, Sealer: sealer}
 	srv := webhooksvc.NewServer(repos, opts)
 	reservations := reservation.New(conn.Repox()).Reservations
 
@@ -135,6 +140,9 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 	rec.secret = hook.GetSecret()
 	if got, _ := srv.GetWebhook(ctx, &webhookpbv1.GetWebhookRequest{Name: hook.GetName()}); got.GetSecret() != "" {
 		t.Fatal("GetWebhook returned the secret")
+	}
+	if stored, err := repos.Webhooks.Get(ctx, hook.GetName()); err != nil || !strings.HasPrefix(stored.GetSecret(), "enc:v1:") {
+		t.Fatalf("stored secret %q (%v), want it sealed", stored.GetSecret(), err)
 	}
 	if _, err := srv.UpdateWebhook(ctx, &webhookpbv1.UpdateWebhookRequest{
 		Webhook: &webhookpbv1.Webhook{Name: hook.GetName(), Uri: "http://example.com/x"}, UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"uri"}},
@@ -231,6 +239,10 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 	if err != nil || rotated.GetSecret() == hook.GetSecret() || !strings.HasPrefix(rotated.GetSecret(), "whsec_") || rotated.GetPreviousSecret() != "" {
 		t.Fatalf("rotate: %v, %v", rotated, err)
 	}
+	if stored, err := repos.Webhooks.Get(ctx, hook.GetName()); err != nil ||
+		!strings.HasPrefix(stored.GetSecret(), "enc:v1:") || !strings.HasPrefix(stored.GetPreviousSecret(), "enc:v1:") {
+		t.Fatalf("stored secrets after rotation %q, %q (%v), want both sealed", stored.GetSecret(), stored.GetPreviousSecret(), err)
+	}
 	if _, err := srv.RetryDelivery(ctx, &webhookpbv1.RetryDeliveryRequest{Name: d[0].GetName()}); err != nil {
 		t.Fatal(err)
 	}
@@ -249,7 +261,7 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 	if _, err := srv.RetryDelivery(ctx, &webhookpbv1.RetryDeliveryRequest{Name: d[0].GetName()}); err != nil {
 		t.Fatal(err)
 	}
-	if err := webhooksvc.NewServer(repos, webhooksvc.Options{AllowInsecureEndpoints: true, Lag: 5 * time.Second}).Round(ctx); err != nil {
+	if err := webhooksvc.NewServer(repos, webhooksvc.Options{AllowInsecureEndpoints: true, Lag: 5 * time.Second, Sealer: sealer}).Round(ctx); err != nil {
 		t.Fatal(err)
 	}
 	if got, _ := srv.GetDelivery(ctx, &webhookpbv1.GetDeliveryRequest{Name: d[0].GetName()}); got.GetState() != webhookpbv1.DeliveryState_DELIVERY_STATE_PENDING ||
@@ -335,7 +347,7 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 	}
 
 	// Finished deliveries older than the retention are pruned.
-	short := webhooksvc.NewServer(repos, webhooksvc.Options{AllowInsecureEndpoints: true, AllowPrivateNetworks: true, Lag: 5 * time.Second,
+	short := webhooksvc.NewServer(repos, webhooksvc.Options{AllowInsecureEndpoints: true, AllowPrivateNetworks: true, Lag: 5 * time.Second, Sealer: sealer,
 		Retention: time.Nanosecond, Now: func() time.Time { return time.Now().Add(time.Minute) }})
 	for range 5 { // a page a round
 		if err := short.Round(ctx); err != nil {

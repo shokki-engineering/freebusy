@@ -94,3 +94,14 @@ interval_seconds = 5
 max_attempts = 8
 allow_private_networks = false
 retention_days = 30
+# Seals signing secrets at rest. Set FREEBUSY_WEBHOOKS__SECRET_KEY to the
+# output of `openssl rand -base64 32`; empty stores them unsealed.
+secret_key = ""
+previous_secret_keys = ""
+
+[retention]
+# Soft-deleted organizations, sites, resources, calendars, events and
+# availability are purged for good this many days after deletion; until then
+# Undelete restores them, and expire_time says when they go.
+purge = true
+deleted_days = 30

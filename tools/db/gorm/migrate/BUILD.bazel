@@ -10,10 +10,7 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//config",
-        "//internal/database/gorm/freebusy",
-        "//internal/database/gorm/rfc",
-        "@io_gorm_driver_postgres//:postgres",
-        "@io_gorm_gorm//:gorm",
+        "//tools/db/schema",
     ],
 )
 

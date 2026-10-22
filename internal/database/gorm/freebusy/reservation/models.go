@@ -60,7 +60,7 @@ type Reservation struct {
 	// Who the reservation is for, by name in the user service. Format: users/{user}
 	Customer *string `gorm:"column:customer;index:idx_resource_customer_trgm,type:gin,expression:customer gin_trgm_ops" json:"customer,omitempty"`
 	// Lifecycle state.
-	State *ReservationState `gorm:"column:state;default:'PENDING';check:chk_resource_state,state IN ('PENDING','CONFIRMED','CANCELLING','CANCELLED','FAILED','RESCHEDULING','RESCHEDULED')" json:"state,omitempty"`
+	State *ReservationState `gorm:"column:state;default:'PENDING';index:idx_resource_state_update_time,priority:1;check:chk_resource_state,state IN ('PENDING','CONFIRMED','CANCELLING','CANCELLED','FAILED','RESCHEDULING','RESCHEDULED')" json:"state,omitempty"`
 	// Whatever a vertical needs to keep with the reservation: a party size, a payment reference, a licence plate. Opaque to the engine.
 	Attributes json.RawMessage `gorm:"column:attributes;type:jsonb" json:"attributes,omitempty"`
 	// Why it was cancelled, in the canceller's words. Set by CancelReservation.
@@ -68,7 +68,7 @@ type Reservation struct {
 	// Creation timestamp.
 	CreateTime time.Time `gorm:"column:create_time;type:timestamptz;not null;autoCreateTime" json:"create_time"`
 	// Last-modification timestamp.
-	UpdateTime time.Time `gorm:"column:update_time;type:timestamptz;not null;autoUpdateTime" json:"update_time"`
+	UpdateTime time.Time `gorm:"column:update_time;type:timestamptz;not null;autoUpdateTime;index:idx_resource_state_update_time,priority:2;index:idx_resource_update_time" json:"update_time"`
 	// When it was confirmed.
 	ConfirmTime *time.Time `gorm:"column:confirm_time;type:timestamptz" json:"confirm_time,omitempty"`
 	// When it was cancelled.

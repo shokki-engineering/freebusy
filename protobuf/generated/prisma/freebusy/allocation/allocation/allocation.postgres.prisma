@@ -62,6 +62,10 @@ model Hold {
   /// Back-relation: Reservation records that reference this model via hold.
   resource2 Reservation[]
 
+  /// Composite index on [state, expire_time].
+  @@index([state, expireTime])
+  /// Index on [update_time].
+  @@index([updateTime])
   /// Composite index on [organizational_unit_id, id].
   @@index([organizationalUnitID, id])
   /// GIN index: case-insensitive contains (ILIKE '%…%') cannot use a B-tree.

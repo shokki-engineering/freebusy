@@ -50,6 +50,10 @@ func Instant(t calendarTime, loc *time.Location) (at time.Time, allDay, ok bool)
 		int(dt.GetHours()), int(dt.GetMinutes()), int(dt.GetSeconds()), int(dt.GetNanos()), in), false, true
 }
 
+// recurrenceFix is what to do about a rule the engine refuses: the parts it
+// expands, and the way out for anything else.
+const recurrenceFix = "Use FREQ (DAILY, WEEKLY, MONTHLY or YEARLY) with INTERVAL, COUNT, UNTIL, BYDAY (numbered, like 2TU, only under MONTHLY or YEARLY), BYMONTHDAY, BYMONTH, BYHOUR, BYMINUTE, BYSETPOS and WKST; for anything else, list the dates with rdates"
+
 // RecurrenceFromProto maps a stored RFC 5545 recurrence onto the engine's rule
 // parts, its UNTIL read in loc. unsupported names the parts the engine does
 // not expand; the parts then carry Unsupported, so RRule renders a rule the
@@ -61,14 +65,9 @@ func RecurrenceFromProto(r *eventv1.Recurrence, loc *time.Location) (p Recurrenc
 		}
 	}
 	note(len(r.GetSecondNumbers()) > 0, "BYSECOND")
-	note(len(r.GetMinuteNumbers()) > 0, "BYMINUTE")
-	note(len(r.GetHourNumbers()) > 0, "BYHOUR")
 	note(len(r.GetYearDays()) > 0, "BYYEARDAY")
 	note(len(r.GetWeekNumbers()) > 0, "BYWEEKNO")
-	note(len(r.GetMonths()) > 0, "BYMONTH")
-	note(len(r.GetSetPositions()) > 0, "BYSETPOS")
 	note(r.GetRscale() != "" || len(r.GetLeapMonths()) > 0, "RSCALE")
-	note(r.GetWeekStart() != dayofweek.DayOfWeek_DAY_OF_WEEK_UNSPECIFIED && r.GetWeekStart() != dayofweek.DayOfWeek_MONDAY, "WKST")
 
 	p.Frequency = strings.TrimPrefix(r.GetFrequency().String(), "FREQUENCY_")
 	p.Unsupported = len(unsupported) > 0
@@ -96,6 +95,15 @@ func RecurrenceFromProto(r *eventv1.Recurrence, loc *time.Location) (p Recurrenc
 		p.ByDay = append(p.ByDay, w)
 	}
 	p.MonthDays = r.GetMonthDays()
+	for _, m := range r.GetMonths() {
+		p.Months = append(p.Months, int32(m))
+	}
+	p.Hours = r.GetHourNumbers()
+	p.Minutes = r.GetMinuteNumbers()
+	p.SetPositions = r.GetSetPositions()
+	if ws := r.GetWeekStart(); ws != dayofweek.DayOfWeek_DAY_OF_WEEK_UNSPECIFIED && ws != dayofweek.DayOfWeek_MONDAY {
+		p.WeekStart = dayCodes[ws.String()]
+	}
 	return p, unsupported
 }
 
@@ -169,14 +177,14 @@ func Occurrences(e *eventv1.Event, overrides []*eventv1.Event, loc *time.Locatio
 		return nil, dur, &types.Problem{Kind: types.ErrUnimplemented, Reason: "UNSUPPORTED_RECURRENCE",
 			ResourceType: hints.TypeOf(e.GetName()), ResourceName: e.GetName(),
 			What: fmt.Sprintf("event %s recurs by %s, which freebusy does not expand", e.GetName(), strings.Join(unsupported, ", ")),
-			Fix:  "Express the recurrence with FREQ, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY and BYMONTH, or list the dates with rdates"}
+			Fix:  recurrenceFix}
 	}
 	rule, err := engine.ParseRRule(parts.RRule(), first.Start.Location())
 	if err != nil {
 		return nil, dur, &types.Problem{Kind: types.ErrUnimplemented, Reason: "UNSUPPORTED_RECURRENCE",
 			ResourceType: hints.TypeOf(e.GetName()), ResourceName: e.GetName(),
 			What: fmt.Sprintf("event %s has a recurrence freebusy cannot expand (%v)", e.GetName(), err),
-			Fix:  "Express the recurrence with FREQ, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY and BYMONTH, or list the dates with rdates"}
+			Fix:  recurrenceFix}
 	}
 	excluded := map[int64]bool{}
 	for _, x := range e.GetExcludedTimes() {

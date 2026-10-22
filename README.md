@@ -86,6 +86,12 @@ flowchart TD
   expand with their RRULE, EXDATE and RDATE; an edited single occurrence
   (RECURRENCE-ID) replaces the instance it names; every time is read in its own
   zone, so a weekly 10:00 stays at 10:00 across daylight-saving changes.
+  Rules may use FREQ DAILY to YEARLY with INTERVAL, COUNT, UNTIL, BYDAY
+  (numbered, "the second Tuesday", under MONTHLY and YEARLY), BYMONTHDAY,
+  BYMONTH, BYHOUR, BYMINUTE, BYSETPOS ("the last weekday of the month") and
+  WKST. A rule using anything else — BYSECOND, BYYEARDAY, BYWEEKNO, RSCALE, or
+  a frequency finer than daily — is refused with UNSUPPORTED_RECURRENCE, and a
+  stored event with one counts as busy from its start rather than free.
 - **Booking rules** — minimum and maximum length, how far ahead, how late —
   come from each resource's RFC 9073 `STRUCTURED-DATA`. freebusy never needs to
   know what a "night" or a "session" means to you.
@@ -94,6 +100,10 @@ flowchart TD
   organization that does not exist — or is soft-deleted — is answered
   `NOT_FOUND` on every surface (gRPC, REST, MCP). Deleting an organization
   that still has sites, or a site that still has resources, is refused.
+- **Deletes are soft, then final.** A deleted organization, site, resource,
+  calendar, event or availability stays restorable with `Undelete` for
+  `[retention] deleted_days` (30 by default), and its `expire_time` says until
+  when; after that it is purged for good, children before parents.
 - **No double booking, ever.** A Postgres exclusion constraint refuses two
   overlapping claims on one resource, however many servers race for it.
 
@@ -211,9 +221,10 @@ bazel run //image:load                      # or into the local Docker as freebu
 
 ### 2. Prepare Postgres
 
-Postgres 18 with a database for freebusy. Create the schema from a checkout of
-this repository, pointed at your database with the same environment variables
-the server uses:
+Postgres 18 with a database for freebusy. Its schema comes from the versioned
+migrations in `migrations/`, applied with [atlas](https://atlasgo.io) (the
+community build is enough) from a checkout of this repository, pointed at your
+database with the same environment variables the server uses:
 
 ```sh
 FREEBUSY_PROFILE=release \
@@ -221,12 +232,26 @@ FREEBUSY_DATABASE__POSTGRES__HOST=db.internal \
 FREEBUSY_DATABASE__POSTGRES__USER=freebusy \
 FREEBUSY_DATABASE__POSTGRES__PASSWORD=… \
 FREEBUSY_DATABASE__POSTGRES__DBNAME=freebusydb \
-go run ./tools/db/gorm/migrate
+just db apply
 ```
 
 `FREEBUSY_PROFILE=release` keeps a checkout's development profile out of it,
-so only the release defaults and your variables apply. Migrations are
-additive and idempotent; run them before each upgrade.
+so only the release defaults and your variables apply. Run it before each
+upgrade; it applies only what the database has not seen. The migrations need
+the `btree_gist` and `pg_trgm` extensions, so the user needs the right to
+create them, or create them once beforehand.
+
+**A database built before migrations existed** (by `go run
+./tools/db/gorm/migrate`) has to be reconciled once. AutoMigrate never drops
+anything, so it may hold indexes and columns the models have since let go of.
+Compare it with what the migrations build, review the SQL, and apply it:
+
+```sh
+atlas schema diff --from "$DATABASE_URL" --to "file://migrations" \
+  --dev-url "postgres://…/scratch?sslmode=disable" > reconcile.sql
+psql "$DATABASE_URL" -f reconcile.sql
+just db apply --baseline <latest version in migrations/>
+```
 
 ### 3. Run the server
 
@@ -322,7 +347,8 @@ underscore as a level, so `FREEBUSY_SERVER_ENABLE_HTTP` would mean
 | `[database.postgres]` | `host`, `port`, `user`, `password`, `dbname`, `sslmode`, pool sizes |
 | `[database.hasura]` | `url` of the engine's GraphQL endpoint |
 | `[caldav]` | `enabled` |
-| `[webhooks]` | `enabled`, `allow_insecure_endpoints`, `allow_private_networks`, `interval_seconds`, `max_attempts`, `retention_days` |
+| `[webhooks]` | `enabled`, `allow_insecure_endpoints`, `allow_private_networks`, `interval_seconds`, `max_attempts`, `retention_days`, `secret_key`, `previous_secret_keys` |
+| `[retention]` | `purge`, `deleted_days` — how long soft-deleted records stay restorable |
 
 Release defaults versus the development profile:
 
@@ -411,7 +437,11 @@ flowchart LR
   `webhook-id`, `webhook-timestamp`, and `webhook-signature: v1,<base64
   HMAC-SHA256 of "id.timestamp.body">` with the `whsec_…` secret
   `CreateWebhook` returns. Any Standard Webhooks library verifies it. After
-  `RotateWebhookSecret` the old secret signs too, for 24 hours.
+  `RotateWebhookSecret` the old secret signs too, for 24 hours. Secrets are
+  stored sealed (AES-256-GCM) under `[webhooks] secret_key`; set it with
+  `FREEBUSY_WEBHOOKS__SECRET_KEY=$(openssl rand -base64 32)`, and when you
+  replace it, move the old key to `previous_secret_keys` until every webhook
+  has rotated.
 - **Safe by default**: `https` only, no redirects followed, and no
   connections to loopback, private, link-local or CGNAT addresses — checked
   on the address DNS returned — unless `allow_private_networks` is set.
@@ -492,7 +522,8 @@ flowchart LR
 ```
 
 After a contract change: `just gen go`, `just gen rfc`, `just gen store`,
-`just migrate`, `just hasura regen`. Rules (also in `CLAUDE.md`):
+`just migrate`, `just db diff <name>` (the production migration, generated),
+`just hasura regen`. Rules (also in `CLAUDE.md`):
 
 - Never edit generated code or Hasura metadata (`hasura/**/*.hml`) by hand.
   When the generated layer cannot express something, extend the generator.
@@ -589,7 +620,6 @@ Ready to build on. Not built yet:
 - **"This and future" edits** to a recurring series (RANGE=THISANDFUTURE) are
   refused; calendar apps split the series instead.
 - **Atomic CalDAV writes** of a series together with its edited occurrences.
-- **Encryption at rest** for webhook secrets.
 
 ## Licence
 

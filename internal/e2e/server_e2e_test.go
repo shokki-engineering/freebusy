@@ -103,6 +103,7 @@ func serverLifecycle(t *testing.T, cc *grpc.ClientConn, repos rfcsvc.Repositorie
 	tenancyFlow(t, c)
 	reservationFlow(t, c)
 	inventoryFlow(t, c)
+	purgeFlow(t, c)
 }
 
 // rejectionFlow pins that the protovalidate interceptor runs in the assembled

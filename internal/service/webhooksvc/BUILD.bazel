@@ -9,6 +9,7 @@ go_library(
         "delivery.go",
         "events.go",
         "repos.go",
+        "sealing.go",
         "server.go",
     ],
     importpath = "github.com/shokki-engineering/freebusy/internal/service/webhooksvc",
@@ -44,7 +45,10 @@ go_library(
 
 go_test(
     name = "webhooksvc_test",
-    srcs = ["events_test.go"],
+    srcs = [
+        "events_test.go",
+        "sealing_test.go",
+    ],
     embed = [":webhooksvc"],
     deps = [
         "//protobuf/generated/go/reservation/v1/reservationpbv1",

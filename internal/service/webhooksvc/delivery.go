@@ -427,7 +427,11 @@ func (s *Server) post(ctx context.Context, w *webhookpbv1.Webhook, d *webhookpbv
 		secrets = append(secrets, prev)
 	}
 	var sigs []string
-	for _, secret := range secrets {
+	for _, stored := range secrets {
+		secret, err := s.opts.Sealer.Open(stored)
+		if err != nil {
+			return 0, err
+		}
 		sig, err := sign(secret, d.GetEventId()+"."+ts+".", body)
 		if err != nil {
 			return 0, err

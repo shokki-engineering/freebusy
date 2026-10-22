@@ -52,6 +52,9 @@ type Options struct {
 	Client *http.Client
 	// Now is the clock. Default time.Now.
 	Now func() time.Time
+	// Sealer encrypts signing secrets at rest (sealing.go). Nil stores them
+	// as they are.
+	Sealer *Sealer
 }
 
 // Server serves WebhookService and runs delivery (see Round).
@@ -111,12 +114,19 @@ func (s *Server) CreateWebhook(ctx context.Context, req *webhookpbv1.CreateWebho
 		if id := req.GetWebhookId(); id != "" {
 			in.Name = "webhooks/" + id
 		}
-		in.State, in.Secret = webhookpbv1.WebhookState_WEBHOOK_STATE_ACTIVE, secret
+		sealed, err := s.opts.Sealer.Seal(secret)
+		if err != nil {
+			return rpc.ToStatusErr(err)
+		}
+		in.State, in.Secret = webhookpbv1.WebhookState_WEBHOOK_STATE_ACTIVE, sealed
 		in.CreateTime, in.UpdateTime, in.Etag = nil, nil, ""
 		in.PreviousSecret, in.RotateTime = "", nil
-		// One of the two responses that carries the secret.
-		out, err = s.repos.Webhooks.Create(ctx, in)
-		return rpc.ToStatusErr(err)
+		if out, err = s.repos.Webhooks.Create(ctx, in); err != nil {
+			return rpc.ToStatusErr(err)
+		}
+		// One of the two responses that carries the secret, in the clear.
+		out.Secret = secret
+		return nil
 	})
 	return out, err
 }
@@ -286,10 +296,25 @@ func (s *Server) RotateWebhookSecret(ctx context.Context, req *webhookpbv1.Rotat
 		if err != nil {
 			return rpc.ToStatusErr(err)
 		}
-		out.PreviousSecret, out.Secret, out.RotateTime = out.GetSecret(), secret, timestamppb.New(s.opts.Now())
-		// One of the two responses that carries the secret.
-		out, err = s.repos.Webhooks.UpdateOutputOnly(ctx, out, []string{"secret", "previous_secret", "rotate_time"})
-		return rpc.ToStatusErr(err)
+		// The replaced secret is resealed under the current key, so one stored
+		// in the clear, or under an older key, is not kept that way.
+		prev, err := s.opts.Sealer.Open(out.GetSecret())
+		if err != nil {
+			return rpc.ToStatusErr(err)
+		}
+		if out.PreviousSecret, err = s.opts.Sealer.Seal(prev); err != nil {
+			return rpc.ToStatusErr(err)
+		}
+		if out.Secret, err = s.opts.Sealer.Seal(secret); err != nil {
+			return rpc.ToStatusErr(err)
+		}
+		out.RotateTime = timestamppb.New(s.opts.Now())
+		if out, err = s.repos.Webhooks.UpdateOutputOnly(ctx, out, []string{"secret", "previous_secret", "rotate_time"}); err != nil {
+			return rpc.ToStatusErr(err)
+		}
+		// One of the two responses that carries the secret, in the clear.
+		out.Secret = secret
+		return nil
 	})
 	if out != nil {
 		out.PreviousSecret = ""

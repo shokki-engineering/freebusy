@@ -215,6 +215,8 @@ github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UV
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.12.1 h1:EuwCh5fleGS7H32xRwO3wRGT7DxrDhLAT6FF8MpWDWE=
 github.com/stretchr/testify v1.12.1/go.mod h1:MDEgiDPPsNp5cuIrHPPCyornHKgEVbtFUmoNlxoYthg=
+github.com/the-protobuf-project/cache v0.3.0 h1:HtKXV6D2wRUcfKgqU/KZZmdehsZr1TxRSgfouyuMkqs=
+github.com/the-protobuf-project/cache v0.3.0/go.mod h1:33juQW+2zFdJ8lR7JFbAXmEbykbPs4kTcjWuvNClQKg=
 github.com/the-protobuf-project/grpc-mcp-gateway v1.6.1 h1:dSGsoyYqqAWTXMJQWaunEtLMlbS9h8iS6wpsm2esisg=
 github.com/the-protobuf-project/grpc-mcp-gateway v1.6.1/go.mod h1:YGJ2oevcwoMcFF2nk5wFsLmd8Ckb4B55XNLnm2W1eE0=
 github.com/the-protobuf-project/runtime-go/agents v0.0.0-20261021172408-4a614accbb1c h1:NmJSbHGJht5sR38f6DEvRJAwRBppdkTCNfDT0i7Nb2Q=
@@ -233,8 +235,8 @@ github.com/the-protobuf-project/runtime-go/telemetry v0.0.0-20261021141431-6d458
 github.com/the-protobuf-project/runtime-go/telemetry v0.0.0-20261021141431-6d4588022f2b/go.mod h1:2XnLUtLO2nHO4F9MI7D7XK9WZibQmxCK6ty/Wo/n6m0=
 github.com/the-protobuf-project/runtime-go/ulid v0.0.0-20261021141431-6d4588022f2b h1:+L+wYItHtioEgjOTmb1LR0exQ7OPo72vuZRB9fLN3Yc=
 github.com/the-protobuf-project/runtime-go/ulid v0.0.0-20261021141431-6d4588022f2b/go.mod h1:5khCfHxMjf5eV4z0IZuVJWjbT3skJLzJsbmavhAwfuc=
-github.com/the-protobuf-project/store v1.5.4 h1:AkrQXK/ZUqqAm5ZPW5rh/5T+2ZrKzoGVKNGE3L7lsrs=
-github.com/the-protobuf-project/store v1.5.4/go.mod h1:AI+N6JbQEJYO+WTaoQBPls6suSoCyM4PhoZZG53IOv4=
+github.com/the-protobuf-project/store v1.5.7 h1:DPF7r0rDHH6WOGtS1P92CKPXaOZ2vc2MOp8wJ3FcaQQ=
+github.com/the-protobuf-project/store v1.5.7/go.mod h1:4kAesiZwRgZh5yV3RyVvkdx+8/KBOn8xeKVCvjmdimE=
 github.com/the-protobuf-project/telemetry/telemetry-go v0.0.0-20261021175734-19bcab17b113 h1:IHjh/cAqCjjOdBKr4FGEWISkoVyhEPkZYgxsArAlfQM=
 github.com/the-protobuf-project/telemetry/telemetry-go v0.0.0-20261021175734-19bcab17b113/go.mod h1:wxCcwh+2Bu4toS7VAScnQtW5emyhE6K9USQTqwZEWVU=
 github.com/xo/terminfo v1.2.0 h1:d0ZTOCpuGE0lwSAOs0zcJjwz3jWQyqcRt9XbGJpCOl4=

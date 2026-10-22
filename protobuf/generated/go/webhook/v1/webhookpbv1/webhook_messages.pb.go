@@ -732,56 +732,58 @@ var File_freebusy_webhook_v1_webhook_messages_proto protoreflect.FileDescriptor
 
 const file_freebusy_webhook_v1_webhook_messages_proto_rawDesc = "" +
 	"\n" +
-	"*freebusy/webhook/v1/webhook_messages.proto\x12\x13freebusy.webhook.v1\x1a\x1bbuf/validate/validate.proto\x1a\"freebusy/webhook/v1/delivery.proto\x1a!freebusy/webhook/v1/webhook.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a google/protobuf/field_mask.proto\"\xa8\x01\n" +
-	"\x14CreateWebhookRequest\x12A\n" +
-	"\awebhook\x18\x01 \x01(\v2\x1c.freebusy.webhook.v1.WebhookB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\awebhook\x12M\n" +
+	"*freebusy/webhook/v1/webhook_messages.proto\x12\x13freebusy.webhook.v1\x1a\x1bbuf/validate/validate.proto\x1a\"freebusy/webhook/v1/delivery.proto\x1a!freebusy/webhook/v1/webhook.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a google/protobuf/field_mask.proto\"\xaa\x01\n" +
+	"\x14CreateWebhookRequest\x12B\n" +
+	"\awebhook\x18\x01 \x01(\v2\x1c.freebusy.webhook.v1.WebhookB\n" +
+	"\xe2A\x01\x02\xbaH\x03\xc8\x01\x01R\awebhook\x12N\n" +
 	"\n" +
-	"webhook_id\x18\x02 \x01(\tB.\xe0A\x01\xbaH(\xd8\x01\x01r#2!^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$R\twebhookId\"c\n" +
-	"\x11GetWebhookRequest\x12N\n" +
-	"\x04name\x18\x01 \x01(\tB:\xe0A\x02\xfaA\x1d\n" +
-	"\x1bfreebusy.webhook.v1/Webhook\xbaH\x14r\x122\x10^webhooks/[^/]+$R\x04name\"e\n" +
-	"\x13ListWebhooksRequest\x12*\n" +
-	"\tpage_size\x18\x01 \x01(\x05B\r\xe0A\x01\xbaH\a\x1a\x05\x18\xe8\a(\x00R\bpageSize\x12\"\n" +
+	"webhook_id\x18\x02 \x01(\tB/\xe2A\x01\x01\xbaH(\xd8\x01\x01r#2!^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$R\twebhookId\"d\n" +
+	"\x11GetWebhookRequest\x12O\n" +
+	"\x04name\x18\x01 \x01(\tB;\xe2A\x01\x02\xfaA\x1d\n" +
+	"\x1bfreebusy.webhook.v1/Webhook\xbaH\x14r\x122\x10^webhooks/[^/]+$R\x04name\"g\n" +
+	"\x13ListWebhooksRequest\x12+\n" +
+	"\tpage_size\x18\x01 \x01(\x05B\x0e\xe2A\x01\x01\xbaH\a\x1a\x05\x18\xe8\a(\x00R\bpageSize\x12#\n" +
 	"\n" +
-	"page_token\x18\x02 \x01(\tB\x03\xe0A\x01R\tpageToken\"x\n" +
+	"page_token\x18\x02 \x01(\tB\x04\xe2A\x01\x01R\tpageToken\"x\n" +
 	"\x14ListWebhooksResponse\x128\n" +
 	"\bwebhooks\x18\x01 \x03(\v2\x1c.freebusy.webhook.v1.WebhookR\bwebhooks\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\x9b\x01\n" +
-	"\x14UpdateWebhookRequest\x12A\n" +
-	"\awebhook\x18\x01 \x01(\v2\x1c.freebusy.webhook.v1.WebhookB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\awebhook\x12@\n" +
-	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskB\x03\xe0A\x01R\n" +
-	"updateMask\"\x9a\x01\n" +
-	"\x14DeleteWebhookRequest\x12N\n" +
-	"\x04name\x18\x01 \x01(\tB:\xe0A\x02\xfaA\x1d\n" +
-	"\x1bfreebusy.webhook.v1/Webhook\xbaH\x14r\x122\x10^webhooks/[^/]+$R\x04name\x12\x17\n" +
-	"\x04etag\x18\x02 \x01(\tB\x03\xe0A\x01R\x04etag\x12\x19\n" +
-	"\x05force\x18\x03 \x01(\bB\x03\xe0A\x01R\x05force\"e\n" +
-	"\x13PauseWebhookRequest\x12N\n" +
-	"\x04name\x18\x01 \x01(\tB:\xe0A\x02\xfaA\x1d\n" +
-	"\x1bfreebusy.webhook.v1/Webhook\xbaH\x14r\x122\x10^webhooks/[^/]+$R\x04name\"f\n" +
-	"\x14ResumeWebhookRequest\x12N\n" +
-	"\x04name\x18\x01 \x01(\tB:\xe0A\x02\xfaA\x1d\n" +
-	"\x1bfreebusy.webhook.v1/Webhook\xbaH\x14r\x122\x10^webhooks/[^/]+$R\x04name\"l\n" +
-	"\x1aRotateWebhookSecretRequest\x12N\n" +
-	"\x04name\x18\x01 \x01(\tB:\xe0A\x02\xfaA\x1d\n" +
-	"\x1bfreebusy.webhook.v1/Webhook\xbaH\x14r\x122\x10^webhooks/[^/]+$R\x04name\"v\n" +
-	"\x12GetDeliveryRequest\x12`\n" +
-	"\x04name\x18\x01 \x01(\tBL\xe0A\x02\xfaA\x1e\n" +
-	"\x1cfreebusy.webhook.v1/Delivery\xbaH%r#2!^webhooks/[^/]+/deliveries/[^/]+$R\x04name\"\xf9\x01\n" +
-	"\x15ListDeliveriesRequest\x12S\n" +
-	"\x06parent\x18\x01 \x01(\tB;\xe0A\x02\xfaA\x1e\x12\x1cfreebusy.webhook.v1/Delivery\xbaH\x14r\x122\x10^webhooks/[^/]+$R\x06parent\x12*\n" +
-	"\tpage_size\x18\x02 \x01(\x05B\r\xe0A\x01\xbaH\a\x1a\x05\x18\xe8\a(\x00R\bpageSize\x12\"\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\x9d\x01\n" +
+	"\x14UpdateWebhookRequest\x12B\n" +
+	"\awebhook\x18\x01 \x01(\v2\x1c.freebusy.webhook.v1.WebhookB\n" +
+	"\xe2A\x01\x02\xbaH\x03\xc8\x01\x01R\awebhook\x12A\n" +
+	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskB\x04\xe2A\x01\x01R\n" +
+	"updateMask\"\x9d\x01\n" +
+	"\x14DeleteWebhookRequest\x12O\n" +
+	"\x04name\x18\x01 \x01(\tB;\xe2A\x01\x02\xfaA\x1d\n" +
+	"\x1bfreebusy.webhook.v1/Webhook\xbaH\x14r\x122\x10^webhooks/[^/]+$R\x04name\x12\x18\n" +
+	"\x04etag\x18\x02 \x01(\tB\x04\xe2A\x01\x01R\x04etag\x12\x1a\n" +
+	"\x05force\x18\x03 \x01(\bB\x04\xe2A\x01\x01R\x05force\"f\n" +
+	"\x13PauseWebhookRequest\x12O\n" +
+	"\x04name\x18\x01 \x01(\tB;\xe2A\x01\x02\xfaA\x1d\n" +
+	"\x1bfreebusy.webhook.v1/Webhook\xbaH\x14r\x122\x10^webhooks/[^/]+$R\x04name\"g\n" +
+	"\x14ResumeWebhookRequest\x12O\n" +
+	"\x04name\x18\x01 \x01(\tB;\xe2A\x01\x02\xfaA\x1d\n" +
+	"\x1bfreebusy.webhook.v1/Webhook\xbaH\x14r\x122\x10^webhooks/[^/]+$R\x04name\"m\n" +
+	"\x1aRotateWebhookSecretRequest\x12O\n" +
+	"\x04name\x18\x01 \x01(\tB;\xe2A\x01\x02\xfaA\x1d\n" +
+	"\x1bfreebusy.webhook.v1/Webhook\xbaH\x14r\x122\x10^webhooks/[^/]+$R\x04name\"w\n" +
+	"\x12GetDeliveryRequest\x12a\n" +
+	"\x04name\x18\x01 \x01(\tBM\xe2A\x01\x02\xfaA\x1e\n" +
+	"\x1cfreebusy.webhook.v1/Delivery\xbaH%r#2!^webhooks/[^/]+/deliveries/[^/]+$R\x04name\"\xfe\x01\n" +
+	"\x15ListDeliveriesRequest\x12T\n" +
+	"\x06parent\x18\x01 \x01(\tB<\xe2A\x01\x02\xfaA\x1e\x12\x1cfreebusy.webhook.v1/Delivery\xbaH\x14r\x122\x10^webhooks/[^/]+$R\x06parent\x12+\n" +
+	"\tpage_size\x18\x02 \x01(\x05B\x0e\xe2A\x01\x01\xbaH\a\x1a\x05\x18\xe8\a(\x00R\bpageSize\x12#\n" +
 	"\n" +
-	"page_token\x18\x03 \x01(\tB\x03\xe0A\x01R\tpageToken\x12\x1b\n" +
-	"\x06filter\x18\x04 \x01(\tB\x03\xe0A\x01R\x06filter\x12\x1e\n" +
-	"\border_by\x18\x05 \x01(\tB\x03\xe0A\x01R\aorderBy\"\x7f\n" +
+	"page_token\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\tpageToken\x12\x1c\n" +
+	"\x06filter\x18\x04 \x01(\tB\x04\xe2A\x01\x01R\x06filter\x12\x1f\n" +
+	"\border_by\x18\x05 \x01(\tB\x04\xe2A\x01\x01R\aorderBy\"\x7f\n" +
 	"\x16ListDeliveriesResponse\x12=\n" +
 	"\n" +
 	"deliveries\x18\x01 \x03(\v2\x1d.freebusy.webhook.v1.DeliveryR\n" +
 	"deliveries\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"x\n" +
-	"\x14RetryDeliveryRequest\x12`\n" +
-	"\x04name\x18\x01 \x01(\tBL\xe0A\x02\xfaA\x1e\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"y\n" +
+	"\x14RetryDeliveryRequest\x12a\n" +
+	"\x04name\x18\x01 \x01(\tBM\xe2A\x01\x02\xfaA\x1e\n" +
 	"\x1cfreebusy.webhook.v1/Delivery\xbaH%r#2!^webhooks/[^/]+/deliveries/[^/]+$R\x04nameB\xfe\x01\n" +
 	"\x17com.freebusy.webhook.v1B\x14WebhookMessagesProtoP\x01Z_github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1\xa2\x02\x03FWX\xaa\x02\x13Freebusy.Webhook.V1\xca\x02\x13Freebusy\\Webhook\\V1\xe2\x02\x1fFreebusy\\Webhook\\V1\\GPBMetadata\xea\x02\x15Freebusy::Webhook::V1b\x06proto3"
 

@@ -24,10 +24,17 @@ type RecurrenceParts struct {
 	// ByDay holds stored day names ("MONDAY") with an optional ordinal.
 	ByDay     []WeekdayPart
 	MonthDays []int32
+	// Months are BYMONTH, 1 to 12.
+	Months       []int32
+	Hours        []int32
+	Minutes      []int32
+	SetPositions []int32
+	// WeekStart is WKST as a day code ("SU"); empty for the default, Monday.
+	WeekStart string
 	// Unsupported is set when any rule part the engine does not expand is
-	// present: BYSECOND, BYMINUTE, BYHOUR, BYYEARDAY, BYWEEKNO, BYSETPOS,
-	// BYMONTH, RSCALE. Rendering such a rule faithfully would only have it
-	// rejected later, so RRule emits a marker the engine refuses outright.
+	// present: BYSECOND, BYYEARDAY, BYWEEKNO, RSCALE. Rendering such a rule
+	// faithfully would only have it rejected later, so RRule emits a marker the
+	// engine refuses outright.
 	Unsupported bool
 }
 
@@ -70,12 +77,23 @@ func (p RecurrenceParts) RRule() string {
 		}
 		parts = append(parts, "BYDAY="+strings.Join(codes, ","))
 	}
-	if len(p.MonthDays) > 0 {
-		days := make([]string, 0, len(p.MonthDays))
-		for _, d := range p.MonthDays {
-			days = append(days, fmt.Sprint(d))
+	for _, list := range []struct {
+		key  string
+		vals []int32
+	}{
+		{"BYMONTHDAY", p.MonthDays}, {"BYMONTH", p.Months}, {"BYHOUR", p.Hours},
+		{"BYMINUTE", p.Minutes}, {"BYSETPOS", p.SetPositions},
+	} {
+		if len(list.vals) > 0 {
+			vals := make([]string, 0, len(list.vals))
+			for _, v := range list.vals {
+				vals = append(vals, fmt.Sprint(v))
+			}
+			parts = append(parts, list.key+"="+strings.Join(vals, ","))
 		}
-		parts = append(parts, "BYMONTHDAY="+strings.Join(days, ","))
+	}
+	if p.WeekStart != "" {
+		parts = append(parts, "WKST="+p.WeekStart)
 	}
 	return strings.Join(parts, ";")
 }

@@ -247,3 +247,78 @@ func TestPolicy(t *testing.T) {
 		}
 	}
 }
+
+// days lists the occurrence starts of rule from dtstart over window, as
+// "2006-01-02 15:04" in dtstart's zone.
+func days(t *testing.T, rule string, dtstart time.Time, window Span) []string {
+	t.Helper()
+	r, err := ParseRRule(rule, dtstart.Location())
+	if err != nil {
+		t.Fatalf("ParseRRule(%q): %v", rule, err)
+	}
+	var out []string
+	for _, o := range r.Occurrences(dtstart, time.Hour, window) {
+		out = append(out, o.Start.In(dtstart.Location()).Format("2006-01-02 15:04"))
+	}
+	return out
+}
+
+func utc(y int, m time.Month, d, h int) time.Time { return time.Date(y, m, d, h, 0, 0, 0, time.UTC) }
+
+// The cases are RFC 5545 section 3.3.10's own examples, or follow from them.
+func TestExpandRuleParts(t *testing.T) {
+	year := Span{Start: utc(2026, 1, 1, 0), End: utc(2027, 1, 1, 0)}
+	cases := []struct {
+		name, rule string
+		dtstart    time.Time
+		window     Span
+		want       []string
+	}{
+		{"second Tuesday monthly", "FREQ=MONTHLY;BYDAY=2TU;COUNT=3", utc(2026, 1, 13, 10), year,
+			[]string{"2026-01-13 10:00", "2026-02-10 10:00", "2026-03-10 10:00"}},
+		{"last Friday monthly", "FREQ=MONTHLY;BYDAY=-1FR;COUNT=3", utc(2026, 1, 30, 10), year,
+			[]string{"2026-01-30 10:00", "2026-02-27 10:00", "2026-03-27 10:00"}},
+		{"last weekday of the month", "FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1;COUNT=3", utc(2026, 1, 30, 9), year,
+			[]string{"2026-01-30 09:00", "2026-02-27 09:00", "2026-03-31 09:00"}},
+		{"first and last workday", "FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=1,-1;COUNT=4", utc(2026, 1, 1, 9), year,
+			[]string{"2026-01-01 09:00", "2026-01-30 09:00", "2026-02-02 09:00", "2026-02-27 09:00"}},
+		{"BYMONTH with day", "FREQ=YEARLY;BYMONTH=6,7;BYMONTHDAY=1;COUNT=3", utc(2026, 6, 1, 9), Span{Start: utc(2026, 1, 1, 0), End: utc(2028, 1, 1, 0)},
+			[]string{"2026-06-01 09:00", "2026-07-01 09:00", "2027-06-01 09:00"}},
+		{"yearly BYDAY spans the year", "FREQ=YEARLY;BYDAY=20MO;COUNT=2", utc(2026, 5, 18, 9), Span{Start: utc(2026, 1, 1, 0), End: utc(2028, 1, 1, 0)},
+			[]string{"2026-05-18 09:00", "2027-05-17 09:00"}},
+		{"several slots a day", "FREQ=DAILY;BYHOUR=9,14;BYMINUTE=0,30;COUNT=6", utc(2026, 3, 2, 9), year,
+			[]string{"2026-03-02 09:00", "2026-03-02 09:30", "2026-03-02 14:00", "2026-03-02 14:30", "2026-03-03 09:00", "2026-03-03 09:30"}},
+		{"BYHOUR keeps later slots on day one", "FREQ=WEEKLY;BYDAY=MO;BYHOUR=9,15;COUNT=3", utc(2026, 3, 2, 9), year,
+			[]string{"2026-03-02 09:00", "2026-03-02 15:00", "2026-03-09 09:00"}},
+		// RFC 5545's WKST example: the week boundary moves which Tuesday and
+		// Sunday share a fortnight.
+		{"WKST=MO", "FREQ=WEEKLY;INTERVAL=2;COUNT=4;BYDAY=TU,SU;WKST=MO", utc(1997, 8, 5, 9), Span{Start: utc(1997, 1, 1, 0), End: utc(1998, 1, 1, 0)},
+			[]string{"1997-08-05 09:00", "1997-08-10 09:00", "1997-08-19 09:00", "1997-08-24 09:00"}},
+		{"WKST=SU", "FREQ=WEEKLY;INTERVAL=2;COUNT=4;BYDAY=TU,SU;WKST=SU", utc(1997, 8, 5, 9), Span{Start: utc(1997, 1, 1, 0), End: utc(1998, 1, 1, 0)},
+			[]string{"1997-08-05 09:00", "1997-08-17 09:00", "1997-08-19 09:00", "1997-08-31 09:00"}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if got := days(t, c.rule, c.dtstart, c.window); !reflect.DeepEqual(got, c.want) {
+				t.Errorf("%s\n got %v\nwant %v", c.rule, got, c.want)
+			}
+		})
+	}
+}
+
+func TestParseRRuleRefusesWhatItCannotExpand(t *testing.T) {
+	for _, bad := range []string{
+		"FREQ=WEEKLY;BYDAY=2MO", // numbered BYDAY means nothing weekly
+		"FREQ=DAILY;BYSETPOS=1", // nothing to pick from
+		"FREQ=YEARLY;BYWEEKNO=20",
+		"FREQ=YEARLY;BYYEARDAY=100",
+		"FREQ=DAILY;BYSECOND=30",
+		"FREQ=DAILY;BYHOUR=24",
+		"FREQ=MONTHLY;BYDAY=0MO",
+		"FREQ=WEEKLY;WKST=XX",
+	} {
+		if _, err := ParseRRule(bad, time.UTC); !errors.Is(err, ErrUnsupportedRule) {
+			t.Errorf("ParseRRule(%q) err = %v, want ErrUnsupportedRule", bad, err)
+		}
+	}
+}

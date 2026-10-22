@@ -76,6 +76,10 @@ model Reservation {
 
   /// Unique constraint on [hold].
   @@unique([holdID])
+  /// Composite index on [state, update_time].
+  @@index([state, updateTime])
+  /// Index on [update_time].
+  @@index([updateTime])
   /// Composite index on [organizational_unit_id, id].
   @@index([organizationalUnitID, id])
   /// GIN index: case-insensitive contains (ILIKE '%…%') cannot use a B-tree.

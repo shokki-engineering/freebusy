@@ -65,6 +65,9 @@ type Service struct {
 	// sites decides whether a site or an organization a call names is live;
 	// the sites interceptor asks it on every call.
 	sites *rfcsvc.Sites
+	// purger ends soft deletes once their retention passes; started in
+	// StartBackground when [retention] purge.
+	purger *rfcsvc.Purger
 	// caldav is the CalDAV server, mounted on the HTTP gateway's mux; nil
 	// unless [caldav] enabled.
 	caldav *caldav.Handler
@@ -95,6 +98,7 @@ func NewService(
 		reservations:              reservations,
 		webhooks:                  webhooks,
 		sites:                     rfcsvc.NewSites(repos),
+		purger:                    rfcsvc.NewPurger(repos, time.Duration(cmp.Or(config.Get().Retention.DeletedDays, 30))*24*time.Hour),
 	}
 }
 
@@ -102,7 +106,8 @@ func NewService(
 // hold sweeper, which converges lapsed holds' stored state; the reservation
 // reconciler, which finishes reservations left mid-transition; and the
 // database pool monitor, which publishes the shared connection pool's health;
-// and, when [webhooks] enabled, webhook delivery.
+// when [webhooks] enabled, webhook delivery; and when [retention] purge, the
+// purger, which ends soft deletes past their retention.
 // The goroutines exit when ctx is cancelled (on server Stop/Restart).
 func (s *Service) StartBackground(ctx context.Context) {
 	if s.reservations != nil {
@@ -119,6 +124,11 @@ func (s *Service) StartBackground(ctx context.Context) {
 		interval := time.Duration(cmp.Or(cfg.IntervalSeconds, 5)) * time.Second
 		s.webhooks.Start(ctx, interval, func(err error) {
 			_ = shared.Telemetry.Logger.Error("webhook delivery failed", map[string]any{"error": err.Error()})
+		})
+	}
+	if s.purger != nil && config.Get().Retention.Purge {
+		s.purger.Start(ctx, 0, func(err error) {
+			_ = shared.Telemetry.Logger.Error("soft-delete purger failed", map[string]any{"error": err.Error()})
 		})
 	}
 	database.StartPoolMonitor(ctx, s.conn, 0)

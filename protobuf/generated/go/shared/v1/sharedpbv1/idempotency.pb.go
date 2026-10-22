@@ -216,18 +216,18 @@ var File_freebusy_shared_v1_idempotency_proto protoreflect.FileDescriptor
 
 const file_freebusy_shared_v1_idempotency_proto_rawDesc = "" +
 	"\n" +
-	"$freebusy/shared/v1/idempotency.proto\x12\x12freebusy.shared.v1\x1a\x1bentity/v1/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\xfa\x03\n" +
-	"\x0eIdempotencyKey\x12\x17\n" +
-	"\x04name\x18\x01 \x01(\tB\x03\xe0A\bR\x04name\x12\x1b\n" +
-	"\x06method\x18\x02 \x01(\tB\x03\xe0A\x02R\x06method\x12*\n" +
+	"$freebusy/shared/v1/idempotency.proto\x12\x12freebusy.shared.v1\x1a\x1bentity/v1/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\x81\x04\n" +
+	"\x0eIdempotencyKey\x12\x18\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x1c\n" +
+	"\x06method\x18\x02 \x01(\tB\x04\xe2A\x01\x02R\x06method\x12+\n" +
 	"\n" +
-	"request_id\x18\x03 \x01(\tB\v\xe0A\x02\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\x12N\n" +
-	"\x05state\x18\x04 \x01(\x0e2$.freebusy.shared.v1.IdempotencyStateB\x12\xe0A\x03ڵ\x18\v\x12\tIN_FLIGHTR\x05state\x12)\n" +
-	"\bresponse\x18\x05 \x01(\tB\r\xe0A\x01ڵ\x18\x06\n" +
-	"\x04TEXTR\bresponse\x12@\n" +
-	"\vcreate_time\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
-	"createTime\x12@\n" +
-	"\vupdate_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampB\x03\xe0A\x03R\n" +
+	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x02\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\x12O\n" +
+	"\x05state\x18\x04 \x01(\x0e2$.freebusy.shared.v1.IdempotencyStateB\x13\xe2A\x01\x03ڵ\x18\v\x12\tIN_FLIGHTR\x05state\x12*\n" +
+	"\bresponse\x18\x05 \x01(\tB\x0e\xe2A\x01\x01ڵ\x18\x06\n" +
+	"\x04TEXTR\bresponse\x12A\n" +
+	"\vcreate_time\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
+	"createTime\x12A\n" +
+	"\vupdate_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"updateTime:\x86\x01\xeaAg\n" +
 	"!freebusy.shared.v1/IdempotencyKey\x12!idempotencyKeys/{idempotency_key}*\x0fidempotencyKeys2\x0eidempotencyKey\xca\xf3\x18\x18*\x16\n" +
 	"\x06method\n" +

@@ -11,8 +11,12 @@
 package config
 
 import (
+	"cmp"
 	"embed"
 	"fmt"
+	"net"
+	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/the-protobuf-project/runtime-go/grpc/options"
@@ -48,6 +52,18 @@ type AppConfig struct {
 
 	// Webhooks tunes delivery of hold and reservation changes.
 	Webhooks WebhooksConfig `koanf:"webhooks"`
+	// Retention decides how long soft-deleted records are kept.
+	Retention RetentionConfig `koanf:"retention"`
+}
+
+// RetentionConfig ends soft deletes (AIP-164): organizations, sites,
+// resources, calendars, events and availability deleted longer ago than
+// DeletedDays are purged for good, and expire_time says when.
+type RetentionConfig struct {
+	// Purge runs the purger on this server. Safe on several servers at once.
+	Purge bool `koanf:"purge"`
+	// DeletedDays keeps a soft-deleted record this long; 0 is 30.
+	DeletedDays int `koanf:"deleted_days"`
 }
 
 // WebhooksConfig tunes webhook delivery (internal/service/webhooksvc).
@@ -70,6 +86,14 @@ type WebhooksConfig struct {
 	IntervalSeconds int `koanf:"interval_seconds"`
 	// MaxAttempts before a delivery is given up as FAILED; 0 is 8.
 	MaxAttempts int `koanf:"max_attempts"`
+	// SecretKey seals webhook signing secrets at rest: the base64 of 32 random
+	// bytes (openssl rand -base64 32). Empty stores them unsealed. A secret,
+	// so set it through FREEBUSY_WEBHOOKS__SECRET_KEY, not a file.
+	SecretKey string `koanf:"secret_key"`
+	// PreviousSecretKeys are keys SecretKey replaced, comma-separated, kept so
+	// secrets they sealed still open; each is resealed at its webhook's next
+	// rotation.
+	PreviousSecretKeys string `koanf:"previous_secret_keys"`
 }
 
 // CalDAVConfig switches the CalDAV server (internal/caldav) on. It has no
@@ -252,6 +276,22 @@ func (p PostgresConfig) DSN() string {
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s TimeZone=%s",
 		p.Host, p.Port, p.User, p.Password, p.DBName, p.SSLMode, p.TimeZone,
 	)
+}
+
+// URL is the connection as a postgres:// URL, for tools that take one (atlas),
+// optionally naming another database on the same server.
+func (p PostgresConfig) URL(dbname string) string {
+	if dbname == "" {
+		dbname = p.DBName
+	}
+	u := url.URL{
+		Scheme:   "postgres",
+		User:     url.UserPassword(p.User, p.Password),
+		Host:     net.JoinHostPort(p.Host, strconv.Itoa(p.Port)),
+		Path:     "/" + dbname,
+		RawQuery: url.Values{"sslmode": {cmp.Or(p.SSLMode, "disable")}}.Encode(),
+	}
+	return u.String()
 }
 
 // HasuraConfig is the Hasura GraphQL backend connection and admin auth.

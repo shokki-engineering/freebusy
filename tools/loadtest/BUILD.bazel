@@ -1,0 +1,34 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "loadtest_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/shokki-engineering/freebusy/tools/loadtest",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//protobuf/generated/go/allocation/v1/allocationpbv1",
+        "//protobuf/generated/go/reservation/v1/reservationpbv1",
+        "@build_buf_gen_go_the_protobuf_project_rfc_grpc_go//protobuf/rfc4519/organization/v1/organizationv1grpc",
+        "@build_buf_gen_go_the_protobuf_project_rfc_grpc_go//protobuf/rfc4519/organizational_unit/v1/organizational_unitv1grpc",
+        "@build_buf_gen_go_the_protobuf_project_rfc_grpc_go//protobuf/rfc9073/resource/v1/resourcev1grpc",
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc4519/organization/v1:organization",
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc4519/organizational_unit/v1:organizational_unit",
+        "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc9073/resource/v1:resource",
+        "@org_golang_google_genproto//googleapis/type/interval",
+        "@org_golang_google_grpc//:grpc",
+        "@org_golang_google_grpc//codes",
+        "@org_golang_google_grpc//credentials",
+        "@org_golang_google_grpc//credentials/insecure",
+        "@org_golang_google_grpc//status",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+    ],
+)
+
+go_binary(
+    name = "loadtest",
+    embed = [":loadtest_lib"],
+    visibility = ["//visibility:public"],
+)

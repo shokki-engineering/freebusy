@@ -600,49 +600,50 @@ var File_freebusy_allocation_v1_allocation_messages_proto protoreflect.FileDescr
 
 const file_freebusy_allocation_v1_allocation_messages_proto_rawDesc = "" +
 	"\n" +
-	"0freebusy/allocation/v1/allocation_messages.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a'freebusy/allocation/v1/allocation.proto\x1a\"freebusy/allocation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1agoogle/type/interval.proto\"\xe0\x03\n" +
-	"\x1aComputeAvailabilityRequest\x12=\n" +
-	"\x06parent\x18\x01 \x01(\tB%\xe0A\x02\xbaH\x1fr\x1d2\x1b^organizationalUnits/[^/]+$R\x06parent\x12G\n" +
-	"\tresources\x18\x02 \x03(\tB)\xe0A\x01\xfaA#\n" +
-	"!the-protobuf-project.org/ResourceR\tresources\x128\n" +
-	"\x06window\x18\x03 \x01(\v2\x15.google.type.IntervalB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x06window\x12^\n" +
-	"\vgranularity\x18\x04 \x01(\x0e2/.freebusy.allocation.v1.AvailabilityGranularityB\v\xe0A\x01\xbaH\x05\x82\x01\x02\x10\x01R\vgranularity\x12C\n" +
-	"\rslot_duration\x18\x05 \x01(\v2\x19.google.protobuf.DurationB\x03\xe0A\x01R\fslotDuration\x12 \n" +
-	"\ttime_zone\x18\x06 \x01(\tB\x03\xe0A\x01R\btimeZone\x129\n" +
-	"\x16include_free_resources\x18\a \x01(\bB\x03\xe0A\x01R\x14includeFreeResources\"\x84\x01\n" +
+	"0freebusy/allocation/v1/allocation_messages.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a'freebusy/allocation/v1/allocation.proto\x1a\"freebusy/allocation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1agoogle/type/interval.proto\"\xe7\x03\n" +
+	"\x1aComputeAvailabilityRequest\x12>\n" +
+	"\x06parent\x18\x01 \x01(\tB&\xe2A\x01\x02\xbaH\x1fr\x1d2\x1b^organizationalUnits/[^/]+$R\x06parent\x12H\n" +
+	"\tresources\x18\x02 \x03(\tB*\xe2A\x01\x01\xfaA#\n" +
+	"!the-protobuf-project.org/ResourceR\tresources\x129\n" +
+	"\x06window\x18\x03 \x01(\v2\x15.google.type.IntervalB\n" +
+	"\xe2A\x01\x02\xbaH\x03\xc8\x01\x01R\x06window\x12_\n" +
+	"\vgranularity\x18\x04 \x01(\x0e2/.freebusy.allocation.v1.AvailabilityGranularityB\f\xe2A\x01\x01\xbaH\x05\x82\x01\x02\x10\x01R\vgranularity\x12D\n" +
+	"\rslot_duration\x18\x05 \x01(\v2\x19.google.protobuf.DurationB\x04\xe2A\x01\x01R\fslotDuration\x12!\n" +
+	"\ttime_zone\x18\x06 \x01(\tB\x04\xe2A\x01\x01R\btimeZone\x12:\n" +
+	"\x16include_free_resources\x18\a \x01(\bB\x04\xe2A\x01\x01R\x14includeFreeResources\"\x84\x01\n" +
 	"\x1bComputeAvailabilityResponse\x12D\n" +
 	"\abuckets\x18\x01 \x03(\v2*.freebusy.allocation.v1.AvailabilityBucketR\abuckets\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x05R\n" +
-	"totalCount\"\x84\x02\n" +
-	"\x18CheckAvailabilityRequest\x12=\n" +
-	"\x06parent\x18\x01 \x01(\tB%\xe0A\x02\xbaH\x1fr\x1d2\x1b^organizationalUnits/[^/]+$R\x06parent\x12G\n" +
-	"\tresources\x18\x02 \x03(\tB)\xe0A\x01\xfaA#\n" +
-	"!the-protobuf-project.org/ResourceR\tresources\x128\n" +
-	"\x06window\x18\x03 \x01(\v2\x15.google.type.IntervalB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x06window\x12&\n" +
-	"\bquantity\x18\x04 \x01(\x05B\n" +
-	"\xe0A\x01\xbaH\x04\x1a\x02(\x00R\bquantity\"\xf3\x01\n" +
+	"totalCount\"\x88\x02\n" +
+	"\x18CheckAvailabilityRequest\x12>\n" +
+	"\x06parent\x18\x01 \x01(\tB&\xe2A\x01\x02\xbaH\x1fr\x1d2\x1b^organizationalUnits/[^/]+$R\x06parent\x12H\n" +
+	"\tresources\x18\x02 \x03(\tB*\xe2A\x01\x01\xfaA#\n" +
+	"!the-protobuf-project.org/ResourceR\tresources\x129\n" +
+	"\x06window\x18\x03 \x01(\v2\x15.google.type.IntervalB\n" +
+	"\xe2A\x01\x02\xbaH\x03\xc8\x01\x01R\x06window\x12'\n" +
+	"\bquantity\x18\x04 \x01(\x05B\v\xe2A\x01\x01\xbaH\x04\x1a\x02(\x00R\bquantity\"\xf3\x01\n" +
 	"\x19CheckAvailabilityResponse\x12\x1a\n" +
 	"\bbookable\x18\x01 \x01(\bR\bbookable\x12\x1d\n" +
 	"\n" +
 	"free_count\x18\x02 \x01(\x05R\tfreeCount\x12B\n" +
 	"\areasons\x18\x03 \x03(\v2(.freebusy.allocation.v1.UnbookableReasonR\areasons\x12W\n" +
 	"\x13candidate_resources\x18\x04 \x03(\tB&\xfaA#\n" +
-	"!the-protobuf-project.org/ResourceR\x12candidateResources\"\x80\x01\n" +
-	"\x1fBatchComputeAvailabilityRequest\x12]\n" +
-	"\brequests\x18\x01 \x03(\v22.freebusy.allocation.v1.ComputeAvailabilityRequestB\r\xe0A\x02\xbaH\a\x92\x01\x04\b\x01\x102R\brequests\"u\n" +
+	"!the-protobuf-project.org/ResourceR\x12candidateResources\"\x81\x01\n" +
+	"\x1fBatchComputeAvailabilityRequest\x12^\n" +
+	"\brequests\x18\x01 \x03(\v22.freebusy.allocation.v1.ComputeAvailabilityRequestB\x0e\xe2A\x01\x02\xbaH\a\x92\x01\x04\b\x01\x102R\brequests\"u\n" +
 	" BatchComputeAvailabilityResponse\x12Q\n" +
-	"\tresponses\x18\x01 \x03(\v23.freebusy.allocation.v1.ComputeAvailabilityResponseR\tresponses\"\x9a\x03\n" +
-	"\x19SearchAvailabilityRequest\x127\n" +
-	"\x06parent\x18\x01 \x01(\tB\x1f\xe0A\x02\xbaH\x19r\x172\x15^organizations/[^/]+$R\x06parent\x128\n" +
-	"\x06window\x18\x02 \x01(\v2\x15.google.type.IntervalB\t\xe0A\x02\xbaH\x03\xc8\x01\x01R\x06window\x12f\n" +
-	"\x14organizational_units\x18\x03 \x03(\tB3\xe0A\x01\xfaA-\n" +
-	"+the-protobuf-project.org/OrganizationalUnitR\x13organizationalUnits\x12*\n" +
-	"\x0eresource_types\x18\x04 \x03(\tB\x03\xe0A\x01R\rresourceTypes\x12&\n" +
-	"\bquantity\x18\x05 \x01(\x05B\n" +
-	"\xe0A\x01\xbaH\x04\x1a\x02(\x00R\bquantity\x12*\n" +
-	"\tpage_size\x18\x06 \x01(\x05B\r\xe0A\x01\xbaH\a\x1a\x05\x18\xe8\a(\x00R\bpageSize\x12\"\n" +
+	"\tresponses\x18\x01 \x03(\v23.freebusy.allocation.v1.ComputeAvailabilityResponseR\tresponses\"\xa1\x03\n" +
+	"\x19SearchAvailabilityRequest\x128\n" +
+	"\x06parent\x18\x01 \x01(\tB \xe2A\x01\x02\xbaH\x19r\x172\x15^organizations/[^/]+$R\x06parent\x129\n" +
+	"\x06window\x18\x02 \x01(\v2\x15.google.type.IntervalB\n" +
+	"\xe2A\x01\x02\xbaH\x03\xc8\x01\x01R\x06window\x12g\n" +
+	"\x14organizational_units\x18\x03 \x03(\tB4\xe2A\x01\x01\xfaA-\n" +
+	"+the-protobuf-project.org/OrganizationalUnitR\x13organizationalUnits\x12+\n" +
+	"\x0eresource_types\x18\x04 \x03(\tB\x04\xe2A\x01\x01R\rresourceTypes\x12'\n" +
+	"\bquantity\x18\x05 \x01(\x05B\v\xe2A\x01\x01\xbaH\x04\x1a\x02(\x00R\bquantity\x12+\n" +
+	"\tpage_size\x18\x06 \x01(\x05B\x0e\xe2A\x01\x01\xbaH\a\x1a\x05\x18\xe8\a(\x00R\bpageSize\x12#\n" +
 	"\n" +
-	"page_token\x18\a \x01(\tB\x03\xe0A\x01R\tpageToken\"\x89\x01\n" +
+	"page_token\x18\a \x01(\tB\x04\xe2A\x01\x01R\tpageToken\"\x89\x01\n" +
 	"\x1aSearchAvailabilityResponse\x12C\n" +
 	"\amatches\x18\x01 \x03(\v2).freebusy.allocation.v1.AvailabilityMatchR\amatches\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageTokenB\x99\x02\n" +

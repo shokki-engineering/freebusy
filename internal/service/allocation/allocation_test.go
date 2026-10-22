@@ -6,6 +6,7 @@ package allocation
 import (
 	"context"
 	"errors"
+	"reflect"
 	"sync"
 	"testing"
 	"time"
@@ -18,7 +19,9 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
+	"google.golang.org/genproto/googleapis/type/dayofweek"
 	"google.golang.org/genproto/googleapis/type/interval"
+	"google.golang.org/genproto/googleapis/type/month"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -396,6 +399,28 @@ func TestUnsupportedEventRuleBlocks(t *testing.T) {
 	}
 	if _, err := engine.ParseRRule("FREQ=HOURLY", time.UTC); !errors.Is(err, engine.ErrUnsupportedRule) {
 		t.Fatal(err)
+	}
+}
+
+// A stored rule using BYSETPOS and BYMONTH expands like any other: the last
+// weekday of each November, here Monday 2026-11-30, and nothing else.
+func TestEventRulePartsExpand(t *testing.T) {
+	ev := busy(time.Date(2025, 11, 28, 10, 0, 0, 0, time.UTC), time.Date(2025, 11, 28, 11, 0, 0, 0, time.UTC))
+	var weekdays []*eventv1.WeekdayNum
+	for _, d := range []dayofweek.DayOfWeek{dayofweek.DayOfWeek_MONDAY, dayofweek.DayOfWeek_TUESDAY,
+		dayofweek.DayOfWeek_WEDNESDAY, dayofweek.DayOfWeek_THURSDAY, dayofweek.DayOfWeek_FRIDAY} {
+		weekdays = append(weekdays, &eventv1.WeekdayNum{Day: d})
+	}
+	ev.Recurrence = &eventv1.Recurrence{
+		Frequency:    eventv1.Frequency_FREQUENCY_YEARLY,
+		Months:       []month.Month{month.Month_NOVEMBER},
+		Weekdays:     weekdays,
+		SetPositions: []int32{-1},
+	}
+	got := expandEvents([]*eventv1.Event{ev}, time.UTC, engine.Span{Start: hr(0), End: hr(24 * 30)})
+	want := engine.Spans{{Start: hr(24*28 + 10), End: hr(24*28 + 11)}}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("got %v, want %v", got, want)
 	}
 }
 

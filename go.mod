@@ -35,6 +35,7 @@ require golang.org/x/crypto/x509roots/fallback v0.0.0-20261020153306-9f2b28d4331
 require (
 	github.com/googleapis/enterprise-certificate-proxy v0.3.17 // indirect
 	github.com/googleapis/gax-go/v2 v2.23.0 // indirect
+	github.com/the-protobuf-project/cache v0.3.0 // indirect
 )
 
 require (
@@ -114,7 +115,7 @@ require (
 	github.com/the-protobuf-project/runtime-go/observability v0.0.0-20261021182109-ed0b69c46242
 	github.com/the-protobuf-project/runtime-go/telemetry v0.0.0-20261021141431-6d4588022f2b // indirect
 	github.com/the-protobuf-project/runtime-go/ulid v0.0.0-20261021141431-6d4588022f2b // indirect
-	github.com/the-protobuf-project/store v1.5.4 // indirect
+	github.com/the-protobuf-project/store v1.5.7 // indirect
 	github.com/xo/terminfo v1.2.0 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect

@@ -16,6 +16,10 @@ mod hasura 'tools/just/hasura.just'
 [group('proxy')]
 mod envoy 'tools/just/envoy.just'
 
+# Versioned database migrations: diff, check, apply.
+[group('db')]
+mod db 'tools/just/db.just'
+
 # Exercise the gRPC API via reflection (server must be running).
 [group('api')]
 mod grpc 'tools/just/grpc.just'
