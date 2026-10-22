@@ -9,7 +9,8 @@
 #   ghcr.io/shokki-engineering/freebusy-connector   the Hasura Postgres connector
 #   oci://ghcr.io/shokki-engineering/charts/freebusy  the Helm chart
 #
-# and a GitHub release whose notes are the tag's CHANGELOG.md section. CI's
+# and a GitHub release whose notes are the tag's CHANGELOG.md section, with
+# the chart and the REST API's OpenAPI file attached. CI's
 # checks are not repeated here: tag a commit main already passed.
 name: Release
 
@@ -81,4 +82,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           awk -v v="$VERSION" '$0 ~ "^## \\[" v "\\]" {on=1; next} /^## \[/ {on=0} on' CHANGELOG.md > notes.md
-          gh release create "$TAG" --title "$TAG" --notes-file notes.md "dist/freebusy-$VERSION.tgz"
+          cp protobuf/generated/openapi/openapiv3-spec.yaml "dist/freebusy-$VERSION.openapi.yaml"
+          gh release create "$TAG" --title "$TAG" --notes-file notes.md \
+            "dist/freebusy-$VERSION.tgz" "dist/freebusy-$VERSION.openapi.yaml"

@@ -112,6 +112,14 @@ func inventoryFlow(t *testing.T, c *e2eClients) {
 		t.Fatalf("free at 07, 10, 12: %v, want [0 0 1]", got)
 	}
 
+	// Searching the whole organization, no site named, finds the same court.
+	found, err := c.availability.SearchAvailability(ctx, &allocationpbv1.SearchAvailabilityRequest{
+		Parent: "organizations/" + id + "-org", Window: span(at(12), at(13)), ResourceTypes: []string{"court"},
+	})
+	if err != nil || len(found.GetMatches()) != 1 || found.GetMatches()[0].GetResource() != res.GetName() {
+		t.Fatalf("SearchAvailability across the organization: %v, %v; want %s", found.GetMatches(), err, res.GetName())
+	}
+
 	hold, err := c.holds.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Parent: site, Hold: &allocationpbv1.Hold{Window: span(at(12), at(13))}})
 	if err != nil {
 		t.Fatalf("CreateHold: %v", err)

@@ -16,6 +16,16 @@ tag `vx.y.z`. The release workflow refuses a tag that disagrees with either.
 
 ### Added
 
+- Docs: `docs/getting-started.md` (empty server to a confirmed booking with
+  curl) and `docs/errors.md`, the error contract: every reason, its code and
+  what to do. `tools/errors` (in `just lint`) fails when the code returns a
+  reason the page does not list, or the page lists one nothing returns.
+- The OpenAPI file covers the whole REST API: the RFC services freebusy serves
+  (organizations, sites, resources, calendars, events, availability) beside its
+  own. It is linted in CI and attached to each GitHub release.
+- MCP tool descriptions for searching, holding and reserving say what to send,
+  in what format, and which tool comes next, so an agent can book with nothing
+  else to read.
 - Deployment: a Compose stack (`deploy/compose`) for one host, with Postgres,
   migrations, scheduled backups, and the Redis cache, Hasura backend and
   observability stack as profiles; and a Helm chart (`deploy/helm/freebusy`).
@@ -37,6 +47,11 @@ tag `vx.y.z`. The release workflow refuses a tag that disagrees with either.
 
 ### Fixed
 
+- `SearchAvailability` across an organization, with no sites named, found
+  nothing: it matched sites by the organization's id while sites store its
+  full name.
+- The OpenAPI file was not valid OpenAPI 3.0 (`info.summary`), listed hosted
+  servers that do not exist, and declared a bearer-token scheme nothing checks.
 - `FREEBUSY_OTLP_ENDPOINT` with a host name (`telemetry:6009`, a cluster
   Service) exported nothing: TLS was forced on for every host name. It is now
   plaintext unless `FREEBUSY_OTLP_SECURE=true`.

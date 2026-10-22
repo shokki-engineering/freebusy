@@ -1,0 +1,670 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: Apache-2.0
+
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Availabilities API
+    description: |-
+        Availabilities manages when a calendar's owner may be scheduled.
+
+         RFC 7953 defines VAVAILABILITY as calendar data, not as an access protocol,
+         so these are the AIP-131..135 standard methods and nothing else. Serialising
+         one to an .ics file is not an Availability-specific concern -- see
+         protobuf.shared.interchange.v1.Interchange, which does it for any resource
+         type.
+
+         Reading these back through free-busy is deliberately elsewhere. RFC 7953
+         section 5 <https://www.rfc-editor.org/rfc/rfc7953.html#section-5> layers availability under events, so a free-busy reply is
+         computed from both; that lives on
+         protobuf.rfc5545.calendar.v1's Calendars.QueryFreeBusy, which owns the
+         calendar. Splitting it that way is forced -- AIP-215 <https://aip.dev/215> permits no
+         cross-package message reference, so neither package can name the other's
+         types.
+    version: 0.0.1
+paths:
+    /v1/calendars/{calendar}/availabilities:
+        get:
+            tags:
+                - Availabilities
+            description: |-
+                Lists a calendar's availabilities.
+
+                   GET /v1/{parent=calendars/*}/availabilities
+
+                 Paginated per AIP-158: pass `page_size` (defaults to 50, capped at 1000)
+                 and the `next_page_token` from the previous response. Page tokens are
+                 opaque and may expire; do not construct or store them.
+
+                 Overlap is permitted and expected -- a general working-week pattern and a
+                 one-off exception may both apply, and `priority` decides which wins,
+                 RFC 7953 section 3.1 <https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1>. This method returns them all; it does not
+                 resolve them.
+
+                   INVALID_ARGUMENT   malformed filter, or page_size out of range
+                   PERMISSION_DENIED  caller may not list this collection
+            operationId: Availabilities_ListAvailabilities
+            parameters:
+                - name: calendar
+                  in: path
+                  description: The calendar id.
+                  required: true
+                  schema:
+                    type: string
+                - name: pageSize
+                  in: query
+                  description: Maximum availabilities to return. Defaults to 50, capped at 1000.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  description: Page token from a previous ListAvailabilitiesResponse.next_page_token.
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Filter expression, AIP-160 <https://aip.dev/160>.
+                  schema:
+                    type: string
+                - name: showDeleted
+                  in: query
+                  description: Include soft-deleted availabilities in the result. AIP-164 <https://aip.dev/164>.
+                  schema:
+                    type: boolean
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListAvailabilitiesResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - Availabilities
+            description: |-
+                Creates an availability.
+
+                   POST /v1/{parent=calendars/*}/availabilities
+                   body: the availability itself
+
+                 Server-assigned fields on the request body are ignored: `name`, `uid`,
+                 `etag` and the timestamps are set by the server regardless of what is
+                 sent. Supply `availability_id` to choose the final path segment.
+
+                 Note the polarity, RFC 7953 section 3.1 <https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1>: creating one declares its
+                 whole range **unavailable**, and each AvailablePeriod inside it carves
+                 out time that is not. An Availability with no periods is valid and means
+                 "never schedulable in this range".
+
+                 Not idempotent. Retrying after a timeout may create a second
+                 availability; supply `availability_id` if the caller needs retry safety.
+
+                   ALREADY_EXISTS     that availability_id is taken
+                   INVALID_ARGUMENT   a field violates its buf.validate constraint
+                   PERMISSION_DENIED  caller may not create here
+            operationId: Availabilities_CreateAvailability
+            parameters:
+                - name: calendar
+                  in: path
+                  description: The calendar id.
+                  required: true
+                  schema:
+                    type: string
+                - name: availabilityId
+                  in: query
+                  description: |-
+                    Client-assigned id, becoming the last segment of the resource name. The
+                     server generates one when empty.
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Availability'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Availability'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/calendars/{calendar}/availabilities/{availability}:
+        get:
+            tags:
+                - Availabilities
+            description: |-
+                Retrieves one availability.
+
+                   GET /v1/{name=calendars/*/availabilities/*}
+
+                 Safe and idempotent. Read the `etag` here and pass it back on update or
+                 delete to make the write conditional.
+
+                   NOT_FOUND          no such availability, or it is soft-deleted and `show_deleted` was not set
+                   INVALID_ARGUMENT   name does not match calendars/*/availabilities/*
+                   PERMISSION_DENIED  caller may not read it
+            operationId: Availabilities_GetAvailability
+            parameters:
+                - name: calendar
+                  in: path
+                  description: The calendar id.
+                  required: true
+                  schema:
+                    type: string
+                - name: availability
+                  in: path
+                  description: The availability id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Availability'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - Availabilities
+            description: |-
+                Deletes an availability.
+
+                   DELETE /v1/{name=calendars/*/availabilities/*}
+
+                 Soft delete: it is marked deleted, disappears from List unless
+                 `show_deleted` is set, and is purged at `expire_time`. Recover it with
+                 Undelete before then.
+
+                 Deleting one makes its range fall back to whatever other availabilities
+                 say, or to no constraint at all if it was the last -- which is more
+                 permissive, not less. That asymmetry is worth a confirmation step in any
+                 interface built on this.
+
+                   NOT_FOUND          no such availability
+                   ABORTED            etag does not match
+                   PERMISSION_DENIED  caller may not delete it
+            operationId: Availabilities_DeleteAvailability
+            parameters:
+                - name: calendar
+                  in: path
+                  description: The calendar id.
+                  required: true
+                  schema:
+                    type: string
+                - name: availability
+                  in: path
+                  description: The availability id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        patch:
+            tags:
+                - Availabilities
+            description: |-
+                Updates an availability.
+
+                   PATCH /v1/{availability.name=calendars/*/availabilities/*}
+                   body: the availability itself
+
+                 A partial update: only fields named in `update_mask` are written. An
+                 empty mask writes every mutable field, which will clear anything the
+                 caller left unset -- pass a mask unless that is the intent.
+
+                 `available_periods` is replaced wholesale when the mask names it, not
+                 merged: the periods are positional value objects with no identity of
+                 their own, so there is nothing to match an incoming one against.
+
+                 Idempotent. Pass the `etag` read from Get to make the write conditional.
+
+                   NOT_FOUND          no such availability
+                   ABORTED            etag does not match the stored resource
+                   INVALID_ARGUMENT   mask names an unknown or immutable field
+                   PERMISSION_DENIED  caller may not modify it
+            operationId: Availabilities_UpdateAvailability
+            parameters:
+                - name: calendar
+                  in: path
+                  description: The calendar id.
+                  required: true
+                  schema:
+                    type: string
+                - name: availability
+                  in: path
+                  description: The availability id.
+                  required: true
+                  schema:
+                    type: string
+                - name: updateMask
+                  in: query
+                  description: Fields to update. An empty mask updates all mutable fields.
+                  schema:
+                    type: string
+                    format: field-mask
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Availability'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Availability'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/calendars/{calendar}/availabilities/{availability}:undelete:
+        post:
+            tags:
+                - Availabilities
+            description: |-
+                Restores a soft-deleted availability.
+
+                   POST /v1/{name=calendars/*/availabilities/*}:undelete
+
+                 Valid only before `expire_time`; after that it is gone and this returns
+                 NOT_FOUND.
+
+                   NOT_FOUND          no such availability, or already purged
+                   ALREADY_EXISTS     the availability is not deleted
+                   PERMISSION_DENIED  caller may not restore it
+            operationId: Availabilities_UndeleteAvailability
+            parameters:
+                - name: calendar
+                  in: path
+                  description: The calendar id.
+                  required: true
+                  schema:
+                    type: string
+                - name: availability
+                  in: path
+                  description: The availability id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UndeleteAvailabilityRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Availability'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        Availability:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Resource name, "calendars/{calendar}/availabilities/{availability}".
+                uid:
+                    readOnly: true
+                    type: string
+                    description: Server-assigned unique id.
+                icalUid:
+                    type: string
+                    description: |-
+                        UID, RFC 5545 section 3.8.4.7 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.7>. Required by RFC 7953 section 3.1 <https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1>.
+                         Interchange identity, distinct from uid above: it arrives inside an
+                         imported .ics and must survive a round trip.
+                busyType:
+                    type: integer
+                    description: |-
+                        BUSYTYPE, RFC 7953 section 3.2 <https://www.rfc-editor.org/rfc/rfc7953.html#section-3.2>. How time inside this range but
+                         outside every AvailablePeriod counts. Unset means BUSY-UNAVAILABLE.
+                    format: enum
+                start:
+                    allOf:
+                        - $ref: '#/components/schemas/CalendarTime'
+                    description: |-
+                        DTSTART, RFC 5545 section 3.8.2.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.2.4>. When this pattern takes
+                         effect. Optional per RFC 7953 section 3.1 <https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1>: absent means it has always
+                         applied.
+                end:
+                    allOf:
+                        - $ref: '#/components/schemas/CalendarTime'
+                    description: |-
+                        DTEND, RFC 5545 section 3.8.2.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.2.2>. When the pattern stops
+                         applying. Absent means it applies indefinitely.
+                duration:
+                    pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
+                    type: string
+                    description: DURATION, RFC 5545 section 3.8.2.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.2.5>, measured from start.
+                availablePeriods:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AvailablePeriod'
+                    description: |-
+                        The free windows inside this range, RFC 7953 section 3.1 <https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1>. An
+                         Availability with none declares its whole range unavailable, which is a
+                         legitimate thing to say.
+                summary:
+                    type: string
+                    description: SUMMARY, RFC 5545 section 3.8.1.12 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.12>, e.g. "Working hours".
+                description:
+                    type: string
+                    description: DESCRIPTION, RFC 5545 section 3.8.1.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.5>.
+                organizer:
+                    type: string
+                    description: |-
+                        ORGANIZER, RFC 5545 section 3.8.4.3 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.3>. The calendar user address
+                         whose availability this is, e.g. "mailto:jane@example.com".
+                priority:
+                    type: integer
+                    description: |-
+                        PRIORITY, RFC 5545 section 3.8.1.9 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.9>. Which pattern wins where two
+                         overlap: RFC 7953 section 3.1 <https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1> makes 1 the highest and 9 the lowest,
+                         with 0 meaning undefined.
+                    format: int32
+                categories:
+                    type: array
+                    items:
+                        type: string
+                    description: CATEGORIES, RFC 5545 section 3.8.1.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.2>.
+                etag:
+                    readOnly: true
+                    type: string
+                    description: |-
+                        Weak validator for optimistic concurrency, AIP-154 <https://aip.dev/154>. Pass it back in an
+                         update or delete to make the write conditional.
+                deleteTime:
+                    readOnly: true
+                    type: string
+                    description: When this availability was soft-deleted, unset while it is live. AIP-164 <https://aip.dev/164>.
+                    format: date-time
+                expireTime:
+                    readOnly: true
+                    type: string
+                    description: When a soft-deleted availability is purged for good. AIP-164 <https://aip.dev/164>.
+                    format: date-time
+                createTime:
+                    readOnly: true
+                    type: string
+                    description: When this availability was created.
+                    format: date-time
+                updateTime:
+                    readOnly: true
+                    type: string
+                    description: When this availability was last modified.
+                    format: date-time
+                extensions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ExtensionProperty'
+                    description: |-
+                        Properties this schema does not model, RFC 5545 section 3.8.8.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.8.2>.
+                         Preserved verbatim so an imported .ics survives a round trip.
+            description: |-
+                Availability is the VAVAILABILITY component, RFC 7953 section 3.1 <https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1>.
+
+                 When someone is willing to be scheduled, as distinct from when they happen
+                 to be free. An Event says "this time is taken"; this says "this time was
+                 never on offer" -- a weekend, or the hours outside a working day.
+
+                 The polarity is inverted from everything else in the calendar, and section
+                 3.1 is explicit about it: the whole range is **busy by default**, and each
+                 AvailablePeriod carves out a window that is not. `busy_type` names how the
+                 uncarved remainder counts, defaulting to BUSY-UNAVAILABLE.
+
+                 A resource of its own rather than a value object on Calendar, because it
+                 has identity and lifecycle: an availability pattern is created, listed,
+                 amended and revoked independently of any calendar entry, which is rule 8's
+                 test. It sits under a calendar, so the pattern is nested.
+
+                 Free-busy consumers: RFC 7953 section 5 <https://www.rfc-editor.org/rfc/rfc7953.html#section-5> layers these under the events,
+                 so a free-busy reply computes availability first and then overlays actual
+                 bookings. protobuf.rfc5545.calendar.v1's Calendars.QueryFreeBusy is where
+                 that combination surfaces; it does not reference this package, per AIP-215 <https://aip.dev/215>.
+
+                 Reference: RFC 7953 "Calendar Availability", section 3.1.
+                 https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1
+        AvailablePeriod:
+            required:
+                - start
+            type: object
+            properties:
+                icalUid:
+                    type: string
+                    description: |-
+                        UID, RFC 5545 section 3.8.4.7 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.7>. Required by RFC 7953 section 3.1 <https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1>.
+
+                         Interchange identity, not ours: it arrives inside an imported .ics and
+                         must survive a round trip unchanged.
+                start:
+                    allOf:
+                        - $ref: '#/components/schemas/CalendarTime'
+                    description: |-
+                        DTSTART, RFC 5545 section 3.8.2.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.2.4>. When the free period begins.
+                         Required by RFC 7953 section 3.1 <https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1>.
+                end:
+                    allOf:
+                        - $ref: '#/components/schemas/CalendarTime'
+                    description: DTEND, RFC 5545 section 3.8.2.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.2.2>. When the free period ends.
+                duration:
+                    pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
+                    type: string
+                    description: |-
+                        DURATION, RFC 5545 section 3.8.2.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.2.5>. How long it lasts, measured
+                         from start.
+                summary:
+                    type: string
+                    description: SUMMARY, RFC 5545 section 3.8.1.12 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.12>, e.g. "Office hours".
+                description:
+                    type: string
+                    description: DESCRIPTION, RFC 5545 section 3.8.1.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.5>.
+                location:
+                    type: string
+                    description: |-
+                        LOCATION, RFC 5545 section 3.8.1.7 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.7>. Where the person is
+                         available, which need not be where the enclosing Availability says.
+                recurrenceRule:
+                    type: string
+                    description: |-
+                        RRULE, RFC 5545 section 3.8.5.3 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.5.3>, as an unparsed rule string.
+
+                         A string rather than the structured Recurrence of
+                         protobuf.rfc5545.event.v1: that message is roughly 160 lines and AIP-215
+                         forbids referencing it across packages, so modelling it here means
+                         copying it whole. Availability recurrence is in practice a weekly office
+                         -hours pattern, and no consumer has yet needed to query inside the rule.
+                         Promote it to a structured type when one does -- rule 13.
+                categories:
+                    type: array
+                    items:
+                        type: string
+                    description: CATEGORIES, RFC 5545 section 3.8.1.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.2>.
+                comments:
+                    type: array
+                    items:
+                        type: string
+                    description: COMMENT, RFC 5545 section 3.8.1.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.4>.
+                extensions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ExtensionProperty'
+                    description: |-
+                        Properties this schema does not model, RFC 5545 section 3.8.8.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.8.2>.
+                         Preserved verbatim so an imported .ics survives a round trip.
+            description: |-
+                AvailablePeriod is the AVAILABLE sub-component, RFC 7953 section 3.1 <https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1>.
+
+                 A window of free time inside an Availability. The enclosing VAVAILABILITY
+                 declares its whole range busy by default, and each of these carves out a
+                 period that is not -- so an ordinary working week is one Availability with
+                 one recurring AvailablePeriod, not five hundred separate ones.
+
+                 A value object, not a resource: section 3.1 defines it only as a
+                 sub-component of VAVAILABILITY, and it has no identity or lifecycle apart
+                 from its parent. Its own UID (`ical_uid`) is interchange identity, the same
+                 distinction rule 9 draws everywhere else.
+
+                 Named AvailablePeriod rather than Available: AIP-140 <https://aip.dev/140> wants a noun, and a
+                 bare adjective names no thing.
+
+                 Reference: RFC 7953 "Calendar Availability", section 3.1.
+                 https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1
+        CalendarTime:
+            type: object
+            properties:
+                date:
+                    type: string
+                    description: 'DATE, section 3.3.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.4>. An all-day value: no time, no zone.'
+                    format: date
+                dateTime:
+                    type: string
+                    description: DATE-TIME, section 3.3.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.5>.
+                    format: date-time
+            description: |-
+                CalendarTime is an iCalendar DATE or DATE-TIME value, RFC 5545
+                 sections 3.3.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.4> and 3.3.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.5>.
+
+                 A copy of the type in protobuf.rfc5545.event.v1, not a reference: AIP-215 <https://aip.dev/215>
+                 permits no cross-package message reference, so a value type shared between
+                 iCalendar components is duplicated per package. That tax is documented in
+                 docs/decisions.md and paid here for the fifth time.
+
+                 google.protobuf.Timestamp cannot express what iCalendar needs: section
+                 3.3.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.5> gives DATE-TIME a floating form, a UTC form and a TZID form,
+                 and section 3.3.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.4> adds the all-day DATE. Availability is exactly
+                 where the difference bites -- "I am free 09:00 to 17:00" is a floating
+                 local-time statement that must not shift across a DST boundary.
+
+                 Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specification (iCalendar)", section 3.3.5.
+                 https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.5
+        ExtensionProperty:
+            required:
+                - key
+            type: object
+            properties:
+                key:
+                    type: string
+                    description: |-
+                        The property name as it appeared, e.g. "X-MY-PROP". Case is preserved:
+                         names match case-insensitively, but echoing a different case back is not
+                         the same bytes.
+                values:
+                    type: array
+                    items:
+                        type: string
+                    description: The property's values, one per comma-separated element.
+                parameters:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: |-
+                        Property parameters, RFC 5545 section 3.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2>, e.g. {"TZID": "Europe/London"}.
+
+                         A map, matching every other ExtensionProperty in this schema. A repeated
+                         "NAME=value" string was tried and reverted: Go map iteration is randomised,
+                         so building a list from one made the encoding non-deterministic -- four
+                         distinct outputs from one input in a twenty-run probe.
+            description: |-
+                ExtensionProperty carries an iCalendar property this schema does not model.
+
+                 Not a hole punched in a typed schema: RFC 5545 section 3.8.8.1 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.8.1> reserves
+                 IANA-registered properties and section 3.8.8.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.8.2> non-standard X-
+                 properties, and requires applications to ignore what they do not recognise
+                 rather than reject it. RFC 7953 section 3.1 <https://www.rfc-editor.org/rfc/rfc7953.html#section-3.1> permits both on
+                 VAVAILABILITY and AVAILABLE explicitly.
+
+                 Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specification (iCalendar)", section 3.8.8.2.
+                 https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.8.2
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        ListAvailabilitiesResponse:
+            type: object
+            properties:
+                availabilities:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Availability'
+                    description: The availabilities on this page.
+                nextPageToken:
+                    type: string
+                    description: Token for the next page, empty when this is the last page.
+            description: Response message for Availabilities.ListAvailabilities, AIP-132 <https://aip.dev/132>.
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        UndeleteAvailabilityRequest:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Name of the soft-deleted availability to restore.
+            description: Request message for Availabilities.UndeleteAvailability, AIP-164 <https://aip.dev/164>.
+tags:
+    - name: Availabilities

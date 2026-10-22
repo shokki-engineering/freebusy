@@ -30,15 +30,15 @@ var File_freebusy_allocation_v1_hold_service_proto protoreflect.FileDescriptor
 
 const file_freebusy_allocation_v1_hold_service_proto_rawDesc = "" +
 	"\n" +
-	")freebusy/allocation/v1/hold_service.proto\x12\x16freebusy.allocation.v1\x1a'freebusy/allocation/v1/allocation.proto\x1a*freebusy/allocation/v1/hold_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1emcp/protobuf/annotations.proto2\xe4\t\n" +
-	"\vHoldService\x12\xf8\x01\n" +
+	")freebusy/allocation/v1/hold_service.proto\x12\x16freebusy.allocation.v1\x1a'freebusy/allocation/v1/allocation.proto\x1a*freebusy/allocation/v1/hold_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1emcp/protobuf/annotations.proto2\xc9\x0f\n" +
+	"\vHoldService\x12\xd6\x05\n" +
 	"\n" +
-	"CreateHold\x12).freebusy.allocation.v1.CreateHoldRequest\x1a\x1c.freebusy.allocation.v1.Hold\"\xa0\x01\xdaA\x13parent,hold,hold_id\xca\xf3\x18P\x12NHold one or more bookable resources for a window. Requires an idempotency key.\x82\xd3\xe4\x93\x020:\x04hold\"(/v1/{parent=organizationalUnits/*}/holds\x12\x88\x01\n" +
+	"CreateHold\x12).freebusy.allocation.v1.CreateHoldRequest\x1a\x1c.freebusy.allocation.v1.Hold\"\xfe\x04\xdaA\x13parent,hold,hold_id\xca\xf3\x18\xad\x04\x12\xaa\x04Claim resources at a site for a window while the booking is settled (payment, forms): the second step of booking. parent: organizationalUnits/{site}. hold.window: start_time and end_time, RFC 3339. hold.quantity defaults to 1; freebusy picks which resources, from hold.candidate_resources if given. Set hold.idempotency_key so a retry returns the same hold. The hold lasts 15 minutes (expire_time): confirm it with reservation_service-create_reservation_v1 before then, or hold_service-extend_hold_v1. Fails with CAPACITY_EXHAUSTED when too few are free.\x82\xd3\xe4\x93\x020:\x04hold\"(/v1/{parent=organizationalUnits/*}/holds\x12\x88\x01\n" +
 	"\aGetHold\x12&.freebusy.allocation.v1.GetHoldRequest\x1a\x1c.freebusy.allocation.v1.Hold\"7\xdaA\x04name\x82\xd3\xe4\x93\x02*\x12(/v1/{name=organizationalUnits/*/holds/*}\x12\x9b\x01\n" +
-	"\tListHolds\x12(.freebusy.allocation.v1.ListHoldsRequest\x1a).freebusy.allocation.v1.ListHoldsResponse\"9\xdaA\x06parent\x82\xd3\xe4\x93\x02*\x12(/v1/{parent=organizationalUnits/*}/holds\x12\xd6\x01\n" +
+	"\tListHolds\x12(.freebusy.allocation.v1.ListHoldsRequest\x1a).freebusy.allocation.v1.ListHoldsResponse\"9\xdaA\x06parent\x82\xd3\xe4\x93\x02*\x12(/v1/{parent=organizationalUnits/*}/holds\x12\xbc\x02\n" +
 	"\n" +
-	"ExtendHold\x12).freebusy.allocation.v1.ExtendHoldRequest\x1a\x1c.freebusy.allocation.v1.Hold\"\x7f\xdaA\rname,duration\xca\xf3\x181\x12/Extend a live hold's expiry, measured from now.\x82\xd3\xe4\x93\x024:\x01*\"//v1/{name=organizationalUnits/*/holds/*}:extend\x12\xcd\x01\n" +
-	"\vReleaseHold\x12*.freebusy.allocation.v1.ReleaseHoldRequest\x1a\x1c.freebusy.allocation.v1.Hold\"t\xdaA\x04name\xca\xf3\x18.\x12,Release a hold early, freeing its resources.\x82\xd3\xe4\x93\x025:\x01*\"0/v1/{name=organizationalUnits/*/holds/*}:release\x12\x88\x01\n" +
+	"ExtendHold\x12).freebusy.allocation.v1.ExtendHoldRequest\x1a\x1c.freebusy.allocation.v1.Hold\"\xe4\x01\xdaA\rname,duration\xca\xf3\x18\x95\x01\x12\x92\x01Move a live hold's expire_time to now plus duration (at most 24 hours), when settling needs longer. name: organizationalUnits/{site}/holds/{hold}.\x82\xd3\xe4\x93\x024:\x01*\"//v1/{name=organizationalUnits/*/holds/*}:extend\x12\xee\x02\n" +
+	"\vReleaseHold\x12*.freebusy.allocation.v1.ReleaseHoldRequest\x1a\x1c.freebusy.allocation.v1.Hold\"\x94\x02\xdaA\x04name\xca\xf3\x18\xcd\x01\x12\xca\x01Give up a live hold, freeing its resources at once. name: organizationalUnits/{site}/holds/{hold}. A hold that became a reservation cannot be released: reservation_service-cancel_reservation_v1 instead.\x82\xd3\xe4\x93\x025:\x01*\"0/v1/{name=organizationalUnits/*/holds/*}:release\x12\x88\x01\n" +
 	"\n" +
 	"DeleteHold\x12).freebusy.allocation.v1.DeleteHoldRequest\x1a\x16.google.protobuf.Empty\"7\xdaA\x04name\x82\xd3\xe4\x93\x02**(/v1/{name=organizationalUnits/*/holds/*}\x1a}\xcaA\x1bfreebusy.shokki.engineering\xc2\xf3\x18[\n" +
 	"Y\n" +

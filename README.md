@@ -390,6 +390,9 @@ Release defaults versus the development profile:
 
 ## Using the API
 
+New to it? [docs/getting-started.md](docs/getting-started.md) goes from an
+empty server to a confirmed booking with `curl`, step by step.
+
 | Service | What it does |
 |---|---|
 | `AllocationService` | `ComputeAvailability`, `CheckAvailability`, `BatchComputeAvailability`, `SearchAvailability` |
@@ -401,7 +404,8 @@ Release defaults versus the development profile:
 
 The contract is in `protobuf/` (and published to the Buf Schema Registry as
 `buf.build/shokki-engineering/freebusy`); REST paths and JSON follow it by
-gRPC transcoding, documented in `protobuf/generated/openapi/`. MCP serves each
+gRPC transcoding, documented in `protobuf/generated/openapi/openapiv3-spec.yaml` (one OpenAPI 3
+file, every REST path, `just gen openapi`). MCP serves each
 service at its own path on one port, e.g.
 `/freebusy/allocation/v1/allocationservice/mcp`.
 
@@ -428,8 +432,9 @@ closures. All of it can also be written by any calendar app over CalDAV.
    so the new time is secured before the old one is let go.
 
 Errors follow AIP-193: `INVALID_ARGUMENT` for a bad request,
-`FAILED_PRECONDITION` for a state that forbids the call (with a machine
-reason), `ABORTED` for a stale `etag`.
+`FAILED_PRECONDITION` for a state that forbids the call, `ABORTED` for a stale
+`etag`, and every one carries a stable `reason` to branch on.
+[docs/errors.md](docs/errors.md) lists them all, with what to do about each.
 
 ## Webhooks
 
@@ -603,6 +608,7 @@ The Hasura job needs no secret: it serves the committed engine build.
 
 ```
 config/                 configuration: release defaults + dev profile, both embedded
+docs/                   getting started, the error contract
 deploy/
   compose/              the single-host stack
   helm/freebusy/        the Helm chart

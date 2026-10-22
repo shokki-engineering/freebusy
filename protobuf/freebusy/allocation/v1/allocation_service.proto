@@ -44,7 +44,13 @@ service AllocationService {
       body: "*"
     };
     option (google.api.method_signature) = "parent,window";
-    option (mcp.tool) = {description: "Compute how many resources are free at a site over a window, bucketed by slot or day."};
+    option (mcp.tool) = {
+      description:
+        "How many resources are free at one site over a window, in buckets of "
+        "slot_duration or by day: for showing a schedule. parent: "
+        "organizationalUnits/{site}. window: start_time and end_time, RFC 3339. "
+        "Read-only; to book, call hold_service-create_hold_v1."
+    };
   }
 
   // Checks one exact window for one exact quantity, with reasons when it fails.
@@ -57,7 +63,14 @@ service AllocationService {
       body: "*"
     };
     option (google.api.method_signature) = "parent,window";
-    option (mcp.tool) = {description: "Check whether a specific window can be booked, and if not, why not."};
+    option (mcp.tool) = {
+      description:
+        "Whether one exact window can be booked at a site now, and if not, each "
+        "resource's reason (outside opening hours, held, booked, too short or too "
+        "long). parent: organizationalUnits/{site}. window: start_time and "
+        "end_time, RFC 3339. quantity defaults to 1. Read-only: it claims "
+        "nothing; call hold_service-create_hold_v1 to claim."
+    };
   }
 
   // Runs several availability computations in one round trip.
@@ -83,6 +96,14 @@ service AllocationService {
       body: "*"
     };
     option (google.api.method_signature) = "parent,window";
-    option (mcp.tool) = {description: "Find bookable resources free across a window, anywhere in an operator's sites."};
+    option (mcp.tool) = {
+      description:
+        "Find resources free for a whole window anywhere in an operator's sites: "
+        "the first step of booking. parent: organizations/{organization}. window: "
+        "start_time and end_time, RFC 3339. Optional: resource_types (e.g. "
+        "padel-court), quantity (defaults to 1; only sites with that many free "
+        "match), organizational_units to search only those. Then call hold_service-create_hold_v1 "
+        "at the site of a match."
+    };
   }
 }

@@ -50,7 +50,17 @@ service HoldService {
       body: "hold"
     };
     option (google.api.method_signature) = "parent,hold,hold_id";
-    option (mcp.tool) = {description: "Hold one or more bookable resources for a window. Requires an idempotency key."};
+    option (mcp.tool) = {
+      description:
+        "Claim resources at a site for a window while the booking is settled "
+        "(payment, forms): the second step of booking. parent: "
+        "organizationalUnits/{site}. hold.window: start_time and end_time, RFC "
+        "3339. hold.quantity defaults to 1; freebusy picks which resources, from "
+        "hold.candidate_resources if given. Set hold.idempotency_key so a retry "
+        "returns the same hold. The hold lasts 15 minutes (expire_time): confirm "
+        "it with reservation_service-create_reservation_v1 before then, or hold_service-extend_hold_v1. Fails with "
+        "CAPACITY_EXHAUSTED when too few are free."
+    };
   }
 
   // Retrieves one hold.
@@ -80,7 +90,12 @@ service HoldService {
       body: "*"
     };
     option (google.api.method_signature) = "name,duration";
-    option (mcp.tool) = {description: "Extend a live hold's expiry, measured from now."};
+    option (mcp.tool) = {
+      description:
+        "Move a live hold's expire_time to now plus duration (at most 24 hours), "
+        "when settling needs longer. name: "
+        "organizationalUnits/{site}/holds/{hold}."
+    };
   }
 
   // Gives a hold up before it expires, freeing its resources immediately.
@@ -93,7 +108,12 @@ service HoldService {
       body: "*"
     };
     option (google.api.method_signature) = "name";
-    option (mcp.tool) = {description: "Release a hold early, freeing its resources."};
+    option (mcp.tool) = {
+      description:
+        "Give up a live hold, freeing its resources at once. name: "
+        "organizationalUnits/{site}/holds/{hold}. A hold that became a "
+        "reservation cannot be released: reservation_service-cancel_reservation_v1 instead."
+    };
   }
 
   // Deletes a hold record.

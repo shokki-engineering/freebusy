@@ -42,7 +42,8 @@ func (s *Store) Resources(ctx context.Context, q allocation.ResourceQuery) ([]al
 			return s.units.List(ctx, repox.ListInput{
 				PageSize:  1000,
 				PageToken: token,
-				Where:     []filterx.Condition{{Field: "organization", Op: filterx.OpEq, Value: repox.LastSegment(q.Organization)}},
+				// A site stores its organization's full name, organizations/{id}.
+				Where: []filterx.Condition{{Field: "organization", Op: filterx.OpEq, Value: q.Organization}},
 			})
 		})
 		if err != nil {

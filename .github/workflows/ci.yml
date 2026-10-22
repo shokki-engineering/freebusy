@@ -46,6 +46,13 @@ jobs:
       # against but the previous push, which already passed.
       - if: github.event_name == 'pull_request'
         run: buf breaking --against ".git#branch=origin/${{ github.base_ref }}"
+      # The merged OpenAPI file is valid OpenAPI 3. Every operation is
+      # without a security scheme until authentication exists, and the only
+      # server is a local deployment's: those two rules would only say so.
+      - name: OpenAPI spec
+        run: |
+          npx -y @redocly/cli@1.34.0 lint protobuf/generated/openapi/openapiv3-spec.yaml \
+            --skip-rule security-defined --skip-rule no-server-example.com
 
   build:
     name: Build

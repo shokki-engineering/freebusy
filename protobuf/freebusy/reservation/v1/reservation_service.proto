@@ -45,7 +45,15 @@ service ReservationService {
       body: "reservation"
     };
     option (google.api.method_signature) = "parent,reservation,reservation_id";
-    option (mcp.tool) = {description: "Confirm a live hold as a reservation, keeping its resources."};
+    option (mcp.tool) = {
+      description:
+        "Confirm a live hold as a reservation: the booking, and the last step. "
+        "parent: the hold's site, organizationalUnits/{site}. reservation.hold: "
+        "the hold's name. Optional: reservation.customer (users/{user}), "
+        "reservation.attributes (any JSON object kept with it). Safe to retry: a "
+        "hold backs at most one reservation. Fails with HOLD_NOT_ACTIVE once the "
+        "hold has expired or been released: take a new hold."
+    };
   }
 
   // Retrieves one reservation.
@@ -59,7 +67,12 @@ service ReservationService {
   rpc ListReservations(ListReservationsRequest) returns (ListReservationsResponse) {
     option (google.api.http) = {get: "/v1/{parent=organizationalUnits/*}/reservations"};
     option (google.api.method_signature) = "parent";
-    option (mcp.tool) = {description: "List a site's reservations, filtered and ordered per AIP-160 and AIP-132."};
+    option (mcp.tool) = {
+      description:
+        "List a site's reservations. parent: organizationalUnits/{site}. filter "
+        "per AIP-160, e.g. state = RESERVATION_STATE_CONFIRMED; order_by per "
+        "AIP-132; page_size defaults to 50."
+    };
   }
 
   // Cancels a reservation, freeing its resources.
@@ -72,7 +85,12 @@ service ReservationService {
       body: "*"
     };
     option (google.api.method_signature) = "name";
-    option (mcp.tool) = {description: "Cancel a reservation and free its resources."};
+    option (mcp.tool) = {
+      description:
+        "Cancel a confirmed reservation and free its resources. name: "
+        "organizationalUnits/{site}/reservations/{reservation}. reason is "
+        "optional and kept as cancel_reason."
+    };
   }
 
   // Moves a confirmed reservation onto a new hold, returning the reservation
@@ -90,6 +108,13 @@ service ReservationService {
       body: "*"
     };
     option (google.api.method_signature) = "name,hold";
-    option (mcp.tool) = {description: "Move a confirmed reservation onto a new live hold; the old slot is freed only once the new one is confirmed."};
+    option (mcp.tool) = {
+      description:
+        "Move a confirmed reservation to a new time: first call hold_service-create_hold_v1 for the "
+        "new window at the same site, then call this with hold set to that hold's "
+        "name. name: organizationalUnits/{site}/reservations/{reservation}. The "
+        "old slot is freed only once the new one is confirmed, so the booking is "
+        "never lost."
+    };
   }
 }

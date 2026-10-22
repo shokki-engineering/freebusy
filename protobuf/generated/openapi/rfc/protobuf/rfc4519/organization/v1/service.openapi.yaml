@@ -1,0 +1,406 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: Apache-2.0
+
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Organizations API
+    description: |-
+        Organizations manages the RFC 4519 'organization' object class,
+         section 3.8 <https://www.rfc-editor.org/rfc/rfc4519.html#section-3.8>.
+    version: 0.0.1
+paths:
+    /v1/organizations:
+        get:
+            tags:
+                - Organizations
+            description: |-
+                Lists organizations.
+
+                   GET /v1/organizations
+
+                 Paginated per AIP-158: pass `page_size` (defaults to 50, capped at 1000)
+                 and the `next_page_token` from the previous response. An empty
+                 `next_page_token` means the last page. Page tokens are opaque and may
+                 expire; do not construct or store them.
+
+                 Filtering uses the AIP-160 expression language over the resource's own
+                 fields. Results carry no guaranteed order.
+
+                   INVALID_ARGUMENT   malformed filter, or page_size out of range
+                   PERMISSION_DENIED  caller may not list this collection
+            operationId: Organizations_ListOrganizations
+            parameters:
+                - name: pageSize
+                  in: query
+                  description: Maximum organizations to return. Defaults to 50, capped at 1000.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  description: Page token from a previous ListOrganizationsResponse.next_page_token.
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Filter expression, AIP-160 <https://aip.dev/160>.
+                  schema:
+                    type: string
+                - name: showDeleted
+                  in: query
+                  description: Include soft-deleted organizations in the result. AIP-164 <https://aip.dev/164>.
+                  schema:
+                    type: boolean
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListOrganizationsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - Organizations
+            description: |-
+                Creates a organization.
+
+                   POST /v1/organizations
+                   body: the organization itself
+
+                 Server-assigned fields on the request body are ignored: `name`, `uid`,
+                 `etag` and the timestamps are set by the server regardless of what is
+                 sent. Supply `organization_id` to choose the final path segment; leave it empty
+                 and the server generates one.
+
+                 Not idempotent. Retrying after a timeout may create a second organization;
+                 supply `organization_id` if the caller needs retry safety.
+
+                   ALREADY_EXISTS     that organization_id is taken
+                   INVALID_ARGUMENT   a field violates its buf.validate constraint
+                   PERMISSION_DENIED  caller may not create here
+            operationId: Organizations_CreateOrganization
+            parameters:
+                - name: organizationId
+                  in: query
+                  description: |-
+                    Client-assigned id, becoming the last segment of the resource name. The
+                     server generates one when empty.
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Organization'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Organization'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/organizations/{organization}:
+        get:
+            tags:
+                - Organizations
+            description: |-
+                Retrieves one organization.
+
+                   GET /v1/{name=organizations/*}
+
+                 Safe and idempotent. Returns the resource as stored; no field is computed
+                 per-caller. Read the `etag` here and pass it back on update or delete to
+                 make the write conditional.
+
+                   NOT_FOUND          no such organization, or it is soft-deleted and `show_deleted` was not set
+                   INVALID_ARGUMENT   name does not match organizations/*
+                   PERMISSION_DENIED  caller may not read it
+            operationId: Organizations_GetOrganization
+            parameters:
+                - name: organization
+                  in: path
+                  description: The organization id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Organization'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - Organizations
+            description: |-
+                Deletes a organization.
+
+                   DELETE /v1/{name=organizations/*}
+
+                 Soft delete: the organization is marked deleted, disappears from List unless
+                 `show_deleted` is set, and is purged at `expire_time`. Recover it with
+                 Undelete before then.
+
+                 Idempotent in effect but not in reporting: a second delete returns
+                 NOT_FOUND rather than succeeding silently.
+
+                   NOT_FOUND          no such organization
+                   ABORTED            etag does not match
+                   PERMISSION_DENIED  caller may not delete it
+            operationId: Organizations_DeleteOrganization
+            parameters:
+                - name: organization
+                  in: path
+                  description: The organization id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        patch:
+            tags:
+                - Organizations
+            description: |-
+                Updates a organization.
+
+                   PATCH /v1/{organization.name=organizations/*}
+                   body: the organization itself
+
+                 A partial update: only fields named in `update_mask` are written. An
+                 empty mask writes every mutable field, which will clear anything the
+                 caller left unset -- pass a mask unless that is the intent. OUTPUT_ONLY
+                 and IMMUTABLE fields are rejected rather than silently dropped.
+
+                 Idempotent. Pass the `etag` read from Get to make the write conditional.
+
+                   NOT_FOUND          no such organization
+                   ABORTED            etag does not match the stored resource
+                   INVALID_ARGUMENT   mask names an unknown or immutable field
+                   PERMISSION_DENIED  caller may not modify it
+            operationId: Organizations_UpdateOrganization
+            parameters:
+                - name: organization
+                  in: path
+                  description: The organization id.
+                  required: true
+                  schema:
+                    type: string
+                - name: updateMask
+                  in: query
+                  description: Fields to update. An empty mask updates all mutable fields.
+                  schema:
+                    type: string
+                    format: field-mask
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Organization'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Organization'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/organizations/{organization}:undelete:
+        post:
+            tags:
+                - Organizations
+            description: |-
+                Restores a soft-deleted organization.
+
+                   POST /v1/{name=organizations/*}:undelete
+
+                 Valid only before `expire_time`; after that the organization is gone and this
+                 returns NOT_FOUND. Clears `delete_time` and `expire_time` and returns the
+                 organization as it was.
+
+                   NOT_FOUND          no such organization, or already purged
+                   ALREADY_EXISTS     the organization is not deleted
+                   PERMISSION_DENIED  caller may not restore it
+            operationId: Organizations_UndeleteOrganization
+            parameters:
+                - name: organization
+                  in: path
+                  description: The organization id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UndeleteOrganizationRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Organization'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        ListOrganizationsResponse:
+            type: object
+            properties:
+                organizations:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Organization'
+                    description: The organizations on this page.
+                nextPageToken:
+                    type: string
+                    description: Token for the next page, empty when this is the last page.
+            description: Response message for Organizations.ListOrganizations, AIP-132 <https://aip.dev/132>.
+        Organization:
+            required:
+                - displayNames
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Resource name, "organizations/{organization}".
+                uid:
+                    readOnly: true
+                    type: string
+                    description: Server-assigned unique id.
+                displayNames:
+                    type: array
+                    items:
+                        type: string
+                    description: '''o'', section 2.19 <https://www.rfc-editor.org/rfc/rfc4519.html#section-2.19>. The only attribute section 3.8 <https://www.rfc-editor.org/rfc/rfc4519.html#section-3.8> makes mandatory.'
+                descriptions:
+                    type: array
+                    items:
+                        type: string
+                    description: '''description'', section 2.5 <https://www.rfc-editor.org/rfc/rfc4519.html#section-2.5>.'
+                businessCategories:
+                    type: array
+                    items:
+                        type: string
+                    description: '''businessCategory'', section 2.1 <https://www.rfc-editor.org/rfc/rfc4519.html#section-2.1>.'
+                seeAlso:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        'seeAlso', section 2.30 <https://www.rfc-editor.org/rfc/rfc4519.html#section-2.30>. Distinguished names of related entries, kept as
+                         opaque strings: an LDAP DN is not a resource name and does not resolve
+                         through this API.
+                createTime:
+                    readOnly: true
+                    type: string
+                    description: When the organization was created.
+                    format: date-time
+                updateTime:
+                    readOnly: true
+                    type: string
+                    description: When the organization was last modified.
+                    format: date-time
+                etag:
+                    readOnly: true
+                    type: string
+                    description: |-
+                        Weak validator for optimistic concurrency, AIP-154 <https://aip.dev/154>. Pass it back in an
+                         update or delete to make the write conditional: if the resource changed
+                         since it was read, the request fails instead of overwriting.
+                deleteTime:
+                    readOnly: true
+                    type: string
+                    description: When the organization was soft-deleted, unset while it is live. AIP-164 <https://aip.dev/164>.
+                    format: date-time
+                expireTime:
+                    readOnly: true
+                    type: string
+                    description: When a soft-deleted organization is purged for good. AIP-164 <https://aip.dev/164>.
+                    format: date-time
+            description: |-
+                Organization is the LDAP 'organization' object class, RFC 4519 section 3.8 <https://www.rfc-editor.org/rfc/rfc4519.html#section-3.8>.
+
+                 Attributes are repeated because LDAP attribute types are multi-valued by
+                 default. Section 3.8 lists twenty-one optional attributes; the four here
+                 are the ones that carry meaning outside a directory server.
+
+                 Reference: RFC 4519 "LDAP: Schema for User Applications", section 3.8.
+                 https://www.rfc-editor.org/rfc/rfc4519.html#section-3.8
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        UndeleteOrganizationRequest:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Name of the soft-deleted organization to restore.
+            description: Request message for Organizations.UndeleteOrganization, AIP-164 <https://aip.dev/164>.
+tags:
+    - name: Organizations

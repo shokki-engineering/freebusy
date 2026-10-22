@@ -1,0 +1,517 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: Apache-2.0
+
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Resources API
+    description: |-
+        Resources manages the RFC 9073 VRESOURCE component as a catalogue,
+         section 7.3 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.3>.
+    version: 0.0.1
+paths:
+    /v1/resources:
+        get:
+            tags:
+                - Resources
+            description: |-
+                Lists resources.
+
+                   GET /v1/resources
+
+                 Paginated per AIP-158: pass `page_size` (defaults to 50, capped at 1000)
+                 and the `next_page_token` from the previous response. An empty
+                 `next_page_token` means the last page. Page tokens are opaque and may
+                 expire; do not construct or store them.
+
+                 Filtering uses the AIP-160 expression language over the resource's own
+                 fields -- `organizational_unit="organizationalUnits/car-park-3"` lists
+                 what one site holds, and `resource_types:"room"` narrows by kind, since
+                 the collection is flat rather than nested. Results carry no guaranteed
+                 order.
+
+                   INVALID_ARGUMENT   malformed filter, or page_size out of range
+                   PERMISSION_DENIED  caller may not list this collection
+            operationId: Resources_ListResources
+            parameters:
+                - name: pageSize
+                  in: query
+                  description: Maximum resources to return. Defaults to 50, capped at 1000.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  description: Page token from a previous ListResourcesResponse.next_page_token.
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Filter expression, AIP-160 <https://aip.dev/160>.
+                  schema:
+                    type: string
+                - name: showDeleted
+                  in: query
+                  description: Include soft-deleted resources in the result. AIP-164 <https://aip.dev/164>.
+                  schema:
+                    type: boolean
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListResourcesResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - Resources
+            description: |-
+                Creates a resource.
+
+                   POST /v1/resources
+                   body: the resource itself
+
+                 Server-assigned fields on the request body are ignored: `name`, `uid`,
+                 `etag` and the timestamps are set by the server regardless of what is
+                 sent. Supply `resource_id` to choose the final path segment; leave it
+                 empty and the server generates one.
+
+                 Not idempotent. Retrying after a timeout may create a second resource;
+                 supply `resource_id` if the caller needs retry safety.
+
+                   ALREADY_EXISTS     that resource_id is taken
+                   INVALID_ARGUMENT   a field violates its buf.validate constraint
+                   PERMISSION_DENIED  caller may not create here
+            operationId: Resources_CreateResource
+            parameters:
+                - name: resourceId
+                  in: query
+                  description: |-
+                    Client-assigned id, becoming the last segment of the resource name. The
+                     server generates one when empty.
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Resource'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Resource'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/resources/{resource}:
+        get:
+            tags:
+                - Resources
+            description: |-
+                Retrieves one resource.
+
+                   GET /v1/{name=resources/*}
+
+                 Safe and idempotent. Returns the resource as stored; no field is computed
+                 per-caller. Read the `etag` here and pass it back on update or delete to
+                 make the write conditional.
+
+                   NOT_FOUND          no such resource, or it is soft-deleted and `show_deleted` was not set
+                   INVALID_ARGUMENT   name does not match resources/*
+                   PERMISSION_DENIED  caller may not read it
+            operationId: Resources_GetResource
+            parameters:
+                - name: resource
+                  in: path
+                  description: The resource id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Resource'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - Resources
+            description: |-
+                Deletes a resource.
+
+                   DELETE /v1/{name=resources/*}
+
+                 Soft delete: the resource is marked deleted, disappears from List unless
+                 `show_deleted` is set, and is purged at `expire_time`. Recover it with
+                 Undelete before then. Bookings already on its calendar are untouched --
+                 retiring a bay does not cancel what is parked on it.
+
+                 Idempotent in effect but not in reporting: a second delete returns
+                 NOT_FOUND rather than succeeding silently.
+
+                   NOT_FOUND          no such resource
+                   ABORTED            etag does not match
+                   PERMISSION_DENIED  caller may not delete it
+            operationId: Resources_DeleteResource
+            parameters:
+                - name: resource
+                  in: path
+                  description: The resource id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        patch:
+            tags:
+                - Resources
+            description: |-
+                Updates a resource.
+
+                   PATCH /v1/{resource.name=resources/*}
+                   body: the resource itself
+
+                 A partial update: only fields named in `update_mask` are written. An
+                 empty mask writes every mutable field, which will clear anything the
+                 caller left unset -- pass a mask unless that is the intent. OUTPUT_ONLY
+                 and IMMUTABLE fields are rejected rather than silently dropped.
+
+                 Idempotent. Pass the `etag` read from Get to make the write conditional.
+
+                   NOT_FOUND          no such resource
+                   ABORTED            etag does not match the stored resource
+                   INVALID_ARGUMENT   mask names an unknown or immutable field
+                   PERMISSION_DENIED  caller may not modify it
+            operationId: Resources_UpdateResource
+            parameters:
+                - name: resource
+                  in: path
+                  description: The resource id.
+                  required: true
+                  schema:
+                    type: string
+                - name: updateMask
+                  in: query
+                  description: Fields to update. An empty mask updates all mutable fields.
+                  schema:
+                    type: string
+                    format: field-mask
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Resource'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Resource'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/resources/{resource}:undelete:
+        post:
+            tags:
+                - Resources
+            description: |-
+                Restores a soft-deleted resource.
+
+                   POST /v1/{name=resources/*}:undelete
+
+                 Valid only before `expire_time`; after that the resource is gone and this
+                 returns NOT_FOUND. Clears `delete_time` and `expire_time` and returns the
+                 resource as it was.
+
+                   NOT_FOUND          no such resource, or already purged
+                   ALREADY_EXISTS     the resource is not deleted
+                   PERMISSION_DENIED  caller may not restore it
+            operationId: Resources_UndeleteResource
+            parameters:
+                - name: resource
+                  in: path
+                  description: The resource id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UndeleteResourceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Resource'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        LatLng:
+            type: object
+            properties:
+                latitude:
+                    type: number
+                    description: The latitude in degrees. It must be in the range [-90.0, +90.0].
+                    format: double
+                longitude:
+                    type: number
+                    description: The longitude in degrees. It must be in the range [-180.0, +180.0].
+                    format: double
+            description: |-
+                An object that represents a latitude/longitude pair. This is expressed as a
+                 pair of doubles to represent degrees latitude and degrees longitude. Unless
+                 specified otherwise, this object must conform to the
+                 <a href="https://en.wikipedia.org/wiki/World_Geodetic_System#1984_version">
+                 WGS84 standard</a>. Values must be within normalized ranges.
+        ListResourcesResponse:
+            type: object
+            properties:
+                resources:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Resource'
+                    description: The resources on this page.
+                nextPageToken:
+                    type: string
+                    description: Token for the next page, empty when this is the last page.
+            description: Response message for Resources.ListResources, AIP-132 <https://aip.dev/132>.
+        Resource:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Resource name, "resources/{resource}".
+                uid:
+                    readOnly: true
+                    type: string
+                    description: Server-assigned unique id.
+                icalUid:
+                    type: string
+                    description: |-
+                        UID, RFC 5545 section 3.8.4.7 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.7>. Required by RFC 9073 section 7.3 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.3>.
+
+                         Interchange identity, distinct from uid above: it arrives inside an
+                         imported .ics and must survive a round trip unchanged -- rule 9's
+                         `<format>_uid` split, the same as Event.ical_uid.
+                displayName:
+                    type: string
+                    description: |-
+                        NAME, RFC 7986 section 5.2 <https://www.rfc-editor.org/rfc/rfc7986.html#section-5.2>. What to call this resource, e.g. "Bay
+                         L2-014" or "Boardroom".
+
+                         Named display_name, not name: AIP-122 <https://aip.dev/122> reserves `name` for the resource
+                         identifier above.
+                description:
+                    type: string
+                    description: DESCRIPTION, RFC 5545 section 3.8.1.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.5>.
+                resourceTypes:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        RESOURCE-TYPE, RFC 9073 section 6.3 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.3>, e.g. "projector", "room",
+                         "remote-conference-audio". Free text: section 6.3 points at an IANA
+                         registry rather than a closed list, so an enum here would reject values
+                         the registry adds later.
+                position:
+                    allOf:
+                        - $ref: '#/components/schemas/LatLng'
+                    description: GEO, RFC 5545 section 3.8.1.6 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.6>. Where the resource is.
+                structuredData:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/StructuredData'
+                    description: |-
+                        STRUCTURED-DATA, RFC 9073 section 6.6 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.6>. Anything this schema does
+                         not model, carried with a SCHEMA URI naming what it conforms to.
+                calendar:
+                    type: string
+                    description: |-
+                        The calendar this resource's bookings are kept on.
+
+                         Native: section 7.3 has no calendar property, because a VRESOURCE
+                         published inside a VEVENT is already on the event's calendar. A
+                         free-standing resource is not, and without this field nothing can ask
+                         when it is busy -- RFC 5545 section 3.6.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.4>'s free/busy query is addressed
+                         to a calendar. The field exists despite having no RFC property behind it,
+                         the same trade OrganizationalUnit.organization records.
+                organizationalUnit:
+                    type: string
+                    description: |-
+                        The organizational unit this resource belongs to, e.g. the car park a bay
+                         is in.
+
+                         Native, for the reason above: left unset, a resource is undiscoverable
+                         from the unit that operates it, and listing what a site has is the first
+                         question a catalogue is asked.
+                createTime:
+                    readOnly: true
+                    type: string
+                    description: When the resource was created.
+                    format: date-time
+                updateTime:
+                    readOnly: true
+                    type: string
+                    description: When the resource was last modified.
+                    format: date-time
+                etag:
+                    readOnly: true
+                    type: string
+                    description: |-
+                        Weak validator for optimistic concurrency, AIP-154 <https://aip.dev/154>. Pass it back in an
+                         update or delete to make the write conditional: if the resource changed
+                         since it was read, the request fails instead of overwriting.
+                deleteTime:
+                    readOnly: true
+                    type: string
+                    description: When the resource was soft-deleted, unset while it is live. AIP-164 <https://aip.dev/164>.
+                    format: date-time
+                expireTime:
+                    readOnly: true
+                    type: string
+                    description: When a soft-deleted resource is purged for good. AIP-164 <https://aip.dev/164>.
+                    format: date-time
+            description: |-
+                Resource is the VRESOURCE component, RFC 9073 section 7.3 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.3>.
+
+                 Something bookable that is not a person and not a place: a projector, a
+                 meeting room, a parking bay, a minibus. RFC 5545 section 3.8.1.10 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.10> had a
+                 free-text RESOURCES property; section 7.3 is its structured replacement.
+
+                 A resource of its own, where `protobuf.rfc5545.event.v1.Resource` is a value
+                 object on an event. The two are the same component serving the two uses
+                 section 7.3 describes: the value object says *this booking needs a room*,
+                 and this says *here is the room*, addressable on its own so a catalogue can
+                 be listed, amended and retired independently of any booking. That is the
+                 test in `docs/adding-data.md` for a package rather than a field, and
+                 rule 8's for full CRUD. Neither replaces the other and both stay.
+
+                 A flat collection, "resources/{resource}", for the reason
+                 OrganizationalUnit is flat: section 7.3 defines the component's properties
+                 and says nothing about where it sits, so nesting it under a calendar or an
+                 organizational unit would assert a containment the RFC does not require.
+
+                 Reference: RFC 9073 "Event Publishing Extensions to iCalendar", section 7.3.
+                 https://www.rfc-editor.org/rfc/rfc9073.html#section-7.3
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        StructuredData:
+            type: object
+            properties:
+                text:
+                    type: string
+                    description: The data inline, as text.
+                uri:
+                    type: string
+                    description: A URI the data lives at.
+                binary:
+                    type: string
+                    description: |-
+                        The data inline, as bytes. Section 6.6 carries this base64-encoded with
+                         ENCODING=BASE64 on the wire; it is decoded here, because a protobuf
+                         `bytes` field is already binary and re-encoding it would be a second
+                         representation of the same thing.
+                    format: bytes
+                formatType:
+                    type: string
+                    description: |-
+                        FMTTYPE parameter, RFC 5545 section 3.2.8 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.8>. The data's media type,
+                         e.g. "application/ld+json".
+                schema:
+                    type: string
+                    description: |-
+                        SCHEMA parameter, RFC 9073 section 5.2 <https://www.rfc-editor.org/rfc/rfc9073.html#section-5.2>. A URI naming the schema the
+                         data conforms to, e.g. "https://schema.org/Event". Without it the media
+                         type alone rarely says enough to parse the payload.
+            description: |-
+                StructuredData is the STRUCTURED-DATA property, RFC 9073 section 6.6 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.6>.
+
+                 Machine-readable data attached to a resource, with a media type and a schema
+                 URI saying how to read it. This is the RFC's own extension point: anything
+                 the schema does not model rides here rather than forcing a new field.
+
+                 A copy of `protobuf.rfc5545.event.v1.StructuredData`, not a reference to it.
+                 AIP-215 <https://aip.dev/215> permits no cross-package message reference and rule 4 forbids a
+                 shared wrapper package, so a value type used by two packages is defined in
+                 each. The duplication is the documented cost of that rule; keep the two in
+                 step when either changes.
+
+                 Reference: RFC 9073 "Event Publishing Extensions to iCalendar", section 6.6.
+                 https://www.rfc-editor.org/rfc/rfc9073.html#section-6.6
+        UndeleteResourceRequest:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Name of the soft-deleted resource to restore.
+            description: Request message for Resources.UndeleteResource, AIP-164 <https://aip.dev/164>.
+tags:
+    - name: Resources

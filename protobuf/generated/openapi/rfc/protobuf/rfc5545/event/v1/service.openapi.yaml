@@ -1,0 +1,1596 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: Apache-2.0
+
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Events API
+    description: |-
+        Events manages RFC 5545 events as resources.
+
+         Named Events, not Calendar: the calendar a event belongs to is its own
+         resource, managed by protobuf.rfc5545.calendar.v1.Calendars. A service
+         named after the parent while managing the child is how a reader ends up
+         looking for CreateCalendar here.
+
+         AIP-131..135 plus one custom method. ExpandEvent earns its place where
+         Export did not: expansion is specific to recurring events and cannot be
+         generalised across resource types, whereas serialising to a file can --
+         that lives in protobuf.shared.interchange.v1.Interchange.
+    version: 0.0.1
+paths:
+    /v1/calendars/{calendar}/events:
+        get:
+            tags:
+                - Events
+            description: |-
+                Lists events.
+
+                   GET /v1/{parent=calendars/*}/events
+
+                 Paginated per AIP-158: pass `page_size` (defaults to 50, capped at 1000)
+                 and the `next_page_token` from the previous response. An empty
+                 `next_page_token` means the last page. Page tokens are opaque and may
+                 expire; do not construct or store them.
+
+                 Filtering uses the AIP-160 expression language over the resource's own
+                 fields. Results carry no guaranteed order.
+
+                 Returns stored events, one per recurrence rule -- listing does not
+                 expand recurrences. An unbounded rule has infinitely many instances, so
+                 expansion needs a window and lives in ExpandEvent.
+
+                   INVALID_ARGUMENT   malformed filter, or page_size out of range
+                   PERMISSION_DENIED  caller may not list this collection
+            operationId: Events_ListEvents
+            parameters:
+                - name: calendar
+                  in: path
+                  description: The calendar id.
+                  required: true
+                  schema:
+                    type: string
+                - name: pageSize
+                  in: query
+                  description: Maximum events to return. Defaults to 50, capped at 1000.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  description: Page token from a previous ListEventsResponse.next_page_token.
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  description: Filter expression, AIP-160 <https://aip.dev/160>.
+                  schema:
+                    type: string
+                - name: showDeleted
+                  in: query
+                  description: Include soft-deleted events in the result. AIP-164 <https://aip.dev/164>.
+                  schema:
+                    type: boolean
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListEventsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - Events
+            description: |-
+                Creates a event.
+
+                   POST /v1/{parent=calendars/*}/events
+                   body: the event itself
+
+                 Server-assigned fields on the request body are ignored: `name`, `uid`,
+                 `etag` and the timestamps are set by the server regardless of what is
+                 sent. Supply `event_id` to choose the final path segment; leave it empty
+                 and the server generates one.
+
+                 Not idempotent. Retrying after a timeout may create a second event;
+                 supply `event_id` if the caller needs retry safety.
+
+                   ALREADY_EXISTS     that event_id is taken
+                   INVALID_ARGUMENT   a field violates its buf.validate constraint
+                   PERMISSION_DENIED  caller may not create here
+            operationId: Events_CreateEvent
+            parameters:
+                - name: calendar
+                  in: path
+                  description: The calendar id.
+                  required: true
+                  schema:
+                    type: string
+                - name: eventId
+                  in: query
+                  description: |-
+                    Client-assigned id, becoming the last segment of the resource name. The
+                     server generates one when empty.
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Event'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Event'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/calendars/{calendar}/events/{event}:
+        get:
+            tags:
+                - Events
+            description: |-
+                Retrieves one event.
+
+                   GET /v1/{name=calendars/*/events/*}
+
+                 Safe and idempotent. Returns the resource as stored; no field is computed
+                 per-caller. Read the `etag` here and pass it back on update or delete to
+                 make the write conditional.
+
+                   NOT_FOUND          no such event, or it is soft-deleted and `show_deleted` was not set
+                   INVALID_ARGUMENT   name does not match calendars/*/events/*
+                   PERMISSION_DENIED  caller may not read it
+            operationId: Events_GetEvent
+            parameters:
+                - name: calendar
+                  in: path
+                  description: The calendar id.
+                  required: true
+                  schema:
+                    type: string
+                - name: event
+                  in: path
+                  description: The event id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Event'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - Events
+            description: |-
+                Deletes a event.
+
+                   DELETE /v1/{name=calendars/*/events/*}
+
+                 Soft delete: the event is marked deleted, disappears from List unless
+                 `show_deleted` is set, and is purged at `expire_time`. Recover it with
+                 Undelete before then.
+
+                 Idempotent in effect but not in reporting: a second delete returns
+                 NOT_FOUND rather than succeeding silently.
+
+                   NOT_FOUND          no such event
+                   ABORTED            etag does not match
+                   PERMISSION_DENIED  caller may not delete it
+            operationId: Events_DeleteEvent
+            parameters:
+                - name: calendar
+                  in: path
+                  description: The calendar id.
+                  required: true
+                  schema:
+                    type: string
+                - name: event
+                  in: path
+                  description: The event id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        patch:
+            tags:
+                - Events
+            description: |-
+                Updates a event.
+
+                   PATCH /v1/{event.name=calendars/*/events/*}
+                   body: the event itself
+
+                 A partial update: only fields named in `update_mask` are written. An
+                 empty mask writes every mutable field, which will clear anything the
+                 caller left unset -- pass a mask unless that is the intent. OUTPUT_ONLY
+                 and IMMUTABLE fields are rejected rather than silently dropped.
+
+                 Idempotent. Pass the `etag` read from Get to make the write conditional.
+
+                   NOT_FOUND          no such event
+                   ABORTED            etag does not match the stored resource
+                   INVALID_ARGUMENT   mask names an unknown or immutable field
+                   PERMISSION_DENIED  caller may not modify it
+            operationId: Events_UpdateEvent
+            parameters:
+                - name: calendar
+                  in: path
+                  description: The calendar id.
+                  required: true
+                  schema:
+                    type: string
+                - name: event
+                  in: path
+                  description: The event id.
+                  required: true
+                  schema:
+                    type: string
+                - name: updateMask
+                  in: query
+                  description: Fields to update. An empty mask updates all mutable fields.
+                  schema:
+                    type: string
+                    format: field-mask
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Event'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Event'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/calendars/{calendar}/events/{event}:expand:
+        post:
+            tags:
+                - Events
+            description: |-
+                Materialises the occurrences of a recurring event within a time window.
+
+                   POST /v1/{name=calendars/*/events/*}:expand
+                   body: the whole request message
+
+                 A custom method (AIP-136) because expansion cannot be generalised across
+                 resource types the way export can -- only a recurrence rule expands.
+
+                 The window is a google.type.Interval and is required at both ends,
+                 deliberately. A rule bounded by neither UNTIL nor COUNT generates
+                 infinitely many instances, so there is no safe default and a missing
+                 bound is a caller bug worth reporting rather than one the server guesses
+                 around. The interval is half-open: instances at `start_time` are
+                 included, instances at `end_time` are not.
+
+                 Returns materialised instances with EXDATE exclusions removed and RDATE
+                 additions folded in. None is a stored resource, so none carries a
+                 resource name and none can be passed to Get, Update or Delete -- edit the
+                 series through its stored event instead.
+
+                 Paginated like List, with its own `page_size` default of 250.
+
+                   NOT_FOUND          no such event
+                   INVALID_ARGUMENT   window.end_time is not after window.start_time
+                   FAILED_PRECONDITION  the event has no recurrence rule
+                   PERMISSION_DENIED  caller may not read it
+            operationId: Events_ExpandEvent
+            parameters:
+                - name: calendar
+                  in: path
+                  description: The calendar id.
+                  required: true
+                  schema:
+                    type: string
+                - name: event
+                  in: path
+                  description: The event id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ExpandEventRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ExpandEventResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/calendars/{calendar}/events/{event}:undelete:
+        post:
+            tags:
+                - Events
+            description: |-
+                Restores a soft-deleted event.
+
+                   POST /v1/{name=calendars/*/events/*}:undelete
+
+                 Valid only before `expire_time`; after that the event is gone and this
+                 returns NOT_FOUND. Clears `delete_time` and `expire_time` and returns the
+                 event as it was.
+
+                   NOT_FOUND          no such event, or already purged
+                   ALREADY_EXISTS     the event is not deleted
+                   PERMISSION_DENIED  caller may not restore it
+            operationId: Events_UndeleteEvent
+            parameters:
+                - name: calendar
+                  in: path
+                  description: The calendar id.
+                  required: true
+                  schema:
+                    type: string
+                - name: event
+                  in: path
+                  description: The event id.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UndeleteEventRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Event'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/calendars/{calendar}/events:batchGet:
+        get:
+            tags:
+                - Events
+            description: |-
+                Retrieves several events by name in one call.
+
+                   GET /v1/{parent=calendars/*}/events:batchGet
+
+                 CALDAV:calendar-multiget, RFC 4791 section 7.9 <https://www.rfc-editor.org/rfc/rfc4791.html#section-7.9>: a client that has
+                 synchronised a collection holds hrefs and wants the bodies, which is one
+                 round trip here instead of one GET per event.
+
+                 Safe and idempotent. Events come back in the order requested, per
+                 AIP-231 <https://aip.dev/231>. All-or-nothing: an unreadable or missing name fails the whole
+                 call rather than returning a short list, so a caller never has to work out
+                 which name a gap belonged to.
+
+                   NOT_FOUND          any requested event does not exist
+                   INVALID_ARGUMENT   a name is malformed, sits under a different parent, or the list is empty or over 1000
+                   PERMISSION_DENIED  caller may not read any one of them
+            operationId: Events_BatchGetEvents
+            parameters:
+                - name: calendar
+                  in: path
+                  description: The calendar id.
+                  required: true
+                  schema:
+                    type: string
+                - name: names
+                  in: query
+                  description: |-
+                    Names of the events to retrieve, each
+                     "calendars/{calendar}/events/{event}". Capped at 1000, matching the page
+                     ceiling on ListEvents.
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/BatchGetEventsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        Alarm:
+            required:
+                - action
+            type: object
+            properties:
+                action:
+                    type: integer
+                    description: ACTION, section 3.8.6.1 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.6.1>. Decides which other fields are required.
+                    format: enum
+                triggerOffset:
+                    pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
+                    type: string
+                    description: |-
+                        A duration relative to `trigger_relation`. Negative fires before --
+                         "-PT15M" is the familiar fifteen-minute warning.
+                triggerTime:
+                    type: string
+                    description: |-
+                        An absolute instant, independent of the component's own times.
+
+                         A Timestamp, not the CalendarTime the other calendar fields use, and
+                         deliberately so: section 3.8.6.3 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.6.3> requires an absolute TRIGGER to be a
+                         UTC-formatted DATE-TIME. Floating and zone-referenced forms are invalid
+                         here, so the narrower type is the accurate one.
+                    format: date-time
+                triggerRelation:
+                    type: integer
+                    description: |-
+                        RELATED, section 3.2.14 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.14>. Whether trigger_offset counts from the
+                         component's start or its end. Meaningless when trigger_time is set.
+                    format: enum
+                repeatInterval:
+                    pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
+                    type: string
+                    description: |-
+                        DURATION, section 3.8.2.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.2.5>. Gap between repeats. Required if
+                         repeat_count is set.
+                repeatCount:
+                    type: integer
+                    description: |-
+                        REPEAT, section 3.8.6.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.6.2>. How many additional times the alarm
+                         fires after the first.
+                    format: int32
+                description:
+                    type: string
+                    description: |-
+                        DESCRIPTION, section 3.8.1.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.5>. The text shown, or the body of the
+                         email. Required for DISPLAY and EMAIL.
+                summary:
+                    type: string
+                    description: SUMMARY, section 3.8.1.12 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.12>. The email subject. Required for EMAIL.
+                attendees:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Attendee'
+                    description: |-
+                        ATTENDEE, section 3.8.4.1 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.1>. Who the email goes to. Required for
+                         EMAIL, meaningless otherwise.
+                icalUid:
+                    type: string
+                    description: |-
+                        UID, RFC 9074 section 4 <https://www.rfc-editor.org/rfc/rfc9074.html#section-4>. Cardinality *1.
+
+                         RFC 5545 gave VALARM no identity, which is why an alarm could not be
+                         acknowledged or snoozed across devices: there was nothing to name. Same
+                         two-identifier split as Event.ical_uid -- this is whatever the
+                         originating system chose and must survive a round trip unchanged.
+                acknowledgedTime:
+                    type: string
+                    description: |-
+                        ACKNOWLEDGED, RFC 9074 section 6.1 <https://www.rfc-editor.org/rfc/rfc9074.html#section-6.1>. Cardinality *1. When this alarm
+                         was last dismissed, in UTC.
+
+                         A Timestamp and not CalendarTime, deliberately: section 6.1 fixes the
+                         value as a UTC DATE-TIME, so none of the floating or zoned forms that
+                         forced CalendarTime elsewhere can occur here.
+                    format: date-time
+                proximity:
+                    type: integer
+                    description: |-
+                        PROXIMITY, RFC 9074 section 8.1 <https://www.rfc-editor.org/rfc/rfc9074.html#section-8.1>. Cardinality *1. Fires the alarm on
+                         a location change rather than at a time.
+
+                         Section 8.1 pairs this with a VLOCATION component (RFC 9073) naming the
+                         place. VLOCATION is not modelled yet, so a proximity alarm currently
+                         carries the trigger kind without the place it refers to.
+                    format: enum
+                snoozedAlarmUid:
+                    type: string
+                    description: |-
+                        RELATED-TO with RELTYPE=SNOOZE, RFC 9074 sections 5 <https://www.rfc-editor.org/rfc/rfc9074.html#section-5> and 7.1 <https://www.rfc-editor.org/rfc/rfc9074.html#section-7.1>. The
+                         ical_uid of the alarm this one is a snooze of.
+
+                         Modelled as a single reference rather than a general RELATED-TO list:
+                         section 7.1 registers SNOOZE as a relationship from exactly one snoozing
+                         alarm to exactly one original. A general relationship list arrives with
+                         RFC 9253 and belongs on the component, not here.
+            description: |-
+                Alarm is the VALARM component, RFC 5545 section 3.6.6 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.6>, as extended by
+                 RFC 9074 <https://www.rfc-editor.org/rfc/rfc9074.html>.
+
+                 A sub-component of VEVENT and VTODO, not a component of its own. It is a
+                 value object here for the same reason: an alarm has no identity, is never
+                 addressed, and disappears with the event that owns it. It gets no resource,
+                 no service and no messages file.
+
+                 Which properties are required depends on `action`, which section 3.6.6 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.6>
+                 specifies as three different property sets rather than one with optional
+                 members. That is expressed here as documented constraints rather than a
+                 oneof, because the shared properties -- trigger, repeat -- apply to all
+                 three and a oneof would force them to be repeated per branch.
+
+                 Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specification (iCalendar)", section 3.6.6.
+                 https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.6
+        Attendee:
+            required:
+                - address
+            type: object
+            properties:
+                address:
+                    type: string
+                    description: The CAL-ADDRESS itself, e.g. "mailto:jane@example.com".
+                displayName:
+                    type: string
+                    description: CN, section 3.2.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.2>. The name to show instead of the address.
+                role:
+                    type: integer
+                    description: ROLE, section 3.2.16 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.16>.
+                    format: enum
+                participation:
+                    type: integer
+                    description: PARTSTAT, section 3.2.12 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.12>. Whether they have replied, and how.
+                    format: enum
+                userType:
+                    type: integer
+                    description: CUTYPE, section 3.2.3 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.3>. A room and a person are both attendees.
+                    format: enum
+                rsvp:
+                    type: boolean
+                    description: |-
+                        RSVP, section 3.2.17 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.17>. Whether a reply is expected. This asks for
+                         one; it does not record whether one arrived -- that is participation.
+                delegatees:
+                    type: array
+                    items:
+                        type: string
+                    description: DELEGATED-TO ("Delegatees"), section 3.2.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.5>. Addresses this attendee delegated to.
+                delegators:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        DELEGATED-FROM ("Delegators"), section 3.2.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.4>. Addresses that delegated to this
+                         attendee.
+            description: |-
+                Attendee is the ATTENDEE property, RFC 5545 section 3.8.4.1 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.1>.
+
+                 The property value is a CAL-ADDRESS -- in practice a mailto: URI -- and
+                 everything that makes an attendee useful is carried in its parameters
+                 rather than its value. Those parameters are the fields below.
+
+                 Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specification (iCalendar)", section 3.8.4.1.
+                 https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.1
+        BatchGetEventsResponse:
+            type: object
+            properties:
+                events:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Event'
+                    description: |-
+                        The events, in the order their names were requested. AIP-231 <https://aip.dev/231> requires
+                         the ordering so a caller can zip the two lists without matching on name.
+            description: Response message for Events.BatchGetEvents, AIP-231 <https://aip.dev/231>.
+        CalendarTime:
+            type: object
+            properties:
+                date:
+                    type: string
+                    description: 'DATE, section 3.3.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.4>. An all-day value: no time, no zone.'
+                    format: date
+                dateTime:
+                    type: string
+                    description: DATE-TIME, section 3.3.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.5>.
+                    format: date-time
+            description: |-
+                Confirmation is the STATUS property for a VEVENT, RFC 5545 section
+                 3.8.1.11.
+
+                 Not named Status or State. AIP-216 <https://aip.dev/216> reserves both for server-owned lifecycle
+                 enums and requires such a field to be OUTPUT_ONLY, but an organiser sets
+                 this one -- moving an event from tentative to confirmed is the whole point.
+                 The name describes what the property records; the values are the RFC's.
+
+                 ExtensionProperty carries an iCalendar property this schema does not model.
+
+                 Not a hole punched in a typed schema: RFC 5545 section 3.8.8.1 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.8.1> reserves
+                 IANA-registered properties and section 3.8.8.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.8.2> non-standard X- properties,
+                 and requires that applications ignore what they do not recognise rather than
+                 reject it. A calendar that round-trips without them is lossy by
+                 construction.
+
+                 It is also what keeps the modelled properties honest. Anything the schema
+                 has not earned a typed field for survives here instead of forcing a
+                 speculative field table, and a property graduates out of this message when a
+                 consumer needs to query it.
+
+                 CalendarTime is an iCalendar DATE or DATE-TIME value, RFC 5545
+                 sections 3.3.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.4> and 3.3.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.5>.
+
+                 google.protobuf.Timestamp cannot express what iCalendar needs. Section
+                 3.3.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.5> gives DATE-TIME three forms and a Timestamp holds only one:
+
+                   form #1, floating    local time, no zone -- "09:00 wherever you are"
+                   form #2, UTC         an absolute instant
+                   form #3, with TZID   local time plus a zone reference
+
+                 The difference is not academic. A recurring 09:00 standup is floating time:
+                 it stays at 09:00 across a DST boundary, where an absolute instant shifts
+                 by an hour. Section 3.3.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.4> adds a fourth case, the all-day DATE, which a
+                 Timestamp can only approximate by picking a midnight in some zone.
+
+                 google.type.DateTime carries all three date-time forms: omit its
+                 time_offset for floating, set utc_offset for absolute, set time_zone for a
+                 zone reference. It is a google.* type, so AIP-215 <https://aip.dev/215> permits referencing
+                 it across packages -- which is the only reason this value object can be
+                 built from shared parts rather than hand-rolled.
+
+                 Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specification (iCalendar)", section 3.3.5.
+                 https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.5
+        Event:
+            required:
+                - start
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Resource name, "calendars/{calendar}/events/{event}".
+                uid:
+                    readOnly: true
+                    type: string
+                    description: Server-assigned unique id.
+                icalUid:
+                    type: string
+                    description: |-
+                        UID, section 3.8.4.7 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.7>. The interchange identity, distinct from uid above.
+
+                         Two identifiers because they answer different questions. uid is ours and
+                         is a UUID4 because AIP-148 <https://aip.dev/148> says so. This one arrives inside an imported
+                         .ics file, is whatever the originating system chose, and must survive a
+                         round trip unchanged or every re-import duplicates the calendar.
+                summary:
+                    type: string
+                    description: SUMMARY, section 3.8.1.12 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.12>. The short title.
+                description:
+                    type: string
+                    description: DESCRIPTION, section 3.8.1.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.5>.
+                location:
+                    type: string
+                    description: LOCATION, section 3.8.1.7 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.7>.
+                start:
+                    allOf:
+                        - $ref: '#/components/schemas/CalendarTime'
+                    description: |-
+                        DTSTART, section 3.8.2.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.2.4>. For a recurring event this is the
+                         first instance, and the recurrence rule is evaluated relative to it.
+                end:
+                    allOf:
+                        - $ref: '#/components/schemas/CalendarTime'
+                    description: |-
+                        DTEND, section 3.8.2.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.2.2>. Exclusive: an event ending at 10:00 does not
+                         occupy 10:00.
+                duration:
+                    pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
+                    type: string
+                    description: DURATION, section 3.8.2.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.2.5>.
+                confirmation:
+                    type: integer
+                    description: STATUS, section 3.8.1.11 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.11>.
+                    format: enum
+                classification:
+                    type: integer
+                    description: CLASS, section 3.8.1.3 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.3>.
+                    format: enum
+                transparency:
+                    type: integer
+                    description: TRANSP, section 3.8.2.7 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.2.7>.
+                    format: enum
+                recurrence:
+                    allOf:
+                        - $ref: '#/components/schemas/Recurrence'
+                    description: RRULE, section 3.8.5.3 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.5.3>. Absent means the event happens once.
+                excludedTimes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/CalendarTime'
+                    description: |-
+                        EXDATE, section 3.8.5.1 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.5.1>. Instances the rule would generate but that do
+                         not occur -- a cancelled week in an otherwise weekly series.
+                additionalTimes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/CalendarTime'
+                    description: RDATE, section 3.8.5.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.5.2>. Extra instances outside the rule.
+                originalStart:
+                    allOf:
+                        - $ref: '#/components/schemas/CalendarTime'
+                    description: |-
+                        RECURRENCE-ID, section 3.8.4.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.4>. Set on an override: an event sharing
+                         its series' ical_uid that replaces the one instance whose start, as the
+                         series generated it, was this -- moved, retimed, or cancelled with
+                         confirmation CANCELLED. Absent on the series itself and on an event that
+                         happens once. RANGE=THISANDFUTURE is not modelled; a client splits the
+                         series instead.
+                sequence:
+                    type: integer
+                    description: |-
+                        SEQUENCE, section 3.8.7.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.7.4>. Incremented by the organiser on each
+                         significant revision, so an attendee can tell a stale invitation from a
+                         current one.
+                    format: int32
+                createTime:
+                    readOnly: true
+                    type: string
+                    description: When the event was created.
+                    format: date-time
+                updateTime:
+                    readOnly: true
+                    type: string
+                    description: When the event was last modified.
+                    format: date-time
+                organizer:
+                    allOf:
+                        - $ref: '#/components/schemas/Organizer'
+                    description: |-
+                        ORGANIZER, section 3.8.4.3 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.3>. Who owns the event and receives
+                         iTIP replies about it.
+                attendees:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Attendee'
+                    description: ATTENDEE, section 3.8.4.1 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.1>. Who is invited, and how each replied.
+                alarms:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Alarm'
+                    description: |-
+                        VALARM sub-components, section 3.6.6 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.6>. Reminders attached to this
+                         event. Not resources: an alarm has no identity and dies with its event.
+                etag:
+                    readOnly: true
+                    type: string
+                    description: |-
+                        Weak validator for optimistic concurrency, AIP-154 <https://aip.dev/154>. Pass it back in an
+                         update or delete to make the write conditional: if the resource changed
+                         since it was read, the request fails instead of overwriting.
+                deleteTime:
+                    readOnly: true
+                    type: string
+                    description: When the event was soft-deleted, unset while it is live. AIP-164 <https://aip.dev/164>.
+                    format: date-time
+                expireTime:
+                    readOnly: true
+                    type: string
+                    description: When a soft-deleted event is purged for good. AIP-164 <https://aip.dev/164>.
+                    format: date-time
+                extensions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ExtensionProperty'
+                    description: |-
+                        Properties this schema does not model, section 3.8.8.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.8.2>.
+                         Preserved verbatim so an imported .ics survives a round trip.
+                position:
+                    allOf:
+                        - $ref: '#/components/schemas/LatLng'
+                    description: |-
+                        GEO, section 3.8.1.6 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.6>. Where the event happens, as latitude and
+                         longitude.
+
+                         google.type.LatLng, because section 3.8.1.6 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.6> is a semicolon-separated
+                         float pair and that is exactly what LatLng holds. Note this does not
+                         generalise to vCard: RFC 6350 section 6.5.2 types GEO as a single URI --
+                         usually a geo: URI per RFC 5870, but explicitly not necessarily -- so
+                         typing that one as coordinates would reject conforming values.
+                concepts:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        CONCEPT, RFC 9253 section 8.1 <https://www.rfc-editor.org/rfc/rfc9253.html#section-8.1>. Formal categories, each a URI.
+
+                         Distinct from CATEGORIES (section 3.8.1.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.2>), which is free-text
+                         tagging: a CONCEPT names a term in a controlled vocabulary that both
+                         ends agree on, which is what makes it worth resolving.
+                links:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Link'
+                    description: |-
+                        LINK, RFC 9253 section 8.2 <https://www.rfc-editor.org/rfc/rfc9253.html#section-8.2>. Typed references to related
+                         information.
+                refids:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        REFID, RFC 9253 section 8.3 <https://www.rfc-editor.org/rfc/rfc9253.html#section-8.3>. An arbitrary key grouping entities
+                         that belong together across components, so they can be retrieved as a
+                         set. Free text, and not a UID: section 8.3 puts no uniqueness
+                         requirement on it, which is the point -- many components share one.
+                participants:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Participant'
+                    description: |-
+                        PARTICIPANT, RFC 9073 section 7.1 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.1>. Who the event involves, as
+                         distinct from `attendees`, who are invited and reply. See Participant
+                         for why the two are separate rather than one list.
+                structuredLocations:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Location'
+                    description: |-
+                        VLOCATION, RFC 9073 section 7.2 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.2>. Structured places, as distinct
+                         from `location` above, which is section 3.8.1.7 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.7>'s single free-text
+                         line. An event may have several -- venue, car park, station.
+
+                         This is also what RFC 9074's Alarm.proximity refers to: a proximity
+                         alarm names the place it triggers near, and until now there was no
+                         place for it to name.
+                resources:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Resource'
+                    description: |-
+                        VRESOURCE, RFC 9073 section 7.3 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.3>. What the event needs that is
+                         neither a person nor a place.
+                styledDescriptions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/StyledDescription'
+                    description: |-
+                        STYLED-DESCRIPTION, RFC 9073 section 6.5 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.5>. Rich text supplementing
+                         `description`, which section 6.5 requires to stay populated so a client
+                         that cannot render markup still has something to show.
+                structuredData:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/StructuredData'
+                    description: |-
+                        STRUCTURED-DATA, RFC 9073 section 6.6 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.6>. Machine-readable data about
+                         the event for a consumer that understands the named schema.
+            description: |-
+                Event is the VEVENT component, RFC 5545 section 3.6.1 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.1>.
+
+                 Unlike User, which wraps an RFC-shaped value object, the calendar
+                 properties sit directly on the resource. VEVENT has no separable property
+                 bag: DTSTART, RRULE and STATUS are what an event *is*, not a payload it
+                 carries. Recurrence is the only part with enough structure to be its own
+                 type.
+
+                 Scope is the properties a scheduler needs. Section 3.6.1 permits about
+                 thirty more -- ATTENDEE, ORGANIZER, ATTACH, CATEGORIES, VALARM
+                 sub-components -- added when a consumer needs them.
+
+                 Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specification (iCalendar)", section 3.6.1.
+                 https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.1
+        ExpandEventRequest:
+            required:
+                - name
+                - window
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: The recurring event to expand.
+                window:
+                    allOf:
+                        - $ref: '#/components/schemas/Interval'
+                    description: |-
+                        The time window to expand over: instances starting at or after
+                         `start_time` and strictly before `end_time`.
+
+                         google.type.Interval rather than two loose timestamps. It documents the
+                         half-open convention upstream instead of in a comment here, and it makes
+                         "both bounds or neither" a property of the type rather than a CEL rule
+                         that has to be written and can silently be wrong.
+
+                         Required, and both bounds with it. An unbounded rule has infinitely many
+                         instances, so there is no sensible default and a missing bound is a
+                         caller bug worth reporting rather than one the server guesses around.
+                pageSize:
+                    type: integer
+                    description: Maximum instances to return. Defaults to 250, capped at 2500.
+                    format: int32
+                pageToken:
+                    type: string
+                    description: Page token from a previous ExpandEventResponse.next_page_token.
+            description: Request message for Events.ExpandEvent, AIP-136 <https://aip.dev/136>.
+        ExpandEventResponse:
+            type: object
+            properties:
+                events:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Event'
+                    description: |-
+                        The materialised occurrences, with EXDATE exclusions removed and RDATE
+                         additions folded in. Each carries the start and end of one instance;
+                         none is a stored resource, so none has a resource name.
+                nextPageToken:
+                    type: string
+                    description: Token for the next page, empty when this is the last page.
+            description: Response message for Events.ExpandEvent.
+        ExtensionProperty:
+            required:
+                - key
+            type: object
+            properties:
+                key:
+                    type: string
+                    description: |-
+                        The property name: an IANA-registered token or an X- name, e.g.
+                         "X-WR-CALNAME". Not called `name`, which would make api-linter treat this
+                         message as a resource.
+                values:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        The property's values, one entry per comma-separated component. The
+                         schema cannot know the structure of a property it does not model, so
+                         these stay unparsed.
+                parameters:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: 'Property parameters, section 3.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2>, e.g. {"TZID": "Europe/London"}.'
+            description: |-
+                Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specification (iCalendar)", section 3.8.8.2.
+                 https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.8.2
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        Interval:
+            type: object
+            properties:
+                startTime:
+                    type: string
+                    description: |-
+                        Optional. Inclusive start of the interval.
+
+                         If specified, a Timestamp matching this interval will have to be the same
+                         or after the start.
+                    format: date-time
+                endTime:
+                    type: string
+                    description: |-
+                        Optional. Exclusive end of the interval.
+
+                         If specified, a Timestamp matching this interval will have to be before the
+                         end.
+                    format: date-time
+            description: |-
+                Represents a time interval, encoded as a Timestamp start (inclusive) and a
+                 Timestamp end (exclusive).
+
+                 The start must be less than or equal to the end.
+                 When the start equals the end, the interval is empty (matches no time).
+                 When both start and end are unspecified, the interval matches any time.
+        LatLng:
+            type: object
+            properties:
+                latitude:
+                    type: number
+                    description: The latitude in degrees. It must be in the range [-90.0, +90.0].
+                    format: double
+                longitude:
+                    type: number
+                    description: The longitude in degrees. It must be in the range [-180.0, +180.0].
+                    format: double
+            description: |-
+                An object that represents a latitude/longitude pair. This is expressed as a
+                 pair of doubles to represent degrees latitude and degrees longitude. Unless
+                 specified otherwise, this object must conform to the
+                 <a href="https://en.wikipedia.org/wiki/World_Geodetic_System#1984_version">
+                 WGS84 standard</a>. Values must be within normalized ranges.
+        Link:
+            required:
+                - relation
+            type: object
+            properties:
+                uri:
+                    type: string
+                    description: 'VALUE=URI. The default form: a reference to an external resource.'
+                icalUid:
+                    type: string
+                    description: |-
+                        VALUE=UID, RFC 9253 section 7.1 <https://www.rfc-editor.org/rfc/rfc9253.html#section-7.1>. The UID of another component in
+                         the same collection, rather than a resolvable address.
+
+                         Named ical_uid, not uid: AIP-148 <https://aip.dev/148> reserves `uid` for a server-assigned
+                         UUID4, and this is whatever the originating calendar chose. Same split
+                         as Event.ical_uid and Alarm.ical_uid.
+                xmlReference:
+                    type: string
+                    description: |-
+                        VALUE=XML-REFERENCE, RFC 9253 section 7.2 <https://www.rfc-editor.org/rfc/rfc9253.html#section-7.2>. A URI with an XPointer
+                         anchor naming a fragment of an XML document.
+                relation:
+                    type: string
+                    description: |-
+                        LINKREL parameter, RFC 9253 section 6.1 <https://www.rfc-editor.org/rfc/rfc9253.html#section-6.1>. What the referenced data is
+                         to this component.
+
+                         Section 6.1 requires it on every LINK, and takes either a relation
+                         registered by RFC 8288 <https://www.rfc-editor.org/rfc/rfc8288.html> --
+                         "about", "describedby", "alternate" -- or an extension relation given as
+                         a URI. Free text for that reason: the IANA link-relation registry grows
+                         without an RFC, so an enum would reject values section 6.1 accepts.
+                formatType:
+                    type: string
+                    description: |-
+                        FMTTYPE parameter, RFC 5545 section 3.2.8 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.8>. The media type of the
+                         referenced data, as an RFC 6838 <https://www.rfc-editor.org/rfc/rfc6838.html> type/subtype.
+                label:
+                    type: string
+                    description: |-
+                        LABEL parameter, RFC 7986 section 6.1 <https://www.rfc-editor.org/rfc/rfc7986.html#section-6.1>. Human-readable text for the
+                         link, for display in place of the raw reference.
+                languageCode:
+                    type: string
+                    description: |-
+                        LANGUAGE parameter, RFC 5545 section 3.2.10 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.10>. The language of
+                         `label`, as a BCP 47 tag, RFC 5646 <https://www.rfc-editor.org/rfc/rfc5646.html>.
+            description: |-
+                Link is the LINK property, RFC 9253 section 8.2 <https://www.rfc-editor.org/rfc/rfc9253.html#section-8.2>.
+
+                 A reference to information related to the component. Section 8.2 gives it
+                 three value types -- URI, UID and XML-REFERENCE -- and requires VALUE to
+                 say which, so the oneof carries the same distinction rather than guessing
+                 from the string's shape.
+
+                 This is deliberately not the same thing as ATTACH (RFC 5545 section 3.8.1.1
+                 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.1>). ATTACH
+                 carries a document belonging to the event; LINK states a typed relationship
+                 to something else, which is what `relation` names.
+
+                 Reference: RFC 9253 "Support for iCalendar Relationships", section 8.2.
+                 https://www.rfc-editor.org/rfc/rfc9253.html#section-8.2
+        ListEventsResponse:
+            type: object
+            properties:
+                events:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Event'
+                    description: The events on this page.
+                nextPageToken:
+                    type: string
+                    description: Token for the next page, empty when this is the last page.
+            description: Response message for Events.ListEvents, AIP-132 <https://aip.dev/132>.
+        Location:
+            type: object
+            properties:
+                icalUid:
+                    type: string
+                    description: |-
+                        UID, RFC 5545 section 3.8.4.7 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.7>. Required by RFC 9073 section 7.2 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.2>.
+
+                         Interchange identity, not ours -- rule 9's `<format>_uid` split, the same
+                         as Event.ical_uid and Alarm.ical_uid.
+                displayName:
+                    type: string
+                    description: |-
+                        NAME, RFC 7986 section 5.2 <https://www.rfc-editor.org/rfc/rfc7986.html#section-5.2>. What to call this place.
+
+                         Named display_name, not name: AIP-122 <https://aip.dev/122> reserves `name` for a resource
+                         identifier, and api-linter treats a message carrying one as a resource.
+                description:
+                    type: string
+                    description: DESCRIPTION, RFC 5545 section 3.8.1.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.5>.
+                locationTypes:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        LOCATION-TYPE, RFC 9073 section 6.1 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.1>. What kind of place this is,
+                         e.g. "venue", "parking", "restaurant".
+
+                         Free text rather than an enum: section 6.1 defers the value set to the
+                         IANA Location Types registry, which grows without an RFC, so an enum here
+                         would reject values the RFC accepts.
+                position:
+                    allOf:
+                        - $ref: '#/components/schemas/LatLng'
+                    description: |-
+                        GEO, RFC 5545 section 3.8.1.6 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.6>. Coordinates for this place, as
+                         a latitude/longitude pair.
+                structuredData:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/StructuredData'
+                    description: |-
+                        STRUCTURED-DATA, RFC 9073 section 6.6 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.6>. Machine-readable detail
+                         about the place, e.g. a schema.org Place object.
+            description: |-
+                Location is the VLOCATION component, RFC 9073 section 7.2 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.2>.
+
+                 Structured location information, as opposed to Event.location, which is RFC
+                 5545 section 3.8.1.7 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.7>'s single free-text line. An event may have
+                 several -- a venue, its car park, the station to arrive at -- and
+                 `location_type` says which is which, so a client can route to the right one
+                 rather than guessing from prose.
+
+                 Reference: RFC 9073 "Event Publishing Extensions to iCalendar", section 7.2.
+                 https://www.rfc-editor.org/rfc/rfc9073.html#section-7.2
+        Organizer:
+            required:
+                - address
+            type: object
+            properties:
+                address:
+                    type: string
+                    description: The CAL-ADDRESS itself.
+                displayName:
+                    type: string
+                    description: CN, section 3.2.2 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.2>.
+                sender:
+                    type: string
+                    description: |-
+                        SENT-BY, section 3.2.18 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.18>. The address that actually sent this on
+                         the organizer's behalf -- an assistant scheduling for an executive.
+            description: |-
+                Organizer is the ORGANIZER property, RFC 5545 section 3.8.4.3 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.3>.
+
+                 Distinct from an Attendee with ROLE=CHAIR: the organizer owns the event and
+                 is who iTIP replies are addressed to, which is a scheduling fact rather than
+                 a statement about who runs the meeting.
+
+                 Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specification (iCalendar)", section 3.8.4.3.
+                 https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.3
+        Participant:
+            required:
+                - participantTypes
+            type: object
+            properties:
+                icalUid:
+                    type: string
+                    description: |-
+                        UID, RFC 5545 section 3.8.4.7 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.7>. Required by RFC 9073 section 7.1 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.1>.
+
+                         Interchange identity, not ours -- rule 9's `<format>_uid` split.
+                participantTypes:
+                    type: array
+                    items:
+                        type: integer
+                        format: enum
+                    description: |-
+                        PARTICIPANT-TYPE, RFC 9073 section 6.2 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.2>. Required by section 7.1 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.1>: a
+                         participant with no stated role says nothing the attendee list did not.
+                calendarAddress:
+                    type: string
+                    description: |-
+                        CALENDAR-ADDRESS, RFC 9073 section 6.4 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.4>, e.g.
+                         "mailto:jane@example.com".
+
+                         Optional, unlike Attendee.address, which is required. That difference is
+                         the point of the component: a speaker listed in a published programme
+                         often has no calendar address, and demanding one would make them
+                         unrepresentable.
+                summary:
+                    type: string
+                    description: |-
+                        SUMMARY, RFC 5545 section 3.8.1.12 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.12>. The participant's name as
+                         shown, e.g. "Dr Jane Rodríguez".
+                description:
+                    type: string
+                    description: DESCRIPTION, RFC 5545 section 3.8.1.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.5>. A biography or note.
+                url:
+                    type: string
+                    description: URL, RFC 5545 section 3.8.4.6 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.6>. A page about this participant.
+                position:
+                    allOf:
+                        - $ref: '#/components/schemas/LatLng'
+                    description: |-
+                        GEO, RFC 5545 section 3.8.1.6 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.6>. Where the participant is, for a
+                         distributed event where that is not the event's own location.
+                structuredData:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/StructuredData'
+                    description: |-
+                        STRUCTURED-DATA, RFC 9073 section 6.6 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.6>. Machine-readable detail,
+                         e.g. a vCard for the participant.
+                styledDescriptions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/StyledDescription'
+                    description: STYLED-DESCRIPTION, RFC 9073 section 6.5 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.5>. A rich-text biography.
+                structuredLocations:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Location'
+                    description: |-
+                        VLOCATION, RFC 9073 section 7.2 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.2>. Section 7.1's grammar is
+                         `partprop *locationc *resourcec`, so a participant carries its own
+                         places -- where a speaker presents from, which need not be where the
+                         event is.
+                resources:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Resource'
+                    description: |-
+                        VRESOURCE, RFC 9073 section 7.3 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.3>. What this participant needs,
+                         e.g. a signer or a microphone.
+            description: |-
+                Participant is the PARTICIPANT component, RFC 9073 section 7.1 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.1>.
+
+                 **Not an Attendee.** RFC 5545 section 3.8.4.1 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.1>'s ATTENDEE is a scheduling
+                 party: someone iTIP sends invitations to and collects replies from, keyed
+                 on a calendar address they must have. A Participant is someone the event
+                 *involves* -- a speaker, a sponsor, a performer, an emergency contact --
+                 who may have no calendar address at all and is never sent a REQUEST.
+
+                 The two overlap without either containing the other, which is why RFC 9073
+                 added a component instead of a parameter on ATTENDEE, and why this is a
+                 separate message rather than a field on Attendee. A person who both speaks
+                 at an event and is invited to it appears as both, and that is correct.
+
+                 Reference: RFC 9073 "Event Publishing Extensions to iCalendar", section 7.1.
+                 https://www.rfc-editor.org/rfc/rfc9073.html#section-7.1
+        Recurrence:
+            required:
+                - frequency
+            type: object
+            properties:
+                frequency:
+                    type: integer
+                    description: FREQ. The only mandatory part of a recurrence rule.
+                    format: enum
+                until:
+                    allOf:
+                        - $ref: '#/components/schemas/CalendarTime'
+                    description: |-
+                        UNTIL. The last instant an instance may start.
+
+                         Section 3.3.10 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.10> requires this to have the same value type as the
+                         component's DTSTART, and a DATE-TIME here MUST be in UTC form -- so set
+                         date when DTSTART is a date, and date_time with utc_offset zero
+                         otherwise.
+                count:
+                    type: integer
+                    description: COUNT. How many instances the rule generates.
+                    format: int32
+                interval:
+                    type: integer
+                    description: INTERVAL. How many frequency units between instances. Defaults to 1.
+                    format: int32
+                secondNumbers:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                    description: BYSECOND, values 0-60. Second 60 is a leap second.
+                minuteNumbers:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                    description: BYMINUTE, values 0-59.
+                hourNumbers:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                    description: BYHOUR, values 0-23.
+                weekdays:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/WeekdayNum'
+                    description: BYDAY.
+                monthDays:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                    description: BYMONTHDAY, values 1-31 or -31 to -1 counting from the month's end.
+                yearDays:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                    description: BYYEARDAY, values 1-366 or -366 to -1 counting from the year's end.
+                weekNumbers:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                    description: |-
+                        BYWEEKNO, values 1-53 or -53 to -1. Only meaningful when frequency is
+                         FREQUENCY_YEARLY.
+                months:
+                    type: array
+                    items:
+                        type: integer
+                        format: enum
+                    description: |-
+                        BYMONTH. Typed rather than an int in 1-12, so the range is enforced by
+                         the type instead of by a constraint that has to be kept in step with it.
+                setPositions:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                    description: |-
+                        BYSETPOS, values 1-366 or -366 to -1. Selects from the set an expanded
+                         rule produces -- "the last weekday of the month" is BYDAY=MO,TU,WE,TH,FR
+                         with BYSETPOS=-1.
+                weekStart:
+                    type: integer
+                    description: |-
+                        WKST. Which day starts the week, affecting how BYWEEKNO and a WEEKLY
+                         INTERVAL are counted. Defaults to Monday per section 3.3.10 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.10>.
+                    format: enum
+                rscale:
+                    type: string
+                    description: |-
+                        RSCALE, RFC 7529 section 4 <https://www.rfc-editor.org/rfc/rfc7529.html#section-4>. The calendar system the rule is
+                         evaluated in, as a CLDR calendar name -- CHINESE, HEBREW, ISLAMIC-CIVIL,
+                         ETHIOPIC. Empty means Gregorian, which is RFC 5545's only option.
+
+                         Free text rather than an enum: section 4 defers the value set to the CLDR
+                         registry, which grows without an RFC, and permits experimental names
+                         besides. An enum here would reject values the RFC accepts.
+                skip:
+                    type: integer
+                    description: |-
+                        SKIP, RFC 7529 section 4 <https://www.rfc-editor.org/rfc/rfc7529.html#section-4>. What to do when an occurrence lands on a
+                         date the calendar system does not have. Section 4 requires this to be
+                         absent unless rscale is set.
+                    format: enum
+                leapMonths:
+                    type: array
+                    items:
+                        type: integer
+                        format: enum
+                    description: |-
+                        The leap-month half of BYMONTH, RFC 7529 section 4 <https://www.rfc-editor.org/rfc/rfc7529.html#section-4>.
+
+                         Section 4 extends BYMONTH so a month number may carry an "L" suffix,
+                         meaning the leap month of that number -- "5L" in a Hebrew or Chinese
+                         year that has one. google.type.Month is a plain 1-12 enum and cannot
+                         express the suffix, so the leap months are listed here instead of being
+                         lost. A month appearing in both fields means the rule matches the
+                         ordinary month and the leap month.
+            description: |-
+                Recurrence is the RECUR value type, RFC 5545 section 3.3.10 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.10>, carried by the
+                 RRULE property of section 3.8.5.3 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.5.3>.
+
+                 Structured rather than the raw "FREQ=MONTHLY;BYDAY=-1FR" string. The string
+                 is what iCalendar puts on the wire, but it is opaque to a database: a
+                 structured rule is what makes "which billing schedules fire on the last
+                 Friday" answerable without parsing every row.
+
+                 Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specification (iCalendar)", section 3.3.10.
+                 https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.10
+        Resource:
+            type: object
+            properties:
+                icalUid:
+                    type: string
+                    description: UID, RFC 5545 section 3.8.4.7 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.4.7>. Required by RFC 9073 section 7.3 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.3>.
+                displayName:
+                    type: string
+                    description: |-
+                        NAME, RFC 7986 section 5.2 <https://www.rfc-editor.org/rfc/rfc7986.html#section-5.2>. See Location.display_name for why this
+                         is not called `name`.
+                description:
+                    type: string
+                    description: DESCRIPTION, RFC 5545 section 3.8.1.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.5>.
+                resourceTypes:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        RESOURCE-TYPE, RFC 9073 section 6.3 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.3>, e.g. "projector", "room",
+                         "remote-conference-audio". Free text, for the same registry reason as
+                         Location.location_types.
+                position:
+                    allOf:
+                        - $ref: '#/components/schemas/LatLng'
+                    description: |-
+                        GEO, RFC 5545 section 3.8.1.6 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.6>. Where the resource is, when
+                         that differs from where the event is.
+                structuredData:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/StructuredData'
+                    description: STRUCTURED-DATA, RFC 9073 section 6.6 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.6>.
+            description: |-
+                Resource is the VRESOURCE component, RFC 9073 section 7.3 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.3>.
+
+                 Something the event needs that is not a person and not a place: a
+                 projector, a minibus, a signer. RFC 5545 section 3.8.1.10 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.10> already had a
+                 free-text RESOURCES property; this is its structured replacement, and that
+                 one is deliberately not modelled rather than carried alongside as a second
+                 way to say the same thing.
+
+                 Reference: RFC 9073 "Event Publishing Extensions to iCalendar", section 7.3.
+                 https://www.rfc-editor.org/rfc/rfc9073.html#section-7.3
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        StructuredData:
+            type: object
+            properties:
+                text:
+                    type: string
+                    description: The data inline, as text.
+                uri:
+                    type: string
+                    description: A URI the data lives at.
+                binary:
+                    type: string
+                    description: |-
+                        The data inline, as bytes. Section 6.6 carries this base64-encoded with
+                         ENCODING=BASE64 on the wire; it is decoded here, because a protobuf
+                         `bytes` field is already binary and re-encoding it would be a second
+                         representation of the same thing.
+                    format: bytes
+                formatType:
+                    type: string
+                    description: |-
+                        FMTTYPE parameter, RFC 5545 section 3.2.8 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.8>. The data's media type,
+                         e.g. "application/ld+json".
+                schema:
+                    type: string
+                    description: |-
+                        SCHEMA parameter, RFC 9073 section 5.2 <https://www.rfc-editor.org/rfc/rfc9073.html#section-5.2>. A URI naming the schema the
+                         data conforms to, e.g. "https://schema.org/Event". Without it the media
+                         type alone rarely says enough to parse the payload.
+            description: |-
+                StructuredData is the STRUCTURED-DATA property, RFC 9073 section 6.6 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.6>.
+
+                 Machine-readable data about the component, for a consumer that understands
+                 the named schema -- a schema.org Event, a vCard, a JSON-LD graph. It is the
+                 escape hatch for publishing detail iCalendar has no property for, and is
+                 deliberately opaque here: this schema does not parse it.
+
+                 Reference: RFC 9073 "Event Publishing Extensions to iCalendar", section 6.6.
+                 https://www.rfc-editor.org/rfc/rfc9073.html#section-6.6
+        StyledDescription:
+            type: object
+            properties:
+                text:
+                    type: string
+                    description: The marked-up text itself.
+                uri:
+                    type: string
+                    description: A URI the styled description lives at.
+                formatType:
+                    type: string
+                    description: |-
+                        FMTTYPE parameter, RFC 5545 section 3.2.8 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.8>. The markup's media
+                         type, RFC 6838 <https://www.rfc-editor.org/rfc/rfc6838.html>, e.g. "text/html". Section 6.5 defaults it to
+                         "text/plain", which would make the property pointless, so a producer of
+                         styled text sets this.
+                derived:
+                    type: boolean
+                    description: |-
+                        DERIVED parameter, RFC 9073 section 5.3 <https://www.rfc-editor.org/rfc/rfc9073.html#section-5.3>. True when this was
+                         generated from the plain DESCRIPTION rather than authored, so a client
+                         knows it carries no information the plain text does not.
+            description: |-
+                StyledDescription is the STYLED-DESCRIPTION property, RFC 9073
+                 section 6.5 <https://www.rfc-editor.org/rfc/rfc9073.html#section-6.5>.
+
+                 A rich-text description, where RFC 5545 section 3.8.1.5 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.5>'s DESCRIPTION is
+                 plain text only. Section 6.5 requires that a component carrying one also
+                 carry a plain DESCRIPTION saying the same thing, so a client that cannot
+                 render HTML is never left with nothing -- which is why this supplements
+                 Event.description rather than replacing it.
+
+                 Reference: RFC 9073 "Event Publishing Extensions to iCalendar", section 6.5.
+                 https://www.rfc-editor.org/rfc/rfc9073.html#section-6.5
+        UndeleteEventRequest:
+            required:
+                - name
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: Name of the soft-deleted event to restore, "calendars/{calendar}/events/{event}".
+            description: Request message for UndeleteEvent, AIP-164 <https://aip.dev/164>.
+        WeekdayNum:
+            required:
+                - day
+            type: object
+            properties:
+                day:
+                    type: integer
+                    description: |-
+                        The day itself.
+
+                         google.type.DayOfWeek rather than an enum of our own. AIP-215 exempts
+                         google.* from the cross-package ban, so this is the one kind of value
+                         type that can be shared between packages instead of copied into each --
+                         which matters the moment RRULE lands on Todo.
+                    format: enum
+                ordinal:
+                    type: integer
+                    description: |-
+                        Which occurrence of that day, e.g. 1 for the first, -1 for the last.
+                         Zero means every occurrence. Only meaningful when the rule's frequency
+                         is monthly or yearly.
+                    format: int32
+            description: |-
+                WeekdayNum is one BYDAY entry, RFC 5545 section 3.3.10 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.10>.
+
+                 Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specification (iCalendar)", section 3.3.10.
+                 https://www.rfc-editor.org/rfc/rfc5545.html#section-3.3.10
+tags:
+    - name: Events

@@ -7,7 +7,6 @@
 openapi: 3.0.0
 info:
   title: FreeBusy API
-  summary: A generalized availability and booking engine.
   description: |-
     freebusy decides what can be booked, when it is free, and who is holding it: RFC 9073 resources with RFC 5545 calendars and RFC 7953 availability, searched, held and reserved without double booking, with webhooks for every change. This document is generated from the Protocol Buffer service definitions and merged into a single specification.
 
@@ -24,21 +23,13 @@ info:
 externalDocs:
   description: FreeBusy API documentation
   url: https://freebusy.shokki.engineering/docs
+# freebusy is self-hosted: the server is your own deployment's REST port
+# (8080 by default). No security scheme yet: there is no authentication
+# until OIDC lands, and a scheme here would tell clients to send a token
+# nothing checks.
 servers:
-  - url: https://freebusy.shokki.engineering
-    description: Production
-  - url: https://staging.freebusy.shokki.engineering
-    description: Staging
   - url: http://localhost:8080
-    description: Local development
-security:
-  - bearerAuth: []
+    description: A local deployment (the release default port)
 tags: []
 paths: {}
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: Bearer token authentication using a JWT access token.
+components: {}

@@ -96,6 +96,7 @@ lint:
     go run honnef.co/go/tools/cmd/staticcheck@2026.2.2 ./...
     buf lint
     go run ./tools/license
+    go run ./tools/errors
 
 # The live suites skip here: they need the variables test-live sets.
 # Unit tests with the race detector.

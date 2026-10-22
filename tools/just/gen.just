@@ -23,10 +23,13 @@ go:
     bazel run //:gazelle
     go run ./tools/license -fix
 
-# Generate the OpenAPI v3 specs and merge them into openapiv3-spec.yaml.
+# Generate the OpenAPI v3 specs -- freebusy's services and the RFC services it
+# serves -- and merge them into openapiv3-spec.yaml.
 [group('codegen')]
 openapi:
+    rm -rf protobuf/generated/openapi/freebusy protobuf/generated/openapi/rfc
     buf generate --template tools/protobuf/buf/openapiv3.buf.gen.yaml
+    buf generate --template tools/protobuf/buf/openapiv3.rfc.buf.gen.yaml
     go run ./tools/protobuf/openapi
     go run ./tools/license -fix
 
