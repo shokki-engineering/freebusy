@@ -13,6 +13,10 @@ go_library(
 go_test(
     name = "layout_test",
     srcs = ["layout_test.go"],
+    data = [
+        "//tools/protobuf/buf:config/cache.yaml",
+        "//tools/protobuf/buf:config/store.backend.yaml",
+    ],
     embed = [":layout"],
     deps = ["@in_gopkg_yaml_v3//:yaml_v3"],
 )

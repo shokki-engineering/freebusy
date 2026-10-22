@@ -1,0 +1,11 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# The plugin configs the layout test compares (//tools/protobuf/layout).
+exports_files(
+    [
+        "config/cache.yaml",
+        "config/store.backend.yaml",
+    ],
+    visibility = ["//tools/protobuf/layout:__pkg__"],
+)

@@ -1,0 +1,130 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# freebusy on Kubernetes. Postgres (and Redis, when the cache is on) are yours:
+# a managed database, or one you run. The chart runs the server, applies the
+# migrations before each pod starts, and -- when hasura.enabled -- the Hasura
+# engine and connector.
+#
+# freebusy has no authentication yet: keep the Service internal (ClusterIP)
+# and reachable only by your own workloads.
+
+replicaCount: 2
+
+image:
+  repository: ghcr.io/shokki-engineering/freebusy
+  # Defaults to the chart's appVersion.
+  tag: ""
+  pullPolicy: IfNotPresent
+
+# Applies migrations/ in an init container before the server starts. atlas
+# takes a database lock, so replicas starting together apply them once.
+migrations:
+  enabled: true
+  image:
+    repository: ghcr.io/shokki-engineering/freebusy-migrations
+    tag: ""
+    pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+database:
+  # gorm (Postgres, the production default) or hasura.
+  provider: gorm
+  postgres:
+    host: ""
+    port: 5432
+    user: freebusy
+    dbname: freebusydb
+    sslmode: require
+  hasura:
+    # The engine's GraphQL endpoint. Empty: the chart's own engine when
+    # hasura.enabled.
+    url: ""
+
+# Secrets. Name an existing Secret (recommended: from your secret store), or
+# let the chart create one from the values below. Keys:
+#   postgres-password             required
+#   webhook-secret-key            seals webhook signing secrets (openssl rand -base64 32)
+#   webhook-previous-secret-keys  after a rotation, the old keys, comma-separated
+#   redis-password                when cache.enabled
+#   connector-token               when hasura.enabled: the engine's bearer token for the connector
+# The migrations' database URL is built from these: keep the Postgres
+# password URL-safe (openssl rand -hex 24).
+secrets:
+  existingSecret: ""
+  postgresPassword: ""
+  webhookSecretKey: ""
+  webhookPreviousSecretKeys: ""
+  redisPassword: ""
+  connectorToken: ""
+
+# The reservation list cache (Redis or Dragonfly).
+cache:
+  enabled: false
+  address: ""
+
+telemetry:
+  # OTLP collector, host:port (gRPC). Empty exports nothing.
+  otlpEndpoint: ""
+  # true when the collector serves TLS.
+  otlpSecure: false
+  environment: production
+  # Labels this deployment's telemetry.
+  site: ""
+
+webhooks:
+  enabled: true
+
+# Any other setting, as FREEBUSY_<SECTION>__<KEY>: value.
+extraEnv: {}
+
+service:
+  type: ClusterIP
+  grpcPort: 50051
+  httpPort: 8080
+  mcpPort: 8081
+
+# In-flight calls finish on SIGTERM; this is how long they get.
+terminationGracePeriodSeconds: 30
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    memory: 512Mi
+
+podAnnotations: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# The Hasura DDN engine and its Postgres connector, for provider: hasura.
+#
+# The engine image carries its metadata build, and the build carries the
+# connector's URL and token. Build one for this release: in hasura/.env set
+# FREEBUSY_FREEBUSY_PGSQL_READ_URL and _WRITE_URL to
+# http://<release>-freebusy-connector:9794 and the bearer token, run
+# `just hasura regen`, and build hasura/engine/Dockerfile.engine. The
+# committed build points at local.hasura.dev and only suits Compose.
+hasura:
+  enabled: false
+  engine:
+    image:
+      repository: ghcr.io/shokki-engineering/freebusy-engine
+      tag: ""
+      pullPolicy: IfNotPresent
+    replicaCount: 1
+    resources: {}
+  connector:
+    image:
+      repository: ghcr.io/shokki-engineering/freebusy-connector
+      tag: ""
+      pullPolicy: IfNotPresent
+    replicaCount: 1
+    resources: {}

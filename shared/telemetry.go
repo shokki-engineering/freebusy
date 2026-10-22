@@ -30,6 +30,7 @@ var (
 
 func init() {
 	once.Do(func() {
+		routeOTLPEndpoint()
 		b := telemetry.New()
 		if tmpPath, err := writeTelemetryConfig(); err == nil {
 			defer os.Remove(tmpPath) //nolint:errcheck
@@ -70,19 +71,13 @@ func init() {
 // variable leaves the embedded default in place.
 //
 //	FREEBUSY_TELEMETRY_ENVIRONMENT  deployment environment (development|staging|production)
-//	FREEBUSY_OTLP_ENDPOINT          OTLP collector as host:port
+//	FREEBUSY_OTLP_ENDPOINT          OTLP collector as host:port (see routeOTLPEndpoint)
+//	FREEBUSY_OTLP_SECURE            true when that collector serves TLS
 //	FREEBUSY_SITE                   label slug for what this deployment serves (e.g. "riverside-club")
 //	FREEBUSY_SITE_NAME              human-readable name for it
 func applyDeploymentOverrides(b *telemetry.Builder) {
 	if env := os.Getenv("FREEBUSY_TELEMETRY_ENVIRONMENT"); env != "" {
 		b.WithEnvironment(options.Environment(env))
-	}
-	if endpoint := os.Getenv("FREEBUSY_OTLP_ENDPOINT"); endpoint != "" {
-		if host, port, ok := splitHostPort(endpoint); ok {
-			b.WithOTLP(host, port)
-		} else {
-			fmt.Printf("WARNING: ignoring malformed FREEBUSY_OTLP_ENDPOINT %q (want host:port)\n", endpoint)
-		}
 	}
 	labels := map[string]string{}
 	if v := os.Getenv("FREEBUSY_SITE"); v != "" {
@@ -94,6 +89,26 @@ func applyDeploymentOverrides(b *telemetry.Builder) {
 	if len(labels) > 0 {
 		b.WithLabels(labels)
 	}
+}
+
+// routeOTLPEndpoint hands FREEBUSY_OTLP_ENDPOINT and FREEBUSY_OTLP_SECURE to
+// the library as its own endpoint and TLS settings (its TELEMETRY_ variables),
+// which it reads when the builder loads its configuration. The builder's
+// WithOTLP would take the endpoint too, but it turns TLS on for every host
+// name, so a plaintext collector beside the server -- telemetry:6009 in the
+// Compose stack, a collector Service in a cluster -- received nothing.
+func routeOTLPEndpoint() {
+	endpoint := os.Getenv("FREEBUSY_OTLP_ENDPOINT")
+	if endpoint == "" {
+		return
+	}
+	if _, _, ok := splitHostPort(endpoint); !ok {
+		fmt.Printf("WARNING: ignoring malformed FREEBUSY_OTLP_ENDPOINT %q (want host:port)\n", endpoint)
+		return
+	}
+	_ = os.Setenv("TELEMETRY_TELEMETRY_OTLP_ENABLED", "true")
+	_ = os.Setenv("TELEMETRY_TELEMETRY_OTLP_ENDPOINT", endpoint)
+	_ = os.Setenv("TELEMETRY_TELEMETRY_OTLP_SECURE", strconv.FormatBool(os.Getenv("FREEBUSY_OTLP_SECURE") == "true"))
 }
 
 // splitHostPort splits a "host:port" OTLP endpoint into its parts.

@@ -113,7 +113,7 @@ require (
 	github.com/the-protobuf-project/grpc-mcp-gateway v1.6.1 // indirect
 	github.com/the-protobuf-project/runtime-go/agents v0.0.0-20261021172408-4a614accbb1c // indirect
 	github.com/the-protobuf-project/runtime-go/observability v0.0.0-20261021182109-ed0b69c46242
-	github.com/the-protobuf-project/runtime-go/telemetry v0.0.0-20261021141431-6d4588022f2b // indirect
+	github.com/the-protobuf-project/runtime-go/telemetry v0.0.0-20261021141431-6d4588022f2b
 	github.com/the-protobuf-project/runtime-go/ulid v0.0.0-20261021141431-6d4588022f2b // indirect
 	github.com/the-protobuf-project/store v1.5.7 // indirect
 	github.com/xo/terminfo v1.2.0 // indirect

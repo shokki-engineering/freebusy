@@ -68,7 +68,7 @@ func newServiceInstance(conn *database.Connection) (*Service, error) {
 		}
 		conn = opened
 	}
-	engine := allocation.NewServer(allocationStore(conn))
+	engine := allocation.NewServer(allocationStore(conn), allocation.WithMeter(shared.Telemetry.Meter()))
 	repos := rfcsvc.NewRepositories(conn.Repox())
 	svc := NewService(
 		engine,
@@ -79,6 +79,7 @@ func newServiceInstance(conn *database.Connection) (*Service, error) {
 			MaxAttempts:            config.Get().Webhooks.MaxAttempts,
 			Retention:              time.Duration(config.Get().Webhooks.RetentionDays) * 24 * time.Hour,
 			Sealer:                 sealer,
+			Meter:                  shared.Telemetry.Meter(),
 		}),
 		repos,
 	)

@@ -36,6 +36,7 @@ var (
 	hashes  = style{open: "# "}
 	dashes  = style{open: "-- "}
 	html    = style{open: "<!-- ", close: " -->"}
+	gotmpl  = style{open: "{{/* ", close: " */}}"}
 	exempt  = rule{exempt: true}
 )
 
@@ -72,6 +73,8 @@ var byExt = map[string]rule{
 	".proto":  {style: slashes},
 	".prisma": {style: slashes},
 	".ts":     {style: slashes},
+
+	".tpl": {style: gotmpl}, // Helm's named templates
 
 	".yaml":    {style: hashes},
 	".yml":     {style: hashes},

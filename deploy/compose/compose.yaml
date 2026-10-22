@@ -1,0 +1,187 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# freebusy on one host: the server, Postgres with its migrations and nightly
+# backups, and -- by profile -- the Redis list cache, the Hasura backend and
+# the observability stack.
+#
+#   cp .env.example .env                       # then set every CHANGE_ME
+#   docker compose up -d                       # Postgres backend, nothing else
+#   docker compose --profile observability up -d
+#   docker compose --profile cache --profile hasura --profile observability up -d
+#
+# Postgres (gorm) is the production backend. The hasura profile adds the DDN
+# engine and its connector; set FREEBUSY_DATABASE_PROVIDER=hasura to serve
+# through them. The cache profile adds Redis; set FREEBUSY_CACHE_ENABLED=true
+# to use it.
+#
+# Every port is published on 127.0.0.1 only: freebusy has no authentication
+# yet, so put a TLS-terminating proxy you control in front of it, or reach it
+# from the same host.
+
+name: freebusy
+
+x-postgres-env: &postgres-env
+  PGHOST: postgres
+  PGUSER: postgres
+  PGPASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+  PGDATABASE: freebusydb
+
+services:
+  freebusy:
+    image: ${FREEBUSY_IMAGE:-ghcr.io/shokki-engineering/freebusy}:${FREEBUSY_TAG:-latest}
+    read_only: true
+    restart: unless-stopped
+    # In-flight calls, webhook sends and the reconciler finish on SIGTERM.
+    stop_grace_period: 30s
+    ports:
+      - "127.0.0.1:50051:50051" # gRPC
+      - "127.0.0.1:8080:8080" # REST and /health
+      - "127.0.0.1:8081:8081" # MCP
+    environment:
+      FREEBUSY_DATABASE__PROVIDER: ${FREEBUSY_DATABASE_PROVIDER:-gorm}
+      FREEBUSY_DATABASE__POSTGRES__HOST: postgres
+      FREEBUSY_DATABASE__POSTGRES__PASSWORD: ${POSTGRES_PASSWORD}
+      # Inside the stack's own network only.
+      FREEBUSY_DATABASE__POSTGRES__SSLMODE: disable
+      FREEBUSY_DATABASE__HASURA__URL: http://engine:3000/graphql
+      FREEBUSY_CACHE__ENABLED: ${FREEBUSY_CACHE_ENABLED:-false}
+      FREEBUSY_CACHE__ADDRESS: redis:6379
+      FREEBUSY_CACHE__PASSWORD: ${REDIS_PASSWORD:-}
+      FREEBUSY_WEBHOOKS__SECRET_KEY: ${WEBHOOK_SECRET_KEY:?set WEBHOOK_SECRET_KEY in .env}
+      FREEBUSY_WEBHOOKS__PREVIOUS_SECRET_KEYS: ${WEBHOOK_PREVIOUS_SECRET_KEYS:-}
+      FREEBUSY_OTLP_ENDPOINT: ${OTLP_ENDPOINT:-}
+      FREEBUSY_TELEMETRY_ENVIRONMENT: ${TELEMETRY_ENVIRONMENT:-production}
+      FREEBUSY_SITE: ${FREEBUSY_SITE:-}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  # Applies migrations/ before the server starts, and on every `up` after an
+  # upgrade; it applies only what the database has not seen, then exits.
+  migrate:
+    image: ${FREEBUSY_MIGRATIONS_IMAGE:-ghcr.io/shokki-engineering/freebusy-migrations}:${FREEBUSY_TAG:-latest}
+    command: ["--url", "postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/freebusydb?sslmode=disable"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:18.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: freebusydb
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # A pg_dump (custom format) every BACKUP_INTERVAL_SECONDS into BACKUP_DIR,
+  # keeping BACKUP_KEEP_DAYS days of them. Copy BACKUP_DIR off the host too:
+  # a backup on the same disk as the database is not one. Restoring: the
+  # README's runbooks.
+  backup:
+    image: postgres:18.4
+    restart: unless-stopped
+    environment:
+      <<: *postgres-env
+      INTERVAL: ${BACKUP_INTERVAL_SECONDS:-86400}
+      KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+    volumes:
+      - ${BACKUP_DIR:-./backups}:/backups
+    entrypoint:
+      - sh
+      - -c
+      - |
+        set -eu
+        while :; do
+          file=/backups/freebusydb-$$(date -u +%Y%m%dT%H%M%SZ).dump
+          if pg_dump --format=custom --file="$$file.partial" && mv "$$file.partial" "$$file"; then
+            echo "backup: wrote $$file"
+          else
+            echo "backup: FAILED" >&2
+            rm -f "$$file.partial"
+          fi
+          find /backups -name 'freebusydb-*.dump' -mtime +"$$KEEP_DAYS" -delete
+          sleep "$$INTERVAL"
+        done
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  redis:
+    profiles: [cache]
+    image: redis:8
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-}", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-}", "--no-auth-warning", "ping"]
+      interval: 5s
+      retries: 10
+
+  # The Hasura DDN engine, serving the committed build (hasura/engine/build).
+  # That build names its connector at local.hasura.dev:9794 with the token in
+  # hasura/.env.example, which is why the connector answers to that name and
+  # port here. A production engine wants its own: rebuild it with
+  # `just hasura regen` against your values, and set them below.
+  engine:
+    profiles: [hasura]
+    image: ${FREEBUSY_ENGINE_IMAGE:-ghcr.io/shokki-engineering/freebusy-engine}:${FREEBUSY_TAG:-latest}
+    build:
+      context: ../../hasura/engine
+      dockerfile: Dockerfile.engine
+    restart: unless-stopped
+    environment:
+      AUTHN_CONFIG_PATH: /md/auth_config.json
+      INTROSPECTION_METADATA_FILE: /md/metadata.json
+      METADATA_PATH: /md/open_dd.json
+      OTLP_ENDPOINT: ${ENGINE_OTLP_ENDPOINT:-}
+    depends_on: [connector]
+
+  connector:
+    profiles: [hasura]
+    image: ${FREEBUSY_CONNECTOR_IMAGE:-ghcr.io/shokki-engineering/freebusy-connector}:${FREEBUSY_TAG:-latest}
+    build:
+      context: ../../hasura/freebusy/connector/freebusy_pgsql
+      dockerfile: .hasura-connector/Dockerfile.freebusy_pgsql
+    restart: unless-stopped
+    environment:
+      CONNECTION_URI: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/freebusydb
+      HASURA_CONNECTOR_PORT: "9794"
+      HASURA_SERVICE_TOKEN_SECRET: ${CONNECTOR_TOKEN:-freebusy-local-connector}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${ENGINE_OTLP_ENDPOINT:-}
+      OTEL_SERVICE_NAME: freebusy_pgsql
+    networks:
+      default:
+        aliases: [local.hasura.dev]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  # Grafana, Prometheus, Loki, Tempo, Alertmanager and an OTel collector in
+  # one image, on one port: http://127.0.0.1:6009/grafana (admin / admin;
+  # change it). Set OTLP_ENDPOINT=telemetry:6009 in .env to send to it.
+  telemetry:
+    profiles: [observability]
+    image: ghcr.io/the-protobuf-project/telemetry:1.2.3
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6009:6009"
+    volumes:
+      - telemetry-data:/data
+      - ../observability/prometheus.yaml:/etc/opentelemetry-stack/prometheus.yaml:ro
+      - ../observability/alerts.yaml:/etc/opentelemetry-stack/freebusy-alerts.yaml:ro
+      - ../observability/alertmanager.yaml:/etc/opentelemetry-stack/alertmanager.yaml:ro
+      - ../../.grafana/dashboard_service.json:/etc/opentelemetry-stack/grafana/provisioning/dashboards/freebusy/service.json:ro
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:6009/grafana/api/health"]
+      interval: 10s
+      start_period: 60s
+
+volumes:
+  postgres-data:
+  telemetry-data:

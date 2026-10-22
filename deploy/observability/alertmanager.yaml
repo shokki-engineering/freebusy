@@ -1,0 +1,25 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Where freebusy's alerts go. The receiver below is a placeholder webhook:
+# replace it with your pager, chat or mail before relying on it
+# (https://prometheus.io/docs/alerting/latest/configuration/#receiver).
+# Critical alerts silence the warnings of the same name while they fire.
+
+route:
+  group_by: ["alertname"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: operator
+
+receivers:
+  - name: operator
+    webhook_configs:
+      - url: http://alert-receiver.invalid/freebusy
+        send_resolved: true
+
+inhibit_rules:
+  - source_matchers: [severity="critical"]
+    target_matchers: [severity="warning"]
+    equal: ["alertname"]

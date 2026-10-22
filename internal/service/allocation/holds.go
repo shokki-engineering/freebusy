@@ -394,7 +394,12 @@ func (s *Server) StartHoldSweeper(ctx context.Context, interval time.Duration, l
 		t := time.NewTicker(interval)
 		defer t.Stop()
 		for {
-			if _, err := s.store.ExpireHolds(ctx, s.now()); err != nil && logErr != nil && ctx.Err() == nil {
+			expired, err := s.store.ExpireHolds(ctx, s.now())
+			if ctx.Err() != nil {
+				return
+			}
+			s.sweeps.record(ctx, expired, err)
+			if err != nil && logErr != nil {
 				logErr(err)
 			}
 			select {

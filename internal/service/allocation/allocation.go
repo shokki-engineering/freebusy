@@ -14,6 +14,7 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 	"github.com/shokki-engineering/freebusy/internal/types"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
+	"github.com/the-protobuf-project/runtime-go/telemetry"
 	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -38,6 +39,8 @@ type Server struct {
 	now func() time.Time
 	// holdTTL is the lifetime of a new hold.
 	holdTTL time.Duration
+	// sweeps reports the hold sweeper's runs (metrics.go).
+	sweeps sweepMetrics
 }
 
 // Option configures a Server.
@@ -49,9 +52,13 @@ func WithClock(now func() time.Time) Option { return func(s *Server) { s.now = n
 // WithHoldTTL sets how long new holds last.
 func WithHoldTTL(d time.Duration) Option { return func(s *Server) { s.holdTTL = d } }
 
+// WithMeter reports the hold sweeper's metrics through m. Without it they go
+// nowhere.
+func WithMeter(m telemetry.Meter) Option { return func(s *Server) { s.sweeps = newSweepMetrics(m) } }
+
 // NewServer returns a Server over store.
 func NewServer(store Store, opts ...Option) *Server {
-	s := &Server{store: store, now: time.Now, holdTTL: DefaultHoldTTL}
+	s := &Server{store: store, now: time.Now, holdTTL: DefaultHoldTTL, sweeps: newSweepMetrics(nil)}
 	for _, o := range opts {
 		o(s)
 	}

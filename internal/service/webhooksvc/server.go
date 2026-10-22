@@ -20,6 +20,7 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
 	"github.com/shokki-engineering/freebusy/internal/types"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1"
+	"github.com/the-protobuf-project/runtime-go/telemetry"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -55,6 +56,8 @@ type Options struct {
 	// Sealer encrypts signing secrets at rest (sealing.go). Nil stores them
 	// as they are.
 	Sealer *Sealer
+	// Meter receives delivery's metrics (metrics.go). Nil drops them.
+	Meter telemetry.Meter
 }
 
 // Server serves WebhookService and runs delivery (see Round).
@@ -67,6 +70,8 @@ type Server struct {
 	// round's reread of the last Lag does not write them all again.
 	mu       sync.Mutex
 	recorded map[string]time.Time
+
+	metrics deliveryMetrics
 }
 
 // NewServer returns a Server over repos.
@@ -96,7 +101,7 @@ func NewServer(repos Repositories, opts Options) *Server {
 	if opts.Now == nil {
 		opts.Now = time.Now
 	}
-	return &Server{repos: repos, opts: opts, recorded: map[string]time.Time{}}
+	return &Server{repos: repos, opts: opts, recorded: map[string]time.Time{}, metrics: newDeliveryMetrics(opts.Meter)}
 }
 
 func (s *Server) CreateWebhook(ctx context.Context, req *webhookpbv1.CreateWebhookRequest) (*webhookpbv1.Webhook, error) {

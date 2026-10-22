@@ -1,0 +1,117 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+{{- $secret := include "freebusy.secretName" . }}
+{{- $pg := .Values.database.postgres }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "freebusy.fullname" . }}
+  labels:
+    {{- include "freebusy.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "freebusy.selector" . | nindent 6 }}
+      app.kubernetes.io/component: server
+  template:
+    metadata:
+      labels:
+        {{- include "freebusy.selector" . | nindent 8 }}
+        app.kubernetes.io/component: server
+      annotations:
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if not .Values.secrets.existingSecret }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- if .Values.migrations.enabled }}
+      initContainers:
+        - name: migrate
+          image: {{ include "freebusy.image" (dict "image" .Values.migrations.image "root" .) }}
+          imagePullPolicy: {{ .Values.migrations.image.pullPolicy }}
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef: { name: {{ $secret }}, key: postgres-password }
+          args:
+            - --url
+            - "postgres://{{ $pg.user }}:$(PGPASSWORD)@{{ required "database.postgres.host is required" $pg.host }}:{{ $pg.port }}/{{ $pg.dbname }}?sslmode={{ $pg.sslmode }}"
+          securityContext:
+            {{- include "freebusy.securityContext" . | nindent 12 }}
+      {{- end }}
+      containers:
+        - name: freebusy
+          image: {{ include "freebusy.image" (dict "image" .Values.image "root" .) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - { name: grpc, containerPort: 50051 }
+            - { name: http, containerPort: 8080 }
+            - { name: mcp, containerPort: 8081 }
+          env:
+            - { name: FREEBUSY_DATABASE__PROVIDER, value: {{ .Values.database.provider | quote }} }
+            - { name: FREEBUSY_DATABASE__POSTGRES__HOST, value: {{ $pg.host | quote }} }
+            - { name: FREEBUSY_DATABASE__POSTGRES__PORT, value: {{ $pg.port | quote }} }
+            - { name: FREEBUSY_DATABASE__POSTGRES__USER, value: {{ $pg.user | quote }} }
+            - { name: FREEBUSY_DATABASE__POSTGRES__DBNAME, value: {{ $pg.dbname | quote }} }
+            - { name: FREEBUSY_DATABASE__POSTGRES__SSLMODE, value: {{ $pg.sslmode | quote }} }
+            - name: FREEBUSY_DATABASE__POSTGRES__PASSWORD
+              valueFrom:
+                secretKeyRef: { name: {{ $secret }}, key: postgres-password }
+            {{- if eq .Values.database.provider "hasura" }}
+            - { name: FREEBUSY_DATABASE__HASURA__URL, value: {{ include "freebusy.hasuraURL" . | quote }} }
+            {{- end }}
+            - { name: FREEBUSY_WEBHOOKS__ENABLED, value: {{ .Values.webhooks.enabled | quote }} }
+            - name: FREEBUSY_WEBHOOKS__SECRET_KEY
+              valueFrom:
+                secretKeyRef: { name: {{ $secret }}, key: webhook-secret-key, optional: true }
+            - name: FREEBUSY_WEBHOOKS__PREVIOUS_SECRET_KEYS
+              valueFrom:
+                secretKeyRef: { name: {{ $secret }}, key: webhook-previous-secret-keys, optional: true }
+            {{- if .Values.cache.enabled }}
+            - { name: FREEBUSY_CACHE__ENABLED, value: "true" }
+            - { name: FREEBUSY_CACHE__ADDRESS, value: {{ required "cache.address is required when cache.enabled" .Values.cache.address | quote }} }
+            - name: FREEBUSY_CACHE__PASSWORD
+              valueFrom:
+                secretKeyRef: { name: {{ $secret }}, key: redis-password, optional: true }
+            {{- end }}
+            {{- with .Values.telemetry }}
+            - { name: FREEBUSY_OTLP_ENDPOINT, value: {{ .otlpEndpoint | quote }} }
+            - { name: FREEBUSY_OTLP_SECURE, value: {{ .otlpSecure | quote }} }
+            - { name: FREEBUSY_TELEMETRY_ENVIRONMENT, value: {{ .environment | quote }} }
+            - { name: FREEBUSY_SITE, value: {{ .site | quote }} }
+            {{- end }}
+            {{- range $k, $v := .Values.extraEnv }}
+            - { name: {{ $k }}, value: {{ $v | quote }} }
+            {{- end }}
+          readinessProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            {{- include "freebusy.securityContext" . | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

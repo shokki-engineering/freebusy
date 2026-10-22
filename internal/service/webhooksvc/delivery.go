@@ -393,11 +393,17 @@ func (s *Server) attempt(ctx context.Context, d *webhookpbv1.Delivery, w *webhoo
 		d.State, d.ErrorMessage, d.NextAttemptTime = webhookpbv1.DeliveryState_DELIVERY_STATE_SUCCEEDED, "", nil
 		d.DeliverTime = timestamppb.New(s.opts.Now())
 		paths = append(paths, "deliver_time")
+		s.metrics.attempt(ctx, "succeeded")
+		if d.GetCreateTime() != nil {
+			s.metrics.delivered(ctx, d.GetDeliverTime().AsTime().Sub(d.GetCreateTime().AsTime()))
+		}
 	case w == nil || int(d.AttemptCount) >= s.opts.MaxAttempts:
 		d.State, d.ErrorMessage, d.NextAttemptTime = webhookpbv1.DeliveryState_DELIVERY_STATE_FAILED, sendErr.Error(), nil
+		s.metrics.attempt(ctx, "failed")
 	default:
 		d.State, d.ErrorMessage = webhookpbv1.DeliveryState_DELIVERY_STATE_PENDING, sendErr.Error()
 		d.NextAttemptTime = timestamppb.New(s.opts.Now().Add(backoff(int(d.AttemptCount))))
+		s.metrics.attempt(ctx, "retrying")
 	}
 	_, err = s.repos.Deliveries.UpdateOutputOnly(ctx, d, paths)
 	return err

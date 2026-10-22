@@ -36,6 +36,7 @@ flowchart LR
 - [Testing and CI](#testing-and-ci)
 - [Repository layout](#repository-layout)
 - [Troubleshooting](#troubleshooting)
+- [Runbooks](#runbooks)
 - [Status](#status)
 - [Licence](#licence)
 
@@ -217,7 +218,11 @@ unprivileged user on a read-only filesystem.
 bazel build //image                         # the two-platform image index
 bazel run //image:push -- --tag 1.0.0       # to ghcr.io/shokki-engineering/freebusy
 bazel run //image:load                      # or into the local Docker as freebusy:latest
+bazel run //image:push_migrations -- --tag 1.0.0   # the migrations image beside it
 ```
+
+A version tag does all of this in CI (`.github/workflows/release.yml`); see
+`CHANGELOG.md` for how to cut one.
 
 ### 2. Prepare Postgres
 
@@ -265,29 +270,41 @@ docker run -d --name freebusy --read-only \
   ghcr.io/shokki-engineering/freebusy:1.0.0
 ```
 
-Or with Compose:
+### Or: the Compose stack
 
-```yaml
-services:
-  freebusy:
-    image: ghcr.io/shokki-engineering/freebusy:1.0.0
-    read_only: true
-    ports: ["50051:50051", "8080:8080", "8081:8081"]
-    environment:
-      FREEBUSY_DATABASE__POSTGRES__HOST: postgres
-      FREEBUSY_DATABASE__POSTGRES__PASSWORD: ${POSTGRES_PASSWORD}
-      FREEBUSY_DATABASE__POSTGRES__SSLMODE: disable   # inside a private network only
-      FREEBUSY_OTLP_ENDPOINT: otel-collector:4317
-    depends_on: [postgres]
-  postgres:
-    image: postgres:18.4
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: freebusydb
-    volumes: ["pgdata:/var/lib/postgresql"]
-volumes:
-  pgdata: {}
+`deploy/compose` runs freebusy on one host: the server, Postgres, the
+migrations (applied before the server starts, on every `up`), and a
+`pg_dump` every day into `./backups`. Profiles add the rest:
+
+```sh
+cd deploy/compose
+cp .env.example .env                      # set every CHANGE_ME
+docker compose up -d                      # Postgres backend
+docker compose --profile observability up -d   # + Grafana, Prometheus, alerts on :6009
+docker compose --profile cache up -d      # + Redis, with FREEBUSY_CACHE_ENABLED=true
+docker compose --profile hasura up -d     # + the Hasura engine and connector
 ```
+
+Postgres is the production backend. Hasura is optional: the `hasura` profile
+with `FREEBUSY_DATABASE_PROVIDER=hasura`. Ports are published on `127.0.0.1`
+only; put a TLS-terminating proxy in front.
+
+### Or: Kubernetes
+
+`deploy/helm/freebusy` is the chart; Postgres (and Redis) are yours. Each pod
+applies pending migrations in an init container before it starts, and atlas's
+lock makes replicas apply them once.
+
+```sh
+helm install freebusy oci://ghcr.io/shokki-engineering/charts/freebusy --version 1.0.0 \
+  --set database.postgres.host=db.internal \
+  --set secrets.existingSecret=freebusy      # postgres-password, webhook-secret-key, ...
+```
+
+`values.yaml` documents every setting. For `database.provider: hasura` with
+`hasura.enabled`, build an engine image for the release first: the engine's
+metadata names its connector's URL, and the committed build names
+`local.hasura.dev`, which suits only Compose.
 
 ### 4. Check it
 
@@ -304,8 +321,17 @@ grpc_health_probe -addr=localhost:50051     # the standard gRPC health service
   your load balancer, or mount a certificate and set
   `FREEBUSY_SERVER__TLS__CERT_FILE` and `FREEBUSY_SERVER__TLS__KEY_FILE`.
 - **Database TLS**: `sslmode` defaults to `require`.
-- **Telemetry**: set `FREEBUSY_OTLP_ENDPOINT` (`host:port`) to export traces,
-  metrics and logs; `FREEBUSY_SITE` and `FREEBUSY_SITE_NAME` label them.
+- **Telemetry**: set `FREEBUSY_OTLP_ENDPOINT` (`host:port`, OTLP gRPC) to
+  export traces, metrics and logs, and `FREEBUSY_OTLP_SECURE=true` when the
+  collector serves TLS; `FREEBUSY_SITE` and `FREEBUSY_SITE_NAME` label them.
+  `deploy/observability` holds the alert rules and Prometheus configuration;
+  the dashboard is `.grafana/dashboard_service.json`.
+- **Backups**: the Compose stack writes one a day; elsewhere, schedule
+  `pg_dump --format=custom` and keep copies off the host. Restoring is in the
+  [runbooks](#runbooks).
+- **Shutdown**: on SIGTERM freebusy stops accepting calls and finishes the ones
+  in flight; give it 30 seconds. Background work (webhook sends, the
+  reconciler) stops at once and resumes on another replica or the next start.
 - **Webhooks** send only to `https` endpoints on public addresses unless you
   allow otherwise.
 - **Authentication is not built yet.** Keep freebusy on a private network,
@@ -577,6 +603,10 @@ The Hasura job needs no secret: it serves the committed engine build.
 
 ```
 config/                 configuration: release defaults + dev profile, both embedded
+deploy/
+  compose/              the single-host stack
+  helm/freebusy/        the Helm chart
+  observability/        alert rules, Prometheus and Alertmanager configuration
 docker/                 local Postgres; the grpc-web Envoy proxy
 hasura/                 Hasura DDN project: metadata, connector, engine
 image/                  the container image (Bazel, rules_oci)
@@ -608,6 +638,67 @@ tools/                  just recipes, buf templates, generator helpers
 | `bazel run //:gazelle`: "unknown repo" | run `bazel mod tidy` first |
 | A dependency's own BUILD files break Bazel | add it to the `gazelle_override(build_file_generation = "clean")` list in `MODULE.bazel` |
 | The server prints "failed to start server" and exits 1 | a port is taken, or the configuration is invalid |
+
+## Runbooks
+
+Each alert in `deploy/observability/alerts.yaml` names its section here.
+
+**Server errors** (`FreebusyServerErrors`). More than 5% of calls end Internal,
+Unknown, Unavailable or DeadlineExceeded. Open the service dashboard's *Error
+Rate by Service*, then *Error & Warning Logs* and *Recent Traces*: a failed
+call's trace shows which statement or call failed, and the error a caller
+received ends with its trace ID. The usual causes are the database (below)
+or, on Hasura, the engine (below).
+
+**Slow calls** (`FreebusySlowCalls`, `FreebusySlowHolds`). Check *Pool Wait
+Events* first: waits mean the pool is the bottleneck (next section). Otherwise
+*Slow Traces* shows where the time goes. Holds racing for one resource wait on
+each other; a long CreateHold tail under contention is a known limit until
+generated inserts take an advisory lock.
+
+**Pool saturated** (`FreebusyPoolSaturated`). Callers are queueing for a
+Postgres connection. Raise `max_open_conns` (`FREEBUSY_DATABASE__POSTGRES__MAX_OPEN_CONNS`)
+if Postgres has headroom, or add replicas; if Postgres itself is busy, find the
+slow statements in *GORM Query Duration*.
+
+**Webhook endpoint stuck** (`FreebusyWebhooksFailing`). Deliveries gave up after
+`max_attempts`. `ListDeliveries` with `filter: state = FAILED` shows each one's
+`response_code` and `error_message`. Once the receiver is fixed,
+`RetryDelivery` sends each failed one again. A webhook whose receiver will be
+down for long can be paused (`PauseWebhook`): its deliveries wait instead of
+using up their attempts, and `ResumeWebhook` lets them go.
+
+**Hold sweeper backlog** (`FreebusyHoldsUnswept`). Every sweep in 10 minutes
+failed, so lapsed holds still read ACTIVE in list views. Availability is not
+affected: reads treat a lapsed hold as expired whatever its stored state. The
+error is in the logs as "allocation hold sweeper failed"; it is almost always
+the database.
+
+**No replica reporting** (`FreebusyAbsent`). No telemetry for 5 minutes: every
+replica is down, or none can reach the collector. `docker compose ps` or
+`kubectl get pods`; then the server's own output, which goes to stdout too.
+
+**Redis down.** The list cache falls through to the database: calls succeed,
+only list latency rises. Nothing to do but bring Redis back; pages written
+before the outage expire on their own within a minute.
+
+**Hasura engine down** (provider `hasura`). Every call fails Unavailable or
+Internal. Restart the engine and connector (`docker compose --profile hasura
+restart engine connector`); if the database is fine, switching
+`FREEBUSY_DATABASE__PROVIDER` to `gorm` serves the same data directly.
+
+**Restore a backup.** Stop the server, restore over the database, start it:
+
+```sh
+docker compose stop freebusy
+docker compose exec -T postgres pg_restore -U postgres -d freebusydb \
+  --clean --if-exists --no-owner < backups/freebusydb-<time>.dump
+docker compose start freebusy
+```
+
+The dump carries atlas's revision table, so the next `migrate` applies only
+what came after the backup. Test a restore now and then: restore into a
+scratch database (`createdb`, then `pg_restore -d` it) and compare row counts.
 
 ## Status
 

@@ -8,6 +8,7 @@ go_library(
     srcs = [
         "delivery.go",
         "events.go",
+        "metrics.go",
         "repos.go",
         "sealing.go",
         "server.go",
@@ -34,6 +35,7 @@ go_library(
         "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc5545/event/v1:event",
         "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc7953/availability/v1:availability",
         "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc9073/resource/v1:resource",
+        "@com_github_the_protobuf_project_runtime_go_telemetry//:telemetry",
         "@org_golang_google_protobuf//encoding/protojson",
         "@org_golang_google_protobuf//proto",
         "@org_golang_google_protobuf//reflect/protoreflect",

@@ -1,0 +1,13 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+apiVersion: v2
+name: freebusy
+description: Generic availability and booking engine.
+type: application
+# The chart's own version; the release workflow sets both to the tag.
+version: 0.1.0
+appVersion: "1.0.0"
+home: https://github.com/shokki-engineering/freebusy
+sources:
+  - https://github.com/shokki-engineering/freebusy

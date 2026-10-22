@@ -1,0 +1,82 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# freebusy's alerts: the five signals an operator is paged or warned on.
+# Prometheus loads this file beside the telemetry image's own rules
+# (prometheus.yaml); each alert names the runbook section that answers it.
+#
+# The metrics arrive over OTLP, pushed by every replica: there is no scrape
+# target to go "down". The hold sweeper runs once a minute in every replica
+# whatever the traffic, so its counter doubles as the heartbeat.
+
+groups:
+  - name: freebusy
+    rules:
+      # 1. Server errors: what a caller cannot fix by changing the request.
+      # NotFound, AlreadyExists, Aborted and the rest are answers, not faults.
+      - alert: FreebusyServerErrors
+        expr: |
+          sum(rate(grpc_server_call_duration_seconds_count{job="freebusy",grpc_status=~"Internal|Unknown|DataLoss|Unavailable|DeadlineExceeded"}[5m]))
+            / sum(rate(grpc_server_call_duration_seconds_count{job="freebusy"}[5m])) > 0.05
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: "freebusy: {{ $value | humanizePercentage }} of calls fail on the server side"
+          runbook: "README.md#runbooks (server errors)"
+
+      # 2. Latency. CreateHold waits on a contended resource by design, so the
+      # contended path has its own, looser threshold.
+      - alert: FreebusySlowCalls
+        expr: |
+          histogram_quantile(0.99, sum by (le) (rate(grpc_server_call_duration_seconds_bucket{job="freebusy",grpc_method!~".*/CreateHold"}[5m]))) > 1
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "freebusy: p99 call latency is {{ $value | humanizeDuration }}"
+          runbook: "README.md#runbooks (slow calls)"
+      - alert: FreebusySlowHolds
+        expr: |
+          histogram_quantile(0.99, sum by (le) (rate(grpc_server_call_duration_seconds_bucket{job="freebusy",grpc_method=~".*/CreateHold"}[5m]))) > 5
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "freebusy: p99 CreateHold latency is {{ $value | humanizeDuration }}"
+          runbook: "README.md#runbooks (slow calls)"
+
+      # 3. The connection pool: callers queueing for a connection.
+      - alert: FreebusyPoolSaturated
+        expr: |
+          sum(freebusy_db_pool_in_use) / sum(freebusy_db_pool_max_open) > 0.9
+            and sum(rate(freebusy_db_pool_wait_count_total[5m])) > 0
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "freebusy: the Postgres pool is {{ $value | humanizePercentage }} in use and callers are waiting"
+          runbook: "README.md#runbooks (pool saturated)"
+
+      # 4. Webhook deliveries given up on: a receiver missed changes for good.
+      - alert: FreebusyWebhooksFailing
+        expr: sum(increase(freebusy_webhook_attempts_total{outcome="failed"}[30m])) > 0
+        labels: { severity: warning }
+        annotations:
+          summary: "freebusy: {{ $value }} webhook deliveries failed for good in the last 30 minutes"
+          runbook: "README.md#runbooks (webhook endpoint stuck)"
+
+      # 5. Lapsed holds not being swept: every sweep in 10 minutes failed.
+      - alert: FreebusyHoldsUnswept
+        expr: |
+          sum(increase(freebusy_hold_sweeps_total{outcome="ok"}[10m])) == 0
+            and sum(increase(freebusy_hold_sweeps_total{outcome="error"}[10m])) > 0
+        labels: { severity: warning }
+        annotations:
+          summary: "freebusy: the hold sweeper has failed every run for 10 minutes"
+          runbook: "README.md#runbooks (hold sweeper backlog)"
+
+      # No sweeper heartbeat at all: no replica is running, or none can
+      # export telemetry.
+      - alert: FreebusyAbsent
+        expr: absent_over_time(freebusy_hold_sweeps_total[5m])
+        labels: { severity: critical }
+        annotations:
+          summary: "freebusy: no replica has reported for 5 minutes"
+          runbook: "README.md#runbooks (no replica reporting)"

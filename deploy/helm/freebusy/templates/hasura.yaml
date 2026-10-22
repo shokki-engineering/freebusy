@@ -1,0 +1,84 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# The Hasura engine and its Postgres connector (values: hasura).
+{{- if .Values.hasura.enabled }}
+{{- $name := include "freebusy.fullname" . -}}
+{{- $secret := include "freebusy.secretName" . -}}
+{{- $pg := .Values.database.postgres -}}
+{{- range $part := list "engine" "connector" }}
+{{- $v := index $.Values.hasura $part }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}-{{ $part }}
+  labels:
+    {{- include "freebusy.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $part }}
+spec:
+  replicas: {{ $v.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "freebusy.selector" $ | nindent 6 }}
+      app.kubernetes.io/component: {{ $part }}
+  template:
+    metadata:
+      labels:
+        {{- include "freebusy.selector" $ | nindent 8 }}
+        app.kubernetes.io/component: {{ $part }}
+    spec:
+      {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ $part }}
+          image: {{ include "freebusy.image" (dict "image" $v.image "root" $) }}
+          imagePullPolicy: {{ $v.image.pullPolicy }}
+          {{- if eq $part "engine" }}
+          ports:
+            - { name: http, containerPort: 3000 }
+          env:
+            - { name: AUTHN_CONFIG_PATH, value: /md/auth_config.json }
+            - { name: INTROSPECTION_METADATA_FILE, value: /md/metadata.json }
+            - { name: METADATA_PATH, value: /md/open_dd.json }
+            {{- with $.Values.telemetry.otlpEndpoint }}
+            - { name: OTLP_ENDPOINT, value: {{ printf "http://%s" . | quote }} }
+            {{- end }}
+          {{- else }}
+          ports:
+            - { name: http, containerPort: 9794 }
+          env:
+            - { name: HASURA_CONNECTOR_PORT, value: "9794" }
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef: { name: {{ $secret }}, key: postgres-password }
+            - name: CONNECTION_URI
+              value: "postgresql://{{ $pg.user }}:$(PGPASSWORD)@{{ $pg.host }}:{{ $pg.port }}/{{ $pg.dbname }}?sslmode={{ $pg.sslmode }}"
+            - name: HASURA_SERVICE_TOKEN_SECRET
+              valueFrom:
+                secretKeyRef: { name: {{ $secret }}, key: connector-token }
+            - { name: OTEL_SERVICE_NAME, value: freebusy_pgsql }
+            {{- with $.Values.telemetry.otlpEndpoint }}
+            - { name: OTEL_EXPORTER_OTLP_ENDPOINT, value: {{ printf "http://%s" . | quote }} }
+            {{- end }}
+          {{- end }}
+          resources:
+            {{- toYaml $v.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}-{{ $part }}
+  labels:
+    {{- include "freebusy.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $part }}
+spec:
+  selector:
+    {{- include "freebusy.selector" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $part }}
+  ports:
+    - { name: http, port: {{ if eq $part "engine" }}3000{{ else }}9794{{ end }}, targetPort: http }
+{{- end }}
+{{- end }}

@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // wrappingDialector is the Postgres dialector with one change: constraint
@@ -52,8 +53,12 @@ func (wrappingDialector) Translate(err error) error {
 // wrappingDialector with TranslateError on. Anything that needs the server's
 // error behaviour -- the live integration suites in particular -- opens its
 // connection here rather than with a bare gorm.Open, which would surface
-// duplicate keys as Internal again.
+// duplicate keys as Internal again. Without a logger of its own, cfg gets
+// GORM's default one minus the errors the services expect (expectedLogger).
 func OpenGorm(dsn string, cfg *gorm.Config) (*gorm.DB, error) {
 	cfg.TranslateError = true
+	if cfg.Logger == nil {
+		cfg.Logger = expectedLogger{logger.Default}
+	}
 	return gorm.Open(wrappingDialector{postgres.Open(dsn).(*postgres.Dialector)}, cfg)
 }

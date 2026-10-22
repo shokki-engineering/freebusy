@@ -8,6 +8,7 @@ go_library(
     srcs = [
         "cache.go",
         "connection.go",
+        "logger.go",
         "open.go",
         "pool.go",
         "translate.go",
@@ -27,6 +28,7 @@ go_library(
         "@com_github_the_protobuf_project_runtime_go_network//runtime",
         "@io_gorm_driver_postgres//:postgres",
         "@io_gorm_gorm//:gorm",
+        "@io_gorm_gorm//logger",
         "@io_opentelemetry_go_otel//propagation",
     ],
 )
@@ -36,6 +38,7 @@ go_test(
     srcs = [
         "cache_test.go",
         "listcache_live_test.go",
+        "logger_test.go",
         "paging_live_test.go",
         "pool_test.go",
         "rfc_roundtrip_live_test.go",

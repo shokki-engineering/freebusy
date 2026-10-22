@@ -1,0 +1,84 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# A release is a tag: v1.2.3 publishes, under 1.2.3,
+#
+#   ghcr.io/shokki-engineering/freebusy             the server (amd64 + arm64)
+#   ghcr.io/shokki-engineering/freebusy-migrations  atlas and migrations/
+#   ghcr.io/shokki-engineering/freebusy-engine      the Hasura engine, committed build
+#   ghcr.io/shokki-engineering/freebusy-connector   the Hasura Postgres connector
+#   oci://ghcr.io/shokki-engineering/charts/freebusy  the Helm chart
+#
+# and a GitHub release whose notes are the tag's CHANGELOG.md section. CI's
+# checks are not repeated here: tag a commit main already passed.
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v7
+
+      # The version the binary reports is config, not a build stamp: the
+      # tag must match it, and CHANGELOG.md must have the tag's section.
+      - name: Tag matches the release config and the changelog
+        run: |
+          version="${TAG#v}"
+          grep -qx "version = \"v$version\"" config/freebusy.release.toml ||
+            { echo "::error::config/freebusy.release.toml [app] version is not v$version"; exit 1; }
+          grep -q "^## \[$version\]" CHANGELOG.md ||
+            { echo "::error::CHANGELOG.md has no '## [$version]' section"; exit 1; }
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: bazel-contrib/setup-bazel@0.19.1
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+      - name: Server and migrations images
+        run: |
+          bazel run //image:push -- --tag "$VERSION" --tag latest
+          bazel run //image:push_migrations -- --tag "$VERSION" --tag latest
+
+      - uses: docker/setup-buildx-action@v3
+      - name: Hasura engine and connector images
+        run: |
+          for part in engine connector; do
+            case $part in
+              engine) ctx=hasura/engine; file=hasura/engine/Dockerfile.engine ;;
+              connector) ctx=hasura/freebusy/connector/freebusy_pgsql; file=$ctx/.hasura-connector/Dockerfile.freebusy_pgsql ;;
+            esac
+            docker buildx build --platform linux/amd64,linux/arm64 --push \
+              -t "ghcr.io/shokki-engineering/freebusy-$part:$VERSION" \
+              -t "ghcr.io/shokki-engineering/freebusy-$part:latest" \
+              -f "$file" "$ctx"
+          done
+
+      - uses: azure/setup-helm@v4
+      - name: Helm chart
+        run: |
+          helm package deploy/helm/freebusy --version "$VERSION" --app-version "$VERSION" -d dist
+          helm push "dist/freebusy-$VERSION.tgz" oci://ghcr.io/shokki-engineering/charts
+
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          awk -v v="$VERSION" '$0 ~ "^## \\[" v "\\]" {on=1; next} /^## \[/ {on=0} on' CHANGELOG.md > notes.md
+          gh release create "$TAG" --title "$TAG" --notes-file notes.md "dist/freebusy-$VERSION.tgz"

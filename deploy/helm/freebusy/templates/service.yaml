@@ -1,0 +1,18 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "freebusy.fullname" . }}
+  labels:
+    {{- include "freebusy.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "freebusy.selector" . | nindent 4 }}
+    app.kubernetes.io/component: server
+  ports:
+    - { name: grpc, port: {{ .Values.service.grpcPort }}, targetPort: grpc, appProtocol: grpc }
+    - { name: http, port: {{ .Values.service.httpPort }}, targetPort: http }
+    - { name: mcp, port: {{ .Values.service.mcpPort }}, targetPort: mcp }
