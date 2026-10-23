@@ -7,9 +7,12 @@
 // Nothing in migrations/ is written by hand. The desired schema is what the
 // generated registries build (tools/db/schema) on a scratch database, and
 // atlas (https://atlasgo.io) diffs it against the directory's history to write
-// the next file. Atlas's community build does not manage extensions, so this
-// tool writes those itself, read off the scratch database: a migration that
-// only creates the extensions the schema has started to use.
+// the next file. Atlas's community build manages neither extensions nor
+// functions and triggers, so this tool writes those itself, read off the
+// scratch database: a migration ahead of atlas's that creates the extensions
+// the schema has started to use, and one after it that (re)creates the
+// functions and triggers it has gained or changed -- the no_overlap lock
+// triggers among them.
 //
 //	migrations diff <name>   write the next migration, if the models changed
 //	migrations check         fail if the models changed without a migration
@@ -95,11 +98,16 @@ func diff(into, name string) error {
 	if err := extensions(db, into); err != nil {
 		return err
 	}
-	if sqlDB, err := db.DB(); err == nil {
-		_ = sqlDB.Close()
+	if err := atlas("migrate", "diff", name, "--dir", "file://"+into,
+		"--to", pg.URL(desired), "--dev-url", pg.URL(dev)); err != nil {
+		return err
 	}
-	return atlas("migrate", "diff", name, "--dir", "file://"+into,
-		"--to", pg.URL(desired), "--dev-url", pg.URL(dev))
+	defer func() {
+		if sqlDB, err := db.DB(); err == nil {
+			_ = sqlDB.Close()
+		}
+	}()
+	return routines(db, into, name)
 }
 
 // check fails when diff would write anything: a model changed and nobody ran
@@ -171,6 +179,70 @@ func extensions(db *gorm.DB, into string) error {
 		return err
 	}
 	return atlas("migrate", "hash", "--dir", "file://"+into)
+}
+
+// routines writes a migration (re)creating the functions and triggers db has
+// that into's history does not -- or has with another definition -- and
+// rehashes the directory. A function is CREATE OR REPLACE; a trigger is
+// dropped first, so a changed one is replaced.
+func routines(db *gorm.DB, into, name string) error {
+	var funcs []string
+	// Functions of the schema's own, not of an extension.
+	if err := db.Raw(`SELECT pg_get_functiondef(p.oid) FROM pg_proc p
+		JOIN pg_namespace n ON n.oid = p.pronamespace
+		WHERE n.nspname NOT IN ('pg_catalog', 'information_schema') AND p.prokind = 'f'
+		  AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.objid = p.oid AND d.deptype = 'e')
+		ORDER BY n.nspname, p.proname`).Scan(&funcs).Error; err != nil {
+		return err
+	}
+	type trigger struct{ Name, Table, Def string }
+	var triggers []trigger
+	if err := db.Raw(`SELECT t.tgname AS name, t.tgrelid::regclass::text AS "table", pg_get_triggerdef(t.oid) AS def
+		FROM pg_trigger t WHERE NOT t.tgisinternal ORDER BY 2, 1`).Scan(&triggers).Error; err != nil {
+		return err
+	}
+	history, err := historyOf(into)
+	if err != nil {
+		return err
+	}
+	var stmts []string
+	for _, f := range funcs {
+		if f = strings.TrimSpace(f); !strings.Contains(history, f) {
+			stmts = append(stmts, f+";\n")
+		}
+	}
+	for _, t := range triggers {
+		if !strings.Contains(history, t.Def) {
+			stmts = append(stmts, fmt.Sprintf("DROP TRIGGER IF EXISTS %q ON %s;\n%s;\n", t.Name, t.Table, t.Def))
+		}
+	}
+	if len(stmts) == 0 {
+		return nil
+	}
+	// One second after atlas names its own file, so these follow the tables
+	// they are on.
+	file := time.Now().UTC().Add(time.Second).Format("20060102150405") + "_" + name + "_routines.sql"
+	if err := os.WriteFile(filepath.Join(into, file), []byte(strings.Join(stmts, "\n")), 0o644); err != nil {
+		return err
+	}
+	return atlas("migrate", "hash", "--dir", "file://"+into)
+}
+
+// historyOf is every migration in dir, one after another.
+func historyOf(dir string) (string, error) {
+	files, err := filepath.Glob(filepath.Join(dir, "*.sql"))
+	if err != nil {
+		return "", err
+	}
+	var b strings.Builder
+	for _, f := range files {
+		src, err := os.ReadFile(f)
+		if err != nil {
+			return "", err
+		}
+		b.Write(src)
+	}
+	return b.String(), nil
 }
 
 // atlas runs the atlas CLI, its output passed through.

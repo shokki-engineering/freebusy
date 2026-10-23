@@ -71,7 +71,7 @@ paths:
             tags:
                 - Organizations
             description: |-
-                Creates a organization.
+                Creates an organization.
 
                    POST /v1/organizations
                    body: the organization itself
@@ -156,7 +156,7 @@ paths:
             tags:
                 - Organizations
             description: |-
-                Deletes a organization.
+                Deletes an organization.
 
                    DELETE /v1/{name=organizations/*}
 
@@ -192,7 +192,7 @@ paths:
             tags:
                 - Organizations
             description: |-
-                Updates a organization.
+                Updates an organization.
 
                    PATCH /v1/{organization.name=organizations/*}
                    body: the organization itself

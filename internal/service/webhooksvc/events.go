@@ -47,14 +47,23 @@ func siteOf(name string) string {
 	return ""
 }
 
+// deleteSlack is how far a delete's update time may trail its delete time and
+// still be the delete. A soft delete writes both at one instant; a row deleted
+// before it did had them a moment apart.
+const deleteSlack = time.Second
+
 // lifecycles are the states of a record that has none of its own.
 var lifecycles = []string{"created", "updated", "deleted"}
 
 // lifecycle is what last happened to a record with no state of its own: a
 // soft delete, else its creation when it has not changed since, else an
-// update.
+// update. A write to a record already deleted -- the purger stamping its
+// expire_time -- is none of these, and is "unspecified", which no feed sends:
+// the deletion was sent when it happened.
 func lifecycle(create, update, del *timestamppb.Timestamp) string {
 	switch {
+	case del != nil && update.AsTime().After(del.AsTime().Add(deleteSlack)):
+		return "unspecified"
 	case del != nil:
 		return "deleted"
 	case create.AsTime().Equal(update.AsTime()):

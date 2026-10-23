@@ -13,13 +13,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/oh-tarnished/runtime-go/ulid"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 	"github.com/shokki-engineering/freebusy/internal/runtime/hints"
 	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 	"github.com/shokki-engineering/freebusy/internal/types"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
+	"github.com/the-protobuf-project/runtime-go/ulid"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -87,7 +87,7 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 		// returns the winner's hold below. A random id would let both win.
 		id = keyedID(parent, in.GetIdempotencyKey())
 	default:
-		id = ulid.GenerateString()
+		id = ulid.Generate().String()
 	}
 	quantity := max(int(in.GetQuantity()), 1)
 

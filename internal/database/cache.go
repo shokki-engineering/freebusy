@@ -48,6 +48,9 @@ func (c *Connection) UseCaches(ctx context.Context, p cache.Provider) error {
 	if err != nil {
 		return err
 	}
+	// The list cache reads its pages through Volatile; measured there, its
+	// gets are the hit rate (cache_gets_total, strategy volatile).
+	db.Volatile = cache.WithVolatileTelemetry(db.Volatile, shared.Telemetry.Meter())
 	reservations, err := reservationcache.NewReservationListCache(db, reservationcache.WithListErrors(reportCacheError))
 	if err != nil {
 		return err

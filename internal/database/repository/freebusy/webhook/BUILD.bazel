@@ -18,6 +18,7 @@ go_library(
     deps = [
         "//internal/database/gorm/filterx",
         "//internal/database/gorm/freebusy/webhook",
+        "//internal/database/gorm/gormx",
         "//internal/database/hasura/freebusyql",
         "//internal/database/hasura/freebusyql/webhookql/deliveriesql",
         "//internal/database/hasura/freebusyql/webhookql/feedcursorsql",

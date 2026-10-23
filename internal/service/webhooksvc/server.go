@@ -45,8 +45,16 @@ type Options struct {
 	// about a day and a half of trying.
 	MaxAttempts int
 	// Lag is how far back each dispatch round rereads, so a write that
-	// committed after a later one was read is still seen. Default 2 minutes.
+	// committed after a later one was read is still seen. Default 30 seconds:
+	// a write's update time is set as it starts, and freebusy's writes commit
+	// within milliseconds. Every round rereads everything changed within Lag,
+	// so a longer one only slows delivery after a burst of changes.
 	Lag time.Duration
+	// HookSettle is how far behind its read of the webhooks a delivery round
+	// stops taking changes: time for a webhook being created as the round
+	// starts to commit. Default 1 second; a test driving rounds by hand
+	// right after a write sets it tiny.
+	HookSettle time.Duration
 	// Client sends deliveries. Default: a client with a 10-second timeout
 	// that follows no redirects and, unless AllowPrivateNetworks, connects
 	// only to public addresses.
@@ -70,6 +78,10 @@ type Server struct {
 	// round's reread of the last Lag does not write them all again.
 	mu       sync.Mutex
 	recorded map[string]time.Time
+	// settled is, per feed, a cursor position everything at or before which
+	// has been read after it could have committed (see dispatchFeed): rounds
+	// at that position read only what is newer.
+	settled map[string]time.Time
 
 	metrics deliveryMetrics
 }
@@ -79,8 +91,11 @@ func NewServer(repos Repositories, opts Options) *Server {
 	if opts.MaxAttempts <= 0 {
 		opts.MaxAttempts = 8
 	}
+	if opts.HookSettle <= 0 {
+		opts.HookSettle = time.Second
+	}
 	if opts.Lag <= 0 {
-		opts.Lag = 2 * time.Minute
+		opts.Lag = 30 * time.Second
 	}
 	if opts.Retention <= 0 {
 		opts.Retention = 30 * 24 * time.Hour
@@ -101,7 +116,7 @@ func NewServer(repos Repositories, opts Options) *Server {
 	if opts.Now == nil {
 		opts.Now = time.Now
 	}
-	return &Server{repos: repos, opts: opts, recorded: map[string]time.Time{}, metrics: newDeliveryMetrics(opts.Meter)}
+	return &Server{repos: repos, opts: opts, recorded: map[string]time.Time{}, settled: map[string]time.Time{}, metrics: newDeliveryMetrics(opts.Meter)}
 }
 
 func (s *Server) CreateWebhook(ctx context.Context, req *webhookpbv1.CreateWebhookRequest) (*webhookpbv1.Webhook, error) {

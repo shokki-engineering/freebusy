@@ -69,7 +69,7 @@ func newServiceInstance(conn *database.Connection) (*Service, error) {
 		conn = opened
 	}
 	engine := allocation.NewServer(allocationStore(conn), allocation.WithMeter(shared.Telemetry.Meter()))
-	repos := rfcsvc.NewRepositories(conn.Repox())
+	repos := rfcsvc.NewRepositories(conn.Repox(), config.Get().Retention.Period())
 	svc := NewService(
 		engine,
 		reservation.NewServer(reservationStore(conn), engine),

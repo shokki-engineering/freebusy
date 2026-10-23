@@ -18,10 +18,10 @@ import (
 
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
-	"github.com/oh-tarnished/runtime-go/ulid"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/calendar"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/event"
+	"github.com/the-protobuf-project/runtime-go/ulid"
 )
 
 func TestLivePaging(t *testing.T) {
@@ -32,7 +32,7 @@ func TestLivePaging(t *testing.T) {
 		t.Run(backend, func(t *testing.T) {
 			cals := calendar.New(conn).Calendars
 			events := event.New(conn).Events
-			cal := "calendars/paging-" + ulid.GenerateString()
+			cal := "calendars/paging-" + ulid.Generate().String()
 			if _, err := cals.Create(ctx, &calendarv1.Calendar{Name: cal, DisplayName: "paging"}); err != nil {
 				t.Fatal(err)
 			}

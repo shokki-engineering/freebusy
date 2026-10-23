@@ -16,7 +16,6 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/oh-tarnished/runtime-go/ulid"
 	"github.com/shokki-engineering/freebusy/internal/database"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/freebusy/reservation"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
@@ -24,6 +23,7 @@ import (
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"github.com/the-protobuf-project/runtime-go/cache"
 	"github.com/the-protobuf-project/runtime-go/cache/redis"
+	"github.com/the-protobuf-project/runtime-go/ulid"
 )
 
 func TestLiveListCache(t *testing.T) {
@@ -38,7 +38,7 @@ func TestLiveListCache(t *testing.T) {
 	for backend, raw := range liveConns(t) {
 		t.Run(backend, func(t *testing.T) {
 			// A prefix of its own, so nothing another run cached is read here.
-			provider := redis.New(client, cache.Config{Prefix: "listcache-test-" + ulid.GenerateString(), RequireTTL: true})
+			provider := redis.New(client, cache.Config{Prefix: "listcache-test-" + ulid.Generate().String(), RequireTTL: true})
 			conn := &database.Connection{PgSQLConn: raw.Gorm, Hasura: raw.GraphQL, Provider: database.ProviderGorm}
 			if raw.GraphQL != nil {
 				conn.Provider = database.ProviderHasura
@@ -52,14 +52,14 @@ func TestLiveListCache(t *testing.T) {
 			unseen := reservation.New(raw).Reservations
 			lists := conn.Caches.Reservations.Wrap(observed)
 
-			site := "organizationalUnits/listcache-" + ulid.GenerateString()
+			site := "organizationalUnits/listcache-" + ulid.Generate().String()
 			// Every record this run makes carries tag, so a List across sites
 			// can be narrowed to them.
-			tag := "listcache-" + ulid.GenerateString()
+			tag := "listcache-" + ulid.Generate().String()
 			var made []string
 			create := func(repo reservation.ReservationRepository) string {
 				t.Helper()
-				r, err := repo.Create(ctx, site, &reservationpbv1.Reservation{Hold: "holds/" + ulid.GenerateString(), Customer: tag})
+				r, err := repo.Create(ctx, site, &reservationpbv1.Reservation{Hold: "holds/" + ulid.Generate().String(), Customer: tag})
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -123,7 +123,7 @@ func TestLiveListCache(t *testing.T) {
 
 			// A Batch on the connection reports what it committed.
 			batch := reservation.NewBatch(conn.Repox())
-			c, err := batch.CreateReservation(site, &reservationpbv1.Reservation{Hold: "holds/" + ulid.GenerateString(), Customer: tag})
+			c, err := batch.CreateReservation(site, &reservationpbv1.Reservation{Hold: "holds/" + ulid.Generate().String(), Customer: tag})
 			if err != nil {
 				t.Fatal(err)
 			}

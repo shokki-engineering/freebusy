@@ -1,5 +1,7 @@
 buf.build/gen/go/bufbuild/protovalidate/grpc/go v1.6.2-20260825204119-511051f7f437.1/go.mod h1:DlOr9fzs1fvVUVjbKVLmxsxvXe214P0UPf4dJ+TyZj4=
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20260415201107-50325440f8f2.1/go.mod h1:tvtbpgaVXZX4g6Pn+AnzFycuRK3MOz5HJfEGeEllXYM=
+buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261021085804-ae1e2acc01d5.1/go.mod h1:Xm2cSkNERXD59Mk+HcqTFayEIKRMCA7MBpK/SvHp3OE=
+buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.11-20261023092131-bed218a71ce9.1/go.mod h1:I4UC1d9XXN/WbzNB1bZDUwjI/UZcATbCOpqSbaKUJ1U=
 buf.build/go/hyperpb v0.1.3/go.mod h1:IHXAM5qnS0/Fsnd7/HGDghFNvUET646WoHmq1FDZXIE=
 cel.dev/expr v0.25.1 h1:1KrZg61W6TWSxuNZ37Xy49ps13NUovb66QLprthtwi4=
 cel.dev/expr v0.25.1/go.mod h1:hrXvqGP6G6gyx8UAHSHJ5RGk//1Oj5nXQ2NI02Nrsg4=
@@ -523,6 +525,7 @@ github.com/the-protobuf-project/protokit v1.3.1 h1:Ky0aSjZAem4qDWbsWjaJihI9iqXN0
 github.com/the-protobuf-project/protokit v1.3.1/go.mod h1:HODRJtLQhT39oud+Hc7hIxK4PQlhaJ6y8qU11dBpPn4=
 github.com/the-protobuf-project/protokit v1.3.2 h1:OdLmPIIh3NmbuzQmvHo/WqDKsNxYH7HqUgFLyNuE24U=
 github.com/the-protobuf-project/protokit v1.3.2/go.mod h1:352liY5RpOxbfEUjZ20P25j81WCWgCi5OH/lrBttbk4=
+github.com/the-protobuf-project/protokit v1.3.3/go.mod h1:352liY5RpOxbfEUjZ20P25j81WCWgCi5OH/lrBttbk4=
 github.com/the-protobuf-project/telemetry/telemetry-go v0.0.0-20261021141513-5a35ba0e3bb7/go.mod h1:wr7SUpMA9nd5dvI2GC0l3IaqX8CF7I8uNN+NLhLwIM4=
 github.com/timandy/routine v1.1.6/go.mod h1:kXslgIosdY8LW0byTyPnenDgn4/azt2euufAq9rK51w=
 github.com/tklauser/go-sysconf v0.3.12/go.mod h1:Ho14jnntGE1fpdOqQEEaiKRpvIavV0hSfmBq8nJbHYI=
@@ -696,6 +699,7 @@ google.golang.org/genproto/googleapis/rpc v0.0.0-20261005182115-fad411399dd8/go.
 google.golang.org/genproto/googleapis/rpc v0.0.0-20261012220534-4341edf3f941/go.mod h1:OaIUM3+LpYcK2GXM4FTmhWoIq371Owdr+Cc7/BsYHHc=
 google.golang.org/grpc v1.79.3/go.mod h1:KmT0Kjez+0dde/v2j9vzwoAScgEPx/Bw1CYChhHLrHQ=
 google.golang.org/grpc v1.80.0/go.mod h1:ho/dLnxwi3EDJA4Zghp7k2Ec1+c2jqup0bFkw07bwF4=
+google.golang.org/grpc v1.81.0/go.mod h1:xGH9GfzOyMTGIOXBJmXt+BX/V0kcdQbdcuwQ/zNw42I=
 google.golang.org/grpc v1.81.1/go.mod h1:xGH9GfzOyMTGIOXBJmXt+BX/V0kcdQbdcuwQ/zNw42I=
 google.golang.org/grpc v1.82.0/go.mod h1:yzTZ1TB1Z3SG+LIYaI+WiE8D5+PZ3ArnrSp8zF3+/ZA=
 google.golang.org/grpc v1.82.1/go.mod h1:yzTZ1TB1Z3SG+LIYaI+WiE8D5+PZ3ArnrSp8zF3+/ZA=

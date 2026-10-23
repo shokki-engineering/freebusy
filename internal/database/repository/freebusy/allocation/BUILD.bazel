@@ -18,6 +18,7 @@ go_library(
     deps = [
         "//internal/database/gorm/filterx",
         "//internal/database/gorm/freebusy/allocation",
+        "//internal/database/gorm/gormx",
         "//internal/database/hasura/freebusyql",
         "//internal/database/hasura/freebusyql/allocationql/holdsql",
         "//internal/database/hasura/freebusyql/allocationql/resourceql",

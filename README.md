@@ -685,7 +685,8 @@ replica is down, or none can reach the collector. `docker compose ps` or
 `kubectl get pods`; then the server's own output, which goes to stdout too.
 
 **Redis down.** The list cache falls through to the database: calls succeed,
-only list latency rises. Nothing to do but bring Redis back; pages written
+only list latency rises. The dashboard's *List Cache Hit Rate* drops to zero
+while gets keep flowing. Nothing to do but bring Redis back; pages written
 before the outage expire on their own within a minute.
 
 **Hasura engine down** (provider `hasura`). Every call fails Unavailable or

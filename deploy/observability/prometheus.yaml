@@ -1,12 +1,12 @@
 # Copyright 2026 Srikanth K.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# The telemetry image's Prometheus configuration with two additions: freebusy's
-# alert rules (alerts.yaml, mounted beside the image's own rules) and the
-# image's Alertmanager as their destination -- the image runs Alertmanager on
-# :9093 but does not point Prometheus at it. Rules evaluate every 15 s: the
-# metrics arrive by remote write, so nothing changes faster. The scrape jobs
-# are the image's own.
+# The telemetry image's Prometheus configuration with freebusy's alert rules
+# (alerts.yaml, mounted beside the image's own rules) added. Mounting this file
+# replaces the image's, so it repeats what the image's holds -- the scrape
+# jobs, and (since 1.2.4) the bundled Alertmanager as the alerts'
+# destination. Rules evaluate every 15 s: the metrics arrive by remote write,
+# so nothing changes faster.
 
 global:
   scrape_interval: 15s

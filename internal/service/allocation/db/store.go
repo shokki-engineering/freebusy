@@ -125,12 +125,11 @@ func (s *Store) InsertHold(ctx context.Context, parent string, h *allocationpbv1
 		if rival, ok := s.rivalClaim(ctx, h, window); ok {
 			return nil, fmt.Errorf("%w: %s was taken while this hold was written", types.ErrConflict, rival)
 		}
-		// No rival to be seen: the insert may have been a deadlock victim --
-		// two losers waiting on an uncommitted winner can deadlock with each
-		// other, and a GraphQL engine hides the database's reason. A victim
-		// is retried, which waits on the winner's lock in the database: it
-		// then fails as a plain conflict, or succeeds if the winner gave up.
-		// The batch is atomic, so a failed attempt left nothing behind.
+		// No rival to be seen: the insert failed for a reason the backend did
+		// not name -- a GraphQL engine hides the database's. Writers of one
+		// resource take turns (the no_overlap lock trigger), so this is not
+		// the race; retrying once or twice rides out a transient fault. The
+		// batch is atomic, so a failed attempt left nothing behind.
 		if attempt == insertAttempts {
 			return nil, err
 		}

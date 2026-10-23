@@ -18,6 +18,7 @@ go_library(
     deps = [
         "//internal/database/gorm/filterx",
         "//internal/database/gorm/freebusy/shared",
+        "//internal/database/gorm/gormx",
         "//internal/database/hasura/freebusyql",
         "//internal/database/hasura/freebusyql/sharedql/idempotencykeysql",
         "//internal/database/repository/repox",

@@ -51,7 +51,7 @@ func TestE2E_Gorm(t *testing.T) {
 	gdb := openTestGorm(t)
 	conn := &database.Connection{PgSQLConn: gdb, Provider: database.ProviderGorm}
 	cc := dialServer(t, conn)
-	serverLifecycle(t, cc, rfcsvc.NewRepositories(repox.Conn{Gorm: gdb}))
+	serverLifecycle(t, cc, rfcsvc.NewRepositories(repox.Conn{Gorm: gdb}, 0))
 }
 
 // TestE2E_Hasura runs the identical client-visible lifecycle with the server
@@ -60,7 +60,7 @@ func TestE2E_Hasura(t *testing.T) {
 	svc := connectTestGraphQL(t)
 	conn := &database.Connection{Hasura: svc, Provider: database.ProviderHasura}
 	cc := dialServer(t, conn)
-	serverLifecycle(t, cc, rfcsvc.NewRepositories(repox.Conn{GraphQL: svc}))
+	serverLifecycle(t, cc, rfcsvc.NewRepositories(repox.Conn{GraphQL: svc}, 0))
 }
 
 // e2eClients bundles the per-service gRPC clients plus the RFC repositories,

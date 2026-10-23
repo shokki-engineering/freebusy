@@ -1277,7 +1277,7 @@ paths:
       tags:
         - Organizations
       description: |-
-        Creates a organization.
+        Creates an organization.
 
            POST /v1/organizations
            body: the organization itself
@@ -1376,7 +1376,7 @@ paths:
       tags:
         - Organizations
       description: |-
-        Deletes a organization.
+        Deletes an organization.
 
            DELETE /v1/{name=organizations/*}
 
@@ -1419,7 +1419,7 @@ paths:
       tags:
         - Organizations
       description: |-
-        Updates a organization.
+        Updates an organization.
 
            PATCH /v1/{organization.name=organizations/*}
            body: the organization itself
@@ -1593,7 +1593,7 @@ paths:
       tags:
         - Organizational Units
       description: |-
-        Creates a organizational unit.
+        Creates an organizational unit.
 
            POST /v1/organizationalUnits
            body: the organizational unit itself
@@ -1692,7 +1692,7 @@ paths:
       tags:
         - Organizational Units
       description: |-
-        Deletes a organizational unit.
+        Deletes an organizational unit.
 
            DELETE /v1/{name=organizationalUnits/*}
 
@@ -1735,7 +1735,7 @@ paths:
       tags:
         - Organizational Units
       description: |-
-        Updates a organizational unit.
+        Updates an organizational unit.
 
            PATCH /v1/{organizational_unit.name=organizationalUnits/*}
            body: the organizational unit itself
@@ -2297,7 +2297,7 @@ paths:
       tags:
         - Events
       description: |-
-        Creates a event.
+        Creates an event.
 
            POST /v1/{parent=calendars/*}/events
            body: the event itself
@@ -2408,7 +2408,7 @@ paths:
       tags:
         - Events
       description: |-
-        Deletes a event.
+        Deletes an event.
 
            DELETE /v1/{name=calendars/*/events/*}
 
@@ -2457,7 +2457,7 @@ paths:
       tags:
         - Events
       description: |-
-        Updates a event.
+        Updates an event.
 
            PATCH /v1/{event.name=calendars/*/events/*}
            body: the event itself

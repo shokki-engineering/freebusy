@@ -73,7 +73,7 @@ paths:
             tags:
                 - OrganizationalUnits
             description: |-
-                Creates a organizational unit.
+                Creates an organizational unit.
 
                    POST /v1/organizationalUnits
                    body: the organizational unit itself
@@ -158,7 +158,7 @@ paths:
             tags:
                 - OrganizationalUnits
             description: |-
-                Deletes a organizational unit.
+                Deletes an organizational unit.
 
                    DELETE /v1/{name=organizationalUnits/*}
 
@@ -194,7 +194,7 @@ paths:
             tags:
                 - OrganizationalUnits
             description: |-
-                Updates a organizational unit.
+                Updates an organizational unit.
 
                    PATCH /v1/{organizational_unit.name=organizationalUnits/*}
                    body: the organizational unit itself

@@ -35,6 +35,8 @@ tag `vx.y.z`. The release workflow refuses a tag that disagrees with either.
 - Alerts (`deploy/observability/alerts.yaml`) on server errors, latency, pool
   saturation, failed webhook deliveries, a failing hold sweeper and a silent
   deployment; runbooks for each in the README.
+- List-cache hit rate: `cache_gets_total{strategy="volatile",result=hit|miss}`,
+  with *List Cache Hit Rate* and *List Cache Gets* on the service dashboard.
 - Metrics: `freebusy_hold_sweeps_total`, `freebusy_hold_expired_total`,
   `freebusy_webhook_attempts_total` and `freebusy_webhook_delivery_lag_seconds`,
   with a "Background work" row on the service dashboard.
@@ -47,6 +49,28 @@ tag `vx.y.z`. The release workflow refuses a tag that disagrees with either.
 
 ### Fixed
 
+- Concurrent holds on one resource deadlocked under the exclusion
+  constraint: a burst of 16 callers racing for a window took up to 86 s on
+  Postgres, and on Hasura failed with Internal and could leave a free window
+  booked by nobody. A generated trigger now has writers of one resource take
+  turns (`pg_advisory_xact_lock` before the insert), and a generated batch
+  takes all its locks up front, in order. Contention p99 is now 44 ms on
+  Postgres and 115 ms on Hasura, every window won exactly once. Migration
+  `no_overlap_locks_routines` adds the trigger.
+- A soft delete now sets `expire_time` in the same write (AIP-164), and
+  Undelete clears it. The purger used to stamp it afterwards, which re-sent a
+  `deleted` webhook for every record it stamped -- thousands at once after a
+  bulk delete. Webhooks no longer resend a deletion for a later write to a
+  deleted record, either.
+- On Hasura, deletes and restores never reached webhooks: they did not move a
+  record's `update_time`, which the change feed reads by.
+- Webhook delivery rereads the last 30 seconds of changes each round, not the
+  last 2 minutes, so a burst of changes delays deliveries less.
+- A change made just after a webhook was created could be lost to it: a
+  delivery round read the webhooks first and the changes after, and a change
+  newer than its list of webhooks was recorded for nobody. A round now takes
+  only the changes up to its read of the webhooks; the next round takes the
+  rest. Slow rounds (Hasura) lost changes this way often.
 - `SearchAvailability` across an organization, with no sites named, found
   nothing: it matched sites by the organization's id while sites store its
   full name.

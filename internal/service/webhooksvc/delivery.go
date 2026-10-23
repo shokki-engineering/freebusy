@@ -183,6 +183,11 @@ func feedOf[R record](id string, list func(context.Context, repox.ListInput) ([]
 // dispatch reads each feed from its cursor, less Lag, and records what it
 // finds for the active webhooks that want it.
 func (s *Server) dispatch(ctx context.Context) error {
+	// The webhooks are read once a round, so a change after that read could
+	// meet a webhook the list does not hold yet, be recorded for nobody and
+	// never be sent. The round takes only the changes up to the read, less
+	// HookSettle for a webhook still committing; the next round takes the rest.
+	upTo := s.opts.Now().Add(-s.opts.HookSettle)
 	var hooks []*webhookpbv1.Webhook
 	for token := ""; ; {
 		page, next, err := s.repos.Webhooks.List(ctx, repox.ListInput{PageSize: 1000, PageToken: token})
@@ -199,38 +204,52 @@ func (s *Server) dispatch(ctx context.Context) error {
 		}
 	}
 	for _, f := range s.feeds() {
-		if err := s.dispatchFeed(ctx, f, hooks); err != nil {
+		if err := s.dispatchFeed(ctx, f, hooks, upTo); err != nil {
 			return fmt.Errorf("%s: %w", f.id, err)
 		}
 	}
 	return nil
 }
 
-func (s *Server) dispatchFeed(ctx context.Context, f feed, hooks []*webhookpbv1.Webhook) error {
+func (s *Server) dispatchFeed(ctx context.Context, f feed, hooks []*webhookpbv1.Webhook, upTo time.Time) error {
 	cur, err := s.cursor(ctx, f.id)
 	if err != nil {
 		return err
 	}
 	pos := cur.GetPositionTime().AsTime()
 	latest := pos
-	since := pos.Add(-s.opts.Lag).UTC().Format(time.RFC3339Nano)
+	// Each round rereads the Lag before the cursor, for writes that commit
+	// after a later one was read. Once a round has read up to Lag past the
+	// cursor, everything at or before it has committed and been read, so
+	// while the cursor stays put the rounds after read only what is newer --
+	// an idle feed would otherwise reread the same Lag every round.
+	from := filterx.Condition{Field: "update_time", Op: filterx.OpGte, Value: pos.Add(-s.opts.Lag).UTC().Format(time.RFC3339Nano)}
+	if s.isSettled(f.id, pos) {
+		from = filterx.Condition{Field: "update_time", Op: filterx.OpGt, Value: pos.UTC().Format(time.RFC3339Nano)}
+	}
 	for token := ""; ; {
 		page, next, err := f.read(ctx, repox.ListInput{
 			PageSize: feedPage, PageToken: token, OrderBy: "update_time",
-			Where: []filterx.Condition{{Field: "update_time", Op: filterx.OpGte, Value: since}},
+			Where: []filterx.Condition{
+				from,
+				// Later changes are the next round's (see dispatch).
+				{Field: "update_time", Op: filterx.OpLte, Value: upTo.UTC().Format(time.RFC3339Nano)},
+			},
 		})
 		if err != nil {
 			return err
 		}
 		for _, c := range page {
+			// A change sent to nobody still moves the cursor past it, or the
+			// next round would read it again, and the one after.
+			if c.updated.After(latest) {
+				latest = c.updated
+			}
 			if c.state == "unspecified" || s.seen(c) {
 				continue
 			}
 			if err := s.record(ctx, c, hooks); err != nil {
 				return err
-			}
-			if c.updated.After(latest) {
-				latest = c.updated
 			}
 		}
 		if token = next; token == "" {
@@ -239,6 +258,9 @@ func (s *Server) dispatchFeed(ctx context.Context, f feed, hooks []*webhookpbv1.
 	}
 	s.forget(latest.Add(-s.opts.Lag))
 	if !latest.After(pos) {
+		if !upTo.Before(pos.Add(s.opts.Lag)) {
+			s.settle(f.id, pos)
+		}
 		return nil
 	}
 	cur.PositionTime = timestamppb.New(latest)
@@ -294,6 +316,22 @@ func (s *Server) record(ctx context.Context, c change, hooks []*webhookpbv1.Webh
 	s.recorded[c.eventID()] = c.updated
 	s.mu.Unlock()
 	return nil
+}
+
+// isSettled reports whether feed's reads at cursor position pos may skip
+// the Lag before it (see dispatchFeed).
+func (s *Server) isSettled(feed string, pos time.Time) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	at, ok := s.settled[feed]
+	return ok && at.Equal(pos)
+}
+
+// settle marks feed's cursor position pos settled.
+func (s *Server) settle(feed string, pos time.Time) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.settled[feed] = pos
 }
 
 // seen reports whether this server recorded c already.

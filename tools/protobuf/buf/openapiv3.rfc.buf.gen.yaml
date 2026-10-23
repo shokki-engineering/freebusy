@@ -17,7 +17,7 @@ managed:
       value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go
       module: buf.build/the-protobuf-project/rfc
 inputs:
-  - module: buf.build/the-protobuf-project/rfc:ae1e2acc01d54d618303e57275f86dee
+  - module: buf.build/the-protobuf-project/rfc:bed218a71ce944ca8951f57bfb47274d
     types:
       - protobuf.rfc4519.organization.v1.Organizations
       - protobuf.rfc4519.organizational_unit.v1.OrganizationalUnits

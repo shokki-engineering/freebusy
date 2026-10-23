@@ -23,7 +23,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/oh-tarnished/runtime-go/ulid"
 	"github.com/shokki-engineering/freebusy/internal/database"
 	"github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/availability"
 	"github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/calendar"
@@ -35,6 +34,7 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/rfc"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
+	"github.com/the-protobuf-project/runtime-go/ulid"
 	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -79,7 +79,7 @@ type site struct {
 
 func seed(t *testing.T, db *gorm.DB) site {
 	t.Helper()
-	run := ulid.GenerateString()
+	run := ulid.Generate().String()
 	s := site{ou: "organizationalUnits/it-" + run}
 	create := func(v any) {
 		t.Helper()
@@ -104,23 +104,23 @@ func seed(t *testing.T, db *gorm.DB) site {
 		s.courts = append(s.courts, res.Name)
 		if i == 2 {
 			create(&resource.StructuredData{
-				ID: ulid.GenerateString(), ResourceID: id, Schema: ptr(rfc.ProfileSchemaURI),
+				ID: ulid.Generate().String(), ResourceID: id, Schema: ptr(rfc.ProfileSchemaURI),
 				Text: ptr(`{"min_duration":"PT1H"}`), ValueCase: ptr(resource.StructuredDataValueCaseText),
 			})
 		}
 
-		avID, startID, endID := ulid.GenerateString(), ulid.GenerateString(), ulid.GenerateString()
+		avID, startID, endID := ulid.Generate().String(), ulid.Generate().String(), ulid.Generate().String()
 		opens, closes := at(8).AddDate(0, 0, -7), at(22).AddDate(0, 0, -7)
 		create(&availability.CalendarTime{ID: startID, DateTime: &opens, ValueCase: &dt})
 		create(&availability.CalendarTime{ID: endID, DateTime: &closes, ValueCase: &dt})
 		create(&availability.Availability{ID: avID, Name: "calendars/" + calID + "/availabilities/" + avID, CalendarID: calID})
 		create(&availability.AvailablePeriod{
-			ID: ulid.GenerateString(), AvailabilityID: avID, StartID: startID, EndID: &endID,
+			ID: ulid.Generate().String(), AvailabilityID: avID, StartID: startID, EndID: &endID,
 			RecurrenceRule: ptr("FREQ=DAILY"), EndFormCase: &endForm,
 		})
 
 		if i == 0 {
-			evID, es, ee := ulid.GenerateString(), ulid.GenerateString(), ulid.GenerateString()
+			evID, es, ee := ulid.Generate().String(), ulid.Generate().String(), ulid.Generate().String()
 			from, to := at(18), at(19)
 			edt := event.CalendarTimeValueCaseDateTime
 			create(&event.CalendarTime{ID: es, DateTime: &from, ValueCase: &edt, EventID: evID})
@@ -247,7 +247,7 @@ func TestLiveEngine(t *testing.T) {
 
 			t.Run("lifecycle", func(t *testing.T) {
 				h, err := srv.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{
-					Parent: s.ou, Hold: &allocationpbv1.Hold{Window: win(10, 11), Quantity: 3, IdempotencyKey: "it-" + ulid.GenerateString()},
+					Parent: s.ou, Hold: &allocationpbv1.Hold{Window: win(10, 11), Quantity: 3, IdempotencyKey: "it-" + ulid.Generate().String()},
 				})
 				if err != nil {
 					t.Fatal(err)

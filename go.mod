@@ -8,18 +8,17 @@ go 1.26.5
 replace github.com/shokki-engineering/freebusy/protobuf => ./protobuf
 
 require (
-	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261021085804-ae1e2acc01d5.1
-	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261021085804-ae1e2acc01d5.2
+	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261023092131-bed218a71ce9.1
+	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261023092131-bed218a71ce9.2
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.12.3
 	github.com/modelcontextprotocol/go-sdk v1.8.0
-	github.com/oh-tarnished/runtime-go/ulid v0.0.0-20260625174747-ee0fd6e44bef
 	github.com/shokki-engineering/freebusy/protobuf v0.0.0-00010101000000-000000000000
-	github.com/the-protobuf-project/runtime-go/cache v0.0.0-20261021182109-ed0b69c46242
-	github.com/the-protobuf-project/runtime-go/grpc v0.0.0-20261021172408-4a614accbb1c
-	github.com/the-protobuf-project/runtime-go/network v0.0.0-20261021182109-ed0b69c46242
-	github.com/the-protobuf-project/runtime-go/rfc v0.0.0-20261021182109-ed0b69c46242
-	github.com/the-protobuf-project/telemetry/telemetry-go v0.0.0-20261021175734-19bcab17b113
+	github.com/the-protobuf-project/runtime-go/cache v0.0.0-20261023094910-2a7ef66b90e9
+	github.com/the-protobuf-project/runtime-go/grpc v0.0.0-20261023094910-2a7ef66b90e9
+	github.com/the-protobuf-project/runtime-go/network v0.0.0-20261023094910-2a7ef66b90e9
+	github.com/the-protobuf-project/runtime-go/rfc v0.0.0-20261023094910-2a7ef66b90e9
+	github.com/the-protobuf-project/telemetry/telemetry-go v0.0.0-20261023093202-d14384d7957b
 	go.opentelemetry.io/otel v1.47.0
 	google.golang.org/genproto v0.0.0-20261019180522-ce908d29299b
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b
@@ -111,11 +110,11 @@ require (
 	github.com/segmentio/encoding v0.5.4 // indirect
 	github.com/stretchr/testify v1.12.1 // indirect
 	github.com/the-protobuf-project/grpc-mcp-gateway v1.6.1 // indirect
-	github.com/the-protobuf-project/runtime-go/agents v0.0.0-20261021172408-4a614accbb1c // indirect
-	github.com/the-protobuf-project/runtime-go/observability v0.0.0-20261021182109-ed0b69c46242
-	github.com/the-protobuf-project/runtime-go/telemetry v0.0.0-20261021141431-6d4588022f2b
-	github.com/the-protobuf-project/runtime-go/ulid v0.0.0-20261021141431-6d4588022f2b // indirect
-	github.com/the-protobuf-project/store v1.5.7 // indirect
+	github.com/the-protobuf-project/runtime-go/agents v0.0.0-20261023094910-2a7ef66b90e9 // indirect
+	github.com/the-protobuf-project/runtime-go/observability v0.0.0-20261023094910-2a7ef66b90e9
+	github.com/the-protobuf-project/runtime-go/telemetry v0.0.0-20261023093745-f96e18ee517c
+	github.com/the-protobuf-project/runtime-go/ulid v0.0.0-20261023094910-2a7ef66b90e9
+	github.com/the-protobuf-project/store v1.5.8 // indirect
 	github.com/xo/terminfo v1.2.0 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect

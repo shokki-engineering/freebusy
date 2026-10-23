@@ -89,7 +89,7 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	opts := webhooksvc.Options{AllowInsecureEndpoints: true, AllowPrivateNetworks: true, Lag: 5 * time.Second, Sealer: sealer}
+	opts := webhooksvc.Options{AllowInsecureEndpoints: true, AllowPrivateNetworks: true, Lag: 5 * time.Second, HookSettle: time.Nanosecond, Sealer: sealer}
 	srv := webhooksvc.NewServer(repos, opts)
 	reservations := reservation.New(conn.Repox()).Reservations
 
@@ -261,7 +261,7 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 	if _, err := srv.RetryDelivery(ctx, &webhookpbv1.RetryDeliveryRequest{Name: d[0].GetName()}); err != nil {
 		t.Fatal(err)
 	}
-	if err := webhooksvc.NewServer(repos, webhooksvc.Options{AllowInsecureEndpoints: true, Lag: 5 * time.Second, Sealer: sealer}).Round(ctx); err != nil {
+	if err := webhooksvc.NewServer(repos, webhooksvc.Options{AllowInsecureEndpoints: true, Lag: 5 * time.Second, HookSettle: time.Nanosecond, Sealer: sealer}).Round(ctx); err != nil {
 		t.Fatal(err)
 	}
 	if got, _ := srv.GetDelivery(ctx, &webhookpbv1.GetDeliveryRequest{Name: d[0].GetName()}); got.GetState() != webhookpbv1.DeliveryState_DELIVERY_STATE_PENDING ||
@@ -312,7 +312,7 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 	defer func() {
 		_, _ = srv.DeleteWebhook(ctx, &webhookpbv1.DeleteWebhookRequest{Name: inv.GetName(), Force: true})
 	}()
-	resources := rfcsvc.NewRepositories(conn.Repox()).Resources
+	resources := rfcsvc.NewRepositories(conn.Repox(), 0).Resources
 	court := &resourcev1.Resource{Name: "resources/wh-court-" + suffix, DisplayName: "Court"}
 	if court, err = resources.Create(ctx, court); err != nil {
 		t.Fatal(err)
@@ -347,7 +347,7 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 	}
 
 	// Finished deliveries older than the retention are pruned.
-	short := webhooksvc.NewServer(repos, webhooksvc.Options{AllowInsecureEndpoints: true, AllowPrivateNetworks: true, Lag: 5 * time.Second, Sealer: sealer,
+	short := webhooksvc.NewServer(repos, webhooksvc.Options{AllowInsecureEndpoints: true, AllowPrivateNetworks: true, Lag: 5 * time.Second, HookSettle: time.Nanosecond, Sealer: sealer,
 		Retention: time.Nanosecond, Now: func() time.Time { return time.Now().Add(time.Minute) }})
 	for range 5 { // a page a round
 		if err := short.Round(ctx); err != nil {

@@ -58,7 +58,7 @@ go_test(
         "//protobuf/generated/go/allocation/v1/allocationpbv1",
         "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc5545/calendar/v1:calendar",
         "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc5545/event/v1:event",
-        "@com_github_oh_tarnished_runtime_go_ulid//:ulid",
+        "@com_github_the_protobuf_project_runtime_go_ulid//:ulid",
         "@io_gorm_gorm//:gorm",
         "@io_gorm_gorm//clause",
         "@io_gorm_gorm//logger",

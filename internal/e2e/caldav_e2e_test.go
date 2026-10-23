@@ -84,7 +84,7 @@ func mustContain(t *testing.T, what, body string, parts ...string) {
 const madrid = "BEGIN:VTIMEZONE\r\nTZID:Europe/Madrid\r\nBEGIN:DAYLIGHT\r\nTZOFFSETFROM:+0100\r\nTZOFFSETTO:+0200\r\nDTSTART:19810329T020000\r\nRRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU\r\nTZNAME:CEST\r\nEND:DAYLIGHT\r\nBEGIN:STANDARD\r\nTZOFFSETFROM:+0200\r\nTZOFFSETTO:+0100\r\nDTSTART:19961027T030000\r\nRRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU\r\nTZNAME:CET\r\nEND:STANDARD\r\nEND:VTIMEZONE\r\n"
 
 func caldavFlow(t *testing.T, conn *database.Connection) {
-	repos := rfcsvc.NewRepositories(conn.Repox())
+	repos := rfcsvc.NewRepositories(conn.Repox(), 0)
 	h := caldav.New(repos, allocation.NewServer(db.New(conn)))
 	mux := runtime.NewServeMux()
 	if err := h.Mount(mux); err != nil {

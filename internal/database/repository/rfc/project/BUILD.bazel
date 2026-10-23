@@ -17,6 +17,7 @@ go_library(
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/database/gorm/filterx",
+        "//internal/database/gorm/gormx",
         "//internal/database/gorm/rfc/project",
         "//internal/database/hasura/freebusyql",
         "//internal/database/hasura/freebusyql/projectql/resourceql",

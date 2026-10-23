@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 	"unicode"
 
 	eventv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
@@ -56,14 +57,14 @@ type Repositories struct {
 
 // NewRepositories opens every repository on conn, picking the backend the
 // connection carries.
-func NewRepositories(conn repox.Conn) Repositories {
+func NewRepositories(conn repox.Conn, retention time.Duration) Repositories {
 	return Repositories{
-		Organizations:       organization.New(conn).Organizations,
-		OrganizationalUnits: orgunit.New(conn).OrganizationalUnits,
-		Resources:           resource.New(conn).Resources,
-		Calendars:           calendar.New(conn).Calendars,
-		Availabilities:      availability.New(conn).Availabilities,
-		Events:              event.New(conn).Events,
+		Organizations:       organization.New(conn, organization.WithRetention(retention)).Organizations,
+		OrganizationalUnits: orgunit.New(conn, orgunit.WithRetention(retention)).OrganizationalUnits,
+		Resources:           resource.New(conn, resource.WithRetention(retention)).Resources,
+		Calendars:           calendar.New(conn, calendar.WithRetention(retention)).Calendars,
+		Availabilities:      availability.New(conn, availability.WithRetention(retention)).Availabilities,
+		Events:              event.New(conn, event.WithRetention(retention)).Events,
 	}
 }
 

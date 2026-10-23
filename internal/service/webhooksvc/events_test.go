@@ -116,3 +116,25 @@ func TestLifecycleAndSite(t *testing.T) {
 		t.Errorf("siteOf = %q", got)
 	}
 }
+
+func TestLifecycle(t *testing.T) {
+	at := func(sec int) *timestamppb.Timestamp {
+		return timestamppb.New(time.Date(2026, 11, 2, 10, 0, sec, 0, time.UTC))
+	}
+	for _, c := range []struct {
+		create, update, del *timestamppb.Timestamp
+		want                string
+	}{
+		{at(0), at(0), nil, "created"},
+		{at(0), at(5), nil, "updated"},
+		{at(0), at(9), at(9), "deleted"},
+		// Deleted by code that wrote the two a moment apart.
+		{at(0), at(9), at(8), "deleted"},
+		// Its expire_time stamped long after: not a deletion to send again.
+		{at(0), at(40), at(9), "unspecified"},
+	} {
+		if got := lifecycle(c.create, c.update, c.del); got != c.want {
+			t.Errorf("lifecycle(%v, %v, %v) = %q, want %q", c.create.AsTime(), c.update.AsTime(), c.del, got, c.want)
+		}
+	}
+}

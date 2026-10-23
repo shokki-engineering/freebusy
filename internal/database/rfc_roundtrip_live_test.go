@@ -22,7 +22,6 @@ import (
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
-	"github.com/oh-tarnished/runtime-go/ulid"
 	"github.com/shokki-engineering/freebusy/internal/database"
 	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
@@ -31,6 +30,7 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/event"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/resource"
 	"github.com/shokki-engineering/freebusy/internal/livetest"
+	"github.com/the-protobuf-project/runtime-go/ulid"
 	"google.golang.org/genproto/googleapis/type/datetime"
 	"google.golang.org/genproto/googleapis/type/dayofweek"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -79,7 +79,7 @@ func TestLiveRFCRoundTrip(t *testing.T) {
 	base := time.Date(2026, 11, 2, 8, 0, 0, 0, time.UTC)
 	for backend, conn := range liveConns(t) {
 		t.Run(backend, func(t *testing.T) {
-			run := ulid.GenerateString()
+			run := ulid.Generate().String()
 
 			t.Run("calendar keeps its time zone", func(t *testing.T) {
 				cals := calendar.New(conn).Calendars

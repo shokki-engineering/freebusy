@@ -10,7 +10,7 @@ info:
     description: |-
         Events manages RFC 5545 events as resources.
 
-         Named Events, not Calendar: the calendar a event belongs to is its own
+         Named Events, not Calendar: the calendar an event belongs to is its own
          resource, managed by protobuf.rfc5545.calendar.v1.Calendars. A service
          named after the parent while managing the child is how a reader ends up
          looking for CreateCalendar here.
@@ -90,7 +90,7 @@ paths:
             tags:
                 - Events
             description: |-
-                Creates a event.
+                Creates an event.
 
                    POST /v1/{parent=calendars/*}/events
                    body: the event itself
@@ -187,7 +187,7 @@ paths:
             tags:
                 - Events
             description: |-
-                Deletes a event.
+                Deletes an event.
 
                    DELETE /v1/{name=calendars/*/events/*}
 
@@ -229,7 +229,7 @@ paths:
             tags:
                 - Events
             description: |-
-                Updates a event.
+                Updates an event.
 
                    PATCH /v1/{event.name=calendars/*/events/*}
                    body: the event itself

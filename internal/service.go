@@ -98,7 +98,7 @@ func NewService(
 		reservations:              reservations,
 		webhooks:                  webhooks,
 		sites:                     rfcsvc.NewSites(repos),
-		purger:                    rfcsvc.NewPurger(repos, time.Duration(cmp.Or(config.Get().Retention.DeletedDays, 30))*24*time.Hour),
+		purger:                    rfcsvc.NewPurger(repos, config.Get().Retention.Period()),
 	}
 }
 

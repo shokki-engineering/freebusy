@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/oh-tarnished/runtime-go/ulid"
 	"github.com/shokki-engineering/freebusy/internal/database"
 	"github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/resource"
 	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql"
@@ -29,6 +28,7 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/service/reservation"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
+	"github.com/the-protobuf-project/runtime-go/ulid"
 	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -80,7 +80,7 @@ func backends(t *testing.T) (*gorm.DB, map[string]backend) {
 // the engine reads as always open.
 func seed(t *testing.T, db *gorm.DB) (site, court string) {
 	t.Helper()
-	run := ulid.GenerateString()
+	run := ulid.Generate().String()
 	ou := "it-" + run
 	res := &resource.Resource{ID: "court-" + run, Name: "resources/court-" + run, OrganizationalUnitID: &ou, ResourceTypes: []string{"padel-court"}}
 	if err := db.Omit(clause.Associations).Create(res).Error; err != nil {
@@ -253,7 +253,7 @@ func TestLiveReservations(t *testing.T) {
 			})
 
 			t.Run("concurrent holds with one idempotency key", func(t *testing.T) {
-				key := "cart-" + ulid.GenerateString()
+				key := "cart-" + ulid.Generate().String()
 				var wg sync.WaitGroup
 				names := make([]string, 8)
 				errs := make([]error, 8)

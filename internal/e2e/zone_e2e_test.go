@@ -44,7 +44,7 @@ func zoneFlow(t *testing.T, conn *database.Connection) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	repos := rfcsvc.NewRepositories(conn.Repox())
+	repos := rfcsvc.NewRepositories(conn.Repox(), 0)
 	suffix := fmt.Sprintf("%d", time.Now().UnixNano()%1_000_000_000)
 	calName := "calendars/zone-" + suffix
 	if _, err := repos.Calendars.Create(ctx, &calendarv1.Calendar{Name: calName, DisplayName: "zone", TimeZone: &datetime.TimeZone{Id: "Europe/Madrid"}}); err != nil {

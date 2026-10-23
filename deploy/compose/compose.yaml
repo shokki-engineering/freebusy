@@ -167,7 +167,7 @@ services:
   # change it). Set OTLP_ENDPOINT=telemetry:6009 in .env to send to it.
   telemetry:
     profiles: [observability]
-    image: ghcr.io/the-protobuf-project/telemetry:1.2.3
+    image: ghcr.io/the-protobuf-project/telemetry:1.2.4
     restart: unless-stopped
     ports:
       - "127.0.0.1:6009:6009"

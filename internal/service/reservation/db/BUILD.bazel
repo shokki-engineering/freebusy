@@ -37,7 +37,7 @@ go_test(
         "//internal/service/reservation",
         "//protobuf/generated/go/allocation/v1/allocationpbv1",
         "//protobuf/generated/go/reservation/v1/reservationpbv1",
-        "@com_github_oh_tarnished_runtime_go_ulid//:ulid",
+        "@com_github_the_protobuf_project_runtime_go_ulid//:ulid",
         "@io_gorm_gorm//:gorm",
         "@io_gorm_gorm//clause",
         "@io_gorm_gorm//logger",

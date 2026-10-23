@@ -8,11 +8,12 @@ package rfcsvc
 // once the retention has passed, and keeps expire_time saying when that will
 // be.
 //
-// The decision rests on delete_time alone. expire_time is what a caller reads,
-// and the purger keeps it true: it stamps delete_time + retention on deleted
-// records, and clears it on live ones, since Undelete restores a record
-// without touching the field. A stale expire_time therefore never purges
-// anything.
+// The decision rests on delete_time alone. expire_time is what a caller reads:
+// Delete sets it to delete_time + retention in the same write, and Undelete
+// clears it (the repositories' WithRetention). The purger only backfills: it
+// stamps records deleted without one -- before retention was configured, or
+// by an older server -- and clears one a restored record kept. A stale
+// expire_time therefore never purges anything.
 //
 // Children go before parents -- events and availability, calendars,
 // resources, sites, organizations -- and a parent with any child row left,

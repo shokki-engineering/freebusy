@@ -66,6 +66,12 @@ type RetentionConfig struct {
 	DeletedDays int `koanf:"deleted_days"`
 }
 
+// Period is how long a soft-deleted record stays restorable: DeletedDays, or
+// 30 days when unset.
+func (r RetentionConfig) Period() time.Duration {
+	return time.Duration(cmp.Or(r.DeletedDays, 30)) * 24 * time.Hour
+}
+
 // WebhooksConfig tunes webhook delivery (internal/service/webhooksvc).
 // WebhookService itself is always served; this decides whether this server
 // also sends what it records.
