@@ -37,7 +37,7 @@ managed:
       module: buf.build/the-protobuf-project/rfc
 inputs:
   # Pinned to the commit buf.lock records, and the SDK versions in go.mod.
-  - module: buf.build/the-protobuf-project/rfc:bed218a71ce944ca8951f57bfb47274d
+  - module: buf.build/the-protobuf-project/rfc:cc82b3b15066438ba44e89dad69e9f8a
 plugins:
   - remote: buf.build/grpc-ecosystem/gateway:v2.27.4
     out: protobuf/generated/go/rfc

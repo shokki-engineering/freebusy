@@ -12,6 +12,7 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/protobuf/timestamp.proto";
 import "google/type/interval.proto";
+import "service/v1/annotations.proto";
 import "store/v1/annotations.proto";
 
 option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1";
@@ -61,6 +62,18 @@ message Hold {
     plural: "holds"
   };
 
+  // A hold's changes are its state changes: the change feed sends
+  // freebusy.hold.<state> to the webhooks of its site (and of every site).
+  option (service.v1.event) = {
+    type: "freebusy.hold"
+    omit: [
+      "created",
+      "updated",
+      "deleted"
+    ]
+    scope: "organizational_unit"
+  };
+
   // The hold name. Nested under the site whose resources it takes, so a hold
   // is listed and swept per site without joining through every resource.
   // Format: organizationalUnits/{organizational_unit}/holds/{hold}
@@ -80,6 +93,8 @@ message Hold {
 
   // The window held. Immutable: moving it is a different allocation, so
   // release this hold and take another.
+  //
+  // Stored as text, its two ends in RFC 3339 joined by "/".
   google.type.Interval window = 3 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.field_behavior) = IMMUTABLE
@@ -132,6 +147,36 @@ message Hold {
 
   // Opaque version for optimistic concurrency (AIP-154); echo on update/delete.
   string etag = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The hold of the reservation this hold is taken to replace with
+  // RescheduleReservation: that reservation's `hold`, converted and at the
+  // same site. Its claims do not count against this hold, so a new window
+  // overlapping the old one -- an extension, a shift by an hour -- can keep
+  // the same resources. Until the move completes this hold claims only the
+  // time the old one does not; RescheduleReservation hands the rest over in
+  // the write that ends the old hold, so no one else can take it in between.
+  // Such a hold can only be used to reschedule that reservation. (A hold,
+  // though no resource_reference says so: AIP-121 allows no cycle of mutable
+  // references, and this one is a hold naming a hold.)
+  // Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  string replaces = 13 [
+    (google.api.field_behavior) = OPTIONAL,
+    (google.api.field_behavior) = IMMUTABLE,
+    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/holds/[^/]+$",
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  // An AIP-160 filter narrowing the resources the allocator may choose from,
+  // supplied on create, alongside `candidate_resources`: the same filter
+  // SearchAvailability takes, over each resource's `resource_types`,
+  // `attributes` (its STRUCTURED-DATA, e.g. `attributes.view = "river"`) and
+  // `display_name`. Empty narrows nothing. Immutable, like the candidates.
+  string candidate_filter = 14 [
+    (google.api.field_behavior) = OPTIONAL,
+    (google.api.field_behavior) = IMMUTABLE,
+    (buf.validate.field).string.max_len = 2048,
+    (store.v1.column) = {type: "TEXT"}
+  ];
 }
 
 // An Allocation is one resource taken by one hold for one span: the row the
@@ -274,4 +319,26 @@ message AvailabilityMatch {
   // RESOURCE-TYPE values carried by the resource, RFC 9073 section 6.3, echoed
   // so a caller can group results without re-fetching each resource.
   repeated string resource_types = 4;
+
+  // The resource's display name, echoed for the same reason.
+  string display_name = 5;
+}
+
+// The counts of one facet of a search: how many matching resources carry
+// each value of one field.
+message SearchFacet {
+  // The field counted, as the request named it, e.g. "attributes.view".
+  string field = 1;
+
+  // The most frequent values, most frequent first, at most 20.
+  repeated FacetBucket buckets = 2;
+}
+
+// One value of a facet and how many resources carry it.
+message FacetBucket {
+  // The value, as text: "river", "22", "true".
+  string value = 1;
+
+  // How many matching resources carry it.
+  int64 count = 2;
 }

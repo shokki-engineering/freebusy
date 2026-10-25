@@ -77,7 +77,7 @@ type serviceDoc struct {
 func main() {
 	root := repoRoot()
 	defaultSpecDir := filepath.Join(root, "protobuf", "generated", "openapi")
-	defaultOutput := filepath.Join(root, "docker/envoy", "launch.yaml")
+	defaultOutput := filepath.Join(root, "deploy/docker/envoy", "launch.yaml")
 
 	var (
 		output      string

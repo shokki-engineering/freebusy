@@ -65,6 +65,11 @@ func rank(p int) int {
 // Components of equal priority whose ranges overlap are unioned. RFC 7953 leaves
 // that case to the implementation, and union is the reading that never hides
 // time an operator deliberately published.
+//
+// One exception to "uncovered is offered": a component with a DTSTART and no
+// DTEND says "from then on, these hours", so the time before the earliest such
+// DTSTART that no component covers is not offered. Opening hours published
+// from Monday do not make the resource bookable around the clock until then.
 func Offered(avs []Availability, window Span) Spans {
 	if window.Empty() {
 		return nil
@@ -95,7 +100,25 @@ func Offered(avs []Availability, window Span) Spans {
 		offered = offered.Union(open.Intersect(claimed))
 		unclaimed = unclaimed.Subtract(claimed)
 	}
+	if from, ok := openFrom(avs); ok && from.After(window.Start) {
+		unclaimed = unclaimed.Subtract(Spans{{Start: window.Start, End: from}})
+	}
 	return offered.Union(unclaimed)
+}
+
+// openFrom is the earliest DTSTART of the components that have one and no
+// DTEND: the time from which the resource's published hours run on without
+// end. ok is false when no component is open-ended that way.
+func openFrom(avs []Availability) (from time.Time, ok bool) {
+	for _, a := range avs {
+		if a.Range.Start.IsZero() || !a.Range.End.IsZero() {
+			continue
+		}
+		if !ok || a.Range.Start.Before(from) {
+			from, ok = a.Range.Start, true
+		}
+	}
+	return from, ok
 }
 
 // periodsIn expands the component's periods inside rng. A period whose rule the

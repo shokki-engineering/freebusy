@@ -12,6 +12,7 @@ package reservationpbv1
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "github.com/the-protobuf-project/cache/plugin/pb/cachepbv1"
+	_ "github.com/the-protobuf-project/service/plugin/pb/servicepbv1"
 	_ "github.com/the-protobuf-project/store/plugin/entity/pb/entitypbv1"
 	_ "github.com/the-protobuf-project/store/plugin/pb/storepbv1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
@@ -30,6 +31,61 @@ const (
 	// Verify that runtime/protoimpl is sufficiently up-to-date.
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
+
+// What a write to a reservation changed.
+type Reservation_Change int32
+
+const (
+	// Default; never persisted.
+	Reservation_CHANGE_UNSPECIFIED Reservation_Change = 0
+	// Its state: it was created, confirmed, cancelled, rescheduled, or a
+	// transition was undone.
+	Reservation_CHANGE_STATE Reservation_Change = 1
+	// What is kept with it, through UpdateReservation: its customer or
+	// attributes. Its state did not change.
+	Reservation_CHANGE_DETAILS Reservation_Change = 2
+)
+
+// Enum value maps for Reservation_Change.
+var (
+	Reservation_Change_name = map[int32]string{
+		0: "CHANGE_UNSPECIFIED",
+		1: "CHANGE_STATE",
+		2: "CHANGE_DETAILS",
+	}
+	Reservation_Change_value = map[string]int32{
+		"CHANGE_UNSPECIFIED": 0,
+		"CHANGE_STATE":       1,
+		"CHANGE_DETAILS":     2,
+	}
+)
+
+func (x Reservation_Change) Enum() *Reservation_Change {
+	p := new(Reservation_Change)
+	*p = x
+	return p
+}
+
+func (x Reservation_Change) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Reservation_Change) Descriptor() protoreflect.EnumDescriptor {
+	return file_freebusy_reservation_v1_reservation_proto_enumTypes[0].Descriptor()
+}
+
+func (Reservation_Change) Type() protoreflect.EnumType {
+	return &file_freebusy_reservation_v1_reservation_proto_enumTypes[0]
+}
+
+func (x Reservation_Change) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Reservation_Change.Descriptor instead.
+func (Reservation_Change) EnumDescriptor() ([]byte, []int) {
+	return file_freebusy_reservation_v1_reservation_proto_rawDescGZIP(), []int{0, 0}
+}
 
 // A Reservation is a confirmed booking: a hold made permanent.
 //
@@ -59,7 +115,10 @@ type Reservation struct {
 	StartTime *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	// End of the reserved window, exclusive, copied from the hold.
 	EndTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	// Who the reservation is for, by name in the user service.
+	// Who the reservation is for, by name in the user service. freebusy does
+	// not keep users: when a resolver for the type is registered (config
+	// `reference_services`) a create or update checks the name with that service, and a deleted user leaves the
+	// reservation as it is.
 	// Format: users/{user}
 	Customer string `protobuf:"bytes,6,opt,name=customer,proto3" json:"customer,omitempty"`
 	// Lifecycle state.
@@ -85,7 +144,11 @@ type Reservation struct {
 	Replaces string `protobuf:"bytes,15,opt,name=replaces,proto3" json:"replaces,omitempty"`
 	// The reservation replacing this one, set when RescheduleReservation began.
 	// Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
-	Replacement   string `protobuf:"bytes,16,opt,name=replacement,proto3" json:"replacement,omitempty"`
+	Replacement string `protobuf:"bytes,16,opt,name=replacement,proto3" json:"replacement,omitempty"`
+	// What the last write to this reservation changed. A webhook is sent
+	// freebusy.reservation.updated exactly when it is CHANGE_DETAILS, and the
+	// event of the new state otherwise.
+	LastChange    Reservation_Change `protobuf:"varint,17,opt,name=last_change,json=lastChange,proto3,enum=freebusy.reservation.v1.Reservation_Change" json:"last_change,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -232,11 +295,18 @@ func (x *Reservation) GetReplacement() string {
 	return ""
 }
 
+func (x *Reservation) GetLastChange() Reservation_Change {
+	if x != nil {
+		return x.LastChange
+	}
+	return Reservation_CHANGE_UNSPECIFIED
+}
+
 var File_freebusy_reservation_v1_reservation_proto protoreflect.FileDescriptor
 
 const file_freebusy_reservation_v1_reservation_proto_rawDesc = "" +
 	"\n" +
-	")freebusy/reservation/v1/reservation.proto\x12\x17freebusy.reservation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acache/v1/annotations.proto\x1a\x1bentity/v1/annotations.proto\x1a#freebusy/reservation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\xd3\t\n" +
+	")freebusy/reservation/v1/reservation.proto\x12\x17freebusy.reservation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1acache/v1/annotations.proto\x1a\x1bentity/v1/annotations.proto\x1a#freebusy/reservation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cservice/v1/annotations.proto\x1a\x1astore/v1/annotations.proto\"\xe3\v\n" +
 	"\vReservation\x12P\n" +
 	"\x04name\x18\x01 \x01(\tB<\xe2A\x01\b\xbaH5\xd8\x01\x01r02.^organizationalUnits/[^/]+/reservations/[^/]+$R\x04name\x12m\n" +
 	"\x04hold\x18\x02 \x01(\tBY\xe2A\x02\x02\x05\xfaA\x1d\n" +
@@ -245,8 +315,9 @@ const file_freebusy_reservation_v1_reservation_proto_rawDesc = "" +
 	"!the-protobuf-project.org/ResourceR\tresources\x12?\n" +
 	"\n" +
 	"start_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\tstartTime\x12;\n" +
-	"\bend_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\aendTime\x12=\n" +
-	"\bcustomer\x18\x06 \x01(\tB!\xe2A\x01\x01\xbaH\x14\xd8\x01\x01r\x0f2\r^users/[^/]+$\xe2\xb5\x18\x02\x18\x01R\bcustomer\x12R\n" +
+	"\bend_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\aendTime\x12e\n" +
+	"\bcustomer\x18\x06 \x01(\tBI\xe2A\x01\x01\xfaA\x1f\n" +
+	"\x1dusers.shokki.engineering/User\xbaH\x14\xd8\x01\x01r\x0f2\r^users/[^/]+$\xe2\xb5\x18\x02\x18\x01\xea\xb5\x18\x02\b\x02R\bcustomer\x12R\n" +
 	"\x05state\x18\a \x01(\x0e2).freebusy.reservation.v1.ReservationStateB\x11\xe2A\x01\x03ڵ\x18\t\x12\aPENDINGR\x05state\x12=\n" +
 	"\n" +
 	"attributes\x18\b \x01(\v2\x17.google.protobuf.StructB\x04\xe2A\x01\x01R\n" +
@@ -262,12 +333,19 @@ const file_freebusy_reservation_v1_reservation_proto_rawDesc = "" +
 	"cancelTime\x12\x18\n" +
 	"\x04etag\x18\x0e \x01(\tB\x04\xe2A\x01\x03R\x04etag\x12 \n" +
 	"\breplaces\x18\x0f \x01(\tB\x04\xe2A\x01\x03R\breplaces\x12&\n" +
-	"\vreplacement\x18\x10 \x01(\tB\x04\xe2A\x01\x03R\vreplacement:\xcb\x01\xeaA\x86\x01\n" +
+	"\vreplacement\x18\x10 \x01(\tB\x04\xe2A\x01\x03R\vreplacement\x12]\n" +
+	"\vlast_change\x18\x11 \x01(\x0e2+.freebusy.reservation.v1.Reservation.ChangeB\x0f\xe2A\x01\x03ڵ\x18\a\x12\x05STATER\n" +
+	"lastChange\"F\n" +
+	"\x06Change\x12\x16\n" +
+	"\x12CHANGE_UNSPECIFIED\x10\x00\x12\x10\n" +
+	"\fCHANGE_STATE\x10\x01\x12\x12\n" +
+	"\x0eCHANGE_DETAILS\x10\x02:\x8c\x02\xeaA\x86\x01\n" +
 	"#freebusy.reservation.v1/Reservation\x12DorganizationalUnits/{organizational_unit}/reservations/{reservation}*\freservations2\vreservation\xca\xf3\x181\x18\x01*\b\n" +
 	"\x04hold\x10\x01*\x14\n" +
 	"\x05state\n" +
 	"\vupdate_time*\r\n" +
-	"\vupdate_time\x8a\xb2\x19\b:\x06\b\x01\x12\x02\b<B\x9a\x02\n" +
+	"\vupdate_time\x8a\xb2\x19\b:\x06\b\x01\x12\x02\b<\xd2\xf0\x19=\n" +
+	"\x14freebusy.reservation\x12\acreated\x12\adeleted\x1a\x13organizational_unitB\x9a\x02\n" +
 	"\x1bcom.freebusy.reservation.v1B\x10ReservationProtoP\x01Zkgithub.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
 
 var (
@@ -282,27 +360,30 @@ func file_freebusy_reservation_v1_reservation_proto_rawDescGZIP() []byte {
 	return file_freebusy_reservation_v1_reservation_proto_rawDescData
 }
 
+var file_freebusy_reservation_v1_reservation_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_freebusy_reservation_v1_reservation_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_freebusy_reservation_v1_reservation_proto_goTypes = []any{
-	(*Reservation)(nil),           // 0: freebusy.reservation.v1.Reservation
-	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
-	(ReservationState)(0),         // 2: freebusy.reservation.v1.ReservationState
-	(*structpb.Struct)(nil),       // 3: google.protobuf.Struct
+	(Reservation_Change)(0),       // 0: freebusy.reservation.v1.Reservation.Change
+	(*Reservation)(nil),           // 1: freebusy.reservation.v1.Reservation
+	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
+	(ReservationState)(0),         // 3: freebusy.reservation.v1.ReservationState
+	(*structpb.Struct)(nil),       // 4: google.protobuf.Struct
 }
 var file_freebusy_reservation_v1_reservation_proto_depIdxs = []int32{
-	1, // 0: freebusy.reservation.v1.Reservation.start_time:type_name -> google.protobuf.Timestamp
-	1, // 1: freebusy.reservation.v1.Reservation.end_time:type_name -> google.protobuf.Timestamp
-	2, // 2: freebusy.reservation.v1.Reservation.state:type_name -> freebusy.reservation.v1.ReservationState
-	3, // 3: freebusy.reservation.v1.Reservation.attributes:type_name -> google.protobuf.Struct
-	1, // 4: freebusy.reservation.v1.Reservation.create_time:type_name -> google.protobuf.Timestamp
-	1, // 5: freebusy.reservation.v1.Reservation.update_time:type_name -> google.protobuf.Timestamp
-	1, // 6: freebusy.reservation.v1.Reservation.confirm_time:type_name -> google.protobuf.Timestamp
-	1, // 7: freebusy.reservation.v1.Reservation.cancel_time:type_name -> google.protobuf.Timestamp
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	2, // 0: freebusy.reservation.v1.Reservation.start_time:type_name -> google.protobuf.Timestamp
+	2, // 1: freebusy.reservation.v1.Reservation.end_time:type_name -> google.protobuf.Timestamp
+	3, // 2: freebusy.reservation.v1.Reservation.state:type_name -> freebusy.reservation.v1.ReservationState
+	4, // 3: freebusy.reservation.v1.Reservation.attributes:type_name -> google.protobuf.Struct
+	2, // 4: freebusy.reservation.v1.Reservation.create_time:type_name -> google.protobuf.Timestamp
+	2, // 5: freebusy.reservation.v1.Reservation.update_time:type_name -> google.protobuf.Timestamp
+	2, // 6: freebusy.reservation.v1.Reservation.confirm_time:type_name -> google.protobuf.Timestamp
+	2, // 7: freebusy.reservation.v1.Reservation.cancel_time:type_name -> google.protobuf.Timestamp
+	0, // 8: freebusy.reservation.v1.Reservation.last_change:type_name -> freebusy.reservation.v1.Reservation.Change
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_freebusy_reservation_v1_reservation_proto_init() }
@@ -316,13 +397,14 @@ func file_freebusy_reservation_v1_reservation_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_freebusy_reservation_v1_reservation_proto_rawDesc), len(file_freebusy_reservation_v1_reservation_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_freebusy_reservation_v1_reservation_proto_goTypes,
 		DependencyIndexes: file_freebusy_reservation_v1_reservation_proto_depIdxs,
+		EnumInfos:         file_freebusy_reservation_v1_reservation_proto_enumTypes,
 		MessageInfos:      file_freebusy_reservation_v1_reservation_proto_msgTypes,
 	}.Build()
 	File_freebusy_reservation_v1_reservation_proto = out.File

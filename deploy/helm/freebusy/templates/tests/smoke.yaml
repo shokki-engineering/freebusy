@@ -1,0 +1,50 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+{{- if .Values.tests.enabled }}
+{{- $base := printf "http://%s:%v" (include "freebusy.fullname" .) .Values.service.httpPort }}
+# `helm test <release>`: through the Service, the server answers its health
+# check and a read API (a one-row page of organizations, which needs the
+# database). Read-only: it leaves nothing behind.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "freebusy.fullname" . }}-test
+  labels:
+    {{- include "freebusy.labels" . | nindent 4 }}
+    app.kubernetes.io/component: test
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  {{- with .Values.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  containers:
+    - name: smoke
+      image: {{ printf "%s:%s" .Values.tests.image.repository .Values.tests.image.tag }}
+      imagePullPolicy: {{ .Values.tests.image.pullPolicy }}
+      command: ["sh", "-c"]
+      args:
+        - |
+          set -e
+          check() {
+            code=$(curl -sS -o /tmp/body -w '%{http_code}' --retry 5 --retry-connrefused --retry-delay 2 "$1")
+            echo "GET $1 -> $code"
+            if [ "$code" != 200 ]; then head -c 500 /tmp/body; echo; exit 1; fi
+          }
+          check {{ $base }}/health
+          check '{{ $base }}/v1/organizations?pageSize=1'
+          echo ok
+      resources:
+        requests: { cpu: 10m, memory: 16Mi }
+        limits: { memory: 64Mi }
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 100
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+{{- end }}

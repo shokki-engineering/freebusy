@@ -1,0 +1,436 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: EventResource
+  fields:
+    - name: calendarId
+      type: String_1!
+    - name: classification
+      type: String_1
+    - name: concepts
+      type: "[String_1]"
+    - name: confirmation
+      type: String_1
+    - name: createTime
+      type: Timestamptz!
+    - name: deleteTime
+      type: Timestamptz
+    - name: description
+      type: String_1
+    - name: duration
+      type: String_1
+    - name: endId
+      type: String_1
+    - name: endsCase
+      type: String_1
+    - name: etag
+      type: String_1
+    - name: expireTime
+      type: Timestamptz
+    - name: icalUid
+      type: String_1
+    - name: id
+      type: String_1!
+    - name: location
+      type: String_1
+    - name: name
+      type: String_1!
+    - name: organizerId
+      type: String_1
+    - name: originalStartId
+      type: String_1
+    - name: originalStartRange
+      type: String_1
+    - name: position
+      type: String_1
+    - name: recurrenceId
+      type: String_1
+    - name: refids
+      type: "[String_1]"
+    - name: sequence
+      type: Int32
+    - name: startId
+      type: String_1!
+    - name: summary
+      type: String_1
+    - name: transparency
+      type: String_1
+    - name: uid
+      type: String_1
+    - name: updateTime
+      type: Timestamptz!
+  graphql:
+    typeName: EventResource
+    inputTypeName: EventResourceInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: event_resource
+      fieldMapping:
+        calendarId:
+          column:
+            name: calendar_id
+        classification:
+          column:
+            name: classification
+        concepts:
+          column:
+            name: concepts
+        confirmation:
+          column:
+            name: confirmation
+        createTime:
+          column:
+            name: create_time
+        deleteTime:
+          column:
+            name: delete_time
+        description:
+          column:
+            name: description
+        duration:
+          column:
+            name: duration
+        endId:
+          column:
+            name: end_id
+        endsCase:
+          column:
+            name: ends_case
+        etag:
+          column:
+            name: etag
+        expireTime:
+          column:
+            name: expire_time
+        icalUid:
+          column:
+            name: ical_uid
+        id:
+          column:
+            name: id
+        location:
+          column:
+            name: location
+        name:
+          column:
+            name: name
+        organizerId:
+          column:
+            name: organizer_id
+        originalStartId:
+          column:
+            name: original_start_id
+        originalStartRange:
+          column:
+            name: original_start_range
+        position:
+          column:
+            name: position
+        recurrenceId:
+          column:
+            name: recurrence_id
+        refids:
+          column:
+            name: refids
+        sequence:
+          column:
+            name: sequence
+        startId:
+          column:
+            name: start_id
+        summary:
+          column:
+            name: summary
+        transparency:
+          column:
+            name: transparency
+        uid:
+          column:
+            name: uid
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: EventResource
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - calendarId
+          - classification
+          - concepts
+          - confirmation
+          - createTime
+          - deleteTime
+          - description
+          - duration
+          - endId
+          - endsCase
+          - etag
+          - expireTime
+          - icalUid
+          - id
+          - location
+          - name
+          - organizerId
+          - originalStartId
+          - originalStartRange
+          - position
+          - recurrenceId
+          - refids
+          - sequence
+          - startId
+          - summary
+          - transparency
+          - uid
+          - updateTime
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: EventResourceBoolExp
+  operand:
+    object:
+      type: EventResource
+      comparableFields:
+        - fieldName: calendarId
+          booleanExpressionType: TextBoolExp
+        - fieldName: classification
+          booleanExpressionType: TextBoolExp
+        - fieldName: confirmation
+          booleanExpressionType: TextBoolExp
+        - fieldName: createTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: deleteTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: description
+          booleanExpressionType: TextBoolExp
+        - fieldName: duration
+          booleanExpressionType: TextBoolExp
+        - fieldName: endId
+          booleanExpressionType: TextBoolExp
+        - fieldName: endsCase
+          booleanExpressionType: TextBoolExp
+        - fieldName: etag
+          booleanExpressionType: TextBoolExp
+        - fieldName: expireTime
+          booleanExpressionType: TimestamptzBoolExp
+        - fieldName: icalUid
+          booleanExpressionType: TextBoolExp
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: location
+          booleanExpressionType: TextBoolExp
+        - fieldName: name
+          booleanExpressionType: TextBoolExp
+        - fieldName: organizerId
+          booleanExpressionType: TextBoolExp
+        - fieldName: originalStartId
+          booleanExpressionType: TextBoolExp
+        - fieldName: originalStartRange
+          booleanExpressionType: TextBoolExp
+        - fieldName: position
+          booleanExpressionType: TextBoolExp
+        - fieldName: recurrenceId
+          booleanExpressionType: TextBoolExp
+        - fieldName: sequence
+          booleanExpressionType: Int4BoolExp
+        - fieldName: startId
+          booleanExpressionType: TextBoolExp
+        - fieldName: summary
+          booleanExpressionType: TextBoolExp
+        - fieldName: transparency
+          booleanExpressionType: TextBoolExp
+        - fieldName: uid
+          booleanExpressionType: TextBoolExp
+        - fieldName: updateTime
+          booleanExpressionType: TimestamptzBoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: EventResourceBoolExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: EventResourceAggExp
+  operand:
+    object:
+      aggregatedType: EventResource
+      aggregatableFields:
+        - fieldName: calendarId
+          aggregateExpression: TextAggExp
+        - fieldName: classification
+          aggregateExpression: TextAggExp
+        - fieldName: confirmation
+          aggregateExpression: TextAggExp
+        - fieldName: createTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: deleteTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: description
+          aggregateExpression: TextAggExp
+        - fieldName: duration
+          aggregateExpression: TextAggExp
+        - fieldName: endId
+          aggregateExpression: TextAggExp
+        - fieldName: endsCase
+          aggregateExpression: TextAggExp
+        - fieldName: etag
+          aggregateExpression: TextAggExp
+        - fieldName: expireTime
+          aggregateExpression: TimestamptzAggExp
+        - fieldName: icalUid
+          aggregateExpression: TextAggExp
+        - fieldName: id
+          aggregateExpression: TextAggExp
+        - fieldName: location
+          aggregateExpression: TextAggExp
+        - fieldName: name
+          aggregateExpression: TextAggExp
+        - fieldName: organizerId
+          aggregateExpression: TextAggExp
+        - fieldName: originalStartId
+          aggregateExpression: TextAggExp
+        - fieldName: originalStartRange
+          aggregateExpression: TextAggExp
+        - fieldName: position
+          aggregateExpression: TextAggExp
+        - fieldName: recurrenceId
+          aggregateExpression: TextAggExp
+        - fieldName: sequence
+          aggregateExpression: Int4AggExp
+        - fieldName: startId
+          aggregateExpression: TextAggExp
+        - fieldName: summary
+          aggregateExpression: TextAggExp
+        - fieldName: transparency
+          aggregateExpression: TextAggExp
+        - fieldName: uid
+          aggregateExpression: TextAggExp
+        - fieldName: updateTime
+          aggregateExpression: TimestamptzAggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: EventResourceAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: EventResourceOrderByExp
+  operand:
+    object:
+      orderedType: EventResource
+      orderableFields:
+        - fieldName: calendarId
+          orderByExpression: String1OrderByExp
+        - fieldName: classification
+          orderByExpression: String1OrderByExp
+        - fieldName: confirmation
+          orderByExpression: String1OrderByExp
+        - fieldName: createTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: deleteTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: description
+          orderByExpression: String1OrderByExp
+        - fieldName: duration
+          orderByExpression: String1OrderByExp
+        - fieldName: endId
+          orderByExpression: String1OrderByExp
+        - fieldName: endsCase
+          orderByExpression: String1OrderByExp
+        - fieldName: etag
+          orderByExpression: String1OrderByExp
+        - fieldName: expireTime
+          orderByExpression: TimestamptzOrderByExp
+        - fieldName: icalUid
+          orderByExpression: String1OrderByExp
+        - fieldName: id
+          orderByExpression: String1OrderByExp
+        - fieldName: location
+          orderByExpression: String1OrderByExp
+        - fieldName: name
+          orderByExpression: String1OrderByExp
+        - fieldName: organizerId
+          orderByExpression: String1OrderByExp
+        - fieldName: originalStartId
+          orderByExpression: String1OrderByExp
+        - fieldName: originalStartRange
+          orderByExpression: String1OrderByExp
+        - fieldName: position
+          orderByExpression: String1OrderByExp
+        - fieldName: recurrenceId
+          orderByExpression: String1OrderByExp
+        - fieldName: sequence
+          orderByExpression: Int32OrderByExp
+        - fieldName: startId
+          orderByExpression: String1OrderByExp
+        - fieldName: summary
+          orderByExpression: String1OrderByExp
+        - fieldName: transparency
+          orderByExpression: String1OrderByExp
+        - fieldName: uid
+          orderByExpression: String1OrderByExp
+        - fieldName: updateTime
+          orderByExpression: TimestamptzOrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: EventResourceOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: EventResource
+  objectType: EventResource
+  source:
+    dataConnectorName: freebusy_pgsql
+    collection: event_resource
+  filterExpressionType: EventResourceBoolExp
+  aggregateExpression: EventResourceAggExp
+  orderByExpression: EventResourceOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: eventResource
+      subscription:
+        rootField: eventResource
+    selectUniques:
+      - queryRootField: eventResourceById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: eventResourceById
+    filterInputTypeName: EventResourceFilterInput
+    aggregate:
+      queryRootField: eventResourceAggregate
+      subscription:
+        rootField: eventResourceAggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: EventResource
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+

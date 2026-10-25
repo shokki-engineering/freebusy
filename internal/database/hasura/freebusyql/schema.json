@@ -15,6 +15,16 @@
       "description": "",
       "fields": [
         {
+          "name": "candidateFilter",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
           "name": "candidateResources",
           "description": "",
           "args": [],
@@ -125,6 +135,16 @@
           }
         },
         {
+          "name": "replaces",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
           "name": "resources",
           "description": "",
           "args": [],
@@ -196,6 +216,20 @@
             "ofType": {
               "kind": "SCALAR",
               "name": "Int64",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "candidateFilter",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
               "ofType": null
             }
           }
@@ -313,6 +347,20 @@
           }
         },
         {
+          "name": "replaces",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
           "name": "state",
           "description": "",
           "args": [],
@@ -412,6 +460,16 @@
           "defaultValue": null
         },
         {
+          "name": "candidateFilter",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
           "name": "createTime",
           "description": "",
           "type": {
@@ -487,6 +545,16 @@
           "type": {
             "kind": "INPUT_OBJECT",
             "name": "Int4BoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "replaces",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
             "ofType": null
           },
           "defaultValue": null
@@ -590,6 +658,16 @@
       "fields": null,
       "inputFields": [
         {
+          "name": "candidateFilter",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
           "name": "createTime",
           "description": "",
           "type": {
@@ -661,6 +739,16 @@
         },
         {
           "name": "quantity",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "replaces",
           "description": "",
           "type": {
             "kind": "ENUM",
@@ -1119,6 +1207,682 @@
           "type": {
             "kind": "INPUT_OBJECT",
             "name": "TimestamptzBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "OBJECT",
+      "name": "AllocationResourceDays",
+      "description": "",
+      "fields": [
+        {
+          "name": "attributes",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "Json",
+            "ofType": null
+          }
+        },
+        {
+          "name": "calendar",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
+          "name": "day",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Date",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "displayName",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
+          "name": "free",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Json",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "freeFraction",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "Float64",
+            "ofType": null
+          }
+        },
+        {
+          "name": "id",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "organization",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
+          "name": "organizationalUnit",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
+          "name": "resource",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "resourceTypes",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "rowVersion",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Int64",
+              "ofType": null
+            }
+          }
+        }
+      ],
+      "inputFields": null,
+      "enumValues": null,
+      "interfaces": []
+    },
+    {
+      "kind": "OBJECT",
+      "name": "AllocationResourceDaysAggExp",
+      "description": "",
+      "fields": [
+        {
+          "name": "_count",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Int64",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "attributes",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "JsonbAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "calendar",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "day",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "DateAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "displayName",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "free",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TstzmultirangeAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "freeFraction",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "Float8AggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "id",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "organization",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "organizationalUnit",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "resource",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "rowVersion",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "Int8AggExp",
+              "ofType": null
+            }
+          }
+        }
+      ],
+      "inputFields": null,
+      "enumValues": null,
+      "interfaces": []
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "AllocationResourceDaysBoolExp",
+      "description": "",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "_and",
+          "description": "",
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "NON_NULL",
+              "name": "",
+              "ofType": {
+                "kind": "INPUT_OBJECT",
+                "name": "AllocationResourceDaysBoolExp",
+                "ofType": null
+              }
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "_not",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "AllocationResourceDaysBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "_or",
+          "description": "",
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "NON_NULL",
+              "name": "",
+              "ofType": {
+                "kind": "INPUT_OBJECT",
+                "name": "AllocationResourceDaysBoolExp",
+                "ofType": null
+              }
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "attributes",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "JsonbBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "calendar",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "day",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "DateBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "displayName",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "free",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TstzmultirangeBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "freeFraction",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "Float8BoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "id",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "organization",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "organizationalUnit",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "resource",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "rowVersion",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "Int8BoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "AllocationResourceDaysFilterInput",
+      "description": "",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "limit",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Int",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "offset",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Int",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "order_by",
+          "description": "",
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "NON_NULL",
+              "name": "",
+              "ofType": {
+                "kind": "INPUT_OBJECT",
+                "name": "AllocationResourceDaysOrderByExp",
+                "ofType": null
+              }
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "where",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "AllocationResourceDaysBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "AllocationResourceDaysOrderByExp",
+      "description": "",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "attributes",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "calendar",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "day",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "displayName",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "free",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "freeFraction",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "id",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "organization",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "organizationalUnit",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "resource",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "rowVersion",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
             "ofType": null
           },
           "defaultValue": null
@@ -9281,6 +10045,52 @@
     },
     {
       "kind": "OBJECT",
+      "name": "DeleteAllocationResourceDaysByIdResponse",
+      "description": "Responses from the 'delete_allocation_resource_days_by_id' procedure",
+      "fields": [
+        {
+          "name": "affectedRows",
+          "description": "The number of rows affected by the mutation",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Int32",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "returning",
+          "description": "Data from rows affected by the mutation",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "LIST",
+              "name": "",
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "AllocationResourceDays",
+                  "ofType": null
+                }
+              }
+            }
+          }
+        }
+      ],
+      "inputFields": null,
+      "enumValues": null,
+      "interfaces": []
+    },
+    {
+      "kind": "OBJECT",
       "name": "DeleteAvailabilityAvailabilitiesByIdResponse",
       "description": "Responses from the 'delete_availability_availabilities_by_id' procedure",
       "fields": [
@@ -10924,52 +11734,6 @@
                 "ofType": {
                   "kind": "OBJECT",
                   "name": "PackResource",
-                  "ofType": null
-                }
-              }
-            }
-          }
-        }
-      ],
-      "inputFields": null,
-      "enumValues": null,
-      "interfaces": []
-    },
-    {
-      "kind": "OBJECT",
-      "name": "DeletePrismaMigrationsByIdResponse",
-      "description": "Responses from the 'delete__prisma_migrations_by_id' procedure",
-      "fields": [
-        {
-          "name": "affectedRows",
-          "description": "The number of rows affected by the mutation",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "Int32",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "returning",
-          "description": "Data from rows affected by the mutation",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "LIST",
-              "name": "",
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": "",
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "PrismaMigrations",
                   "ofType": null
                 }
               }
@@ -18233,6 +18997,16 @@
           }
         },
         {
+          "name": "originalStartRange",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
           "name": "position",
           "description": "",
           "args": [],
@@ -18597,6 +19371,20 @@
           }
         },
         {
+          "name": "originalStartRange",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
           "name": "position",
           "description": "",
           "args": [],
@@ -18936,6 +19724,16 @@
           "defaultValue": null
         },
         {
+          "name": "originalStartRange",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
           "name": "position",
           "description": "",
           "type": {
@@ -19245,6 +20043,16 @@
         },
         {
           "name": "originalStartId",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "originalStartRange",
           "description": "",
           "type": {
             "kind": "ENUM",
@@ -21675,6 +22483,16 @@
       "fields": null,
       "inputFields": [
         {
+          "name": "candidateFilter",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
           "name": "candidateResources",
           "description": "",
           "type": {
@@ -21785,6 +22603,16 @@
           "defaultValue": null
         },
         {
+          "name": "replaces",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
           "name": "resources",
           "description": "",
           "type": {
@@ -21875,6 +22703,202 @@
                 "ofType": {
                   "kind": "OBJECT",
                   "name": "AllocationHolds",
+                  "ofType": null
+                }
+              }
+            }
+          }
+        }
+      ],
+      "inputFields": null,
+      "enumValues": null,
+      "interfaces": []
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "InsertAllocationResourceDaysObjectInput",
+      "description": "",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "attributes",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Json",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "calendar",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "day",
+          "description": "",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Date",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "displayName",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "free",
+          "description": "",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Json",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "freeFraction",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Float64",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "id",
+          "description": "",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "organization",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "organizationalUnit",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "resource",
+          "description": "",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "resourceTypes",
+          "description": "",
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "rowVersion",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Int64",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "OBJECT",
+      "name": "InsertAllocationResourceDaysResponse",
+      "description": "Responses from the 'insert_allocation_resource_days' procedure",
+      "fields": [
+        {
+          "name": "affectedRows",
+          "description": "The number of rows affected by the mutation",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Int32",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "returning",
+          "description": "Data from rows affected by the mutation",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "LIST",
+              "name": "",
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "AllocationResourceDays",
                   "ofType": null
                 }
               }
@@ -25825,6 +26849,16 @@
           "defaultValue": null
         },
         {
+          "name": "originalStartRange",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
           "name": "position",
           "description": "",
           "type": {
@@ -28414,154 +29448,6 @@
     },
     {
       "kind": "INPUT_OBJECT",
-      "name": "InsertPrismaMigrationsObjectInput",
-      "description": "",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "appliedStepsCount",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "Int32",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "checksum",
-          "description": "",
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "finishedAt",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "Timestamptz",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "id",
-          "description": "",
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "logs",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "migrationName",
-          "description": "",
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "rolledBackAt",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "Timestamptz",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "startedAt",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "Timestamptz",
-            "ofType": null
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "OBJECT",
-      "name": "InsertPrismaMigrationsResponse",
-      "description": "Responses from the 'insert__prisma_migrations' procedure",
-      "fields": [
-        {
-          "name": "affectedRows",
-          "description": "The number of rows affected by the mutation",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "Int32",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "returning",
-          "description": "Data from rows affected by the mutation",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "LIST",
-              "name": "",
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": "",
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "PrismaMigrations",
-                  "ofType": null
-                }
-              }
-            }
-          }
-        }
-      ],
-      "inputFields": null,
-      "enumValues": null,
-      "interfaces": []
-    },
-    {
-      "kind": "INPUT_OBJECT",
       "name": "InsertProjectResourceObjectInput",
       "description": "",
       "fields": null,
@@ -28891,6 +29777,16 @@
               "name": "String1",
               "ofType": null
             }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "lastChange",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
           },
           "defaultValue": null
         },
@@ -39716,6 +40612,45 @@
           }
         },
         {
+          "name": "deleteAllocationResourceDaysById",
+          "description": "Delete any row on the 'allocation_resource_days' collection using the 'id' key",
+          "args": [
+            {
+              "name": "keyId",
+              "description": "",
+              "type": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String1",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "preCheck",
+              "description": "Delete permission predicate over the 'allocation_resource_days' collection",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "AllocationResourceDaysBoolExp",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "DeleteAllocationResourceDaysByIdResponse",
+              "ofType": null
+            }
+          }
+        },
+        {
           "name": "deleteAvailabilityAvailabilitiesById",
           "description": "Delete any row on the 'availability_availabilities' collection using the 'id' key",
           "args": [
@@ -41115,45 +42050,6 @@
             "ofType": {
               "kind": "OBJECT",
               "name": "DeletePackResourceByIdResponse",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "deletePrismaMigrationsById",
-          "description": "Delete any row on the '_prisma_migrations' collection using the 'id' key",
-          "args": [
-            {
-              "name": "keyId",
-              "description": "",
-              "type": {
-                "kind": "NON_NULL",
-                "name": "",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String1",
-                  "ofType": null
-                }
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "preCheck",
-              "description": "Delete permission predicate over the '_prisma_migrations' collection",
-              "type": {
-                "kind": "INPUT_OBJECT",
-                "name": "PrismaMigrationsBoolExp",
-                "ofType": null
-              },
-              "defaultValue": null
-            }
-          ],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "DeletePrismaMigrationsByIdResponse",
               "ofType": null
             }
           }
@@ -43008,6 +43904,53 @@
           }
         },
         {
+          "name": "insertAllocationResourceDays",
+          "description": "Insert into the allocation_resource_days table",
+          "args": [
+            {
+              "name": "objects",
+              "description": "",
+              "type": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "LIST",
+                  "name": "",
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": "",
+                    "ofType": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "InsertAllocationResourceDaysObjectInput",
+                      "ofType": null
+                    }
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "postCheck",
+              "description": "Insert permission predicate over the 'allocation_resource_days' collection",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "AllocationResourceDaysBoolExp",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "InsertAllocationResourceDaysResponse",
+              "ofType": null
+            }
+          }
+        },
+        {
           "name": "insertAvailabilityAvailabilities",
           "description": "Insert into the availability_availabilities table",
           "args": [
@@ -44695,53 +45638,6 @@
             "ofType": {
               "kind": "OBJECT",
               "name": "InsertPackResourceResponse",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "insertPrismaMigrations",
-          "description": "Insert into the _prisma_migrations table",
-          "args": [
-            {
-              "name": "objects",
-              "description": "",
-              "type": {
-                "kind": "NON_NULL",
-                "name": "",
-                "ofType": {
-                  "kind": "LIST",
-                  "name": "",
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": "",
-                    "ofType": {
-                      "kind": "INPUT_OBJECT",
-                      "name": "InsertPrismaMigrationsObjectInput",
-                      "ofType": null
-                    }
-                  }
-                }
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "postCheck",
-              "description": "Insert permission predicate over the '_prisma_migrations' collection",
-              "type": {
-                "kind": "INPUT_OBJECT",
-                "name": "PrismaMigrationsBoolExp",
-                "ofType": null
-              },
-              "defaultValue": null
-            }
-          ],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "InsertPrismaMigrationsResponse",
               "ofType": null
             }
           }
@@ -46983,6 +47879,69 @@
             "ofType": {
               "kind": "OBJECT",
               "name": "UpdateAllocationResourceByIdResponse",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "updateAllocationResourceDaysById",
+          "description": "Update any row on the 'allocation_resource_days' collection using the 'id' key",
+          "args": [
+            {
+              "name": "keyId",
+              "description": "",
+              "type": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String1",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "postCheck",
+              "description": "Update permission post-condition predicate over the 'allocation_resource_days' collection",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "AllocationResourceDaysBoolExp",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "preCheck",
+              "description": "Update permission pre-condition predicate over the 'allocation_resource_days' collection",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "AllocationResourceDaysBoolExp",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "updateColumns",
+              "description": "",
+              "type": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "UpdateAllocationResourceDaysByIdUpdateColumnsInput",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "UpdateAllocationResourceDaysByIdResponse",
               "ofType": null
             }
           }
@@ -49251,69 +50210,6 @@
             "ofType": {
               "kind": "OBJECT",
               "name": "UpdatePackResourceByIdResponse",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "updatePrismaMigrationsById",
-          "description": "Update any row on the '_prisma_migrations' collection using the 'id' key",
-          "args": [
-            {
-              "name": "keyId",
-              "description": "",
-              "type": {
-                "kind": "NON_NULL",
-                "name": "",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String1",
-                  "ofType": null
-                }
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "postCheck",
-              "description": "Update permission post-condition predicate over the '_prisma_migrations' collection",
-              "type": {
-                "kind": "INPUT_OBJECT",
-                "name": "PrismaMigrationsBoolExp",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "preCheck",
-              "description": "Update permission pre-condition predicate over the '_prisma_migrations' collection",
-              "type": {
-                "kind": "INPUT_OBJECT",
-                "name": "PrismaMigrationsBoolExp",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "updateColumns",
-              "description": "",
-              "type": {
-                "kind": "NON_NULL",
-                "name": "",
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "UpdatePrismaMigrationsByIdUpdateColumnsInput",
-                  "ofType": null
-                }
-              },
-              "defaultValue": null
-            }
-          ],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "UpdatePrismaMigrationsByIdResponse",
               "ofType": null
             }
           }
@@ -55444,536 +56340,6 @@
     },
     {
       "kind": "OBJECT",
-      "name": "PrismaMigrations",
-      "description": "",
-      "fields": [
-        {
-          "name": "appliedStepsCount",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "Int32",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "checksum",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "finishedAt",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "SCALAR",
-            "name": "Timestamptz",
-            "ofType": null
-          }
-        },
-        {
-          "name": "id",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "logs",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          }
-        },
-        {
-          "name": "migrationName",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "rolledBackAt",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "SCALAR",
-            "name": "Timestamptz",
-            "ofType": null
-          }
-        },
-        {
-          "name": "startedAt",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "Timestamptz",
-              "ofType": null
-            }
-          }
-        }
-      ],
-      "inputFields": null,
-      "enumValues": null,
-      "interfaces": []
-    },
-    {
-      "kind": "OBJECT",
-      "name": "PrismaMigrationsAggExp",
-      "description": "",
-      "fields": [
-        {
-          "name": "_count",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "Int64",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "appliedStepsCount",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "Int4AggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "checksum",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "VarcharAggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "finishedAt",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "TimestamptzAggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "id",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "VarcharAggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "logs",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "TextAggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "migrationName",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "VarcharAggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "rolledBackAt",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "TimestamptzAggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "startedAt",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "TimestamptzAggExp",
-              "ofType": null
-            }
-          }
-        }
-      ],
-      "inputFields": null,
-      "enumValues": null,
-      "interfaces": []
-    },
-    {
-      "kind": "INPUT_OBJECT",
-      "name": "PrismaMigrationsBoolExp",
-      "description": "",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "_and",
-          "description": "",
-          "type": {
-            "kind": "LIST",
-            "name": "",
-            "ofType": {
-              "kind": "NON_NULL",
-              "name": "",
-              "ofType": {
-                "kind": "INPUT_OBJECT",
-                "name": "PrismaMigrationsBoolExp",
-                "ofType": null
-              }
-            }
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_not",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "PrismaMigrationsBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_or",
-          "description": "",
-          "type": {
-            "kind": "LIST",
-            "name": "",
-            "ofType": {
-              "kind": "NON_NULL",
-              "name": "",
-              "ofType": {
-                "kind": "INPUT_OBJECT",
-                "name": "PrismaMigrationsBoolExp",
-                "ofType": null
-              }
-            }
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "appliedStepsCount",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "Int4BoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "checksum",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "VarcharBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "finishedAt",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "TimestamptzBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "id",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "VarcharBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "logs",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "TextBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "migrationName",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "VarcharBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "rolledBackAt",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "TimestamptzBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "startedAt",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "TimestamptzBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
-      "name": "PrismaMigrationsFilterInput",
-      "description": "",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "limit",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "Int",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "offset",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "Int",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "order_by",
-          "description": "",
-          "type": {
-            "kind": "LIST",
-            "name": "",
-            "ofType": {
-              "kind": "NON_NULL",
-              "name": "",
-              "ofType": {
-                "kind": "INPUT_OBJECT",
-                "name": "PrismaMigrationsOrderByExp",
-                "ofType": null
-              }
-            }
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "where",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "PrismaMigrationsBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
-      "name": "PrismaMigrationsOrderByExp",
-      "description": "",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "appliedStepsCount",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "checksum",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "finishedAt",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "id",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "logs",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "migrationName",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "rolledBackAt",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "startedAt",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "OBJECT",
       "name": "ProjectResource",
       "description": "",
       "fields": [
@@ -56994,6 +57360,119 @@
           "type": {
             "kind": "OBJECT",
             "name": "AllocationResource",
+            "ofType": null
+          }
+        },
+        {
+          "name": "allocationResourceDays",
+          "description": "",
+          "args": [
+            {
+              "name": "limit",
+              "description": "",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "offset",
+              "description": "",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "order_by",
+              "description": "",
+              "type": {
+                "kind": "LIST",
+                "name": "",
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": "",
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AllocationResourceDaysOrderByExp",
+                    "ofType": null
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "where",
+              "description": "",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "AllocationResourceDaysBoolExp",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "NON_NULL",
+              "name": "",
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AllocationResourceDays",
+                "ofType": null
+              }
+            }
+          }
+        },
+        {
+          "name": "allocationResourceDaysAggregate",
+          "description": "",
+          "args": [
+            {
+              "name": "filter_input",
+              "description": "",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "AllocationResourceDaysFilterInput",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "OBJECT",
+            "name": "AllocationResourceDaysAggExp",
+            "ofType": null
+          }
+        },
+        {
+          "name": "allocationResourceDaysById",
+          "description": "",
+          "args": [
+            {
+              "name": "id",
+              "description": "",
+              "type": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String1",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "OBJECT",
+            "name": "AllocationResourceDays",
             "ofType": null
           }
         },
@@ -61062,119 +61541,6 @@
           "type": {
             "kind": "OBJECT",
             "name": "PackResource",
-            "ofType": null
-          }
-        },
-        {
-          "name": "prismaMigrations",
-          "description": "",
-          "args": [
-            {
-              "name": "limit",
-              "description": "",
-              "type": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "offset",
-              "description": "",
-              "type": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "order_by",
-              "description": "",
-              "type": {
-                "kind": "LIST",
-                "name": "",
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": "",
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "PrismaMigrationsOrderByExp",
-                    "ofType": null
-                  }
-                }
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "where",
-              "description": "",
-              "type": {
-                "kind": "INPUT_OBJECT",
-                "name": "PrismaMigrationsBoolExp",
-                "ofType": null
-              },
-              "defaultValue": null
-            }
-          ],
-          "type": {
-            "kind": "LIST",
-            "name": "",
-            "ofType": {
-              "kind": "NON_NULL",
-              "name": "",
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "PrismaMigrations",
-                "ofType": null
-              }
-            }
-          }
-        },
-        {
-          "name": "prismaMigrationsAggregate",
-          "description": "",
-          "args": [
-            {
-              "name": "filter_input",
-              "description": "",
-              "type": {
-                "kind": "INPUT_OBJECT",
-                "name": "PrismaMigrationsFilterInput",
-                "ofType": null
-              },
-              "defaultValue": null
-            }
-          ],
-          "type": {
-            "kind": "OBJECT",
-            "name": "PrismaMigrationsAggExp",
-            "ofType": null
-          }
-        },
-        {
-          "name": "prismaMigrationsById",
-          "description": "",
-          "args": [
-            {
-              "name": "id",
-              "description": "",
-              "type": {
-                "kind": "NON_NULL",
-                "name": "",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String1",
-                  "ofType": null
-                }
-              },
-              "defaultValue": null
-            }
-          ],
-          "type": {
-            "kind": "OBJECT",
-            "name": "PrismaMigrations",
             "ofType": null
           }
         },
@@ -66386,6 +66752,16 @@
           }
         },
         {
+          "name": "lastChange",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          }
+        },
+        {
           "name": "name",
           "description": "",
           "args": [],
@@ -66633,6 +67009,20 @@
         },
         {
           "name": "id",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "TextAggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "lastChange",
           "description": "",
           "args": [],
           "type": {
@@ -66901,6 +67291,16 @@
           "defaultValue": null
         },
         {
+          "name": "lastChange",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TextBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
           "name": "name",
           "description": "",
           "type": {
@@ -67130,6 +67530,16 @@
         },
         {
           "name": "id",
+          "description": "",
+          "type": {
+            "kind": "ENUM",
+            "name": "OrderBy",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "lastChange",
           "description": "",
           "type": {
             "kind": "ENUM",
@@ -73510,6 +73920,119 @@
           }
         },
         {
+          "name": "allocationResourceDays",
+          "description": "",
+          "args": [
+            {
+              "name": "limit",
+              "description": "",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "offset",
+              "description": "",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "order_by",
+              "description": "",
+              "type": {
+                "kind": "LIST",
+                "name": "",
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": "",
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AllocationResourceDaysOrderByExp",
+                    "ofType": null
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "where",
+              "description": "",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "AllocationResourceDaysBoolExp",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "NON_NULL",
+              "name": "",
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AllocationResourceDays",
+                "ofType": null
+              }
+            }
+          }
+        },
+        {
+          "name": "allocationResourceDaysAggregate",
+          "description": "",
+          "args": [
+            {
+              "name": "filter_input",
+              "description": "",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "AllocationResourceDaysFilterInput",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "OBJECT",
+            "name": "AllocationResourceDaysAggExp",
+            "ofType": null
+          }
+        },
+        {
+          "name": "allocationResourceDaysById",
+          "description": "",
+          "args": [
+            {
+              "name": "id",
+              "description": "",
+              "type": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String1",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "type": {
+            "kind": "OBJECT",
+            "name": "AllocationResourceDays",
+            "ofType": null
+          }
+        },
+        {
           "name": "availabilityAvailabilities",
           "description": "",
           "args": [
@@ -77574,119 +78097,6 @@
           "type": {
             "kind": "OBJECT",
             "name": "PackResource",
-            "ofType": null
-          }
-        },
-        {
-          "name": "prismaMigrations",
-          "description": "",
-          "args": [
-            {
-              "name": "limit",
-              "description": "",
-              "type": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "offset",
-              "description": "",
-              "type": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "order_by",
-              "description": "",
-              "type": {
-                "kind": "LIST",
-                "name": "",
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": "",
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "PrismaMigrationsOrderByExp",
-                    "ofType": null
-                  }
-                }
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "where",
-              "description": "",
-              "type": {
-                "kind": "INPUT_OBJECT",
-                "name": "PrismaMigrationsBoolExp",
-                "ofType": null
-              },
-              "defaultValue": null
-            }
-          ],
-          "type": {
-            "kind": "LIST",
-            "name": "",
-            "ofType": {
-              "kind": "NON_NULL",
-              "name": "",
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "PrismaMigrations",
-                "ofType": null
-              }
-            }
-          }
-        },
-        {
-          "name": "prismaMigrationsAggregate",
-          "description": "",
-          "args": [
-            {
-              "name": "filter_input",
-              "description": "",
-              "type": {
-                "kind": "INPUT_OBJECT",
-                "name": "PrismaMigrationsFilterInput",
-                "ofType": null
-              },
-              "defaultValue": null
-            }
-          ],
-          "type": {
-            "kind": "OBJECT",
-            "name": "PrismaMigrationsAggExp",
-            "ofType": null
-          }
-        },
-        {
-          "name": "prismaMigrationsById",
-          "description": "",
-          "args": [
-            {
-              "name": "id",
-              "description": "",
-              "type": {
-                "kind": "NON_NULL",
-                "name": "",
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String1",
-                  "ofType": null
-                }
-              },
-              "defaultValue": null
-            }
-          ],
-          "type": {
-            "kind": "OBJECT",
-            "name": "PrismaMigrations",
             "ofType": null
           }
         },
@@ -85183,6 +85593,128 @@
     },
     {
       "kind": "OBJECT",
+      "name": "TstzmultirangeAggExp",
+      "description": "",
+      "fields": [
+        {
+          "name": "_count",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Int64",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "_count_distinct",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Int64",
+              "ofType": null
+            }
+          }
+        }
+      ],
+      "inputFields": null,
+      "enumValues": null,
+      "interfaces": []
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "TstzmultirangeBoolExp",
+      "description": "",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "_and",
+          "description": "",
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "NON_NULL",
+              "name": "",
+              "ofType": {
+                "kind": "INPUT_OBJECT",
+                "name": "TstzmultirangeBoolExp",
+                "ofType": null
+              }
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "_in",
+          "description": "",
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "NON_NULL",
+              "name": "",
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Json",
+                "ofType": null
+              }
+            }
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "_is_null",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Boolean",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "_not",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "TstzmultirangeBoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "_or",
+          "description": "",
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "NON_NULL",
+              "name": "",
+              "ofType": {
+                "kind": "INPUT_OBJECT",
+                "name": "TstzmultirangeBoolExp",
+                "ofType": null
+              }
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "OBJECT",
       "name": "UnitResource",
       "description": "",
       "fields": [
@@ -86072,6 +86604,16 @@
       "fields": null,
       "inputFields": [
         {
+          "name": "candidateFilter",
+          "description": "Update the 'candidate_filter' column in the 'allocation_holds' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnAllocationHoldsCandidateFilterInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
           "name": "candidateResources",
           "description": "Update the 'candidate_resources' column in the 'allocation_holds' collection.",
           "type": {
@@ -86157,6 +86699,16 @@
           "type": {
             "kind": "INPUT_OBJECT",
             "name": "UpdateColumnAllocationHoldsQuantityInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "replaces",
+          "description": "Update the 'replaces' column in the 'allocation_holds' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnAllocationHoldsReplacesInput",
             "ofType": null
           },
           "defaultValue": null
@@ -86343,6 +86895,182 @@
           "type": {
             "kind": "INPUT_OBJECT",
             "name": "UpdateColumnAllocationResourceStartTimeInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "OBJECT",
+      "name": "UpdateAllocationResourceDaysByIdResponse",
+      "description": "Responses from the 'update_allocation_resource_days_by_id' procedure",
+      "fields": [
+        {
+          "name": "affectedRows",
+          "description": "The number of rows affected by the mutation",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Int32",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "returning",
+          "description": "Data from rows affected by the mutation",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "LIST",
+              "name": "",
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": "",
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "AllocationResourceDays",
+                  "ofType": null
+                }
+              }
+            }
+          }
+        }
+      ],
+      "inputFields": null,
+      "enumValues": null,
+      "interfaces": []
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateAllocationResourceDaysByIdUpdateColumnsInput",
+      "description": "Update the columns of the 'allocation_resource_days' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "attributes",
+          "description": "Update the 'attributes' column in the 'allocation_resource_days' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnAllocationResourceDaysAttributesInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "calendar",
+          "description": "Update the 'calendar' column in the 'allocation_resource_days' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnAllocationResourceDaysCalendarInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "day",
+          "description": "Update the 'day' column in the 'allocation_resource_days' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnAllocationResourceDaysDayInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "displayName",
+          "description": "Update the 'display_name' column in the 'allocation_resource_days' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnAllocationResourceDaysDisplayNameInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "free",
+          "description": "Update the 'free' column in the 'allocation_resource_days' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnAllocationResourceDaysFreeInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "freeFraction",
+          "description": "Update the 'free_fraction' column in the 'allocation_resource_days' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnAllocationResourceDaysFreeFractionInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "id",
+          "description": "Update the 'id' column in the 'allocation_resource_days' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnAllocationResourceDaysIdInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "organization",
+          "description": "Update the 'organization' column in the 'allocation_resource_days' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnAllocationResourceDaysOrganizationInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "organizationalUnit",
+          "description": "Update the 'organizational_unit' column in the 'allocation_resource_days' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnAllocationResourceDaysOrganizationalUnitInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "resource",
+          "description": "Update the 'resource' column in the 'allocation_resource_days' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnAllocationResourceDaysResourceInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "resourceTypes",
+          "description": "Update the 'resource_types' column in the 'allocation_resource_days' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnAllocationResourceDaysResourceTypesInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "rowVersion",
+          "description": "Update the 'row_version' column in the 'allocation_resource_days' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnAllocationResourceDaysRowVersionInput",
             "ofType": null
           },
           "defaultValue": null
@@ -88093,6 +88821,26 @@
     },
     {
       "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnAllocationHoldsCandidateFilterInput",
+      "description": "Update the 'candidate_filter' column in the 'allocation_holds' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
       "name": "UpdateColumnAllocationHoldsCandidateResourcesInput",
       "description": "Update the 'candidate_resources' column in the 'allocation_holds' collection",
       "fields": null,
@@ -88293,6 +89041,26 @@
     },
     {
       "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnAllocationHoldsReplacesInput",
+      "description": "Update the 'replaces' column in the 'allocation_holds' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
       "name": "UpdateColumnAllocationHoldsResourcesInput",
       "description": "Update the 'resources' column in the 'allocation_holds' collection",
       "fields": null,
@@ -88398,6 +89166,270 @@
             "ofType": {
               "kind": "SCALAR",
               "name": "Timestamptz",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnAllocationResourceDaysAttributesInput",
+      "description": "Update the 'attributes' column in the 'allocation_resource_days' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Json",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnAllocationResourceDaysCalendarInput",
+      "description": "Update the 'calendar' column in the 'allocation_resource_days' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnAllocationResourceDaysDayInput",
+      "description": "Update the 'day' column in the 'allocation_resource_days' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Date",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnAllocationResourceDaysDisplayNameInput",
+      "description": "Update the 'display_name' column in the 'allocation_resource_days' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnAllocationResourceDaysFreeFractionInput",
+      "description": "Update the 'free_fraction' column in the 'allocation_resource_days' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "Float64",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnAllocationResourceDaysFreeInput",
+      "description": "Update the 'free' column in the 'allocation_resource_days' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Json",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnAllocationResourceDaysIdInput",
+      "description": "Update the 'id' column in the 'allocation_resource_days' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnAllocationResourceDaysOrganizationInput",
+      "description": "Update the 'organization' column in the 'allocation_resource_days' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnAllocationResourceDaysOrganizationalUnitInput",
+      "description": "Update the 'organizational_unit' column in the 'allocation_resource_days' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnAllocationResourceDaysResourceInput",
+      "description": "Update the 'resource' column in the 'allocation_resource_days' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnAllocationResourceDaysResourceTypesInput",
+      "description": "Update the 'resource_types' column in the 'allocation_resource_days' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "LIST",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "String1",
+              "ofType": null
+            }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnAllocationResourceDaysRowVersionInput",
+      "description": "Update the 'row_version' column in the 'allocation_resource_days' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "SCALAR",
+              "name": "Int64",
               "ofType": null
             }
           },
@@ -93457,6 +94489,26 @@
     },
     {
       "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnEventResourceOriginalStartRangeInput",
+      "description": "Update the 'original_start_range' column in the 'event_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
       "name": "UpdateColumnEventResourcePositionInput",
       "description": "Update the 'position' column in the 'event_resource' collection",
       "fields": null,
@@ -96685,186 +97737,6 @@
     },
     {
       "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnPrismaMigrationsAppliedStepsCountInput",
-      "description": "Update the 'applied_steps_count' column in the '_prisma_migrations' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "Int32",
-              "ofType": null
-            }
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnPrismaMigrationsChecksumInput",
-      "description": "Update the 'checksum' column in the '_prisma_migrations' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnPrismaMigrationsFinishedAtInput",
-      "description": "Update the 'finished_at' column in the '_prisma_migrations' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "SCALAR",
-            "name": "Timestamptz",
-            "ofType": null
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnPrismaMigrationsIdInput",
-      "description": "Update the 'id' column in the '_prisma_migrations' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnPrismaMigrationsLogsInput",
-      "description": "Update the 'logs' column in the '_prisma_migrations' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnPrismaMigrationsMigrationNameInput",
-      "description": "Update the 'migration_name' column in the '_prisma_migrations' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnPrismaMigrationsRolledBackAtInput",
-      "description": "Update the 'rolled_back_at' column in the '_prisma_migrations' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "SCALAR",
-            "name": "Timestamptz",
-            "ofType": null
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnPrismaMigrationsStartedAtInput",
-      "description": "Update the 'started_at' column in the '_prisma_migrations' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "Timestamptz",
-              "ofType": null
-            }
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
       "name": "UpdateColumnProjectResourceCreateTimeInput",
       "description": "Update the 'create_time' column in the 'project_resource' collection",
       "fields": null,
@@ -97368,6 +98240,26 @@
               "name": "String1",
               "ofType": null
             }
+          },
+          "defaultValue": null
+        }
+      ],
+      "enumValues": null,
+      "interfaces": null
+    },
+    {
+      "kind": "INPUT_OBJECT",
+      "name": "UpdateColumnReservationResourceLastChangeInput",
+      "description": "Update the 'last_change' column in the 'reservation_resource' collection",
+      "fields": null,
+      "inputFields": [
+        {
+          "name": "set",
+          "description": "Set the column to this value",
+          "type": {
+            "kind": "SCALAR",
+            "name": "String1",
+            "ofType": null
           },
           "defaultValue": null
         }
@@ -107754,6 +108646,16 @@
           "defaultValue": null
         },
         {
+          "name": "originalStartRange",
+          "description": "Update the 'original_start_range' column in the 'event_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnEventResourceOriginalStartRangeInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
           "name": "position",
           "description": "Update the 'position' column in the 'event_resource' collection.",
           "type": {
@@ -110013,142 +110915,6 @@
     },
     {
       "kind": "OBJECT",
-      "name": "UpdatePrismaMigrationsByIdResponse",
-      "description": "Responses from the 'update__prisma_migrations_by_id' procedure",
-      "fields": [
-        {
-          "name": "affectedRows",
-          "description": "The number of rows affected by the mutation",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "Int32",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "returning",
-          "description": "Data from rows affected by the mutation",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "LIST",
-              "name": "",
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": "",
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "PrismaMigrations",
-                  "ofType": null
-                }
-              }
-            }
-          }
-        }
-      ],
-      "inputFields": null,
-      "enumValues": null,
-      "interfaces": []
-    },
-    {
-      "kind": "INPUT_OBJECT",
-      "name": "UpdatePrismaMigrationsByIdUpdateColumnsInput",
-      "description": "Update the columns of the '_prisma_migrations' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "appliedStepsCount",
-          "description": "Update the 'applied_steps_count' column in the '_prisma_migrations' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnPrismaMigrationsAppliedStepsCountInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "checksum",
-          "description": "Update the 'checksum' column in the '_prisma_migrations' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnPrismaMigrationsChecksumInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "finishedAt",
-          "description": "Update the 'finished_at' column in the '_prisma_migrations' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnPrismaMigrationsFinishedAtInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "id",
-          "description": "Update the 'id' column in the '_prisma_migrations' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnPrismaMigrationsIdInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "logs",
-          "description": "Update the 'logs' column in the '_prisma_migrations' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnPrismaMigrationsLogsInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "migrationName",
-          "description": "Update the 'migration_name' column in the '_prisma_migrations' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnPrismaMigrationsMigrationNameInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "rolledBackAt",
-          "description": "Update the 'rolled_back_at' column in the '_prisma_migrations' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnPrismaMigrationsRolledBackAtInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "startedAt",
-          "description": "Update the 'started_at' column in the '_prisma_migrations' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnPrismaMigrationsStartedAtInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "OBJECT",
       "name": "UpdateProjectResourceByIdResponse",
       "description": "Responses from the 'update_project_resource_by_id' procedure",
       "fields": [
@@ -110491,6 +111257,16 @@
           "type": {
             "kind": "INPUT_OBJECT",
             "name": "UpdateColumnReservationResourceIdInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "lastChange",
+          "description": "Update the 'last_change' column in the 'reservation_resource' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "UpdateColumnReservationResourceLastChangeInput",
             "ofType": null
           },
           "defaultValue": null
@@ -120373,308 +121149,6 @@
           "type": {
             "kind": "ENUM",
             "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "OBJECT",
-      "name": "VarcharAggExp",
-      "description": "",
-      "fields": [
-        {
-          "name": "_count",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "Int64",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "_count_distinct",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "Int64",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "max",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          }
-        },
-        {
-          "name": "min",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          }
-        }
-      ],
-      "inputFields": null,
-      "enumValues": null,
-      "interfaces": []
-    },
-    {
-      "kind": "INPUT_OBJECT",
-      "name": "VarcharBoolExp",
-      "description": "",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "_and",
-          "description": "",
-          "type": {
-            "kind": "LIST",
-            "name": "",
-            "ofType": {
-              "kind": "NON_NULL",
-              "name": "",
-              "ofType": {
-                "kind": "INPUT_OBJECT",
-                "name": "VarcharBoolExp",
-                "ofType": null
-              }
-            }
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_eq",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_gt",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_gte",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_ilike",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_in",
-          "description": "",
-          "type": {
-            "kind": "LIST",
-            "name": "",
-            "ofType": {
-              "kind": "NON_NULL",
-              "name": "",
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String1",
-                "ofType": null
-              }
-            }
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_iregex",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_is_null",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "Boolean",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_like",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_lt",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_lte",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_neq",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_nilike",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_niregex",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_nlike",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_not",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "VarcharBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_nregex",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_or",
-          "description": "",
-          "type": {
-            "kind": "LIST",
-            "name": "",
-            "ofType": {
-              "kind": "NON_NULL",
-              "name": "",
-              "ofType": {
-                "kind": "INPUT_OBJECT",
-                "name": "VarcharBoolExp",
-                "ofType": null
-              }
-            }
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "_regex",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "starts_with",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "ts_match_tt",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
             "ofType": null
           },
           "defaultValue": null

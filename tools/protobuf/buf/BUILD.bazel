@@ -5,6 +5,7 @@
 exports_files(
     [
         "config/cache.yaml",
+        "config/service.yaml",
         "config/store.backend.yaml",
     ],
     visibility = ["//tools/protobuf/layout:__pkg__"],

@@ -15,6 +15,7 @@ package db
 import (
 	"context"
 	"net/url"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -22,16 +23,17 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/database"
 	"github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/resource"
 	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql"
-	"github.com/shokki-engineering/freebusy/internal/livetest"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/db"
 	"github.com/shokki-engineering/freebusy/internal/service/reservation"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
+	"github.com/shokki-engineering/freebusy/test/live"
 	"github.com/the-protobuf-project/runtime-go/ulid"
 	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
@@ -54,14 +56,14 @@ type backend struct {
 
 func backends(t *testing.T) (*gorm.DB, map[string]backend) {
 	t.Helper()
-	dsn := livetest.Env(t, livetest.DatabaseURL)
+	dsn := live.Env(t, live.DatabaseURL)
 	gdb, err := database.OpenGorm(dsn, &gorm.Config{Logger: logger.Discard})
 	if err != nil {
 		t.Fatal(err)
 	}
 	gconn := &database.Connection{PgSQLConn: gdb, Provider: database.ProviderGorm}
 	out := map[string]backend{"gorm": {alloc: db.New(gconn), res: New(gconn)}}
-	if raw := livetest.Optional(t, livetest.GraphQLURL); raw != "" {
+	if raw := live.Optional(t, live.GraphQLURL); raw != "" {
 		u, err := url.Parse(raw)
 		if err != nil {
 			t.Fatal(err)
@@ -82,6 +84,7 @@ func seed(t *testing.T, db *gorm.DB) (site, court string) {
 	t.Helper()
 	run := ulid.Generate().String()
 	ou := "it-" + run
+	live.Site(t, db, ou)
 	res := &resource.Resource{ID: "court-" + run, Name: "resources/court-" + run, OrganizationalUnitID: &ou, ResourceTypes: []string{"padel-court"}}
 	if err := db.Omit(clause.Associations).Create(res).Error; err != nil {
 		t.Fatal(err)
@@ -134,7 +137,8 @@ func TestLiveReservations(t *testing.T) {
 				}
 				if r.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED || r.GetHold() != h.GetName() ||
 					!r.GetStartTime().AsTime().Equal(win(10).GetStartTime().AsTime()) || len(r.GetResources()) != 1 ||
-					r.GetAttributes().GetFields()["players"].GetNumberValue() != 4 || r.GetConfirmTime() == nil {
+					r.GetAttributes().GetFields()["players"].GetNumberValue() != 4 || r.GetConfirmTime() == nil ||
+					r.GetLastChange() != reservationpbv1.Reservation_CHANGE_STATE {
 					t.Fatalf("reservation %v", r)
 				}
 				again, err := create(h.GetName())
@@ -158,9 +162,21 @@ func TestLiveReservations(t *testing.T) {
 					t.Fatalf("list %v", list.GetReservations())
 				}
 
+				// UpdateReservation marks its write CHANGE_DETAILS; the cancel
+				// after it is a change of state again.
+				u, err := srv.UpdateReservation(ctx, &reservationpbv1.UpdateReservationRequest{
+					Reservation: &reservationpbv1.Reservation{Name: r.GetName(), Customer: "users/ben"},
+					UpdateMask:  &fieldmaskpb.FieldMask{Paths: []string{"customer"}},
+				})
+				if err != nil || u.GetCustomer() != "users/ben" || u.GetLastChange() != reservationpbv1.Reservation_CHANGE_DETAILS ||
+					u.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED {
+					t.Fatalf("update: %v %v", u, err)
+				}
+
 				for range 2 {
 					c, err := srv.CancelReservation(ctx, &reservationpbv1.CancelReservationRequest{Name: r.GetName(), Reason: "rain"})
-					if err != nil || c.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CANCELLED || c.GetCancelReason() != "rain" {
+					if err != nil || c.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CANCELLED || c.GetCancelReason() != "rain" ||
+						c.GetLastChange() != reservationpbv1.Reservation_CHANGE_STATE || c.GetCustomer() != "users/ben" {
 						t.Fatalf("cancel: %v %v", c, err)
 					}
 				}
@@ -249,6 +265,53 @@ func TestLiveReservations(t *testing.T) {
 					if errs[i] != nil || names[i] != names[0] {
 						t.Fatalf("concurrent move %d: %q %v", i, names[i], errs[i])
 					}
+				}
+			})
+
+			t.Run("extend in place", func(t *testing.T) {
+				// The site has one court: extending 22:00-23:00 to 22:00-24:00
+				// can only keep it if the booking's own claim does not count.
+				r, err := create(hold(22).GetName())
+				if err != nil {
+					t.Fatal(err)
+				}
+				longer := &interval.Interval{StartTime: win(22).GetStartTime(), EndTime: win(23).GetEndTime()}
+				if _, err := engine.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Parent: site, Hold: &allocationpbv1.Hold{Window: longer}}); status.Code(err) != codes.FailedPrecondition {
+					t.Fatalf("a plain hold over the booking's own time: %v, want FailedPrecondition", err)
+				}
+				nh, err := engine.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Parent: site, Hold: &allocationpbv1.Hold{Window: longer, Replaces: r.GetHold()}})
+				if err != nil {
+					t.Fatalf("hold replacing the booking: %v", err)
+				}
+				if !slices.Equal(nh.GetResources(), r.GetResources()) {
+					t.Fatalf("the extension moved courts: %v, was %v", nh.GetResources(), r.GetResources())
+				}
+				// The hour added is the new hold's; the hour shared is still the
+				// booking's. Neither is free to anyone else.
+				if a, b := free(22), free(23); a != 0 || b != 0 {
+					t.Fatalf("while the extension is held: %d and %d free, want 0 and 0", a, b)
+				}
+				// Only the move of that booking may use it.
+				if _, err := create(nh.GetName()); status.Code(err) != codes.FailedPrecondition {
+					t.Fatalf("CreateReservation from a replacing hold: %v, want FailedPrecondition", err)
+				}
+				rep, err := srv.RescheduleReservation(ctx, &reservationpbv1.RescheduleReservationRequest{Name: r.GetName(), Hold: nh.GetName()})
+				if err != nil {
+					t.Fatal(err)
+				}
+				if rep.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED || !slices.Equal(rep.GetResources(), r.GetResources()) ||
+					!rep.GetEndTime().AsTime().Equal(longer.GetEndTime().AsTime()) {
+					t.Fatalf("replacement %v", rep)
+				}
+				time.Sleep(pastTTL) // only conversions count now
+				if a, b := free(22), free(23); a != 0 || b != 0 {
+					t.Fatalf("after the extension: %d and %d free, want 0 and 0 -- the hand-over left a gap", a, b)
+				}
+				if _, err := srv.CancelReservation(ctx, &reservationpbv1.CancelReservationRequest{Name: rep.GetName()}); err != nil {
+					t.Fatal(err)
+				}
+				if a, b := free(22), free(23); a != 1 || b != 1 {
+					t.Fatalf("after cancelling the extension: %d and %d free, want 1 and 1", a, b)
 				}
 			})
 

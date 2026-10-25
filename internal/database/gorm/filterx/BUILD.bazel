@@ -9,6 +9,7 @@ go_library(
         "filterx.go",
         "gorm.go",
         "hasura.go",
+        "opensearch.go",
         "telemetry.go",
     ],
     importpath = "github.com/shokki-engineering/freebusy/internal/database/gorm/filterx",

@@ -10,6 +10,7 @@ import "freebusy/webhook/v1/enums.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/protobuf/timestamp.proto";
+import "service/v1/annotations.proto";
 
 option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1";
 option java_multiple_files = true;
@@ -28,6 +29,8 @@ message Delivery {
     singular: "delivery"
     plural: "deliveries"
   };
+  // The record runtime-go's events dispatcher keeps a delivery in.
+  option (service.v1.adapter) = {role: ROLE_DELIVERY};
   option (entity.v1.table) = {
     indexes: [
       {
@@ -96,6 +99,14 @@ message FeedCursor {
     pattern: "feedCursors/{feed_cursor}"
     singular: "feedCursor"
     plural: "feedCursors"
+  };
+  // The record runtime-go's events dispatcher keeps a feed's position in.
+  option (service.v1.adapter) = {
+    role: ROLE_FEED_CURSOR
+    fields: {
+      key: "position"
+      value: "position_time"
+    }
   };
   option (entity.v1.table) = {};
 

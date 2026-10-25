@@ -1,0 +1,155 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+#
+# yaml-language-server: $schema=https://raw.githubusercontent.com/the-protobuf-project/protoc-gen-openapi-solo/main/schema/flows.schema.json
+#
+# Flows and state transitions of freebusy.webhook.v1, rendered by protoc-gen-openapi
+# (flows=<dir>). Re-run mode=scaffold after changing the protos: it adds what
+# is new and marks what is gone with STALE, and keeps everything you wrote.
+
+package: freebusy.webhook.v1
+
+services:
+  WebhookService:
+    methods:
+      CreateWebhook:
+        request: CreateWebhookRequest
+        response: Webhook
+        http: POST /v1/webhooks
+      GetWebhook:
+        request: GetWebhookRequest
+        response: Webhook
+        http: GET /v1/{name=webhooks/*}
+      ListWebhooks:
+        request: ListWebhooksRequest
+        response: ListWebhooksResponse
+        http: GET /v1/webhooks
+      UpdateWebhook:
+        request: UpdateWebhookRequest
+        response: Webhook
+        http: PATCH /v1/{webhook.name=webhooks/*}
+      PauseWebhook:
+        request: PauseWebhookRequest
+        response: Webhook
+        http: POST /v1/{name=webhooks/*}:pause
+      ResumeWebhook:
+        request: ResumeWebhookRequest
+        response: Webhook
+        http: POST /v1/{name=webhooks/*}:resume
+      DeleteWebhook:
+        request: DeleteWebhookRequest
+        response: google.protobuf.Empty
+        http: DELETE /v1/{name=webhooks/*}
+      RotateWebhookSecret:
+        request: RotateWebhookSecretRequest
+        response: Webhook
+        http: POST /v1/{name=webhooks/*}:rotateSecret
+      GetDelivery:
+        request: GetDeliveryRequest
+        response: Delivery
+        http: GET /v1/{name=webhooks/*/deliveries/*}
+      ListDeliveries:
+        request: ListDeliveriesRequest
+        response: ListDeliveriesResponse
+        http: GET /v1/{parent=webhooks/*}/deliveries
+      RetryDelivery:
+        request: RetryDeliveryRequest
+        response: Delivery
+        http: POST /v1/{name=webhooks/*/deliveries/*}:retry
+    events: []
+    errors:
+      - reason: INVALID_URI
+        code: INVALID_ARGUMENT
+        description: '`uri` is not an absolute URL.'
+      - reason: URI_HAS_CREDENTIALS
+        code: INVALID_ARGUMENT
+        description: '`uri` carries a username or password.'
+      - reason: URI_NOT_HTTPS
+        code: INVALID_ARGUMENT
+        description: '`uri` is not https.'
+      - reason: URI_NOT_PUBLIC
+        code: INVALID_ARGUMENT
+        description: '`uri` resolves to a private or loopback address.'
+      - reason: UNKNOWN_EVENT_TYPE
+        code: INVALID_ARGUMENT
+        description: An entry in `event_types` is not an event freebusy sends.
+      - reason: WEBHOOK_HAS_DELIVERIES
+        code: FAILED_PRECONDITION
+        description: The webhook still has deliveries on record.
+
+# Lifecycle enums: for each value, how it is reached. A value takes one
+# transition or a list of them: {from: [values], rpc: Service.Method or event:
+# cause, condition: guard}. Empty from with a trigger is an entry from the
+# initial state; a value left as {from: []} is not drawn.
+states:
+  WebhookState:
+    # Changes are delivered.
+    WEBHOOK_STATE_ACTIVE:
+      - from: []
+        rpc: WebhookService.CreateWebhook
+      - from: [PAUSED]
+        rpc: WebhookService.ResumeWebhook
+    # Changes are neither recorded nor delivered for this webhook, and pending
+    # deliveries wait. Resuming delivers what was pending, not what changed
+    # while paused.
+    WEBHOOK_STATE_PAUSED:
+      from: [ACTIVE]
+      rpc: WebhookService.PauseWebhook
+  DeliveryState:
+    # Not yet accepted by the endpoint; attempted at next_attempt_time.
+    DELIVERY_STATE_PENDING:
+      - from: []
+        event: change recorded
+      - from: [PENDING]
+        event: attempt failed
+        condition: attempts left
+      - from: [FAILED, SUCCEEDED]
+        rpc: WebhookService.RetryDelivery
+    # The endpoint answered 2xx.
+    DELIVERY_STATE_SUCCEEDED:
+      from: [PENDING]
+      event: endpoint answered 2xx
+    # Every attempt failed and no more are scheduled. RetryDelivery sends it
+    # again.
+    DELIVERY_STATE_FAILED:
+      from: [PENDING]
+      event: attempt failed
+      condition: no attempts left
+
+flows:
+  - id: webhook-delivery
+    title: Webhook delivery
+    service: WebhookService
+    description: |-
+      Every change a webhook subscribes to is recorded as a Delivery and sent
+      as a signed CloudEvent (Standard Webhooks). Failed deliveries are retried
+      with backoff, and can be sent again by hand.
+    actors: [Client, WebhookService, ReservationService, Dispatcher, Endpoint]
+    steps:
+      - call: freebusy.webhook.v1.WebhookService.CreateWebhook
+        returns: Webhook (ACTIVE)
+      - actor: ReservationService
+        message: change recorded (e.g. reservation confirmed)
+        to: Dispatcher
+        note: one Delivery per matching webhook, PENDING
+      - actor: Dispatcher
+        message: POST signed CloudEvent
+        to: Endpoint
+        alternatives:
+          - when: 2xx
+            steps:
+              - actor: Endpoint
+                message: 2xx
+                to: Dispatcher
+                note: Delivery SUCCEEDED
+          - when: error or timeout
+            steps:
+              - actor: Endpoint
+                message: 5xx / timeout
+                to: Dispatcher
+                note: retried with backoff; FAILED when no attempts are left
+              - call: freebusy.webhook.v1.WebhookService.ListDeliveries
+                note: filter state = FAILED
+              - call: freebusy.webhook.v1.WebhookService.RetryDelivery
+                returns: Delivery (PENDING)

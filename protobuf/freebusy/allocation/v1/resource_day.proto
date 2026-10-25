@@ -1,0 +1,124 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package freebusy.allocation.v1;
+
+import "google/protobuf/struct.proto";
+import "google/type/date.proto";
+import "google/type/interval.proto";
+import "store/v1/annotations.proto";
+
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1";
+option java_multiple_files = true;
+option java_outer_classname = "ResourceDayProto";
+option java_package = "engineering.shokki.freebusy.allocation.v1";
+
+// A ResourceDay is one resource's standing free time on one UTC day: the
+// availability read model SearchAvailability, ComputeAvailability,
+// CheckAvailability and CreateHold read their candidates from, instead of
+// evaluating every resource an operator has.
+//
+// Storage-only, and derived: no RPC takes or returns it. It is a projection
+// of the resources, their sites, calendars, RFC 7953 availability, RFC 5545
+// events and the claims of converted holds, rewritten in the same transaction
+// as every write to those (on Hasura, a single write projects in a request of
+// its own right after it), for every day of a rolling horizon. `free` is
+// offered time less booked time; live holds are not subtracted, and neither
+// is a resource's booking policy applied, because both change with the
+// clock. The engine evaluates every candidate the projection returns before
+// answering, so an answer never depends on the projection being current; a
+// stale row can only make a search miss a resource or read one it then
+// drops.
+message ResourceDay {
+  option (store.v1.projection) = {
+    sources: [
+      "the-protobuf-project.org/Resource",
+      "the-protobuf-project.org/OrganizationalUnit",
+      "the-protobuf-project.org/Calendar",
+      "the-protobuf-project.org/Availability",
+      "the-protobuf-project.org/Event",
+      "freebusy.allocation.v1/Allocation"
+    ]
+    key: [
+      "resource",
+      "day"
+    ]
+    range_field: "free"
+    search_index: "freebusy_resource_days"
+    indexes: [
+      {
+        fields: [
+          "organization",
+          "day"
+        ]
+      },
+      {
+        fields: [
+          "organizational_unit",
+          "day"
+        ]
+      },
+      {
+        fields: ["calendar"]
+      },
+      {
+        // The page index: equality on the organization and the day, then
+        // the default order (site, resource), so a search reads its page
+        // straight from the index instead of sorting every match.
+        fields: [
+          "organization",
+          "day",
+          "organizational_unit",
+          "resource"
+        ]
+      }
+    ]
+  };
+
+  // The resource, "resources/{resource}". Not a resource reference: a
+  // projection row must never keep its source from being purged.
+  string resource = 1;
+
+  // The organization of the resource's site, "organizations/{organization}".
+  string organization = 2;
+
+  // The resource's site, "organizationalUnits/{organizational_unit}".
+  string organizational_unit = 3;
+
+  // The UTC calendar day this row covers.
+  google.type.Date day = 4;
+
+  // The resource's free time within the day, [day 00:00Z, next day 00:00Z):
+  // offered by its availability, less confirmed events on its calendar and
+  // the claims of converted holds. Live holds are not subtracted.
+  repeated google.type.Interval free = 5;
+
+  // RFC 9073 RESOURCE-TYPE values the resource carries.
+  repeated string resource_types = 6;
+
+  // Every JSON object the resource's RFC 9073 STRUCTURED-DATA carries as
+  // inline text, merged in order (a later key wins): freebusy's booking
+  // profile and any vertical's own attributes. Searched with AIP-160 paths
+  // such as `attributes.view = "river"` or `attributes.charger_kw >= 22`.
+  google.protobuf.Struct attributes = 7 [(store.v1.query) = {
+    json_keys: [
+      {
+        path: "max_occupancy"
+        type: JSON_KEY_TYPE_INT64
+      }
+    ]
+  }];
+
+  // The resource's calendar, "calendars/{calendar}": what an event or an
+  // availability on that calendar re-projects.
+  string calendar = 8;
+
+  // The resource's display name, matched by a bare word in a filter.
+  string display_name = 9 [(store.v1.query) = {search: true}];
+
+  // The share of the day that is free, from 0 to 1, for ordering by how open
+  // a resource is.
+  double free_fraction = 10;
+}

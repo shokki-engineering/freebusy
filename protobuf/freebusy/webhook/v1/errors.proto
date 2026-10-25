@@ -1,0 +1,72 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package freebusy.webhook.v1;
+
+import "service/v1/annotations.proto";
+
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1";
+option java_multiple_files = true;
+option java_outer_classname = "ErrorsProto";
+option java_package = "engineering.shokki.freebusy.webhook.v1";
+
+// The reasons freebusy returns for webhooks: the google.rpc.ErrorInfo reasons
+// (AIP-193) in the freebusy.dev domain. They are part of the API: clients branch
+// on them, never on a message. protoc-gen-service renders them as Go constants,
+// sentinels and the tables of docs/errors.md.
+enum ErrorReason {
+  option (service.v1.error_domain) = {domain: "freebusy.dev"};
+
+  // Unset; never returned.
+  ERROR_REASON_UNSPECIFIED = 0;
+
+  // uri is not an absolute URL.
+  ERROR_REASON_INVALID_URI = 1 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "`uri` is not an absolute URL."
+    fix: "Send scheme, host and path."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // uri carries a username or password.
+  ERROR_REASON_URI_HAS_CREDENTIALS = 2 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "`uri` carries a username or password."
+    fix: "Remove them; verify the delivery signature instead."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // uri is not https.
+  ERROR_REASON_URI_NOT_HTTPS = 3 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "`uri` is not https."
+    fix: "Serve the endpoint over https."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // uri resolves to a private or loopback address.
+  ERROR_REASON_URI_NOT_PUBLIC = 4 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "`uri` resolves to a private or loopback address."
+    fix: "Expose it publicly."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // An entry in event_types is not an event freebusy sends.
+  ERROR_REASON_UNKNOWN_EVENT_TYPE = 5 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "An entry in `event_types` is not an event freebusy sends."
+    fix: "Choose from the list in the message, or leave it empty for all."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // The webhook still has deliveries on record.
+  ERROR_REASON_WEBHOOK_HAS_DELIVERIES = 6 [(service.v1.error_reason) = {
+    code: "FAILED_PRECONDITION"
+    description: "The webhook still has deliveries on record."
+    fix: "Send `force=true`, or `PauseWebhook` to keep the record."
+    detail: DETAIL_KIND_PRECONDITION_FAILURE
+  }];
+}

@@ -9,7 +9,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 2 | 4 |
+| 2 | 5 |
 
 ## Entity relationships
 
@@ -63,4 +63,5 @@ Reference: RFC 5545 "Internet Calendaring and Scheduling Core Object Specificati
 - `Confirmation`: TENTATIVE, CONFIRMED, CANCELLED
 - `EventClassification`: PUBLIC, PRIVATE, CONFIDENTIAL
 - `Transparency`: OPAQUE, TRANSPARENT
+- `RecurrenceRange`: THIS_AND_FUTURE
 - `EventCalendarTimeValueCase`: DATE, DATE_TIME

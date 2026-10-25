@@ -18,7 +18,6 @@ go_library(
     deps = [
         "//internal/database/gorm/filterx",
         "//internal/database/gorm/freebusy/webhook",
-        "//internal/database/gorm/gormx",
         "//internal/database/hasura/freebusyql",
         "//internal/database/hasura/freebusyql/webhookql/deliveriesql",
         "//internal/database/hasura/freebusyql/webhookql/feedcursorsql",
@@ -26,8 +25,8 @@ go_library(
         "//internal/database/repository/repox",
         "//protobuf/generated/go/webhook/v1/webhookpbv1",
         "@com_github_the_protobuf_project_runtime_go_network//graphql",
-        "@com_github_the_protobuf_project_runtime_go_network//runtime",
         "@io_gorm_gorm//:gorm",
+        "@io_gorm_gorm//clause",
         "@org_golang_google_protobuf//proto",
         "@org_golang_google_protobuf//types/known/timestamppb",
     ],

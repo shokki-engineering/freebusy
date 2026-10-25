@@ -7,14 +7,15 @@ go 1.26.5
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2
-	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261023092131-bed218a71ce9.1
-	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261023092131-bed218a71ce9.2
+	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261024035057-cc82b3b15066.1
+	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261024035057-cc82b3b15066.2
 	cloud.google.com/go/longrunning v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0
 	github.com/the-protobuf-project/cache v0.3.0
-	github.com/the-protobuf-project/grpc-mcp-gateway v1.6.1
-	github.com/the-protobuf-project/runtime-go/agents v0.0.0-20261023094910-2a7ef66b90e9
-	github.com/the-protobuf-project/store v1.5.8
+	github.com/the-protobuf-project/mcp v1.7.4
+	github.com/the-protobuf-project/runtime-go/agents v0.0.0-20261024145511-26d67bc81588
+	github.com/the-protobuf-project/service v0.1.0
+	github.com/the-protobuf-project/store v1.6.5
 	google.golang.org/genproto v0.0.0-20260831171406-18b4a7587f8a
 	google.golang.org/genproto/googleapis/api v0.0.0-20261019180522-ce908d29299b
 	google.golang.org/grpc v1.84.0

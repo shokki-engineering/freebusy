@@ -10,6 +10,7 @@ import "google/api/field_behavior.proto";
 import "google/api/field_info.proto";
 import "google/api/resource.proto";
 import "google/protobuf/timestamp.proto";
+import "service/v1/annotations.proto";
 import "store/v1/annotations.proto";
 
 option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/shared/v1/sharedpbv1;sharedpbv1";
@@ -36,6 +37,8 @@ message IdempotencyKey {
     singular: "idempotencyKey"
     plural: "idempotencyKeys"
   };
+  // The record runtime-go's idempotency interceptor keeps a request_id in.
+  option (service.v1.adapter) = {role: ROLE_IDEMPOTENCY_KEY};
   option (entity.v1.table) = {
     indexes: [
       {

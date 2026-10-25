@@ -4,7 +4,7 @@
 # A release is a tag: v1.2.3 publishes, under 1.2.3,
 #
 #   ghcr.io/shokki-engineering/freebusy             the server (amd64 + arm64)
-#   ghcr.io/shokki-engineering/freebusy-migrations  atlas and migrations/
+#   ghcr.io/shokki-engineering/freebusy-migrations  atlas and deploy/migrations/
 #   ghcr.io/shokki-engineering/freebusy-engine      the Hasura engine, committed build
 #   ghcr.io/shokki-engineering/freebusy-connector   the Hasura Postgres connector
 #   oci://ghcr.io/shokki-engineering/charts/freebusy  the Helm chart
@@ -12,6 +12,10 @@
 # and a GitHub release whose notes are the tag's CHANGELOG.md section, with
 # the chart and the REST API's OpenAPI file attached. CI's
 # checks are not repeated here: tag a commit main already passed.
+#
+# A tag with a pre-release part (v1.0.0-rc.1: anything after a `-`) publishes
+# the same artifacts under its version, but does not move the images'
+# `latest` tag, and its GitHub release is marked as a pre-release.
 name: Release
 
 on:
@@ -30,16 +34,23 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # The version the binary reports is config, not a build stamp: the
-      # tag must match it, and CHANGELOG.md must have the tag's section.
+      # The version the server reports is config: the tag must match it, and
+      # CHANGELOG.md must have the tag's section. The image build below also
+      # stamps the tag and commit into the binary (`freebusy --version`).
       - name: Tag matches the release config and the changelog
         run: |
           version="${TAG#v}"
-          grep -qx "version = \"v$version\"" config/freebusy.release.toml ||
-            { echo "::error::config/freebusy.release.toml [app] version is not v$version"; exit 1; }
-          grep -q "^## \[$version\]" CHANGELOG.md ||
+          # Fixed strings: a version's dots and dashes are matched as written.
+          grep -qxF "version = \"v$version\"" internal/config/freebusy.release.toml ||
+            { echo "::error::internal/config/freebusy.release.toml [app] version is not v$version"; exit 1; }
+          awk -v h="## [$version]" 'index($0, h) == 1 {found=1} END {exit !found}' CHANGELOG.md ||
             { echo "::error::CHANGELOG.md has no '## [$version]' section"; exit 1; }
           echo "VERSION=$version" >> "$GITHUB_ENV"
+          # v1.0.0-rc.1 is a pre-release: no `latest`, a pre-release on GitHub.
+          case "$version" in
+            *-*) echo "PRERELEASE=true" >> "$GITHUB_ENV" ;;
+            *) echo "PRERELEASE=false" >> "$GITHUB_ENV" ;;
+          esac
 
       - uses: docker/login-action@v3
         with:
@@ -53,22 +64,28 @@ jobs:
           disk-cache: ${{ github.workflow }}
           repository-cache: true
       - name: Server and migrations images
+        env:
+          # tools/bazel/status.sh stamps this tag; --config=release turns
+          # stamping on.
+          RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          bazel run //image:push -- --tag "$VERSION" --tag latest
-          bazel run //image:push_migrations -- --tag "$VERSION" --tag latest
+          tags=(--tag "$VERSION")
+          if [ "$PRERELEASE" != true ]; then tags+=(--tag latest); fi
+          bazel run --config=release //deploy/image:push -- "${tags[@]}"
+          bazel run //deploy/image:push_migrations -- "${tags[@]}"
 
       - uses: docker/setup-buildx-action@v3
       - name: Hasura engine and connector images
         run: |
           for part in engine connector; do
             case $part in
-              engine) ctx=hasura/engine; file=hasura/engine/Dockerfile.engine ;;
-              connector) ctx=hasura/freebusy/connector/freebusy_pgsql; file=$ctx/.hasura-connector/Dockerfile.freebusy_pgsql ;;
+              engine) ctx=deploy/hasura/engine; file=deploy/hasura/engine/Dockerfile.engine ;;
+              connector) ctx=deploy/hasura/freebusy/connector/freebusy_pgsql; file=$ctx/.hasura-connector/Dockerfile.freebusy_pgsql ;;
             esac
+            tags=(-t "ghcr.io/shokki-engineering/freebusy-$part:$VERSION")
+            if [ "$PRERELEASE" != true ]; then tags+=(-t "ghcr.io/shokki-engineering/freebusy-$part:latest"); fi
             docker buildx build --platform linux/amd64,linux/arm64 --push \
-              -t "ghcr.io/shokki-engineering/freebusy-$part:$VERSION" \
-              -t "ghcr.io/shokki-engineering/freebusy-$part:latest" \
-              -f "$file" "$ctx"
+              "${tags[@]}" -f "$file" "$ctx"
           done
 
       - uses: azure/setup-helm@v4
@@ -81,7 +98,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          awk -v v="$VERSION" '$0 ~ "^## \\[" v "\\]" {on=1; next} /^## \[/ {on=0} on' CHANGELOG.md > notes.md
+          awk -v h="## [$VERSION]" 'index($0, h) == 1 {on=1; next} /^## \[/ {on=0} on' CHANGELOG.md > notes.md
           cp protobuf/generated/openapi/openapiv3-spec.yaml "dist/freebusy-$VERSION.openapi.yaml"
-          gh release create "$TAG" --title "$TAG" --notes-file notes.md \
+          flags=()
+          if [ "$PRERELEASE" = true ]; then flags+=(--prerelease); fi
+          gh release create "$TAG" --title "$TAG" --notes-file notes.md "${flags[@]}" \
             "dist/freebusy-$VERSION.tgz" "dist/freebusy-$VERSION.openapi.yaml"

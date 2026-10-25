@@ -9,8 +9,10 @@ go_library(
     importpath = "github.com/shokki-engineering/freebusy/tools/db/gorm/migrate",
     visibility = ["//visibility:private"],
     deps = [
-        "//config",
-        "//tools/db/schema",
+        "//internal/config",
+        "//internal/database/gorm/freebusy",
+        "//internal/database/gorm/rfc",
+        "@com_github_the_protobuf_project_store//migrate",
     ],
 )
 

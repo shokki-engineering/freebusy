@@ -111,28 +111,6 @@ func StoredDuration(s string) time.Duration {
 	return icalDuration(s)
 }
 
-// EncodeWindow renders a hold's window for its text column, as an ISO 8601
-// interval of two RFC 3339 instants. The column predates a typed mapping for
-// google.type.Interval, so both adapters write and read it through these two
-// functions and agree on the form.
-func EncodeWindow(w engine.Span) string {
-	return w.Start.UTC().Format(time.RFC3339Nano) + "/" + w.End.UTC().Format(time.RFC3339Nano)
-}
-
-// DecodeWindow parses EncodeWindow's output; ok is false for anything else.
-func DecodeWindow(s string) (engine.Span, bool) {
-	a, b, found := strings.Cut(s, "/")
-	if !found {
-		return engine.Span{}, false
-	}
-	start, err1 := time.Parse(time.RFC3339Nano, a)
-	end, err2 := time.Parse(time.RFC3339Nano, b)
-	if err1 != nil || err2 != nil {
-		return engine.Span{}, false
-	}
-	return engine.Span{Start: start, End: end}, true
-}
-
 // SpanOf converts a hold's interval, for the adapters.
 func SpanOf(iv *interval.Interval) engine.Span {
 	return engine.Span{Start: iv.GetStartTime().AsTime(), End: iv.GetEndTime().AsTime()}

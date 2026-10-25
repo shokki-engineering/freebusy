@@ -10,6 +10,7 @@
 package reservationpbv1
 
 import (
+	_ "github.com/the-protobuf-project/service/plugin/pb/servicepbv1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -115,16 +116,23 @@ var File_freebusy_reservation_v1_enums_proto protoreflect.FileDescriptor
 
 const file_freebusy_reservation_v1_enums_proto_rawDesc = "" +
 	"\n" +
-	"#freebusy/reservation/v1/enums.proto\x12\x17freebusy.reservation.v1*\x9d\x02\n" +
+	"#freebusy/reservation/v1/enums.proto\x12\x17freebusy.reservation.v1\x1a\x1cservice/v1/annotations.proto*\xa8\x04\n" +
 	"\x10ReservationState\x12!\n" +
-	"\x1dRESERVATION_STATE_UNSPECIFIED\x10\x00\x12\x1d\n" +
-	"\x19RESERVATION_STATE_PENDING\x10\x01\x12\x1f\n" +
-	"\x1bRESERVATION_STATE_CONFIRMED\x10\x02\x12 \n" +
-	"\x1cRESERVATION_STATE_CANCELLING\x10\x03\x12\x1f\n" +
-	"\x1bRESERVATION_STATE_CANCELLED\x10\x04\x12\x1c\n" +
-	"\x18RESERVATION_STATE_FAILED\x10\x05\x12\"\n" +
-	"\x1eRESERVATION_STATE_RESCHEDULING\x10\x06\x12!\n" +
-	"\x1dRESERVATION_STATE_RESCHEDULED\x10\aB\x94\x02\n" +
+	"\x1dRESERVATION_STATE_UNSPECIFIED\x10\x00\x12A\n" +
+	"\x19RESERVATION_STATE_PENDING\x10\x01\x1a\"\xda\xf0\x19\x1e\n" +
+	"\x1cfreebusy.reservation.pending\x12E\n" +
+	"\x1bRESERVATION_STATE_CONFIRMED\x10\x02\x1a$\xda\xf0\x19 \n" +
+	"\x1efreebusy.reservation.confirmed\x12G\n" +
+	"\x1cRESERVATION_STATE_CANCELLING\x10\x03\x1a%\xda\xf0\x19!\n" +
+	"\x1ffreebusy.reservation.cancelling\x12E\n" +
+	"\x1bRESERVATION_STATE_CANCELLED\x10\x04\x1a$\xda\xf0\x19 \n" +
+	"\x1efreebusy.reservation.cancelled\x12?\n" +
+	"\x18RESERVATION_STATE_FAILED\x10\x05\x1a!\xda\xf0\x19\x1d\n" +
+	"\x1bfreebusy.reservation.failed\x12K\n" +
+	"\x1eRESERVATION_STATE_RESCHEDULING\x10\x06\x1a'\xda\xf0\x19#\n" +
+	"!freebusy.reservation.rescheduling\x12I\n" +
+	"\x1dRESERVATION_STATE_RESCHEDULED\x10\a\x1a&\xda\xf0\x19\"\n" +
+	" freebusy.reservation.rescheduledB\x94\x02\n" +
 	"\x1bcom.freebusy.reservation.v1B\n" +
 	"EnumsProtoP\x01Zkgithub.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
 

@@ -60,7 +60,7 @@ func patchOperations(paths *yaml.Node) {
 
 // collectTags builds the top-level tags sequence from the tags used across all
 // operations, de-duplicated and sorted.
-func collectTags(paths *yaml.Node) *yaml.Node {
+func collectTags(paths *yaml.Node, described map[string]*yaml.Node) *yaml.Node {
 	names := map[string]bool{}
 	if paths.Kind == yaml.MappingNode {
 		for i := 0; i+1 < len(paths.Content); i += 2 {
@@ -91,6 +91,15 @@ func collectTags(paths *yaml.Node) *yaml.Node {
 	for _, n := range sorted {
 		m := newMapping()
 		mapSet(m, "name", strNode(n))
+		// The per-package documents describe each service's tag: its comment
+		// and the flows drawn for it, with the raw diagrams under x-mermaid.
+		if d := described[n]; d != nil {
+			for _, key := range []string{"description", "x-mermaid"} {
+				if v := mapGet(d, key); v != nil {
+					mapSet(m, key, v)
+				}
+			}
+		}
 		seq.Content = append(seq.Content, m)
 	}
 	return seq

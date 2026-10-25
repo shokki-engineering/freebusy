@@ -1,0 +1,11 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+#
+# yaml-language-server: $schema=https://raw.githubusercontent.com/the-protobuf-project/protoc-gen-openapi-solo/main/schema/docs.schema.json
+
+markdown:
+  index_title: Freebusy Protobuf APIs
+  footer: "© 2026 Srikanth K | Apache 2.0 License"
+  copyright: Copyright 2026 Srikanth K.
+  license_header: "SPDX-License-Identifier: Apache-2.0"

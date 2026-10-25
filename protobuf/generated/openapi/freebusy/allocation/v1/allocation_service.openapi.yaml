@@ -221,6 +221,9 @@ components:
                     description: |-
                         RESOURCE-TYPE values carried by the resource, RFC 9073 section 6.3, echoed
                          so a caller can group results without re-fetching each resource.
+                displayName:
+                    type: string
+                    description: The resource's display name, echoed for the same reason.
             description: One resource that satisfies a search, with the window it is free for.
         BatchComputeAvailabilityRequest:
             required:
@@ -274,6 +277,15 @@ components:
                     type: integer
                     description: How many resources are needed. Defaults to 1.
                     format: int32
+                filter:
+                    type: string
+                    description: |-
+                        An AIP-160 filter over each resource's search record (ResourceDay): its
+                         `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
+                         `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
+                         `display_name` (a bare word matches it) and `organizational_unit`. Terms
+                         are ANDed unless joined with OR. Empty matches every resource.
+                         Only matching resources are checked.
             description: Request message for AllocationService.CheckAvailability.
         CheckAvailabilityResponse:
             type: object
@@ -341,6 +353,15 @@ components:
                     description: |-
                         Populate AvailabilityBucket.free_resources. Off by default: a large site
                          would otherwise repeat every resource name in every bucket.
+                filter:
+                    type: string
+                    description: |-
+                        An AIP-160 filter over each resource's search record (ResourceDay): its
+                         `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
+                         `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
+                         `display_name` (a bare word matches it) and `organizational_unit`. Terms
+                         are ANDed unless joined with OR. Empty matches every resource.
+                         Only matching resources are computed over or counted.
             description: Request message for AllocationService.ComputeAvailability.
         ComputeAvailabilityResponse:
             type: object
@@ -355,6 +376,16 @@ components:
                     description: How many resources were considered across the whole window.
                     format: int32
             description: Response message for AllocationService.ComputeAvailability.
+        FacetBucket:
+            type: object
+            properties:
+                value:
+                    type: string
+                    description: 'The value, as text: "river", "22", "true".'
+                count:
+                    type: string
+                    description: How many matching resources carry it.
+            description: One value of a facet and how many resources carry it.
         GoogleProtobufAny:
             type: object
             properties:
@@ -417,7 +448,8 @@ components:
                         type: string
                     description: |-
                         Restrict to RESOURCE-TYPE values, RFC 9073 section 6.3, e.g. "room" or
-                         "parking-bay". Empty matches every type.
+                         "parking-bay": a resource matches when it carries any of them. Empty
+                         matches every type.
                 quantity:
                     type: integer
                     description: |-
@@ -430,7 +462,36 @@ components:
                     format: int32
                 pageToken:
                     type: string
-                    description: Page token from a previous SearchAvailabilityResponse.next_page_token.
+                    description: |-
+                        Page token from a previous SearchAvailabilityResponse.next_page_token.
+                         Every other field must be the same as in the call that returned it.
+                filter:
+                    type: string
+                    description: |-
+                        An AIP-160 filter over each resource's search record (ResourceDay): its
+                         `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
+                         `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
+                         `display_name` (a bare word matches it) and `organizational_unit`. Terms
+                         are ANDed unless joined with OR. Empty matches every resource.
+                orderBy:
+                    type: string
+                    description: |-
+                        AIP-132 order of the matches: a comma-separated list of `resource`,
+                         `organizational_unit`, `display_name`, `free_fraction` (the share of
+                         the window's first UTC day that is free) and `attributes.max_occupancy`
+                         (the booking profile's, as a number), each optionally followed by
+                         ` desc`, e.g. `free_fraction desc, display_name`. Defaults to
+                         `organizational_unit, resource`. When quantity is above 1, matches are
+                         grouped by site first, and the order applies within a site.
+                facets:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        Fields to count matching resources by, returned in
+                         SearchAvailabilityResponse.facets: `resource_types`,
+                         `organizational_unit` or an `attributes.<path>`, e.g.
+                         ["resource_types", "attributes.view"]. At most 10.
             description: |-
                 Request message for AllocationService.SearchAvailability. Sweeps a whole
                  operator for resources free across a window, where ComputeAvailability
@@ -446,7 +507,31 @@ components:
                 nextPageToken:
                     type: string
                     description: Token for the next page, empty when this is the last page.
+                facets:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SearchFacet'
+                    description: |-
+                        One entry per field the request named in `facets`, in that order: how
+                         many resources matching the filter have that window free in their
+                         standing availability, by value. Counts come from the search records
+                         and do not subtract live holds, so they can run slightly above what a
+                         hold would get; the matches themselves are exact.
             description: Response message for AllocationService.SearchAvailability.
+        SearchFacet:
+            type: object
+            properties:
+                field:
+                    type: string
+                    description: The field counted, as the request named it, e.g. "attributes.view".
+                buckets:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/FacetBucket'
+                    description: The most frequent values, most frequent first, at most 20.
+            description: |-
+                The counts of one facet of a search: how many matching resources carry
+                 each value of one field.
         Status:
             type: object
             properties:

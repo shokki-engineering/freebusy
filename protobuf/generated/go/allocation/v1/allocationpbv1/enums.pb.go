@@ -10,6 +10,7 @@
 package allocationpbv1
 
 import (
+	_ "github.com/the-protobuf-project/service/plugin/pb/servicepbv1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -230,13 +231,17 @@ var File_freebusy_allocation_v1_enums_proto protoreflect.FileDescriptor
 
 const file_freebusy_allocation_v1_enums_proto_rawDesc = "" +
 	"\n" +
-	"\"freebusy/allocation/v1/enums.proto\x12\x16freebusy.allocation.v1*\x89\x01\n" +
+	"\"freebusy/allocation/v1/enums.proto\x12\x16freebusy.allocation.v1\x1a\x1cservice/v1/annotations.proto*\xff\x01\n" +
 	"\tHoldState\x12\x1a\n" +
-	"\x16HOLD_STATE_UNSPECIFIED\x10\x00\x12\x15\n" +
-	"\x11HOLD_STATE_ACTIVE\x10\x01\x12\x17\n" +
-	"\x13HOLD_STATE_RELEASED\x10\x02\x12\x16\n" +
-	"\x12HOLD_STATE_EXPIRED\x10\x03\x12\x18\n" +
-	"\x14HOLD_STATE_CONVERTED\x10\x04*\x88\x01\n" +
+	"\x16HOLD_STATE_UNSPECIFIED\x10\x00\x121\n" +
+	"\x11HOLD_STATE_ACTIVE\x10\x01\x1a\x1a\xda\xf0\x19\x16\n" +
+	"\x14freebusy.hold.active\x125\n" +
+	"\x13HOLD_STATE_RELEASED\x10\x02\x1a\x1c\xda\xf0\x19\x18\n" +
+	"\x16freebusy.hold.released\x123\n" +
+	"\x12HOLD_STATE_EXPIRED\x10\x03\x1a\x1b\xda\xf0\x19\x17\n" +
+	"\x15freebusy.hold.expired\x127\n" +
+	"\x14HOLD_STATE_CONVERTED\x10\x04\x1a\x1d\xda\xf0\x19\x19\n" +
+	"\x17freebusy.hold.converted*\x88\x01\n" +
 	"\x17AvailabilityGranularity\x12(\n" +
 	"$AVAILABILITY_GRANULARITY_UNSPECIFIED\x10\x00\x12!\n" +
 	"\x1dAVAILABILITY_GRANULARITY_SLOT\x10\x01\x12 \n" +

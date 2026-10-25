@@ -11,10 +11,10 @@ package db
 import (
 	"context"
 	"slices"
+	"strings"
 	"time"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organizational_unit/v1"
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
@@ -31,46 +31,63 @@ var _ allocation.Store = (*Store)(nil)
 const acrossCalendars = "calendars/-"
 
 // Resources reads the resources q selects, soft-deleted ones included -- the
-// engine counts those but never offers them -- with their calendars' zones.
+// engine counts those but never offers them -- with their calendars' zones,
+// ordered by name.
 func (s *Store) Resources(ctx context.Context, q allocation.ResourceQuery) ([]allocation.ResourceRecord, error) {
-	var where []filterx.Condition
-	if len(q.OrganizationalUnits) > 0 {
-		where = append(where, filterx.In("organizational_unit", q.OrganizationalUnits...))
-	}
-	if q.Organization != "" {
-		units, err := listAll(func(token string) ([]*organizational_unitv1.OrganizationalUnit, string, error) {
-			return s.units.List(ctx, repox.ListInput{
-				PageSize:  1000,
-				PageToken: token,
-				// A site stores its organization's full name, organizations/{id}.
-				Where: []filterx.Condition{{Field: "organization", Op: filterx.OpEq, Value: q.Organization}},
-			})
-		})
+	// One scope: sites, an organization's sites, or calendars. Each is
+	// batched by key, so a large one is read in parts side by side.
+	scopeField, scope := "", []string(nil)
+	switch {
+	case len(q.OrganizationalUnits) > 0:
+		scopeField, scope = "organizational_unit", q.OrganizationalUnits
+	case q.Organization != "":
+		units, err := s.Sites(ctx, q.Organization)
 		if err != nil {
 			return nil, err
 		}
 		if len(units) == 0 {
 			return nil, nil
 		}
-		names := make([]string, len(units))
-		for i, u := range units {
-			names[i] = u.GetName()
-		}
-		where = append(where, filterx.In("organizational_unit", names...))
+		scopeField, scope = "organizational_unit", units
+	case len(q.Calendars) > 0:
+		scopeField, scope = "calendar", q.Calendars
 	}
-	if len(q.Calendars) > 0 {
-		where = append(where, filterx.In("calendar", q.Calendars...))
-	}
-	if len(q.Names) > 0 {
+	var where []filterx.Condition
+	if len(q.Names) > 0 && scopeField != "" {
 		where = append(where, filterx.In("name", q.Names...))
 	}
-	found, err := listAll(func(token string) ([]*resourcev1.Resource, string, error) {
-		return s.resources.List(ctx, repox.ListInput{PageSize: 1000, PageToken: token, OrderBy: "name", ShowDeleted: true, Where: where})
-	})
+	// RESOURCE-TYPE is a text[] column: "any of these types" is an OR of
+	// containments, which the GORM engine evaluates in SQL. The GraphQL
+	// schema has no array containment, so on Hasura the filter below is the
+	// only one (see the generator note in CHANGELOG).
+	if len(q.Types) > 0 && s.conn.Gorm != nil {
+		alts := make([]filterx.Condition, len(q.Types))
+		for i, t := range q.Types {
+			alts[i] = filterx.Condition{Field: "resource_types", Op: filterx.OpHas, Value: t}
+		}
+		where = append(where, filterx.Or(alts...))
+	}
+	// A scope, or names alone, is read by key: chunks of repox.KeysPerRead
+	// keys, a few side by side (ListByKeys).
+	in := repox.ListInput{OrderBy: "name", ShowDeleted: true, Where: where}
+	var found []*resourcev1.Resource
+	var err error
+	switch {
+	case scopeField != "":
+		found, err = s.resources.ListByKeys(ctx, scopeField, scope, in)
+	case len(q.Names) > 0:
+		found, err = s.resources.ListByKeys(ctx, "name", q.Names, in)
+	default:
+		found, err = listAll(func(token string) ([]*resourcev1.Resource, string, error) {
+			in.PageSize, in.PageToken = 1000, token
+			return s.resources.List(ctx, in)
+		})
+	}
 	if err != nil {
 		return nil, err
 	}
-	// RESOURCE-TYPE is a list column; "any of these types" is read here.
+	// Chunks are each in name order; together they are not.
+	slices.SortFunc(found, func(a, b *resourcev1.Resource) int { return strings.Compare(a.GetName(), b.GetName()) })
 	if len(q.Types) > 0 {
 		found = slices.DeleteFunc(found, func(r *resourcev1.Resource) bool {
 			return !slices.ContainsFunc(r.GetResourceTypes(), func(t string) bool { return slices.Contains(q.Types, t) })
@@ -78,19 +95,16 @@ func (s *Store) Resources(ctx context.Context, q allocation.ResourceQuery) ([]al
 	}
 
 	var cals []string
+	seen := map[string]bool{}
 	for _, r := range found {
-		if c := r.GetCalendar(); c != "" && !slices.Contains(cals, c) {
+		if c := r.GetCalendar(); c != "" && !seen[c] {
+			seen[c] = true
 			cals = append(cals, c)
 		}
 	}
 	zones := map[string]string{}
 	if len(cals) > 0 {
-		got, err := listAll(func(token string) ([]*calendarv1.Calendar, string, error) {
-			return s.calendars.List(ctx, repox.ListInput{
-				PageSize: 1000, PageToken: token, ShowDeleted: true,
-				Where: []filterx.Condition{filterx.In("name", cals...)},
-			})
-		})
+		got, err := s.calendars.ListByKeys(ctx, "name", cals, repox.ListInput{ShowDeleted: true})
 		if err != nil {
 			return nil, err
 		}
@@ -105,18 +119,34 @@ func (s *Store) Resources(ctx context.Context, q allocation.ResourceQuery) ([]al
 	return out, nil
 }
 
+// Sites returns the names of an organization's live sites, in name order.
+func (s *Store) Sites(ctx context.Context, organization string) ([]string, error) {
+	units, err := listAll(func(token string) ([]*organizational_unitv1.OrganizationalUnit, string, error) {
+		return s.units.List(ctx, repox.ListInput{
+			PageSize:  1000,
+			PageToken: token,
+			OrderBy:   "name",
+			// A site stores its organization's full name, organizations/{id}.
+			Where: []filterx.Condition{{Field: "organization", Op: filterx.OpEq, Value: organization}},
+		})
+	})
+	if err != nil {
+		return nil, err
+	}
+	names := make([]string, len(units))
+	for i, u := range units {
+		names[i] = u.GetName()
+	}
+	return names, nil
+}
+
 // Availability reads every live VAVAILABILITY on the calendars.
 func (s *Store) Availability(ctx context.Context, calendars []string) (map[string][]*availabilityv1.Availability, error) {
 	out := map[string][]*availabilityv1.Availability{}
 	if len(calendars) == 0 {
 		return out, nil
 	}
-	found, err := listAll(func(token string) ([]*availabilityv1.Availability, string, error) {
-		return s.availabilities.List(ctx, acrossCalendars, repox.ListInput{
-			PageSize: 1000, PageToken: token,
-			Where: []filterx.Condition{filterx.In("calendar", calendars...)},
-		})
-	})
+	found, err := s.availabilities.ListByKeys(ctx, "calendar", calendars, repox.ListInput{})
 	if err != nil {
 		return nil, err
 	}
@@ -141,12 +171,7 @@ func (s *Store) Events(ctx context.Context, calendars []string, window engine.Sp
 	// midnight and read later as local midnight, from being clipped a zone
 	// early.
 	lo, hi := window.Start.Add(-24*time.Hour), window.End.Add(24*time.Hour)
-	found, err := listAll(func(token string) ([]*eventv1.Event, string, error) {
-		return s.events.List(ctx, acrossCalendars, repox.ListInput{
-			PageSize: 1000, PageToken: token,
-			Where: append([]filterx.Condition{filterx.In("calendar", calendars...)}, windowHints(lo, hi)...),
-		})
-	})
+	found, err := s.events.ListByKeys(ctx, "calendar", calendars, repox.ListInput{Where: windowHints(lo, hi)})
 	if err != nil {
 		return nil, err
 	}

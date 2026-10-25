@@ -8,7 +8,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/shokki-engineering/freebusy/shared"
+	"github.com/shokki-engineering/freebusy/internal/telemetry"
 )
 
 // defaultPoolSampleInterval is how often the pool monitor samples sql.DB.Stats.
@@ -31,15 +31,16 @@ type poolMetrics struct {
 
 // StartPoolMonitor launches a background loop publishing the connection-pool
 // health of the process's single shared Connection until ctx is cancelled. It
-// is a no-op for providers without a pool (Hasura speaks HTTP). Non-blocking;
+// is a no-op for providers without a pool (Hasura speaks HTTP), and without a
+// telemetry pipeline to publish to. Non-blocking;
 // the goroutine exits when ctx is done.
 func StartPoolMonitor(ctx context.Context, conn *Connection, interval time.Duration) {
-	if conn == nil || conn.Provider != ProviderGorm || conn.PgSQLConn == nil {
+	if conn == nil || conn.Provider != ProviderGorm || conn.PgSQLConn == nil || telemetry.Telemetry == nil {
 		return
 	}
 	sqlDB, err := conn.PgSQLConn.DB()
 	if err != nil {
-		_ = shared.Telemetry.Logger.Error("pool monitor: no pool handle", map[string]any{"error": err.Error()})
+		telemetry.Error("pool monitor: no pool handle", map[string]any{"error": err.Error()})
 		return
 	}
 	if interval <= 0 {
@@ -73,7 +74,11 @@ func sample(sqlDB *sql.DB, last *sql.DBStats) {
 		WaitMs:  (s.WaitDuration - last.WaitDuration).Milliseconds(),
 	}
 	*last = s
-	if err := shared.Telemetry.Metrics.Record(m); err != nil {
-		_ = shared.Telemetry.Logger.Error("pool monitor: record failed", map[string]any{"error": err.Error()})
+	t := telemetry.Telemetry
+	if t == nil {
+		return
+	}
+	if err := t.Metrics.Record(m); err != nil {
+		telemetry.Error("pool monitor: record failed", map[string]any{"error": err.Error()})
 	}
 }

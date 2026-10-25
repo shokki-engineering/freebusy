@@ -1,0 +1,228 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+#
+# yaml-language-server: $schema=https://raw.githubusercontent.com/the-protobuf-project/protoc-gen-openapi-solo/main/schema/flows.schema.json
+#
+# Flows and state transitions of freebusy.allocation.v1, rendered by protoc-gen-openapi
+# (flows=<dir>). Re-run mode=scaffold after changing the protos: it adds what
+# is new and marks what is gone with STALE, and keeps everything you wrote.
+
+package: freebusy.allocation.v1
+
+services:
+  AllocationService:
+    methods:
+      ComputeAvailability:
+        request: ComputeAvailabilityRequest
+        response: ComputeAvailabilityResponse
+        http: POST /v1/{parent=organizationalUnits/*}:computeAvailability
+      CheckAvailability:
+        request: CheckAvailabilityRequest
+        response: CheckAvailabilityResponse
+        http: POST /v1/{parent=organizationalUnits/*}:checkAvailability
+      BatchComputeAvailability:
+        request: BatchComputeAvailabilityRequest
+        response: BatchComputeAvailabilityResponse
+        http: POST /v1/resources:batchCompute
+      SearchAvailability:
+        request: SearchAvailabilityRequest
+        response: SearchAvailabilityResponse
+        http: POST /v1/{parent=organizations/*}:searchAvailability
+    events: []
+    errors:
+      - reason: INVALID_TIME_ZONE
+        code: INVALID_ARGUMENT
+        description: '`time_zone` is not an IANA zone name.'
+      - reason: TOO_MANY_BUCKETS
+        code: INVALID_ARGUMENT
+        description: The window would be answered in too many buckets.
+      - reason: INVALID_FILTER
+        code: INVALID_ARGUMENT
+        description: '`filter` (or `hold.candidate_filter` on `CreateHold`) is not an AIP-160 filter over a resource''s search record: a syntax error, or a field it does not have. `BadRequest` names the field.'
+      - reason: FILTER_UNSUPPORTED
+        code: INVALID_ARGUMENT
+        description: 'The filter is valid, but the backend the search records are read on cannot evaluate it: on a Hasura-only deployment (no `[database.postgres]`), a `:` on `resource_types`, since DDN over ndc-postgres has no comparison on array columns. `BadRequest` names the field.'
+      - reason: INVALID_ORDER_BY
+        code: INVALID_ARGUMENT
+        description: '`SearchAvailability`''s `order_by` names a field matches cannot be ordered by, or a direction other than `asc`/`desc`.'
+      - reason: ORDER_BY_UNSUPPORTED
+        code: INVALID_ARGUMENT
+        description: '`SearchAvailability`''s `order_by` is valid, but orders by an attribute path (`attributes.max_occupancy`) that the backend the search records are read on cannot sort by: DDN''s order_by, on a Hasura-only deployment, has no JSON path expression.'
+      - reason: INVALID_FACET
+        code: INVALID_ARGUMENT
+        description: '`SearchAvailability`''s `facets` names a field resources cannot be counted by.'
+      - reason: INVALID_PAGE_TOKEN
+        code: INVALID_ARGUMENT
+        description: '`SearchAvailability`''s `page_token` is not one it returned.'
+      - reason: WINDOW_BEYOND_HORIZON
+        code: INVALID_ARGUMENT
+        description: '`SearchAvailability` with `order_by` or `facets` for a window outside the search records'' horizon (yesterday to `[search] horizon_days` ahead).'
+      - reason: ENGINE_BUSY
+        code: RESOURCE_EXHAUSTED
+        description: '`SearchAvailability`, `ComputeAvailability`, `BatchComputeAvailability`, `CheckAvailability` or `CreateHold`: as many availability evaluations as the server runs at once (`[engine] max_evaluations`) were running, and none finished within `[engine] admission_wait_ms`. Nothing was read or written.'
+      - reason: CAPACITY_EXHAUSTED
+        code: FAILED_PRECONDITION
+        description: '`CreateHold`: fewer resources are free for the whole window than were asked for. The race for the last one is lost this way too.'
+      - reason: OUTSIDE_AVAILABILITY
+        code: FAILED_PRECONDITION
+        description: '`CreateHold`: the window is outside the published availability of every resource asked about (closed then), so nothing is offered at all. A window that is offered but taken is `CAPACITY_EXHAUSTED`.'
+      - reason: INVALID_HOLD_EXTENSION
+        code: INVALID_ARGUMENT
+        description: '`ExtendHold`''s `duration` is zero, negative or above the maximum.'
+      - reason: HOLD_NOT_ACTIVE
+        code: FAILED_PRECONDITION
+        description: The hold expired, was released, or became a reservation.
+      - reason: HOLD_CONVERTED
+        code: FAILED_PRECONDITION
+        description: '`ReleaseHold` on a hold that became a reservation.'
+      - reason: HOLD_ACTIVE
+        code: FAILED_PRECONDITION
+        description: '`DeleteHold` on a hold that still holds its resources.'
+      - reason: REPLACED_HOLD_NOT_BOOKED
+        code: FAILED_PRECONDITION
+        description: '`CreateHold`: `hold.replaces` names a hold that backs no booking still keeping its resources -- it never became a reservation, or that reservation was cancelled or moved.'
+  HoldService:
+    methods:
+      CreateHold:
+        request: CreateHoldRequest
+        response: Hold
+        http: POST /v1/{parent=organizationalUnits/*}/holds
+      GetHold:
+        request: GetHoldRequest
+        response: Hold
+        http: GET /v1/{name=organizationalUnits/*/holds/*}
+      ListHolds:
+        request: ListHoldsRequest
+        response: ListHoldsResponse
+        http: GET /v1/{parent=organizationalUnits/*}/holds
+      ExtendHold:
+        request: ExtendHoldRequest
+        response: Hold
+        http: POST /v1/{name=organizationalUnits/*/holds/*}:extend
+      ReleaseHold:
+        request: ReleaseHoldRequest
+        response: Hold
+        http: POST /v1/{name=organizationalUnits/*/holds/*}:release
+      DeleteHold:
+        request: DeleteHoldRequest
+        response: google.protobuf.Empty
+        http: DELETE /v1/{name=organizationalUnits/*/holds/*}
+    events:
+      - freebusy.hold.expired
+      - freebusy.hold.active
+      - freebusy.hold.released
+      - freebusy.hold.converted
+    errors:
+      - reason: INVALID_TIME_ZONE
+        code: INVALID_ARGUMENT
+        description: '`time_zone` is not an IANA zone name.'
+      - reason: TOO_MANY_BUCKETS
+        code: INVALID_ARGUMENT
+        description: The window would be answered in too many buckets.
+      - reason: INVALID_FILTER
+        code: INVALID_ARGUMENT
+        description: '`filter` (or `hold.candidate_filter` on `CreateHold`) is not an AIP-160 filter over a resource''s search record: a syntax error, or a field it does not have. `BadRequest` names the field.'
+      - reason: FILTER_UNSUPPORTED
+        code: INVALID_ARGUMENT
+        description: 'The filter is valid, but the backend the search records are read on cannot evaluate it: on a Hasura-only deployment (no `[database.postgres]`), a `:` on `resource_types`, since DDN over ndc-postgres has no comparison on array columns. `BadRequest` names the field.'
+      - reason: INVALID_ORDER_BY
+        code: INVALID_ARGUMENT
+        description: '`SearchAvailability`''s `order_by` names a field matches cannot be ordered by, or a direction other than `asc`/`desc`.'
+      - reason: ORDER_BY_UNSUPPORTED
+        code: INVALID_ARGUMENT
+        description: '`SearchAvailability`''s `order_by` is valid, but orders by an attribute path (`attributes.max_occupancy`) that the backend the search records are read on cannot sort by: DDN''s order_by, on a Hasura-only deployment, has no JSON path expression.'
+      - reason: INVALID_FACET
+        code: INVALID_ARGUMENT
+        description: '`SearchAvailability`''s `facets` names a field resources cannot be counted by.'
+      - reason: INVALID_PAGE_TOKEN
+        code: INVALID_ARGUMENT
+        description: '`SearchAvailability`''s `page_token` is not one it returned.'
+      - reason: WINDOW_BEYOND_HORIZON
+        code: INVALID_ARGUMENT
+        description: '`SearchAvailability` with `order_by` or `facets` for a window outside the search records'' horizon (yesterday to `[search] horizon_days` ahead).'
+      - reason: ENGINE_BUSY
+        code: RESOURCE_EXHAUSTED
+        description: '`SearchAvailability`, `ComputeAvailability`, `BatchComputeAvailability`, `CheckAvailability` or `CreateHold`: as many availability evaluations as the server runs at once (`[engine] max_evaluations`) were running, and none finished within `[engine] admission_wait_ms`. Nothing was read or written.'
+      - reason: CAPACITY_EXHAUSTED
+        code: FAILED_PRECONDITION
+        description: '`CreateHold`: fewer resources are free for the whole window than were asked for. The race for the last one is lost this way too.'
+      - reason: OUTSIDE_AVAILABILITY
+        code: FAILED_PRECONDITION
+        description: '`CreateHold`: the window is outside the published availability of every resource asked about (closed then), so nothing is offered at all. A window that is offered but taken is `CAPACITY_EXHAUSTED`.'
+      - reason: INVALID_HOLD_EXTENSION
+        code: INVALID_ARGUMENT
+        description: '`ExtendHold`''s `duration` is zero, negative or above the maximum.'
+      - reason: HOLD_NOT_ACTIVE
+        code: FAILED_PRECONDITION
+        description: The hold expired, was released, or became a reservation.
+      - reason: HOLD_CONVERTED
+        code: FAILED_PRECONDITION
+        description: '`ReleaseHold` on a hold that became a reservation.'
+      - reason: HOLD_ACTIVE
+        code: FAILED_PRECONDITION
+        description: '`DeleteHold` on a hold that still holds its resources.'
+      - reason: REPLACED_HOLD_NOT_BOOKED
+        code: FAILED_PRECONDITION
+        description: '`CreateHold`: `hold.replaces` names a hold that backs no booking still keeping its resources -- it never became a reservation, or that reservation was cancelled or moved.'
+
+# Lifecycle enums: for each value, how it is reached. A value takes one
+# transition or a list of them: {from: [values], rpc: Service.Method or event:
+# cause, condition: guard}. Empty from with a trigger is an entry from the
+# initial state; a value left as {from: []} is not drawn.
+states:
+  HoldState:
+    # Live and holding its resources against other callers, until expire_time.
+    HOLD_STATE_ACTIVE:
+      from: []
+      rpc: HoldService.CreateHold
+    # Given up before expiry, by ReleaseHold or by the booking it backed
+    # failing. The resources are free again.
+    HOLD_STATE_RELEASED:
+      - from: [ACTIVE]
+        rpc: HoldService.ReleaseHold
+      - from: [ACTIVE]
+        event: reservation failed
+    # expire_time passed with no confirmation. Reached by the sweeper, and by
+    # any authoritative read that notices the deadline before the sweeper does,
+    # so a stale ACTIVE row never hands out a resource twice.
+    HOLD_STATE_EXPIRED:
+      from: [ACTIVE]
+      event: sweeper
+      condition: expire_time passed
+    # Converted into a confirmed booking. Terminal, and the only outcome that
+    # keeps the resources allocated.
+    HOLD_STATE_CONVERTED:
+      from: [ACTIVE]
+      rpc: freebusy.reservation.v1.ReservationService.CreateReservation
+
+flows:
+  - id: hold-expiry
+    title: Hold expiry
+    service: HoldService
+    description: |-
+      A hold nobody confirms lapses at `expire_time`; ExtendHold pushes the
+      deadline out while it is still ACTIVE.
+
+      Reads are authoritative on expiry, so a caller never sees an ACTIVE hold
+      that no longer holds anything, even before the sweeper runs.
+    actors: [Client, HoldService, Sweeper, Webhooks]
+    steps:
+      - call: freebusy.allocation.v1.HoldService.CreateHold
+        returns: Hold (ACTIVE)
+      - alternatives:
+          - when: the caller needs more time
+            steps:
+              - call: freebusy.allocation.v1.HoldService.ExtendHold
+                returns: Hold (later expire_time)
+      - actor: Sweeper
+        message: expire lapsed holds
+        to: HoldService
+        note: expire_time passed; the claims stop counting
+      - actor: HoldService
+        emits: freebusy.hold.expired
+        to: Webhooks
+      - call: freebusy.allocation.v1.HoldService.GetHold
+        returns: Hold (EXPIRED)
+      - call: freebusy.allocation.v1.HoldService.ExtendHold
+        error: FAILED_PRECONDITION (HOLD_NOT_ACTIVE)

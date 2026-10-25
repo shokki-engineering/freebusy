@@ -17,7 +17,7 @@ image:
   tag: ""
   pullPolicy: IfNotPresent
 
-# Applies migrations/ in an init container before the server starts. atlas
+# Applies deploy/migrations/ in an init container before the server starts. atlas
 # takes a database lock, so replicas starting together apply them once.
 migrations:
   enabled: true
@@ -49,6 +49,8 @@ database:
 #   webhook-previous-secret-keys  after a rotation, the old keys, comma-separated
 #   redis-password                when cache.enabled
 #   connector-token               when hasura.enabled: the engine's bearer token for the connector
+#   opensearch-username           when search.provider is opensearch and the cluster wants basic auth
+#   opensearch-password
 # The migrations' database URL is built from these: keep the Postgres
 # password URL-safe (openssl rand -hex 24).
 secrets:
@@ -58,11 +60,32 @@ secrets:
   webhookPreviousSecretKeys: ""
   redisPassword: ""
   connectorToken: ""
+  opensearchUsername: ""
+  opensearchPassword: ""
 
 # The reservation list cache (Redis or Dragonfly).
 cache:
   enabled: false
   address: ""
+
+# The availability read model searches read their candidates from: one row
+# per resource per UTC day, in Postgres, kept current in every write. The
+# server backfills it as it starts when it is empty ([search]
+# rebuild_on_start; set FREEBUSY_SEARCH__REBUILD_ON_START=always in extraEnv
+# for one rollout to repair it).
+search:
+  # postgres (the read model's own table) or opensearch: SearchAvailability
+  # served from an external OpenSearch cluster the server indexes into,
+  # falling back to Postgres on errors and timeouts. The server loads an
+  # empty index from Postgres as it starts ([search.opensearch]
+  # reindex_on_start).
+  provider: postgres
+  # Days ahead the read model covers; the server extends it daily.
+  horizonDays: 365
+  opensearch:
+    # The cluster, e.g. https://opensearch.search.svc:9200. Credentials go
+    # in the Secret (opensearch-username / opensearch-password).
+    url: ""
 
 telemetry:
   # OTLP collector, host:port (gRPC). Empty exports nothing.
@@ -85,8 +108,16 @@ service:
   httpPort: 8080
   mcpPort: 8081
 
-# In-flight calls finish on SIGTERM; this is how long they get.
+# In-flight calls finish on SIGTERM; this is how long they get. The server's
+# drain bound (server.shutdown_timeout_seconds) is derived from it: this, less
+# preStopSleepSeconds, less 5 s to flush telemetry -- 20 s by default.
 terminationGracePeriodSeconds: 30
+
+# Seconds a terminating pod keeps serving before SIGTERM, so the Service's
+# endpoints drop it before it stops accepting connections. Without it, calls
+# dialled during a rolling restart are refused. 0 turns it off. The pod
+# lifecycle sleep action needs Kubernetes 1.30 or later (the image has no shell).
+preStopSleepSeconds: 5
 
 podDisruptionBudget:
   enabled: true
@@ -99,6 +130,15 @@ resources:
   limits:
     memory: 512Mi
 
+# `helm test <release>`: a Pod that checks /health and a read API through the
+# Service (templates/tests/smoke.yaml).
+tests:
+  enabled: true
+  image:
+    repository: curlimages/curl
+    tag: "8.11.1"
+    pullPolicy: IfNotPresent
+
 podAnnotations: {}
 nodeSelector: {}
 tolerations: []
@@ -107,10 +147,10 @@ affinity: {}
 # The Hasura DDN engine and its Postgres connector, for provider: hasura.
 #
 # The engine image carries its metadata build, and the build carries the
-# connector's URL and token. Build one for this release: in hasura/.env set
+# connector's URL and token. Build one for this release: in deploy/hasura/.env set
 # FREEBUSY_FREEBUSY_PGSQL_READ_URL and _WRITE_URL to
 # http://<release>-freebusy-connector:9794 and the bearer token, run
-# `just hasura regen`, and build hasura/engine/Dockerfile.engine. The
+# `just hasura regen`, and build deploy/hasura/engine/Dockerfile.engine. The
 # committed build points at local.hasura.dev and only suits Compose.
 hasura:
   enabled: false

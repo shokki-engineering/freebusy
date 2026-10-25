@@ -9,9 +9,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/shokki-engineering/freebusy/config"
-	"github.com/shokki-engineering/freebusy/internal"
-	"github.com/shokki-engineering/freebusy/shared"
+	"github.com/shokki-engineering/freebusy/internal/config"
+	"github.com/shokki-engineering/freebusy/internal/server"
+	"github.com/shokki-engineering/freebusy/internal/telemetry"
+	"github.com/the-protobuf-project/runtime-go/grpc"
 )
 
 // App is the top-level application instance. It owns the gRPC/HTTP server
@@ -22,22 +23,33 @@ type App struct {
 	// Version is the service version read from the VERSION file.
 	Version string
 	// server is the underlying hybrid gRPC/HTTP/MCP server.
-	server *internal.Server
+	server *server.Server
 }
 
-// InitializeApp creates an App from the loaded configuration. It validates
-// that name and version are present, but does not start the server.
+// InitializeApp builds the process's telemetry pipeline, loads the
+// configuration, and creates an App from it. It validates that name and
+// version are present, but does not start the server.
 func InitializeApp() *App {
-	cfg := config.Get()
+	// Telemetry first, then configuration: what used to happen as the
+	// packages initialised, now explicit, in the same order. Neither can be
+	// done without, so a failure stops the process as it always did.
+	if err := telemetry.Init(); err != nil {
+		fmt.Printf("ERROR: Failed to create Telemetry: %v\n", err)
+		panic(err)
+	}
+	cfg, err := config.Load()
+	if err != nil {
+		panic(err.Error())
+	}
 
 	if cfg.Meta.Name == "" || cfg.Meta.Version == "" {
-		_ = shared.Telemetry.Logger.Error("Invalid configuration: name or version is empty",
+		telemetry.Error("Invalid configuration: name or version is empty",
 			"name", cfg.Meta.Name,
 			"version", cfg.Meta.Version)
 		panic("cannot initialize app with empty name or version from config")
 	}
 
-	shared.Telemetry.Logger.Debug("Initializing application from config",
+	telemetry.Debug("Initializing application from config",
 		"name", cfg.Meta.Name, "version", cfg.Meta.Version)
 
 	app := &App{
@@ -45,7 +57,7 @@ func InitializeApp() *App {
 		Version: cfg.Meta.Version,
 	}
 
-	shared.Telemetry.Logger.Debug("App instance created",
+	telemetry.Debug("App instance created",
 		"name", app.Name, "version", app.Version)
 	return app
 }
@@ -54,36 +66,42 @@ func InitializeApp() *App {
 // traffic. Non-blocking — call Wait() afterwards to keep the process alive.
 // An error means nothing is being served, and the process should exit.
 func (a *App) Start() (string, error) {
-	shared.Telemetry.Logger.Debug("Starting application",
+	telemetry.Debug("Starting application",
 		"name", a.Name, "version", a.Version)
 
-	message := "Starting " + a.Name + " version " + a.Version
+	message := "Starting " + a.Name + " version " + a.Version + " (commit " + buildRevision() + ")"
 
-	server, err := internal.NewServer(a.Name, a.Version)
+	// A Bazel build records no VCS information, so the startup banner would
+	// read "dev": hand it the commit stamped at link time instead.
+	if buildCommit != "" && buildCommit != "dev" && buildCommit != "unknown" {
+		grpc.BuildRevision = buildCommit
+	}
+
+	server, err := server.NewServer(a.Name, a.Version)
 	if err != nil {
-		_ = shared.Telemetry.Logger.Error("Failed to create server", "error", err)
+		telemetry.Error("Failed to create server", "error", err)
 		return "", fmt.Errorf("failed to create server: %w", err)
 	}
 	a.server = server
 
 	if err := a.server.Start(); err != nil {
-		_ = shared.Telemetry.Logger.Error("Failed to start server", "error", err)
+		telemetry.Error("Failed to start server", "error", err)
 		return "", fmt.Errorf("failed to start server: %w", err)
 	}
 
-	shared.Telemetry.Logger.Info("Application started",
-		"name", a.Name, "version", a.Version)
+	telemetry.Info("Application started",
+		"name", a.Name, "version", a.Version, "commit", buildRevision())
 	return message, nil
 }
 
 // Stop gracefully drains connections, shuts the server down, and releases
 // shared resources (Telemetry logger/tracer).
 func (a *App) Stop() error {
-	shared.Telemetry.Logger.Debug("Stopping application", "name", a.Name)
+	telemetry.Debug("Stopping application", "name", a.Name)
 
 	if a.server != nil {
 		if err := a.server.Stop(); err != nil {
-			_ = shared.Telemetry.Logger.Error("Error stopping server", "error", err)
+			telemetry.Error("Error stopping server", "error", err)
 			return fmt.Errorf("failed to stop server: %w", err)
 		}
 	}
@@ -91,11 +109,11 @@ func (a *App) Stop() error {
 	// Flushing telemetry can fail -- no collector listening, a network gone --
 	// without the server having stopped any less cleanly, so it is reported,
 	// not returned: a supervisor reading the exit code sees a clean stop.
-	if err := shared.Close(); err != nil {
-		shared.Telemetry.Logger.Warn("Telemetry was not flushed on shutdown", "error", err)
+	if err := telemetry.Close(); err != nil {
+		telemetry.Warn("Telemetry was not flushed on shutdown", "error", err)
 	}
 
-	shared.Telemetry.Logger.Info("Application stopped", "name", a.Name)
+	telemetry.Info("Application stopped", "name", a.Name)
 	return nil
 }
 
@@ -103,27 +121,8 @@ func (a *App) Stop() error {
 // immediately if Start() has not been called.
 func (a *App) Wait() {
 	if a.server != nil {
-		shared.Telemetry.Logger.Debug("Waiting for shutdown signal")
+		telemetry.Telemetry.Logger.Debug("Waiting for shutdown signal")
 		a.server.Wait()
-		shared.Telemetry.Logger.Info("Shutdown signal received")
+		telemetry.Telemetry.Logger.Info("Shutdown signal received")
 	}
-}
-
-// Restart performs a hot restart of the server without tearing down the
-// entire process. Useful for applying config changes at runtime.
-func (a *App) Restart() error {
-	shared.Telemetry.Logger.Debug("Restarting server", "app", a.Name)
-
-	if a.server == nil {
-		shared.Telemetry.Logger.Warn("Cannot restart: server not initialized")
-		return fmt.Errorf("server not initialized")
-	}
-
-	if err := a.server.Restart(); err != nil {
-		_ = shared.Telemetry.Logger.Error("Failed to restart server", "error", err)
-		return fmt.Errorf("failed to restart server: %w", err)
-	}
-
-	shared.Telemetry.Logger.Info("Server restarted", "app", a.Name)
-	return nil
 }

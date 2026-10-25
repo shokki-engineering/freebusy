@@ -1,0 +1,188 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Production configuration for the freebusy service.
+#
+# Compiled into the binary via //go:embed (see internal/config/config.go). Holds
+# production-safe, non-secret topology only — secrets (passwords, admin secret)
+# are left blank here and injected at deploy time. For local development these
+# defaults are overlaid by internal/config/freebusy.dev.toml.
+
+[app]
+name = "freebusy"
+version = "v1.0.0-rc.1"
+description = "Generic availability and booking engine: compute availability, hold and reserve RFC 9073 resources."
+
+[server]
+# environment: "development", "debug", "staging", or "production".
+environment = "production"
+enable_http = true
+enable_health = true
+enable_mcp = true
+experimental_http3 = false
+# shutdown_timeout_seconds: how long a stop waits for in-flight requests (HTTP
+# gateways drain first, then gRPC) before cutting them off. 0 = the runtime's
+# default, 20 s. Keep it under the orchestrator's grace period minus any
+# preStop delay; the Helm chart derives it that way.
+shutdown_timeout_seconds = 20
+
+[server.grpc]
+host = "0.0.0.0"
+port = 50051
+
+[server.http]
+host = "0.0.0.0"
+port = 8080
+
+[server.mcp]
+host = "0.0.0.0"
+port = 8081
+# transport: "stdio", "streamable-http", or "sse".
+transport = "streamable-http"
+# path: the one MCP endpoint serving every service's tools ("/mcp" when empty).
+path = "/mcp"
+# stateless: serve streamable HTTP without sessions, at path and at each
+# service's own path, so any replica behind a load balancer answers any
+# request with no sticky routing. Gives up what needs a session:
+# server-to-client requests (elicitation, sampling, roots), the standalone
+# GET stream and DELETE (405). Tool calls, progress notifications included,
+# are unaffected; so are stdio and sse.
+stateless = true
+
+[server.tls]
+# Required when experimental_http3 = true. Provide the PEM cert/key at deploy time.
+cert_file = ""
+key_file = ""
+
+[database]
+# provider selects the backend: "gorm" (Postgres) or "hasura".
+provider = "gorm"
+
+[database.postgres]
+host = "127.0.0.1"
+port = 5432
+user = "postgres"
+password = ""
+dbname = "freebusydb"
+sslmode = "require"
+timezone = "UTC"
+# Connection-pool bounds; the pool is the process's backpressure point.
+max_open_conns = 25
+max_idle_conns = 25
+conn_max_lifetime_minutes = 30
+conn_max_idle_minutes = 5
+# Set on every connection at startup. force_custom_plan keeps Postgres from
+# switching a prepared search to a generic plan after five runs on a pooled
+# connection (a filtered, faceted search: 7 ms -> 150 ms). Also auto,
+# force_generic_plan, or "database" to send nothing and leave it to
+# ALTER DATABASE/ROLE (behind a pooler that refuses startup parameters).
+plan_cache_mode = "force_custom_plan"
+
+[database.hasura]
+url = ""
+admin_secret = ""
+
+# Read-through cache behind protoc-gen-cache's generated decorators.
+#
+# Off by default. The service is correct without it, and turning a cache on
+# before the read it serves has been measured only adds a way to be stale.
+#
+# Resources annotated STRATEGY_INDEXED need server-side sets, so the address
+# must be Redis or Dragonfly; memcached is refused at construction. No resource
+# is annotated for caching today, so nothing is cached even when enabled.
+[cache]
+enabled = false
+address = "127.0.0.1:6379"
+username = ""
+password = ""
+database = 0
+pool_size = 0
+# Separates this deployment's keys from another sharing one server. Set it per
+# environment — it is config, not schema, which is why cache.v1 has no prefix.
+prefix = "freebusy"
+
+# Services that keep resources freebusy names but does not store: a
+# reservation's customer (users/{user}) in a user service. Each entry is
+# checked on write through the service's AIP Get; without one, the reference
+# is stored unchecked. Repeat the table for more services, e.g.
+#
+# [[reference_services]]
+# type = "users.shokki.engineering/User"
+# get = "users.v1.UserService/GetUser"
+# target = "${USERS_GRPC_TARGET}"
+# referrers = []
+# plaintext = false
+
+[caldav]
+# CalDAV (RFC 4791) under /dav/ on the HTTP port. Off: it has no
+# authentication yet, so it must not face a network.
+enabled = false
+
+[webhooks]
+# Webhook delivery of hold and reservation changes. Endpoints must be https.
+enabled = true
+allow_insecure_endpoints = false
+interval_seconds = 5
+max_attempts = 8
+allow_private_networks = false
+retention_days = 30
+# Seals signing secrets at rest. Set FREEBUSY_WEBHOOKS__SECRET_KEY to the
+# output of `openssl rand -base64 32`; empty stores them unsealed.
+secret_key = ""
+previous_secret_keys = ""
+
+[retention]
+# Soft-deleted organizations, sites, resources, calendars, events and
+# availability are purged for good this many days after deletion; until then
+# Undelete restores them, and expire_time says when they go.
+purge = true
+deleted_days = 30
+
+[engine]
+# Admission control for availability evaluations (search, compute, check, and
+# CreateHold's choice of resources). They are CPU-bound: past this many at
+# once, more only makes each slower. 0 is the number of CPUs.
+max_evaluations = 0
+# How long an evaluation waits for a turn before it is refused with
+# RESOURCE_EXHAUSTED / ENGINE_BUSY, in milliseconds. 0 is 250.
+admission_wait_ms = 250
+
+[search]
+# The availability read model: one row per resource per UTC day, holding its
+# standing free time (offered less booked; live holds and booking policy are
+# left to the engine), kept current in the same transaction as every write to
+# a resource, its site, calendar, availability, events or converted holds.
+# Searches read candidates from it; the engine checks every one. Rows cover
+# yesterday through this many days ahead, extended daily; a window past the
+# horizon is answered without the read model.
+horizon_days = 365
+# When the server recomputes the whole read model as it starts (in the
+# background; it serves meanwhile, and searches see each batch as it lands):
+# "empty" when the table has no rows -- a fresh deployment, or an upgrade from
+# a version without it; "always" on every start -- the repair after writes
+# that bypassed the API: restart with it set, then set it back; "never".
+rebuild_on_start = "empty"
+# Where SearchAvailability searches: "postgres" (the read model's own table)
+# or "opensearch" (a copy kept by a change-feed indexer, see
+# [search.opensearch]; any error or timeout falls back to Postgres).
+provider = "postgres"
+
+[search.opensearch]
+# The cluster, used only when provider = "opensearch". Credentials are
+# secrets: set FREEBUSY_SEARCH__OPENSEARCH__USERNAME / __PASSWORD.
+url = ""
+username = ""
+password = ""
+# Committed changes buffered for the indexer before writes wait on it.
+index_queue = 1024
+# A search slower than this falls back to Postgres, in milliseconds.
+timeout_ms = 500
+# When the server reloads the index from the read model's table as it starts
+# (in the background: a new versioned index, then an alias swap): "empty" when
+# the index has no documents but the table has rows -- the alias was just
+# created, or the cluster was replaced; "always" on every start -- the repair
+# after the indexer missed changes: restart one replica with it set, then set
+# it back; "never". Needs [database] provider = "gorm" (the table is read
+# directly). A start that rebuilt the read model leaves the index to the
+# indexer, which follows the rebuild.
+reindex_on_start = "empty"

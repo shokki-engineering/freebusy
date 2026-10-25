@@ -9,11 +9,15 @@
 #   docker compose up -d                       # Postgres backend, nothing else
 #   docker compose --profile observability up -d
 #   docker compose --profile cache --profile hasura --profile observability up -d
+#   docker compose --profile search up -d      # + OpenSearch for SearchAvailability
 #
 # Postgres (gorm) is the production backend. The hasura profile adds the DDN
 # engine and its connector; set FREEBUSY_DATABASE_PROVIDER=hasura to serve
 # through them. The cache profile adds Redis; set FREEBUSY_CACHE_ENABLED=true
-# to use it.
+# to use it. The search profile adds a single-node OpenSearch; set
+# FREEBUSY_SEARCH_PROVIDER=opensearch to search it (the read model in Postgres
+# stays the source, and searches fall back to it); the server loads the
+# index from it as it starts when the index is empty.
 #
 # Every port is published on 127.0.0.1 only: freebusy has no authentication
 # yet, so put a TLS-terminating proxy you control in front of it, or reach it
@@ -37,7 +41,7 @@ services:
     ports:
       - "127.0.0.1:50051:50051" # gRPC
       - "127.0.0.1:8080:8080" # REST and /health
-      - "127.0.0.1:8081:8081" # MCP
+      - "127.0.0.1:8081:8081" # MCP, one endpoint at /mcp
     environment:
       FREEBUSY_DATABASE__PROVIDER: ${FREEBUSY_DATABASE_PROVIDER:-gorm}
       FREEBUSY_DATABASE__POSTGRES__HOST: postgres
@@ -48,6 +52,11 @@ services:
       FREEBUSY_CACHE__ENABLED: ${FREEBUSY_CACHE_ENABLED:-false}
       FREEBUSY_CACHE__ADDRESS: redis:6379
       FREEBUSY_CACHE__PASSWORD: ${REDIS_PASSWORD:-}
+      FREEBUSY_SEARCH__PROVIDER: ${FREEBUSY_SEARCH_PROVIDER:-postgres}
+      FREEBUSY_SEARCH__HORIZON_DAYS: ${FREEBUSY_SEARCH_HORIZON_DAYS:-365}
+      FREEBUSY_SEARCH__OPENSEARCH__URL: ${OPENSEARCH_URL:-http://opensearch:9200}
+      FREEBUSY_SEARCH__OPENSEARCH__USERNAME: ${OPENSEARCH_USERNAME:-}
+      FREEBUSY_SEARCH__OPENSEARCH__PASSWORD: ${OPENSEARCH_PASSWORD:-}
       FREEBUSY_WEBHOOKS__SECRET_KEY: ${WEBHOOK_SECRET_KEY:?set WEBHOOK_SECRET_KEY in .env}
       FREEBUSY_WEBHOOKS__PREVIOUS_SECRET_KEYS: ${WEBHOOK_PREVIOUS_SECRET_KEYS:-}
       FREEBUSY_OTLP_ENDPOINT: ${OTLP_ENDPOINT:-}
@@ -57,7 +66,7 @@ services:
       migrate:
         condition: service_completed_successfully
 
-  # Applies migrations/ before the server starts, and on every `up` after an
+  # Applies deploy/migrations/ before the server starts, and on every `up` after an
   # upgrade; it applies only what the database has not seen, then exits.
   migrate:
     image: ${FREEBUSY_MIGRATIONS_IMAGE:-ghcr.io/shokki-engineering/freebusy-migrations}:${FREEBUSY_TAG:-latest}
@@ -123,16 +132,44 @@ services:
       interval: 5s
       retries: 10
 
-  # The Hasura DDN engine, serving the committed build (hasura/engine/build).
+  # OpenSearch for SearchAvailability ([search] provider = "opensearch"):
+  # a copy of the availability read model the server indexes into. Single
+  # node, and the security plugin is DISABLED -- plain HTTP, no users -- which
+  # is acceptable only on one host with the port bound to 127.0.0.1; a shared
+  # or production cluster must run with security on, its credentials in
+  # OPENSEARCH_USERNAME / OPENSEARCH_PASSWORD and an https OPENSEARCH_URL.
+  opensearch:
+    profiles: [search]
+    image: opensearchproject/opensearch:3.9.0
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+    ulimits:
+      memlock: {soft: -1, hard: -1}
+      nofile: {soft: 65536, hard: 65536}
+    ports:
+      - "127.0.0.1:9200:9200"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s'"]
+      interval: 10s
+      retries: 30
+      start_period: 30s
+
+  # The Hasura DDN engine, serving the committed build (deploy/hasura/engine/build).
   # That build names its connector at local.hasura.dev:9794 with the token in
-  # hasura/.env.example, which is why the connector answers to that name and
+  # deploy/hasura/.env.example, which is why the connector answers to that name and
   # port here. A production engine wants its own: rebuild it with
   # `just hasura regen` against your values, and set them below.
   engine:
     profiles: [hasura]
     image: ${FREEBUSY_ENGINE_IMAGE:-ghcr.io/shokki-engineering/freebusy-engine}:${FREEBUSY_TAG:-latest}
     build:
-      context: ../../hasura/engine
+      context: ../hasura/engine
       dockerfile: Dockerfile.engine
     restart: unless-stopped
     environment:
@@ -146,7 +183,7 @@ services:
     profiles: [hasura]
     image: ${FREEBUSY_CONNECTOR_IMAGE:-ghcr.io/shokki-engineering/freebusy-connector}:${FREEBUSY_TAG:-latest}
     build:
-      context: ../../hasura/freebusy/connector/freebusy_pgsql
+      context: ../hasura/freebusy/connector/freebusy_pgsql
       dockerfile: .hasura-connector/Dockerfile.freebusy_pgsql
     restart: unless-stopped
     environment:
@@ -176,7 +213,7 @@ services:
       - ../observability/prometheus.yaml:/etc/opentelemetry-stack/prometheus.yaml:ro
       - ../observability/alerts.yaml:/etc/opentelemetry-stack/freebusy-alerts.yaml:ro
       - ../observability/alertmanager.yaml:/etc/opentelemetry-stack/alertmanager.yaml:ro
-      - ../../.grafana/dashboard_service.json:/etc/opentelemetry-stack/grafana/provisioning/dashboards/freebusy/service.json:ro
+      - ../grafana/dashboard_service.json:/etc/opentelemetry-stack/grafana/provisioning/dashboards/freebusy/service.json:ro
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:6009/grafana/api/health"]
       interval: 10s
@@ -185,3 +222,4 @@ services:
 volumes:
   postgres-data:
   telemetry-data:
+  opensearch-data:

@@ -1,0 +1,135 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# The server's container image: the static binary and nothing else -- no base
+# image, no shell, no libc, no certificate store. The binary carries what an
+# empty filesystem lacks (time zones and fallback root certificates, see
+# main.go) and is configured entirely by FREEBUSY_* environment variables
+# over the release defaults compiled into it (internal/config/load.go).
+#
+#   bazel run //deploy/image:load            # into the local Docker, as freebusy:latest
+#   bazel build //deploy/image               # the linux/amd64 + linux/arm64 index
+#   bazel run //deploy/image:push -- --tag <tag>
+#
+# Beside it, the migrations image (:migrations): atlas and deploy/migrations/, which
+# applies them to the database its --url names. It is how a deployment with
+# no checkout -- the Compose stack, the Helm chart's pre-upgrade Job -- runs
+# `just db apply`.
+#
+#   bazel run //deploy/image:load_migrations   # as freebusy-migrations:latest
+#   bazel run //deploy/image:push_migrations -- --tag <tag>
+load("@rules_go//go:def.bzl", "go_cross_binary")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_image_index", "oci_load", "oci_push")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+
+ARCHS = [
+    "amd64",
+    "arm64",
+]
+
+[go_cross_binary(
+    name = "freebusy_linux_" + arch,
+    platform = "@rules_go//go/toolchain:linux_" + arch,
+    target = "//:freebusy",
+) for arch in ARCHS]
+
+[pkg_tar(
+    name = "layer_" + arch,
+    files = {":freebusy_linux_" + arch: "freebusy"},
+    mode = "0755",
+) for arch in ARCHS]
+
+[oci_image(
+    name = "image_" + arch,
+    architecture = arch,
+    entrypoint = ["/freebusy"],
+    # gRPC, HTTP (REST, health), MCP.
+    exposed_ports = [
+        "50051/tcp",
+        "8080/tcp",
+        "8081/tcp",
+    ],
+    labels = {
+        "org.opencontainers.image.title": "freebusy",
+        "org.opencontainers.image.description": "Generic availability and booking engine.",
+        "org.opencontainers.image.source": "https://github.com/shokki-engineering/freebusy",
+        "org.opencontainers.image.licenses": "AGPL-3.0-or-later",
+        "org.opencontainers.image.authors": "Srikanth K",
+        "org.opencontainers.image.vendor": "Srikanth K",
+    },
+    os = "linux",
+    tars = [":layer_" + arch],
+    # Not root: the image has no users, so a bare uid:gid.
+    user = "65532:65532",
+) for arch in ARCHS]
+
+oci_image_index(
+    name = "image",
+    images = [":image_" + arch for arch in ARCHS],
+    visibility = ["//visibility:public"],
+)
+
+# Docker loads one platform: the machine's own.
+oci_load(
+    name = "load",
+    image = select({
+        "@platforms//cpu:arm64": ":image_arm64",
+        "//conditions:default": ":image_amd64",
+    }),
+    repo_tags = ["freebusy:latest"],
+)
+
+oci_push(
+    name = "push",
+    image = ":image",
+    repository = "ghcr.io/shokki-engineering/freebusy",
+)
+
+# The migrations image, one per platform over atlas's own.
+[pkg_tar(
+    name = "migrations_layer_" + arch,
+    srcs = ["//deploy/migrations"],
+    mode = "0644",
+    package_dir = "/migrations",
+) for arch in ARCHS]
+
+[oci_image(
+    name = "migrations_" + arch,
+    base = "@atlas_linux_" + arch,
+    # The command's tail is the deployment's: --url and any atlas flags.
+    entrypoint = [
+        "/atlas",
+        "migrate",
+        "apply",
+        "--dir",
+        "file:///migrations",
+    ],
+    labels = {
+        "org.opencontainers.image.title": "freebusy-migrations",
+        "org.opencontainers.image.description": "The freebusy schema's versioned migrations, applied with atlas.",
+        "org.opencontainers.image.source": "https://github.com/shokki-engineering/freebusy",
+        "org.opencontainers.image.licenses": "AGPL-3.0-or-later",
+    },
+    tars = [":migrations_layer_" + arch],
+    user = "65532:65532",
+) for arch in ARCHS]
+
+oci_image_index(
+    name = "migrations",
+    images = [":migrations_" + arch for arch in ARCHS],
+)
+
+oci_load(
+    name = "load_migrations",
+    image = select({
+        "@platforms//cpu:arm64": ":migrations_arm64",
+        "//conditions:default": ":migrations_amd64",
+    }),
+    repo_tags = ["freebusy-migrations:latest"],
+)
+
+oci_push(
+    name = "push_migrations",
+    image = ":migrations",
+    repository = "ghcr.io/shokki-engineering/freebusy-migrations",
+)

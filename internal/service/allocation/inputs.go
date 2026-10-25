@@ -7,10 +7,11 @@ import (
 	"context"
 	"regexp"
 	"strconv"
+	"sync"
 	"time"
 
-	eventv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
-	availabilityv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"github.com/shokki-engineering/freebusy/internal/rfc"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 )
@@ -26,6 +27,8 @@ type site struct {
 	resources []engine.Resource
 	// records are parallel to resources.
 	records []ResourceRecord
+	// statics are parallel to resources: what each was built from.
+	statics []staticResource
 	// zone is the first resource's calendar zone, the "site's zone" requests
 	// default to.
 	zone *time.Location
@@ -34,59 +37,96 @@ type site struct {
 // gather reads everything the engine needs about the resources q selects, over
 // span, and converts it.
 //
-// Four reads regardless of how many resources match -- resources, then
-// availability, events and claims each batched across all of them -- so cost
-// grows with the rows returned, not with round trips.
+// The static inputs -- resources, calendars, availability -- come from the
+// per-site cache when the store is versioned (statics.go), unless fresh is
+// set. Bookings are read on every call: events and claims, each batched
+// across every resource and read side by side, so cost grows with the rows
+// returned, not with round trips.
 func (s *Server) gather(ctx context.Context, q ResourceQuery, span engine.Span, now time.Time) (*site, error) {
-	recs, err := s.store.Resources(ctx, q)
+	return s.gatherFrom(ctx, q, span, now, false, nil)
+}
+
+// gatherFrom is gather, reading the static inputs from the database when
+// fresh is set, and leaving kept -- a replaced booking's own claims, by
+// resource -- out of what is booked.
+func (s *Server) gatherFrom(ctx context.Context, q ResourceQuery, span engine.Span, now time.Time, fresh bool, kept map[string]engine.Spans) (*site, error) {
+	statics, err := s.staticInputs(ctx, q, fresh)
 	if err != nil {
 		return nil, err
 	}
-	out := &site{records: recs, zone: time.UTC}
-	if len(recs) == 0 {
+	return s.assemble(ctx, statics, span, now, kept)
+}
+
+// assemble reads the bookings on statics' resources over span and builds the
+// engine's view of them, less kept. Claims of different holds on one resource
+// never overlap (the no_overlap constraint), so taking kept out of the
+// converted claims removes exactly the replaced booking's.
+func (s *Server) assemble(ctx context.Context, statics []staticResource, span engine.Span, now time.Time, kept map[string]engine.Spans) (*site, error) {
+	out := &site{zone: time.UTC, statics: statics}
+	if len(statics) == 0 {
 		return out, nil
 	}
-
-	names := make([]string, 0, len(recs))
+	names := make([]string, 0, len(statics))
 	var calendars []string
 	seen := map[string]bool{}
-	for _, r := range recs {
-		names = append(names, r.Resource.GetName())
-		if c := r.Resource.GetCalendar(); c != "" && !seen[c] {
+	for _, r := range statics {
+		names = append(names, r.rec.Resource.GetName())
+		if c := r.rec.Resource.GetCalendar(); c != "" && !seen[c] {
 			seen[c] = true
 			calendars = append(calendars, c)
 		}
 	}
-	avs, err := s.store.Availability(ctx, calendars)
-	if err != nil {
-		return nil, err
+	var (
+		events   map[string][]*eventv1.Event
+		claims   Claims
+		evErr    error
+		claimErr error
+		wg       sync.WaitGroup
+	)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		events, evErr = s.store.Events(ctx, calendars, span)
+	}()
+	claims, claimErr = s.store.Claims(ctx, names, span, now)
+	wg.Wait()
+	if evErr != nil {
+		return nil, evErr
 	}
-	events, err := s.store.Events(ctx, calendars, span)
-	if err != nil {
-		return nil, err
-	}
-	claims, err := s.store.Claims(ctx, names, span, now)
-	if err != nil {
-		return nil, err
+	if claimErr != nil {
+		return nil, claimErr
 	}
 
-	out.zone = zone(recs[0].TimeZone)
-	for _, rec := range recs {
-		loc := zone(rec.TimeZone)
-		cal := rec.Resource.GetCalendar()
-		name := rec.Resource.GetName()
-		booked := expandEvents(events[cal], loc, span).Union(claims.Converted[name])
+	out.zone = statics[0].loc
+	out.resources = make([]engine.Resource, 0, len(statics))
+	out.records = make([]ResourceRecord, 0, len(statics))
+	// A calendar's events are expanded once, however many resources share it.
+	expanded := map[string]engine.Spans{}
+	for _, r := range statics {
+		cal := r.rec.Resource.GetCalendar()
+		name := r.rec.Resource.GetName()
+		key := cal + "\x00" + r.loc.String()
+		evs, ok := expanded[key]
+		if !ok {
+			evs = expandEvents(events[cal], r.loc, span)
+			expanded[key] = evs
+		}
 		out.resources = append(out.resources, engine.Resource{
 			Name:     name,
-			Inactive: rec.Resource.GetDeleteTime() != nil,
-			Offered:  engine.Offered(toAvailabilities(avs[cal], loc), span),
+			Inactive: r.inactive,
+			Offered:  engine.Offered(r.avs, span),
 			Held:     claims.Held[name],
-			Booked:   booked,
-			Policy:   policyOf(rec),
+			Booked:   evs.Union(claims.Converted[name].Subtract(kept[name])),
+			Policy:   r.policy,
 		})
+		out.records = append(out.records, r.rec)
 	}
 	return out, nil
 }
+
+// zones caches loaded time zones: time.LoadLocation reads the zone database
+// on every call.
+var zones sync.Map
 
 // zone loads an IANA zone, falling back to UTC. A bad zone name shifts day
 // boundaries by hours; refusing to answer would be worse.
@@ -94,10 +134,14 @@ func zone(name string) *time.Location {
 	if name == "" {
 		return time.UTC
 	}
+	if l, ok := zones.Load(name); ok {
+		return l.(*time.Location)
+	}
 	loc, err := time.LoadLocation(name)
 	if err != nil {
 		return time.UTC
 	}
+	zones.Store(name, loc)
 	return loc
 }
 

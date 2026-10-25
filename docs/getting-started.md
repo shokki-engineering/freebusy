@@ -4,7 +4,8 @@
 # Getting started
 
 From nothing to a confirmed booking over the REST API, with `curl`. The same
-calls exist over gRPC (`:50051`) and as MCP tools (`:8081`); the names match.
+calls exist over gRPC (`:50051`) and as MCP tools (`http://localhost:8081/mcp`);
+the names match.
 
 You need a running freebusy. The quickest is the Compose stack:
 
@@ -221,6 +222,24 @@ curl -s "$B/v1/webhooks/bookings/deliveries"
 backoff.)
 
 ## 7. Change it
+
+Update who it is for, or what is kept with it. `updateMask` names the fields
+to change -- `customer`, `attributes`, or both -- and is required; the time and
+the court cannot change this way. Send the `etag` you read to be refused,
+rather than overwrite, if someone changed it since:
+
+```sh
+curl -s -X PATCH "$B/v1/organizationalUnits/riverside/reservations/c49331c0a350a309395876fa75?updateMask=attributes" \
+  -H 'Content-Type: application/json' \
+  -d '{"attributes": {"party_size": 6, "payment": "pi_3Q9"}, "etag": "<etag>"}'
+```
+
+```json
+{ "attributes": {"party_size": 6, "payment": "pi_3Q9"},
+  "state": "RESERVATION_STATE_CONFIRMED" }
+```
+
+A webhook that asked for it receives `freebusy.reservation.updated`.
 
 Cancel, which frees the court:
 

@@ -30,10 +30,10 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/event"
 	"github.com/shokki-engineering/freebusy/internal/database/gorm/rfc/resource"
 	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql"
-	"github.com/shokki-engineering/freebusy/internal/livetest"
 	"github.com/shokki-engineering/freebusy/internal/rfc"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
+	"github.com/shokki-engineering/freebusy/test/live"
 	"github.com/the-protobuf-project/runtime-go/ulid"
 	"google.golang.org/genproto/googleapis/type/interval"
 	"google.golang.org/grpc/codes"
@@ -61,7 +61,7 @@ func win(a, b float64) *interval.Interval {
 
 func liveDB(t *testing.T) *gorm.DB {
 	t.Helper()
-	dsn := livetest.Env(t, livetest.DatabaseURL)
+	dsn := live.Env(t, live.DatabaseURL)
 	db, err := database.OpenGorm(dsn, &gorm.Config{Logger: logger.Discard})
 	if err != nil {
 		t.Fatalf("open: %v", err)
@@ -80,7 +80,7 @@ type site struct {
 func seed(t *testing.T, db *gorm.DB) site {
 	t.Helper()
 	run := ulid.Generate().String()
-	s := site{ou: "organizationalUnits/it-" + run}
+	s := site{ou: live.Site(t, db, "it-"+run)}
 	create := func(v any) {
 		t.Helper()
 		if err := db.Omit(clause.Associations).Create(v).Error; err != nil {
@@ -144,7 +144,7 @@ func stores(t *testing.T) map[string]func(*gorm.DB) allocation.Store {
 			return New(&database.Connection{PgSQLConn: g, Provider: database.ProviderGorm})
 		},
 	}
-	if raw := livetest.Optional(t, livetest.GraphQLURL); raw != "" {
+	if raw := live.Optional(t, live.GraphQLURL); raw != "" {
 		u, err := url.Parse(raw)
 		if err != nil {
 			t.Fatal(err)

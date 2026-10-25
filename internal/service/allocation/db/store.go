@@ -26,6 +26,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
+	"strings"
 	"time"
 
 	"github.com/shokki-engineering/freebusy/internal/database"
@@ -37,7 +39,8 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/event"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/orgunit"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/resource"
-	"github.com/shokki-engineering/freebusy/internal/types"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
+	"github.com/shokki-engineering/freebusy/internal/telemetry"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -52,11 +55,32 @@ type Store struct {
 	availabilities availability.AvailabilityRepository
 	events         event.EventRepository
 	units          orgunit.OrganizationalUnitRepository
+	// version moves on every write to the engine's static inputs.
+	version *inputVersion
 }
 
-// New returns the Store on conn's backend.
+// New returns the Store on conn's backend, observing conn's writes so its
+// InputVersion moves with them.
 func New(conn *database.Connection) *Store {
-	c := conn.Repox()
+	v := &inputVersion{}
+	if p := conn.CacheProvider(); p != nil {
+		if db, err := p.SetDatabase(context.Background(), inputsNamespace); err == nil {
+			v.shared = db
+		} else {
+			telemetry.Warn("Engine input version is per process: the cache database could not be opened", "error", err)
+		}
+	}
+	conn.Observe(v)
+	s := On(conn.Repox())
+	s.version = v
+	return s
+}
+
+// On returns the Store over c alone: its reads and writes go through c, and
+// nothing observes them, so its InputVersion never moves. The read model's
+// writer reads through it inside the write it projects (c is that write's
+// transaction on GORM).
+func On(c repox.Conn) *Store {
 	allocs := allocation.New(c)
 	return &Store{
 		conn:           c,
@@ -67,6 +91,7 @@ func New(conn *database.Connection) *Store {
 		availabilities: availability.New(c).Availabilities,
 		events:         event.New(c).Events,
 		units:          orgunit.New(c).OrganizationalUnits,
+		version:        &inputVersion{},
 	}
 }
 
@@ -95,23 +120,18 @@ func (s *Store) claimsOverlapping(ctx context.Context, resources []string, windo
 	if len(resources) == 0 {
 		return nil, nil
 	}
-	return listAll(func(token string) ([]*allocationpbv1.Allocation, string, error) {
-		return s.allocations.List(ctx, acrossSites, repox.ListInput{
-			PageSize:  1000,
-			PageToken: token,
-			Where: []filterx.Condition{
-				filterx.In("resource", resources...),
-				{Field: "start_time", Op: filterx.OpLt, Value: window[1].UTC().Format(time.RFC3339Nano)},
-				{Field: "end_time", Op: filterx.OpGt, Value: window[0].UTC().Format(time.RFC3339Nano)},
-			},
-		})
+	return s.allocations.ListByKeys(ctx, "resource", resources, repox.ListInput{
+		Where: []filterx.Condition{
+			{Field: "start_time", Op: filterx.OpLt, Value: window[1].UTC().Format(time.RFC3339Nano)},
+			{Field: "end_time", Op: filterx.OpGt, Value: window[0].UTC().Format(time.RFC3339Nano)},
+		},
 	})
 }
 
 // InsertHold writes hold and one allocation per resource it took, in one
 // Batch. Lapsed claims in the way are deleted in the same batch, so a hold
 // that expired unswept never blocks one that wants its time. A live claim in
-// the way makes the no_overlap constraint refuse the batch: types.ErrConflict.
+// the way makes the no_overlap constraint refuse the batch: repox.ErrConflict.
 func (s *Store) InsertHold(ctx context.Context, parent string, h *allocationpbv1.Hold) (*allocationpbv1.Hold, error) {
 	window := [2]time.Time{h.GetWindow().GetStartTime().AsTime(), h.GetWindow().GetEndTime().AsTime()}
 	for attempt := 1; ; attempt++ {
@@ -119,11 +139,11 @@ func (s *Store) InsertHold(ctx context.Context, parent string, h *allocationpbv1
 		if err == nil {
 			return s.holds.Get(ctx, name)
 		}
-		if errors.Is(err, types.ErrConflict) || errors.Is(err, types.ErrAlreadyExists) {
+		if errors.Is(err, repox.ErrConflict) || errors.Is(err, repox.ErrAlreadyExists) {
 			return nil, err
 		}
 		if rival, ok := s.rivalClaim(ctx, h, window); ok {
-			return nil, fmt.Errorf("%w: %s was taken while this hold was written", types.ErrConflict, rival)
+			return nil, fmt.Errorf("%w: %s was taken while this hold was written", repox.ErrConflict, rival)
 		}
 		// No rival to be seen: the insert failed for a reason the backend did
 		// not name -- a GraphQL engine hides the database's. Writers of one
@@ -155,8 +175,14 @@ func (s *Store) insertHold(ctx context.Context, parent string, h *allocationpbv1
 	}
 	now := time.Now()
 	b := allocation.NewBatch(s.conn)
+	// What a replaced booking keeps stays its own until HandOver: this hold
+	// claims the rest of its window.
+	kept := map[string]engine.Spans{}
 	for _, a := range inWay {
-		if a.GetExpireTime() != nil && !a.GetExpireTime().AsTime().After(now) {
+		switch {
+		case h.GetReplaces() != "" && a.GetHold() == h.GetReplaces():
+			kept[a.GetResource()] = kept[a.GetResource()].Union(engine.Spans{spanOf(a)})
+		case a.GetExpireTime() != nil && !a.GetExpireTime().AsTime().After(now):
 			b.DeleteAllocation(a.GetName())
 		}
 	}
@@ -165,17 +191,78 @@ func (s *Store) insertHold(ctx context.Context, parent string, h *allocationpbv1
 		return "", err
 	}
 	for _, r := range h.GetResources() {
-		if _, err := b.CreateAllocation(parent, &allocationpbv1.Allocation{
-			Resource:   r,
-			StartTime:  h.GetWindow().GetStartTime(),
-			EndTime:    h.GetWindow().GetEndTime(),
-			ExpireTime: h.GetExpireTime(),
-			Hold:       name,
-		}); err != nil {
-			return "", err
+		for _, sp := range (engine.Spans{{Start: window[0], End: window[1]}}).Subtract(kept[r]) {
+			if _, err := b.CreateAllocation(parent, &allocationpbv1.Allocation{
+				Resource:   r,
+				StartTime:  timestamppb.New(sp.Start),
+				EndTime:    timestamppb.New(sp.End),
+				ExpireTime: h.GetExpireTime(),
+				Hold:       name,
+			}); err != nil {
+				return "", err
+			}
 		}
 	}
 	return name, b.Commit(ctx)
+}
+
+// spanOf is the time an allocation row claims.
+func spanOf(a *allocationpbv1.Allocation) engine.Span {
+	return engine.Span{Start: a.GetStartTime().AsTime(), End: a.GetEndTime().AsTime()}
+}
+
+// HandOver ends the converted hold from as of at, guarded by etag, and gives
+// hold to the rest of its window, in one batch: from's claims on to's
+// resources across to's window are deleted -- they would collide with to's
+// under the no_overlap constraint -- its other claims take the expiry at,
+// and to gains a claim for every part of its window it does not yet hold on
+// each of its resources.
+func (s *Store) HandOver(ctx context.Context, from, etag, to string, at time.Time) (*allocationpbv1.Hold, error) {
+	next, err := s.holds.Get(ctx, to)
+	if err != nil {
+		return nil, err
+	}
+	window := engine.Span{Start: next.GetWindow().GetStartTime().AsTime(), End: next.GetWindow().GetEndTime().AsTime()}
+	old, err := s.claimsOf(ctx, from)
+	if err != nil {
+		return nil, err
+	}
+	have, err := s.claimsOf(ctx, to)
+	if err != nil {
+		return nil, err
+	}
+	end := timestamppb.New(at)
+	b := allocation.NewBatch(s.conn)
+	b.UpdateHoldOutputOnly(&allocationpbv1.Hold{Name: from, Etag: etag, State: allocationpbv1.HoldState_HOLD_STATE_CONVERTED, ExpireTime: end}, []string{"state", "expire_time"})
+	for _, a := range old {
+		if slices.Contains(next.GetResources(), a.GetResource()) && spanOf(a).Overlaps(window) {
+			b.DeleteAllocation(a.GetName())
+		} else {
+			b.UpdateAllocationOutputOnly(&allocationpbv1.Allocation{Name: a.GetName(), ExpireTime: end}, []string{"expire_time"})
+		}
+	}
+	held := map[string]engine.Spans{}
+	for _, a := range have {
+		held[a.GetResource()] = held[a.GetResource()].Union(engine.Spans{spanOf(a)})
+	}
+	parent, _, _ := strings.Cut(next.GetName(), "/holds/")
+	for _, r := range next.GetResources() {
+		for _, sp := range (engine.Spans{window}).Subtract(held[r]) {
+			if _, err := b.CreateAllocation(parent, &allocationpbv1.Allocation{
+				Resource:   r,
+				StartTime:  timestamppb.New(sp.Start),
+				EndTime:    timestamppb.New(sp.End),
+				ExpireTime: next.GetExpireTime(),
+				Hold:       to,
+			}); err != nil {
+				return nil, err
+			}
+		}
+	}
+	if err := b.Commit(ctx); err != nil {
+		return nil, err
+	}
+	return s.holds.Get(ctx, from)
 }
 
 // rivalClaim names a resource another hold now claims, live, across window.
@@ -187,7 +274,7 @@ func (s *Store) rivalClaim(ctx context.Context, h *allocationpbv1.Hold, window [
 	}
 	for _, a := range claims {
 		live := a.GetExpireTime() == nil || a.GetExpireTime().AsTime().After(now)
-		if live && a.GetHold() != h.GetName() {
+		if live && a.GetHold() != h.GetName() && (h.GetReplaces() == "" || a.GetHold() != h.GetReplaces()) {
 			return a.GetResource(), true
 		}
 	}
@@ -210,7 +297,7 @@ func (s *Store) FindHold(ctx context.Context, parent, key string) (*allocationpb
 		return nil, err
 	}
 	if len(found) == 0 {
-		return nil, types.ErrNotFound
+		return nil, repox.ErrNotFound
 	}
 	return found[0], nil
 }
@@ -300,7 +387,7 @@ func (s *Store) ExpireHolds(ctx context.Context, now time.Time) (int64, error) {
 		switch err := b.Commit(ctx); {
 		case err == nil:
 			n++
-		case errors.Is(err, types.ErrConflict), errors.Is(err, types.ErrNotFound):
+		case errors.Is(err, repox.ErrConflict), errors.Is(err, repox.ErrNotFound):
 			// Changed or gone under us: whoever did it owns it now.
 		default:
 			return n, err

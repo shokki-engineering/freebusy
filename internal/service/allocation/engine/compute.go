@@ -85,6 +85,21 @@ func (r Resource) Free() Spans {
 	return r.Offered.Subtract(r.Held).Subtract(r.Booked)
 }
 
+// FreeIntervals is r's standing free time within [from, to): what its
+// availability offers less what confirmed bookings take, clipped to the span.
+// Live holds are left in, since they lapse by the clock with no write to say
+// so, and so is the booking policy, which depends on when a window is asked
+// about; Why applies both. This is what the availability read model
+// (allocation.v1.ResourceDay) stores per resource and day, and what any copy
+// of it elsewhere must compute, so a candidate it offers is one Why may still
+// refuse but never one it hides.
+func FreeIntervals(r Resource, from, to time.Time) Spans {
+	if r.Inactive {
+		return nil
+	}
+	return r.Offered.Subtract(r.Booked).Clip(Span{Start: from, End: to})
+}
+
 // Why returns the reason the resource cannot take window, or ReasonNone when it
 // can. Ordered from the most permanent cause to the most transient, so the
 // reason reported is the one worth acting on: a court that is both closed and
@@ -240,6 +255,8 @@ type CheckResult struct {
 	// them. All of them, not just the first quantity: a caller can show
 	// alternatives.
 	Candidates []string
+	// Fits are Candidates with the gap each would leave, for Pick.
+	Fits []Fit
 	// Reasons are populated only when Bookable is false: one request-level
 	// NO_CAPACITY, then why each resource that was not free was refused.
 	Reasons []Unbookable
@@ -258,7 +275,11 @@ func Check(resources []Resource, window Span, quantity int, now time.Time) Check
 			refused = append(refused, Unbookable{Reason: why, Resource: r.Name})
 		}
 	}
-	res.Candidates = Rank(resources, window, now)
+	res.Fits = Fits(resources, window, now)
+	res.Candidates = make([]string, len(res.Fits))
+	for i, f := range res.Fits {
+		res.Candidates[i] = f.Name
+	}
 	res.Bookable = len(res.Candidates) >= quantity
 	if !res.Bookable {
 		res.Reasons = append([]Unbookable{{Reason: ReasonNoCapacity}}, refused...)
@@ -266,20 +287,35 @@ func Check(resources []Resource, window Span, quantity int, now time.Time) Check
 	return res
 }
 
-// Rank returns the resources that can take window, best first.
+// Fit is one resource that can take a window, and the free gap around the
+// window on it: the measure best fit ranks by.
+type Fit struct {
+	Name string
+	Gap  time.Duration
+}
+
+// Rank returns the resources that can take window, best first: the names of
+// Fits.
+func Rank(resources []Resource, window Span, now time.Time) []string {
+	fits := Fits(resources, window, now)
+	out := make([]string, len(fits))
+	for i, f := range fits {
+		out[i] = f.Name
+	}
+	return out
+}
+
+// Fits returns the resources that can take window, best first.
 //
 // "Best" is best fit: the resource whose free gap around the window is
 // tightest. Taking a 1-hour booking out of a court that is free for exactly an
 // hour leaves the court that is free all afternoon whole for the 3-hour
 // booking that comes next; taking it from the long gap would split that gap
 // into two that may each be too short to sell. Ties break by name, so the
-// choice is deterministic and two identical requests pick identically.
-func Rank(resources []Resource, window Span, now time.Time) []string {
-	type fit struct {
-		name string
-		gap  time.Duration
-	}
-	var fits []fit
+// order is deterministic and two identical questions get identical answers;
+// Pick is what spreads callers across a tie.
+func Fits(resources []Resource, window Span, now time.Time) []Fit {
+	var fits []Fit
 	for _, r := range resources {
 		if r.Why(window, now) != ReasonNone {
 			continue
@@ -288,17 +324,48 @@ func Rank(resources []Resource, window Span, now time.Time) []string {
 		if !ok {
 			continue
 		}
-		fits = append(fits, fit{name: r.Name, gap: gap.Duration()})
+		fits = append(fits, Fit{Name: r.Name, Gap: gap.Duration()})
 	}
 	sort.SliceStable(fits, func(i, j int) bool {
-		if fits[i].gap != fits[j].gap {
-			return fits[i].gap < fits[j].gap
+		if fits[i].Gap != fits[j].Gap {
+			return fits[i].Gap < fits[j].Gap
 		}
-		return fits[i].name < fits[j].name
+		return fits[i].Name < fits[j].Name
 	})
-	out := make([]string, len(fits))
-	for i, f := range fits {
-		out[i] = f.name
+	return fits
+}
+
+// Pick chooses quantity resources from fits, which are best first, keeping to
+// best fit but choosing at random among equally good ones: where a tie spans
+// the cut, shuffle decides which of the tied resources are taken.
+//
+// Without it every concurrent caller asking for the same window picks the
+// same resource -- the first by name -- and all but one lose the race for
+// it, re-plan, and pile onto the next one, until they run out of attempts
+// with resources still free. Spread across the tie, most of them land on
+// different resources first time.
+//
+// shuffle has math/rand's Shuffle signature; nil keeps the name order.
+func Pick(fits []Fit, quantity int, shuffle func(n int, swap func(i, j int))) []string {
+	quantity = min(quantity, len(fits))
+	out := make([]string, 0, quantity)
+	for i := 0; i < len(fits) && len(out) < quantity; {
+		j := i + 1
+		for j < len(fits) && fits[j].Gap == fits[i].Gap {
+			j++
+		}
+		tie := make([]string, 0, j-i)
+		for _, f := range fits[i:j] {
+			tie = append(tie, f.Name)
+		}
+		if need := quantity - len(out); need < len(tie) && shuffle != nil {
+			shuffle(len(tie), func(a, b int) { tie[a], tie[b] = tie[b], tie[a] })
+			tie = tie[:need]
+		} else if need < len(tie) {
+			tie = tie[:need]
+		}
+		out = append(out, tie...)
+		i = j
 	}
 	return out
 }

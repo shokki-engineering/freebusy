@@ -763,8 +763,16 @@ components:
                          its series' ical_uid that replaces the one instance whose start, as the
                          series generated it, was this -- moved, retimed, or cancelled with
                          confirmation CANCELLED. Absent on the series itself and on an event that
-                         happens once. RANGE=THISANDFUTURE is not modelled; a client splits the
-                         series instead.
+                         happens once. original_start_range widens it to every later instance.
+                originalStartRange:
+                    type: integer
+                    description: |-
+                        The RANGE parameter on RECURRENCE-ID, section 3.2.13 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.2.13>. Unspecified, the
+                         override replaces the one instance original_start names; THIS_AND_FUTURE
+                         makes it apply to that instance and every later one, which a server
+                         stores by splitting the series at original_start. Meaningless, and
+                         rejected by a codec, without original_start.
+                    format: enum
                 sequence:
                     type: integer
                     description: |-

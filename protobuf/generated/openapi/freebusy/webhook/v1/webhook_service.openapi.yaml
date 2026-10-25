@@ -595,8 +595,11 @@ components:
                          "freebusy.event.deleted". Empty sends every type. A type is
                          "freebusy.<record>.<what happened>": holds are active, released, expired
                          and converted; reservations pending, confirmed, cancelling, cancelled,
-                         failed, rescheduling and rescheduled; resources, calendars, events and
-                         availabilities created, updated and deleted.
+                         failed, rescheduling and rescheduled, and updated exactly when
+                         UpdateReservation changed its customer or attributes -- the reservation's
+                         last_change is CHANGE_DETAILS (freebusy.reservation.updated);
+                         resources, calendars, events and availabilities created, updated and
+                         deleted.
                 organizationalUnit:
                     type: string
                     description: |-

@@ -84,7 +84,7 @@ jobs:
       - run: bazel build //...
       - run: bazel test //...
       # Both platforms of the image: the static binary and nothing else.
-      - run: bazel build //image
+      - run: bazel build //deploy/image
 
   deploy:
     name: Deploy manifests
@@ -111,6 +111,48 @@ jobs:
           docker run --rm -v "$PWD/deploy/observability:/w" --entrypoint promtool \
             prom/prometheus:v3.5.0 check rules /w/alerts.yaml
 
+  kind:
+    name: Helm install on kind
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: bazel-contrib/setup-bazel@0.19.1
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+      - uses: azure/setup-helm@v4
+      - uses: helm/kind-action@v1
+        with:
+          cluster_name: freebusy
+      # The runner's own platform (linux/amd64), as single-platform images:
+      # kind load takes those, not the multi-platform index.
+      - name: Build and load the images
+        run: |
+          bazel run //deploy/image:load
+          bazel run //deploy/image:load_migrations
+          kind load docker-image --name freebusy freebusy:latest freebusy-migrations:latest
+      - name: Postgres and Redis
+        run: |
+          kubectl apply -f deploy/kind/datastores.yaml
+          kubectl -n freebusy rollout status statefulset/postgres --timeout=300s
+          kubectl -n freebusy rollout status deploy/redis --timeout=180s
+      - name: helm install
+        run: |
+          helm install freebusy deploy/helm/freebusy -n freebusy \
+            -f deploy/kind/values.yaml --wait --timeout 5m
+      - name: helm test
+        run: helm test freebusy -n freebusy --logs --timeout 3m
+      # No call fails while the pods are replaced (preStopSleepSeconds).
+      - name: Rolling restart under traffic
+        run: deploy/kind/rollout-check.sh freebusy freebusy
+      - name: Cluster state
+        if: failure()
+        run: |
+          kubectl -n freebusy get pods -o wide
+          kubectl -n freebusy describe pods
+          kubectl -n freebusy logs -l app.kubernetes.io/name=freebusy --all-containers --tail=200
+
   test:
     name: Unit tests
     runs-on: ubuntu-latest
@@ -127,7 +169,7 @@ jobs:
   live:
     name: Live suites (Postgres and Hasura DDN)
     runs-on: ubuntu-latest
-    # The database the dev overlay (config/freebusy.dev.toml) names, so the
+    # The database the dev overlay (internal/config/freebusy.dev.toml) names, so the
     # migrate tool and the server binary need no configuration of their own.
     services:
       postgres:
@@ -162,13 +204,13 @@ jobs:
       - run: just db apply
       - run: just db check
 
-      # The engine serves the committed build (hasura/engine/build), which
+      # The engine serves the committed build (deploy/hasura/engine/build), which
       # `just hasura regen` makes from the metadata with a developer's DDN
       # login. Serving it needs none: the engine and the connector are plain
-      # images, and hasura/.env.example holds the connector settings the build
+      # images, and deploy/hasura/.env.example holds the connector settings the build
       # was made with.
       - name: Start the engine and connector
-        working-directory: hasura
+        working-directory: deploy/hasura
         run: |
           cp .env.example .env
           docker compose -f compose.yaml --env-file .env up -d --build --pull always --wait
@@ -181,10 +223,10 @@ jobs:
           exit 1
 
       # Every test on both backends; a suite that cannot reach its backend
-      # fails the job rather than skipping (internal/livetest).
+      # fails the job rather than skipping (test/live).
       - run: just test-live
 
       - name: Engine and connector logs
         if: failure()
-        working-directory: hasura
+        working-directory: deploy/hasura
         run: docker compose logs --no-color

@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
-	"github.com/shokki-engineering/freebusy/internal/types"
+	"github.com/shokki-engineering/freebusy/internal/service/generated/servicex"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"google.golang.org/genproto/googleapis/type/interval"
@@ -33,6 +33,8 @@ type memStore struct {
 	updated map[string]time.Time
 	clock   func() time.Time
 	version int
+	// writes counts Update calls that wrote.
+	writes int
 }
 
 func newMemStore(clock func() time.Time) *memStore {
@@ -44,7 +46,7 @@ func (m *memStore) Get(_ context.Context, name string) (*reservationpbv1.Reserva
 	defer m.mu.Unlock()
 	r, ok := m.rows[name]
 	if !ok {
-		return nil, types.ErrNotFound
+		return nil, repox.ErrNotFound
 	}
 	return proto.Clone(r).(*reservationpbv1.Reservation), nil
 }
@@ -57,7 +59,7 @@ func (m *memStore) FindByHold(_ context.Context, hold string) (*reservationpbv1.
 			return proto.Clone(r).(*reservationpbv1.Reservation), nil
 		}
 	}
-	return nil, types.ErrNotFound
+	return nil, repox.ErrNotFound
 }
 
 func (m *memStore) List(context.Context, string, repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
@@ -68,14 +70,15 @@ func (m *memStore) Insert(_ context.Context, r *reservationpbv1.Reservation) (*r
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if _, ok := m.rows[r.GetName()]; ok {
-		return nil, types.ErrAlreadyExists
+		return nil, repox.ErrAlreadyExists
 	}
 	for _, other := range m.rows {
 		if other.GetHold() == r.GetHold() {
-			return nil, types.ErrAlreadyExists // the unique index on hold
+			return nil, repox.ErrAlreadyExists // the unique index on hold
 		}
 	}
 	c := proto.Clone(r).(*reservationpbv1.Reservation)
+	c.LastChange = reservationpbv1.Reservation_CHANGE_STATE
 	m.version++
 	c.Etag = strconv.Itoa(m.version)
 	m.rows[r.GetName()] = c
@@ -88,12 +91,13 @@ func (m *memStore) Transition(_ context.Context, name, etag string, from []reser
 	defer m.mu.Unlock()
 	r, ok := m.rows[name]
 	if !ok {
-		return nil, types.ErrNotFound
+		return nil, repox.ErrNotFound
 	}
 	if !slices.Contains(from, r.GetState()) || (etag != "" && etag != r.GetEtag()) {
-		return nil, types.ErrConflict
+		return nil, repox.ErrConflict
 	}
 	r.State = c.State
+	r.LastChange = reservationpbv1.Reservation_CHANGE_STATE
 	if c.ConfirmTime != nil {
 		r.ConfirmTime = timestamppb.New(*c.ConfirmTime)
 	}
@@ -109,6 +113,34 @@ func (m *memStore) Transition(_ context.Context, name, etag string, from []reser
 	m.version++
 	r.Etag = strconv.Itoa(m.version)
 	m.updated[name] = m.clock()
+	return proto.Clone(r).(*reservationpbv1.Reservation), nil
+}
+
+func (m *memStore) Update(_ context.Context, in *reservationpbv1.Reservation, from []reservationpbv1.ReservationState, paths []string) (*reservationpbv1.Reservation, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	r, ok := m.rows[in.GetName()]
+	if !ok {
+		return nil, repox.ErrNotFound
+	}
+	if !slices.Contains(from, r.GetState()) || (in.GetEtag() != "" && in.GetEtag() != r.GetEtag()) {
+		return nil, repox.ErrConflict
+	}
+	for _, p := range paths {
+		switch p {
+		case "customer":
+			r.Customer = in.GetCustomer()
+		case "attributes":
+			r.Attributes = in.GetAttributes()
+		default:
+			return nil, repox.ErrInvalidArgument
+		}
+	}
+	r.LastChange = reservationpbv1.Reservation_CHANGE_DETAILS
+	m.version++
+	r.Etag = strconv.Itoa(m.version)
+	m.updated[in.GetName()] = m.clock()
+	m.writes++
 	return proto.Clone(r).(*reservationpbv1.Reservation), nil
 }
 
@@ -143,7 +175,7 @@ func (f *fakeHolds) LookupHold(_ context.Context, name string) (*allocationpbv1.
 	defer f.mu.Unlock()
 	h, ok := f.holds[name]
 	if !ok {
-		return nil, types.ErrNotFound
+		return nil, repox.ErrNotFound
 	}
 	return proto.Clone(h).(*allocationpbv1.Hold), nil
 }
@@ -161,9 +193,13 @@ func (f *fakeHolds) ConvertHold(_ context.Context, name string) (*allocationpbv1
 	case allocationpbv1.HoldState_HOLD_STATE_ACTIVE:
 		h.State = allocationpbv1.HoldState_HOLD_STATE_CONVERTED
 	default:
-		return nil, types.ErrInvalidState
+		return nil, servicex.ErrFailedPrecondition
 	}
 	return proto.Clone(h).(*allocationpbv1.Hold), nil
+}
+
+func (f *fakeHolds) HandOver(ctx context.Context, from, _ string, at time.Time) (*allocationpbv1.Hold, error) {
+	return f.EndConversion(ctx, from, at)
 }
 
 func (f *fakeHolds) EndConversion(_ context.Context, name string, _ time.Time) (*allocationpbv1.Hold, error) {
@@ -252,7 +288,7 @@ func TestCreateRejectsLapsedOrForeignHold(t *testing.T) {
 func TestHoldLapsingMidCreateFails(t *testing.T) {
 	f := newFixture()
 	h := f.hold("h1", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
-	f.holds.failConvert = types.ErrInvalidState // lapsed between lookup and convert
+	f.holds.failConvert = servicex.ErrFailedPrecondition // lapsed between lookup and convert
 	if _, err := f.create(h); status.Code(err) != codes.FailedPrecondition {
 		t.Fatalf("got %v", err)
 	}
@@ -338,7 +374,7 @@ func TestReconcilerFinishesInterruptedCancel(t *testing.T) {
 func TestLostConvertRaceConfirmsNotFails(t *testing.T) {
 	f := newFixture()
 	h := f.hold("h1", allocationpbv1.HoldState_HOLD_STATE_CONVERTED)
-	f.holds.failConvert = types.ErrInvalidState
+	f.holds.failConvert = servicex.ErrFailedPrecondition
 	r, err := f.create(h)
 	if err != nil || r.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED {
 		t.Fatalf("got %v %v", r.GetState(), err)
@@ -400,7 +436,7 @@ func TestRescheduleOntoLapsedHoldKeepsOriginal(t *testing.T) {
 	oldHold := f.hold("h1", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
 	old, _ := f.create(oldHold)
 	newHold := f.hold("h2", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
-	f.holds.failConvert = types.ErrInvalidState // lapses between lookup and convert
+	f.holds.failConvert = servicex.ErrFailedPrecondition // lapses between lookup and convert
 	if _, err := f.move(old.GetName(), newHold); status.Code(err) != codes.FailedPrecondition {
 		t.Fatalf("got %v", err)
 	}

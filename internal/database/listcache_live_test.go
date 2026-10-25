@@ -19,8 +19,8 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/database"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/freebusy/reservation"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
-	"github.com/shokki-engineering/freebusy/internal/livetest"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
+	"github.com/shokki-engineering/freebusy/test/live"
 	"github.com/the-protobuf-project/runtime-go/cache"
 	"github.com/the-protobuf-project/runtime-go/cache/redis"
 	"github.com/the-protobuf-project/runtime-go/ulid"
@@ -28,14 +28,15 @@ import (
 
 func TestLiveListCache(t *testing.T) {
 	ctx := context.Background()
-	addr := livetest.Env(t, livetest.RedisAddr)
+	addr := live.Env(t, live.RedisAddr)
 	client, err := redis.NewClient(ctx, redis.Config{Address: addr})
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { _ = client.Close() })
 
-	for backend, raw := range liveConns(t) {
+	conns := liveConns(t)
+	for backend, raw := range conns {
 		t.Run(backend, func(t *testing.T) {
 			// A prefix of its own, so nothing another run cached is read here.
 			provider := redis.New(client, cache.Config{Prefix: "listcache-test-" + ulid.Generate().String(), RequireTTL: true})
@@ -52,7 +53,8 @@ func TestLiveListCache(t *testing.T) {
 			unseen := reservation.New(raw).Reservations
 			lists := conn.Caches.Reservations.Wrap(observed)
 
-			site := "organizationalUnits/listcache-" + ulid.Generate().String()
+			// Both backends share one database; the site is seeded through GORM.
+			site := live.Site(t, conns["gorm"].Gorm, "listcache-"+ulid.Generate().String())
 			// Every record this run makes carries tag, so a List across sites
 			// can be narrowed to them.
 			tag := "listcache-" + ulid.Generate().String()

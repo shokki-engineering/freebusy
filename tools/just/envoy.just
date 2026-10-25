@@ -10,15 +10,15 @@ set working-directory := '../..'
 # Admin/dashboard port (matches the admin socket in launch.yaml).
 admin_port := env_var_or_default("FREEBUSY_ENVOY_ADMIN_PORT", "9901")
 
-# Start the Envoy grpc-web proxy (docker/envoy/docker-compose.yaml).
+# Start the Envoy grpc-web proxy (deploy/docker/envoy/docker-compose.yaml).
 [group('proxy')]
 up:
-    docker compose -f docker/envoy/docker-compose.yaml up -d
+    docker compose -f deploy/docker/envoy/docker-compose.yaml up -d
 
 # Stop the Envoy grpc-web proxy.
 [group('proxy')]
 down:
-    docker compose -f docker/envoy/docker-compose.yaml down
+    docker compose -f deploy/docker/envoy/docker-compose.yaml down
 
 # Open the Envoy admin dashboard (stats, config_dump, clusters, /ready).
 [group('proxy')]

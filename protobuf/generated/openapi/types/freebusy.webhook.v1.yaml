@@ -1,0 +1,868 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: Apache-2.0
+
+components:
+  schemas:
+    freebusy.webhook.v1.CreateWebhookRequest:
+      description: Request message for WebhookService.CreateWebhook, AIP-133.
+      properties:
+        webhook:
+          description: The webhook to create. `uri` is required.
+          properties:
+            createTime:
+              description: Creation timestamp.
+              format: date-time
+              type: string
+            displayName:
+              description: Human-readable name, for the operator's own reference.
+              type: string
+            etag:
+              description: Opaque version for optimistic concurrency (AIP-154).
+              type: string
+            eventTypes:
+              description: |-
+                The event types sent, e.g. "freebusy.reservation.confirmed" or
+                "freebusy.event.deleted". Empty sends every type. A type is
+                "freebusy.<record>.<what happened>": holds are active, released, expired
+                and converted; reservations pending, confirmed, cancelling, cancelled,
+                failed, rescheduling and rescheduled, and updated exactly when
+                UpdateReservation changed its customer or attributes -- the reservation's
+                last_change is CHANGE_DETAILS (freebusy.reservation.updated);
+                resources, calendars, events and availabilities created, updated and
+                deleted.
+              items:
+                type: string
+              type: array
+            name:
+              description: |-
+                The webhook name.
+                Format: webhooks/{webhook}
+              type: string
+            organizationalUnit:
+              description: |-
+                Limits events to one site's holds, reservations and resources. Empty
+                sends every site's. Calendars, events and availabilities belong to no
+                site, so a webhook limited to one is not sent them.
+                Format: organizationalUnits/{organizational_unit}
+              type: string
+            previousSecret:
+              description: |-
+                The key the secret replaced, which also signs deliveries for a day after
+                a rotation so a receiver can switch keys without dropping one. Never
+                returned.
+              type: string
+            rotateTime:
+              description: When the secret was last rotated.
+              format: date-time
+              type: string
+            secret:
+              description: |-
+                The key every delivery is signed with, in the Standard Webhooks form: a
+                "whsec_" prefix and the encoded key. Returned by CreateWebhook and
+                RotateWebhookSecret only; every other read leaves it empty.
+              type: string
+            state:
+              description: |-
+                Whether changes are sent. Set by PauseWebhook and ResumeWebhook; pausing
+                keeps the webhook and its history.
+              enum:
+              - WEBHOOK_STATE_UNSPECIFIED
+              - WEBHOOK_STATE_ACTIVE
+              - WEBHOOK_STATE_PAUSED
+              type: string
+            updateTime:
+              description: Last-modification timestamp.
+              format: date-time
+              type: string
+            uri:
+              description: |-
+                The endpoint each event is POSTed to. HTTPS, except to a loopback host
+                when the server allows insecure endpoints for development. Required on
+                create; an update that leaves it out keeps the current one.
+              type: string
+          type: object
+        webhookId:
+          description: |-
+            Client-assigned id, becoming the last segment of the webhook name.
+            Server-assigned when empty.
+          type: string
+      type: object
+    freebusy.webhook.v1.DeleteWebhookRequest:
+      description: Request message for WebhookService.DeleteWebhook, AIP-135.
+      properties:
+        etag:
+          description: |-
+            Opaque version read from the webhook; the delete is rejected if it
+            changed since (AIP-154).
+          type: string
+        force:
+          description: |-
+            Deletes the webhook's deliveries with it. Without it, a webhook that has
+            any is not deleted (AIP-135); pausing it stops new ones.
+          type: boolean
+        name:
+          description: 'Format: webhooks/{webhook}'
+          type: string
+      type: object
+    freebusy.webhook.v1.Delivery:
+      description: |-
+        One event owed to one webhook, and how sending it went.
+
+        The id is derived, not random: a digest of the webhook and the event, so
+        recording the same change twice -- a rescan, or two servers scanning at once
+        -- loses the race on the primary key instead of sending the event twice.
+      properties:
+        attemptCount:
+          description: Attempts made so far.
+          format: int32
+          type: integer
+        createTime:
+          description: When the change was recorded for this webhook.
+          format: date-time
+          type: string
+        deliverTime:
+          description: When the endpoint accepted it.
+          format: date-time
+          type: string
+        errorMessage:
+          description: Why the last attempt failed, empty after a success.
+          type: string
+        etag:
+          description: Opaque version for optimistic concurrency (AIP-154).
+          type: string
+        eventId:
+          description: |-
+            The CloudEvents id, the same for every webhook sent this change: a digest
+            of the record's name and etag. Receivers deduplicate on it.
+          type: string
+        eventType:
+          description: The CloudEvents type, e.g. "freebusy.reservation.confirmed".
+          type: string
+        name:
+          description: |-
+            The delivery name. The final segment is a digest of (webhook, event_id).
+            Format: webhooks/{webhook}/deliveries/{delivery}
+          type: string
+        nextAttemptTime:
+          description: When the next attempt is due, while PENDING.
+          format: date-time
+          type: string
+        payload:
+          description: |-
+            The request body sent: a CloudEvents 1.0 JSON document whose data is the
+            record as it stood.
+          type: string
+        responseCode:
+          description: HTTP status of the last attempt; 0 when it got no response.
+          format: int32
+          type: integer
+        state:
+          description: Where sending stands.
+          enum:
+          - DELIVERY_STATE_UNSPECIFIED
+          - DELIVERY_STATE_PENDING
+          - DELIVERY_STATE_SUCCEEDED
+          - DELIVERY_STATE_FAILED
+          type: string
+        subject:
+          description: |-
+            The record that changed.
+            Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+            or organizationalUnits/{organizational_unit}/holds/{hold}
+          type: string
+        updateTime:
+          description: Last-modification timestamp.
+          format: date-time
+          type: string
+      type: object
+    freebusy.webhook.v1.DeliveryState:
+      description: |-
+        Where one Delivery stands.
+
+        ```mermaid
+        stateDiagram-v2
+            state "PENDING" as DELIVERY_STATE_PENDING
+            state "SUCCEEDED" as DELIVERY_STATE_SUCCEEDED
+            state "FAILED" as DELIVERY_STATE_FAILED
+            [*] --> DELIVERY_STATE_PENDING: change recorded
+            DELIVERY_STATE_PENDING --> DELIVERY_STATE_PENDING: attempt failed [attempts left]
+            DELIVERY_STATE_FAILED --> DELIVERY_STATE_PENDING: RetryDelivery
+            DELIVERY_STATE_SUCCEEDED --> DELIVERY_STATE_PENDING: RetryDelivery
+            DELIVERY_STATE_PENDING --> DELIVERY_STATE_SUCCEEDED: endpoint answered 2xx
+            DELIVERY_STATE_PENDING --> DELIVERY_STATE_FAILED: attempt failed [no attempts left]
+        ```
+      enum:
+      - DELIVERY_STATE_UNSPECIFIED
+      - DELIVERY_STATE_PENDING
+      - DELIVERY_STATE_SUCCEEDED
+      - DELIVERY_STATE_FAILED
+      type: string
+      x-mermaid:
+      - diagram: |
+          stateDiagram-v2
+              state "PENDING" as DELIVERY_STATE_PENDING
+              state "SUCCEEDED" as DELIVERY_STATE_SUCCEEDED
+              state "FAILED" as DELIVERY_STATE_FAILED
+              [*] --> DELIVERY_STATE_PENDING: change recorded
+              DELIVERY_STATE_PENDING --> DELIVERY_STATE_PENDING: attempt failed [attempts left]
+              DELIVERY_STATE_FAILED --> DELIVERY_STATE_PENDING: RetryDelivery
+              DELIVERY_STATE_SUCCEEDED --> DELIVERY_STATE_PENDING: RetryDelivery
+              DELIVERY_STATE_PENDING --> DELIVERY_STATE_SUCCEEDED: endpoint answered 2xx
+              DELIVERY_STATE_PENDING --> DELIVERY_STATE_FAILED: attempt failed [no attempts left]
+        title: DeliveryState
+        type: stateDiagram-v2
+    freebusy.webhook.v1.ErrorReason:
+      description: |-
+        The reasons freebusy returns for webhooks: the google.rpc.ErrorInfo reasons
+        (AIP-193) in the freebusy.dev domain. They are part of the API: clients branch
+        on them, never on a message. protoc-gen-service renders them as Go constants,
+        sentinels and the tables of docs/errors.md.
+      enum:
+      - ERROR_REASON_UNSPECIFIED
+      - ERROR_REASON_INVALID_URI
+      - ERROR_REASON_URI_HAS_CREDENTIALS
+      - ERROR_REASON_URI_NOT_HTTPS
+      - ERROR_REASON_URI_NOT_PUBLIC
+      - ERROR_REASON_UNKNOWN_EVENT_TYPE
+      - ERROR_REASON_WEBHOOK_HAS_DELIVERIES
+      type: string
+    freebusy.webhook.v1.FeedCursor:
+      description: |-
+        How far the dispatcher has read one change feed: every record of the feed
+        last modified before position_time has been recorded for every webhook. Storage
+        only -- no service exposes it.
+      properties:
+        etag:
+          description: Opaque version for optimistic concurrency (AIP-154).
+          type: string
+        name:
+          description: |-
+            The cursor name; the final segment names the feed, e.g. "reservations".
+            Format: feedCursors/{feed_cursor}
+          type: string
+        positionTime:
+          description: Records modified before this have been recorded.
+          format: date-time
+          type: string
+        updateTime:
+          description: Last-modification timestamp.
+          format: date-time
+          type: string
+      type: object
+    freebusy.webhook.v1.GetDeliveryRequest:
+      description: Request message for WebhookService.GetDelivery, AIP-131.
+      properties:
+        name:
+          description: 'Format: webhooks/{webhook}/deliveries/{delivery}'
+          type: string
+      type: object
+    freebusy.webhook.v1.GetWebhookRequest:
+      description: Request message for WebhookService.GetWebhook, AIP-131.
+      properties:
+        name:
+          description: 'Format: webhooks/{webhook}'
+          type: string
+      type: object
+    freebusy.webhook.v1.ListDeliveriesRequest:
+      description: Request message for WebhookService.ListDeliveries, AIP-132.
+      properties:
+        filter:
+          description: Filter expression, AIP-160, e.g. `state = DELIVERY_STATE_FAILED`.
+          type: string
+        orderBy:
+          description: Ordering, AIP-132, e.g. `create_time desc`. Defaults to newest
+            first.
+          type: string
+        pageSize:
+          description: Maximum deliveries to return. Defaults to 50, capped at 1000.
+          format: int32
+          type: integer
+        pageToken:
+          description: Page token from a previous ListDeliveriesResponse.next_page_token.
+          type: string
+        parent:
+          description: 'Format: webhooks/{webhook}'
+          type: string
+      type: object
+    freebusy.webhook.v1.ListDeliveriesResponse:
+      description: Response message for WebhookService.ListDeliveries, AIP-132.
+      properties:
+        deliveries:
+          description: The deliveries on this page.
+          items:
+            description: |-
+              One event owed to one webhook, and how sending it went.
+
+              The id is derived, not random: a digest of the webhook and the event, so
+              recording the same change twice -- a rescan, or two servers scanning at once
+              -- loses the race on the primary key instead of sending the event twice.
+            properties:
+              attemptCount:
+                description: Attempts made so far.
+                format: int32
+                type: integer
+              createTime:
+                description: When the change was recorded for this webhook.
+                format: date-time
+                type: string
+              deliverTime:
+                description: When the endpoint accepted it.
+                format: date-time
+                type: string
+              errorMessage:
+                description: Why the last attempt failed, empty after a success.
+                type: string
+              etag:
+                description: Opaque version for optimistic concurrency (AIP-154).
+                type: string
+              eventId:
+                description: |-
+                  The CloudEvents id, the same for every webhook sent this change: a digest
+                  of the record's name and etag. Receivers deduplicate on it.
+                type: string
+              eventType:
+                description: The CloudEvents type, e.g. "freebusy.reservation.confirmed".
+                type: string
+              name:
+                description: |-
+                  The delivery name. The final segment is a digest of (webhook, event_id).
+                  Format: webhooks/{webhook}/deliveries/{delivery}
+                type: string
+              nextAttemptTime:
+                description: When the next attempt is due, while PENDING.
+                format: date-time
+                type: string
+              payload:
+                description: |-
+                  The request body sent: a CloudEvents 1.0 JSON document whose data is the
+                  record as it stood.
+                type: string
+              responseCode:
+                description: HTTP status of the last attempt; 0 when it got no response.
+                format: int32
+                type: integer
+              state:
+                description: Where sending stands.
+                enum:
+                - DELIVERY_STATE_UNSPECIFIED
+                - DELIVERY_STATE_PENDING
+                - DELIVERY_STATE_SUCCEEDED
+                - DELIVERY_STATE_FAILED
+                type: string
+              subject:
+                description: |-
+                  The record that changed.
+                  Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                  or organizationalUnits/{organizational_unit}/holds/{hold}
+                type: string
+              updateTime:
+                description: Last-modification timestamp.
+                format: date-time
+                type: string
+            type: object
+          type: array
+        nextPageToken:
+          description: Token for the next page, empty when this is the last page.
+          type: string
+      type: object
+    freebusy.webhook.v1.ListWebhooksRequest:
+      description: Request message for WebhookService.ListWebhooks, AIP-132.
+      properties:
+        pageSize:
+          description: Maximum webhooks to return. Defaults to 50, capped at 1000.
+          format: int32
+          type: integer
+        pageToken:
+          description: Page token from a previous ListWebhooksResponse.next_page_token.
+          type: string
+      type: object
+    freebusy.webhook.v1.ListWebhooksResponse:
+      description: Response message for WebhookService.ListWebhooks, AIP-132.
+      properties:
+        nextPageToken:
+          description: Token for the next page, empty when this is the last page.
+          type: string
+        webhooks:
+          description: The webhooks on this page.
+          items:
+            description: |-
+              A Webhook sends an HTTPS endpoint each change to holds, reservations and the
+              inventory they draw on -- resources, calendars, calendar events and
+              availability -- as a signed CloudEvent: how a payment service learns a hold
+              lapsed, or a booking layer that a reservation was confirmed or a court was
+              closed for maintenance, without polling.
+
+              Changes are read from the records themselves, not announced by the writes,
+              so a change cannot be lost to a crash between a write and its
+              announcement. The price is coalescing: two transitions of one record in
+              quick succession may arrive as one event carrying the later state. Every
+              event carries the whole record, so a receiver acts on what is, not on a
+              diff.
+            properties:
+              createTime:
+                description: Creation timestamp.
+                format: date-time
+                type: string
+              displayName:
+                description: Human-readable name, for the operator's own reference.
+                type: string
+              etag:
+                description: Opaque version for optimistic concurrency (AIP-154).
+                type: string
+              eventTypes:
+                description: |-
+                  The event types sent, e.g. "freebusy.reservation.confirmed" or
+                  "freebusy.event.deleted". Empty sends every type. A type is
+                  "freebusy.<record>.<what happened>": holds are active, released, expired
+                  and converted; reservations pending, confirmed, cancelling, cancelled,
+                  failed, rescheduling and rescheduled, and updated exactly when
+                  UpdateReservation changed its customer or attributes -- the reservation's
+                  last_change is CHANGE_DETAILS (freebusy.reservation.updated);
+                  resources, calendars, events and availabilities created, updated and
+                  deleted.
+                items:
+                  type: string
+                type: array
+              name:
+                description: |-
+                  The webhook name.
+                  Format: webhooks/{webhook}
+                type: string
+              organizationalUnit:
+                description: |-
+                  Limits events to one site's holds, reservations and resources. Empty
+                  sends every site's. Calendars, events and availabilities belong to no
+                  site, so a webhook limited to one is not sent them.
+                  Format: organizationalUnits/{organizational_unit}
+                type: string
+              previousSecret:
+                description: |-
+                  The key the secret replaced, which also signs deliveries for a day after
+                  a rotation so a receiver can switch keys without dropping one. Never
+                  returned.
+                type: string
+              rotateTime:
+                description: When the secret was last rotated.
+                format: date-time
+                type: string
+              secret:
+                description: |-
+                  The key every delivery is signed with, in the Standard Webhooks form: a
+                  "whsec_" prefix and the encoded key. Returned by CreateWebhook and
+                  RotateWebhookSecret only; every other read leaves it empty.
+                type: string
+              state:
+                description: |-
+                  Whether changes are sent. Set by PauseWebhook and ResumeWebhook; pausing
+                  keeps the webhook and its history.
+                enum:
+                - WEBHOOK_STATE_UNSPECIFIED
+                - WEBHOOK_STATE_ACTIVE
+                - WEBHOOK_STATE_PAUSED
+                type: string
+              updateTime:
+                description: Last-modification timestamp.
+                format: date-time
+                type: string
+              uri:
+                description: |-
+                  The endpoint each event is POSTed to. HTTPS, except to a loopback host
+                  when the server allows insecure endpoints for development. Required on
+                  create; an update that leaves it out keeps the current one.
+                type: string
+            type: object
+          type: array
+      type: object
+    freebusy.webhook.v1.PauseWebhookRequest:
+      description: Request message for WebhookService.PauseWebhook.
+      properties:
+        name:
+          description: 'Format: webhooks/{webhook}'
+          type: string
+      type: object
+    freebusy.webhook.v1.ResumeWebhookRequest:
+      description: Request message for WebhookService.ResumeWebhook.
+      properties:
+        name:
+          description: 'Format: webhooks/{webhook}'
+          type: string
+      type: object
+    freebusy.webhook.v1.RetryDeliveryRequest:
+      description: Request message for WebhookService.RetryDelivery.
+      properties:
+        name:
+          description: 'Format: webhooks/{webhook}/deliveries/{delivery}'
+          type: string
+      type: object
+    freebusy.webhook.v1.RotateWebhookSecretRequest:
+      description: Request message for WebhookService.RotateWebhookSecret.
+      properties:
+        name:
+          description: 'Format: webhooks/{webhook}'
+          type: string
+      type: object
+    freebusy.webhook.v1.UpdateWebhookRequest:
+      description: Request message for WebhookService.UpdateWebhook, AIP-134.
+      properties:
+        updateMask:
+          description: |-
+            Fields to update: display_name, uri, event_types, organizational_unit.
+            Empty updates every one of them.
+          properties:
+            paths:
+              description: The set of field mask paths.
+              items:
+                type: string
+              type: array
+          type: object
+        webhook:
+          description: The webhook, its name identifying which. `etag`, when set,
+            must match.
+          properties:
+            createTime:
+              description: Creation timestamp.
+              format: date-time
+              type: string
+            displayName:
+              description: Human-readable name, for the operator's own reference.
+              type: string
+            etag:
+              description: Opaque version for optimistic concurrency (AIP-154).
+              type: string
+            eventTypes:
+              description: |-
+                The event types sent, e.g. "freebusy.reservation.confirmed" or
+                "freebusy.event.deleted". Empty sends every type. A type is
+                "freebusy.<record>.<what happened>": holds are active, released, expired
+                and converted; reservations pending, confirmed, cancelling, cancelled,
+                failed, rescheduling and rescheduled, and updated exactly when
+                UpdateReservation changed its customer or attributes -- the reservation's
+                last_change is CHANGE_DETAILS (freebusy.reservation.updated);
+                resources, calendars, events and availabilities created, updated and
+                deleted.
+              items:
+                type: string
+              type: array
+            name:
+              description: |-
+                The webhook name.
+                Format: webhooks/{webhook}
+              type: string
+            organizationalUnit:
+              description: |-
+                Limits events to one site's holds, reservations and resources. Empty
+                sends every site's. Calendars, events and availabilities belong to no
+                site, so a webhook limited to one is not sent them.
+                Format: organizationalUnits/{organizational_unit}
+              type: string
+            previousSecret:
+              description: |-
+                The key the secret replaced, which also signs deliveries for a day after
+                a rotation so a receiver can switch keys without dropping one. Never
+                returned.
+              type: string
+            rotateTime:
+              description: When the secret was last rotated.
+              format: date-time
+              type: string
+            secret:
+              description: |-
+                The key every delivery is signed with, in the Standard Webhooks form: a
+                "whsec_" prefix and the encoded key. Returned by CreateWebhook and
+                RotateWebhookSecret only; every other read leaves it empty.
+              type: string
+            state:
+              description: |-
+                Whether changes are sent. Set by PauseWebhook and ResumeWebhook; pausing
+                keeps the webhook and its history.
+              enum:
+              - WEBHOOK_STATE_UNSPECIFIED
+              - WEBHOOK_STATE_ACTIVE
+              - WEBHOOK_STATE_PAUSED
+              type: string
+            updateTime:
+              description: Last-modification timestamp.
+              format: date-time
+              type: string
+            uri:
+              description: |-
+                The endpoint each event is POSTed to. HTTPS, except to a loopback host
+                when the server allows insecure endpoints for development. Required on
+                create; an update that leaves it out keeps the current one.
+              type: string
+          type: object
+      type: object
+    freebusy.webhook.v1.Webhook:
+      description: |-
+        A Webhook sends an HTTPS endpoint each change to holds, reservations and the
+        inventory they draw on -- resources, calendars, calendar events and
+        availability -- as a signed CloudEvent: how a payment service learns a hold
+        lapsed, or a booking layer that a reservation was confirmed or a court was
+        closed for maintenance, without polling.
+
+        Changes are read from the records themselves, not announced by the writes,
+        so a change cannot be lost to a crash between a write and its
+        announcement. The price is coalescing: two transitions of one record in
+        quick succession may arrive as one event carrying the later state. Every
+        event carries the whole record, so a receiver acts on what is, not on a
+        diff.
+      properties:
+        createTime:
+          description: Creation timestamp.
+          format: date-time
+          type: string
+        displayName:
+          description: Human-readable name, for the operator's own reference.
+          type: string
+        etag:
+          description: Opaque version for optimistic concurrency (AIP-154).
+          type: string
+        eventTypes:
+          description: |-
+            The event types sent, e.g. "freebusy.reservation.confirmed" or
+            "freebusy.event.deleted". Empty sends every type. A type is
+            "freebusy.<record>.<what happened>": holds are active, released, expired
+            and converted; reservations pending, confirmed, cancelling, cancelled,
+            failed, rescheduling and rescheduled, and updated exactly when
+            UpdateReservation changed its customer or attributes -- the reservation's
+            last_change is CHANGE_DETAILS (freebusy.reservation.updated);
+            resources, calendars, events and availabilities created, updated and
+            deleted.
+          items:
+            type: string
+          type: array
+        name:
+          description: |-
+            The webhook name.
+            Format: webhooks/{webhook}
+          type: string
+        organizationalUnit:
+          description: |-
+            Limits events to one site's holds, reservations and resources. Empty
+            sends every site's. Calendars, events and availabilities belong to no
+            site, so a webhook limited to one is not sent them.
+            Format: organizationalUnits/{organizational_unit}
+          type: string
+        previousSecret:
+          description: |-
+            The key the secret replaced, which also signs deliveries for a day after
+            a rotation so a receiver can switch keys without dropping one. Never
+            returned.
+          type: string
+        rotateTime:
+          description: When the secret was last rotated.
+          format: date-time
+          type: string
+        secret:
+          description: |-
+            The key every delivery is signed with, in the Standard Webhooks form: a
+            "whsec_" prefix and the encoded key. Returned by CreateWebhook and
+            RotateWebhookSecret only; every other read leaves it empty.
+          type: string
+        state:
+          description: |-
+            Whether changes are sent. Set by PauseWebhook and ResumeWebhook; pausing
+            keeps the webhook and its history.
+          enum:
+          - WEBHOOK_STATE_UNSPECIFIED
+          - WEBHOOK_STATE_ACTIVE
+          - WEBHOOK_STATE_PAUSED
+          type: string
+        updateTime:
+          description: Last-modification timestamp.
+          format: date-time
+          type: string
+        uri:
+          description: |-
+            The endpoint each event is POSTed to. HTTPS, except to a loopback host
+            when the server allows insecure endpoints for development. Required on
+            create; an update that leaves it out keeps the current one.
+          type: string
+      type: object
+    freebusy.webhook.v1.WebhookState:
+      description: |-
+        Whether a Webhook is sent changes.
+
+        ```mermaid
+        stateDiagram-v2
+            state "ACTIVE" as WEBHOOK_STATE_ACTIVE
+            state "PAUSED" as WEBHOOK_STATE_PAUSED
+            [*] --> WEBHOOK_STATE_ACTIVE: CreateWebhook
+            WEBHOOK_STATE_PAUSED --> WEBHOOK_STATE_ACTIVE: ResumeWebhook
+            WEBHOOK_STATE_ACTIVE --> WEBHOOK_STATE_PAUSED: PauseWebhook
+        ```
+      enum:
+      - WEBHOOK_STATE_UNSPECIFIED
+      - WEBHOOK_STATE_ACTIVE
+      - WEBHOOK_STATE_PAUSED
+      type: string
+      x-mermaid:
+      - diagram: |
+          stateDiagram-v2
+              state "ACTIVE" as WEBHOOK_STATE_ACTIVE
+              state "PAUSED" as WEBHOOK_STATE_PAUSED
+              [*] --> WEBHOOK_STATE_ACTIVE: CreateWebhook
+              WEBHOOK_STATE_PAUSED --> WEBHOOK_STATE_ACTIVE: ResumeWebhook
+              WEBHOOK_STATE_ACTIVE --> WEBHOOK_STATE_PAUSED: PauseWebhook
+        title: WebhookState
+        type: stateDiagram-v2
+info:
+  description: |-
+    ## Resources
+
+    ```mermaid
+    erDiagram
+        Delivery {
+            string name PK "IDENTIFIER"
+            string event_id "OUTPUT_ONLY"
+            string event_type "OUTPUT_ONLY"
+            string subject "OUTPUT_ONLY"
+            string payload "OUTPUT_ONLY"
+            DeliveryState state "OUTPUT_ONLY"
+            int32 attempt_count "OUTPUT_ONLY"
+            Timestamp next_attempt_time "OUTPUT_ONLY"
+            int32 response_code "OUTPUT_ONLY"
+            string error_message "OUTPUT_ONLY"
+            Timestamp create_time "OUTPUT_ONLY"
+            Timestamp update_time "OUTPUT_ONLY"
+            Timestamp deliver_time "OUTPUT_ONLY"
+            string etag "OUTPUT_ONLY"
+        }
+        FeedCursor {
+            string name PK "IDENTIFIER"
+            Timestamp position_time "REQUIRED"
+            Timestamp update_time "OUTPUT_ONLY"
+            string etag "OUTPUT_ONLY"
+        }
+        Webhook {
+            string name PK "IDENTIFIER"
+            string display_name "OPTIONAL"
+            string uri "REQUIRED"
+            string[] event_types "OPTIONAL"
+            string organizational_unit FK "OPTIONAL"
+            WebhookState state "OUTPUT_ONLY"
+            string secret "OUTPUT_ONLY"
+            string previous_secret "OUTPUT_ONLY"
+            Timestamp rotate_time "OUTPUT_ONLY"
+            Timestamp create_time "OUTPUT_ONLY"
+            Timestamp update_time "OUTPUT_ONLY"
+            string etag "OUTPUT_ONLY"
+        }
+        Webhook ||--o{ Delivery : "deliveries"
+        Webhook }o--o| OrganizationalUnit : "organizational_unit"
+    ```
+
+    ## Flows
+
+    - **Webhook delivery** (`webhook-delivery`, tag WebhookService): Every change a webhook subscribes to is recorded as a Delivery and sent as a signed CloudEvent (Standard Webhooks). Failed deliveries are retried with backoff, and can be sent again by hand.
+  title: OpenAPI Spec for Solo APIs.
+  version: v1
+  x-mermaid:
+  - diagram: |
+      erDiagram
+          Delivery {
+              string name PK "IDENTIFIER"
+              string event_id "OUTPUT_ONLY"
+              string event_type "OUTPUT_ONLY"
+              string subject "OUTPUT_ONLY"
+              string payload "OUTPUT_ONLY"
+              DeliveryState state "OUTPUT_ONLY"
+              int32 attempt_count "OUTPUT_ONLY"
+              Timestamp next_attempt_time "OUTPUT_ONLY"
+              int32 response_code "OUTPUT_ONLY"
+              string error_message "OUTPUT_ONLY"
+              Timestamp create_time "OUTPUT_ONLY"
+              Timestamp update_time "OUTPUT_ONLY"
+              Timestamp deliver_time "OUTPUT_ONLY"
+              string etag "OUTPUT_ONLY"
+          }
+          FeedCursor {
+              string name PK "IDENTIFIER"
+              Timestamp position_time "REQUIRED"
+              Timestamp update_time "OUTPUT_ONLY"
+              string etag "OUTPUT_ONLY"
+          }
+          Webhook {
+              string name PK "IDENTIFIER"
+              string display_name "OPTIONAL"
+              string uri "REQUIRED"
+              string[] event_types "OPTIONAL"
+              string organizational_unit FK "OPTIONAL"
+              WebhookState state "OUTPUT_ONLY"
+              string secret "OUTPUT_ONLY"
+              string previous_secret "OUTPUT_ONLY"
+              Timestamp rotate_time "OUTPUT_ONLY"
+              Timestamp create_time "OUTPUT_ONLY"
+              Timestamp update_time "OUTPUT_ONLY"
+              string etag "OUTPUT_ONLY"
+          }
+          Webhook ||--o{ Delivery : "deliveries"
+          Webhook }o--o| OrganizationalUnit : "organizational_unit"
+    title: Resources
+    type: erDiagram
+openapi: 3.0.1
+paths: null
+tags:
+- description: |-
+    WebhookService subscribes endpoints to changes in holds, reservations and
+    inventory, and shows what was sent to each.
+
+    ### Flow: Webhook delivery
+
+    Every change a webhook subscribes to is recorded as a Delivery and sent
+    as a signed CloudEvent (Standard Webhooks). Failed deliveries are retried
+    with backoff, and can be sent again by hand.
+
+    ```mermaid
+    sequenceDiagram
+        participant Client
+        participant WebhookService
+        participant ReservationService
+        participant Dispatcher
+        participant Endpoint
+        Client->>+WebhookService: CreateWebhook
+        WebhookService-->>-Client: Webhook (ACTIVE)
+        ReservationService->>Dispatcher: change recorded (e.g. reservation confirmed)
+        Note over ReservationService,Dispatcher: one Delivery per matching webhook, PENDING
+        Dispatcher->>Endpoint: POST signed CloudEvent
+        alt 2xx
+            Endpoint->>Dispatcher: 2xx
+            Note over Endpoint,Dispatcher: Delivery SUCCEEDED
+        else error or timeout
+            Endpoint->>Dispatcher: 5xx / timeout
+            Note over Endpoint,Dispatcher: retried with backoff#59; FAILED when no attempts are left
+            Client->>+WebhookService: ListDeliveries
+            Note over Client,WebhookService: filter state = FAILED
+            WebhookService-->>-Client: ListDeliveriesResponse
+            Client->>+WebhookService: RetryDelivery
+            WebhookService-->>-Client: Delivery (PENDING)
+        end
+    ```
+  name: WebhookService
+  x-mermaid:
+  - diagram: |
+      sequenceDiagram
+          participant Client
+          participant WebhookService
+          participant ReservationService
+          participant Dispatcher
+          participant Endpoint
+          Client->>+WebhookService: CreateWebhook
+          WebhookService-->>-Client: Webhook (ACTIVE)
+          ReservationService->>Dispatcher: change recorded (e.g. reservation confirmed)
+          Note over ReservationService,Dispatcher: one Delivery per matching webhook, PENDING
+          Dispatcher->>Endpoint: POST signed CloudEvent
+          alt 2xx
+              Endpoint->>Dispatcher: 2xx
+              Note over Endpoint,Dispatcher: Delivery SUCCEEDED
+          else error or timeout
+              Endpoint->>Dispatcher: 5xx / timeout
+              Note over Endpoint,Dispatcher: retried with backoff#59; FAILED when no attempts are left
+              Client->>+WebhookService: ListDeliveries
+              Note over Client,WebhookService: filter state = FAILED
+              WebhookService-->>-Client: ListDeliveriesResponse
+              Client->>+WebhookService: RetryDelivery
+              WebhookService-->>-Client: Delivery (PENDING)
+          end
+    title: Webhook delivery
+    type: sequenceDiagram

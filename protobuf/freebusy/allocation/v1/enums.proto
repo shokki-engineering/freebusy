@@ -5,6 +5,8 @@ syntax = "proto3";
 
 package freebusy.allocation.v1;
 
+import "service/v1/annotations.proto";
+
 option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "EnumsProto";
@@ -18,20 +20,20 @@ enum HoldState {
   HOLD_STATE_UNSPECIFIED = 0;
 
   // Live and holding its resources against other callers, until expire_time.
-  HOLD_STATE_ACTIVE = 1;
+  HOLD_STATE_ACTIVE = 1 [(service.v1.state_event) = {type: "freebusy.hold.active"}];
 
   // Given up before expiry, by ReleaseHold or by the booking it backed
   // failing. The resources are free again.
-  HOLD_STATE_RELEASED = 2;
+  HOLD_STATE_RELEASED = 2 [(service.v1.state_event) = {type: "freebusy.hold.released"}];
 
   // expire_time passed with no confirmation. Reached by the sweeper, and by
   // any authoritative read that notices the deadline before the sweeper does,
   // so a stale ACTIVE row never hands out a resource twice.
-  HOLD_STATE_EXPIRED = 3;
+  HOLD_STATE_EXPIRED = 3 [(service.v1.state_event) = {type: "freebusy.hold.expired"}];
 
   // Converted into a confirmed booking. Terminal, and the only outcome that
   // keeps the resources allocated.
-  HOLD_STATE_CONVERTED = 4;
+  HOLD_STATE_CONVERTED = 4 [(service.v1.state_event) = {type: "freebusy.hold.converted"}];
 }
 
 // The slicing of an availability answer over a window.

@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "mutations": [
+    {
+      "field": "deleteLdapgroupResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/LdapGroup",
+      "pattern": "ldapGroups/{ldap_group}",
+      "keyArgument": "keyId",
+      "byIdQuery": "ldapgroupResourceById"
+    },
+    {
+      "field": "deleteMembershipResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Membership",
+      "pattern": "ldapGroups/{ldap_group}/memberships/{membership}",
+      "keyArgument": "keyId",
+      "byIdQuery": "membershipResourceById"
+    },
+    {
+      "field": "deleteOrganizationResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Organization",
+      "pattern": "organizations/{organization}",
+      "keyArgument": "keyId",
+      "byIdQuery": "organizationResourceById"
+    },
+    {
+      "field": "deleteOrgunitOrganizationalUnitsById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/OrganizationalUnit",
+      "pattern": "organizationalUnits/{organizational_unit}",
+      "keyArgument": "keyId",
+      "byIdQuery": "orgunitOrganizationalUnitsById"
+    },
+    {
+      "field": "deleteCalendarResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Calendar",
+      "pattern": "calendars/{calendar}",
+      "keyArgument": "keyId",
+      "byIdQuery": "calendarResourceById"
+    },
+    {
+      "field": "deleteEventResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Event",
+      "pattern": "calendars/{calendar}/events/{event}",
+      "keyArgument": "keyId",
+      "byIdQuery": "eventResourceById"
+    },
+    {
+      "field": "deleteJournalResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Journal",
+      "pattern": "calendars/{calendar}/journals/{journal}",
+      "keyArgument": "keyId",
+      "byIdQuery": "journalResourceById"
+    },
+    {
+      "field": "deleteTodoResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Todo",
+      "pattern": "calendars/{calendar}/todos/{todo}",
+      "keyArgument": "keyId",
+      "byIdQuery": "todoResourceById"
+    },
+    {
+      "field": "deleteVcardResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Vcard",
+      "pattern": "vcards/{vcard}",
+      "keyArgument": "keyId",
+      "byIdQuery": "vcardResourceById"
+    },
+    {
+      "field": "deleteScimgroupGroupsById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Group",
+      "pattern": "groups/{group}",
+      "keyArgument": "keyId",
+      "byIdQuery": "scimgroupGroupsById"
+    },
+    {
+      "field": "deleteUserResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/User",
+      "pattern": "users/{user}",
+      "keyArgument": "keyId",
+      "byIdQuery": "userResourceById"
+    },
+    {
+      "field": "deleteAvailabilityAvailabilitiesById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Availability",
+      "pattern": "calendars/{calendar}/availabilities/{availability}",
+      "keyArgument": "keyId",
+      "byIdQuery": "availabilityAvailabilitiesById"
+    },
+    {
+      "field": "deletePackResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Pack",
+      "pattern": "packs/{pack}",
+      "keyArgument": "keyId",
+      "byIdQuery": "packResourceById"
+    },
+    {
+      "field": "deleteSensorResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Sensor",
+      "pattern": "sensors/{sensor}",
+      "keyArgument": "keyId",
+      "byIdQuery": "sensorResourceById"
+    },
+    {
+      "field": "deleteStreamResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Stream",
+      "pattern": "streams/{stream}",
+      "keyArgument": "keyId",
+      "byIdQuery": "streamResourceById"
+    },
+    {
+      "field": "deleteUnitResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Unit",
+      "pattern": "units/{unit}",
+      "keyArgument": "keyId",
+      "byIdQuery": "unitResourceById"
+    },
+    {
+      "field": "deleteResourceEntityById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Resource",
+      "pattern": "resources/{resource}",
+      "keyArgument": "keyId",
+      "byIdQuery": "resourceEntityById"
+    },
+    {
+      "field": "deleteCardResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Card",
+      "pattern": "cards/{card}",
+      "keyArgument": "keyId",
+      "byIdQuery": "cardResourceById"
+    },
+    {
+      "field": "deleteProjectResourceById",
+      "kind": "delete",
+      "resourceType": "the-protobuf-project.org/Project",
+      "pattern": "projects/{project}",
+      "keyArgument": "keyId",
+      "byIdQuery": "projectResourceById"
+    }
+  ]
+}

@@ -20,4 +20,5 @@ deps:
   - buf.build/the-protobuf-project/mcp
   - buf.build/the-protobuf-project/rfc
   - buf.build/the-protobuf-project/store
+  - buf.build/the-protobuf-project/service
   - buf.build/the-protobuf-project/cache

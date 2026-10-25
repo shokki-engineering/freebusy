@@ -1,0 +1,213 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertReservationResourceObject
+  fields:
+    - name: attributes
+      type: Json
+    - name: cancelReason
+      type: String_1
+    - name: cancelTime
+      type: Timestamptz
+    - name: confirmTime
+      type: Timestamptz
+    - name: createTime
+      type: Timestamptz!
+    - name: customer
+      type: String_1
+    - name: endTime
+      type: Timestamptz
+    - name: etag
+      type: String_1
+    - name: hold
+      type: String_1!
+    - name: id
+      type: String_1!
+    - name: lastChange
+      type: String_1
+    - name: name
+      type: String_1!
+    - name: organizationalUnitId
+      type: String_1!
+    - name: replacement
+      type: String_1
+    - name: replaces
+      type: String_1
+    - name: resources
+      type: "[String_1]"
+    - name: startTime
+      type: Timestamptz
+    - name: state
+      type: String_1
+    - name: updateTime
+      type: Timestamptz!
+  graphql:
+    typeName: InsertReservationResourceObject
+    inputTypeName: InsertReservationResourceObjectInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_reservation_resource_object
+      fieldMapping:
+        attributes:
+          column:
+            name: attributes
+        cancelReason:
+          column:
+            name: cancel_reason
+        cancelTime:
+          column:
+            name: cancel_time
+        confirmTime:
+          column:
+            name: confirm_time
+        createTime:
+          column:
+            name: create_time
+        customer:
+          column:
+            name: customer
+        endTime:
+          column:
+            name: end_time
+        etag:
+          column:
+            name: etag
+        hold:
+          column:
+            name: hold
+        id:
+          column:
+            name: id
+        lastChange:
+          column:
+            name: last_change
+        name:
+          column:
+            name: name
+        organizationalUnitId:
+          column:
+            name: organizational_unit_id
+        replacement:
+          column:
+            name: replacement
+        replaces:
+          column:
+            name: replaces
+        resources:
+          column:
+            name: resources
+        startTime:
+          column:
+            name: start_time
+        state:
+          column:
+            name: state
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertReservationResourceObject
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - attributes
+          - cancelReason
+          - cancelTime
+          - confirmTime
+          - createTime
+          - customer
+          - endTime
+          - etag
+          - hold
+          - id
+          - lastChange
+          - name
+          - organizationalUnitId
+          - replacement
+          - replaces
+          - resources
+          - startTime
+          - state
+          - updateTime
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: InsertReservationResourceResponse
+  description: Responses from the 'insert_reservation_resource' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[ReservationResource!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: InsertReservationResourceResponse
+    inputTypeName: InsertReservationResourceResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: insert_reservation_resource_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: InsertReservationResourceResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: InsertReservationResource
+  outputType: InsertReservationResourceResponse!
+  arguments:
+    - name: objects
+      type: "[InsertReservationResourceObject!]!"
+    - name: postCheck
+      type: ReservationResourceBoolExp
+      description: Insert permission predicate over the 'reservation_resource' collection
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: insert_reservation_resource
+    argumentMapping:
+      objects: objects
+      postCheck: post_check
+  graphql:
+    rootFieldName: insertReservationResource
+    rootFieldKind: Mutation
+  description: Insert into the reservation_resource table
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: InsertReservationResource
+  permissions:
+    - role: admin
+      allowExecution: true
+

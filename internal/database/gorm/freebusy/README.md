@@ -11,7 +11,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 7 | 5 |
+| 8 | 6 |
 
 ## Entity relationships
 
@@ -38,6 +38,9 @@ erDiagram
     Reservation {
         string id PK
         string hold FK
+    }
+    ResourceDay {
+        string id PK
     }
     Webhook {
         string id PK
@@ -68,7 +71,7 @@ A Hold is a temporary, expiring claim on one or more bookable resources for a wi
 | --- | --- | --- |
 | `id` | `CHAR(26)` | not null |
 | `name` | `VARCHAR(255)` | not null |
-| `window` | `TSTZRANGE` | not null |
+| `window` | `TEXT` | not null |
 | `quantity` | `INTEGER` | nullable |
 | `expire_time` | `TIMESTAMPTZ` | nullable |
 | `state` | `HoldState` | nullable |
@@ -76,6 +79,8 @@ A Hold is a temporary, expiring claim on one or more bookable resources for a wi
 | `create_time` | `TIMESTAMPTZ` | not null |
 | `update_time` | `TIMESTAMPTZ` | not null |
 | `etag` | `VARCHAR(255)` | nullable |
+| `replaces` | `VARCHAR(255)` | nullable |
+| `candidate_filter` | `TEXT` | nullable |
 | `organizational_unit_id` | `CHAR(26)` | not null |
 | `resources` | `VARCHAR(255)[]` | nullable |
 | `candidate_resources` | `VARCHAR(255)[]` | nullable |
@@ -93,8 +98,27 @@ An Allocation is one resource taken by one hold for one span: the row the engine
 | `end_time` | `TIMESTAMPTZ` | not null |
 | `expire_time` | `TIMESTAMPTZ` | nullable |
 | `create_time` | `TIMESTAMPTZ` | not null |
-| `hold` | `CHAR(26)` | nullable |
+| `hold` | `VARCHAR(255)` | nullable |
 | `organizational_unit_id` | `CHAR(26)` | not null |
+
+### `ResourceDay` → `resource_days`
+
+A ResourceDay is one resource's standing free time on one UTC day: the availability read model SearchAvailability, ComputeAvailability, CheckAvailability and CreateHold read their candidates from, instead of evaluating every resource an operator has. Storage-only, and derived: no RPC takes or returns it. It is a projection of the resources, their sites, calendars, RFC 7953 availability, RFC 5545 events and the claims of converted holds, rewritten in the same transaction as every write to those (on Hasura, a single write projects in a request of its own right after it), for every day of a rolling horizon. `free` is offered time less booked time; live holds are not subtracted, and neither is a resource's booking policy applied, because both change with the clock. The engine evaluates every candidate the projection returns before answering, so an answer never depends on the projection being current; a stale row can only make a search miss a resource or read one it then drops.
+
+| Column | Type | Null |
+| --- | --- | --- |
+| `id` | `TEXT` | not null |
+| `resource` | `TEXT` | not null |
+| `organization` | `TEXT` | not null |
+| `organizational_unit` | `TEXT` | not null |
+| `day` | `DATE` | not null |
+| `free` | `TSTZMULTIRANGE` | not null |
+| `resource_types` | `TEXT[]` | not null |
+| `attributes` | `JSONB` | not null |
+| `calendar` | `TEXT` | not null |
+| `display_name` | `TEXT` | not null |
+| `free_fraction` | `DOUBLE PRECISION` | not null |
+| `row_version` | `BIGINT` | not null |
 
 ### Enums
 
@@ -110,7 +134,7 @@ A Reservation is a confirmed booking: a hold made permanent. It is the last step
 | --- | --- | --- |
 | `id` | `CHAR(26)` | not null |
 | `name` | `VARCHAR(255)` | not null |
-| `hold` | `CHAR(26)` | not null |
+| `hold` | `VARCHAR(255)` | not null |
 | `start_time` | `TIMESTAMPTZ` | nullable |
 | `end_time` | `TIMESTAMPTZ` | nullable |
 | `customer` | `VARCHAR(255)` | nullable |
@@ -124,12 +148,14 @@ A Reservation is a confirmed booking: a hold made permanent. It is the last step
 | `etag` | `VARCHAR(255)` | nullable |
 | `replaces` | `VARCHAR(255)` | nullable |
 | `replacement` | `VARCHAR(255)` | nullable |
+| `last_change` | `Change` | nullable |
 | `organizational_unit_id` | `CHAR(26)` | not null |
 | `resources` | `VARCHAR(255)[]` | nullable |
 
 ### Enums
 
 - `ReservationState`: PENDING, CONFIRMED, CANCELLING, CANCELLED, FAILED, RESCHEDULING, RESCHEDULED
+- `Change`: STATE, DETAILS
 
 ## Schema `shared`
 

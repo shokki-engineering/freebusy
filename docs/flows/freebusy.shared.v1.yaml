@@ -1,0 +1,46 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+#
+# yaml-language-server: $schema=https://raw.githubusercontent.com/the-protobuf-project/protoc-gen-openapi-solo/main/schema/flows.schema.json
+#
+# Flows and state transitions of freebusy.shared.v1, rendered by protoc-gen-openapi
+# (flows=<dir>). Re-run mode=scaffold after changing the protos: it adds what
+# is new and marks what is gone with STALE, and keeps everything you wrote.
+
+package: freebusy.shared.v1
+
+# Lifecycle enums: for each value, how it is reached. A value takes one
+# transition or a list of them: {from: [values], rpc: Service.Method or event:
+# cause, condition: guard}. Empty from with a trigger is an entry from the
+# initial state; a value left as {from: []} is not drawn.
+states:
+  IdempotencyState:
+    # Claimed: a handler is running for this key right now. A second caller
+    # arriving here is a concurrent duplicate, not a replay.
+    IDEMPOTENCY_STATE_IN_FLIGHT:
+      from: []
+    # Settled: `response` holds what the first call returned.
+    IDEMPOTENCY_STATE_DONE:
+      from: []
+
+# Flows, rendered as sequence diagrams. For example:
+#
+#   - id: book
+#     title: Book a resource
+#     description: Hold, then confirm.
+#     service: ReservationService   # optional: show it with this service
+#     steps:
+#       - call: acme.booking.v1.HoldService.CreateHold
+#       - call: acme.booking.v1.ReservationService.CreateReservation
+#         alternatives:
+#           - when: hold still active
+#             steps:
+#               - emits: acme.booking.v1.reservation.confirmed
+#                 actor: ReservationService
+#                 to: Webhooks
+#           - when: hold lapsed
+#             steps:
+#               - call: acme.booking.v1.HoldService.GetHold
+#                 error: FAILED_PRECONDITION (HOLD_NOT_ACTIVE)
+flows: []

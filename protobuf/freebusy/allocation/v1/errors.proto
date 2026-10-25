@@ -1,0 +1,179 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package freebusy.allocation.v1;
+
+import "service/v1/annotations.proto";
+
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1";
+option java_multiple_files = true;
+option java_outer_classname = "ErrorsProto";
+option java_package = "engineering.shokki.freebusy.allocation.v1";
+
+// The reasons freebusy returns for availability and holds: the
+// google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.dev domain. They are
+// part of the API: clients branch on them, never on a message.
+// protoc-gen-service renders them as Go constants, sentinels and the tables of
+// docs/errors.md.
+enum ErrorReason {
+  option (service.v1.error_domain) = {domain: "freebusy.dev"};
+
+  // Unset; never returned.
+  ERROR_REASON_UNSPECIFIED = 0;
+
+  // time_zone is not an IANA zone name.
+  ERROR_REASON_INVALID_TIME_ZONE = 1 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "`time_zone` is not an IANA zone name."
+    fix: "Use one such as `Europe/London`, or leave it empty for the site's own."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // The window would be answered in too many buckets.
+  ERROR_REASON_TOO_MANY_BUCKETS = 2 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "The window would be answered in too many buckets."
+    fix: "A shorter window, a longer `slot_duration`, or day granularity."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // filter (or hold.candidate_filter on CreateHold) is not an AIP-160 filter
+  // over a resource's search record: a syntax error, or a field it does not
+  // have.
+  ERROR_REASON_INVALID_FILTER = 3 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "`filter` (or `hold.candidate_filter` on `CreateHold`) is not an AIP-160 filter over a resource's search record: a syntax error, or a field it does not have. `BadRequest` names the field."
+    fix: "Filter on `resource_types`, `display_name`, `organizational_unit` and `attributes.<path>`, e.g. `resource_types:\"room\" AND attributes.view = \"river\"`."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // The filter is valid, but the backend the search records are read on cannot
+  // evaluate it: on a Hasura-only deployment (no [database.postgres]), a : on
+  // resource_types, since DDN over ndc-postgres has no comparison on array
+  // columns.
+  ERROR_REASON_FILTER_UNSUPPORTED = 4 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "The filter is valid, but the backend the search records are read on cannot evaluate it: on a Hasura-only deployment (no `[database.postgres]`), a `:` on `resource_types`, since DDN over ndc-postgres has no comparison on array columns. `BadRequest` names the field."
+    fix: "Pass the types in the request's `resource_types` field instead, or configure Postgres for the server."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // SearchAvailability's order_by names a field matches cannot be ordered by, or
+  // a direction other than asc/desc.
+  ERROR_REASON_INVALID_ORDER_BY = 5 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "`SearchAvailability`'s `order_by` names a field matches cannot be ordered by, or a direction other than `asc`/`desc`."
+    fix: "Order by `resource`, `organizational_unit`, `display_name`, `free_fraction` or `attributes.max_occupancy`."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // SearchAvailability's order_by is valid, but orders by an attribute path
+  // (attributes.max_occupancy) that the backend the search records are read on
+  // cannot sort by: DDN's order_by, on a Hasura-only deployment, has no JSON
+  // path expression.
+  ERROR_REASON_ORDER_BY_UNSUPPORTED = 6 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "`SearchAvailability`'s `order_by` is valid, but orders by an attribute path (`attributes.max_occupancy`) that the backend the search records are read on cannot sort by: DDN's order_by, on a Hasura-only deployment, has no JSON path expression."
+    fix: "Order by `resource`, `organizational_unit`, `display_name` or `free_fraction`, or configure Postgres for the server."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // SearchAvailability's facets names a field resources cannot be counted by.
+  ERROR_REASON_INVALID_FACET = 7 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "`SearchAvailability`'s `facets` names a field resources cannot be counted by."
+    fix: "Count by `resource_types`, `organizational_unit`, `organization`, `display_name` or `attributes.<path>`."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // SearchAvailability's page_token is not one it returned.
+  ERROR_REASON_INVALID_PAGE_TOKEN = 8 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "`SearchAvailability`'s `page_token` is not one it returned."
+    fix: "Send `next_page_token` unchanged, with the same other fields, or leave it empty."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // SearchAvailability with order_by or facets for a window outside the search
+  // records' horizon (yesterday to [search] horizon_days ahead).
+  ERROR_REASON_WINDOW_BEYOND_HORIZON = 9 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "`SearchAvailability` with `order_by` or `facets` for a window outside the search records' horizon (yesterday to `[search] horizon_days` ahead)."
+    fix: "Search inside the horizon, or leave `order_by` and `facets` empty."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // SearchAvailability, ComputeAvailability, BatchComputeAvailability,
+  // CheckAvailability or CreateHold: as many availability evaluations as the
+  // server runs at once ([engine] max_evaluations) were running, and none
+  // finished within [engine] admission_wait_ms.
+  ERROR_REASON_ENGINE_BUSY = 10 [(service.v1.error_reason) = {
+    code: "RESOURCE_EXHAUSTED"
+    description: "`SearchAvailability`, `ComputeAvailability`, `BatchComputeAvailability`, `CheckAvailability` or `CreateHold`: as many availability evaluations as the server runs at once (`[engine] max_evaluations`) were running, and none finished within `[engine] admission_wait_ms`. Nothing was read or written."
+    fix: "Retry after a short randomized backoff; a narrower request (a resource type, fewer sites, a smaller page) is cheaper."
+    retryable: true
+    sentinel: true
+  }];
+
+  // CreateHold: fewer resources are free for the whole window than were asked
+  // for.
+  ERROR_REASON_CAPACITY_EXHAUSTED = 11 [(service.v1.error_reason) = {
+    code: "FAILED_PRECONDITION"
+    description: "`CreateHold`: fewer resources are free for the whole window than were asked for. The race for the last one is lost this way too."
+    fix: "Ask for fewer, or another window; `ComputeAvailability` shows what is free."
+    sentinel: true
+  }];
+
+  // CreateHold: the window is outside the published availability of every
+  // resource asked about (closed then), so nothing is offered at all.
+  ERROR_REASON_OUTSIDE_AVAILABILITY = 12 [(service.v1.error_reason) = {
+    code: "FAILED_PRECONDITION"
+    description: "`CreateHold`: the window is outside the published availability of every resource asked about (closed then), so nothing is offered at all. A window that is offered but taken is `CAPACITY_EXHAUSTED`."
+    fix: "Ask for a window inside opening hours; `ComputeAvailability` shows what is offered and free."
+    detail: DETAIL_KIND_PRECONDITION_FAILURE
+  }];
+
+  // ExtendHold's duration is zero, negative or above the maximum.
+  ERROR_REASON_INVALID_HOLD_EXTENSION = 13 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "`ExtendHold`'s `duration` is zero, negative or above the maximum."
+    fix: "Extend by less, again before it expires if needed."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // The hold expired, was released, or became a reservation.
+  ERROR_REASON_HOLD_NOT_ACTIVE = 14 [(service.v1.error_reason) = {
+    code: "FAILED_PRECONDITION"
+    description: "The hold expired, was released, or became a reservation."
+    fix: "Take a new hold."
+    detail: DETAIL_KIND_PRECONDITION_FAILURE
+  }];
+
+  // ReleaseHold on a hold that became a reservation.
+  ERROR_REASON_HOLD_CONVERTED = 15 [(service.v1.error_reason) = {
+    code: "FAILED_PRECONDITION"
+    description: "`ReleaseHold` on a hold that became a reservation."
+    fix: "Cancel the reservation instead."
+    detail: DETAIL_KIND_PRECONDITION_FAILURE
+  }];
+
+  // DeleteHold on a hold that still holds its resources.
+  ERROR_REASON_HOLD_ACTIVE = 16 [(service.v1.error_reason) = {
+    code: "FAILED_PRECONDITION"
+    description: "`DeleteHold` on a hold that still holds its resources."
+    fix: "`ReleaseHold` first."
+    detail: DETAIL_KIND_PRECONDITION_FAILURE
+  }];
+
+  // CreateHold: hold.replaces names a hold that backs no booking still keeping
+  // its resources -- it never became a reservation, or that reservation was
+  // cancelled or moved.
+  ERROR_REASON_REPLACED_HOLD_NOT_BOOKED = 17 [(service.v1.error_reason) = {
+    code: "FAILED_PRECONDITION"
+    description: "`CreateHold`: `hold.replaces` names a hold that backs no booking still keeping its resources -- it never became a reservation, or that reservation was cancelled or moved."
+    fix: "Send the `hold` of a confirmed reservation, or leave `replaces` empty."
+    detail: DETAIL_KIND_PRECONDITION_FAILURE
+  }];
+}

@@ -1,0 +1,20 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# protoc-gen-openapi-solo in mode=scaffold: writes or updates the flow files
+# under docs/flows -- one per package, the services and their methods, the
+# lifecycle enums, and the events and error reasons protoc-gen-service's
+# options declare. A rerun merges: new methods, enums and values are added,
+# gone ones marked STALE, and the flows and transitions written by hand are
+# kept. `just gen flows`. The output directory is the repository root, where
+# the plugin reads the existing files from.
+version: v2
+inputs:
+  - directory: protobuf
+plugins:
+  - local: protoc-gen-openapi-solo
+    out: .
+    strategy: all
+    opt:
+      - mode=scaffold
+      - flows_dir=docs/flows

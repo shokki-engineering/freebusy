@@ -4,8 +4,8 @@
 package db
 
 // Live test of Events' window: events far before or after the window are not
-// returned, on either backend, and on GORM the database already leaves them
-// out. Skipped unless FREEBUSY_TEST_DATABASE_URL names a database.
+// returned, on either backend, and the database already leaves them out on
+// both. Skipped unless FREEBUSY_TEST_DATABASE_URL names a database.
 
 import (
 	"context"
@@ -91,18 +91,12 @@ func TestLiveEventsWindow(t *testing.T) {
 			}
 			slices.Sort(ids)
 			want := []string{"drop-past-lasting", "keep-allday", "keep-inside", "keep-spanning", "keep-weekly-old"}
-			if backend == "hasura" {
-				// DDN exposes no path from an event to its times, so the
-				// hints are skipped and Events' own checks narrow.
-				if len(ids) != len(events) {
-					t.Fatalf("hasura read %d rows, want all %d: %v", len(ids), len(events), ids)
-				}
-				return
-			}
+			// Both backends narrow in the database: GORM in SQL, Hasura through
+			// the value-object lookups the generated filter engine runs per page.
 			// An open-ended event (DURATION, no DTEND) passes the database
 			// and is dropped by Events.
 			if !slices.Equal(ids, want) {
-				t.Fatalf("gorm read %v, want %v", ids, want)
+				t.Fatalf("%s read %v, want %v", backend, ids, want)
 			}
 		})
 	}

@@ -1,0 +1,1202 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceCalendarId
+  description: Update the 'calendar_id' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceCalendarId
+    inputTypeName: UpdateColumnEventResourceCalendarIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_calendar_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceCalendarId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceClassification
+  description: Update the 'classification' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceClassification
+    inputTypeName: UpdateColumnEventResourceClassificationInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_classification
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceClassification
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceConcepts
+  description: Update the 'concepts' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: "[String_1]"
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceConcepts
+    inputTypeName: UpdateColumnEventResourceConceptsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_concepts
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceConcepts
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceConfirmation
+  description: Update the 'confirmation' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceConfirmation
+    inputTypeName: UpdateColumnEventResourceConfirmationInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_confirmation
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceConfirmation
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceCreateTime
+  description: Update the 'create_time' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceCreateTime
+    inputTypeName: UpdateColumnEventResourceCreateTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_create_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceCreateTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceDeleteTime
+  description: Update the 'delete_time' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceDeleteTime
+    inputTypeName: UpdateColumnEventResourceDeleteTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_delete_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceDeleteTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceDescription
+  description: Update the 'description' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceDescription
+    inputTypeName: UpdateColumnEventResourceDescriptionInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_description
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceDescription
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceDuration
+  description: Update the 'duration' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceDuration
+    inputTypeName: UpdateColumnEventResourceDurationInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_duration
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceDuration
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceEndId
+  description: Update the 'end_id' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceEndId
+    inputTypeName: UpdateColumnEventResourceEndIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_end_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceEndId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceEndsCase
+  description: Update the 'ends_case' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceEndsCase
+    inputTypeName: UpdateColumnEventResourceEndsCaseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_ends_case
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceEndsCase
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceEtag
+  description: Update the 'etag' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceEtag
+    inputTypeName: UpdateColumnEventResourceEtagInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_etag
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceEtag
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceExpireTime
+  description: Update the 'expire_time' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceExpireTime
+    inputTypeName: UpdateColumnEventResourceExpireTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_expire_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceExpireTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceIcalUid
+  description: Update the 'ical_uid' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceIcalUid
+    inputTypeName: UpdateColumnEventResourceIcalUidInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_ical_uid
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceIcalUid
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceId
+  description: Update the 'id' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceId
+    inputTypeName: UpdateColumnEventResourceIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceLocation
+  description: Update the 'location' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceLocation
+    inputTypeName: UpdateColumnEventResourceLocationInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_location
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceLocation
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceName
+  description: Update the 'name' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceName
+    inputTypeName: UpdateColumnEventResourceNameInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_name
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceName
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceOrganizerId
+  description: Update the 'organizer_id' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceOrganizerId
+    inputTypeName: UpdateColumnEventResourceOrganizerIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_organizer_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceOrganizerId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceOriginalStartId
+  description: Update the 'original_start_id' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceOriginalStartId
+    inputTypeName: UpdateColumnEventResourceOriginalStartIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_original_start_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceOriginalStartId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceOriginalStartRange
+  description: Update the 'original_start_range' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceOriginalStartRange
+    inputTypeName: UpdateColumnEventResourceOriginalStartRangeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_original_start_range
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceOriginalStartRange
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourcePosition
+  description: Update the 'position' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourcePosition
+    inputTypeName: UpdateColumnEventResourcePositionInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_position
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourcePosition
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceRecurrenceId
+  description: Update the 'recurrence_id' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceRecurrenceId
+    inputTypeName: UpdateColumnEventResourceRecurrenceIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_recurrence_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceRecurrenceId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceRefids
+  description: Update the 'refids' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: "[String_1]"
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceRefids
+    inputTypeName: UpdateColumnEventResourceRefidsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_refids
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceRefids
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceSequence
+  description: Update the 'sequence' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: Int32
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceSequence
+    inputTypeName: UpdateColumnEventResourceSequenceInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_sequence
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceSequence
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceStartId
+  description: Update the 'start_id' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceStartId
+    inputTypeName: UpdateColumnEventResourceStartIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_start_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceStartId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceSummary
+  description: Update the 'summary' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceSummary
+    inputTypeName: UpdateColumnEventResourceSummaryInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_summary
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceSummary
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceTransparency
+  description: Update the 'transparency' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceTransparency
+    inputTypeName: UpdateColumnEventResourceTransparencyInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_transparency
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceTransparency
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceUid
+  description: Update the 'uid' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceUid
+    inputTypeName: UpdateColumnEventResourceUidInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_uid
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceUid
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnEventResourceUpdateTime
+  description: Update the 'update_time' column in the 'event_resource' collection
+  fields:
+    - name: set
+      type: Timestamptz!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnEventResourceUpdateTime
+    inputTypeName: UpdateColumnEventResourceUpdateTimeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_event_resource_update_time
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnEventResourceUpdateTime
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateEventResourceByIdUpdateColumns
+  description: Update the columns of the 'event_resource' collection
+  fields:
+    - name: calendarId
+      type: UpdateColumnEventResourceCalendarId
+      description: Update the 'calendar_id' column in the 'event_resource' collection.
+    - name: classification
+      type: UpdateColumnEventResourceClassification
+      description: Update the 'classification' column in the 'event_resource' collection.
+    - name: concepts
+      type: UpdateColumnEventResourceConcepts
+      description: Update the 'concepts' column in the 'event_resource' collection.
+    - name: confirmation
+      type: UpdateColumnEventResourceConfirmation
+      description: Update the 'confirmation' column in the 'event_resource' collection.
+    - name: createTime
+      type: UpdateColumnEventResourceCreateTime
+      description: Update the 'create_time' column in the 'event_resource' collection.
+    - name: deleteTime
+      type: UpdateColumnEventResourceDeleteTime
+      description: Update the 'delete_time' column in the 'event_resource' collection.
+    - name: description
+      type: UpdateColumnEventResourceDescription
+      description: Update the 'description' column in the 'event_resource' collection.
+    - name: duration
+      type: UpdateColumnEventResourceDuration
+      description: Update the 'duration' column in the 'event_resource' collection.
+    - name: endId
+      type: UpdateColumnEventResourceEndId
+      description: Update the 'end_id' column in the 'event_resource' collection.
+    - name: endsCase
+      type: UpdateColumnEventResourceEndsCase
+      description: Update the 'ends_case' column in the 'event_resource' collection.
+    - name: etag
+      type: UpdateColumnEventResourceEtag
+      description: Update the 'etag' column in the 'event_resource' collection.
+    - name: expireTime
+      type: UpdateColumnEventResourceExpireTime
+      description: Update the 'expire_time' column in the 'event_resource' collection.
+    - name: icalUid
+      type: UpdateColumnEventResourceIcalUid
+      description: Update the 'ical_uid' column in the 'event_resource' collection.
+    - name: id
+      type: UpdateColumnEventResourceId
+      description: Update the 'id' column in the 'event_resource' collection.
+    - name: location
+      type: UpdateColumnEventResourceLocation
+      description: Update the 'location' column in the 'event_resource' collection.
+    - name: name
+      type: UpdateColumnEventResourceName
+      description: Update the 'name' column in the 'event_resource' collection.
+    - name: organizerId
+      type: UpdateColumnEventResourceOrganizerId
+      description: Update the 'organizer_id' column in the 'event_resource' collection.
+    - name: originalStartId
+      type: UpdateColumnEventResourceOriginalStartId
+      description: Update the 'original_start_id' column in the 'event_resource' collection.
+    - name: originalStartRange
+      type: UpdateColumnEventResourceOriginalStartRange
+      description: Update the 'original_start_range' column in the 'event_resource'
+        collection.
+    - name: position
+      type: UpdateColumnEventResourcePosition
+      description: Update the 'position' column in the 'event_resource' collection.
+    - name: recurrenceId
+      type: UpdateColumnEventResourceRecurrenceId
+      description: Update the 'recurrence_id' column in the 'event_resource' collection.
+    - name: refids
+      type: UpdateColumnEventResourceRefids
+      description: Update the 'refids' column in the 'event_resource' collection.
+    - name: sequence
+      type: UpdateColumnEventResourceSequence
+      description: Update the 'sequence' column in the 'event_resource' collection.
+    - name: startId
+      type: UpdateColumnEventResourceStartId
+      description: Update the 'start_id' column in the 'event_resource' collection.
+    - name: summary
+      type: UpdateColumnEventResourceSummary
+      description: Update the 'summary' column in the 'event_resource' collection.
+    - name: transparency
+      type: UpdateColumnEventResourceTransparency
+      description: Update the 'transparency' column in the 'event_resource' collection.
+    - name: uid
+      type: UpdateColumnEventResourceUid
+      description: Update the 'uid' column in the 'event_resource' collection.
+    - name: updateTime
+      type: UpdateColumnEventResourceUpdateTime
+      description: Update the 'update_time' column in the 'event_resource' collection.
+  graphql:
+    typeName: UpdateEventResourceByIdUpdateColumns
+    inputTypeName: UpdateEventResourceByIdUpdateColumnsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_event_resource_by_id_update_columns
+      fieldMapping:
+        calendarId:
+          column:
+            name: calendar_id
+        classification:
+          column:
+            name: classification
+        concepts:
+          column:
+            name: concepts
+        confirmation:
+          column:
+            name: confirmation
+        createTime:
+          column:
+            name: create_time
+        deleteTime:
+          column:
+            name: delete_time
+        description:
+          column:
+            name: description
+        duration:
+          column:
+            name: duration
+        endId:
+          column:
+            name: end_id
+        endsCase:
+          column:
+            name: ends_case
+        etag:
+          column:
+            name: etag
+        expireTime:
+          column:
+            name: expire_time
+        icalUid:
+          column:
+            name: ical_uid
+        id:
+          column:
+            name: id
+        location:
+          column:
+            name: location
+        name:
+          column:
+            name: name
+        organizerId:
+          column:
+            name: organizer_id
+        originalStartId:
+          column:
+            name: original_start_id
+        originalStartRange:
+          column:
+            name: original_start_range
+        position:
+          column:
+            name: position
+        recurrenceId:
+          column:
+            name: recurrence_id
+        refids:
+          column:
+            name: refids
+        sequence:
+          column:
+            name: sequence
+        startId:
+          column:
+            name: start_id
+        summary:
+          column:
+            name: summary
+        transparency:
+          column:
+            name: transparency
+        uid:
+          column:
+            name: uid
+        updateTime:
+          column:
+            name: update_time
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateEventResourceByIdUpdateColumns
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - calendarId
+          - classification
+          - concepts
+          - confirmation
+          - createTime
+          - deleteTime
+          - description
+          - duration
+          - endId
+          - endsCase
+          - etag
+          - expireTime
+          - icalUid
+          - id
+          - location
+          - name
+          - organizerId
+          - originalStartId
+          - originalStartRange
+          - position
+          - recurrenceId
+          - refids
+          - sequence
+          - startId
+          - summary
+          - transparency
+          - uid
+          - updateTime
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateEventResourceByIdResponse
+  description: Responses from the 'update_event_resource_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[EventResource!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: UpdateEventResourceByIdResponse
+    inputTypeName: UpdateEventResourceByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_event_resource_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateEventResourceByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: UpdateEventResourceById
+  outputType: UpdateEventResourceByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: postCheck
+      type: EventResourceBoolExp
+      description: Update permission post-condition predicate over the
+        'event_resource' collection
+    - name: preCheck
+      type: EventResourceBoolExp
+      description: Update permission pre-condition predicate over the 'event_resource'
+        collection
+    - name: updateColumns
+      type: UpdateEventResourceByIdUpdateColumns!
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: update_event_resource_by_id
+    argumentMapping:
+      keyId: key_id
+      postCheck: post_check
+      preCheck: pre_check
+      updateColumns: update_columns
+  graphql:
+    rootFieldName: updateEventResourceById
+    rootFieldKind: Mutation
+  description: Update any row on the 'event_resource' collection using the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: UpdateEventResourceById
+  permissions:
+    - role: admin
+      allowExecution: true
+

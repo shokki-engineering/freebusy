@@ -9,7 +9,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 76 | 49 |
+| 76 | 50 |
 
 ## Entity relationships
 

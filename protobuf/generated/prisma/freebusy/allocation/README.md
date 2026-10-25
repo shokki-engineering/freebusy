@@ -9,7 +9,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 2 | 1 |
+| 3 | 1 |
 
 ## Entity relationships
 
@@ -23,6 +23,9 @@ erDiagram
     Hold {
         string id PK
     }
+    ResourceDay {
+        string id PK
+    }
     Allocation }o--|| Hold : "hold"
 ```
 
@@ -30,3 +33,4 @@ erDiagram
 
 - [`allocation/`](./allocation/README.md)
 - [`enums/`](./enums/README.md)
+- [`resource_day/`](./resource_day/README.md)

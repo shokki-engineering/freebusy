@@ -8,13 +8,15 @@ openapi: 3.0.3
 info:
     title: ReservationService API
     description: |-
-        ReservationService turns holds into confirmed bookings and cancels them.
+        ReservationService turns holds into confirmed bookings, updates and cancels
+         them.
 
          It is where HoldService's conversion is driven from: a hold is never
          converted by a caller reaching into HoldService, only by a reservation being
-         made of it. There is no UpdateReservation -- the window and resources are the
-         hold's, and changing either is a new hold and a new reservation, which is
-         exactly what RescheduleReservation does.
+         made of it. UpdateReservation changes only what the engine does not own --
+         the customer and the attributes. The window and resources are the hold's,
+         and changing either is a new hold and a new reservation, which is exactly
+         what RescheduleReservation does.
     version: 0.0.1
 servers:
     - url: https://freebusy.shokki.engineering
@@ -145,6 +147,60 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+        patch:
+            tags:
+                - ReservationService
+            description: |-
+                Updates a confirmed reservation's customer or attributes, AIP-134.
+
+                 update_mask is required and may name only `customer` and `attributes`;
+                 everything else is the engine's, and is changed by CancelReservation or
+                 RescheduleReservation. `reservation.etag`, when set, must match the
+                 stored one (AIP-154). Fails with FAILED_PRECONDITION unless the
+                 reservation is confirmed.
+            operationId: ReservationService_UpdateReservation
+            parameters:
+                - name: organizationalUnit
+                  in: path
+                  description: The organizationalUnit id.
+                  required: true
+                  schema:
+                    type: string
+                - name: reservation
+                  in: path
+                  description: The reservation id.
+                  required: true
+                  schema:
+                    type: string
+                - name: updateMask
+                  in: query
+                  description: |-
+                    The fields to change: `customer`, `attributes`, or both; `*` is both.
+                     It must be sent -- an update never guesses what was meant from the
+                     fields that happen to be set -- and an empty one is rejected with
+                     REQUIRED_FIELD. Any other field is rejected with UNKNOWN_MASK_PATH.
+                  schema:
+                    type: string
+                    format: field-mask
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Reservation'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Reservation'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /v1/organizationalUnits/{organizationalUnit}/reservations/{reservation}:cancel:
         post:
             tags:
@@ -199,8 +255,11 @@ paths:
                  ways (`replaces`, `replacement`); the original ends RESCHEDULED. The
                  original keeps its resources until the replacement is confirmed, so a
                  failure part-way -- the new hold lapsing, a crash -- leaves the customer
-                 with their old booking, never with neither. Idempotent: repeating the call
-                 with the same hold returns the same replacement.
+                 with their old booking, never with neither. A new hold taken with
+                 `replaces` naming the original's hold may overlap the original's window on
+                 the same resources -- an extension in place -- and the overlap passes to
+                 the replacement in the same write that frees the original. Idempotent:
+                 repeating the call with the same hold returns the same replacement.
             operationId: ReservationService_RescheduleReservation
             parameters:
                 - name: organizationalUnit
@@ -334,7 +393,10 @@ components:
                 customer:
                     type: string
                     description: |-
-                        Who the reservation is for, by name in the user service.
+                        Who the reservation is for, by name in the user service. freebusy does
+                         not keep users: when a resolver for the type is registered (config
+                         `reference_services`) a create or update checks the name with that service, and a deleted user leaves the
+                         reservation as it is.
                          Format: users/{user}
                 state:
                     readOnly: true
@@ -387,6 +449,14 @@ components:
                     description: |-
                         The reservation replacing this one, set when RescheduleReservation began.
                          Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                lastChange:
+                    readOnly: true
+                    type: integer
+                    description: |-
+                        What the last write to this reservation changed. A webhook is sent
+                         freebusy.reservation.updated exactly when it is CHANGE_DETAILS, and the
+                         event of the new state otherwise.
+                    format: enum
             description: |-
                 A Reservation is a confirmed booking: a hold made permanent.
 

@@ -5,12 +5,30 @@ load("@rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "repox",
-    srcs = ["repox.go"],
+    srcs = [
+        "grpc.go",
+        "projection.go",
+        "references.go",
+        "repox.go",
+    ],
     importpath = "github.com/shokki-engineering/freebusy/internal/database/repository/repox",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/database/gorm/filterx",
+        "//internal/database/gorm/gormx",
         "//internal/database/hasura/freebusyql",
+        "@com_github_the_protobuf_project_runtime_go_network//graphql",
+        "@com_github_the_protobuf_project_runtime_go_network//runtime",
+        "@com_github_the_protobuf_project_store//plugin/pb/storepbv1",
         "@io_gorm_gorm//:gorm",
+        "@org_golang_google_grpc//:grpc",
+        "@org_golang_google_grpc//codes",
+        "@org_golang_google_grpc//status",
+        "@org_golang_google_protobuf//encoding/protojson",
+        "@org_golang_google_protobuf//proto",
+        "@org_golang_google_protobuf//reflect/protoreflect",
+        "@org_golang_google_protobuf//types/known/emptypb",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+        "@org_golang_google_protobuf//types/known/wrapperspb",
     ],
 )

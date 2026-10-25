@@ -9,6 +9,7 @@ import "buf/validate/validate.proto";
 import "freebusy/reservation/v1/reservation.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
+import "google/protobuf/field_mask.proto";
 
 option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1";
 option java_multiple_files = true;
@@ -92,6 +93,38 @@ message ListReservationsResponse {
 
   // Token for the next page, empty when this is the last page.
   string next_page_token = 2;
+}
+
+// Request message for ReservationService.UpdateReservation, AIP-134.
+//
+// The reservation's own field rules are not applied: a partial update leaves
+// out `hold`, which a create must send. Instead this message checks
+// `reservation.name` and `reservation.customer`, and the service checks the
+// mask.
+message UpdateReservationRequest {
+  option (buf.validate.message).cel = {
+    id: "update_reservation.name"
+    message: "reservation.name must be organizationalUnits/{organizational_unit}/reservations/{reservation}"
+    expression: "has(this.reservation) && this.reservation.name.matches('^organizationalUnits/[^/]+/reservations/[^/]+$')"
+  };
+  option (buf.validate.message).cel = {
+    id: "update_reservation.customer"
+    message: "reservation.customer must be users/{user}, or empty to clear it"
+    expression: "!has(this.reservation) || this.reservation.customer == '' || this.reservation.customer.matches('^users/[^/]+$')"
+  };
+
+  // The reservation, its name identifying which. Only the fields update_mask
+  // names are read. `etag`, when set, must match the stored one (AIP-154).
+  Reservation reservation = 1 [
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).ignore = IGNORE_ALWAYS
+  ];
+
+  // The fields to change: `customer`, `attributes`, or both; `*` is both.
+  // It must be sent -- an update never guesses what was meant from the
+  // fields that happen to be set -- and an empty one is rejected with
+  // REQUIRED_FIELD. Any other field is rejected with UNKNOWN_MASK_PATH.
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // Request message for ReservationService.CancelReservation.

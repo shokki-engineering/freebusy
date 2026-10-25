@@ -10,7 +10,8 @@ import "freebusy/allocation/v1/hold_messages.proto";
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/protobuf/empty.proto";
-import "mcp/protobuf/annotations.proto";
+import "mcp/v1/annotations.proto";
+import "service/v1/annotations.proto";
 
 option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1";
 option java_multiple_files = true;
@@ -30,9 +31,13 @@ option java_package = "engineering.shokki.freebusy.allocation.v1";
 // mutations are the two custom methods below.
 service HoldService {
   option (google.api.default_host) = "freebusy.shokki.engineering";
-  option (mcp.service) = {
+  // Hand-written, not generated: every method here runs the engine. Even
+  // GetHold and ListHolds are authoritative reads that expire a lapsed hold
+  // as they find it, which no generated standard method does.
+  option (service.v1.service) = {skip: true};
+  option (mcp.v1.service) = {
     app: {
-      name: "Resource Holds"
+      display_name: "Resource Holds"
       version: "1.0.0"
       description: "Take, extend and release temporary claims on bookable resources."
     }
@@ -50,7 +55,7 @@ service HoldService {
       body: "hold"
     };
     option (google.api.method_signature) = "parent,hold,hold_id";
-    option (mcp.tool) = {
+    option (mcp.v1.tool) = {
       description:
         "Claim resources at a site for a window while the booking is settled "
         "(payment, forms): the second step of booking. parent: "
@@ -59,7 +64,10 @@ service HoldService {
         "hold.candidate_resources if given. Set hold.idempotency_key so a retry "
         "returns the same hold. The hold lasts 15 minutes (expire_time): confirm "
         "it with reservation_service-create_reservation_v1 before then, or hold_service-extend_hold_v1. Fails with "
-        "CAPACITY_EXHAUSTED when too few are free."
+        "CAPACITY_EXHAUSTED when too few are free. To move or extend a booking, "
+        "set hold.replaces to its reservation's hold: the booking's own time then "
+        "does not count against the new hold, so it can keep the same resources; "
+        "pass the new hold to reservation_service-reschedule_reservation_v1."
     };
   }
 
@@ -90,7 +98,7 @@ service HoldService {
       body: "*"
     };
     option (google.api.method_signature) = "name,duration";
-    option (mcp.tool) = {
+    option (mcp.v1.tool) = {
       description:
         "Move a live hold's expire_time to now plus duration (at most 24 hours), "
         "when settling needs longer. name: "
@@ -108,7 +116,7 @@ service HoldService {
       body: "*"
     };
     option (google.api.method_signature) = "name";
-    option (mcp.tool) = {
+    option (mcp.v1.tool) = {
       description:
         "Give up a live hold, freeing its resources at once. name: "
         "organizationalUnits/{site}/holds/{hold}. A hold that became a "

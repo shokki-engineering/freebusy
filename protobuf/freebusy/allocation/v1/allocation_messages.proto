@@ -58,6 +58,14 @@ message ComputeAvailabilityRequest {
   // Populate AvailabilityBucket.free_resources. Off by default: a large site
   // would otherwise repeat every resource name in every bucket.
   bool include_free_resources = 7 [(google.api.field_behavior) = OPTIONAL];
+
+  // An AIP-160 filter over each resource's search record (ResourceDay): its
+  // `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
+  // `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
+  // `display_name` (a bare word matches it) and `organizational_unit`. Terms
+  // are ANDed unless joined with OR. Empty matches every resource.
+  // Only matching resources are computed over or counted.
+  string filter = 8 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // Response message for AllocationService.ComputeAvailability.
@@ -97,6 +105,14 @@ message CheckAvailabilityRequest {
     (google.api.field_behavior) = OPTIONAL,
     (buf.validate.field).int32.gte = 0
   ];
+
+  // An AIP-160 filter over each resource's search record (ResourceDay): its
+  // `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
+  // `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
+  // `display_name` (a bare word matches it) and `organizational_unit`. Terms
+  // are ANDed unless joined with OR. Empty matches every resource.
+  // Only matching resources are checked.
+  string filter = 5 [(google.api.field_behavior) = OPTIONAL];
 }
 
 // Response message for AllocationService.CheckAvailability.
@@ -162,7 +178,8 @@ message SearchAvailabilityRequest {
   ];
 
   // Restrict to RESOURCE-TYPE values, RFC 9073 section 6.3, e.g. "room" or
-  // "parking-bay". Empty matches every type.
+  // "parking-bay": a resource matches when it carries any of them. Empty
+  // matches every type.
   repeated string resource_types = 4 [(google.api.field_behavior) = OPTIONAL];
 
   // How many resources must be free together at one site for it to match.
@@ -182,7 +199,33 @@ message SearchAvailabilityRequest {
   ];
 
   // Page token from a previous SearchAvailabilityResponse.next_page_token.
+  // Every other field must be the same as in the call that returned it.
   string page_token = 7 [(google.api.field_behavior) = OPTIONAL];
+
+  // An AIP-160 filter over each resource's search record (ResourceDay): its
+  // `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
+  // `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
+  // `display_name` (a bare word matches it) and `organizational_unit`. Terms
+  // are ANDed unless joined with OR. Empty matches every resource.
+  string filter = 8 [(google.api.field_behavior) = OPTIONAL];
+
+  // AIP-132 order of the matches: a comma-separated list of `resource`,
+  // `organizational_unit`, `display_name`, `free_fraction` (the share of
+  // the window's first UTC day that is free) and `attributes.max_occupancy`
+  // (the booking profile's, as a number), each optionally followed by
+  // ` desc`, e.g. `free_fraction desc, display_name`. Defaults to
+  // `organizational_unit, resource`. When quantity is above 1, matches are
+  // grouped by site first, and the order applies within a site.
+  string order_by = 9 [(google.api.field_behavior) = OPTIONAL];
+
+  // Fields to count matching resources by, returned in
+  // SearchAvailabilityResponse.facets: `resource_types`,
+  // `organizational_unit` or an `attributes.<path>`, e.g.
+  // ["resource_types", "attributes.view"]. At most 10.
+  repeated string facets = 10 [
+    (google.api.field_behavior) = OPTIONAL,
+    (buf.validate.field).repeated.max_items = 10
+  ];
 }
 
 // Response message for AllocationService.SearchAvailability.
@@ -192,4 +235,11 @@ message SearchAvailabilityResponse {
 
   // Token for the next page, empty when this is the last page.
   string next_page_token = 2;
+
+  // One entry per field the request named in `facets`, in that order: how
+  // many resources matching the filter have that window free in their
+  // standing availability, by value. Counts come from the search records
+  // and do not subtract live holds, so they can run slightly above what a
+  // hold would get; the matches themselves are exact.
+  repeated SearchFacet facets = 3;
 }

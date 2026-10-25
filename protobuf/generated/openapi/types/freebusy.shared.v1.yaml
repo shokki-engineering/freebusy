@@ -1,0 +1,309 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: Apache-2.0
+
+components:
+  schemas:
+    freebusy.shared.v1.BookingMode:
+      description: How a resource is booked, which decides the availability shape
+        it produces.
+      enum:
+      - BOOKING_MODE_UNSPECIFIED
+      - BOOKING_MODE_TIME_SLOT
+      - BOOKING_MODE_NIGHTLY
+      type: string
+    freebusy.shared.v1.DateRange:
+      description: |-
+        A half-open range of calendar dates [start_date, end_date), evaluated in the
+        resource's local timezone. The natural query and exception shape for NIGHTLY
+        resources: end_date is the check-out date and is not itself included.
+      properties:
+        endDate:
+          description: Exclusive end date of the range.
+          properties:
+            day:
+              description: |-
+                Day of a month. Must be from 1 to 31 and valid for the year and month, or 0
+                to specify a year by itself or a year and month where the day isn't
+                significant.
+              format: int32
+              type: integer
+            month:
+              description: |-
+                Month of a year. Must be from 1 to 12, or 0 to specify a year without a
+                month and day.
+              format: int32
+              type: integer
+            year:
+              description: |-
+                Year of the date. Must be from 1 to 9999, or 0 to specify a date without
+                a year.
+              format: int32
+              type: integer
+          type: object
+        startDate:
+          description: Inclusive first date of the range.
+          properties:
+            day:
+              description: |-
+                Day of a month. Must be from 1 to 31 and valid for the year and month, or 0
+                to specify a year by itself or a year and month where the day isn't
+                significant.
+              format: int32
+              type: integer
+            month:
+              description: |-
+                Month of a year. Must be from 1 to 12, or 0 to specify a year without a
+                month and day.
+              format: int32
+              type: integer
+            year:
+              description: |-
+                Year of the date. Must be from 1 to 9999, or 0 to specify a date without
+                a year.
+              format: int32
+              type: integer
+          type: object
+      type: object
+    freebusy.shared.v1.ErrorReason:
+      description: |-
+        The reasons freebusy returns for the directory (organizations, sites) and the
+        calendars, events and availability freebusy serves, and any call: the
+        google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.dev domain. They are
+        part of the API: clients branch on them, never on a message.
+        protoc-gen-service renders them as Go constants, sentinels and the tables of
+        docs/errors.md.
+      enum:
+      - ERROR_REASON_UNSPECIFIED
+      - ERROR_REASON_ORGANIZATION_REQUIRED
+      - ERROR_REASON_ORGANIZATION_NOT_FOUND
+      - ERROR_REASON_ORGANIZATION_DELETED
+      - ERROR_REASON_ORGANIZATION_HAS_SITES
+      - ERROR_REASON_SITE_REQUIRED
+      - ERROR_REASON_SITE_NOT_FOUND
+      - ERROR_REASON_SITE_DELETED
+      - ERROR_REASON_SITE_WITHOUT_ORGANIZATION
+      - ERROR_REASON_SITE_HAS_RESOURCES
+      - ERROR_REASON_CALENDAR_NOT_FOUND
+      - ERROR_REASON_CALENDAR_DELETED
+      - ERROR_REASON_CALENDAR_NOT_EMPTY
+      - ERROR_REASON_NAME_NOT_UNDER_PARENT
+      - ERROR_REASON_NOT_RECURRING
+      - ERROR_REASON_SERIES_NOT_FOUND
+      - ERROR_REASON_NOT_AN_INSTANCE
+      - ERROR_REASON_RANGE_NOT_SUPPORTED
+      - ERROR_REASON_INVALID_EVENT
+      - ERROR_REASON_UNSUPPORTED_RECURRENCE
+      - ERROR_REASON_WINDOW_INCOMPLETE
+      - ERROR_REASON_WINDOW_BACKWARDS
+      - ERROR_REASON_WINDOW_TOO_LONG
+      - ERROR_REASON_UNIMPLEMENTED
+      type: string
+    freebusy.shared.v1.IdempotencyKey:
+      description: |-
+        The record behind every `request_id` field in this API: it remembers what the
+        first call with a given id returned, so a retry replays that response instead
+        of attempting the write twice. Storage only — no service exposes it, and no
+        caller constructs one. It lives in freebusy.shared.v1 because request_id is
+        an API-wide convention any RPC may opt into, and one interceptor records them
+        all; homing it in any single service's package would make every other
+        service import that service to dedupe its own writes. No RPC declares
+        request_id today -- holds and reservations carry their own idempotency.
+
+        The id is derived, not random: it is a digest of (method, request_id), so the
+        primary key itself is the uniqueness constraint that makes a concurrent
+        duplicate lose the race rather than double-write.
+      properties:
+        createTime:
+          description: When the key was claimed.
+          format: date-time
+          type: string
+        method:
+          description: |-
+            Fully-qualified RPC that was called, e.g.
+            "/freebusy.allocation.v1.HoldService/CreateHold". Part of the key: the
+            same request_id replayed against a different method is a different request.
+          type: string
+        name:
+          description: |-
+            The key name. The final segment is a digest of (method, request_id).
+            Format: idempotencyKeys/{idempotency_key}
+          type: string
+        requestId:
+          description: |-
+            The caller-supplied idempotency key, verbatim from the request's
+            `request_id` field.
+          type: string
+        response:
+          description: |-
+            What the first call returned: a google.protobuf.Any holding the response
+            message, encoded as protojson. Empty while IN_FLIGHT. Stored as text rather
+            than bytes so it round-trips identically through GORM and through Hasura's
+            GraphQL, and self-describing (the Any carries its @type) so a replay can
+            rebuild the exact response message without knowing which RPC wrote it.
+          type: string
+        state:
+          description: |-
+            Whether the first call is still running or has settled.
+            REQUIRED, not OUTPUT_ONLY, and AIP-216's state-field-output-only is
+            knowingly not satisfied here. protoc-gen-orm reads OUTPUT_ONLY as "the
+            repository never writes this column": with it set, GORM's Update stops
+            copying State and the GraphQL create input and update patch both omit it,
+            so settle()'s transition to DONE is silently dropped and every replay
+            re-runs the handler. AIP-216 is about a *client* not setting lifecycle;
+            this record has no client -- no service exposes it and the server is the
+            only writer -- so the rule's premise does not hold while its cost is a
+            broken idempotency mechanism. Revisit if orm gains a writable override.
+          enum:
+          - IDEMPOTENCY_STATE_UNSPECIFIED
+          - IDEMPOTENCY_STATE_IN_FLIGHT
+          - IDEMPOTENCY_STATE_DONE
+          type: string
+        updateTime:
+          description: When the key settled to DONE.
+          format: date-time
+          type: string
+      type: object
+    freebusy.shared.v1.IdempotencyState:
+      description: |-
+        Lifecycle of a recorded request. A key is claimed IN_FLIGHT before the
+        handler runs and settles to DONE once its response is recorded; a handler
+        that fails deletes its key, so the caller may genuinely retry.
+      enum:
+      - IDEMPOTENCY_STATE_UNSPECIFIED
+      - IDEMPOTENCY_STATE_IN_FLIGHT
+      - IDEMPOTENCY_STATE_DONE
+      type: string
+    freebusy.shared.v1.MediaType:
+      description: |-
+        Kind of media asset a Media reference points at. Documents (PDFs, house rules,
+        fact sheets) are just media with type DOCUMENT — they are not a separate type.
+      enum:
+      - MEDIA_TYPE_UNSPECIFIED
+      - MEDIA_TYPE_IMAGE
+      - MEDIA_TYPE_VIDEO
+      - MEDIA_TYPE_DOCUMENT
+      - MEDIA_TYPE_FLOORPLAN
+      - MEDIA_TYPE_VIRTUAL_TOUR
+      type: string
+    freebusy.shared.v1.OrderDirection:
+      description: |-
+        Enums shared across more than one freebusy resource. Resource-specific enums
+        live alongside their resource (e.g. BookingStatus in the booking package), so
+        only the genuinely cross-cutting ones are defined here.
+        Sort direction for list endpoints.
+      enum:
+      - ORDER_DIRECTION_UNSPECIFIED
+      - ORDER_DIRECTION_ASC
+      - ORDER_DIRECTION_DESC
+      type: string
+    freebusy.shared.v1.PriceComponent:
+      description: |-
+        One line in a price breakdown: a base charge, a fee, a tax, or a discount.
+        Clients branch on `type` and `code`; the signed `amount` rolls up to the
+        booking total (charges positive, discounts negative).
+      properties:
+        amount:
+          description: |-
+            Signed amount: positive for charges (base, fees, taxes), negative for
+            discounts. Summing every component yields the booking total.
+          properties:
+            currencyCode:
+              description: The three-letter currency code defined in ISO 4217.
+              type: string
+            nanos:
+              description: |-
+                Number of nano (10^-9) units of the amount.
+                The value must be between -999,999,999 and +999,999,999 inclusive.
+                If `units` is positive, `nanos` must be positive or zero.
+                If `units` is zero, `nanos` can be positive, zero, or negative.
+                If `units` is negative, `nanos` must be negative or zero.
+                For example $-1.75 is represented as `units`=-1 and `nanos`=-750,000,000.
+              format: int32
+              type: integer
+            units:
+              description: |-
+                The whole units of the amount.
+                For example if `currencyCode` is `"USD"`, then 1 unit is one US dollar.
+              format: int64
+              type: integer
+              x-kubernetes-int-or-string: true
+          type: object
+        code:
+          description: |-
+            Stable machine code for the line, e.g. "base", "cleaning_fee",
+            "occupancy_tax", or a promo code. Clients key display and logic off this.
+          type: string
+        displayName:
+          description: Human-readable label suitable for display on an itemized receipt.
+          type: string
+        type:
+          description: Which kind of line this is.
+          enum:
+          - TYPE_UNSPECIFIED
+          - TYPE_BASE
+          - TYPE_FEE
+          - TYPE_TAX
+          - TYPE_DISCOUNT
+          type: string
+      type: object
+    freebusy.shared.v1.TimeWindow:
+      description: |-
+        A half-open time interval [start_time, end_time). Used for query windows and
+        for a booking's reserved span in both TIME_SLOT and NIGHTLY modes.
+      properties:
+        endTime:
+          description: Exclusive end of the interval.
+          format: date-time
+          type: string
+        startTime:
+          description: Inclusive start of the interval.
+          format: date-time
+          type: string
+      type: object
+    freebusy.shared.v1.Weekday:
+      description: Day of the week, numbered to match google.type.DayOfWeek (Monday
+        = 1).
+      enum:
+      - WEEKDAY_UNSPECIFIED
+      - WEEKDAY_MONDAY
+      - WEEKDAY_TUESDAY
+      - WEEKDAY_WEDNESDAY
+      - WEEKDAY_THURSDAY
+      - WEEKDAY_FRIDAY
+      - WEEKDAY_SATURDAY
+      - WEEKDAY_SUNDAY
+      type: string
+info:
+  description: |-
+    ## Resources
+
+    ```mermaid
+    erDiagram
+        IdempotencyKey {
+            string name PK "IDENTIFIER"
+            string method "REQUIRED"
+            string request_id "REQUIRED"
+            IdempotencyState state "OUTPUT_ONLY"
+            string response "OPTIONAL"
+            Timestamp create_time "OUTPUT_ONLY"
+            Timestamp update_time "OUTPUT_ONLY"
+        }
+    ```
+  title: OpenAPI Spec for Solo APIs.
+  version: v1
+  x-mermaid:
+  - diagram: |
+      erDiagram
+          IdempotencyKey {
+              string name PK "IDENTIFIER"
+              string method "REQUIRED"
+              string request_id "REQUIRED"
+              IdempotencyState state "OUTPUT_ONLY"
+              string response "OPTIONAL"
+              Timestamp create_time "OUTPUT_ONLY"
+              Timestamp update_time "OUTPUT_ONLY"
+          }
+    title: Resources
+    type: erDiagram
+openapi: 3.0.1
+paths: null

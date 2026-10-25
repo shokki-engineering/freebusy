@@ -1,16 +1,25 @@
 // Copyright 2026 Srikanth K.
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Command errors checks that docs/errors.md -- the error contract clients
-// branch on -- lists exactly the reasons the server can return: every
-// ErrorInfo reason found in the Go source under internal/, and the few that
-// come from libraries (external). A reason the page lacks, or one it lists
-// that nothing returns any more, fails the check.
+// Command errors keeps docs/errors.md -- the error contract clients branch
+// on -- true to the server.
 //
-//	go run ./tools/errors
+// The reason tables come from the protos: protoc-gen-service renders each
+// error_domain enum, and the standard methods' reasons, as a Markdown fragment
+// between protoc-gen-service:errors markers, and this command copies them into
+// the page (-fix) or fails when the page's copy is stale. It then checks that
+// the page lists exactly the reasons the server can return: every ErrorInfo
+// reason found in the Go source under internal/ -- the generated reason
+// constants among them -- and the few that come from libraries (external). A
+// reason the page lacks, or one it lists that nothing returns any more, fails
+// the check.
+//
+//	go run ./tools/errors        # check (just lint)
+//	go run ./tools/errors -fix   # copy the generated tables in (just gen service)
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -24,9 +33,16 @@ const doc = "docs/errors.md"
 // external are reasons a library returns on freebusy's behalf.
 var external = []string{
 	"INVALID_REQUEST_FIELDS", // runtime-go/grpc: a request failing its buf.validate rules
+	"REQUEST_IN_FLIGHT",      // runtime-go/grpc/idempotency: the first call is still running
+	"REQUEST_ABANDONED",      // runtime-go/grpc/idempotency: the first call died unsettled
 }
 
 func main() {
+	fix := flag.Bool("fix", false, "copy the generated reason tables into "+doc)
+	flag.Parse()
+	if err := syncTables(*fix); err != nil {
+		fail(err)
+	}
 	files, err := sources()
 	if err != nil {
 		fail(err)
@@ -74,6 +90,30 @@ func main() {
 		}
 		os.Exit(1)
 	}
+}
+
+// syncTables copies the generated fragments into the page, or with fix
+// false fails when the page's copies differ from them.
+func syncTables(fix bool) error {
+	frags, err := fragments(generated)
+	if err != nil {
+		return err
+	}
+	page, err := os.ReadFile(doc)
+	if err != nil {
+		return err
+	}
+	next, err := splice(string(page), frags)
+	if err != nil {
+		return err
+	}
+	switch {
+	case next == string(page):
+		return nil
+	case fix:
+		return os.WriteFile(doc, []byte(next), 0o644)
+	}
+	return fmt.Errorf("%s's reason tables differ from the generated ones: run go run ./tools/errors -fix", doc)
 }
 
 // sources are the non-test Go files under internal/ that git tracks or would.

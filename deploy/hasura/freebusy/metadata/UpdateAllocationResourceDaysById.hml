@@ -1,0 +1,590 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnAllocationResourceDaysAttributes
+  description: Update the 'attributes' column in the 'allocation_resource_days' collection
+  fields:
+    - name: set
+      type: Json
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnAllocationResourceDaysAttributes
+    inputTypeName: UpdateColumnAllocationResourceDaysAttributesInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_allocation_resource_days_attributes
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnAllocationResourceDaysAttributes
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnAllocationResourceDaysCalendar
+  description: Update the 'calendar' column in the 'allocation_resource_days' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnAllocationResourceDaysCalendar
+    inputTypeName: UpdateColumnAllocationResourceDaysCalendarInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_allocation_resource_days_calendar
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnAllocationResourceDaysCalendar
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnAllocationResourceDaysDay
+  description: Update the 'day' column in the 'allocation_resource_days' collection
+  fields:
+    - name: set
+      type: Date!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnAllocationResourceDaysDay
+    inputTypeName: UpdateColumnAllocationResourceDaysDayInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_allocation_resource_days_day
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnAllocationResourceDaysDay
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnAllocationResourceDaysDisplayName
+  description: Update the 'display_name' column in the 'allocation_resource_days' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnAllocationResourceDaysDisplayName
+    inputTypeName: UpdateColumnAllocationResourceDaysDisplayNameInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_allocation_resource_days_display_name
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnAllocationResourceDaysDisplayName
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnAllocationResourceDaysFree
+  description: Update the 'free' column in the 'allocation_resource_days' collection
+  fields:
+    - name: set
+      type: Json!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnAllocationResourceDaysFree
+    inputTypeName: UpdateColumnAllocationResourceDaysFreeInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_allocation_resource_days_free
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnAllocationResourceDaysFree
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnAllocationResourceDaysFreeFraction
+  description: Update the 'free_fraction' column in the 'allocation_resource_days'
+    collection
+  fields:
+    - name: set
+      type: Float64
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnAllocationResourceDaysFreeFraction
+    inputTypeName: UpdateColumnAllocationResourceDaysFreeFractionInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_allocation_resource_days_free_fraction
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnAllocationResourceDaysFreeFraction
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnAllocationResourceDaysId
+  description: Update the 'id' column in the 'allocation_resource_days' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnAllocationResourceDaysId
+    inputTypeName: UpdateColumnAllocationResourceDaysIdInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_allocation_resource_days_id
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnAllocationResourceDaysId
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnAllocationResourceDaysOrganization
+  description: Update the 'organization' column in the 'allocation_resource_days' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnAllocationResourceDaysOrganization
+    inputTypeName: UpdateColumnAllocationResourceDaysOrganizationInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_allocation_resource_days_organization
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnAllocationResourceDaysOrganization
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnAllocationResourceDaysOrganizationalUnit
+  description: Update the 'organizational_unit' column in the
+    'allocation_resource_days' collection
+  fields:
+    - name: set
+      type: String_1
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnAllocationResourceDaysOrganizationalUnit
+    inputTypeName: UpdateColumnAllocationResourceDaysOrganizationalUnitInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_allocation_resource_days_organizational_unit
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnAllocationResourceDaysOrganizationalUnit
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnAllocationResourceDaysResource
+  description: Update the 'resource' column in the 'allocation_resource_days' collection
+  fields:
+    - name: set
+      type: String_1!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnAllocationResourceDaysResource
+    inputTypeName: UpdateColumnAllocationResourceDaysResourceInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_allocation_resource_days_resource
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnAllocationResourceDaysResource
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnAllocationResourceDaysResourceTypes
+  description: Update the 'resource_types' column in the
+    'allocation_resource_days' collection
+  fields:
+    - name: set
+      type: "[String_1]"
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnAllocationResourceDaysResourceTypes
+    inputTypeName: UpdateColumnAllocationResourceDaysResourceTypesInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_allocation_resource_days_resource_types
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnAllocationResourceDaysResourceTypes
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateColumnAllocationResourceDaysRowVersion
+  description: Update the 'row_version' column in the 'allocation_resource_days' collection
+  fields:
+    - name: set
+      type: Int64!
+      description: Set the column to this value
+  graphql:
+    typeName: UpdateColumnAllocationResourceDaysRowVersion
+    inputTypeName: UpdateColumnAllocationResourceDaysRowVersionInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_column_allocation_resource_days_row_version
+      fieldMapping:
+        set:
+          column:
+            name: _set
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateColumnAllocationResourceDaysRowVersion
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - set
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateAllocationResourceDaysByIdUpdateColumns
+  description: Update the columns of the 'allocation_resource_days' collection
+  fields:
+    - name: attributes
+      type: UpdateColumnAllocationResourceDaysAttributes
+      description: Update the 'attributes' column in the 'allocation_resource_days'
+        collection.
+    - name: calendar
+      type: UpdateColumnAllocationResourceDaysCalendar
+      description: Update the 'calendar' column in the 'allocation_resource_days'
+        collection.
+    - name: day
+      type: UpdateColumnAllocationResourceDaysDay
+      description: Update the 'day' column in the 'allocation_resource_days' collection.
+    - name: displayName
+      type: UpdateColumnAllocationResourceDaysDisplayName
+      description: Update the 'display_name' column in the 'allocation_resource_days'
+        collection.
+    - name: free
+      type: UpdateColumnAllocationResourceDaysFree
+      description: Update the 'free' column in the 'allocation_resource_days' collection.
+    - name: freeFraction
+      type: UpdateColumnAllocationResourceDaysFreeFraction
+      description: Update the 'free_fraction' column in the 'allocation_resource_days'
+        collection.
+    - name: id
+      type: UpdateColumnAllocationResourceDaysId
+      description: Update the 'id' column in the 'allocation_resource_days' collection.
+    - name: organization
+      type: UpdateColumnAllocationResourceDaysOrganization
+      description: Update the 'organization' column in the 'allocation_resource_days'
+        collection.
+    - name: organizationalUnit
+      type: UpdateColumnAllocationResourceDaysOrganizationalUnit
+      description: Update the 'organizational_unit' column in the
+        'allocation_resource_days' collection.
+    - name: resource
+      type: UpdateColumnAllocationResourceDaysResource
+      description: Update the 'resource' column in the 'allocation_resource_days'
+        collection.
+    - name: resourceTypes
+      type: UpdateColumnAllocationResourceDaysResourceTypes
+      description: Update the 'resource_types' column in the
+        'allocation_resource_days' collection.
+    - name: rowVersion
+      type: UpdateColumnAllocationResourceDaysRowVersion
+      description: Update the 'row_version' column in the 'allocation_resource_days'
+        collection.
+  graphql:
+    typeName: UpdateAllocationResourceDaysByIdUpdateColumns
+    inputTypeName: UpdateAllocationResourceDaysByIdUpdateColumnsInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_allocation_resource_days_by_id_update_columns
+      fieldMapping:
+        attributes:
+          column:
+            name: attributes
+        calendar:
+          column:
+            name: calendar
+        day:
+          column:
+            name: day
+        displayName:
+          column:
+            name: display_name
+        free:
+          column:
+            name: free
+        freeFraction:
+          column:
+            name: free_fraction
+        id:
+          column:
+            name: id
+        organization:
+          column:
+            name: organization
+        organizationalUnit:
+          column:
+            name: organizational_unit
+        resource:
+          column:
+            name: resource
+        resourceTypes:
+          column:
+            name: resource_types
+        rowVersion:
+          column:
+            name: row_version
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateAllocationResourceDaysByIdUpdateColumns
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - attributes
+          - calendar
+          - day
+          - displayName
+          - free
+          - freeFraction
+          - id
+          - organization
+          - organizationalUnit
+          - resource
+          - resourceTypes
+          - rowVersion
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: UpdateAllocationResourceDaysByIdResponse
+  description: Responses from the 'update_allocation_resource_days_by_id' procedure
+  fields:
+    - name: affectedRows
+      type: Int32!
+      description: The number of rows affected by the mutation
+    - name: returning
+      type: "[AllocationResourceDays!]!"
+      description: Data from rows affected by the mutation
+  graphql:
+    typeName: UpdateAllocationResourceDaysByIdResponse
+    inputTypeName: UpdateAllocationResourceDaysByIdResponseInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: update_allocation_resource_days_by_id_response
+      fieldMapping:
+        affectedRows:
+          column:
+            name: affected_rows
+        returning:
+          column:
+            name: returning
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: UpdateAllocationResourceDaysByIdResponse
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - affectedRows
+          - returning
+
+---
+kind: Command
+version: v1
+definition:
+  name: UpdateAllocationResourceDaysById
+  outputType: UpdateAllocationResourceDaysByIdResponse!
+  arguments:
+    - name: keyId
+      type: String_1!
+    - name: postCheck
+      type: AllocationResourceDaysBoolExp
+      description: Update permission post-condition predicate over the
+        'allocation_resource_days' collection
+    - name: preCheck
+      type: AllocationResourceDaysBoolExp
+      description: Update permission pre-condition predicate over the
+        'allocation_resource_days' collection
+    - name: updateColumns
+      type: UpdateAllocationResourceDaysByIdUpdateColumns!
+  source:
+    dataConnectorName: freebusy_pgsql
+    dataConnectorCommand:
+      procedure: update_allocation_resource_days_by_id
+    argumentMapping:
+      keyId: key_id
+      postCheck: post_check
+      preCheck: pre_check
+      updateColumns: update_columns
+  graphql:
+    rootFieldName: updateAllocationResourceDaysById
+    rootFieldKind: Mutation
+  description: Update any row on the 'allocation_resource_days' collection using
+    the 'id' key
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: UpdateAllocationResourceDaysById
+  permissions:
+    - role: admin
+      allowExecution: true
+

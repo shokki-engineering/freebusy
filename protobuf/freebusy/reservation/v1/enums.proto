@@ -5,6 +5,8 @@ syntax = "proto3";
 
 package freebusy.reservation.v1;
 
+import "service/v1/annotations.proto";
+
 option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "EnumsProto";
@@ -25,28 +27,28 @@ enum ReservationState {
   // Recorded, and its hold is being converted. Transient: the call that
   // created it, a retry of that call, or the reconciler moves it on to
   // CONFIRMED or FAILED.
-  RESERVATION_STATE_PENDING = 1;
+  RESERVATION_STATE_PENDING = 1 [(service.v1.state_event) = {type: "freebusy.reservation.pending"}];
 
   // The hold was converted: the resources are taken for the window for good.
-  RESERVATION_STATE_CONFIRMED = 2;
+  RESERVATION_STATE_CONFIRMED = 2 [(service.v1.state_event) = {type: "freebusy.reservation.confirmed"}];
 
   // Cancellation is recorded and the resources are being freed. Transient,
   // like PENDING, and finished the same way.
-  RESERVATION_STATE_CANCELLING = 3;
+  RESERVATION_STATE_CANCELLING = 3 [(service.v1.state_event) = {type: "freebusy.reservation.cancelling"}];
 
   // Cancelled; the resources are free again. Terminal.
-  RESERVATION_STATE_CANCELLED = 4;
+  RESERVATION_STATE_CANCELLED = 4 [(service.v1.state_event) = {type: "freebusy.reservation.cancelled"}];
 
   // The hold lapsed or was released before it could be converted, so nothing
   // was taken. Terminal.
-  RESERVATION_STATE_FAILED = 5;
+  RESERVATION_STATE_FAILED = 5 [(service.v1.state_event) = {type: "freebusy.reservation.failed"}];
 
   // Being replaced by the reservation named in `replacement`. Transient: it
   // keeps its resources until the replacement is confirmed, then becomes
   // RESCHEDULED -- or returns to CONFIRMED if the replacement's hold lapsed.
-  RESERVATION_STATE_RESCHEDULING = 6;
+  RESERVATION_STATE_RESCHEDULING = 6 [(service.v1.state_event) = {type: "freebusy.reservation.rescheduling"}];
 
   // Replaced by `replacement`, which now holds the booking; this one's
   // resources are free. Terminal.
-  RESERVATION_STATE_RESCHEDULED = 7;
+  RESERVATION_STATE_RESCHEDULED = 7 [(service.v1.state_event) = {type: "freebusy.reservation.rescheduled"}];
 }

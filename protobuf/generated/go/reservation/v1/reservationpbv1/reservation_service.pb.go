@@ -10,7 +10,8 @@
 package reservationpbv1
 
 import (
-	_ "github.com/the-protobuf-project/grpc-mcp-gateway/mcp/protobuf/mcppb"
+	_ "github.com/the-protobuf-project/mcp/protobuf/mcppb"
+	_ "github.com/the-protobuf-project/service/plugin/pb/servicepbv1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -29,39 +30,43 @@ var File_freebusy_reservation_v1_reservation_service_proto protoreflect.FileDesc
 
 const file_freebusy_reservation_v1_reservation_service_proto_rawDesc = "" +
 	"\n" +
-	"1freebusy/reservation/v1/reservation_service.proto\x12\x17freebusy.reservation.v1\x1a)freebusy/reservation/v1/reservation.proto\x1a2freebusy/reservation/v1/reservation_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1emcp/protobuf/annotations.proto2\x99\x11\n" +
+	"1freebusy/reservation/v1/reservation_service.proto\x12\x17freebusy.reservation.v1\x1a)freebusy/reservation/v1/reservation.proto\x1a2freebusy/reservation/v1/reservation_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x18mcp/v1/annotations.proto\x1a\x1cservice/v1/annotations.proto2\x8d\x18\n" +
 	"\x12ReservationService\x12\xef\x04\n" +
 	"\x11CreateReservation\x121.freebusy.reservation.v1.CreateReservationRequest\x1a$.freebusy.reservation.v1.Reservation\"\x80\x04\xdaA!parent,reservation,reservation_id\xca\xf3\x18\x93\x03\x12\x90\x03Confirm a live hold as a reservation: the booking, and the last step. parent: the hold's site, organizationalUnits/{site}. reservation.hold: the hold's name. Optional: reservation.customer (users/{user}), reservation.attributes (any JSON object kept with it). Safe to retry: a hold backs at most one reservation. Fails with HOLD_NOT_ACTIVE once the hold has expired or been released: take a new hold.\x82\xd3\xe4\x93\x02>:\vreservation\"//v1/{parent=organizationalUnits/*}/reservations\x12\xbe\x01\n" +
 	"\x0eGetReservation\x12..freebusy.reservation.v1.GetReservationRequest\x1a$.freebusy.reservation.v1.Reservation\"V\xdaA\x04name\xca\xf3\x18\x14\x12\x12Get a reservation.\x82\xd3\xe4\x93\x021\x12//v1/{name=organizationalUnits/*/reservations/*}\x12\xef\x02\n" +
-	"\x10ListReservations\x120.freebusy.reservation.v1.ListReservationsRequest\x1a1.freebusy.reservation.v1.ListReservationsResponse\"\xf5\x01\xdaA\x06parent\xca\xf3\x18\xb0\x01\x12\xad\x01List a site's reservations. parent: organizationalUnits/{site}. filter per AIP-160, e.g. state = RESERVATION_STATE_CONFIRMED; order_by per AIP-132; page_size defaults to 50.\x82\xd3\xe4\x93\x021\x12//v1/{parent=organizationalUnits/*}/reservations\x12\xe0\x02\n" +
-	"\x11CancelReservation\x121.freebusy.reservation.v1.CancelReservationRequest\x1a$.freebusy.reservation.v1.Reservation\"\xf1\x01\xdaA\x04name\xca\xf3\x18\xa4\x01\x12\xa1\x01Cancel a confirmed reservation and free its resources. name: organizationalUnits/{site}/reservations/{reservation}. reason is optional and kept as cancel_reason.\x82\xd3\xe4\x93\x02;:\x01*\"6/v1/{name=organizationalUnits/*/reservations/*}:cancel\x12\x8e\x04\n" +
-	"\x15RescheduleReservation\x125.freebusy.reservation.v1.RescheduleReservationRequest\x1a$.freebusy.reservation.v1.Reservation\"\x97\x03\xdaA\tname,hold\xca\xf3\x18\xc1\x02\x12\xbe\x02Move a confirmed reservation to a new time: first call hold_service-create_hold_v1 for the new window at the same site, then call this with hold set to that hold's name. name: organizationalUnits/{site}/reservations/{reservation}. The old slot is freed only once the new one is confirmed, so the booking is never lost.\x82\xd3\xe4\x93\x02?:\x01*\":/v1/{name=organizationalUnits/*/reservations/*}:reschedule\x1aj\xcaA\x1bfreebusy.shokki.engineering\xc2\xf3\x18H\n" +
-	"F\n" +
-	"\fReservations\x12\x051.0.0\x1a/Confirm holds as reservations, and cancel them.B\xa1\x02\n" +
+	"\x10ListReservations\x120.freebusy.reservation.v1.ListReservationsRequest\x1a1.freebusy.reservation.v1.ListReservationsResponse\"\xf5\x01\xdaA\x06parent\xca\xf3\x18\xb0\x01\x12\xad\x01List a site's reservations. parent: organizationalUnits/{site}. filter per AIP-160, e.g. state = RESERVATION_STATE_CONFIRMED; order_by per AIP-132; page_size defaults to 50.\x82\xd3\xe4\x93\x021\x12//v1/{parent=organizationalUnits/*}/reservations\x12\xe8\x05\n" +
+	"\x11UpdateReservation\x121.freebusy.reservation.v1.UpdateReservationRequest\x1a$.freebusy.reservation.v1.Reservation\"\xf9\x04\xdaA\x17reservation,update_mask\xca\xf3\x18\x8a\x04\x12\x87\x04Change who a confirmed reservation is for, or what is kept with it. reservation.name: organizationalUnits/{site}/reservations/{reservation}. update_mask is required, comma-separated: customer (users/{user}, empty to clear), attributes (any JSON object; replaces the old one whole), e.g. \"customer,attributes\". Send reservation.etag, as reservation_service-get_reservation_v1 returned it, to fail instead of overwriting a concurrent change. The time, resources and state cannot change here: reschedule or cancel instead.\x82\xd3\xe4\x93\x02J:\vreservation2;/v1/{reservation.name=organizationalUnits/*/reservations/*}\x12\xe0\x02\n" +
+	"\x11CancelReservation\x121.freebusy.reservation.v1.CancelReservationRequest\x1a$.freebusy.reservation.v1.Reservation\"\xf1\x01\xdaA\x04name\xca\xf3\x18\xa4\x01\x12\xa1\x01Cancel a confirmed reservation and free its resources. name: organizationalUnits/{site}/reservations/{reservation}. reason is optional and kept as cancel_reason.\x82\xd3\xe4\x93\x02;:\x01*\"6/v1/{name=organizationalUnits/*/reservations/*}:cancel\x12\x84\x05\n" +
+	"\x15RescheduleReservation\x125.freebusy.reservation.v1.RescheduleReservationRequest\x1a$.freebusy.reservation.v1.Reservation\"\x8d\x04\xdaA\tname,hold\xca\xf3\x18\xb7\x03\x12\xb4\x03Move a confirmed reservation to a new time: first call hold_service-create_hold_v1 for the new window at the same site, with hold.replaces set to this reservation's hold so a window overlapping the old one can keep the same resources, then call this with hold set to the new hold's name. name: organizationalUnits/{site}/reservations/{reservation}. The old slot is freed only once the new one is confirmed, so the booking is never lost.\x82\xd3\xe4\x93\x02?:\x01*\":/v1/{name=organizationalUnits/*/reservations/*}:reschedule\x1a}\xcaA\x1bfreebusy.shokki.engineering\xc2\xf3\x18U\n" +
+	"S\n" +
+	"\fReservations\x12\x051.0.0\x1a<Confirm holds as reservations, update them, and cancel them.\xc2\xf0\x19\x02\b\x01B\xa1\x02\n" +
 	"\x1bcom.freebusy.reservation.v1B\x17ReservationServiceProtoP\x01Zkgithub.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
 
 var file_freebusy_reservation_v1_reservation_service_proto_goTypes = []any{
 	(*CreateReservationRequest)(nil),     // 0: freebusy.reservation.v1.CreateReservationRequest
 	(*GetReservationRequest)(nil),        // 1: freebusy.reservation.v1.GetReservationRequest
 	(*ListReservationsRequest)(nil),      // 2: freebusy.reservation.v1.ListReservationsRequest
-	(*CancelReservationRequest)(nil),     // 3: freebusy.reservation.v1.CancelReservationRequest
-	(*RescheduleReservationRequest)(nil), // 4: freebusy.reservation.v1.RescheduleReservationRequest
-	(*Reservation)(nil),                  // 5: freebusy.reservation.v1.Reservation
-	(*ListReservationsResponse)(nil),     // 6: freebusy.reservation.v1.ListReservationsResponse
+	(*UpdateReservationRequest)(nil),     // 3: freebusy.reservation.v1.UpdateReservationRequest
+	(*CancelReservationRequest)(nil),     // 4: freebusy.reservation.v1.CancelReservationRequest
+	(*RescheduleReservationRequest)(nil), // 5: freebusy.reservation.v1.RescheduleReservationRequest
+	(*Reservation)(nil),                  // 6: freebusy.reservation.v1.Reservation
+	(*ListReservationsResponse)(nil),     // 7: freebusy.reservation.v1.ListReservationsResponse
 }
 var file_freebusy_reservation_v1_reservation_service_proto_depIdxs = []int32{
 	0, // 0: freebusy.reservation.v1.ReservationService.CreateReservation:input_type -> freebusy.reservation.v1.CreateReservationRequest
 	1, // 1: freebusy.reservation.v1.ReservationService.GetReservation:input_type -> freebusy.reservation.v1.GetReservationRequest
 	2, // 2: freebusy.reservation.v1.ReservationService.ListReservations:input_type -> freebusy.reservation.v1.ListReservationsRequest
-	3, // 3: freebusy.reservation.v1.ReservationService.CancelReservation:input_type -> freebusy.reservation.v1.CancelReservationRequest
-	4, // 4: freebusy.reservation.v1.ReservationService.RescheduleReservation:input_type -> freebusy.reservation.v1.RescheduleReservationRequest
-	5, // 5: freebusy.reservation.v1.ReservationService.CreateReservation:output_type -> freebusy.reservation.v1.Reservation
-	5, // 6: freebusy.reservation.v1.ReservationService.GetReservation:output_type -> freebusy.reservation.v1.Reservation
-	6, // 7: freebusy.reservation.v1.ReservationService.ListReservations:output_type -> freebusy.reservation.v1.ListReservationsResponse
-	5, // 8: freebusy.reservation.v1.ReservationService.CancelReservation:output_type -> freebusy.reservation.v1.Reservation
-	5, // 9: freebusy.reservation.v1.ReservationService.RescheduleReservation:output_type -> freebusy.reservation.v1.Reservation
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
+	3, // 3: freebusy.reservation.v1.ReservationService.UpdateReservation:input_type -> freebusy.reservation.v1.UpdateReservationRequest
+	4, // 4: freebusy.reservation.v1.ReservationService.CancelReservation:input_type -> freebusy.reservation.v1.CancelReservationRequest
+	5, // 5: freebusy.reservation.v1.ReservationService.RescheduleReservation:input_type -> freebusy.reservation.v1.RescheduleReservationRequest
+	6, // 6: freebusy.reservation.v1.ReservationService.CreateReservation:output_type -> freebusy.reservation.v1.Reservation
+	6, // 7: freebusy.reservation.v1.ReservationService.GetReservation:output_type -> freebusy.reservation.v1.Reservation
+	7, // 8: freebusy.reservation.v1.ReservationService.ListReservations:output_type -> freebusy.reservation.v1.ListReservationsResponse
+	6, // 9: freebusy.reservation.v1.ReservationService.UpdateReservation:output_type -> freebusy.reservation.v1.Reservation
+	6, // 10: freebusy.reservation.v1.ReservationService.CancelReservation:output_type -> freebusy.reservation.v1.Reservation
+	6, // 11: freebusy.reservation.v1.ReservationService.RescheduleReservation:output_type -> freebusy.reservation.v1.Reservation
+	6, // [6:12] is the sub-list for method output_type
+	0, // [0:6] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

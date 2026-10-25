@@ -10,11 +10,10 @@ import (
 	"sync"
 	"time"
 
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
+	eventv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	availabilityv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
-	"github.com/shokki-engineering/freebusy/internal/types"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"google.golang.org/genproto/googleapis/type/datetime"
 	"google.golang.org/protobuf/proto"
@@ -94,12 +93,16 @@ func (m *memStore) Events(_ context.Context, calendars []string, _ engine.Span) 
 func (m *memStore) Claims(_ context.Context, resources []string, window engine.Span, now time.Time) (Claims, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	return m.claimsLocked(resources, window, now), nil
+	return m.claimsLocked(resources, window, now, ""), nil
 }
 
-func (m *memStore) claimsLocked(resources []string, window engine.Span, now time.Time) Claims {
+// claimsLocked is Claims, leaving out the claims of hold except.
+func (m *memStore) claimsLocked(resources []string, window engine.Span, now time.Time, except string) Claims {
 	c := Claims{Held: map[string]engine.Spans{}, Converted: map[string]engine.Spans{}}
-	for _, h := range m.holds {
+	for n, h := range m.holds {
+		if except != "" && n == except {
+			continue
+		}
 		w := engine.Span{Start: h.GetWindow().GetStartTime().AsTime(), End: h.GetWindow().GetEndTime().AsTime()}
 		if !w.Overlaps(window) {
 			continue
@@ -128,13 +131,13 @@ func (m *memStore) InsertHold(_ context.Context, _ string, h *allocationpbv1.Hol
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if _, ok := m.holds[h.GetName()]; ok {
-		return nil, types.ErrAlreadyExists
+		return nil, repox.ErrAlreadyExists
 	}
 	w := engine.Span{Start: h.GetWindow().GetStartTime().AsTime(), End: h.GetWindow().GetEndTime().AsTime()}
-	c := m.claimsLocked(h.GetResources(), w, m.clock())
+	c := m.claimsLocked(h.GetResources(), w, m.clock(), h.GetReplaces())
 	for _, r := range h.GetResources() {
 		if c.Held[r].AnyOverlap(w) || c.Converted[r].AnyOverlap(w) {
-			return nil, types.ErrConflict
+			return nil, repox.ErrConflict
 		}
 	}
 	stored := proto.Clone(h).(*allocationpbv1.Hold)
@@ -151,7 +154,7 @@ func (m *memStore) GetHold(_ context.Context, name string) (*allocationpbv1.Hold
 	defer m.mu.Unlock()
 	h, ok := m.holds[name]
 	if !ok {
-		return nil, types.ErrNotFound
+		return nil, repox.ErrNotFound
 	}
 	return proto.Clone(h).(*allocationpbv1.Hold), nil
 }
@@ -165,7 +168,7 @@ func (m *memStore) FindHold(_ context.Context, parent, key string) (*allocationp
 			return proto.Clone(h).(*allocationpbv1.Hold), nil
 		}
 	}
-	return nil, types.ErrNotFound
+	return nil, repox.ErrNotFound
 }
 
 func (m *memStore) ListHolds(_ context.Context, parent string, _ repox.ListInput) ([]*allocationpbv1.Hold, string, error) {
@@ -185,10 +188,10 @@ func (m *memStore) UpdateHold(_ context.Context, name, etag string, state alloca
 	defer m.mu.Unlock()
 	h, ok := m.holds[name]
 	if !ok {
-		return nil, types.ErrNotFound
+		return nil, repox.ErrNotFound
 	}
 	if etag != "" && etag != h.GetEtag() {
-		return nil, types.ErrConflict
+		return nil, repox.ErrConflict
 	}
 	h.State = state
 	h.ExpireTime = nil
@@ -200,15 +203,33 @@ func (m *memStore) UpdateHold(_ context.Context, name, etag string, state alloca
 	return proto.Clone(h).(*allocationpbv1.Hold), nil
 }
 
+// HandOver ends from as of at. Holds here claim their whole window, so to
+// already has it all.
+func (m *memStore) HandOver(_ context.Context, from, etag, _ string, at time.Time) (*allocationpbv1.Hold, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	h, ok := m.holds[from]
+	if !ok {
+		return nil, repox.ErrNotFound
+	}
+	if etag != "" && etag != h.GetEtag() {
+		return nil, repox.ErrConflict
+	}
+	h.ExpireTime = timestamppb.New(at)
+	m.version++
+	h.Etag = strconv.Itoa(m.version)
+	return proto.Clone(h).(*allocationpbv1.Hold), nil
+}
+
 func (m *memStore) DeleteHold(_ context.Context, name, etag string) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	h, ok := m.holds[name]
 	if !ok {
-		return types.ErrNotFound
+		return repox.ErrNotFound
 	}
 	if etag != "" && etag != h.GetEtag() {
-		return types.ErrConflict
+		return repox.ErrConflict
 	}
 	delete(m.holds, name)
 	return nil

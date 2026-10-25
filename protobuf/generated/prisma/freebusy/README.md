@@ -9,7 +9,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 7 | 5 |
+| 8 | 6 |
 
 ## Entity relationships
 
@@ -36,6 +36,9 @@ erDiagram
     Reservation {
         string id PK
         string hold FK
+    }
+    ResourceDay {
+        string id PK
     }
     Webhook {
         string id PK

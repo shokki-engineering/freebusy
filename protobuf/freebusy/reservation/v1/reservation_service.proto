@@ -9,27 +9,34 @@ import "freebusy/reservation/v1/reservation.proto";
 import "freebusy/reservation/v1/reservation_messages.proto";
 import "google/api/annotations.proto";
 import "google/api/client.proto";
-import "mcp/protobuf/annotations.proto";
+import "mcp/v1/annotations.proto";
+import "service/v1/annotations.proto";
 
 option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1";
 option java_multiple_files = true;
 option java_outer_classname = "ReservationServiceProto";
 option java_package = "engineering.shokki.freebusy.reservation.v1";
 
-// ReservationService turns holds into confirmed bookings and cancels them.
+// ReservationService turns holds into confirmed bookings, updates and cancels
+// them.
 //
 // It is where HoldService's conversion is driven from: a hold is never
 // converted by a caller reaching into HoldService, only by a reservation being
-// made of it. There is no UpdateReservation -- the window and resources are the
-// hold's, and changing either is a new hold and a new reservation, which is
-// exactly what RescheduleReservation does.
+// made of it. UpdateReservation changes only what the engine does not own --
+// the customer and the attributes. The window and resources are the hold's,
+// and changing either is a new hold and a new reservation, which is exactly
+// what RescheduleReservation does.
 service ReservationService {
   option (google.api.default_host) = "freebusy.shokki.engineering";
-  option (mcp.service) = {
+  // Hand-written, not generated: every method drives the reservation state
+  // machine and the hold it converts, and its reads are served through the
+  // site's list cache.
+  option (service.v1.service) = {skip: true};
+  option (mcp.v1.service) = {
     app: {
-      name: "Reservations"
+      display_name: "Reservations"
       version: "1.0.0"
-      description: "Confirm holds as reservations, and cancel them."
+      description: "Confirm holds as reservations, update them, and cancel them."
     }
   };
 
@@ -45,7 +52,7 @@ service ReservationService {
       body: "reservation"
     };
     option (google.api.method_signature) = "parent,reservation,reservation_id";
-    option (mcp.tool) = {
+    option (mcp.v1.tool) = {
       description:
         "Confirm a live hold as a reservation: the booking, and the last step. "
         "parent: the hold's site, organizationalUnits/{site}. reservation.hold: "
@@ -60,18 +67,44 @@ service ReservationService {
   rpc GetReservation(GetReservationRequest) returns (Reservation) {
     option (google.api.http) = {get: "/v1/{name=organizationalUnits/*/reservations/*}"};
     option (google.api.method_signature) = "name";
-    option (mcp.tool) = {description: "Get a reservation."};
+    option (mcp.v1.tool) = {description: "Get a reservation."};
   }
 
   // Lists a site's reservations.
   rpc ListReservations(ListReservationsRequest) returns (ListReservationsResponse) {
     option (google.api.http) = {get: "/v1/{parent=organizationalUnits/*}/reservations"};
     option (google.api.method_signature) = "parent";
-    option (mcp.tool) = {
+    option (mcp.v1.tool) = {
       description:
         "List a site's reservations. parent: organizationalUnits/{site}. filter "
         "per AIP-160, e.g. state = RESERVATION_STATE_CONFIRMED; order_by per "
         "AIP-132; page_size defaults to 50."
+    };
+  }
+
+  // Updates a confirmed reservation's customer or attributes, AIP-134.
+  //
+  // update_mask is required and may name only `customer` and `attributes`;
+  // everything else is the engine's, and is changed by CancelReservation or
+  // RescheduleReservation. `reservation.etag`, when set, must match the
+  // stored one (AIP-154). Fails with FAILED_PRECONDITION unless the
+  // reservation is confirmed.
+  rpc UpdateReservation(UpdateReservationRequest) returns (Reservation) {
+    option (google.api.http) = {
+      patch: "/v1/{reservation.name=organizationalUnits/*/reservations/*}"
+      body: "reservation"
+    };
+    option (google.api.method_signature) = "reservation,update_mask";
+    option (mcp.v1.tool) = {
+      description:
+        "Change who a confirmed reservation is for, or what is kept with it. "
+        "reservation.name: organizationalUnits/{site}/reservations/{reservation}. "
+        "update_mask is required, comma-separated: customer (users/{user}, empty "
+        "to clear), attributes (any JSON object; replaces the old one whole), "
+        "e.g. \"customer,attributes\". Send reservation.etag, as "
+        "reservation_service-get_reservation_v1 returned it, to fail instead of "
+        "overwriting a concurrent change. The time, resources and state cannot "
+        "change here: reschedule or cancel instead."
     };
   }
 
@@ -85,7 +118,7 @@ service ReservationService {
       body: "*"
     };
     option (google.api.method_signature) = "name";
-    option (mcp.tool) = {
+    option (mcp.v1.tool) = {
       description:
         "Cancel a confirmed reservation and free its resources. name: "
         "organizationalUnits/{site}/reservations/{reservation}. reason is "
@@ -100,21 +133,25 @@ service ReservationService {
   // ways (`replaces`, `replacement`); the original ends RESCHEDULED. The
   // original keeps its resources until the replacement is confirmed, so a
   // failure part-way -- the new hold lapsing, a crash -- leaves the customer
-  // with their old booking, never with neither. Idempotent: repeating the call
-  // with the same hold returns the same replacement.
+  // with their old booking, never with neither. A new hold taken with
+  // `replaces` naming the original's hold may overlap the original's window on
+  // the same resources -- an extension in place -- and the overlap passes to
+  // the replacement in the same write that frees the original. Idempotent:
+  // repeating the call with the same hold returns the same replacement.
   rpc RescheduleReservation(RescheduleReservationRequest) returns (Reservation) {
     option (google.api.http) = {
       post: "/v1/{name=organizationalUnits/*/reservations/*}:reschedule"
       body: "*"
     };
     option (google.api.method_signature) = "name,hold";
-    option (mcp.tool) = {
+    option (mcp.v1.tool) = {
       description:
         "Move a confirmed reservation to a new time: first call hold_service-create_hold_v1 for the "
-        "new window at the same site, then call this with hold set to that hold's "
-        "name. name: organizationalUnits/{site}/reservations/{reservation}. The "
-        "old slot is freed only once the new one is confirmed, so the booking is "
-        "never lost."
+        "new window at the same site, with hold.replaces set to this reservation's "
+        "hold so a window overlapping the old one can keep the same resources, "
+        "then call this with hold set to the new hold's name. name: "
+        "organizationalUnits/{site}/reservations/{reservation}. The old slot is "
+        "freed only once the new one is confirmed, so the booking is never lost."
     };
   }
 }

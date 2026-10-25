@@ -65,10 +65,10 @@ func TestHasHeader(t *testing.T) {
 
 func TestRules(t *testing.T) {
 	for file, want := range map[string]string{
-		"internal/service/allocation/holds.go":       "AGPL-3.0-or-later",
-		"protobuf/freebusy/webhook/v1/webhook.proto": "Apache-2.0",
-		"protobuf/generated/go/x/v1/xpbv1/x.pb.go":   "Apache-2.0",
-		"hasura/freebusy/metadata/EventResource.hml": "AGPL-3.0-or-later",
+		"internal/service/allocation/holds.go":              "AGPL-3.0-or-later",
+		"protobuf/freebusy/webhook/v1/webhook.proto":        "Apache-2.0",
+		"protobuf/generated/go/x/v1/xpbv1/x.pb.go":          "Apache-2.0",
+		"deploy/hasura/freebusy/metadata/EventResource.hml": "AGPL-3.0-or-later",
 	} {
 		if got := licenseFor(file); got != want {
 			t.Errorf("licenseFor(%s) = %s, want %s", file, got, want)
@@ -82,7 +82,7 @@ func TestRules(t *testing.T) {
 			t.Errorf("%s should be exempt", file)
 		}
 	}
-	if r, ok := ruleFor("hasura/engine/Dockerfile.engine"); !ok || r.style != hashes {
+	if r, ok := ruleFor("deploy/hasura/engine/Dockerfile.engine"); !ok || r.style != hashes {
 		t.Error("a Dockerfile takes # comments")
 	}
 	if _, ok := ruleFor("something.unknownext"); ok {

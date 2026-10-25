@@ -10,6 +10,7 @@ go_library(
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/database/hasura/freebusyql/allocationql/holdsql",
+        "//internal/database/hasura/freebusyql/allocationql/resourcedaysql",
         "//internal/database/hasura/freebusyql/allocationql/resourceql",
         "@com_github_the_protobuf_project_runtime_go_network//runtime",
     ],

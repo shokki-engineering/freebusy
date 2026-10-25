@@ -34,7 +34,7 @@ prek *args:
 
 # Application (server) — run, build, test, and exercise the gRPC API.
 # Database settings (provider + connection) come from config: the embedded
-# config/freebusy.release.toml defaults, overlaid by config/freebusy.dev.toml
+# internal/config/freebusy.release.toml defaults, overlaid by internal/config/freebusy.dev.toml
 # for local development. Switch backends by editing [database].provider there.
 
 # Ports come from config too. Any key can be overridden from the environment,
@@ -105,7 +105,7 @@ test:
     go test -race -count=1 ./...
 
 # Needs a running Postgres, Hasura DDN engine and Redis (`just migrate`, then
-# `ddn run docker-start` in hasura/; Redis serves the list cache's suite). A
+# `ddn run docker-start` in deploy/hasura/; Redis serves the list cache's suite). A
 # suite that cannot reach its backend fails rather than skips. One package at a time (-p 1): the suites share the
 # database, and the binary suite runs a whole server -- reconciler, sweeper,
 # webhook delivery -- that would act on another package's rows.
@@ -135,7 +135,7 @@ bazel-check:
 # The image -- the static binary and nothing else -- loaded into Docker as freebusy:latest.
 [group('bazel')]
 image:
-    bazel run //image:load
+    bazel run //deploy/image:load
 
 # Run the image against the local Postgres (`just migrate` first), configured
 # only by environment variables, with a read-only filesystem.

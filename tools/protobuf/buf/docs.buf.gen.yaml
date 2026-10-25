@@ -1,0 +1,22 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# protoc-gen-openapi-solo in mode=markdown: the API reference, one README.md
+# per package beside its protos (protobuf/freebusy/<package>/README.md) and the
+# index at protobuf/README.md, with the Mermaid ER, sequence and state
+# diagrams drawn from the protos and the flow files under docs/flows. Titles,
+# footer and the license header come from docs/flows/docs.yaml. `just gen
+# docs`. strategy: all, so the index sees every package and a flow's calls
+# resolve across packages; generation fails on a flow that names something the
+# protos no longer have.
+version: v2
+inputs:
+  - directory: protobuf
+plugins:
+  - local: protoc-gen-openapi-solo
+    out: protobuf
+    strategy: all
+    opt:
+      - mode=markdown
+      - readme_strip_version=true
+      - flows=docs/flows

@@ -11,12 +11,12 @@ import (
 	"testing"
 	"time"
 
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
+	eventv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	availabilityv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
+	resourcev1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/shokki-engineering/freebusy/internal/rfc"
-	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
+	"github.com/shokki-engineering/freebusy/internal/service/generated/freebusy/allocation/v1/allocationpbv1svc"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/genproto/googleapis/type/dayofweek"
@@ -182,7 +182,7 @@ func TestCreateHoldAllocatesAndExhausts(t *testing.T) {
 	_, err = f.srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
 		Parent: club, Hold: &allocationpbv1.Hold{Window: win(19, 20), Quantity: 2},
 	})
-	if c, r := reasonOf(t, err); c != codes.FailedPrecondition || r != rpc.ReasonCapacityExhausted {
+	if c, r := reasonOf(t, err); c != codes.FailedPrecondition || r != allocationpbv1svc.ReasonCapacityExhausted {
 		t.Fatalf("second hold: %v %q", c, r)
 	}
 }

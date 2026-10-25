@@ -1,0 +1,210 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+#
+# yaml-language-server: $schema=https://raw.githubusercontent.com/the-protobuf-project/protoc-gen-openapi-solo/main/schema/flows.schema.json
+#
+# Flows and state transitions of freebusy.reservation.v1, rendered by protoc-gen-openapi
+# (flows=<dir>). Re-run mode=scaffold after changing the protos: it adds what
+# is new and marks what is gone with STALE, and keeps everything you wrote.
+
+package: freebusy.reservation.v1
+
+markdown:
+  title: Reservation API
+
+services:
+  ReservationService:
+    methods:
+      CreateReservation:
+        request: CreateReservationRequest
+        response: Reservation
+        http: POST /v1/{parent=organizationalUnits/*}/reservations
+      GetReservation:
+        request: GetReservationRequest
+        response: Reservation
+        http: GET /v1/{name=organizationalUnits/*/reservations/*}
+      ListReservations:
+        request: ListReservationsRequest
+        response: ListReservationsResponse
+        http: GET /v1/{parent=organizationalUnits/*}/reservations
+      UpdateReservation:
+        request: UpdateReservationRequest
+        response: Reservation
+        http: PATCH /v1/{reservation.name=organizationalUnits/*/reservations/*}
+      CancelReservation:
+        request: CancelReservationRequest
+        response: Reservation
+        http: POST /v1/{name=organizationalUnits/*/reservations/*}:cancel
+      RescheduleReservation:
+        request: RescheduleReservationRequest
+        response: Reservation
+        http: POST /v1/{name=organizationalUnits/*/reservations/*}:reschedule
+    events:
+      - freebusy.reservation.confirmed
+      - freebusy.reservation.updated
+      - freebusy.reservation.cancelled
+      - freebusy.reservation.rescheduled
+      - freebusy.reservation.pending
+      - freebusy.reservation.cancelling
+      - freebusy.reservation.failed
+      - freebusy.reservation.rescheduling
+    errors:
+      - reason: HOLD_NOT_FOUND
+        code: INVALID_ARGUMENT
+        description: The reservation's `hold` does not exist, or `CreateHold`'s `hold.replaces` names one that does not.
+      - reason: HOLD_AT_ANOTHER_SITE
+        code: INVALID_ARGUMENT
+        description: The hold is at a different site from the reservation's parent, or `CreateHold`'s `hold.replaces` is a hold at another site.
+      - reason: HOLD_LAPSED
+        code: FAILED_PRECONDITION
+        description: The hold lapsed before the reservation was confirmed; the reservation failed.
+      - reason: RESERVATION_ID_TAKEN
+        code: ALREADY_EXISTS
+        description: '`reservation_id` names a reservation made from another hold.'
+      - reason: RESERVATION_FAILED
+        code: FAILED_PRECONDITION
+        description: '`CancelReservation` on a reservation that failed; it holds nothing.'
+      - reason: RESERVATION_MOVED
+        code: FAILED_PRECONDITION
+        description: The reservation was rescheduled; its replacement holds the booking.
+      - reason: RESERVATION_NOT_CONFIRMED
+        code: FAILED_PRECONDITION
+        description: Only a confirmed reservation can be rescheduled or updated; this one is cancelled, cancelling or failed.
+      - reason: RESCHEDULE_IN_PROGRESS
+        code: FAILED_PRECONDITION
+        description: The reservation is being moved, so it cannot be moved elsewhere or updated.
+      - reason: SAME_HOLD
+        code: INVALID_ARGUMENT
+        description: Rescheduling onto the hold the reservation was made from changes nothing.
+      - reason: REPLACEMENT_FAILED
+        code: FAILED_PRECONDITION
+        description: The new slot could not be booked; the reservation keeps its original one.
+      - reason: HOLD_FOR_RESCHEDULE
+        code: FAILED_PRECONDITION
+        description: The hold was taken to replace a booking (`hold.replaces`), so it can only be used to reschedule the reservation made from that hold.
+
+# Lifecycle enums: for each value, how it is reached. A value takes one
+# transition or a list of them: {from: [values], rpc: Service.Method or event:
+# cause, condition: guard}. Empty from with a trigger is an entry from the
+# initial state; a value left as {from: []} is not drawn.
+states:
+  ReservationState:
+    # Recorded, and its hold is being converted. Transient: the call that
+    # created it, a retry of that call, or the reconciler moves it on to
+    # CONFIRMED or FAILED.
+    RESERVATION_STATE_PENDING:
+      from: []
+      rpc: ReservationService.CreateReservation
+    # The hold was converted: the resources are taken for the window for good.
+    RESERVATION_STATE_CONFIRMED:
+      - from: [PENDING]
+        event: hold converted
+      - from: [RESCHEDULING]
+        event: reconciler
+        condition: replacement's hold lapsed
+    # Cancellation is recorded and the resources are being freed. Transient,
+    # like PENDING, and finished the same way.
+    RESERVATION_STATE_CANCELLING:
+      from: [CONFIRMED]
+      rpc: ReservationService.CancelReservation
+    # Cancelled; the resources are free again. Terminal.
+    RESERVATION_STATE_CANCELLED:
+      from: [CANCELLING]
+      event: resources freed
+    # The hold lapsed or was released before it could be converted, so nothing
+    # was taken. Terminal.
+    RESERVATION_STATE_FAILED:
+      from: [PENDING]
+      event: reconciler
+      condition: hold lapsed or released
+    # Being replaced by the reservation named in `replacement`. Transient: it
+    # keeps its resources until the replacement is confirmed, then becomes
+    # RESCHEDULED -- or returns to CONFIRMED if the replacement's hold lapsed.
+    RESERVATION_STATE_RESCHEDULING:
+      from: [CONFIRMED]
+      rpc: ReservationService.RescheduleReservation
+    # Replaced by `replacement`, which now holds the booking; this one's
+    # resources are free. Terminal.
+    RESERVATION_STATE_RESCHEDULED:
+      from: [RESCHEDULING]
+      event: replacement confirmed
+
+flows:
+  - id: book
+    title: Book a resource
+    description: |-
+      Search, check, hold, then confirm. Only the hold secures capacity: search
+      and check are advisory and can be stale the instant they answer.
+    actors: [Client, AllocationService, HoldService, ReservationService, Webhooks]
+    steps:
+      - call: freebusy.allocation.v1.AllocationService.SearchAvailability
+      - call: freebusy.allocation.v1.AllocationService.CheckAvailability
+        note: advisory only
+      - note: CreateHold is idempotent on hold_id / idempotency_key, so a retry is safe
+        alternatives:
+          - when: enough capacity
+            steps:
+              - call: freebusy.allocation.v1.HoldService.CreateHold
+                returns: Hold (ACTIVE)
+              - alternatives:
+                  - when: hold still ACTIVE
+                    steps:
+                      - call: freebusy.reservation.v1.ReservationService.CreateReservation
+                        returns: Reservation (CONFIRMED)
+                        note: the hold becomes CONVERTED
+                      - actor: ReservationService
+                        emits: freebusy.reservation.confirmed
+                        to: Webhooks
+                  - when: hold expired or released
+                    steps:
+                      - call: freebusy.reservation.v1.ReservationService.CreateReservation
+                        error: FAILED_PRECONDITION (HOLD_NOT_ACTIVE)
+          - when: capacity taken
+            steps:
+              - call: freebusy.allocation.v1.HoldService.CreateHold
+                error: FAILED_PRECONDITION (CAPACITY_EXHAUSTED)
+
+  - id: reschedule
+    title: Reschedule a reservation
+    service: ReservationService
+    description: |-
+      Moves a booking onto a new hold. The original keeps its resources until
+      the replacement is confirmed, so a failure part-way leaves the old
+      booking in place.
+    steps:
+      - call: ReservationService.GetReservation
+        returns: Reservation (CONFIRMED)
+      - call: freebusy.allocation.v1.HoldService.CreateHold
+        note: hold.replaces = the reservation's hold
+        returns: Hold (ACTIVE)
+      - note: the original goes RESCHEDULING and keeps its resources meanwhile
+        alternatives:
+          - when: new hold still active
+            steps:
+              - call: ReservationService.RescheduleReservation
+                returns: replacement Reservation (CONFIRMED)
+                note: original becomes RESCHEDULED
+              - actor: ReservationService
+                emits: freebusy.reservation.rescheduled
+                to: Webhooks
+          - when: new hold lapsed
+            steps:
+              - call: ReservationService.RescheduleReservation
+                error: FAILED_PRECONDITION (HOLD_NOT_ACTIVE)
+                note: original back to CONFIRMED
+
+  - id: cancel
+    title: Cancel a reservation
+    service: ReservationService
+    description: Cancelling frees the resources; repeating it changes nothing.
+    steps:
+      - call: ReservationService.CancelReservation
+        note: CONFIRMED -> CANCELLING -> CANCELLED
+        returns: Reservation (CANCELLED)
+      - actor: ReservationService
+        emits: freebusy.reservation.cancelled
+        to: Webhooks
+      - call: ReservationService.CancelReservation
+        note: idempotent; no second event
+        returns: Reservation (CANCELLED)

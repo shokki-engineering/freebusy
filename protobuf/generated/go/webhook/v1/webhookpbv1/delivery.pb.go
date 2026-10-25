@@ -10,6 +10,7 @@
 package webhookpbv1
 
 import (
+	_ "github.com/the-protobuf-project/service/plugin/pb/servicepbv1"
 	_ "github.com/the-protobuf-project/store/plugin/entity/pb/entitypbv1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -279,7 +280,7 @@ var File_freebusy_webhook_v1_delivery_proto protoreflect.FileDescriptor
 
 const file_freebusy_webhook_v1_delivery_proto_rawDesc = "" +
 	"\n" +
-	"\"freebusy/webhook/v1/delivery.proto\x12\x13freebusy.webhook.v1\x1a\x1bentity/v1/annotations.proto\x1a\x1ffreebusy/webhook/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xa2\x06\n" +
+	"\"freebusy/webhook/v1/delivery.proto\x12\x13freebusy.webhook.v1\x1a\x1bentity/v1/annotations.proto\x1a\x1ffreebusy/webhook/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cservice/v1/annotations.proto\"\xa8\x06\n" +
 	"\bDelivery\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x1f\n" +
 	"\bevent_id\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\aeventId\x12#\n" +
@@ -298,20 +299,21 @@ const file_freebusy_webhook_v1_delivery_proto_rawDesc = "" +
 	"\vupdate_time\x18\f \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"updateTime\x12C\n" +
 	"\fdeliver_time\x18\r \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\vdeliverTime\x12\x18\n" +
-	"\x04etag\x18\x0e \x01(\tB\x04\xe2A\x01\x03R\x04etag:\x81\x01\xeaA^\n" +
+	"\x04etag\x18\x0e \x01(\tB\x04\xe2A\x01\x03R\x04etag:\x87\x01\xeaA^\n" +
 	"\x1cfreebusy.webhook.v1/Delivery\x12(webhooks/{webhook}/deliveries/{delivery}*\n" +
 	"deliveries2\bdelivery\xca\xf3\x18\x1c*\x1a\n" +
 	"\x05state\n" +
-	"\x11next_attempt_time\"\xa7\x02\n" +
+	"\x11next_attempt_time\xf2\xf0\x19\x02\b\x02\"\xc8\x02\n" +
 	"\n" +
 	"FeedCursor\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12E\n" +
 	"\rposition_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x02R\fpositionTime\x12A\n" +
 	"\vupdate_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"updateTime\x12\x18\n" +
-	"\x04etag\x18\x04 \x01(\tB\x04\xe2A\x01\x03R\x04etag:[\xeaAT\n" +
+	"\x04etag\x18\x04 \x01(\tB\x04\xe2A\x01\x03R\x04etag:|\xeaAT\n" +
 	"\x1efreebusy.webhook.v1/FeedCursor\x12\x19feedCursors/{feed_cursor}*\vfeedCursors2\n" +
-	"feedCursor\xca\xf3\x18\x00B\xf7\x01\n" +
+	"feedCursor\xca\xf3\x18\x00\xf2\xf0\x19\x1d\b\x03\x12\x19\n" +
+	"\bposition\x12\rposition_timeB\xf7\x01\n" +
 	"\x17com.freebusy.webhook.v1B\rDeliveryProtoP\x01Z_github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1\xa2\x02\x03FWX\xaa\x02\x13Freebusy.Webhook.V1\xca\x02\x13Freebusy\\Webhook\\V1\xe2\x02\x1fFreebusy\\Webhook\\V1\\GPBMetadata\xea\x02\x15Freebusy::Webhook::V1b\x06proto3"
 
 var (

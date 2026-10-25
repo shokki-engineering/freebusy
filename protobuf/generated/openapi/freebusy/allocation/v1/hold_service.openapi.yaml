@@ -332,6 +332,8 @@ components:
                     description: |-
                         The window held. Immutable: moving it is a different allocation, so
                          release this hold and take another.
+
+                         Stored as text, its two ends in RFC 3339 joined by "/".
                 candidateResources:
                     type: array
                     items:
@@ -379,6 +381,28 @@ components:
                     readOnly: true
                     type: string
                     description: Opaque version for optimistic concurrency (AIP-154); echo on update/delete.
+                replaces:
+                    type: string
+                    description: |-
+                        The hold of the reservation this hold is taken to replace with
+                         RescheduleReservation: that reservation's `hold`, converted and at the
+                         same site. Its claims do not count against this hold, so a new window
+                         overlapping the old one -- an extension, a shift by an hour -- can keep
+                         the same resources. Until the move completes this hold claims only the
+                         time the old one does not; RescheduleReservation hands the rest over in
+                         the write that ends the old hold, so no one else can take it in between.
+                         Such a hold can only be used to reschedule that reservation. (A hold,
+                         though no resource_reference says so: AIP-121 allows no cycle of mutable
+                         references, and this one is a hold naming a hold.)
+                         Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                candidateFilter:
+                    type: string
+                    description: |-
+                        An AIP-160 filter narrowing the resources the allocator may choose from,
+                         supplied on create, alongside `candidate_resources`: the same filter
+                         SearchAvailability takes, over each resource's `resource_types`,
+                         `attributes` (its STRUCTURED-DATA, e.g. `attributes.view = "river"`) and
+                         `display_name`. Empty narrows nothing. Immutable, like the candidates.
             description: |-
                 A Hold is a temporary, expiring claim on one or more bookable resources for a
                  window, taken before payment or confirmation so two callers cannot be sold

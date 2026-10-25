@@ -11,6 +11,7 @@ import "freebusy/webhook/v1/enums.proto";
 import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/protobuf/timestamp.proto";
+import "service/v1/annotations.proto";
 import "store/v1/annotations.proto";
 
 option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1";
@@ -38,6 +39,15 @@ message Webhook {
     pattern: "webhooks/{webhook}"
     singular: "webhook"
     plural: "webhooks"
+  };
+  // The record runtime-go's events dispatcher reads a subscription from; its
+  // scope is the site it is limited to.
+  option (service.v1.adapter) = {
+    role: ROLE_WEBHOOK
+    fields: {
+      key: "scope"
+      value: "organizational_unit"
+    }
   };
 
   // The webhook name.
@@ -67,8 +77,11 @@ message Webhook {
   // "freebusy.event.deleted". Empty sends every type. A type is
   // "freebusy.<record>.<what happened>": holds are active, released, expired
   // and converted; reservations pending, confirmed, cancelling, cancelled,
-  // failed, rescheduling and rescheduled; resources, calendars, events and
-  // availabilities created, updated and deleted.
+  // failed, rescheduling and rescheduled, and updated exactly when
+  // UpdateReservation changed its customer or attributes -- the reservation's
+  // last_change is CHANGE_DETAILS (freebusy.reservation.updated);
+  // resources, calendars, events and availabilities created, updated and
+  // deleted.
   repeated string event_types = 4 [
     (google.api.field_behavior) = OPTIONAL,
     (buf.validate.field).repeated.items.string.pattern = "^freebusy\\.[a-z]+\\.[a-z]+$"

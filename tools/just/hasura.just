@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Hasura DDN metadata regeneration. Invoked as `just hasura <recipe>`.
-# Recipes run from the repo root so hasura/ + buf template paths resolve unchanged.
+# Recipes run from the repo root so deploy/hasura/ + buf template paths resolve unchanged.
 set working-directory := '../..'
 
 # Connector link name + endpoint to poll/verify. Override via env or CLI.
@@ -49,7 +49,7 @@ regen domain="":
     GRAPHQL_URL="{{ graphql_url }}"
     DOMAIN="{{ domain }}"
     REPO_ROOT="$(pwd)"
-    HASURA_DIR="${REPO_ROOT}/hasura"
+    HASURA_DIR="${REPO_ROOT}/deploy/hasura"
     META_DIR="${HASURA_DIR}/freebusy/metadata"
 
     log() { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
@@ -78,7 +78,7 @@ regen domain="":
     #    additive changes). With no arg: a full clean regen of every generated model,
     #    command, and the <connector>-types.hml (required for breaking changes that
     #    span domains, like a shared scalar type change). Everything here is
-    #    regenerated below and is git-tracked, so `git checkout hasura/` reverts it.
+    #    regenerated below and is git-tracked, so `git checkout deploy/hasura/` reverts it.
     LINK_FILE="${CONNECTOR}.hml"
     if [[ -n "$DOMAIN" ]]; then
       cap="$(tr '[:lower:]' '[:upper:]' <<<"${DOMAIN:0:1}")${DOMAIN:1}"

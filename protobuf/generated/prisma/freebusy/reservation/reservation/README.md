@@ -9,7 +9,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 1 | 0 |
+| 1 | 1 |
 
 ## Entity relationships
 
@@ -36,7 +36,7 @@ A Reservation is a confirmed booking: a hold made permanent. It is the last step
 | --- | --- | --- |
 | `id` | `CHAR(26)` | not null |
 | `name` | `VARCHAR(255)` | not null |
-| `hold` | `CHAR(26)` | not null |
+| `hold` | `VARCHAR(255)` | not null |
 | `start_time` | `TIMESTAMPTZ` | nullable |
 | `end_time` | `TIMESTAMPTZ` | nullable |
 | `customer` | `VARCHAR(255)` | nullable |
@@ -50,5 +50,10 @@ A Reservation is a confirmed booking: a hold made permanent. It is the last step
 | `etag` | `VARCHAR(255)` | nullable |
 | `replaces` | `VARCHAR(255)` | nullable |
 | `replacement` | `VARCHAR(255)` | nullable |
+| `last_change` | `Change` | nullable |
 | `organizational_unit_id` | `CHAR(26)` | not null |
 | `resources` | `VARCHAR(255)[]` | nullable |
+
+### Enums
+
+- `Change`: STATE, DETAILS

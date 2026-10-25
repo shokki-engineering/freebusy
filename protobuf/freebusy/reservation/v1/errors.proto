@@ -1,0 +1,117 @@
+// Copyright 2026 Srikanth K.
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package freebusy.reservation.v1;
+
+import "service/v1/annotations.proto";
+
+option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1";
+option java_multiple_files = true;
+option java_outer_classname = "ErrorsProto";
+option java_package = "engineering.shokki.freebusy.reservation.v1";
+
+// The reasons freebusy returns for reservations: the google.rpc.ErrorInfo
+// reasons (AIP-193) in the freebusy.dev domain. They are part of the API:
+// clients branch on them, never on a message. protoc-gen-service renders them as
+// Go constants, sentinels and the tables of docs/errors.md.
+enum ErrorReason {
+  option (service.v1.error_domain) = {domain: "freebusy.dev"};
+
+  // Unset; never returned.
+  ERROR_REASON_UNSPECIFIED = 0;
+
+  // The reservation's hold does not exist, or CreateHold's hold.replaces names
+  // one that does not.
+  ERROR_REASON_HOLD_NOT_FOUND = 1 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "The reservation's `hold` does not exist, or `CreateHold`'s `hold.replaces` names one that does not."
+    fix: "Take a hold first with `CreateHold`; for `replaces`, send the reservation's `hold`."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // The hold is at a different site from the reservation's parent, or
+  // CreateHold's hold.replaces is a hold at another site.
+  ERROR_REASON_HOLD_AT_ANOTHER_SITE = 2 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "The hold is at a different site from the reservation's parent, or `CreateHold`'s `hold.replaces` is a hold at another site."
+    fix: "Send the hold's own site as `parent`; a hold replaces only a booking at its own site."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // The hold lapsed before the reservation was confirmed; the reservation
+  // failed.
+  ERROR_REASON_HOLD_LAPSED = 3 [(service.v1.error_reason) = {
+    code: "FAILED_PRECONDITION"
+    description: "The hold lapsed before the reservation was confirmed; the reservation failed."
+    fix: "Take a new hold and create the reservation again; hold longer, or `ExtendHold`."
+    detail: DETAIL_KIND_PRECONDITION_FAILURE
+  }];
+
+  // reservation_id names a reservation made from another hold.
+  ERROR_REASON_RESERVATION_ID_TAKEN = 4 [(service.v1.error_reason) = {
+    code: "ALREADY_EXISTS"
+    description: "`reservation_id` names a reservation made from another hold."
+    fix: "Choose another id, or leave it empty."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // CancelReservation on a reservation that failed; it holds nothing.
+  ERROR_REASON_RESERVATION_FAILED = 5 [(service.v1.error_reason) = {
+    code: "FAILED_PRECONDITION"
+    description: "`CancelReservation` on a reservation that failed; it holds nothing."
+    fix: "Nothing to do."
+    detail: DETAIL_KIND_PRECONDITION_FAILURE
+  }];
+
+  // The reservation was rescheduled; its replacement holds the booking.
+  ERROR_REASON_RESERVATION_MOVED = 6 [(service.v1.error_reason) = {
+    code: "FAILED_PRECONDITION"
+    description: "The reservation was rescheduled; its replacement holds the booking."
+    fix: "Act on the replacement the message names."
+    detail: DETAIL_KIND_PRECONDITION_FAILURE
+  }];
+
+  // Only a confirmed reservation can be rescheduled or updated; this one is
+  // cancelled, cancelling or failed.
+  ERROR_REASON_RESERVATION_NOT_CONFIRMED = 7 [(service.v1.error_reason) = {
+    code: "FAILED_PRECONDITION"
+    description: "Only a confirmed reservation can be rescheduled or updated; this one is cancelled, cancelling or failed."
+    fix: "Create a new reservation from a new hold."
+    detail: DETAIL_KIND_PRECONDITION_FAILURE
+  }];
+
+  // The reservation is being moved, so it cannot be moved elsewhere or updated.
+  ERROR_REASON_RESCHEDULE_IN_PROGRESS = 8 [(service.v1.error_reason) = {
+    code: "FAILED_PRECONDITION"
+    description: "The reservation is being moved, so it cannot be moved elsewhere or updated."
+    fix: "Wait for that move; `GetReservation` shows its state."
+    detail: DETAIL_KIND_PRECONDITION_FAILURE
+  }];
+
+  // Rescheduling onto the hold the reservation was made from changes nothing.
+  ERROR_REASON_SAME_HOLD = 9 [(service.v1.error_reason) = {
+    code: "INVALID_ARGUMENT"
+    description: "Rescheduling onto the hold the reservation was made from changes nothing."
+    fix: "Take a hold for the new window and reschedule onto it."
+    detail: DETAIL_KIND_BAD_REQUEST
+  }];
+
+  // The new slot could not be booked; the reservation keeps its original one.
+  ERROR_REASON_REPLACEMENT_FAILED = 10 [(service.v1.error_reason) = {
+    code: "FAILED_PRECONDITION"
+    description: "The new slot could not be booked; the reservation keeps its original one."
+    fix: "Take a fresh hold and reschedule again."
+    detail: DETAIL_KIND_PRECONDITION_FAILURE
+  }];
+
+  // The hold was taken to replace a booking (hold.replaces), so it can only be
+  // used to reschedule the reservation made from that hold.
+  ERROR_REASON_HOLD_FOR_RESCHEDULE = 11 [(service.v1.error_reason) = {
+    code: "FAILED_PRECONDITION"
+    description: "The hold was taken to replace a booking (`hold.replaces`), so it can only be used to reschedule the reservation made from that hold."
+    fix: "`RescheduleReservation` that reservation onto it, or take a hold without `replaces`."
+    detail: DETAIL_KIND_PRECONDITION_FAILURE
+  }];
+}

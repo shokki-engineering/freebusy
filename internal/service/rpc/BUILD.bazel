@@ -1,0 +1,36 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "rpc",
+    srcs = [
+        "page.go",
+        "rpc.go",
+    ],
+    importpath = "github.com/shokki-engineering/freebusy/internal/service/rpc",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/service/generated/freebusy/allocation/v1/allocationpbv1svc",
+        "//internal/service/generated/freebusy/reservation/v1/reservationpbv1svc",
+        "//internal/service/generated/freebusy/shared/v1/sharedpbv1svc",
+        "//internal/service/generated/freebusy/webhook/v1/webhookpbv1svc",
+        "//internal/service/generated/servicex",
+        "//internal/telemetry",
+        "@com_github_the_protobuf_project_runtime_go_grpc//:grpc",
+    ],
+)
+
+go_test(
+    name = "rpc_test",
+    srcs = ["rpc_test.go"],
+    embed = [":rpc"],
+    deps = [
+        "//internal/database/repository/repox",
+        "//internal/service/generated/servicex",
+        "@org_golang_google_genproto_googleapis_rpc//errdetails",
+        "@org_golang_google_grpc//codes",
+        "@org_golang_google_grpc//status",
+    ],
+)

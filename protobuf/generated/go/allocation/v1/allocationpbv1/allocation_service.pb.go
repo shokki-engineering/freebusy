@@ -10,7 +10,7 @@
 package allocationpbv1
 
 import (
-	_ "github.com/the-protobuf-project/grpc-mcp-gateway/mcp/protobuf/mcppb"
+	_ "github.com/the-protobuf-project/mcp/protobuf/mcppb"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -29,7 +29,7 @@ var File_freebusy_allocation_v1_allocation_service_proto protoreflect.FileDescri
 
 const file_freebusy_allocation_v1_allocation_service_proto_rawDesc = "" +
 	"\n" +
-	"/freebusy/allocation/v1/allocation_service.proto\x12\x16freebusy.allocation.v1\x1a0freebusy/allocation/v1/allocation_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1emcp/protobuf/annotations.proto2\xa5\x0f\n" +
+	"/freebusy/allocation/v1/allocation_service.proto\x12\x16freebusy.allocation.v1\x1a0freebusy/allocation/v1/allocation_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x18mcp/v1/annotations.proto2\xa5\x0f\n" +
 	"\x11AllocationService\x12\xd4\x03\n" +
 	"\x13ComputeAvailability\x122.freebusy.allocation.v1.ComputeAvailabilityRequest\x1a3.freebusy.allocation.v1.ComputeAvailabilityResponse\"\xd3\x02\xdaA\rparent,window\xca\xf3\x18\xfd\x01\x12\xfa\x01How many resources are free at one site over a window, in buckets of slot_duration or by day: for showing a schedule. parent: organizationalUnits/{site}. window: start_time and end_time, RFC 3339. Read-only; to book, call hold_service-create_hold_v1.\x82\xd3\xe4\x93\x02;:\x01*\"6/v1/{parent=organizationalUnits/*}:computeAvailability\x12\x98\x04\n" +
 	"\x11CheckAvailability\x120.freebusy.allocation.v1.CheckAvailabilityRequest\x1a1.freebusy.allocation.v1.CheckAvailabilityResponse\"\x9d\x03\xdaA\rparent,window\xca\xf3\x18\xc9\x02\x12\xc6\x02Whether one exact window can be booked at a site now, and if not, each resource's reason (outside opening hours, held, booked, too short or too long). parent: organizationalUnits/{site}. window: start_time and end_time, RFC 3339. quantity defaults to 1. Read-only: it claims nothing; call hold_service-create_hold_v1 to claim.\x82\xd3\xe4\x93\x029:\x01*\"4/v1/{parent=organizationalUnits/*}:checkAvailability\x12\xb4\x01\n" +

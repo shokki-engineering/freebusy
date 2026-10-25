@@ -11,6 +11,7 @@ package allocationpbv1
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	_ "github.com/the-protobuf-project/service/plugin/pb/servicepbv1"
 	_ "github.com/the-protobuf-project/store/plugin/entity/pb/entitypbv1"
 	_ "github.com/the-protobuf-project/store/plugin/pb/storepbv1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
@@ -58,6 +59,8 @@ type Hold struct {
 	Resources []string `protobuf:"bytes,2,rep,name=resources,proto3" json:"resources,omitempty"`
 	// The window held. Immutable: moving it is a different allocation, so
 	// release this hold and take another.
+	//
+	// Stored as text, its two ends in RFC 3339 joined by "/".
 	Window *interval.Interval `protobuf:"bytes,3,opt,name=window,proto3" json:"window,omitempty"`
 	// Candidate resources the allocator may choose from, supplied on create.
 	// Empty offers every resource the site holds. Immutable: the choice is made
@@ -81,9 +84,27 @@ type Hold struct {
 	// Last-modification timestamp.
 	UpdateTime *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`
 	// Opaque version for optimistic concurrency (AIP-154); echo on update/delete.
-	Etag          string `protobuf:"bytes,11,opt,name=etag,proto3" json:"etag,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Etag string `protobuf:"bytes,11,opt,name=etag,proto3" json:"etag,omitempty"`
+	// The hold of the reservation this hold is taken to replace with
+	// RescheduleReservation: that reservation's `hold`, converted and at the
+	// same site. Its claims do not count against this hold, so a new window
+	// overlapping the old one -- an extension, a shift by an hour -- can keep
+	// the same resources. Until the move completes this hold claims only the
+	// time the old one does not; RescheduleReservation hands the rest over in
+	// the write that ends the old hold, so no one else can take it in between.
+	// Such a hold can only be used to reschedule that reservation. (A hold,
+	// though no resource_reference says so: AIP-121 allows no cycle of mutable
+	// references, and this one is a hold naming a hold.)
+	// Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	Replaces string `protobuf:"bytes,13,opt,name=replaces,proto3" json:"replaces,omitempty"`
+	// An AIP-160 filter narrowing the resources the allocator may choose from,
+	// supplied on create, alongside `candidate_resources`: the same filter
+	// SearchAvailability takes, over each resource's `resource_types`,
+	// `attributes` (its STRUCTURED-DATA, e.g. `attributes.view = "river"`) and
+	// `display_name`. Empty narrows nothing. Immutable, like the candidates.
+	CandidateFilter string `protobuf:"bytes,14,opt,name=candidate_filter,json=candidateFilter,proto3" json:"candidate_filter,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *Hold) Reset() {
@@ -189,6 +210,20 @@ func (x *Hold) GetUpdateTime() *timestamppb.Timestamp {
 func (x *Hold) GetEtag() string {
 	if x != nil {
 		return x.Etag
+	}
+	return ""
+}
+
+func (x *Hold) GetReplaces() string {
+	if x != nil {
+		return x.Replaces
+	}
+	return ""
+}
+
+func (x *Hold) GetCandidateFilter() string {
+	if x != nil {
+		return x.CandidateFilter
 	}
 	return ""
 }
@@ -479,6 +514,8 @@ type AvailabilityMatch struct {
 	// RESOURCE-TYPE values carried by the resource, RFC 9073 section 6.3, echoed
 	// so a caller can group results without re-fetching each resource.
 	ResourceTypes []string `protobuf:"bytes,4,rep,name=resource_types,json=resourceTypes,proto3" json:"resource_types,omitempty"`
+	// The resource's display name, echoed for the same reason.
+	DisplayName   string `protobuf:"bytes,5,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -541,11 +578,129 @@ func (x *AvailabilityMatch) GetResourceTypes() []string {
 	return nil
 }
 
+func (x *AvailabilityMatch) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+// The counts of one facet of a search: how many matching resources carry
+// each value of one field.
+type SearchFacet struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The field counted, as the request named it, e.g. "attributes.view".
+	Field string `protobuf:"bytes,1,opt,name=field,proto3" json:"field,omitempty"`
+	// The most frequent values, most frequent first, at most 20.
+	Buckets       []*FacetBucket `protobuf:"bytes,2,rep,name=buckets,proto3" json:"buckets,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchFacet) Reset() {
+	*x = SearchFacet{}
+	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchFacet) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchFacet) ProtoMessage() {}
+
+func (x *SearchFacet) ProtoReflect() protoreflect.Message {
+	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchFacet.ProtoReflect.Descriptor instead.
+func (*SearchFacet) Descriptor() ([]byte, []int) {
+	return file_freebusy_allocation_v1_allocation_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *SearchFacet) GetField() string {
+	if x != nil {
+		return x.Field
+	}
+	return ""
+}
+
+func (x *SearchFacet) GetBuckets() []*FacetBucket {
+	if x != nil {
+		return x.Buckets
+	}
+	return nil
+}
+
+// One value of a facet and how many resources carry it.
+type FacetBucket struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The value, as text: "river", "22", "true".
+	Value string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	// How many matching resources carry it.
+	Count         int64 `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FacetBucket) Reset() {
+	*x = FacetBucket{}
+	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FacetBucket) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FacetBucket) ProtoMessage() {}
+
+func (x *FacetBucket) ProtoReflect() protoreflect.Message {
+	mi := &file_freebusy_allocation_v1_allocation_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FacetBucket.ProtoReflect.Descriptor instead.
+func (*FacetBucket) Descriptor() ([]byte, []int) {
+	return file_freebusy_allocation_v1_allocation_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *FacetBucket) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
+func (x *FacetBucket) GetCount() int64 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
 var File_freebusy_allocation_v1_allocation_proto protoreflect.FileDescriptor
 
 const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	"\n" +
-	"'freebusy/allocation/v1/allocation.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a\"freebusy/allocation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1agoogle/type/interval.proto\x1a\x1astore/v1/annotations.proto\"\xd6\x06\n" +
+	"'freebusy/allocation/v1/allocation.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a\"freebusy/allocation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1agoogle/type/interval.proto\x1a\x1cservice/v1/annotations.proto\x1a\x1astore/v1/annotations.proto\"\xb1\b\n" +
 	"\x04Hold\x12I\n" +
 	"\x04name\x18\x01 \x01(\tB5\xe2A\x01\b\xbaH.\xd8\x01\x01r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\x04name\x12H\n" +
 	"\tresources\x18\x02 \x03(\tB*\xe2A\x01\x03\xfaA#\n" +
@@ -563,11 +718,15 @@ const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	"\vupdate_time\x18\n" +
 	" \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"updateTime\x12\x18\n" +
-	"\x04etag\x18\v \x01(\tB\x04\xe2A\x01\x03R\x04etag:\x90\x01\xeaAb\n" +
+	"\x04etag\x18\v \x01(\tB\x04\xe2A\x01\x03R\x04etag\x12R\n" +
+	"\breplaces\x18\r \x01(\tB6\xe2A\x02\x01\x05\xbaH.\xd8\x01\x01r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\breplaces\x12B\n" +
+	"\x10candidate_filter\x18\x0e \x01(\tB\x17\xe2A\x02\x01\x05\xbaH\x05r\x03\x18\x80\x10ڵ\x18\x06\n" +
+	"\x04TEXTR\x0fcandidateFilter:\xd3\x01\xeaAb\n" +
 	"\x1bfreebusy.allocation.v1/Hold\x126organizationalUnits/{organizational_unit}/holds/{hold}*\x05holds2\x04hold\xca\xf3\x18'\x18\x01*\x14\n" +
 	"\x05state\n" +
 	"\vexpire_time*\r\n" +
-	"\vupdate_timeJ\x04\b\a\x10\b\"\x81\x05\n" +
+	"\vupdate_time\xd2\xf0\x19?\n" +
+	"\rfreebusy.hold\x12\acreated\x12\aupdated\x12\adeleted\x1a\x13organizational_unitJ\x04\b\a\x10\b\"\x81\x05\n" +
 	"\n" +
 	"Allocation\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12F\n" +
@@ -602,14 +761,21 @@ const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	"\x04code\x18\x01 \x01(\x0e2,.freebusy.allocation.v1.UnbookableReasonCodeR\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12B\n" +
 	"\bresource\x18\x03 \x01(\tB&\xfaA#\n" +
-	"!the-protobuf-project.org/ResourceR\bresource\"\x90\x02\n" +
+	"!the-protobuf-project.org/ResourceR\bresource\"\xb3\x02\n" +
 	"\x11AvailabilityMatch\x12B\n" +
 	"\bresource\x18\x01 \x01(\tB&\xfaA#\n" +
 	"!the-protobuf-project.org/ResourceR\bresource\x12a\n" +
 	"\x13organizational_unit\x18\x02 \x01(\tB0\xfaA-\n" +
 	"+the-protobuf-project.org/OrganizationalUnitR\x12organizationalUnit\x12-\n" +
 	"\x06window\x18\x03 \x01(\v2\x15.google.type.IntervalR\x06window\x12%\n" +
-	"\x0eresource_types\x18\x04 \x03(\tR\rresourceTypesB\x91\x02\n" +
+	"\x0eresource_types\x18\x04 \x03(\tR\rresourceTypes\x12!\n" +
+	"\fdisplay_name\x18\x05 \x01(\tR\vdisplayName\"b\n" +
+	"\vSearchFacet\x12\x14\n" +
+	"\x05field\x18\x01 \x01(\tR\x05field\x12=\n" +
+	"\abuckets\x18\x02 \x03(\v2#.freebusy.allocation.v1.FacetBucketR\abuckets\"9\n" +
+	"\vFacetBucket\x12\x14\n" +
+	"\x05value\x18\x01 \x01(\tR\x05value\x12\x14\n" +
+	"\x05count\x18\x02 \x01(\x03R\x05countB\x91\x02\n" +
 	"\x1acom.freebusy.allocation.v1B\x0fAllocationProtoP\x01Zhgithub.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
 
 var (
@@ -624,36 +790,39 @@ func file_freebusy_allocation_v1_allocation_proto_rawDescGZIP() []byte {
 	return file_freebusy_allocation_v1_allocation_proto_rawDescData
 }
 
-var file_freebusy_allocation_v1_allocation_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_freebusy_allocation_v1_allocation_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_freebusy_allocation_v1_allocation_proto_goTypes = []any{
 	(*Hold)(nil),                  // 0: freebusy.allocation.v1.Hold
 	(*Allocation)(nil),            // 1: freebusy.allocation.v1.Allocation
 	(*AvailabilityBucket)(nil),    // 2: freebusy.allocation.v1.AvailabilityBucket
 	(*UnbookableReason)(nil),      // 3: freebusy.allocation.v1.UnbookableReason
 	(*AvailabilityMatch)(nil),     // 4: freebusy.allocation.v1.AvailabilityMatch
-	(*interval.Interval)(nil),     // 5: google.type.Interval
-	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
-	(HoldState)(0),                // 7: freebusy.allocation.v1.HoldState
-	(UnbookableReasonCode)(0),     // 8: freebusy.allocation.v1.UnbookableReasonCode
+	(*SearchFacet)(nil),           // 5: freebusy.allocation.v1.SearchFacet
+	(*FacetBucket)(nil),           // 6: freebusy.allocation.v1.FacetBucket
+	(*interval.Interval)(nil),     // 7: google.type.Interval
+	(*timestamppb.Timestamp)(nil), // 8: google.protobuf.Timestamp
+	(HoldState)(0),                // 9: freebusy.allocation.v1.HoldState
+	(UnbookableReasonCode)(0),     // 10: freebusy.allocation.v1.UnbookableReasonCode
 }
 var file_freebusy_allocation_v1_allocation_proto_depIdxs = []int32{
-	5,  // 0: freebusy.allocation.v1.Hold.window:type_name -> google.type.Interval
-	6,  // 1: freebusy.allocation.v1.Hold.expire_time:type_name -> google.protobuf.Timestamp
-	7,  // 2: freebusy.allocation.v1.Hold.state:type_name -> freebusy.allocation.v1.HoldState
-	6,  // 3: freebusy.allocation.v1.Hold.create_time:type_name -> google.protobuf.Timestamp
-	6,  // 4: freebusy.allocation.v1.Hold.update_time:type_name -> google.protobuf.Timestamp
-	6,  // 5: freebusy.allocation.v1.Allocation.start_time:type_name -> google.protobuf.Timestamp
-	6,  // 6: freebusy.allocation.v1.Allocation.end_time:type_name -> google.protobuf.Timestamp
-	6,  // 7: freebusy.allocation.v1.Allocation.expire_time:type_name -> google.protobuf.Timestamp
-	6,  // 8: freebusy.allocation.v1.Allocation.create_time:type_name -> google.protobuf.Timestamp
-	5,  // 9: freebusy.allocation.v1.AvailabilityBucket.window:type_name -> google.type.Interval
-	8,  // 10: freebusy.allocation.v1.UnbookableReason.code:type_name -> freebusy.allocation.v1.UnbookableReasonCode
-	5,  // 11: freebusy.allocation.v1.AvailabilityMatch.window:type_name -> google.type.Interval
-	12, // [12:12] is the sub-list for method output_type
-	12, // [12:12] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	7,  // 0: freebusy.allocation.v1.Hold.window:type_name -> google.type.Interval
+	8,  // 1: freebusy.allocation.v1.Hold.expire_time:type_name -> google.protobuf.Timestamp
+	9,  // 2: freebusy.allocation.v1.Hold.state:type_name -> freebusy.allocation.v1.HoldState
+	8,  // 3: freebusy.allocation.v1.Hold.create_time:type_name -> google.protobuf.Timestamp
+	8,  // 4: freebusy.allocation.v1.Hold.update_time:type_name -> google.protobuf.Timestamp
+	8,  // 5: freebusy.allocation.v1.Allocation.start_time:type_name -> google.protobuf.Timestamp
+	8,  // 6: freebusy.allocation.v1.Allocation.end_time:type_name -> google.protobuf.Timestamp
+	8,  // 7: freebusy.allocation.v1.Allocation.expire_time:type_name -> google.protobuf.Timestamp
+	8,  // 8: freebusy.allocation.v1.Allocation.create_time:type_name -> google.protobuf.Timestamp
+	7,  // 9: freebusy.allocation.v1.AvailabilityBucket.window:type_name -> google.type.Interval
+	10, // 10: freebusy.allocation.v1.UnbookableReason.code:type_name -> freebusy.allocation.v1.UnbookableReasonCode
+	7,  // 11: freebusy.allocation.v1.AvailabilityMatch.window:type_name -> google.type.Interval
+	6,  // 12: freebusy.allocation.v1.SearchFacet.buckets:type_name -> freebusy.allocation.v1.FacetBucket
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_freebusy_allocation_v1_allocation_proto_init() }
@@ -668,7 +837,7 @@ func file_freebusy_allocation_v1_allocation_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_freebusy_allocation_v1_allocation_proto_rawDesc), len(file_freebusy_allocation_v1_allocation_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

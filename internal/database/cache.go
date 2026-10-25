@@ -7,10 +7,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/shokki-engineering/freebusy/config"
+	"github.com/shokki-engineering/freebusy/internal/config"
 	"github.com/shokki-engineering/freebusy/internal/database/cache/freebusy/reservationcache"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
-	"github.com/shokki-engineering/freebusy/shared"
+	"github.com/shokki-engineering/freebusy/internal/telemetry"
 	"github.com/the-protobuf-project/runtime-go/cache"
 	"github.com/the-protobuf-project/runtime-go/cache/redis"
 )
@@ -37,7 +37,7 @@ func (c *Connection) attachCaches(ctx context.Context) {
 		err = c.UseCaches(ctx, p)
 	}
 	if err != nil {
-		shared.Telemetry.Logger.Warn("List caches are off: the cache could not be opened", "error", err)
+		telemetry.Warn("List caches are off: the cache could not be opened", "error", err)
 	}
 }
 
@@ -50,12 +50,13 @@ func (c *Connection) UseCaches(ctx context.Context, p cache.Provider) error {
 	}
 	// The list cache reads its pages through Volatile; measured there, its
 	// gets are the hit rate (cache_gets_total, strategy volatile).
-	db.Volatile = cache.WithVolatileTelemetry(db.Volatile, shared.Telemetry.Meter())
+	db.Volatile = cache.WithVolatileTelemetry(db.Volatile, telemetry.Meter())
 	reservations, err := reservationcache.NewReservationListCache(db, reservationcache.WithListErrors(reportCacheError))
 	if err != nil {
 		return err
 	}
 	c.Caches = Caches{Reservations: reservations}
+	c.cacheProvider = p
 	c.Changes = repox.Changes{reservations}
 	return nil
 }
@@ -64,7 +65,7 @@ func (c *Connection) UseCaches(ctx context.Context, p cache.Provider) error {
 // request, but a version that did not move leaves a site's pages stale for
 // their ttl, so each is worth a line.
 func reportCacheError(_ context.Context, resource, op string, err error) {
-	shared.Telemetry.Logger.Warn("List cache failure", "resource", resource, "op", op, "error", err)
+	telemetry.Warn("List cache failure", "resource", resource, "op", op, "error", err)
 }
 
 // OpenCacheProvider builds the cache.Provider the generated decorators are

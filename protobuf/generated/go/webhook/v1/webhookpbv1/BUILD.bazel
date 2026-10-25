@@ -8,6 +8,7 @@ go_library(
     srcs = [
         "delivery.pb.go",
         "enums.pb.go",
+        "errors.pb.go",
         "mcp_shared.pb.mcp.go",
         "webhook.pb.go",
         "webhook_messages.pb.go",
@@ -22,8 +23,9 @@ go_library(
         "@build_buf_gen_go_bufbuild_protovalidate_protocolbuffers_go//buf/validate",
         "@com_github_grpc_ecosystem_grpc_gateway_v2//runtime",
         "@com_github_grpc_ecosystem_grpc_gateway_v2//utilities",
-        "@com_github_the_protobuf_project_grpc_mcp_gateway//mcp/protobuf/mcppb",
+        "@com_github_the_protobuf_project_mcp//protobuf/mcppb",
         "@com_github_the_protobuf_project_runtime_go_agents//mcp",
+        "@com_github_the_protobuf_project_service//plugin/pb/servicepbv1",
         "@com_github_the_protobuf_project_store//plugin/entity/pb/entitypbv1",
         "@com_github_the_protobuf_project_store//plugin/pb/storepbv1",
         "@org_golang_google_genproto_googleapis_api//annotations",

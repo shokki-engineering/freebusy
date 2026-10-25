@@ -5,7 +5,9 @@ package engine
 
 import (
 	"errors"
+	"math/rand/v2"
 	"reflect"
+	"slices"
 	"testing"
 	"time"
 )
@@ -152,6 +154,24 @@ func TestOfferedRangeLeavesOutsideOpen(t *testing.T) {
 	want := Spans{sp(0, 24), sp(30, 32), sp(48, 72)}
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("Offered = %v, want %v", got, want)
+	}
+}
+
+func TestOfferedOpenEndedRangeStartsAtDTSTART(t *testing.T) {
+	daily, _ := ParseRRule("FREQ=DAILY", time.UTC)
+	// Open 09-17 daily from day 1 on, with no end: nothing before day 1.
+	a := Availability{Range: Span{Start: at(24)}, Periods: []Period{{Start: at(24 + 9), End: at(24 + 17), Rule: &daily}}}
+	got := Offered([]Availability{a}, sp(0, 72))
+	want := Spans{sp(24+9, 24+17), sp(48+9, 48+17)}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("Offered = %v, want %v", got, want)
+	}
+	// Another component covering time before it still offers that time.
+	early := Availability{Range: sp(0, 12), Periods: []Period{{Start: at(10), End: at(11)}}}
+	got = Offered([]Availability{a, early}, sp(0, 72))
+	want = Spans{sp(10, 11), sp(24+9, 24+17), sp(48+9, 48+17)}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("Offered with an earlier component = %v, want %v", got, want)
 	}
 }
 
@@ -320,5 +340,29 @@ func TestParseRRuleRefusesWhatItCannotExpand(t *testing.T) {
 		if _, err := ParseRRule(bad, time.UTC); !errors.Is(err, ErrUnsupportedRule) {
 			t.Errorf("ParseRRule(%q) err = %v, want ErrUnsupportedRule", bad, err)
 		}
+	}
+}
+
+func TestPickSpreadsAcrossTies(t *testing.T) {
+	fits := []Fit{{"a", time.Hour}, {"b", 2 * time.Hour}, {"c", 2 * time.Hour}, {"d", 2 * time.Hour}, {"e", 3 * time.Hour}}
+	if got := Pick(fits, 2, nil); !slices.Equal(got, []string{"a", "b"}) {
+		t.Fatalf("without shuffle: %v", got)
+	}
+	// The tightest fit is always taken; the second place is drawn from the
+	// three-way tie, never from the looser e.
+	seen := map[string]bool{}
+	r := rand.New(rand.NewPCG(1, 2))
+	for range 100 {
+		got := Pick(fits, 2, r.Shuffle)
+		if len(got) != 2 || got[0] != "a" || got[1] == "e" {
+			t.Fatalf("pick %v", got)
+		}
+		seen[got[1]] = true
+	}
+	if len(seen) != 3 {
+		t.Fatalf("second place drawn from %v, want all of b, c, d", seen)
+	}
+	if got := Pick(fits, 9, r.Shuffle); len(got) != 5 {
+		t.Fatalf("more than there are: %v", got)
 	}
 }

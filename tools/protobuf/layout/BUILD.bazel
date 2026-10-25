@@ -15,6 +15,7 @@ go_test(
     srcs = ["layout_test.go"],
     data = [
         "//tools/protobuf/buf:config/cache.yaml",
+        "//tools/protobuf/buf:config/service.yaml",
         "//tools/protobuf/buf:config/store.backend.yaml",
     ],
     embed = [":layout"],

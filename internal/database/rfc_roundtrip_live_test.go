@@ -29,7 +29,7 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/calendar"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/event"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/resource"
-	"github.com/shokki-engineering/freebusy/internal/livetest"
+	"github.com/shokki-engineering/freebusy/test/live"
 	"github.com/the-protobuf-project/runtime-go/ulid"
 	"google.golang.org/genproto/googleapis/type/datetime"
 	"google.golang.org/genproto/googleapis/type/dayofweek"
@@ -40,13 +40,13 @@ import (
 
 func liveConns(t *testing.T) map[string]repox.Conn {
 	t.Helper()
-	dsn := livetest.Env(t, livetest.DatabaseURL)
+	dsn := live.Env(t, live.DatabaseURL)
 	db, err := database.OpenGorm(dsn, &gorm.Config{Logger: logger.Discard})
 	if err != nil {
 		t.Fatal(err)
 	}
 	out := map[string]repox.Conn{"gorm": {Gorm: db}}
-	if raw := livetest.Optional(t, livetest.GraphQLURL); raw != "" {
+	if raw := live.Optional(t, live.GraphQLURL); raw != "" {
 		u, err := url.Parse(raw)
 		if err != nil {
 			t.Fatal(err)

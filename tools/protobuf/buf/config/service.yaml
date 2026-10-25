@@ -1,0 +1,66 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# protoc-gen-service's configuration: the store's database layout, so the
+# generated servers import the repository packages by the names
+# protoc-gen-store gave them, and the bindings -- where each proto package's
+# gRPC, gateway and MCP stubs live. The layout repeats store.backend.yaml's
+# (tools/protobuf/layout's test keeps the copies equal).
+
+strip_version: true
+dedupe_schema_table: true
+
+datasources:
+  # Shared value objects (imported google.type.* like Money, Date, TimeOfDay)
+  # cannot carry a (orm.v1.table) annotation, so route them into one shared
+  # "common" schema. Every service that embeds them then references a single
+  # deduped common.<type> table cross-schema instead of materializing a copy in
+  # its own schema. More specific than the freebusy.** rule, so it wins.
+  - match: "google.type"
+    database: freebusy
+    schema: common
+
+  - match: "freebusy.**" # every freebusy.<service>.<version> package
+    database: freebusy
+    schema: "{leaf}" # the service segment: schedule, identity, booking, ...
+
+  # The RFC schema module, generated alongside freebusy's own protos. Its own
+  # database, because the catalogue is upstream data with its own lifecycle —
+  # regenerated when protobuf-rfc releases, not when freebusy changes. Without a
+  # rule here every RFC resource collapses into one schema: protoc-gen-store
+  # falls back to the AIP resource-type host, and every protobuf-rfc resource
+  # declares the same one ("the-protobuf-project.org").
+  # organizational_unit is the only multi-word schema in either database, and a
+  # multi-word schema breaks the graphql target: DDN names a model by
+  # concatenating schema and table in PascalCase ("OrganizationalUnitResource"),
+  # and the target splits that at the first token — yielding "organizational" +
+  # "UnitResource" where the repository target expects "organizationalunit" +
+  # "resource". A single-word name removes the ambiguity. More specific than the
+  # protobuf.** rule below, so it wins.
+  - match: "protobuf.rfc4519.organizational_unit.**"
+    database: rfc
+    schema: orgunit
+
+  # RFC 4519 and RFC 7643 both define a group/v1, so {leaf} would put an LDAP
+  # group and a SCIM group in one "group" schema, and one generated Go package
+  # would import two packages both named groupv1 -- which only an import alias
+  # could resolve. Each gets a schema named for what its own RFC calls it.
+  - match: "protobuf.rfc4519.group.**"
+    database: rfc
+    schema: ldapgroup
+  - match: "protobuf.rfc7643.group.**"
+    database: rfc
+    schema: scimgroup
+
+  - match: "protobuf.**"
+    database: rfc
+    schema: "{leaf}" # rfc9073.resource.v1 -> schema "resource"
+
+# freebusy's own packages keep their stubs beside their messages (the default,
+# {import_path}). The RFC module's are the BSR SDK's gRPC packages and the
+# standalone gateway and MCP packages rfc.buf.gen.yaml writes.
+bindings:
+  - match: "protobuf.**"
+    grpc_package: "buf.build/gen/go/the-protobuf-project/rfc/grpc/go/{proto_dir}/{package}grpc"
+    gateway_package: "github.com/shokki-engineering/freebusy/protobuf/generated/go/rfc/{proto_dir}/{package}gw"
+    mcp_package: "github.com/shokki-engineering/freebusy/protobuf/generated/go/rfc/{proto_dir}/{package}mcp"

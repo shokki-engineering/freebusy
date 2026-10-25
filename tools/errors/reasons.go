@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-// constructors take a reason as their first argument: internal/types'
+// constructors take a reason as their first argument: servicex's
 // BadField, Missing and Blocked, and the idempotency interceptor's aborted.
 var constructors = map[string]bool{"BadField": true, "Missing": true, "Blocked": true, "aborted": true}
 

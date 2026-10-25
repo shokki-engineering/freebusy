@@ -10,9 +10,18 @@ plugins:
     out: protobuf/generated/openapi
     opt:
       - output_mode=source_relative
+  # The strong component definitions the merge overlays, one document per
+  # package (not per_file: freebusy has an enums.proto in four packages, and
+  # per-file documents of one name would overwrite each other's schemas and
+  # state diagrams). diagrams=all embeds the ER, flow and state diagrams, from
+  # the protos and docs/flows, in the descriptions and under x-mermaid; the
+  # merge carries the tags' and the packages' ones into openapiv3-spec.yaml.
   - local: protoc-gen-openapi-solo
     out: protobuf/generated/openapi/types
+    strategy: all
     opt:
-      - per_file=true
       - yaml=true
       - include_description=true
+      - multiline_description=true
+      - diagrams=all
+      - flows=docs/flows

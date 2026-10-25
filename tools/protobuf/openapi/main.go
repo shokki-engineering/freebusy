@@ -24,6 +24,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 // baseSpec is the merged document's skeleton — everything fixed rather than
@@ -95,8 +97,14 @@ func main() {
 	mergeStrongComponents(specDir, components)
 	// Step 3: patch operations with summary and 4xx responses.
 	patchOperations(paths)
-	// Step 4: populate the top-level tags list from operation tags.
-	mapSet(merged, "tags", collectTags(paths))
+	// Step 4: populate the top-level tags list from operation tags, described
+	// as the per-package documents describe them, and carry the packages' own
+	// diagrams (ER diagrams, package-level flows) under info.x-mermaid.
+	described, diagrams := packageDocs(specDir)
+	mapSet(merged, "tags", collectTags(paths, described))
+	if len(diagrams) > 0 {
+		mapSet(mapGet(merged, "info"), "x-mermaid", &yaml.Node{Kind: yaml.SequenceNode, Tag: "!!seq", Content: diagrams})
+	}
 	// Step 5: drop components nothing references.
 	pruneUnusedComponents(merged)
 

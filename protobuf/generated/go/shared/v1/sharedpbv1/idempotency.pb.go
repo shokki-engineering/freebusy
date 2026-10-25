@@ -10,6 +10,7 @@
 package sharedpbv1
 
 import (
+	_ "github.com/the-protobuf-project/service/plugin/pb/servicepbv1"
 	_ "github.com/the-protobuf-project/store/plugin/entity/pb/entitypbv1"
 	_ "github.com/the-protobuf-project/store/plugin/pb/storepbv1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
@@ -216,7 +217,7 @@ var File_freebusy_shared_v1_idempotency_proto protoreflect.FileDescriptor
 
 const file_freebusy_shared_v1_idempotency_proto_rawDesc = "" +
 	"\n" +
-	"$freebusy/shared/v1/idempotency.proto\x12\x12freebusy.shared.v1\x1a\x1bentity/v1/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\x81\x04\n" +
+	"$freebusy/shared/v1/idempotency.proto\x12\x12freebusy.shared.v1\x1a\x1bentity/v1/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cservice/v1/annotations.proto\x1a\x1astore/v1/annotations.proto\"\x87\x04\n" +
 	"\x0eIdempotencyKey\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x1c\n" +
 	"\x06method\x18\x02 \x01(\tB\x04\xe2A\x01\x02R\x06method\x12+\n" +
@@ -228,11 +229,11 @@ const file_freebusy_shared_v1_idempotency_proto_rawDesc = "" +
 	"\vcreate_time\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"createTime\x12A\n" +
 	"\vupdate_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
-	"updateTime:\x86\x01\xeaAg\n" +
+	"updateTime:\x8c\x01\xeaAg\n" +
 	"!freebusy.shared.v1/IdempotencyKey\x12!idempotencyKeys/{idempotency_key}*\x0fidempotencyKeys2\x0eidempotencyKey\xca\xf3\x18\x18*\x16\n" +
 	"\x06method\n" +
 	"\n" +
-	"request_id\x10\x01*r\n" +
+	"request_id\x10\x01\xf2\xf0\x19\x02\b\x04*r\n" +
 	"\x10IdempotencyState\x12!\n" +
 	"\x1dIDEMPOTENCY_STATE_UNSPECIFIED\x10\x00\x12\x1f\n" +
 	"\x1bIDEMPOTENCY_STATE_IN_FLIGHT\x10\x01\x12\x1a\n" +

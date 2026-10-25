@@ -11,6 +11,7 @@ package webhookpbv1
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	_ "github.com/the-protobuf-project/service/plugin/pb/servicepbv1"
 	_ "github.com/the-protobuf-project/store/plugin/entity/pb/entitypbv1"
 	_ "github.com/the-protobuf-project/store/plugin/pb/storepbv1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
@@ -56,8 +57,11 @@ type Webhook struct {
 	// "freebusy.event.deleted". Empty sends every type. A type is
 	// "freebusy.<record>.<what happened>": holds are active, released, expired
 	// and converted; reservations pending, confirmed, cancelling, cancelled,
-	// failed, rescheduling and rescheduled; resources, calendars, events and
-	// availabilities created, updated and deleted.
+	// failed, rescheduling and rescheduled, and updated exactly when
+	// UpdateReservation changed its customer or attributes -- the reservation's
+	// last_change is CHANGE_DETAILS (freebusy.reservation.updated);
+	// resources, calendars, events and availabilities created, updated and
+	// deleted.
 	EventTypes []string `protobuf:"bytes,4,rep,name=event_types,json=eventTypes,proto3" json:"event_types,omitempty"`
 	// Limits events to one site's holds, reservations and resources. Empty
 	// sends every site's. Calendars, events and availabilities belong to no
@@ -205,7 +209,7 @@ var File_freebusy_webhook_v1_webhook_proto protoreflect.FileDescriptor
 
 const file_freebusy_webhook_v1_webhook_proto_rawDesc = "" +
 	"\n" +
-	"!freebusy/webhook/v1/webhook.proto\x12\x13freebusy.webhook.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a\x1ffreebusy/webhook/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1astore/v1/annotations.proto\"\xb5\x06\n" +
+	"!freebusy/webhook/v1/webhook.proto\x12\x13freebusy.webhook.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a\x1ffreebusy/webhook/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cservice/v1/annotations.proto\x1a\x1astore/v1/annotations.proto\"\xd9\x06\n" +
 	"\aWebhook\x122\n" +
 	"\x04name\x18\x01 \x01(\tB\x1e\xe2A\x01\b\xbaH\x17\xd8\x01\x01r\x122\x10^webhooks/[^/]+$R\x04name\x12/\n" +
 	"\fdisplay_name\x18\x02 \x01(\tB\f\xe2A\x01\x01\xbaH\x05r\x03\x18\x80\x01R\vdisplayName\x12!\n" +
@@ -224,8 +228,9 @@ const file_freebusy_webhook_v1_webhook_proto_rawDesc = "" +
 	"\vupdate_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"updateTime\x12\x18\n" +
 	"\x04etag\x18\n" +
-	" \x01(\tB\x04\xe2A\x01\x03R\x04etag:M\xeaAD\n" +
-	"\x1bfreebusy.webhook.v1/Webhook\x12\x12webhooks/{webhook}*\bwebhooks2\awebhook\xca\xf3\x18\x02\x18\x01B\xf6\x01\n" +
+	" \x01(\tB\x04\xe2A\x01\x03R\x04etag:q\xeaAD\n" +
+	"\x1bfreebusy.webhook.v1/Webhook\x12\x12webhooks/{webhook}*\bwebhooks2\awebhook\xca\xf3\x18\x02\x18\x01\xf2\xf0\x19 \b\x01\x12\x1c\n" +
+	"\x05scope\x12\x13organizational_unitB\xf6\x01\n" +
 	"\x17com.freebusy.webhook.v1B\fWebhookProtoP\x01Z_github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1\xa2\x02\x03FWX\xaa\x02\x13Freebusy.Webhook.V1\xca\x02\x13Freebusy\\Webhook\\V1\xe2\x02\x1fFreebusy\\Webhook\\V1\\GPBMetadata\xea\x02\x15Freebusy::Webhook::V1b\x06proto3"
 
 var (

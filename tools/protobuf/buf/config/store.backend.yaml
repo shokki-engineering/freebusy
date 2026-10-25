@@ -68,6 +68,15 @@ datasources:
   - match: "protobuf.**"
     database: rfc
     schema: "{leaf}" # rfc9073.resource.v1 -> schema "resource"
+# Descriptor images read only to discover the targets of references this run
+# does not generate. buf runs the store plugin once per input, so freebusy's
+# run never sees the RFC module's messages; with the RFC image here its
+# references to RFC resources (the-protobuf-project.org/Resource, ...) become
+# foreign keys into the rfc tables, which share freebusy's Postgres database.
+# `just gen store` builds the image from the RFC commit buf.lock pins.
+references:
+  - build/protobuf/rfc.binpb
+
 telemetry:
   enabled: true                # override the telemetry opt's master switch
   metrics: true                 # ops counter + duration histogram, in addition to spans/logs

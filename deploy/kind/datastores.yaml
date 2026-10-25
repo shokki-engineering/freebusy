@@ -1,0 +1,119 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Throwaway datastores for the chart on a kind cluster (CI's deploy job, or a
+# local try-out): Postgres and Redis in the freebusy namespace, and the Secret
+# the chart reads (secrets.existingSecret=freebusy-secrets). Every password
+# here is a placeholder for a disposable cluster -- never use this file for a
+# real deployment. See "Kubernetes on kind" in README.md.
+apiVersion: v1
+kind: Namespace
+metadata: { name: freebusy }
+---
+apiVersion: v1
+kind: Secret
+metadata: { name: freebusy-secrets, namespace: freebusy }
+type: Opaque
+stringData:
+  postgres-password: kind-only-postgres-password
+  # openssl rand -base64 32 for a real one.
+  webhook-secret-key: a2luZC1vbmx5LXdlYmhvb2stc2VjcmV0LWtleS0zMmI=
+  webhook-previous-secret-keys: ""
+  redis-password: kind-only-redis-password
+  connector-token: ""
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: { name: postgres-init, namespace: freebusy }
+data:
+  init.sql: |
+    CREATE ROLE freebusy LOGIN PASSWORD 'kind-only-postgres-password';
+    CREATE DATABASE freebusydb OWNER freebusy;
+    \c freebusydb
+    GRANT ALL ON SCHEMA public TO freebusy;
+    -- The migrations create extensions (btree_gist and others).
+    ALTER ROLE freebusy SUPERUSER;
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: { name: postgres, namespace: freebusy }
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector: { matchLabels: { app: postgres } }
+  template:
+    metadata: { labels: { app: postgres } }
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:18.4
+          # TLS with the image's snakeoil certificate: the chart's default
+          # sslmode is require.
+          args:
+            - -c
+            - max_connections=200
+            - -c
+            - ssl=on
+            - -c
+            - ssl_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+            - -c
+            - ssl_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+          env:
+            - { name: POSTGRES_PASSWORD, value: kind-only-superuser-password }
+            - { name: PGDATA, value: /var/lib/postgresql/data/pgdata }
+          ports: [{ containerPort: 5432, name: pg }]
+          readinessProbe:
+            exec: { command: [pg_isready, -U, postgres] }
+            periodSeconds: 5
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { memory: 1Gi }
+          volumeMounts:
+            - { name: data, mountPath: /var/lib/postgresql/data }
+            - { name: init, mountPath: /docker-entrypoint-initdb.d }
+      volumes:
+        - name: init
+          configMap: { name: postgres-init }
+  volumeClaimTemplates:
+    - metadata: { name: data }
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources: { requests: { storage: 1Gi } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: postgres, namespace: freebusy }
+spec:
+  selector: { app: postgres }
+  ports: [{ port: 5432, targetPort: pg, name: pg }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: redis, namespace: freebusy }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: redis } }
+  template:
+    metadata: { labels: { app: redis } }
+    spec:
+      containers:
+        - name: redis
+          image: redis:8
+          command: [sh, -c, 'exec redis-server --requirepass "$REDIS_PASSWORD" --maxmemory 128mb --maxmemory-policy allkeys-lru --save "" --appendonly no']
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom: { secretKeyRef: { name: freebusy-secrets, key: redis-password } }
+          ports: [{ containerPort: 6379, name: redis }]
+          readinessProbe:
+            tcpSocket: { port: redis }
+            periodSeconds: 5
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { memory: 256Mi }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: redis, namespace: freebusy }
+spec:
+  selector: { app: redis }
+  ports: [{ port: 6379, targetPort: redis, name: redis }]

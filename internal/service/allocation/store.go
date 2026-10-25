@@ -16,9 +16,9 @@ import (
 	"context"
 	"time"
 
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
+	eventv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
+	availabilityv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
+	resourcev1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
@@ -61,7 +61,7 @@ type Claims struct {
 }
 
 // Store is everything the engine reads and writes. Implementations exist for
-// GORM and Hasura; errors are the internal/types sentinels.
+// GORM and Hasura; errors are the repositories' sentinels (repox).
 type Store interface {
 	// Resources returns the resources a query selects, including soft-deleted
 	// ones, which the engine counts but never offers.
@@ -87,16 +87,26 @@ type Store interface {
 	// InsertHold writes hold and one allocation per entry of hold.Resources,
 	// atomically, guarded: if any of those resources has a live claim
 	// overlapping the hold's window when the write lands, nothing is written
-	// and the error is types.ErrConflict. This is the one place the race for
+	// and the error is repox.ErrConflict. This is the one place the race for
 	// the last resource is decided, so it must hold under concurrency, not
 	// just on a quiet database.
+	//
+	// A hold that replaces another (hold.Replaces) claims, on each resource,
+	// only the part of its window the replaced hold's claims leave free; the
+	// replaced hold's claims are no conflict.
 	InsertHold(ctx context.Context, parent string, hold *allocationpbv1.Hold) (*allocationpbv1.Hold, error)
+
+	// HandOver ends the converted hold from as of at, guarded by etag, and in
+	// the same write gives hold to -- which replaces it -- the rest of its
+	// window on each of its resources: from's claims there are deleted, its
+	// other claims take the expiry at, and to's claims fill its window.
+	HandOver(ctx context.Context, from, etag, to string, at time.Time) (*allocationpbv1.Hold, error)
 
 	// GetHold returns a hold by name as stored, without applying expiry.
 	GetHold(ctx context.Context, name string) (*allocationpbv1.Hold, error)
 
 	// FindHold returns the hold at parent carrying idempotency key, or
-	// types.ErrNotFound.
+	// repox.ErrNotFound.
 	FindHold(ctx context.Context, parent, idempotencyKey string) (*allocationpbv1.Hold, error)
 
 	// ListHolds returns a page of holds at parent.
@@ -104,7 +114,7 @@ type Store interface {
 
 	// UpdateHold changes a hold's state and expiry, and its allocations'
 	// expiry with it, if the stored etag still equals etag (empty skips the
-	// check). types.ErrConflict on a mismatch. A nil expire clears it, which
+	// check). repox.ErrConflict on a mismatch. A nil expire clears it, which
 	// is how a converted hold keeps its resources for good.
 	UpdateHold(ctx context.Context, name, etag string, state allocationpbv1.HoldState, expire *time.Time) (*allocationpbv1.Hold, error)
 

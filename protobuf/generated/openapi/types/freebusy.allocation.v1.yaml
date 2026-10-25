@@ -1,0 +1,1624 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: Apache-2.0
+
+components:
+  schemas:
+    freebusy.allocation.v1.Allocation:
+      description: |-
+        An Allocation is one resource taken by one hold for one span: the row the
+        engine counts when it asks what is already claimed.
+
+        Storage-only. No RPC returns it -- callers see a Hold and its `resources` --
+        but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is
+        one value and its resources a list, so an overlap query over holds would
+        have to unpack both on every row. One row per resource, with the span as two
+        indexed instants, makes that query a plain range scan on either backend.
+
+        The span and `expire_time` are copies of the hold's, written in the same
+        write as the hold. The copy is the point: a claim stops counting the instant
+        `expire_time` passes, with no sweeper write needed, because every read
+        filters on it.
+
+        It sits under the site and names its hold, rather than nesting under the
+        hold: the engine asks about allocations by resource and time across a whole
+        site, never hold by hold, and a hold with child resources would owe
+        DeleteHold a `force` flag guarding rows no caller can see.
+      properties:
+        createTime:
+          description: Creation timestamp.
+          format: date-time
+          type: string
+        endTime:
+          description: End of the span taken, exclusive. A copy of the hold's window
+            end.
+          format: date-time
+          type: string
+        expireTime:
+          description: |-
+            When this claim stops counting. A copy of the hold's expire_time while it
+            is ACTIVE; set to the release instant on release; unset once the hold is
+            CONVERTED, which is the one outcome that keeps the resource taken. Always
+            the server's to write, never a caller's.
+          format: date-time
+          type: string
+        hold:
+          description: |-
+            The hold that took it. Deleting the hold deletes its allocations with it.
+            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+          type: string
+        name:
+          description: |-
+            The allocation name, under the site whose resource it takes.
+            Format: organizationalUnits/{organizational_unit}/allocations/{allocation}
+          type: string
+        resource:
+          description: |-
+            The resource taken.
+            Format: resources/{resource}
+          type: string
+        startTime:
+          description: Start of the span taken, inclusive. A copy of the hold's window
+            start.
+          format: date-time
+          type: string
+      type: object
+    freebusy.allocation.v1.AvailabilityBucket:
+      description: |-
+        One slice of an availability answer: how many resources are free across a
+        span, and which ones.
+
+        This is where pooling happens. No RFC counts inventory -- RFC 5545 and 7953
+        are one-calendar-one-timeline -- so a count is produced by asking each
+        resource's calendar whether it is free and totalling the answers, rather than
+        by storing a capacity number anywhere.
+      properties:
+        freeCount:
+          description: How many candidate resources are free across the whole span.
+          format: int32
+          type: integer
+        freeResources:
+          description: |-
+            Which resources are free, when the request asked for them. Omitted by
+            default: a car park with 200 bays would otherwise repeat 200 names in
+            every bucket of every day.
+            Format: resources/{resource}
+          items:
+            type: string
+          type: array
+        totalCount:
+          description: |-
+            How many candidates were considered. `free_count` out of this is the
+            "5 of 12 free" a caller renders.
+          format: int32
+          type: integer
+        window:
+          description: |-
+            The span this bucket covers: one slot, or one calendar day in the target
+            time zone, per the request's granularity.
+          properties:
+            endTime:
+              description: |-
+                Optional. Exclusive end of the interval.
+
+                If specified, a Timestamp matching this interval will have to be before the
+                end.
+              format: date-time
+              type: string
+            startTime:
+              description: |-
+                Optional. Inclusive start of the interval.
+
+                If specified, a Timestamp matching this interval will have to be the same
+                or after the start.
+              format: date-time
+              type: string
+          type: object
+      type: object
+    freebusy.allocation.v1.AvailabilityGranularity:
+      description: The slicing of an availability answer over a window.
+      enum:
+      - AVAILABILITY_GRANULARITY_UNSPECIFIED
+      - AVAILABILITY_GRANULARITY_SLOT
+      - AVAILABILITY_GRANULARITY_DAY
+      type: string
+    freebusy.allocation.v1.AvailabilityMatch:
+      description: One resource that satisfies a search, with the window it is free
+        for.
+      properties:
+        displayName:
+          description: The resource's display name, echoed for the same reason.
+          type: string
+        organizationalUnit:
+          description: |-
+            The site it belongs to.
+            Format: organizationalUnits/{organizational_unit}
+          type: string
+        resource:
+          description: |-
+            The free resource.
+            Format: resources/{resource}
+          type: string
+        resourceTypes:
+          description: |-
+            RESOURCE-TYPE values carried by the resource, RFC 9073 section 6.3, echoed
+            so a caller can group results without re-fetching each resource.
+          items:
+            type: string
+          type: array
+        window:
+          description: The span it is free for, which may be narrower than the searched
+            window.
+          properties:
+            endTime:
+              description: |-
+                Optional. Exclusive end of the interval.
+
+                If specified, a Timestamp matching this interval will have to be before the
+                end.
+              format: date-time
+              type: string
+            startTime:
+              description: |-
+                Optional. Inclusive start of the interval.
+
+                If specified, a Timestamp matching this interval will have to be the same
+                or after the start.
+              format: date-time
+              type: string
+          type: object
+      type: object
+    freebusy.allocation.v1.BatchComputeAvailabilityRequest:
+      description: |-
+        Request message for AllocationService.BatchComputeAvailability. Each entry is
+        a full ComputeAvailabilityRequest, so sites, windows and granularities may
+        differ within one batch.
+      properties:
+        requests:
+          description: |-
+            The computations to run. Capped at 50 to bound the calendar reads a single
+            call can trigger.
+          items:
+            description: Request message for AllocationService.ComputeAvailability.
+            properties:
+              filter:
+                description: |-
+                  An AIP-160 filter over each resource's search record (ResourceDay): its
+                  `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
+                  `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
+                  `display_name` (a bare word matches it) and `organizational_unit`. Terms
+                  are ANDed unless joined with OR. Empty matches every resource.
+                  Only matching resources are computed over or counted.
+                type: string
+              granularity:
+                description: How to slice the window. Defaults by window length.
+                enum:
+                - AVAILABILITY_GRANULARITY_UNSPECIFIED
+                - AVAILABILITY_GRANULARITY_SLOT
+                - AVAILABILITY_GRANULARITY_DAY
+                type: string
+              includeFreeResources:
+                description: |-
+                  Populate AvailabilityBucket.free_resources. Off by default: a large site
+                  would otherwise repeat every resource name in every bucket.
+                type: boolean
+              parent:
+                description: |-
+                  The site whose resources to compute over.
+                  Format: organizationalUnits/{organizational_unit}
+                type: string
+              resources:
+                description: |-
+                  Restrict the computation to these resources. Empty means every resource
+                  the site holds.
+                  Format: resources/{resource}
+                items:
+                  type: string
+                type: array
+              slotDuration:
+                description: Slot length for SLOT granularity. Ignored for DAY.
+                type: string
+              timeZone:
+                description: |-
+                  IANA time zone the day boundaries are drawn in, e.g. "Asia/Kolkata".
+                  Defaults to the site's zone. Required in effect for DAY granularity, since
+                  "a night" has no meaning without one.
+                type: string
+              window:
+                description: The window to compute over.
+                properties:
+                  endTime:
+                    description: |-
+                      Optional. Exclusive end of the interval.
+
+                      If specified, a Timestamp matching this interval will have to be before the
+                      end.
+                    format: date-time
+                    type: string
+                  startTime:
+                    description: |-
+                      Optional. Inclusive start of the interval.
+
+                      If specified, a Timestamp matching this interval will have to be the same
+                      or after the start.
+                    format: date-time
+                    type: string
+                type: object
+            type: object
+          type: array
+      type: object
+    freebusy.allocation.v1.BatchComputeAvailabilityResponse:
+      description: Response message for AllocationService.BatchComputeAvailability.
+      properties:
+        responses:
+          description: One response per request, in the order requested.
+          items:
+            description: Response message for AllocationService.ComputeAvailability.
+            properties:
+              buckets:
+                description: One bucket per slot or day, in ascending time order.
+                items:
+                  description: |-
+                    One slice of an availability answer: how many resources are free across a
+                    span, and which ones.
+
+                    This is where pooling happens. No RFC counts inventory -- RFC 5545 and 7953
+                    are one-calendar-one-timeline -- so a count is produced by asking each
+                    resource's calendar whether it is free and totalling the answers, rather than
+                    by storing a capacity number anywhere.
+                  properties:
+                    freeCount:
+                      description: How many candidate resources are free across the
+                        whole span.
+                      format: int32
+                      type: integer
+                    freeResources:
+                      description: |-
+                        Which resources are free, when the request asked for them. Omitted by
+                        default: a car park with 200 bays would otherwise repeat 200 names in
+                        every bucket of every day.
+                        Format: resources/{resource}
+                      items:
+                        type: string
+                      type: array
+                    totalCount:
+                      description: |-
+                        How many candidates were considered. `free_count` out of this is the
+                        "5 of 12 free" a caller renders.
+                      format: int32
+                      type: integer
+                    window:
+                      description: |-
+                        The span this bucket covers: one slot, or one calendar day in the target
+                        time zone, per the request's granularity.
+                      properties:
+                        endTime:
+                          description: |-
+                            Optional. Exclusive end of the interval.
+
+                            If specified, a Timestamp matching this interval will have to be before the
+                            end.
+                          format: date-time
+                          type: string
+                        startTime:
+                          description: |-
+                            Optional. Inclusive start of the interval.
+
+                            If specified, a Timestamp matching this interval will have to be the same
+                            or after the start.
+                          format: date-time
+                          type: string
+                      type: object
+                  type: object
+                type: array
+              totalCount:
+                description: How many resources were considered across the whole window.
+                format: int32
+                type: integer
+            type: object
+          type: array
+      type: object
+    freebusy.allocation.v1.CheckAvailabilityRequest:
+      description: Request message for AllocationService.CheckAvailability.
+      properties:
+        filter:
+          description: |-
+            An AIP-160 filter over each resource's search record (ResourceDay): its
+            `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
+            `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
+            `display_name` (a bare word matches it) and `organizational_unit`. Terms
+            are ANDed unless joined with OR. Empty matches every resource.
+            Only matching resources are checked.
+          type: string
+        parent:
+          description: |-
+            The site whose resources to check.
+            Format: organizationalUnits/{organizational_unit}
+          type: string
+        quantity:
+          description: How many resources are needed. Defaults to 1.
+          format: int32
+          type: integer
+        resources:
+          description: |-
+            Restrict the check to these resources. Empty means every resource the site
+            holds.
+            Format: resources/{resource}
+          items:
+            type: string
+          type: array
+        window:
+          description: The exact window to check.
+          properties:
+            endTime:
+              description: |-
+                Optional. Exclusive end of the interval.
+
+                If specified, a Timestamp matching this interval will have to be before the
+                end.
+              format: date-time
+              type: string
+            startTime:
+              description: |-
+                Optional. Inclusive start of the interval.
+
+                If specified, a Timestamp matching this interval will have to be the same
+                or after the start.
+              format: date-time
+              type: string
+          type: object
+      type: object
+    freebusy.allocation.v1.CheckAvailabilityResponse:
+      description: Response message for AllocationService.CheckAvailability.
+      properties:
+        bookable:
+          description: Whether `quantity` resources can be held for the window right
+            now.
+          type: boolean
+        candidateResources:
+          description: |-
+            Which resources would be taken, in the order the allocator would pick
+            them. Advisory: another caller may take one before a hold is created.
+            Format: resources/{resource}
+          items:
+            type: string
+          type: array
+        freeCount:
+          description: How many are actually free, which may be fewer than requested.
+          format: int32
+          type: integer
+        reasons:
+          description: Why not, when bookable is false. Empty when it is true.
+          items:
+            description: Why a requested window is not bookable.
+            properties:
+              code:
+                description: What went wrong, as a code a caller can branch on.
+                enum:
+                - UNBOOKABLE_REASON_CODE_UNSPECIFIED
+                - UNBOOKABLE_REASON_CODE_NO_CAPACITY
+                - UNBOOKABLE_REASON_CODE_OUTSIDE_AVAILABILITY
+                - UNBOOKABLE_REASON_CODE_HELD
+                - UNBOOKABLE_REASON_CODE_BOOKED
+                - UNBOOKABLE_REASON_CODE_WINDOW_TOO_SHORT
+                - UNBOOKABLE_REASON_CODE_WINDOW_TOO_LONG
+                - UNBOOKABLE_REASON_CODE_LEAD_TIME
+                - UNBOOKABLE_REASON_CODE_RESOURCE_INACTIVE
+                type: string
+              message:
+                description: Human-readable detail for logs and support, not for parsing.
+                type: string
+              resource:
+                description: |-
+                  The resource this reason is about, when it concerns one in particular.
+                  Format: resources/{resource}
+                type: string
+            type: object
+          type: array
+      type: object
+    freebusy.allocation.v1.ComputeAvailabilityRequest:
+      description: Request message for AllocationService.ComputeAvailability.
+      properties:
+        filter:
+          description: |-
+            An AIP-160 filter over each resource's search record (ResourceDay): its
+            `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
+            `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
+            `display_name` (a bare word matches it) and `organizational_unit`. Terms
+            are ANDed unless joined with OR. Empty matches every resource.
+            Only matching resources are computed over or counted.
+          type: string
+        granularity:
+          description: How to slice the window. Defaults by window length.
+          enum:
+          - AVAILABILITY_GRANULARITY_UNSPECIFIED
+          - AVAILABILITY_GRANULARITY_SLOT
+          - AVAILABILITY_GRANULARITY_DAY
+          type: string
+        includeFreeResources:
+          description: |-
+            Populate AvailabilityBucket.free_resources. Off by default: a large site
+            would otherwise repeat every resource name in every bucket.
+          type: boolean
+        parent:
+          description: |-
+            The site whose resources to compute over.
+            Format: organizationalUnits/{organizational_unit}
+          type: string
+        resources:
+          description: |-
+            Restrict the computation to these resources. Empty means every resource
+            the site holds.
+            Format: resources/{resource}
+          items:
+            type: string
+          type: array
+        slotDuration:
+          description: Slot length for SLOT granularity. Ignored for DAY.
+          type: string
+        timeZone:
+          description: |-
+            IANA time zone the day boundaries are drawn in, e.g. "Asia/Kolkata".
+            Defaults to the site's zone. Required in effect for DAY granularity, since
+            "a night" has no meaning without one.
+          type: string
+        window:
+          description: The window to compute over.
+          properties:
+            endTime:
+              description: |-
+                Optional. Exclusive end of the interval.
+
+                If specified, a Timestamp matching this interval will have to be before the
+                end.
+              format: date-time
+              type: string
+            startTime:
+              description: |-
+                Optional. Inclusive start of the interval.
+
+                If specified, a Timestamp matching this interval will have to be the same
+                or after the start.
+              format: date-time
+              type: string
+          type: object
+      type: object
+    freebusy.allocation.v1.ComputeAvailabilityResponse:
+      description: Response message for AllocationService.ComputeAvailability.
+      properties:
+        buckets:
+          description: One bucket per slot or day, in ascending time order.
+          items:
+            description: |-
+              One slice of an availability answer: how many resources are free across a
+              span, and which ones.
+
+              This is where pooling happens. No RFC counts inventory -- RFC 5545 and 7953
+              are one-calendar-one-timeline -- so a count is produced by asking each
+              resource's calendar whether it is free and totalling the answers, rather than
+              by storing a capacity number anywhere.
+            properties:
+              freeCount:
+                description: How many candidate resources are free across the whole
+                  span.
+                format: int32
+                type: integer
+              freeResources:
+                description: |-
+                  Which resources are free, when the request asked for them. Omitted by
+                  default: a car park with 200 bays would otherwise repeat 200 names in
+                  every bucket of every day.
+                  Format: resources/{resource}
+                items:
+                  type: string
+                type: array
+              totalCount:
+                description: |-
+                  How many candidates were considered. `free_count` out of this is the
+                  "5 of 12 free" a caller renders.
+                format: int32
+                type: integer
+              window:
+                description: |-
+                  The span this bucket covers: one slot, or one calendar day in the target
+                  time zone, per the request's granularity.
+                properties:
+                  endTime:
+                    description: |-
+                      Optional. Exclusive end of the interval.
+
+                      If specified, a Timestamp matching this interval will have to be before the
+                      end.
+                    format: date-time
+                    type: string
+                  startTime:
+                    description: |-
+                      Optional. Inclusive start of the interval.
+
+                      If specified, a Timestamp matching this interval will have to be the same
+                      or after the start.
+                    format: date-time
+                    type: string
+                type: object
+            type: object
+          type: array
+        totalCount:
+          description: How many resources were considered across the whole window.
+          format: int32
+          type: integer
+      type: object
+    freebusy.allocation.v1.CreateHoldRequest:
+      description: |-
+        Request message for HoldService.CreateHold, AIP-133.
+
+        The allocating call, in standard-method clothing: the caller states what it
+        wants on the Hold -- window, quantity, and which resources it will accept --
+        and the server picks the concrete resources under a lock. There is
+        deliberately no separate Allocate method, so there is one place where the
+        race is handled.
+      properties:
+        hold:
+          description: |-
+            The hold to take. Its window is required; quantity defaults to 1 and
+            candidate_resources empty offers every resource the site holds. Supply
+            idempotency_key to make a retry safe.
+          properties:
+            candidateFilter:
+              description: |-
+                An AIP-160 filter narrowing the resources the allocator may choose from,
+                supplied on create, alongside `candidate_resources`: the same filter
+                SearchAvailability takes, over each resource's `resource_types`,
+                `attributes` (its STRUCTURED-DATA, e.g. `attributes.view = "river"`) and
+                `display_name`. Empty narrows nothing. Immutable, like the candidates.
+              type: string
+            candidateResources:
+              description: |-
+                Candidate resources the allocator may choose from, supplied on create.
+                Empty offers every resource the site holds. Immutable: the choice is made
+                once, and re-offering a different set is a different allocation.
+                Format: resources/{resource}
+              items:
+                type: string
+              type: array
+            createTime:
+              description: Creation timestamp.
+              format: date-time
+              type: string
+            etag:
+              description: Opaque version for optimistic concurrency (AIP-154); echo
+                on update/delete.
+              type: string
+            expireTime:
+              description: |-
+                When the hold lapses if nothing confirms it. Extend it with ExtendHold;
+                past this instant the hold no longer reserves anything, whether or not the
+                sweeper has yet marked it EXPIRED.
+              format: date-time
+              type: string
+            idempotencyKey:
+              description: |-
+                Caller-supplied key making CreateHold safe to retry. A repeat with the same
+                key returns the original hold rather than taking a second one.
+              type: string
+            name:
+              description: |-
+                The hold name. Nested under the site whose resources it takes, so a hold
+                is listed and swept per site without joining through every resource.
+                Format: organizationalUnits/{organizational_unit}/holds/{hold}
+              type: string
+            quantity:
+              description: |-
+                How many resources to take, supplied on create; defaults to 1. Once the
+                hold is ACTIVE this equals the length of `resources`.
+              format: int32
+              type: integer
+            replaces:
+              description: |-
+                The hold of the reservation this hold is taken to replace with
+                RescheduleReservation: that reservation's `hold`, converted and at the
+                same site. Its claims do not count against this hold, so a new window
+                overlapping the old one -- an extension, a shift by an hour -- can keep
+                the same resources. Until the move completes this hold claims only the
+                time the old one does not; RescheduleReservation hands the rest over in
+                the write that ends the old hold, so no one else can take it in between.
+                Such a hold can only be used to reschedule that reservation. (A hold,
+                though no resource_reference says so: AIP-121 allows no cycle of mutable
+                references, and this one is a hold naming a hold.)
+                Format: organizationalUnits/{organizational_unit}/holds/{hold}
+              type: string
+            resources:
+              description: |-
+                The concrete resources this hold has taken, one per unit of `quantity`.
+                Chosen by the server from the candidates the request offered.
+                Format: resources/{resource}
+              items:
+                type: string
+              type: array
+            state:
+              description: Lifecycle state. New holds start ACTIVE.
+              enum:
+              - HOLD_STATE_UNSPECIFIED
+              - HOLD_STATE_ACTIVE
+              - HOLD_STATE_RELEASED
+              - HOLD_STATE_EXPIRED
+              - HOLD_STATE_CONVERTED
+              type: string
+            updateTime:
+              description: Last-modification timestamp.
+              format: date-time
+              type: string
+            window:
+              description: |-
+                The window held. Immutable: moving it is a different allocation, so
+                release this hold and take another.
+
+                Stored as text, its two ends in RFC 3339 joined by "/".
+              properties:
+                endTime:
+                  description: |-
+                    Optional. Exclusive end of the interval.
+
+                    If specified, a Timestamp matching this interval will have to be before the
+                    end.
+                  format: date-time
+                  type: string
+                startTime:
+                  description: |-
+                    Optional. Inclusive start of the interval.
+
+                    If specified, a Timestamp matching this interval will have to be the same
+                    or after the start.
+                  format: date-time
+                  type: string
+              type: object
+          type: object
+        holdId:
+          description: |-
+            Client-assigned id, becoming the last segment of the hold name. The server
+            generates one when empty.
+          type: string
+        parent:
+          description: |-
+            The site whose resources may be taken.
+            Format: organizationalUnits/{organizational_unit}
+          type: string
+      type: object
+    freebusy.allocation.v1.DeleteHoldRequest:
+      description: Request message for HoldService.DeleteHold, AIP-135.
+      properties:
+        etag:
+          description: |-
+            Opaque version read from the hold; the delete is rejected if the hold
+            changed since (AIP-154).
+          type: string
+        name:
+          description: |-
+            Name of the hold to delete.
+            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+          type: string
+      type: object
+    freebusy.allocation.v1.ErrorReason:
+      description: |-
+        The reasons freebusy returns for availability and holds: the
+        google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.dev domain. They are
+        part of the API: clients branch on them, never on a message.
+        protoc-gen-service renders them as Go constants, sentinels and the tables of
+        docs/errors.md.
+      enum:
+      - ERROR_REASON_UNSPECIFIED
+      - ERROR_REASON_INVALID_TIME_ZONE
+      - ERROR_REASON_TOO_MANY_BUCKETS
+      - ERROR_REASON_INVALID_FILTER
+      - ERROR_REASON_FILTER_UNSUPPORTED
+      - ERROR_REASON_INVALID_ORDER_BY
+      - ERROR_REASON_ORDER_BY_UNSUPPORTED
+      - ERROR_REASON_INVALID_FACET
+      - ERROR_REASON_INVALID_PAGE_TOKEN
+      - ERROR_REASON_WINDOW_BEYOND_HORIZON
+      - ERROR_REASON_ENGINE_BUSY
+      - ERROR_REASON_CAPACITY_EXHAUSTED
+      - ERROR_REASON_OUTSIDE_AVAILABILITY
+      - ERROR_REASON_INVALID_HOLD_EXTENSION
+      - ERROR_REASON_HOLD_NOT_ACTIVE
+      - ERROR_REASON_HOLD_CONVERTED
+      - ERROR_REASON_HOLD_ACTIVE
+      - ERROR_REASON_REPLACED_HOLD_NOT_BOOKED
+      type: string
+    freebusy.allocation.v1.ExtendHoldRequest:
+      description: Request message for HoldService.ExtendHold.
+      properties:
+        duration:
+          description: |-
+            How much further out to push expire_time, measured from now rather than
+            from the current deadline, so repeated extensions cannot accumulate.
+          type: string
+        etag:
+          description: |-
+            Opaque version read from the hold; the extension is rejected if the hold
+            changed since (AIP-154).
+          type: string
+        name:
+          description: |-
+            Name of the hold to extend.
+            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+          type: string
+      type: object
+    freebusy.allocation.v1.FacetBucket:
+      description: One value of a facet and how many resources carry it.
+      properties:
+        count:
+          description: How many matching resources carry it.
+          format: int64
+          type: integer
+          x-kubernetes-int-or-string: true
+        value:
+          description: 'The value, as text: "river", "22", "true".'
+          type: string
+      type: object
+    freebusy.allocation.v1.GetHoldRequest:
+      description: Request message for HoldService.GetHold, AIP-131.
+      properties:
+        name:
+          description: |-
+            Name of the hold to retrieve.
+            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+          type: string
+      type: object
+    freebusy.allocation.v1.Hold:
+      description: |-
+        A Hold is a temporary, expiring claim on one or more bookable resources for a
+        window, taken before payment or confirmation so two callers cannot be sold
+        the same thing.
+
+        Native, with no RFC behind it, and the comment says why (the same trade
+        protobuf.shared.project.v1 records upstream). RFC 5545 section 3.2.12's
+        PARTSTAT=TENTATIVE can express that a claim is provisional, and RFC 5546's
+        iTIP can carry the request that created it, but neither specifies a lapse
+        time, and an expiring claim is the one thing a commercial booking engine
+        cannot do without. The resources held are RFC 9073 VRESOURCEs and the window
+        is measured against their RFC 7953 availability; only the clock is ours.
+
+        Holds are allocated, not requested: CreateHold names candidate resources and
+        a quantity, and the server decides which concrete resources are taken. That
+        keeps "which bay did I get" a server decision made under a lock, rather than
+        a client guess that races.
+      properties:
+        candidateFilter:
+          description: |-
+            An AIP-160 filter narrowing the resources the allocator may choose from,
+            supplied on create, alongside `candidate_resources`: the same filter
+            SearchAvailability takes, over each resource's `resource_types`,
+            `attributes` (its STRUCTURED-DATA, e.g. `attributes.view = "river"`) and
+            `display_name`. Empty narrows nothing. Immutable, like the candidates.
+          type: string
+        candidateResources:
+          description: |-
+            Candidate resources the allocator may choose from, supplied on create.
+            Empty offers every resource the site holds. Immutable: the choice is made
+            once, and re-offering a different set is a different allocation.
+            Format: resources/{resource}
+          items:
+            type: string
+          type: array
+        createTime:
+          description: Creation timestamp.
+          format: date-time
+          type: string
+        etag:
+          description: Opaque version for optimistic concurrency (AIP-154); echo on
+            update/delete.
+          type: string
+        expireTime:
+          description: |-
+            When the hold lapses if nothing confirms it. Extend it with ExtendHold;
+            past this instant the hold no longer reserves anything, whether or not the
+            sweeper has yet marked it EXPIRED.
+          format: date-time
+          type: string
+        idempotencyKey:
+          description: |-
+            Caller-supplied key making CreateHold safe to retry. A repeat with the same
+            key returns the original hold rather than taking a second one.
+          type: string
+        name:
+          description: |-
+            The hold name. Nested under the site whose resources it takes, so a hold
+            is listed and swept per site without joining through every resource.
+            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+          type: string
+        quantity:
+          description: |-
+            How many resources to take, supplied on create; defaults to 1. Once the
+            hold is ACTIVE this equals the length of `resources`.
+          format: int32
+          type: integer
+        replaces:
+          description: |-
+            The hold of the reservation this hold is taken to replace with
+            RescheduleReservation: that reservation's `hold`, converted and at the
+            same site. Its claims do not count against this hold, so a new window
+            overlapping the old one -- an extension, a shift by an hour -- can keep
+            the same resources. Until the move completes this hold claims only the
+            time the old one does not; RescheduleReservation hands the rest over in
+            the write that ends the old hold, so no one else can take it in between.
+            Such a hold can only be used to reschedule that reservation. (A hold,
+            though no resource_reference says so: AIP-121 allows no cycle of mutable
+            references, and this one is a hold naming a hold.)
+            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+          type: string
+        resources:
+          description: |-
+            The concrete resources this hold has taken, one per unit of `quantity`.
+            Chosen by the server from the candidates the request offered.
+            Format: resources/{resource}
+          items:
+            type: string
+          type: array
+        state:
+          description: Lifecycle state. New holds start ACTIVE.
+          enum:
+          - HOLD_STATE_UNSPECIFIED
+          - HOLD_STATE_ACTIVE
+          - HOLD_STATE_RELEASED
+          - HOLD_STATE_EXPIRED
+          - HOLD_STATE_CONVERTED
+          type: string
+        updateTime:
+          description: Last-modification timestamp.
+          format: date-time
+          type: string
+        window:
+          description: |-
+            The window held. Immutable: moving it is a different allocation, so
+            release this hold and take another.
+
+            Stored as text, its two ends in RFC 3339 joined by "/".
+          properties:
+            endTime:
+              description: |-
+                Optional. Exclusive end of the interval.
+
+                If specified, a Timestamp matching this interval will have to be before the
+                end.
+              format: date-time
+              type: string
+            startTime:
+              description: |-
+                Optional. Inclusive start of the interval.
+
+                If specified, a Timestamp matching this interval will have to be the same
+                or after the start.
+              format: date-time
+              type: string
+          type: object
+      type: object
+    freebusy.allocation.v1.HoldState:
+      description: |-
+        Lifecycle of a Hold. A hold is the only thing in this API that expires on its
+        own: RFC 5545 section 3.2.12's PARTSTAT=TENTATIVE says a tentative claim
+        exists, but no RFC says when it lapses, so the clock is ours.
+
+        ```mermaid
+        stateDiagram-v2
+            state "ACTIVE" as HOLD_STATE_ACTIVE
+            state "RELEASED" as HOLD_STATE_RELEASED
+            state "EXPIRED" as HOLD_STATE_EXPIRED
+            state "CONVERTED" as HOLD_STATE_CONVERTED
+            [*] --> HOLD_STATE_ACTIVE: CreateHold
+            HOLD_STATE_ACTIVE --> HOLD_STATE_RELEASED: ReleaseHold
+            HOLD_STATE_ACTIVE --> HOLD_STATE_RELEASED: reservation failed
+            HOLD_STATE_ACTIVE --> HOLD_STATE_EXPIRED: sweeper [expire_time passed]
+            HOLD_STATE_ACTIVE --> HOLD_STATE_CONVERTED: CreateReservation
+            HOLD_STATE_RELEASED --> [*]
+            HOLD_STATE_EXPIRED --> [*]
+            HOLD_STATE_CONVERTED --> [*]
+        ```
+      enum:
+      - HOLD_STATE_UNSPECIFIED
+      - HOLD_STATE_ACTIVE
+      - HOLD_STATE_RELEASED
+      - HOLD_STATE_EXPIRED
+      - HOLD_STATE_CONVERTED
+      type: string
+      x-mermaid:
+      - diagram: |
+          stateDiagram-v2
+              state "ACTIVE" as HOLD_STATE_ACTIVE
+              state "RELEASED" as HOLD_STATE_RELEASED
+              state "EXPIRED" as HOLD_STATE_EXPIRED
+              state "CONVERTED" as HOLD_STATE_CONVERTED
+              [*] --> HOLD_STATE_ACTIVE: CreateHold
+              HOLD_STATE_ACTIVE --> HOLD_STATE_RELEASED: ReleaseHold
+              HOLD_STATE_ACTIVE --> HOLD_STATE_RELEASED: reservation failed
+              HOLD_STATE_ACTIVE --> HOLD_STATE_EXPIRED: sweeper [expire_time passed]
+              HOLD_STATE_ACTIVE --> HOLD_STATE_CONVERTED: CreateReservation
+              HOLD_STATE_RELEASED --> [*]
+              HOLD_STATE_EXPIRED --> [*]
+              HOLD_STATE_CONVERTED --> [*]
+        title: HoldState
+        type: stateDiagram-v2
+    freebusy.allocation.v1.ListHoldsRequest:
+      description: Request message for HoldService.ListHolds, AIP-132.
+      properties:
+        filter:
+          description: |-
+            Filter expression, AIP-160, over the hold's own fields, e.g.
+            `state=HOLD_STATE_ACTIVE`.
+          type: string
+        pageSize:
+          description: Maximum holds to return. Defaults to 50, capped at 1000.
+          format: int32
+          type: integer
+        pageToken:
+          description: Page token from a previous ListHoldsResponse.next_page_token.
+          type: string
+        parent:
+          description: |-
+            The site whose holds to list.
+            Format: organizationalUnits/{organizational_unit}
+          type: string
+      type: object
+    freebusy.allocation.v1.ListHoldsResponse:
+      description: Response message for HoldService.ListHolds, AIP-132.
+      properties:
+        holds:
+          description: The holds on this page.
+          items:
+            description: |-
+              A Hold is a temporary, expiring claim on one or more bookable resources for a
+              window, taken before payment or confirmation so two callers cannot be sold
+              the same thing.
+
+              Native, with no RFC behind it, and the comment says why (the same trade
+              protobuf.shared.project.v1 records upstream). RFC 5545 section 3.2.12's
+              PARTSTAT=TENTATIVE can express that a claim is provisional, and RFC 5546's
+              iTIP can carry the request that created it, but neither specifies a lapse
+              time, and an expiring claim is the one thing a commercial booking engine
+              cannot do without. The resources held are RFC 9073 VRESOURCEs and the window
+              is measured against their RFC 7953 availability; only the clock is ours.
+
+              Holds are allocated, not requested: CreateHold names candidate resources and
+              a quantity, and the server decides which concrete resources are taken. That
+              keeps "which bay did I get" a server decision made under a lock, rather than
+              a client guess that races.
+            properties:
+              candidateFilter:
+                description: |-
+                  An AIP-160 filter narrowing the resources the allocator may choose from,
+                  supplied on create, alongside `candidate_resources`: the same filter
+                  SearchAvailability takes, over each resource's `resource_types`,
+                  `attributes` (its STRUCTURED-DATA, e.g. `attributes.view = "river"`) and
+                  `display_name`. Empty narrows nothing. Immutable, like the candidates.
+                type: string
+              candidateResources:
+                description: |-
+                  Candidate resources the allocator may choose from, supplied on create.
+                  Empty offers every resource the site holds. Immutable: the choice is made
+                  once, and re-offering a different set is a different allocation.
+                  Format: resources/{resource}
+                items:
+                  type: string
+                type: array
+              createTime:
+                description: Creation timestamp.
+                format: date-time
+                type: string
+              etag:
+                description: Opaque version for optimistic concurrency (AIP-154);
+                  echo on update/delete.
+                type: string
+              expireTime:
+                description: |-
+                  When the hold lapses if nothing confirms it. Extend it with ExtendHold;
+                  past this instant the hold no longer reserves anything, whether or not the
+                  sweeper has yet marked it EXPIRED.
+                format: date-time
+                type: string
+              idempotencyKey:
+                description: |-
+                  Caller-supplied key making CreateHold safe to retry. A repeat with the same
+                  key returns the original hold rather than taking a second one.
+                type: string
+              name:
+                description: |-
+                  The hold name. Nested under the site whose resources it takes, so a hold
+                  is listed and swept per site without joining through every resource.
+                  Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                type: string
+              quantity:
+                description: |-
+                  How many resources to take, supplied on create; defaults to 1. Once the
+                  hold is ACTIVE this equals the length of `resources`.
+                format: int32
+                type: integer
+              replaces:
+                description: |-
+                  The hold of the reservation this hold is taken to replace with
+                  RescheduleReservation: that reservation's `hold`, converted and at the
+                  same site. Its claims do not count against this hold, so a new window
+                  overlapping the old one -- an extension, a shift by an hour -- can keep
+                  the same resources. Until the move completes this hold claims only the
+                  time the old one does not; RescheduleReservation hands the rest over in
+                  the write that ends the old hold, so no one else can take it in between.
+                  Such a hold can only be used to reschedule that reservation. (A hold,
+                  though no resource_reference says so: AIP-121 allows no cycle of mutable
+                  references, and this one is a hold naming a hold.)
+                  Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                type: string
+              resources:
+                description: |-
+                  The concrete resources this hold has taken, one per unit of `quantity`.
+                  Chosen by the server from the candidates the request offered.
+                  Format: resources/{resource}
+                items:
+                  type: string
+                type: array
+              state:
+                description: Lifecycle state. New holds start ACTIVE.
+                enum:
+                - HOLD_STATE_UNSPECIFIED
+                - HOLD_STATE_ACTIVE
+                - HOLD_STATE_RELEASED
+                - HOLD_STATE_EXPIRED
+                - HOLD_STATE_CONVERTED
+                type: string
+              updateTime:
+                description: Last-modification timestamp.
+                format: date-time
+                type: string
+              window:
+                description: |-
+                  The window held. Immutable: moving it is a different allocation, so
+                  release this hold and take another.
+
+                  Stored as text, its two ends in RFC 3339 joined by "/".
+                properties:
+                  endTime:
+                    description: |-
+                      Optional. Exclusive end of the interval.
+
+                      If specified, a Timestamp matching this interval will have to be before the
+                      end.
+                    format: date-time
+                    type: string
+                  startTime:
+                    description: |-
+                      Optional. Inclusive start of the interval.
+
+                      If specified, a Timestamp matching this interval will have to be the same
+                      or after the start.
+                    format: date-time
+                    type: string
+                type: object
+            type: object
+          type: array
+        nextPageToken:
+          description: Token for the next page, empty when this is the last page.
+          type: string
+      type: object
+    freebusy.allocation.v1.ReleaseHoldRequest:
+      description: Request message for HoldService.ReleaseHold.
+      properties:
+        etag:
+          description: |-
+            Opaque version read from the hold; the release is rejected if the hold
+            changed since (AIP-154).
+          type: string
+        name:
+          description: |-
+            Name of the hold to release.
+            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+          type: string
+      type: object
+    freebusy.allocation.v1.ResourceDay:
+      description: |-
+        A ResourceDay is one resource's standing free time on one UTC day: the
+        availability read model SearchAvailability, ComputeAvailability,
+        CheckAvailability and CreateHold read their candidates from, instead of
+        evaluating every resource an operator has.
+
+        Storage-only, and derived: no RPC takes or returns it. It is a projection
+        of the resources, their sites, calendars, RFC 7953 availability, RFC 5545
+        events and the claims of converted holds, rewritten in the same transaction
+        as every write to those (on Hasura, a single write projects in a request of
+        its own right after it), for every day of a rolling horizon. `free` is
+        offered time less booked time; live holds are not subtracted, and neither
+        is a resource's booking policy applied, because both change with the
+        clock. The engine evaluates every candidate the projection returns before
+        answering, so an answer never depends on the projection being current; a
+        stale row can only make a search miss a resource or read one it then
+        drops.
+      properties:
+        attributes:
+          description: |-
+            Every JSON object the resource's RFC 9073 STRUCTURED-DATA carries as
+            inline text, merged in order (a later key wins): freebusy's booking
+            profile and any vertical's own attributes. Searched with AIP-160 paths
+            such as `attributes.view = "river"` or `attributes.charger_kw >= 22`.
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+        calendar:
+          description: |-
+            The resource's calendar, "calendars/{calendar}": what an event or an
+            availability on that calendar re-projects.
+          type: string
+        day:
+          description: The UTC calendar day this row covers.
+          properties:
+            day:
+              description: |-
+                Day of a month. Must be from 1 to 31 and valid for the year and month, or 0
+                to specify a year by itself or a year and month where the day isn't
+                significant.
+              format: int32
+              type: integer
+            month:
+              description: |-
+                Month of a year. Must be from 1 to 12, or 0 to specify a year without a
+                month and day.
+              format: int32
+              type: integer
+            year:
+              description: |-
+                Year of the date. Must be from 1 to 9999, or 0 to specify a date without
+                a year.
+              format: int32
+              type: integer
+          type: object
+        displayName:
+          description: The resource's display name, matched by a bare word in a filter.
+          type: string
+        free:
+          description: |-
+            The resource's free time within the day, [day 00:00Z, next day 00:00Z):
+            offered by its availability, less confirmed events on its calendar and
+            the claims of converted holds. Live holds are not subtracted.
+          items:
+            description: |-
+              Represents a time interval, encoded as a Timestamp start (inclusive) and a
+              Timestamp end (exclusive).
+
+              The start must be less than or equal to the end.
+              When the start equals the end, the interval is empty (matches no time).
+              When both start and end are unspecified, the interval matches any time.
+            properties:
+              endTime:
+                description: |-
+                  Optional. Exclusive end of the interval.
+
+                  If specified, a Timestamp matching this interval will have to be before the
+                  end.
+                format: date-time
+                type: string
+              startTime:
+                description: |-
+                  Optional. Inclusive start of the interval.
+
+                  If specified, a Timestamp matching this interval will have to be the same
+                  or after the start.
+                format: date-time
+                type: string
+            type: object
+          type: array
+        freeFraction:
+          description: |-
+            The share of the day that is free, from 0 to 1, for ordering by how open
+            a resource is.
+          type: number
+        organization:
+          description: The organization of the resource's site, "organizations/{organization}".
+          type: string
+        organizationalUnit:
+          description: The resource's site, "organizationalUnits/{organizational_unit}".
+          type: string
+        resource:
+          description: |-
+            The resource, "resources/{resource}". Not a resource reference: a
+            projection row must never keep its source from being purged.
+          type: string
+        resourceTypes:
+          description: RFC 9073 RESOURCE-TYPE values the resource carries.
+          items:
+            type: string
+          type: array
+      type: object
+    freebusy.allocation.v1.SearchAvailabilityRequest:
+      description: |-
+        Request message for AllocationService.SearchAvailability. Sweeps a whole
+        operator for resources free across a window, where ComputeAvailability
+        answers for one site already chosen.
+      properties:
+        facets:
+          description: |-
+            Fields to count matching resources by, returned in
+            SearchAvailabilityResponse.facets: `resource_types`,
+            `organizational_unit` or an `attributes.<path>`, e.g.
+            ["resource_types", "attributes.view"]. At most 10.
+          items:
+            type: string
+          type: array
+        filter:
+          description: |-
+            An AIP-160 filter over each resource's search record (ResourceDay): its
+            `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
+            `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
+            `display_name` (a bare word matches it) and `organizational_unit`. Terms
+            are ANDed unless joined with OR. Empty matches every resource.
+          type: string
+        orderBy:
+          description: |-
+            AIP-132 order of the matches: a comma-separated list of `resource`,
+            `organizational_unit`, `display_name`, `free_fraction` (the share of
+            the window's first UTC day that is free) and `attributes.max_occupancy`
+            (the booking profile's, as a number), each optionally followed by
+            ` desc`, e.g. `free_fraction desc, display_name`. Defaults to
+            `organizational_unit, resource`. When quantity is above 1, matches are
+            grouped by site first, and the order applies within a site.
+          type: string
+        organizationalUnits:
+          description: |-
+            Restrict to sites, e.g. one car park or one venue. Empty searches all.
+            Format: organizationalUnits/{organizational_unit}
+          items:
+            type: string
+          type: array
+        pageSize:
+          description: Maximum matches to return. Defaults to 50, capped at 1000.
+          format: int32
+          type: integer
+        pageToken:
+          description: |-
+            Page token from a previous SearchAvailabilityResponse.next_page_token.
+            Every other field must be the same as in the call that returned it.
+          type: string
+        parent:
+          description: |-
+            The operator to search within.
+            Format: organizations/{organization}
+          type: string
+        quantity:
+          description: |-
+            How many resources must be free together at one site for it to match.
+            Defaults to 1.
+          format: int32
+          type: integer
+        resourceTypes:
+          description: |-
+            Restrict to RESOURCE-TYPE values, RFC 9073 section 6.3, e.g. "room" or
+            "parking-bay": a resource matches when it carries any of them. Empty
+            matches every type.
+          items:
+            type: string
+          type: array
+        window:
+          description: The window that must be free.
+          properties:
+            endTime:
+              description: |-
+                Optional. Exclusive end of the interval.
+
+                If specified, a Timestamp matching this interval will have to be before the
+                end.
+              format: date-time
+              type: string
+            startTime:
+              description: |-
+                Optional. Inclusive start of the interval.
+
+                If specified, a Timestamp matching this interval will have to be the same
+                or after the start.
+              format: date-time
+              type: string
+          type: object
+      type: object
+    freebusy.allocation.v1.SearchAvailabilityResponse:
+      description: Response message for AllocationService.SearchAvailability.
+      properties:
+        facets:
+          description: |-
+            One entry per field the request named in `facets`, in that order: how
+            many resources matching the filter have that window free in their
+            standing availability, by value. Counts come from the search records
+            and do not subtract live holds, so they can run slightly above what a
+            hold would get; the matches themselves are exact.
+          items:
+            description: |-
+              The counts of one facet of a search: how many matching resources carry
+              each value of one field.
+            properties:
+              buckets:
+                description: The most frequent values, most frequent first, at most
+                  20.
+                items:
+                  description: One value of a facet and how many resources carry it.
+                  properties:
+                    count:
+                      description: How many matching resources carry it.
+                      format: int64
+                      type: integer
+                      x-kubernetes-int-or-string: true
+                    value:
+                      description: 'The value, as text: "river", "22", "true".'
+                      type: string
+                  type: object
+                type: array
+              field:
+                description: The field counted, as the request named it, e.g. "attributes.view".
+                type: string
+            type: object
+          type: array
+        matches:
+          description: The free resources found.
+          items:
+            description: One resource that satisfies a search, with the window it
+              is free for.
+            properties:
+              displayName:
+                description: The resource's display name, echoed for the same reason.
+                type: string
+              organizationalUnit:
+                description: |-
+                  The site it belongs to.
+                  Format: organizationalUnits/{organizational_unit}
+                type: string
+              resource:
+                description: |-
+                  The free resource.
+                  Format: resources/{resource}
+                type: string
+              resourceTypes:
+                description: |-
+                  RESOURCE-TYPE values carried by the resource, RFC 9073 section 6.3, echoed
+                  so a caller can group results without re-fetching each resource.
+                items:
+                  type: string
+                type: array
+              window:
+                description: The span it is free for, which may be narrower than the
+                  searched window.
+                properties:
+                  endTime:
+                    description: |-
+                      Optional. Exclusive end of the interval.
+
+                      If specified, a Timestamp matching this interval will have to be before the
+                      end.
+                    format: date-time
+                    type: string
+                  startTime:
+                    description: |-
+                      Optional. Inclusive start of the interval.
+
+                      If specified, a Timestamp matching this interval will have to be the same
+                      or after the start.
+                    format: date-time
+                    type: string
+                type: object
+            type: object
+          type: array
+        nextPageToken:
+          description: Token for the next page, empty when this is the last page.
+          type: string
+      type: object
+    freebusy.allocation.v1.SearchFacet:
+      description: |-
+        The counts of one facet of a search: how many matching resources carry
+        each value of one field.
+      properties:
+        buckets:
+          description: The most frequent values, most frequent first, at most 20.
+          items:
+            description: One value of a facet and how many resources carry it.
+            properties:
+              count:
+                description: How many matching resources carry it.
+                format: int64
+                type: integer
+                x-kubernetes-int-or-string: true
+              value:
+                description: 'The value, as text: "river", "22", "true".'
+                type: string
+            type: object
+          type: array
+        field:
+          description: The field counted, as the request named it, e.g. "attributes.view".
+          type: string
+      type: object
+    freebusy.allocation.v1.UnbookableReason:
+      description: Why a requested window is not bookable.
+      properties:
+        code:
+          description: What went wrong, as a code a caller can branch on.
+          enum:
+          - UNBOOKABLE_REASON_CODE_UNSPECIFIED
+          - UNBOOKABLE_REASON_CODE_NO_CAPACITY
+          - UNBOOKABLE_REASON_CODE_OUTSIDE_AVAILABILITY
+          - UNBOOKABLE_REASON_CODE_HELD
+          - UNBOOKABLE_REASON_CODE_BOOKED
+          - UNBOOKABLE_REASON_CODE_WINDOW_TOO_SHORT
+          - UNBOOKABLE_REASON_CODE_WINDOW_TOO_LONG
+          - UNBOOKABLE_REASON_CODE_LEAD_TIME
+          - UNBOOKABLE_REASON_CODE_RESOURCE_INACTIVE
+          type: string
+        message:
+          description: Human-readable detail for logs and support, not for parsing.
+          type: string
+        resource:
+          description: |-
+            The resource this reason is about, when it concerns one in particular.
+            Format: resources/{resource}
+          type: string
+      type: object
+    freebusy.allocation.v1.UnbookableReasonCode:
+      description: |-
+        Why a window could not be booked. Returned by CheckAvailability so a caller
+        can say what to change rather than only that it failed.
+      enum:
+      - UNBOOKABLE_REASON_CODE_UNSPECIFIED
+      - UNBOOKABLE_REASON_CODE_NO_CAPACITY
+      - UNBOOKABLE_REASON_CODE_OUTSIDE_AVAILABILITY
+      - UNBOOKABLE_REASON_CODE_HELD
+      - UNBOOKABLE_REASON_CODE_BOOKED
+      - UNBOOKABLE_REASON_CODE_WINDOW_TOO_SHORT
+      - UNBOOKABLE_REASON_CODE_WINDOW_TOO_LONG
+      - UNBOOKABLE_REASON_CODE_LEAD_TIME
+      - UNBOOKABLE_REASON_CODE_RESOURCE_INACTIVE
+      type: string
+info:
+  description: |-
+    ## Resources
+
+    ```mermaid
+    erDiagram
+        Hold {
+            string name PK "IDENTIFIER"
+            string[] resources FK "OUTPUT_ONLY"
+            Interval window "REQUIRED, IMMUTABLE"
+            string[] candidate_resources FK "OPTIONAL, IMMUTABLE"
+            int32 quantity "OPTIONAL, IMMUTABLE"
+            Timestamp expire_time "OUTPUT_ONLY"
+            HoldState state "OUTPUT_ONLY"
+            string idempotency_key "OPTIONAL, IMMUTABLE"
+            Timestamp create_time "OUTPUT_ONLY"
+            Timestamp update_time "OUTPUT_ONLY"
+            string etag "OUTPUT_ONLY"
+            string replaces "OPTIONAL, IMMUTABLE"
+            string candidate_filter "OPTIONAL, IMMUTABLE"
+        }
+        Allocation {
+            string name PK "IDENTIFIER"
+            string resource FK "REQUIRED"
+            Timestamp start_time "REQUIRED"
+            Timestamp end_time "REQUIRED"
+            Timestamp expire_time "OUTPUT_ONLY"
+            Timestamp create_time "OUTPUT_ONLY"
+            string hold FK "OUTPUT_ONLY"
+        }
+        OrganizationalUnit ||--o{ Hold : "holds"
+        Hold }o--o{ Resource : "resources"
+        Hold }o--o{ Resource : "candidate_resources"
+        OrganizationalUnit ||--o{ Allocation : "allocations"
+        Allocation }o--|| Resource : "resource"
+        Allocation }o--o| Hold : "hold"
+    ```
+
+    ## Flows
+
+    - **Hold expiry** (`hold-expiry`, tag HoldService): A hold nobody confirms lapses at `expire_time`; ExtendHold pushes the deadline out while it is still ACTIVE.
+  title: OpenAPI Spec for Solo APIs.
+  version: v1
+  x-mermaid:
+  - diagram: |
+      erDiagram
+          Hold {
+              string name PK "IDENTIFIER"
+              string[] resources FK "OUTPUT_ONLY"
+              Interval window "REQUIRED, IMMUTABLE"
+              string[] candidate_resources FK "OPTIONAL, IMMUTABLE"
+              int32 quantity "OPTIONAL, IMMUTABLE"
+              Timestamp expire_time "OUTPUT_ONLY"
+              HoldState state "OUTPUT_ONLY"
+              string idempotency_key "OPTIONAL, IMMUTABLE"
+              Timestamp create_time "OUTPUT_ONLY"
+              Timestamp update_time "OUTPUT_ONLY"
+              string etag "OUTPUT_ONLY"
+              string replaces "OPTIONAL, IMMUTABLE"
+              string candidate_filter "OPTIONAL, IMMUTABLE"
+          }
+          Allocation {
+              string name PK "IDENTIFIER"
+              string resource FK "REQUIRED"
+              Timestamp start_time "REQUIRED"
+              Timestamp end_time "REQUIRED"
+              Timestamp expire_time "OUTPUT_ONLY"
+              Timestamp create_time "OUTPUT_ONLY"
+              string hold FK "OUTPUT_ONLY"
+          }
+          OrganizationalUnit ||--o{ Hold : "holds"
+          Hold }o--o{ Resource : "resources"
+          Hold }o--o{ Resource : "candidate_resources"
+          OrganizationalUnit ||--o{ Allocation : "allocations"
+          Allocation }o--|| Resource : "resource"
+          Allocation }o--o| Hold : "hold"
+    title: Resources
+    type: erDiagram
+openapi: 3.0.1
+paths: null
+tags:
+- description: |-
+    AllocationService is the read-only half of the engine: it answers how much is
+    free, and never changes anything. HoldService is the half that takes.
+
+    The counting is done here rather than stored anywhere. No RFC models an
+    inventory count -- RFC 5545 and RFC 7953 are one-calendar-one-timeline -- so
+    "5 of 12 free" is produced by asking each RFC 9073 resource's calendar
+    whether it is free across the window and totalling the answers. RFC 7953's
+    VAVAILABILITY says when a resource was on offer at all; bookings on its
+    calendar say what has since been taken; the difference is availability.
+
+    Every operation is a custom method (AIP-136): they compute rather than fetch,
+    so they take neither the standard-method names nor their shapes.
+  name: AllocationService
+- description: |-
+    HoldService takes and releases expiring claims on resources. It is the only
+    thing in this API that mutates availability.
+
+    Two things are deliberately not RPCs: the sweeper that expires lapsed holds
+    is an internal job, not a call, and conversion to a confirmed booking is
+    driven by ReservationService, so a hold is never converted by a caller
+    reaching in here.
+
+    There is no UpdateHold. A hold's window and resources are immutable by
+    construction -- changing either is a different allocation -- so the only
+    mutations are the two custom methods below.
+
+    ### Flow: Hold expiry
+
+    A hold nobody confirms lapses at `expire_time`; ExtendHold pushes the
+    deadline out while it is still ACTIVE.
+
+    Reads are authoritative on expiry, so a caller never sees an ACTIVE hold
+    that no longer holds anything, even before the sweeper runs.
+
+    ```mermaid
+    sequenceDiagram
+        participant Client
+        participant HoldService
+        participant Sweeper
+        participant Webhooks
+        Client->>+HoldService: CreateHold
+        HoldService-->>-Client: Hold (ACTIVE)
+        opt the caller needs more time
+            Client->>+HoldService: ExtendHold
+            HoldService-->>-Client: Hold (later expire_time)
+        end
+        Sweeper->>HoldService: expire lapsed holds
+        Note over Sweeper,HoldService: expire_time passed#59; the claims stop counting
+        HoldService-)Webhooks: freebusy.hold.expired
+        Client->>+HoldService: GetHold
+        HoldService-->>-Client: Hold (EXPIRED)
+        Client->>+HoldService: ExtendHold
+        HoldService--x-Client: FAILED_PRECONDITION (HOLD_NOT_ACTIVE)
+    ```
+  name: HoldService
+  x-mermaid:
+  - diagram: |
+      sequenceDiagram
+          participant Client
+          participant HoldService
+          participant Sweeper
+          participant Webhooks
+          Client->>+HoldService: CreateHold
+          HoldService-->>-Client: Hold (ACTIVE)
+          opt the caller needs more time
+              Client->>+HoldService: ExtendHold
+              HoldService-->>-Client: Hold (later expire_time)
+          end
+          Sweeper->>HoldService: expire lapsed holds
+          Note over Sweeper,HoldService: expire_time passed#59; the claims stop counting
+          HoldService-)Webhooks: freebusy.hold.expired
+          Client->>+HoldService: GetHold
+          HoldService-->>-Client: Hold (EXPIRED)
+          Client->>+HoldService: ExtendHold
+          HoldService--x-Client: FAILED_PRECONDITION (HOLD_NOT_ACTIVE)
+    title: Hold expiry
+    type: sequenceDiagram

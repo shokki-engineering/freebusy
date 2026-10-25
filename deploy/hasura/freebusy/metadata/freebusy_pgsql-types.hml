@@ -1,0 +1,1089 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+kind: ScalarType
+version: v1
+definition:
+  name: String_1
+  graphql:
+    typeName: String1
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: TextBoolExp
+  operand:
+    scalar:
+      type: String_1
+      comparisonOperators:
+        - name: _eq
+          argumentType: String_1!
+        - name: _gt
+          argumentType: String_1!
+        - name: _gte
+          argumentType: String_1!
+        - name: _ilike
+          argumentType: String_1!
+        - name: _in
+          argumentType: "[String_1!]!"
+        - name: _iregex
+          argumentType: String_1!
+        - name: _like
+          argumentType: String_1!
+        - name: _lt
+          argumentType: String_1!
+        - name: _lte
+          argumentType: String_1!
+        - name: _neq
+          argumentType: String_1!
+        - name: _nilike
+          argumentType: String_1!
+        - name: _niregex
+          argumentType: String_1!
+        - name: _nlike
+          argumentType: String_1!
+        - name: _nregex
+          argumentType: String_1!
+        - name: _regex
+          argumentType: String_1!
+        - name: starts_with
+          argumentType: String_1!
+        - name: ts_match_tt
+          argumentType: String_1!
+      dataConnectorOperatorMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: text
+          operatorMapping: {}
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: TextBoolExp
+
+---
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: freebusy_pgsql
+  dataConnectorScalarType: text
+  representation: String_1
+  graphql:
+    comparisonExpressionTypeName: String1ComparisonExp
+
+---
+kind: ScalarType
+version: v1
+definition:
+  name: Timestamptz
+  graphql:
+    typeName: Timestamptz
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: TimestamptzBoolExp
+  operand:
+    scalar:
+      type: Timestamptz
+      comparisonOperators:
+        - name: _eq
+          argumentType: Timestamptz!
+        - name: _gt
+          argumentType: Timestamptz!
+        - name: _gte
+          argumentType: Timestamptz!
+        - name: _in
+          argumentType: "[Timestamptz!]!"
+        - name: _lt
+          argumentType: Timestamptz!
+        - name: _lte
+          argumentType: Timestamptz!
+        - name: _neq
+          argumentType: Timestamptz!
+      dataConnectorOperatorMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: timestamptz
+          operatorMapping: {}
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: TimestamptzBoolExp
+
+---
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: freebusy_pgsql
+  dataConnectorScalarType: timestamptz
+  representation: Timestamptz
+  graphql:
+    comparisonExpressionTypeName: TimestamptzComparisonExp
+
+---
+kind: ScalarType
+version: v1
+definition:
+  name: Int32
+  graphql:
+    typeName: Int32
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: Int4BoolExp
+  operand:
+    scalar:
+      type: Int32
+      comparisonOperators:
+        - name: _eq
+          argumentType: Int32!
+        - name: _gt
+          argumentType: Int32!
+        - name: _gte
+          argumentType: Int32!
+        - name: _in
+          argumentType: "[Int32!]!"
+        - name: _lt
+          argumentType: Int32!
+        - name: _lte
+          argumentType: Int32!
+        - name: _neq
+          argumentType: Int32!
+      dataConnectorOperatorMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: int4
+          operatorMapping: {}
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: Int4BoolExp
+
+---
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: freebusy_pgsql
+  dataConnectorScalarType: int4
+  representation: Int32
+  graphql:
+    comparisonExpressionTypeName: Int32ComparisonExp
+
+---
+kind: ScalarType
+version: v1
+definition:
+  name: Int64
+  graphql:
+    typeName: Int64
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: Int8BoolExp
+  operand:
+    scalar:
+      type: Int64
+      comparisonOperators:
+        - name: _eq
+          argumentType: Int64!
+        - name: _gt
+          argumentType: Int64!
+        - name: _gte
+          argumentType: Int64!
+        - name: _in
+          argumentType: "[Int64!]!"
+        - name: _lt
+          argumentType: Int64!
+        - name: _lte
+          argumentType: Int64!
+        - name: _neq
+          argumentType: Int64!
+      dataConnectorOperatorMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: int8
+          operatorMapping: {}
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: Int8BoolExp
+
+---
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: freebusy_pgsql
+  dataConnectorScalarType: int8
+  representation: Int64
+  graphql:
+    comparisonExpressionTypeName: Int64ComparisonExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: TextAggExp
+  operand:
+    scalar:
+      aggregatedType: String_1
+      aggregationFunctions:
+        - name: max
+          returnType: String_1
+        - name: min
+          returnType: String_1
+      dataConnectorAggregationFunctionMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: text
+          functionMapping:
+            max:
+              name: max
+            min:
+              name: min
+  count:
+    enable: true
+    returnType: Int64
+  countDistinct:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: TextAggExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: TimestamptzAggExp
+  operand:
+    scalar:
+      aggregatedType: Timestamptz
+      aggregationFunctions:
+        - name: max
+          returnType: Timestamptz
+        - name: min
+          returnType: Timestamptz
+      dataConnectorAggregationFunctionMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: timestamptz
+          functionMapping:
+            max:
+              name: max
+            min:
+              name: min
+  count:
+    enable: true
+    returnType: Int64
+  countDistinct:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: TimestamptzAggExp
+
+---
+kind: ScalarType
+version: v1
+definition:
+  name: Bigdecimal
+  graphql:
+    typeName: Bigdecimal
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: NumericBoolExp
+  operand:
+    scalar:
+      type: Bigdecimal
+      comparisonOperators:
+        - name: _eq
+          argumentType: Bigdecimal!
+        - name: _gt
+          argumentType: Bigdecimal!
+        - name: _gte
+          argumentType: Bigdecimal!
+        - name: _in
+          argumentType: "[Bigdecimal!]!"
+        - name: _lt
+          argumentType: Bigdecimal!
+        - name: _lte
+          argumentType: Bigdecimal!
+        - name: _neq
+          argumentType: Bigdecimal!
+      dataConnectorOperatorMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: numeric
+          operatorMapping: {}
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: NumericBoolExp
+
+---
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: freebusy_pgsql
+  dataConnectorScalarType: numeric
+  representation: Bigdecimal
+  graphql:
+    comparisonExpressionTypeName: BigdecimalComparisonExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: Int4AggExp
+  operand:
+    scalar:
+      aggregatedType: Int32
+      aggregationFunctions:
+        - name: avg
+          returnType: Bigdecimal
+        - name: bit_and
+          returnType: Int32
+        - name: bit_or
+          returnType: Int32
+        - name: bit_xor
+          returnType: Int32
+        - name: max
+          returnType: Int32
+        - name: min
+          returnType: Int32
+        - name: stddev
+          returnType: Bigdecimal
+        - name: stddev_pop
+          returnType: Bigdecimal
+        - name: stddev_samp
+          returnType: Bigdecimal
+        - name: sum
+          returnType: Int64
+        - name: var_pop
+          returnType: Bigdecimal
+        - name: var_samp
+          returnType: Bigdecimal
+        - name: variance
+          returnType: Bigdecimal
+      dataConnectorAggregationFunctionMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: int4
+          functionMapping:
+            avg:
+              name: avg
+            bit_and:
+              name: bit_and
+            bit_or:
+              name: bit_or
+            bit_xor:
+              name: bit_xor
+            max:
+              name: max
+            min:
+              name: min
+            stddev:
+              name: stddev
+            stddev_pop:
+              name: stddev_pop
+            stddev_samp:
+              name: stddev_samp
+            sum:
+              name: sum
+            var_pop:
+              name: var_pop
+            var_samp:
+              name: var_samp
+            variance:
+              name: variance
+  count:
+    enable: true
+    returnType: Int64
+  countDistinct:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: Int4AggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: String1OrderByExp
+  operand:
+    scalar:
+      orderedType: String_1
+      enableOrderByDirections:
+        enableAll: true
+  graphql:
+    expressionTypeName: String1OrderByExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: TimestamptzOrderByExp
+  operand:
+    scalar:
+      orderedType: Timestamptz
+      enableOrderByDirections:
+        enableAll: true
+  graphql:
+    expressionTypeName: TimestamptzOrderByExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: Int32OrderByExp
+  operand:
+    scalar:
+      orderedType: Int32
+      enableOrderByDirections:
+        enableAll: true
+  graphql:
+    expressionTypeName: Int32OrderByExp
+
+---
+kind: ScalarType
+version: v1
+definition:
+  name: Json
+  graphql:
+    typeName: Json
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: JsonbBoolExp
+  operand:
+    scalar:
+      type: Json
+      comparisonOperators:
+        - name: _eq
+          argumentType: Json!
+        - name: _gt
+          argumentType: Json!
+        - name: _gte
+          argumentType: Json!
+        - name: _in
+          argumentType: "[Json!]!"
+        - name: _lt
+          argumentType: Json!
+        - name: _lte
+          argumentType: Json!
+        - name: _neq
+          argumentType: Json!
+        - name: jsonb_contained
+          argumentType: Json!
+        - name: jsonb_contains
+          argumentType: Json!
+        - name: jsonb_exists
+          argumentType: String_1!
+      dataConnectorOperatorMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: jsonb
+          operatorMapping: {}
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: JsonbBoolExp
+
+---
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: freebusy_pgsql
+  dataConnectorScalarType: jsonb
+  representation: Json
+  graphql:
+    comparisonExpressionTypeName: JsonComparisonExp
+
+---
+kind: ScalarType
+version: v1
+definition:
+  name: Date
+  graphql:
+    typeName: Date
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: DateBoolExp
+  operand:
+    scalar:
+      type: Date
+      comparisonOperators:
+        - name: _eq
+          argumentType: Date!
+        - name: _gt
+          argumentType: Date!
+        - name: _gte
+          argumentType: Date!
+        - name: _in
+          argumentType: "[Date!]!"
+        - name: _lt
+          argumentType: Date!
+        - name: _lte
+          argumentType: Date!
+        - name: _neq
+          argumentType: Date!
+      dataConnectorOperatorMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: date
+          operatorMapping: {}
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: DateBoolExp
+
+---
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: freebusy_pgsql
+  dataConnectorScalarType: date
+  representation: Date
+  graphql:
+    comparisonExpressionTypeName: DateComparisonExp
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: TstzmultirangeBoolExp
+  operand:
+    scalar:
+      type: Json
+      comparisonOperators:
+        - name: _in
+          argumentType: "[Json!]!"
+      dataConnectorOperatorMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: tstzmultirange
+          operatorMapping: {}
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: TstzmultirangeBoolExp
+
+---
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: freebusy_pgsql
+  dataConnectorScalarType: tstzmultirange
+  representation: Json
+  graphql:
+    comparisonExpressionTypeName: JsonComparisonExp_1
+
+---
+kind: ScalarType
+version: v1
+definition:
+  name: Float64
+  graphql:
+    typeName: Float64
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: Float8BoolExp
+  operand:
+    scalar:
+      type: Float64
+      comparisonOperators:
+        - name: _eq
+          argumentType: Float64!
+        - name: _gt
+          argumentType: Float64!
+        - name: _gte
+          argumentType: Float64!
+        - name: _in
+          argumentType: "[Float64!]!"
+        - name: _lt
+          argumentType: Float64!
+        - name: _lte
+          argumentType: Float64!
+        - name: _neq
+          argumentType: Float64!
+      dataConnectorOperatorMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: float8
+          operatorMapping: {}
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: Float8BoolExp
+
+---
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: freebusy_pgsql
+  dataConnectorScalarType: float8
+  representation: Float64
+  graphql:
+    comparisonExpressionTypeName: Float64ComparisonExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: JsonbAggExp
+  operand:
+    scalar:
+      aggregatedType: Json
+      aggregationFunctions: []
+      dataConnectorAggregationFunctionMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: jsonb
+          functionMapping: {}
+  count:
+    enable: true
+    returnType: Int64
+  countDistinct:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: JsonbAggExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: DateAggExp
+  operand:
+    scalar:
+      aggregatedType: Date
+      aggregationFunctions:
+        - name: max
+          returnType: Date
+        - name: min
+          returnType: Date
+      dataConnectorAggregationFunctionMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: date
+          functionMapping:
+            max:
+              name: max
+            min:
+              name: min
+  count:
+    enable: true
+    returnType: Int64
+  countDistinct:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: DateAggExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: TstzmultirangeAggExp
+  operand:
+    scalar:
+      aggregatedType: Json
+      aggregationFunctions: []
+      dataConnectorAggregationFunctionMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: tstzmultirange
+          functionMapping: {}
+  count:
+    enable: true
+    returnType: Int64
+  countDistinct:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: TstzmultirangeAggExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: Float8AggExp
+  operand:
+    scalar:
+      aggregatedType: Float64
+      aggregationFunctions:
+        - name: avg
+          returnType: Float64
+        - name: max
+          returnType: Float64
+        - name: min
+          returnType: Float64
+        - name: stddev
+          returnType: Float64
+        - name: stddev_pop
+          returnType: Float64
+        - name: stddev_samp
+          returnType: Float64
+        - name: sum
+          returnType: Float64
+        - name: var_pop
+          returnType: Float64
+        - name: var_samp
+          returnType: Float64
+        - name: variance
+          returnType: Float64
+      dataConnectorAggregationFunctionMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: float8
+          functionMapping:
+            avg:
+              name: avg
+            max:
+              name: max
+            min:
+              name: min
+            stddev:
+              name: stddev
+            stddev_pop:
+              name: stddev_pop
+            stddev_samp:
+              name: stddev_samp
+            sum:
+              name: sum
+            var_pop:
+              name: var_pop
+            var_samp:
+              name: var_samp
+            variance:
+              name: variance
+  count:
+    enable: true
+    returnType: Int64
+  countDistinct:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: Float8AggExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: Int8AggExp
+  operand:
+    scalar:
+      aggregatedType: Int64
+      aggregationFunctions:
+        - name: avg
+          returnType: Bigdecimal
+        - name: bit_and
+          returnType: Int64
+        - name: bit_or
+          returnType: Int64
+        - name: bit_xor
+          returnType: Int64
+        - name: max
+          returnType: Int64
+        - name: min
+          returnType: Int64
+        - name: stddev
+          returnType: Bigdecimal
+        - name: stddev_pop
+          returnType: Bigdecimal
+        - name: stddev_samp
+          returnType: Bigdecimal
+        - name: sum
+          returnType: Bigdecimal
+        - name: var_pop
+          returnType: Bigdecimal
+        - name: var_samp
+          returnType: Bigdecimal
+        - name: variance
+          returnType: Bigdecimal
+      dataConnectorAggregationFunctionMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: int8
+          functionMapping:
+            avg:
+              name: avg
+            bit_and:
+              name: bit_and
+            bit_or:
+              name: bit_or
+            bit_xor:
+              name: bit_xor
+            max:
+              name: max
+            min:
+              name: min
+            stddev:
+              name: stddev
+            stddev_pop:
+              name: stddev_pop
+            stddev_samp:
+              name: stddev_samp
+            sum:
+              name: sum
+            var_pop:
+              name: var_pop
+            var_samp:
+              name: var_samp
+            variance:
+              name: variance
+  count:
+    enable: true
+    returnType: Int64
+  countDistinct:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: Int8AggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: JsonOrderByExp
+  operand:
+    scalar:
+      orderedType: Json
+      enableOrderByDirections:
+        enableAll: true
+  graphql:
+    expressionTypeName: JsonOrderByExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: DateOrderByExp
+  operand:
+    scalar:
+      orderedType: Date
+      enableOrderByDirections:
+        enableAll: true
+  graphql:
+    expressionTypeName: DateOrderByExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: Float64OrderByExp
+  operand:
+    scalar:
+      orderedType: Float64
+      enableOrderByDirections:
+        enableAll: true
+  graphql:
+    expressionTypeName: Float64OrderByExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: Int64OrderByExp
+  operand:
+    scalar:
+      orderedType: Int64
+      enableOrderByDirections:
+        enableAll: true
+  graphql:
+    expressionTypeName: Int64OrderByExp
+
+---
+kind: ScalarType
+version: v1
+definition:
+  name: Boolean_1
+  graphql:
+    typeName: Boolean1
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: BoolBoolExp
+  operand:
+    scalar:
+      type: Boolean_1
+      comparisonOperators:
+        - name: _eq
+          argumentType: Boolean_1!
+        - name: _gt
+          argumentType: Boolean_1!
+        - name: _gte
+          argumentType: Boolean_1!
+        - name: _in
+          argumentType: "[Boolean_1!]!"
+        - name: _lt
+          argumentType: Boolean_1!
+        - name: _lte
+          argumentType: Boolean_1!
+        - name: _neq
+          argumentType: Boolean_1!
+      dataConnectorOperatorMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: bool
+          operatorMapping: {}
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: BoolBoolExp
+
+---
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: freebusy_pgsql
+  dataConnectorScalarType: bool
+  representation: Boolean_1
+  graphql:
+    comparisonExpressionTypeName: Boolean1ComparisonExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: BoolAggExp
+  operand:
+    scalar:
+      aggregatedType: Boolean_1
+      aggregationFunctions:
+        - name: bool_and
+          returnType: Boolean_1
+        - name: bool_or
+          returnType: Boolean_1
+        - name: every
+          returnType: Boolean_1
+      dataConnectorAggregationFunctionMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: bool
+          functionMapping:
+            bool_and:
+              name: bool_and
+            bool_or:
+              name: bool_or
+            every:
+              name: every
+  count:
+    enable: true
+    returnType: Int64
+  countDistinct:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: BoolAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: Boolean1OrderByExp
+  operand:
+    scalar:
+      orderedType: Boolean_1
+      enableOrderByDirections:
+        enableAll: true
+  graphql:
+    expressionTypeName: Boolean1OrderByExp
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: ByteaBoolExp
+  operand:
+    scalar:
+      type: Json
+      comparisonOperators:
+        - name: _eq
+          argumentType: Json!
+        - name: _gt
+          argumentType: Json!
+        - name: _gte
+          argumentType: Json!
+        - name: _in
+          argumentType: "[Json!]!"
+        - name: _like
+          argumentType: Json!
+        - name: _lt
+          argumentType: Json!
+        - name: _lte
+          argumentType: Json!
+        - name: _neq
+          argumentType: Json!
+        - name: _nlike
+          argumentType: Json!
+      dataConnectorOperatorMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: bytea
+          operatorMapping: {}
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: ByteaBoolExp
+
+---
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: freebusy_pgsql
+  dataConnectorScalarType: bytea
+  representation: Json
+  graphql:
+    comparisonExpressionTypeName: JsonComparisonExp_2
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: ByteaAggExp
+  operand:
+    scalar:
+      aggregatedType: Json
+      aggregationFunctions:
+        - name: max
+          returnType: Json
+        - name: min
+          returnType: Json
+      dataConnectorAggregationFunctionMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: bytea
+          functionMapping:
+            max:
+              name: max
+            min:
+              name: min
+  count:
+    enable: true
+    returnType: Int64
+  countDistinct:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: ByteaAggExp
+

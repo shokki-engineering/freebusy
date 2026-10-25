@@ -10,9 +10,11 @@ import (
 	"time"
 
 	eventv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
-	"github.com/shokki-engineering/freebusy/internal/runtime/hints"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
-	"github.com/shokki-engineering/freebusy/internal/types"
+	"github.com/shokki-engineering/freebusy/internal/service/generated/freebusy/shared/v1/sharedpbv1svc"
+	"github.com/shokki-engineering/freebusy/internal/service/generated/servicex"
+	"github.com/the-protobuf-project/runtime-go/grpc/hints"
+	"github.com/the-protobuf-project/runtime-go/grpc/problem"
 	"google.golang.org/genproto/googleapis/type/date"
 	"google.golang.org/genproto/googleapis/type/datetime"
 	"google.golang.org/genproto/googleapis/type/dayofweek"
@@ -174,14 +176,14 @@ func Occurrences(e *eventv1.Event, overrides []*eventv1.Event, loc *time.Locatio
 
 	parts, unsupported := RecurrenceFromProto(e.GetRecurrence(), loc)
 	if len(unsupported) > 0 {
-		return nil, dur, &types.Problem{Kind: types.ErrUnimplemented, Reason: "UNSUPPORTED_RECURRENCE",
+		return nil, dur, &problem.Problem{Kind: sharedpbv1svc.ErrUnimplemented, Reason: "UNSUPPORTED_RECURRENCE",
 			ResourceType: hints.TypeOf(e.GetName()), ResourceName: e.GetName(),
 			What: fmt.Sprintf("event %s recurs by %s, which freebusy does not expand", e.GetName(), strings.Join(unsupported, ", ")),
 			Fix:  recurrenceFix}
 	}
 	rule, err := engine.ParseRRule(parts.RRule(), first.Start.Location())
 	if err != nil {
-		return nil, dur, &types.Problem{Kind: types.ErrUnimplemented, Reason: "UNSUPPORTED_RECURRENCE",
+		return nil, dur, &problem.Problem{Kind: sharedpbv1svc.ErrUnimplemented, Reason: "UNSUPPORTED_RECURRENCE",
 			ResourceType: hints.TypeOf(e.GetName()), ResourceName: e.GetName(),
 			What: fmt.Sprintf("event %s has a recurrence freebusy cannot expand (%v)", e.GetName(), err),
 			Fix:  recurrenceFix}
@@ -251,7 +253,7 @@ func OverridesOf(series *eventv1.Event, events []*eventv1.Event) []*eventv1.Even
 // about some other request -- availability, a hold. The request is fine; the
 // calendar data is not, and the fix is to the event, so the problem names it.
 func brokenEvent(name, what, fix string) error {
-	return types.Blocked("INVALID_EVENT", hints.TypeOf(name), name,
+	return servicex.Blocked("INVALID_EVENT", hints.TypeOf(name), name,
 		fmt.Sprintf("event %s %s, so its calendar's time cannot be computed", name, what),
 		"Fix the event -- "+fix+" -- with "+hints.Call("UpdateEvent", map[string]string{"event.name": name})+", then ask again")
 }

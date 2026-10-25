@@ -6,9 +6,10 @@
 # Recipes run from the repo root so buf/template paths resolve unchanged.
 set working-directory := '../..'
 
-# Regenerate everything: Go, OpenAPI (+merge+envoy), database layer + cache, docs.
+# Regenerate everything: Go, OpenAPI (+merge+envoy), database layer + cache,
+# service layer, docs.
 [group('codegen')]
-all: deps go rfc openapi envoy store docs
+all: deps go rfc openapi envoy store service docs
 
 # Update buf module dependencies.
 [group('codegen')]
@@ -27,7 +28,7 @@ go:
 # serves -- and merge them into openapiv3-spec.yaml.
 [group('codegen')]
 openapi:
-    rm -rf protobuf/generated/openapi/freebusy protobuf/generated/openapi/rfc
+    rm -rf protobuf/generated/openapi/freebusy protobuf/generated/openapi/rfc protobuf/generated/openapi/types
     buf generate --template tools/protobuf/buf/openapiv3.buf.gen.yaml
     buf generate --template tools/protobuf/buf/openapiv3.rfc.buf.gen.yaml
     go run ./tools/protobuf/openapi
@@ -60,13 +61,44 @@ rfc:
 # (`just hasura regen`) or this recipe fails at that step.
 [group('codegen')]
 store:
+    # buf runs the plugins once per input, so the freebusy run cannot see the
+    # RFC module's tables. This image of the RFC module, at the commit
+    # buf.lock pins, lets protoc-gen-store discover them (store.backend.yaml
+    # `references:`) and turn freebusy's references into foreign keys.
+    mkdir -p build/protobuf
+    buf build buf.build/the-protobuf-project/rfc:$(awk '/name: buf.build\/the-protobuf-project\/rfc$/ {getline; print $2}' buf.lock) -o build/protobuf/rfc.binpb
     buf generate --template tools/protobuf/buf/store.buf.gen.yaml
     # The generators clear their output directories, BUILD.bazel included.
     bazel run //:gazelle
     go run ./tools/license -fix
 
-# Generate protobuf docs (per-module + root README.md) via protodoc.
+# Generate the service layer over the repositories: the AIP standard-method
+# servers and their hooks (internal/service/generated), RegisterAll, the change
+# feeds and store adapters for runtime-go's events and grpc/idempotency, and
+# the error reasons declared in proto -- then copy the reasons' tables into
+# docs/errors.md. Requires protoc-gen-service on PATH; run after `store`, whose
+# repositories the servers persist through.
+[group('codegen')]
+service:
+    buf generate --template tools/protobuf/buf/service.buf.gen.yaml
+    go run ./tools/errors -fix
+    # The generator clears its output directory, BUILD.bazel included.
+    bazel run //:gazelle
+    go run ./tools/license -fix
+
+# Write or update the flow files (docs/flows/*.yaml) after the protos change:
+# new methods, lifecycle enums and values are added with the events and error
+# reasons protoc-gen-service declares, gone ones are marked STALE, and what was
+# written by hand is kept.
+[group('codegen')]
+flows:
+    buf generate --template tools/protobuf/buf/docs.scaffold.buf.gen.yaml
+    go run ./tools/license -fix
+
+# Generate the API reference: a README per package beside its protos and the
+# index at protobuf/README.md, with ER, flow and state diagrams
+# (protoc-gen-openapi-solo, mode=markdown, flows from docs/flows).
 [group('codegen')]
 docs:
-    go run ./tools/protobuf/docs protobuf
+    buf generate --template tools/protobuf/buf/docs.buf.gen.yaml
     go run ./tools/license -fix

@@ -8,6 +8,7 @@ import (
 	_ "embed"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -64,7 +65,76 @@ func mergeStrongComponents(specDir string, components *yaml.Node) {
 		}
 		logf("INFO", "loading strong components from %s", filepath.Base(file))
 		mergeComponentSections(components, mapGet(doc, "components"), true)
+		carryDiagrams(components, mapGet(doc, "components"))
 	}
+}
+
+// carryDiagrams gives each schema the paths reference by its short name
+// ("HoldState") the diagram its package document drew for it under its full
+// name ("freebusy.allocation.v1.HoldState"): the description that embeds the
+// state diagram, and the raw diagram under x-mermaid.
+func carryDiagrams(target, source *yaml.Node) {
+	from, to := schemasOf(source), schemasOf(target)
+	if from == nil || to == nil {
+		return
+	}
+	for i := 0; i+1 < len(from.Content); i += 2 {
+		full, schema := from.Content[i].Value, from.Content[i+1]
+		if mapGet(schema, "x-mermaid") == nil {
+			continue
+		}
+		short := full[strings.LastIndex(full, ".")+1:]
+		weak := mapGet(to, short)
+		if weak == nil || weak == schema {
+			continue
+		}
+		for _, key := range []string{"description", "x-mermaid"} {
+			if v := mapGet(schema, key); v != nil {
+				mapSet(weak, key, v)
+			}
+		}
+	}
+}
+
+// packageDocs reads what the per-package documents under types/ say beyond
+// their components: each service tag (description and x-mermaid, by name) and
+// each package's own diagrams (info.x-mermaid: its ER diagram and flows) and
+// its lifecycle enums' state diagrams.
+func packageDocs(specDir string) (tags map[string]*yaml.Node, diagrams []*yaml.Node) {
+	tags = map[string]*yaml.Node{}
+	files, _ := filepath.Glob(filepath.Join(specDir, "types", "*.yaml"))
+	sort.Strings(files)
+	for _, file := range files {
+		doc, err := loadYAMLFile(file)
+		if err != nil || doc == nil || doc.Kind != yaml.MappingNode {
+			continue
+		}
+		if t := mapGet(doc, "tags"); t != nil && t.Kind == yaml.SequenceNode {
+			for _, tag := range t.Content {
+				if name := mapGet(tag, "name"); name != nil {
+					// Operations are tagged "Hold Service" by the time the
+					// tags are collected; the package documents say
+					// "HoldService".
+					tags[name.Value] = tag
+					tags[splitCamelCase(name.Value)] = tag
+				}
+			}
+		}
+		if m := mapGet(mapGet(doc, "info"), "x-mermaid"); m != nil && m.Kind == yaml.SequenceNode {
+			diagrams = append(diagrams, m.Content...)
+		}
+		// The lifecycle enums' state diagrams too: gnostic inlines most
+		// enums, so the schema a diagram was drawn on may not survive the
+		// merge, and the diagram must not go with it.
+		if schemas := schemasOf(mapGet(doc, "components")); schemas != nil {
+			for i := 0; i+1 < len(schemas.Content); i += 2 {
+				if m := mapGet(schemas.Content[i+1], "x-mermaid"); m != nil && m.Kind == yaml.SequenceNode {
+					diagrams = append(diagrams, m.Content...)
+				}
+			}
+		}
+	}
+	return tags, diagrams
 }
 
 // mergeComponentSections merges each section of source into target. When a key

@@ -13,6 +13,7 @@ import "google/api/field_behavior.proto";
 import "google/api/resource.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "service/v1/annotations.proto";
 import "store/v1/annotations.proto";
 
 option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1";
@@ -76,6 +77,18 @@ message Reservation {
     plural: "reservations"
   };
 
+  // A reservation's changes are its state changes, and the one write that is
+  // not: an UpdateReservation of its details (last_change CHANGE_DETAILS),
+  // sent as freebusy.reservation.updated. Scoped by site.
+  option (service.v1.event) = {
+    type: "freebusy.reservation"
+    omit: [
+      "created",
+      "deleted"
+    ]
+    scope: "organizational_unit"
+  };
+
   // The reservation name. Its id is the caller's reservation_id, or else the
   // id of the hold it was made from.
   // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
@@ -108,10 +121,15 @@ message Reservation {
   // End of the reserved window, exclusive, copied from the hold.
   google.protobuf.Timestamp end_time = 5 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-  // Who the reservation is for, by name in the user service.
+  // Who the reservation is for, by name in the user service. freebusy does
+  // not keep users: when a resolver for the type is registered (config
+  // `reference_services`) a create or update checks the name with that service, and a deleted user leaves the
+  // reservation as it is.
   // Format: users/{user}
   string customer = 6 [
     (google.api.field_behavior) = OPTIONAL,
+    (google.api.resource_reference).type = "users.shokki.engineering/User",
+    (store.v1.reference) = {on_delete: ON_DELETE_ALLOW},
     (buf.validate.field).string.pattern = "^users/[^/]+$",
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE,
     (store.v1.query) = {search: true}
@@ -153,4 +171,26 @@ message Reservation {
   // The reservation replacing this one, set when RescheduleReservation began.
   // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
   string replacement = 16 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // What a write to a reservation changed.
+  enum Change {
+    // Default; never persisted.
+    CHANGE_UNSPECIFIED = 0;
+
+    // Its state: it was created, confirmed, cancelled, rescheduled, or a
+    // transition was undone.
+    CHANGE_STATE = 1;
+
+    // What is kept with it, through UpdateReservation: its customer or
+    // attributes. Its state did not change.
+    CHANGE_DETAILS = 2;
+  }
+
+  // What the last write to this reservation changed. A webhook is sent
+  // freebusy.reservation.updated exactly when it is CHANGE_DETAILS, and the
+  // event of the new state otherwise.
+  Change last_change = 17 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (store.v1.column) = {default_value: "STATE"}
+  ];
 }

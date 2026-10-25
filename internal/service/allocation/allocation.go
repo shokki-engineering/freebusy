@@ -7,12 +7,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/rand/v2"
+	"slices"
 	"sort"
+	"sync"
 	"time"
 
-	"github.com/shokki-engineering/freebusy/internal/runtime/rpc"
+	"github.com/shokki-engineering/freebusy/internal/database/gorm/filterx"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
-	"github.com/shokki-engineering/freebusy/internal/types"
+	"github.com/shokki-engineering/freebusy/internal/service/generated/servicex"
+	"github.com/shokki-engineering/freebusy/internal/service/rpc"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/the-protobuf-project/runtime-go/telemetry"
 	"google.golang.org/genproto/googleapis/type/interval"
@@ -41,6 +45,24 @@ type Server struct {
 	holdTTL time.Duration
 	// sweeps reports the hold sweeper's runs (metrics.go).
 	sweeps sweepMetrics
+	// statics caches converted static inputs per site (statics.go).
+	statics *statics
+	// admit bounds concurrent evaluations (admission.go).
+	admit *admission
+	// shuffle spreads concurrent holds across equally good resources.
+	shuffle func(n int, swap func(i, j int))
+	// meter is kept for options applied after WithMeter.
+	meter telemetry.Meter
+	// admitLimit and admitWait configure admit.
+	admitLimit int
+	admitWait  time.Duration
+	// days maintains the availability read model; nil without one, when
+	// every evaluation reads every resource in scope (readmodel.go).
+	days *DayProjection
+	// pg searches the read model's Postgres table; searcher, when set,
+	// serves SearchAvailability's candidates instead (OpenSearch).
+	pg       DaySearcher
+	searcher DaySearcher
 }
 
 // Option configures a Server.
@@ -54,14 +76,40 @@ func WithHoldTTL(d time.Duration) Option { return func(s *Server) { s.holdTTL = 
 
 // WithMeter reports the hold sweeper's metrics through m. Without it they go
 // nowhere.
-func WithMeter(m telemetry.Meter) Option { return func(s *Server) { s.sweeps = newSweepMetrics(m) } }
+func WithMeter(m telemetry.Meter) Option {
+	return func(s *Server) { s.sweeps, s.meter = newSweepMetrics(m), m }
+}
+
+// WithAdmission bounds the availability evaluations -- search, compute,
+// check, and a hold's choice of resources -- running at once to limit (the
+// number of CPUs when <= 0). One that finds no slot within wait
+// (DefaultAdmissionWait when <= 0) is turned away with ENGINE_BUSY.
+func WithAdmission(limit int, wait time.Duration) Option {
+	return func(s *Server) { s.admitLimit, s.admitWait = limit, wait }
+}
+
+// WithSeed makes the choice among equally good resources for a hold
+// deterministic for a seed. For tests.
+func WithSeed(seed uint64) Option {
+	return func(s *Server) {
+		var mu sync.Mutex
+		r := rand.New(rand.NewPCG(seed, seed))
+		s.shuffle = func(n int, swap func(i, j int)) {
+			mu.Lock()
+			defer mu.Unlock()
+			r.Shuffle(n, swap)
+		}
+	}
+}
 
 // NewServer returns a Server over store.
 func NewServer(store Store, opts ...Option) *Server {
-	s := &Server{store: store, now: time.Now, holdTTL: DefaultHoldTTL, sweeps: newSweepMetrics(nil)}
+	s := &Server{store: store, now: time.Now, holdTTL: DefaultHoldTTL, sweeps: newSweepMetrics(nil),
+		statics: newStatics(), shuffle: rand.Shuffle}
 	for _, o := range opts {
 		o(s)
 	}
+	s.admit = newAdmission(s.admitLimit, s.admitWait, s.meter)
 	return s
 }
 
@@ -69,6 +117,11 @@ func NewServer(store Store, opts ...Option) *Server {
 func (s *Server) ComputeAvailability(ctx context.Context, req *allocationpbv1.ComputeAvailabilityRequest) (*allocationpbv1.ComputeAvailabilityResponse, error) {
 	var out *allocationpbv1.ComputeAvailabilityResponse
 	err := rpc.Traced(ctx, "AllocationService", "ComputeAvailability", func(ctx context.Context) error {
+		release, err := s.admit.acquire(ctx, "ComputeAvailability")
+		if err != nil {
+			return rpc.ToStatusErr(err)
+		}
+		defer release()
 		res, err := s.compute(ctx, req)
 		out = res
 		return rpc.ToStatusErr(err)
@@ -81,18 +134,21 @@ func (s *Server) compute(ctx context.Context, req *allocationpbv1.ComputeAvailab
 	if err != nil {
 		return nil, err
 	}
-	st, err := s.gather(ctx, ResourceQuery{
-		OrganizationalUnits: []string{req.GetParent()},
-		Names:               req.GetResources(),
-	}, window, s.now())
+	scope, restricted, err := s.scopeOf(ctx, req.GetParent(), req.GetResources(), req.GetFilter(), "filter")
 	if err != nil {
 		return nil, err
+	}
+	st := &site{zone: time.UTC}
+	if !restricted || len(scope) > 0 {
+		if st, err = s.gather(ctx, ResourceQuery{OrganizationalUnits: []string{req.GetParent()}, Names: scope}, window, s.now()); err != nil {
+			return nil, err
+		}
 	}
 	loc := st.zone
 	if tz := req.GetTimeZone(); tz != "" {
 		l, lerr := time.LoadLocation(tz)
 		if lerr != nil {
-			return nil, types.BadField("INVALID_TIME_ZONE", "time_zone",
+			return nil, servicex.BadField("INVALID_TIME_ZONE", "time_zone",
 				fmt.Sprintf("time_zone %q is not a time zone", tz),
 				"Use an IANA zone name such as Europe/London or America/New_York, or leave it empty to read the site's own zone")
 		}
@@ -100,7 +156,7 @@ func (s *Server) compute(ctx context.Context, req *allocationpbv1.ComputeAvailab
 	}
 	buckets, err := engine.Buckets(window, granularity(req.GetGranularity()), req.GetSlotDuration().AsDuration(), loc)
 	if errors.Is(err, engine.ErrTooManyBuckets) {
-		return nil, types.BadField("TOO_MANY_BUCKETS", "granularity",
+		return nil, servicex.BadField("TOO_MANY_BUCKETS", "granularity",
 			fmt.Sprintf("this window would be answered in more than %d buckets", engine.MaxBuckets),
 			"Ask for a shorter window, a longer slot_duration, or granularity AVAILABILITY_GRANULARITY_DAY")
 	}
@@ -130,15 +186,16 @@ func (s *Server) CheckAvailability(ctx context.Context, req *allocationpbv1.Chec
 		if err != nil {
 			return rpc.ToStatusErr(err)
 		}
-		now := s.now()
-		st, err := s.gather(ctx, ResourceQuery{
-			OrganizationalUnits: []string{req.GetParent()},
-			Names:               req.GetResources(),
-		}, horizon(window), now)
+		release, err := s.admit.acquire(ctx, "CheckAvailability")
 		if err != nil {
 			return rpc.ToStatusErr(err)
 		}
-		res := engine.Check(st.resources, window, int(req.GetQuantity()), now)
+		defer release()
+		now := s.now()
+		res, err := s.check(ctx, req, window, now)
+		if err != nil {
+			return rpc.ToStatusErr(err)
+		}
 		out = &allocationpbv1.CheckAvailabilityResponse{
 			Bookable:           res.Bookable,
 			FreeCount:          int32(len(res.Candidates)),
@@ -156,12 +213,53 @@ func (s *Server) CheckAvailability(ctx context.Context, req *allocationpbv1.Chec
 	return out, err
 }
 
+// check decides CheckAvailability: first over the candidates the read model
+// offers, and over every resource in scope when they are not enough, so a
+// refusal always carries the reason of each resource asked about.
+func (s *Server) check(ctx context.Context, req *allocationpbv1.CheckAvailabilityRequest, window engine.Span, now time.Time) (engine.CheckResult, error) {
+	site, quantity := req.GetParent(), max(int(req.GetQuantity()), 1)
+	if err := validFilter(req.GetFilter(), "filter"); err != nil {
+		return engine.CheckResult{}, err
+	}
+	cands, ok, err := s.modelCandidates(ctx, site, req.GetResources(), req.GetFilter(), window, now)
+	if err != nil {
+		return engine.CheckResult{}, err
+	}
+	if ok && len(cands) >= quantity {
+		st, err := s.gather(ctx, ResourceQuery{OrganizationalUnits: []string{site}, Names: cands}, horizon(window), now)
+		if err != nil {
+			return engine.CheckResult{}, err
+		}
+		if res := engine.Check(st.resources, window, int(req.GetQuantity()), now); res.Bookable {
+			return res, nil
+		}
+	}
+	scope, restricted, err := s.scopeOf(ctx, site, req.GetResources(), req.GetFilter(), "filter")
+	if err != nil {
+		return engine.CheckResult{}, err
+	}
+	var resources []engine.Resource
+	if !restricted || len(scope) > 0 {
+		st, err := s.gather(ctx, ResourceQuery{OrganizationalUnits: []string{site}, Names: scope}, horizon(window), now)
+		if err != nil {
+			return engine.CheckResult{}, err
+		}
+		resources = st.resources
+	}
+	return engine.Check(resources, window, int(req.GetQuantity()), now), nil
+}
+
 // BatchComputeAvailability runs several computations in one call. One failing
 // entry fails the batch: a partial answer with a hole in it would render as
 // "nothing free" for whatever was missing.
 func (s *Server) BatchComputeAvailability(ctx context.Context, req *allocationpbv1.BatchComputeAvailabilityRequest) (*allocationpbv1.BatchComputeAvailabilityResponse, error) {
 	var out *allocationpbv1.BatchComputeAvailabilityResponse
 	err := rpc.Traced(ctx, "AllocationService", "BatchComputeAvailability", func(ctx context.Context) error {
+		release, err := s.admit.acquire(ctx, "BatchComputeAvailability")
+		if err != nil {
+			return rpc.ToStatusErr(err)
+		}
+		defer release()
 		out = &allocationpbv1.BatchComputeAvailabilityResponse{}
 		for _, r := range req.GetRequests() {
 			res, err := s.compute(ctx, r)
@@ -185,73 +283,156 @@ func (s *Server) SearchAvailability(ctx context.Context, req *allocationpbv1.Sea
 		if err != nil {
 			return rpc.ToStatusErr(err)
 		}
-		now := s.now()
-		q := ResourceQuery{Types: req.GetResourceTypes()}
-		if ous := req.GetOrganizationalUnits(); len(ous) > 0 {
-			q.OrganizationalUnits = ous
-		} else {
-			q.Organization = req.GetParent()
+		if err := checkSearch(req); err != nil {
+			return rpc.ToStatusErr(err)
 		}
-		st, err := s.gather(ctx, q, horizon(window), now)
+		release, err := s.admit.acquire(ctx, "SearchAvailability")
 		if err != nil {
 			return rpc.ToStatusErr(err)
 		}
-		quantity := max(int(req.GetQuantity()), 1)
-
-		// Group by site, keeping only sites with enough free together.
-		bySite := map[string][]*allocationpbv1.AvailabilityMatch{}
-		for i, r := range st.resources {
-			if r.Why(window, now) != engine.ReasonNone {
-				continue
-			}
-			res := st.records[i].Resource
-			ou := res.GetOrganizationalUnit()
-			bySite[ou] = append(bySite[ou], &allocationpbv1.AvailabilityMatch{
-				Resource:           r.Name,
-				OrganizationalUnit: ou,
-				Window:             intervalOf(window),
-				ResourceTypes:      res.GetResourceTypes(),
-			})
+		defer release()
+		if s.days != nil && s.days.Covers(window, s.now()) {
+			out, err = s.searchModel(ctx, req, window)
+			return rpc.ToStatusErr(err)
 		}
-		sites := make([]string, 0, len(bySite))
-		for ou, ms := range bySite {
-			if len(ms) >= quantity {
-				sites = append(sites, ou)
-			}
+		if req.GetOrderBy() != "" || len(req.GetFacets()) > 0 {
+			return rpc.ToStatusErr(servicex.BadField("WINDOW_BEYOND_HORIZON", "window",
+				"order_by and facets are answered from search records, which reach only from yesterday to the search horizon ahead, and this window is outside them",
+				"Search a window inside the horizon ([search] horizon_days), or leave order_by and facets empty"))
 		}
-		sort.Strings(sites)
-		var all []*allocationpbv1.AvailabilityMatch
-		for _, ou := range sites {
-			ms := bySite[ou]
-			sort.Slice(ms, func(i, j int) bool { return ms[i].GetResource() < ms[j].GetResource() })
-			all = append(all, ms...)
-		}
-
-		limit, offset := types.PageBounds(req.GetPageSize(), req.GetPageToken())
-		out = &allocationpbv1.SearchAvailabilityResponse{}
-		if offset < len(all) {
-			end := min(offset+limit, len(all))
-			out.Matches = all[offset:end]
-			if end < len(all) {
-				out.NextPageToken = types.EncodeOffset(end)
-			}
-		}
-		return nil
+		out, err = s.search(ctx, req, window)
+		return rpc.ToStatusErr(err)
 	})
 	return out, err
+}
+
+// searchParallel is how many sites one search evaluates side by side.
+const searchParallel = 4
+
+// search answers SearchAvailability site by site, in the order the answer is
+// paged in -- sites by name, resources by name within a site -- and stops as
+// soon as it has the page asked for and one match past it, which is all it
+// needs to know whether there is a next page. Page boundaries are the ones a
+// search of every site would have drawn: a site's matches are all taken or
+// none are, and only sites before the stop are read.
+func (s *Server) search(ctx context.Context, req *allocationpbv1.SearchAvailabilityRequest, window engine.Span) (*allocationpbv1.SearchAvailabilityResponse, error) {
+	now := s.now()
+	quantity := max(int(req.GetQuantity()), 1)
+	limit, offset := rpc.PageBounds(req.GetPageSize(), req.GetPageToken())
+	need := offset + limit + 1
+
+	sites, err := s.searchSites(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	var names []string
+	if f := req.GetFilter(); f != "" {
+		where := []filterx.Condition{{Field: "organization", Op: filterx.OpEq, Value: req.GetParent()}}
+		if names, err = s.filterNames(ctx, where, f, "filter"); err != nil || len(names) == 0 {
+			return &allocationpbv1.SearchAvailabilityResponse{}, err
+		}
+	}
+	var all []*allocationpbv1.AvailabilityMatch
+	for i := 0; i < len(sites) && len(all) < need; i += searchParallel {
+		batch := sites[i:min(i+searchParallel, len(sites))]
+		found := make([][]*allocationpbv1.AvailabilityMatch, len(batch))
+		errs := make([]error, len(batch))
+		var wg sync.WaitGroup
+		for j, ou := range batch {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				found[j], errs[j] = s.searchSite(ctx, ou, req.GetResourceTypes(), names, window, now, quantity)
+			}()
+		}
+		wg.Wait()
+		for j := range batch {
+			if errs[j] != nil {
+				return nil, errs[j]
+			}
+			all = append(all, found[j]...)
+		}
+	}
+
+	out := &allocationpbv1.SearchAvailabilityResponse{}
+	if offset < len(all) {
+		end := min(offset+limit, len(all))
+		out.Matches = all[offset:end]
+		if end < len(all) {
+			out.NextPageToken = rpc.EncodeOffset(end)
+		}
+	}
+	return out, nil
+}
+
+// searchSites are the sites a search covers, in name order.
+func (s *Server) searchSites(ctx context.Context, req *allocationpbv1.SearchAvailabilityRequest) ([]string, error) {
+	if ous := req.GetOrganizationalUnits(); len(ous) > 0 {
+		sites := slices.Clone(ous)
+		slices.Sort(sites)
+		return slices.Compact(sites), nil
+	}
+	if vs, ok := s.store.(VersionedStore); ok {
+		version, err := vs.InputVersion(ctx)
+		if err == nil {
+			return s.orgSites(ctx, vs, req.GetParent(), version)
+		}
+		return vs.Sites(ctx, req.GetParent())
+	}
+	// A store that cannot list sites: read the organization's resources once
+	// and take the sites from them.
+	recs, err := s.store.Resources(ctx, ResourceQuery{Organization: req.GetParent(), Types: req.GetResourceTypes()})
+	if err != nil {
+		return nil, err
+	}
+	var sites []string
+	for _, r := range recs {
+		sites = append(sites, r.Resource.GetOrganizationalUnit())
+	}
+	slices.Sort(sites)
+	return slices.Compact(sites), nil
+}
+
+// searchSite returns one site's matches in name order, or none when fewer than
+// quantity are free together.
+func (s *Server) searchSite(ctx context.Context, ou string, resourceTypes, names []string, window engine.Span, now time.Time, quantity int) ([]*allocationpbv1.AvailabilityMatch, error) {
+	st, err := s.gather(ctx, ResourceQuery{OrganizationalUnits: []string{ou}, Types: resourceTypes, Names: names}, horizon(window), now)
+	if err != nil {
+		return nil, err
+	}
+	var ms []*allocationpbv1.AvailabilityMatch
+	for i, r := range st.resources {
+		if r.Why(window, now) != engine.ReasonNone {
+			continue
+		}
+		res := st.records[i].Resource
+		ms = append(ms, &allocationpbv1.AvailabilityMatch{
+			Resource:           r.Name,
+			OrganizationalUnit: res.GetOrganizationalUnit(),
+			Window:             intervalOf(window),
+			// A copy: the record may be cached and shared.
+			ResourceTypes: slices.Clone(res.GetResourceTypes()),
+			DisplayName:   res.GetDisplayName(),
+		})
+	}
+	if len(ms) < quantity {
+		return nil, nil
+	}
+	sort.Slice(ms, func(i, j int) bool { return ms[i].GetResource() < ms[j].GetResource() })
+	return ms, nil
 }
 
 // spanOf validates and converts a request window. Both ends are required: an
 // open-ended availability question has no finite answer.
 func spanOf(iv *interval.Interval) (engine.Span, error) {
 	if iv.GetStartTime() == nil || iv.GetEndTime() == nil {
-		return engine.Span{}, types.BadField("WINDOW_INCOMPLETE", "window",
+		return engine.Span{}, servicex.BadField("WINDOW_INCOMPLETE", "window",
 			"window needs both start_time and end_time",
 			"Send both as RFC 3339 timestamps, e.g. start_time: \"2026-11-02T18:00:00Z\", end_time: \"2026-11-02T19:00:00Z\"")
 	}
 	w := engine.Span{Start: iv.GetStartTime().AsTime(), End: iv.GetEndTime().AsTime()}
 	if w.Empty() {
-		return engine.Span{}, types.BadField("WINDOW_BACKWARDS", "window.end_time",
+		return engine.Span{}, servicex.BadField("WINDOW_BACKWARDS", "window.end_time",
 			"window.end_time must be after window.start_time",
 			"Swap them, or check the offsets: 18:00+01:00 is 17:00Z")
 	}

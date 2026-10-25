@@ -12,8 +12,8 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 # gazelle:prefix github.com/shokki-engineering/freebusy
 # gazelle:proto disable_global
 # gazelle:go_naming_convention import
-# gazelle:exclude hasura
-# gazelle:exclude docker
+# gazelle:exclude deploy/hasura
+# gazelle:exclude deploy/docker
 # gazelle:exclude .claude
 gazelle(name = "gazelle")
 
@@ -21,15 +21,17 @@ go_library(
     name = "freebusy_lib",
     srcs = [
         "app.go",
+        "build.go",
         "main.go",
     ],
     importpath = "github.com/shokki-engineering/freebusy",
     visibility = ["//visibility:private"],
     deps = [
-        "//config",
-        "//internal",
-        "//shared",
+        "//internal/config",
+        "//internal/server",
+        "//internal/telemetry",
         "@com_github_joho_godotenv//autoload",
+        "@com_github_the_protobuf_project_runtime_go_grpc//:grpc",
         "@org_golang_x_crypto_x509roots_fallback//:fallback",
     ],
 )
@@ -38,4 +40,9 @@ go_binary(
     name = "freebusy",
     embed = [":freebusy_lib"],
     visibility = ["//visibility:public"],
+    # Filled only when stamping (bazel build --config=release); see build.go.
+    x_defs = {
+        "buildVersion": "{STABLE_BUILD_VERSION}",
+        "buildCommit": "{STABLE_BUILD_COMMIT}",
+    },
 )

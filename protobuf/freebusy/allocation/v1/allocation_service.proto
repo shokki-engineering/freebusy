@@ -8,7 +8,7 @@ package freebusy.allocation.v1;
 import "freebusy/allocation/v1/allocation_messages.proto";
 import "google/api/annotations.proto";
 import "google/api/client.proto";
-import "mcp/protobuf/annotations.proto";
+import "mcp/v1/annotations.proto";
 
 option go_package = "github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1";
 option java_multiple_files = true;
@@ -29,9 +29,9 @@ option java_package = "engineering.shokki.freebusy.allocation.v1";
 // so they take neither the standard-method names nor their shapes.
 service AllocationService {
   option (google.api.default_host) = "freebusy.shokki.engineering";
-  option (mcp.service) = {
+  option (mcp.v1.service) = {
     app: {
-      name: "Resource Availability"
+      display_name: "Resource Availability"
       version: "1.0.0"
       description: "Compute how many bookable resources are free over a window. Read-only."
     }
@@ -44,7 +44,7 @@ service AllocationService {
       body: "*"
     };
     option (google.api.method_signature) = "parent,window";
-    option (mcp.tool) = {
+    option (mcp.v1.tool) = {
       description:
         "How many resources are free at one site over a window, in buckets of "
         "slot_duration or by day: for showing a schedule. parent: "
@@ -63,7 +63,7 @@ service AllocationService {
       body: "*"
     };
     option (google.api.method_signature) = "parent,window";
-    option (mcp.tool) = {
+    option (mcp.v1.tool) = {
       description:
         "Whether one exact window can be booked at a site now, and if not, each "
         "resource's reason (outside opening hours, held, booked, too short or too "
@@ -96,7 +96,7 @@ service AllocationService {
       body: "*"
     };
     option (google.api.method_signature) = "parent,window";
-    option (mcp.tool) = {
+    option (mcp.v1.tool) = {
       description:
         "Find resources free for a whole window anywhere in an operator's sites: "
         "the first step of booking. parent: organizations/{organization}. window: "

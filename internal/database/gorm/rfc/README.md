@@ -11,7 +11,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 76 | 49 |
+| 76 | 50 |
 
 ## Entity relationships
 
@@ -569,6 +569,7 @@ Event is the VEVENT component, RFC 5545 section 3.6.1 <https://www.rfc-editor.or
 | `confirmation` | `Confirmation` | nullable |
 | `classification` | `Classification` | nullable |
 | `transparency` | `Transparency` | nullable |
+| `original_start_range` | `RecurrenceRange` | nullable |
 | `sequence` | `INTEGER` | nullable |
 | `create_time` | `TIMESTAMPTZ` | not null |
 | `update_time` | `TIMESTAMPTZ` | not null |
@@ -799,6 +800,7 @@ WeekdayNum is one BYDAY entry, RFC 5545 section 3.3.10 <https://www.rfc-editor.o
 - `Confirmation`: TENTATIVE, CONFIRMED, CANCELLED
 - `Classification`: PUBLIC, PRIVATE, CONFIDENTIAL
 - `Transparency`: OPAQUE, TRANSPARENT
+- `RecurrenceRange`: THIS_AND_FUTURE
 - `EventEndsCase`: END, DURATION
 - `CalendarTimeValueCase`: DATE, DATE_TIME
 - `Frequency`: SECONDLY, MINUTELY, HOURLY, DAILY, WEEKLY, MONTHLY, YEARLY

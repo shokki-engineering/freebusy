@@ -10,7 +10,7 @@
 package webhookpbv1
 
 import (
-	_ "github.com/the-protobuf-project/grpc-mcp-gateway/mcp/protobuf/mcppb"
+	_ "github.com/the-protobuf-project/mcp/protobuf/mcppb"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -30,7 +30,7 @@ var File_freebusy_webhook_v1_webhook_service_proto protoreflect.FileDescriptor
 
 const file_freebusy_webhook_v1_webhook_service_proto_rawDesc = "" +
 	"\n" +
-	")freebusy/webhook/v1/webhook_service.proto\x12\x13freebusy.webhook.v1\x1a\"freebusy/webhook/v1/delivery.proto\x1a!freebusy/webhook/v1/webhook.proto\x1a*freebusy/webhook/v1/webhook_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1emcp/protobuf/annotations.proto2\x9d\x13\n" +
+	")freebusy/webhook/v1/webhook_service.proto\x12\x13freebusy.webhook.v1\x1a\"freebusy/webhook/v1/delivery.proto\x1a!freebusy/webhook/v1/webhook.proto\x1a*freebusy/webhook/v1/webhook_messages.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x18mcp/v1/annotations.proto2\x9d\x13\n" +
 	"\x0eWebhookService\x12\x8b\x04\n" +
 	"\rCreateWebhook\x12).freebusy.webhook.v1.CreateWebhookRequest\x1a\x1c.freebusy.webhook.v1.Webhook\"\xb0\x03\xdaA\x12webhook,webhook_id\xca\xf3\x18\xf9\x02\x12\xf6\x02Subscribe an https endpoint on the public internet to changes: holds, reservations, resources, calendars, events and availability, sent as signed CloudEvents. webhook.uri: the endpoint. webhook.event_types: e.g. freebusy.reservation.confirmed; empty sends every type. webhook.organizational_unit: only that site's changes. The response carries the signing secret, this once.\x82\xd3\xe4\x93\x02\x17:\awebhook\"\f/v1/webhooks\x12\x8c\x01\n" +
 	"\n" +

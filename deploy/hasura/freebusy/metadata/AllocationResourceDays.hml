@@ -1,0 +1,250 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: AllocationResourceDays
+  fields:
+    - name: attributes
+      type: Json
+    - name: calendar
+      type: String_1
+    - name: day
+      type: Date!
+    - name: displayName
+      type: String_1
+    - name: free
+      type: Json!
+    - name: freeFraction
+      type: Float64
+    - name: id
+      type: String_1!
+    - name: organization
+      type: String_1
+    - name: organizationalUnit
+      type: String_1
+    - name: resource
+      type: String_1!
+    - name: resourceTypes
+      type: "[String_1]"
+    - name: rowVersion
+      type: Int64!
+  graphql:
+    typeName: AllocationResourceDays
+    inputTypeName: AllocationResourceDaysInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: freebusy_pgsql
+      dataConnectorObjectType: allocation_resource_days
+      fieldMapping:
+        attributes:
+          column:
+            name: attributes
+        calendar:
+          column:
+            name: calendar
+        day:
+          column:
+            name: day
+        displayName:
+          column:
+            name: display_name
+        free:
+          column:
+            name: free
+        freeFraction:
+          column:
+            name: free_fraction
+        id:
+          column:
+            name: id
+        organization:
+          column:
+            name: organization
+        organizationalUnit:
+          column:
+            name: organizational_unit
+        resource:
+          column:
+            name: resource
+        resourceTypes:
+          column:
+            name: resource_types
+        rowVersion:
+          column:
+            name: row_version
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: AllocationResourceDays
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - attributes
+          - calendar
+          - day
+          - displayName
+          - free
+          - freeFraction
+          - id
+          - organization
+          - organizationalUnit
+          - resource
+          - resourceTypes
+          - rowVersion
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: AllocationResourceDaysBoolExp
+  operand:
+    object:
+      type: AllocationResourceDays
+      comparableFields:
+        - fieldName: attributes
+          booleanExpressionType: JsonbBoolExp
+        - fieldName: calendar
+          booleanExpressionType: TextBoolExp
+        - fieldName: day
+          booleanExpressionType: DateBoolExp
+        - fieldName: displayName
+          booleanExpressionType: TextBoolExp
+        - fieldName: free
+          booleanExpressionType: TstzmultirangeBoolExp
+        - fieldName: freeFraction
+          booleanExpressionType: Float8BoolExp
+        - fieldName: id
+          booleanExpressionType: TextBoolExp
+        - fieldName: organization
+          booleanExpressionType: TextBoolExp
+        - fieldName: organizationalUnit
+          booleanExpressionType: TextBoolExp
+        - fieldName: resource
+          booleanExpressionType: TextBoolExp
+        - fieldName: rowVersion
+          booleanExpressionType: Int8BoolExp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: AllocationResourceDaysBoolExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: AllocationResourceDaysAggExp
+  operand:
+    object:
+      aggregatedType: AllocationResourceDays
+      aggregatableFields:
+        - fieldName: attributes
+          aggregateExpression: JsonbAggExp
+        - fieldName: calendar
+          aggregateExpression: TextAggExp
+        - fieldName: day
+          aggregateExpression: DateAggExp
+        - fieldName: displayName
+          aggregateExpression: TextAggExp
+        - fieldName: free
+          aggregateExpression: TstzmultirangeAggExp
+        - fieldName: freeFraction
+          aggregateExpression: Float8AggExp
+        - fieldName: id
+          aggregateExpression: TextAggExp
+        - fieldName: organization
+          aggregateExpression: TextAggExp
+        - fieldName: organizationalUnit
+          aggregateExpression: TextAggExp
+        - fieldName: resource
+          aggregateExpression: TextAggExp
+        - fieldName: rowVersion
+          aggregateExpression: Int8AggExp
+  count:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: AllocationResourceDaysAggExp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: AllocationResourceDaysOrderByExp
+  operand:
+    object:
+      orderedType: AllocationResourceDays
+      orderableFields:
+        - fieldName: attributes
+          orderByExpression: JsonOrderByExp
+        - fieldName: calendar
+          orderByExpression: String1OrderByExp
+        - fieldName: day
+          orderByExpression: DateOrderByExp
+        - fieldName: displayName
+          orderByExpression: String1OrderByExp
+        - fieldName: free
+          orderByExpression: JsonOrderByExp
+        - fieldName: freeFraction
+          orderByExpression: Float64OrderByExp
+        - fieldName: id
+          orderByExpression: String1OrderByExp
+        - fieldName: organization
+          orderByExpression: String1OrderByExp
+        - fieldName: organizationalUnit
+          orderByExpression: String1OrderByExp
+        - fieldName: resource
+          orderByExpression: String1OrderByExp
+        - fieldName: rowVersion
+          orderByExpression: Int64OrderByExp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: AllocationResourceDaysOrderByExp
+
+---
+kind: Model
+version: v2
+definition:
+  name: AllocationResourceDays
+  objectType: AllocationResourceDays
+  source:
+    dataConnectorName: freebusy_pgsql
+    collection: allocation_resource_days
+  filterExpressionType: AllocationResourceDaysBoolExp
+  aggregateExpression: AllocationResourceDaysAggExp
+  orderByExpression: AllocationResourceDaysOrderByExp
+  graphql:
+    selectMany:
+      queryRootField: allocationResourceDays
+      subscription:
+        rootField: allocationResourceDays
+    selectUniques:
+      - queryRootField: allocationResourceDaysById
+        uniqueIdentifier:
+          - id
+        subscription:
+          rootField: allocationResourceDaysById
+    filterInputTypeName: AllocationResourceDaysFilterInput
+    aggregate:
+      queryRootField: allocationResourceDaysAggregate
+      subscription:
+        rootField: allocationResourceDaysAggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: AllocationResourceDays
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+

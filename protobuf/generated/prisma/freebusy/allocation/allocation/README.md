@@ -36,7 +36,7 @@ A Hold is a temporary, expiring claim on one or more bookable resources for a wi
 | --- | --- | --- |
 | `id` | `CHAR(26)` | not null |
 | `name` | `VARCHAR(255)` | not null |
-| `window` | `TSTZRANGE` | not null |
+| `window` | `TEXT` | not null |
 | `quantity` | `INTEGER` | nullable |
 | `expire_time` | `TIMESTAMPTZ` | nullable |
 | `state` | `HoldState` | nullable |
@@ -44,6 +44,8 @@ A Hold is a temporary, expiring claim on one or more bookable resources for a wi
 | `create_time` | `TIMESTAMPTZ` | not null |
 | `update_time` | `TIMESTAMPTZ` | not null |
 | `etag` | `VARCHAR(255)` | nullable |
+| `replaces` | `VARCHAR(255)` | nullable |
+| `candidate_filter` | `TEXT` | nullable |
 | `organizational_unit_id` | `CHAR(26)` | not null |
 | `resources` | `VARCHAR(255)[]` | nullable |
 | `candidate_resources` | `VARCHAR(255)[]` | nullable |
@@ -61,5 +63,5 @@ An Allocation is one resource taken by one hold for one span: the row the engine
 | `end_time` | `TIMESTAMPTZ` | not null |
 | `expire_time` | `TIMESTAMPTZ` | nullable |
 | `create_time` | `TIMESTAMPTZ` | not null |
-| `hold` | `CHAR(26)` | nullable |
+| `hold` | `VARCHAR(255)` | nullable |
 | `organizational_unit_id` | `CHAR(26)` | not null |

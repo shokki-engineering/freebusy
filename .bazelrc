@@ -13,5 +13,10 @@ test --test_env=FREEBUSY_TEST_POSTGRES_DSN --test_env=FREEBUSY_TEST_DATABASE_URL
 test --test_env=FREEBUSY_TEST_GRAPHQL_URL --test_env=FREEBUSY_TEST_REQUIRE_LIVE
 test --test_output=errors
 
+# Release builds stamp the server binary with the tag and commit
+# (tools/bazel/status.sh, the x_defs on //:freebusy): `freebusy --version` and
+# the startup line report them. Unstamped builds say "dev".
+build:release --stamp --workspace_status_command=tools/bazel/status.sh
+
 # A developer's own flags, never committed.
 try-import %workspace%/.bazelrc.user

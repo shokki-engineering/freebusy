@@ -100,7 +100,7 @@ inputs:
   # Pinned to the commit buf.lock records: an unpinned module input resolves
   # to the BSR head, and a regen then rewrites every RFC stub to whatever
   # upstream last pushed.
-  - module: buf.build/the-protobuf-project/rfc:bed218a71ce944ca8951f57bfb47274d
+  - module: buf.build/the-protobuf-project/rfc:cc82b3b15066438ba44e89dad69e9f8a
 
 plugins:
   # strategy: all is required — store must see every proto file in one
@@ -154,6 +154,22 @@ plugins:
       - go_module=github.com/shokki-engineering/freebusy/internal/database/repository
       - gorm_module=github.com/shokki-engineering/freebusy/internal/database/gorm
       - graphql_module=github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql
+  # OpenSearch copy of the projections ((store.v1.projection), the
+  # availability read model allocation.v1.ResourceDay): the runtime (osx/) and
+  # one <Model>Index per projection -- generated mapping, index template and
+  # alias, the change-feed indexer, PIT search, facets and alias-swap reindex
+  # -- on github.com/oh-tarnished/opensearch-go-sdk. Optional at run time:
+  # used only with [search] provider = "opensearch". gorm_module and
+  # repository_module MUST match the gorm and repository targets above.
+  - local: protoc-gen-store
+    out: ./internal/database/opensearch
+    strategy: all
+    opt:
+      - target=opensearch
+      - config=tools/protobuf/buf/config/store.backend.yaml
+      - go_module=github.com/shokki-engineering/freebusy/internal/database/opensearch
+      - gorm_module=github.com/shokki-engineering/freebusy/internal/database/gorm
+      - repository_module=github.com/shokki-engineering/freebusy/internal/database/repository
   # Read-through cache decorators over the generated stores. protoc-gen-cache
   # reads cache.v1 annotations and emits a <Model>StoreIface implementation that
   # wraps the store from store_module — same interface in, same interface out,

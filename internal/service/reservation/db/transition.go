@@ -14,10 +14,12 @@ import (
 var _ reservation.Store = (*Store)(nil)
 
 // Transition applies c if the stored state is one of from and, when etag is
-// set, the stored etag equals it; otherwise types.ErrConflict.
+// set, the stored etag equals it; otherwise repox.ErrConflict.
 func (s *Store) Transition(ctx context.Context, name, etag string, from []reservationpbv1.ReservationState, c reservation.Change) (*reservationpbv1.Reservation, error) {
-	next := &reservationpbv1.Reservation{Name: name, State: c.State}
-	paths := []string{"state"}
+	// Every transition is a change of state: the webhook feed reads
+	// last_change to tell it from UpdateReservation's change of details.
+	next := &reservationpbv1.Reservation{Name: name, State: c.State, LastChange: reservationpbv1.Reservation_CHANGE_STATE}
+	paths := []string{"state", "last_change"}
 	if c.ConfirmTime != nil {
 		next.ConfirmTime = timestamppb.New(*c.ConfirmTime)
 		paths = append(paths, "confirm_time")

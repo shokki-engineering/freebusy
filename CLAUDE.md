@@ -26,7 +26,7 @@
 - If the generated layer can't express something a service needs, extend the
   plugin (~/Projects/personal/orm for protoc-gen-store) and regenerate. Don't
   write the query, the converter or the adapter by hand.
-- Never edit Hasura metadata (`hasura/**/*.hml`) by hand. Regenerate it with
+- Never edit Hasura metadata (`deploy/hasura/**/*.hml`) by hand. Regenerate it with
   `just hasura regen`, and do so only when a schema change requires it.
 
 ## API rules

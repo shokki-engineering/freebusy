@@ -64,6 +64,7 @@ Event is the VEVENT component, RFC 5545 section 3.6.1 <https://www.rfc-editor.or
 | `confirmation` | `Confirmation` | nullable |
 | `classification` | `EventClassification` | nullable |
 | `transparency` | `Transparency` | nullable |
+| `original_start_range` | `RecurrenceRange` | nullable |
 | `sequence` | `INTEGER` | nullable |
 | `create_time` | `TIMESTAMPTZ` | not null |
 | `update_time` | `TIMESTAMPTZ` | not null |

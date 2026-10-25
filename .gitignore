@@ -12,6 +12,10 @@ orm/
 grpc-mcp-gateway/
 runtime-go/
 
+# Build scratch: the RFC descriptor image `just gen store` builds for
+# reference discovery.
+/build/
+
 # Bazel
 /bazel-*
 .bazelrc.user

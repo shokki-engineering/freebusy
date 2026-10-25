@@ -50,3 +50,21 @@ func TestDocumented(t *testing.T) {
 		t.Errorf("dups = %v", dups)
 	}
 }
+
+func TestSplice(t *testing.T) {
+	frags := map[string]string{"p.v1": "<!-- protoc-gen-service:errors:begin p.v1 -->\nnew\n<!-- protoc-gen-service:errors:end p.v1 -->"}
+	page := "# E\n\n<!-- protoc-gen-service:errors:begin p.v1 -->\nold\nrows\n<!-- protoc-gen-service:errors:end p.v1 -->\n\ntail\n"
+	got, err := splice(page, frags)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := "# E\n\n" + frags["p.v1"] + "\n\ntail\n"; got != want {
+		t.Errorf("splice = %q, want %q", got, want)
+	}
+	if _, err := splice("# E\n", frags); err == nil {
+		t.Error("a fragment with no place in the page was accepted")
+	}
+	if _, err := splice("<!-- protoc-gen-service:errors:begin q.v1 -->\n<!-- protoc-gen-service:errors:end q.v1 -->\n", frags); err == nil {
+		t.Error("a block no fragment fills was accepted")
+	}
+}
