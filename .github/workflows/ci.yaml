@@ -91,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
       # Every template rendered, the optional parts included, and checked
       # against the Kubernetes schemas.
       - name: Helm chart
@@ -121,7 +121,7 @@ jobs:
           bazelisk-cache: true
           disk-cache: ${{ github.workflow }}
           repository-cache: true
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
       - uses: helm/kind-action@v1
         with:
           cluster_name: freebusy

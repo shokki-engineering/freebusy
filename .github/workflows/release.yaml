@@ -106,7 +106,7 @@ jobs:
               "${tags[@]}" -f "$file" "$ctx"
           done
 
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
       - name: Helm chart
         run: |
           # Artifact Hub annotations that depend on the version: images,
