@@ -132,7 +132,7 @@ jobs:
       # Artifact Hub's repository metadata, for the Verified Publisher badge.
       # Skipped until deploy/helm/artifacthub-repo.yaml carries the repository
       # ID Artifact Hub assigns when the repository is added there.
-      - uses: oras-project/setup-oras@v1
+      - uses: oras-project/setup-oras@v2
       - name: Artifact Hub repository metadata
         run: |
           id="$(yq '.repositoryID // ""' deploy/helm/artifacthub-repo.yaml)"
