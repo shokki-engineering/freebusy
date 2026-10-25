@@ -68,7 +68,7 @@ jobs:
       # cosign signs every artifact this release publishes; crane resolves a
       # pushed tag to the digest that gets signed.
       - uses: sigstore/cosign-installer@v3
-      - uses: imjasonh/setup-crane@v0.4
+      - uses: imjasonh/setup-crane@v0.7
 
       - uses: bazel-contrib/setup-bazel@0.19.1
         with:
