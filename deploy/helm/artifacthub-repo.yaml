@@ -1,0 +1,15 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Artifact Hub repository metadata (artifacthub.io). The release workflow
+# pushes this file to oci://ghcr.io/shokki-engineering/charts/freebusy under
+# the tag `artifacthub.io`, which earns the chart's repository the "Verified
+# Publisher" badge.
+#
+# After adding the repository in Artifact Hub (Control Panel > Repositories >
+# Add, kind "Helm charts", URL oci://ghcr.io/shokki-engineering/charts/freebusy),
+# copy its repository ID here. While it is empty the workflow skips the push.
+repositoryID: ""
+owners:
+  - name: Srikanth K
+    email: ""

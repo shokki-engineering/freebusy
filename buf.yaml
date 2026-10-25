@@ -6,7 +6,7 @@ modules:
   - path: protobuf
     name: buf.build/shokki-engineering/freebusy
 # BASIC, not STANDARD: STANDARD wants HoldServiceCreateHoldResponse-style
-# wrappers that AIP-131..135 forbid, and api-linter (api-lint.yml) is the
+# wrappers that AIP-131..135 forbid, and api-linter (api-lint.yaml) is the
 # authority on API design. buf checks structure; api-linter checks design.
 lint:
   use:

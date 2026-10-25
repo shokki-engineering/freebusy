@@ -11,3 +11,28 @@ appVersion: "1.0.0"
 home: https://github.com/shokki-engineering/freebusy
 sources:
   - https://github.com/shokki-engineering/freebusy
+keywords:
+  - availability
+  - booking
+  - scheduling
+  - calendar
+  - caldav
+  - reservations
+  - mcp
+maintainers:
+  - name: Srikanth K
+    url: https://github.com/shokki-engineering
+# Artifact Hub (artifacthub.io) metadata. The release workflow adds the
+# version-dependent ones (images, changes, prerelease) with
+# tools/release/chart-annotations.sh before packaging.
+annotations:
+  artifacthub.io/license: AGPL-3.0-or-later
+  artifacthub.io/links: |
+    - name: Source
+      url: https://github.com/shokki-engineering/freebusy
+    - name: Getting started
+      url: https://github.com/shokki-engineering/freebusy/blob/main/docs/getting-started.md
+    - name: API reference
+      url: https://github.com/shokki-engineering/freebusy/blob/main/protobuf/README.md
+    - name: Errors
+      url: https://github.com/shokki-engineering/freebusy/blob/main/docs/errors.md

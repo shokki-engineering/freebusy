@@ -232,12 +232,28 @@ bazel run //deploy/image:load                      # or into the local Docker as
 bazel run //deploy/image:push_migrations -- --tag 1.0.0   # the migrations image beside it
 ```
 
-A version tag does all of this in CI (`.github/workflows/release.yml`); see
+A version tag does all of this in CI (`.github/workflows/release.yaml`); see
 `CHANGELOG.md` for how to cut one. Release builds stamp the binary with the tag
 and commit (`--config=release`, which runs `tools/bazel/status.sh`;
 `RELEASE_TAG` overrides `git describe`): `docker run --rm <image> --version`
 prints them, and the startup line names the commit. Unstamped builds say
 `dev`.
+
+Every release artifact is signed keylessly with [cosign](https://docs.sigstore.dev/)
+by the release workflow: the four images (and each platform in them), the Helm
+chart in the registry, and the files on the GitHub release (each with a
+`.sigstore.json` bundle). Verify before you deploy:
+
+```sh
+id='^https://github.com/shokki-engineering/freebusy/.github/workflows/release.yaml@refs/tags/v'
+iss=https://token.actions.githubusercontent.com
+cosign verify ghcr.io/shokki-engineering/freebusy:1.0.0-rc.1 \
+  --certificate-identity-regexp "$id" --certificate-oidc-issuer "$iss"
+cosign verify ghcr.io/shokki-engineering/charts/freebusy:1.0.0-rc.1 \
+  --certificate-identity-regexp "$id" --certificate-oidc-issuer "$iss"
+cosign verify-blob freebusy-1.0.0-rc.1.tgz --bundle freebusy-1.0.0-rc.1.tgz.sigstore.json \
+  --certificate-identity-regexp "$id" --certificate-oidc-issuer "$iss"
+```
 
 ### 2. Prepare Postgres
 

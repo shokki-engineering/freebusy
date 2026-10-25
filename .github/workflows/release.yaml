@@ -13,6 +13,10 @@
 # the chart and the REST API's OpenAPI file attached. CI's
 # checks are not repeated here: tag a commit main already passed.
 #
+# Everything is signed keylessly with cosign (Sigstore, through this run's
+# GitHub OIDC identity): each image and every platform in it, the chart in
+# the registry, and the release's files (a .sigstore.json bundle beside each).
+#
 # A tag with a pre-release part (v1.0.0-rc.1: anything after a `-`) publishes
 # the same artifacts under its version, but does not move the images'
 # `latest` tag, and its GitHub release is marked as a pre-release.
@@ -25,6 +29,9 @@ on:
 permissions:
   contents: write
   packages: write
+  # Keyless signing: cosign gets a short-lived certificate for this workflow
+  # run from Sigstore through GitHub's OIDC token. No signing key to keep.
+  id-token: write
 
 jobs:
   release:
@@ -58,6 +65,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # cosign signs every artifact this release publishes; crane resolves a
+      # pushed tag to the digest that gets signed.
+      - uses: sigstore/cosign-installer@v3
+      - uses: imjasonh/setup-crane@v0.4
+
       - uses: bazel-contrib/setup-bazel@0.19.1
         with:
           bazelisk-cache: true
@@ -84,15 +96,59 @@ jobs:
             esac
             tags=(-t "ghcr.io/shokki-engineering/freebusy-$part:$VERSION")
             if [ "$PRERELEASE" != true ]; then tags+=(-t "ghcr.io/shokki-engineering/freebusy-$part:latest"); fi
+            # The source label links the package to this repository on GHCR,
+            # like the server and migrations images' labels do.
             docker buildx build --platform linux/amd64,linux/arm64 --push \
+              --label "org.opencontainers.image.source=https://github.com/${GITHUB_REPOSITORY}" \
+              --label "org.opencontainers.image.title=freebusy-$part" \
+              --label "org.opencontainers.image.version=$VERSION" \
+              --label "org.opencontainers.image.licenses=AGPL-3.0-or-later" \
               "${tags[@]}" -f "$file" "$ctx"
           done
 
       - uses: azure/setup-helm@v4
       - name: Helm chart
         run: |
+          # Artifact Hub annotations that depend on the version: images,
+          # this version's CHANGELOG entries, and the pre-release flag.
+          bash tools/release/chart-annotations.sh "$VERSION"
           helm package deploy/helm/freebusy --version "$VERSION" --app-version "$VERSION" -d dist
           helm push "dist/freebusy-$VERSION.tgz" oci://ghcr.io/shokki-engineering/charts
+
+      # Every image (each platform too, --recursive) and the chart, signed by
+      # digest. Artifact Hub shows the chart's signature as "Signed".
+      - name: Sign images and chart
+        run: |
+          for ref in \
+            "ghcr.io/shokki-engineering/freebusy:$VERSION" \
+            "ghcr.io/shokki-engineering/freebusy-migrations:$VERSION" \
+            "ghcr.io/shokki-engineering/freebusy-engine:$VERSION" \
+            "ghcr.io/shokki-engineering/freebusy-connector:$VERSION" \
+            "ghcr.io/shokki-engineering/charts/freebusy:$VERSION"; do
+            digest="$(crane digest "$ref")"
+            cosign sign --yes --recursive "${ref%:*}@$digest"
+          done
+
+      # Artifact Hub's repository metadata, for the Verified Publisher badge.
+      # Skipped until deploy/helm/artifacthub-repo.yaml carries the repository
+      # ID Artifact Hub assigns when the repository is added there.
+      - uses: oras-project/setup-oras@v1
+      - name: Artifact Hub repository metadata
+        run: |
+          id="$(yq '.repositoryID // ""' deploy/helm/artifacthub-repo.yaml)"
+          if [ -z "$id" ]; then
+            echo "deploy/helm/artifacthub-repo.yaml has no repositoryID yet; skipping"
+            exit 0
+          fi
+          oras login ghcr.io -u "${{ github.actor }}" -p "${{ secrets.GITHUB_TOKEN }}"
+          # Artifact Hub documents the file as artifacthub-repo.yml; the repo
+          # keeps .yaml, so it is copied to that name for the push.
+          work="$(mktemp -d)"
+          cp deploy/helm/artifacthub-repo.yaml "$work/artifacthub-repo.yml"
+          cd "$work"
+          oras push ghcr.io/shokki-engineering/charts/freebusy:artifacthub.io \
+            --config /dev/null:application/vnd.cncf.artifacthub.config.v1+yaml \
+            artifacthub-repo.yml:application/vnd.cncf.artifacthub.repository-metadata.layer.v1.yaml
 
       - name: GitHub release
         env:
@@ -100,7 +156,13 @@ jobs:
         run: |
           awk -v h="## [$VERSION]" 'index($0, h) == 1 {on=1; next} /^## \[/ {on=0} on' CHANGELOG.md > notes.md
           cp protobuf/generated/openapi/openapiv3-spec.yaml "dist/freebusy-$VERSION.openapi.yaml"
+          # The release's files are signed too: each gets a Sigstore bundle
+          # (signature, certificate and transparency-log entry) beside it.
+          assets=("dist/freebusy-$VERSION.tgz" "dist/freebusy-$VERSION.openapi.yaml")
+          for f in "${assets[@]}"; do
+            cosign sign-blob --yes --bundle "$f.sigstore.json" "$f"
+            assets+=("$f.sigstore.json")
+          done
           flags=()
           if [ "$PRERELEASE" = true ]; then flags+=(--prerelease); fi
-          gh release create "$TAG" --title "$TAG" --notes-file notes.md "${flags[@]}" \
-            "dist/freebusy-$VERSION.tgz" "dist/freebusy-$VERSION.openapi.yaml"
+          gh release create "$TAG" --title "$TAG" --notes-file notes.md "${flags[@]}" "${assets[@]}"

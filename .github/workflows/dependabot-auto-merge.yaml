@@ -6,7 +6,7 @@
 # This job does not wait for CI itself: it switches on GitHub's auto-merge,
 # and GitHub merges when every check main's branch protection requires has
 # passed. Those required checks are the gate. Without them auto-merge would
-# merge at once, so they must name every job in ci.yml and api-lint.yml
+# merge at once, so they must name every job in ci.yaml and api-lint.yaml
 # (Settings -> Branches -> main). A failing check leaves the pull request open,
 # for a person to read why.
 #

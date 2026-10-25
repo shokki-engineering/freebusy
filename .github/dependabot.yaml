@@ -6,7 +6,7 @@
 # whatever the schedule says.
 #
 # Every Dependabot pull request into main is merged by
-# workflows/dependabot-auto-merge.yml once the required CI checks pass; a
+# workflows/dependabot-auto-merge.yaml once the required CI checks pass; a
 # failing one leaves it open for a person.
 #
 # Minor and patch updates are grouped, one pull request per ecosystem a week,
