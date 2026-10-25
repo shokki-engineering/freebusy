@@ -86,7 +86,7 @@ jobs:
           bazel run --config=release //deploy/image:push -- "${tags[@]}"
           bazel run //deploy/image:push_migrations -- "${tags[@]}"
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Hasura engine and connector images
         run: |
           for part in engine connector; do
