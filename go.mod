@@ -31,6 +31,7 @@ require (
 
 require (
 	github.com/oh-tarnished/opensearch-go-sdk v0.1.1
+	github.com/the-protobuf-project/runtime-go/events v0.0.0-20261024145511-26d67bc81588
 	golang.org/x/crypto/x509roots/fallback v0.0.0-20261020153306-9f2b28d4331a
 )
 
@@ -41,7 +42,7 @@ require (
 	github.com/oapi-codegen/runtime v1.8.0 // indirect
 	github.com/the-protobuf-project/cache v0.3.0 // indirect
 	github.com/the-protobuf-project/mcp v1.7.4 // indirect
-	github.com/the-protobuf-project/runtime-go/events v0.0.0-20261024145511-26d67bc81588 // indirect
+	github.com/the-protobuf-project/service v0.1.0 // indirect
 )
 
 require (
@@ -137,7 +138,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.47.0 // indirect
 	go.opentelemetry.io/otel/sdk/log v1.47.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.47.0 // indirect
-	go.opentelemetry.io/otel/trace v1.47.0
+	go.opentelemetry.io/otel/trace v1.47.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.11.1 // indirect
 	go.uber.org/atomic v1.12.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
