@@ -241,7 +241,8 @@ pre-release and does not move the images' `latest` tag.
   server, assembly and site check `internal/server/`, `rfcsvc`
   `internal/service/directory`, `webhooksvc` `internal/service/webhook`, the
   error translator and paging `internal/service/rpc`; the e2e and live-test
-  gate are `test/e2e` and `test/live`. The binary stays `//:freebusy`.
+  gate are `test/e2e` and `test/live`. The binary stays `//:freebusy`; `licenses/` is gone (its Apache-2.0 text is
+  `protobuf/LICENSE`), and the CLA is `.github/CLA.md`.
 - Pins: protoc-gen-store and the store module 1.6.5, protoc-gen-service
   0.1.0 (BSR `buf.build/the-protobuf-project/service`), protoc-gen-mcp
   1.7.5, protoc-gen-openapi-solo 1.2.0, runtime-go at main (26d67bc, `events`

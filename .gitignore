@@ -12,10 +12,16 @@ orm/
 grpc-mcp-gateway/
 runtime-go/
 
-# Build scratch: the RFC descriptor image `just gen store` builds for
-# reference discovery.
-/build/
+# Local env overrides, loaded at startup when present (main.go). Never commit.
+/.env
 
-# Bazel
-/bazel-*
+# Tool caches: .cache/buf holds the RFC descriptor image `just gen store`
+# builds for reference discovery.
+/.cache/
+
+# Bazel convenience symlinks (.bazelrc --symlink_prefix)
+/.bazel/
 .bazelrc.user
+
+# Claude Code local settings and state
+.claude/

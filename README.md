@@ -1075,7 +1075,7 @@ The `.proto` contract and the code generated from it (everything under
 *talks to* a freebusy server needs no commercial licence. The line is drawn at
 building on, or modifying, the server itself.
 
-Contributions are accepted under the [Contributor Licence Agreement](./CLA.md):
+Contributions are accepted under the [Contributor Licence Agreement](.github/CLA.md):
 sign off every commit (`git commit -s`).
 
 ---

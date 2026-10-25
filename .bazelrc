@@ -4,6 +4,10 @@
 # Bzlmod only; Bazel 9 has no WORKSPACE.
 common --enable_bzlmod
 
+# Convenience symlinks (bin, out, testlogs, freebusy) under one hidden .bazel/
+# directory instead of four bazel-* entries at the repository root.
+common --symlink_prefix=.bazel/
+
 # Pure Go: no cgo anywhere, so every binary is static and cross-compiles with
 # nothing but the Go toolchain.
 build --@rules_go//go/config:pure

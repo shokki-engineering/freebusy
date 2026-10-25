@@ -54,7 +54,6 @@ var byName = map[string]rule{
 	// Legal texts carry their own terms; a header would amend them.
 	"LICENSE":               exempt,
 	"NOTICE":                exempt,
-	"CLA.md":                exempt,
 	"LICENSE-COMMERCIAL.md": exempt,
 
 	// Machine-written, and their formats have no comments, or the tool that
@@ -95,11 +94,17 @@ var byExt = map[string]rule{
 	".sum":  exempt,
 }
 
-// ruleFor finds a file's rule: by name, then by the Dockerfile convention,
+// byPath are the files whose rule is their own, whatever their name: the
+// contributor agreement, a legal text kept verbatim.
+var byPath = map[string]rule{
+	".github/CLA.md": exempt,
+}
+
+// ruleFor finds a file's rule: by path, then by name, then by the Dockerfile convention,
 // then by extension. ok is false when no rule covers it.
 func ruleFor(file string) (rule, bool) {
-	if strings.HasPrefix(file, "licenses/") {
-		return exempt, true // licence texts, verbatim
+	if r, ok := byPath[file]; ok {
+		return r, true
 	}
 	name := path.Base(file)
 	if r, ok := byName[name]; ok {

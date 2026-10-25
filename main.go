@@ -12,6 +12,9 @@ import (
 	// when the host has none, as in a scratch container.
 	_ "time/tzdata"
 
+	// An untracked .env in the working directory, when there is one, sets
+	// FREEBUSY_ overrides for local runs; none is needed, as the dev profile
+	// (internal/config/freebusy.dev.toml) holds the development settings.
 	_ "github.com/joho/godotenv/autoload"
 	_ "golang.org/x/crypto/x509roots/fallback"
 )

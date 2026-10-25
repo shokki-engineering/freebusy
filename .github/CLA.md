@@ -5,7 +5,7 @@ reason explained below.
 
 ## Why this is required
 
-freebusy is [dual-licensed](./LICENSE-COMMERCIAL.md): AGPL-3.0-or-later for open
+freebusy is [dual-licensed](../LICENSE-COMMERCIAL.md): AGPL-3.0-or-later for open
 source, commercial for proprietary use. Offering a commercial licence requires
 holding sufficient rights over *all* the code — including yours.
 

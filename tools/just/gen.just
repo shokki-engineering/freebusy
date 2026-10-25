@@ -65,8 +65,8 @@ store:
     # RFC module's tables. This image of the RFC module, at the commit
     # buf.lock pins, lets protoc-gen-store discover them (store.backend.yaml
     # `references:`) and turn freebusy's references into foreign keys.
-    mkdir -p build/protobuf
-    buf build buf.build/the-protobuf-project/rfc:$(awk '/name: buf.build\/the-protobuf-project\/rfc$/ {getline; print $2}' buf.lock) -o build/protobuf/rfc.binpb
+    mkdir -p .cache/buf
+    buf build buf.build/the-protobuf-project/rfc:$(awk '/name: buf.build\/the-protobuf-project\/rfc$/ {getline; print $2}' buf.lock) -o .cache/buf/rfc.binpb
     buf generate --template tools/protobuf/buf/store.buf.gen.yaml
     # The generators clear their output directories, BUILD.bazel included.
     bazel run //:gazelle

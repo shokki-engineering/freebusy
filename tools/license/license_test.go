@@ -77,7 +77,7 @@ func TestRules(t *testing.T) {
 			t.Errorf("no rule for %s", file)
 		}
 	}
-	for _, file := range []string{"LICENSE", "protobuf/LICENSE", "go.sum", "a/b/config.json", "licenses/LICENSE-APACHE-2.0.txt"} {
+	for _, file := range []string{"LICENSE", "protobuf/LICENSE", "go.sum", "a/b/config.json", ".github/CLA.md"} {
 		if r, ok := ruleFor(file); !ok || !r.exempt {
 			t.Errorf("%s should be exempt", file)
 		}

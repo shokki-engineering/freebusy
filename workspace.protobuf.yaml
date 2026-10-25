@@ -11,11 +11,12 @@ proto_path: ./protobuf
 # covers everything under it; * and ** work as usual.
 exclude:
   - bazel
-  # Bazel's output symlinks (bazel-bin, bazel-out, bazel-testlogs,
-  # bazel-bacnet-rs): each a copy of every proto, as .gitignore skips them.
+  # Bazel's output symlinks (.bazel/bin, .bazel/out, .bazel/testlogs,
+  # .bazel/freebusy): each a copy of every proto, as .gitignore skips them.
   # Spelled `/**` because the extension widens only a bare name to its
-  # contents; `bazel-*` alone matches the symlink and nothing beneath it.
-  - bazel-*/**
+  # contents; `.bazel` alone matches the directory's symlinks and nothing
+  # beneath them.
+  - .bazel/**
   # Build output: generated and scratch protos (target/agent-protos,
   # target/scratch-mcp), never the schema.
   - target

@@ -75,7 +75,7 @@ datasources:
 # foreign keys into the rfc tables, which share freebusy's Postgres database.
 # `just gen store` builds the image from the RFC commit buf.lock pins.
 references:
-  - build/protobuf/rfc.binpb
+  - .cache/buf/rfc.binpb
 
 telemetry:
   enabled: true                # override the telemetry opt's master switch
