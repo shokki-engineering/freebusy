@@ -20,6 +20,11 @@ on:
     branches: [main]
     types: [opened, reopened, synchronize, ready_for_review]
 
+# One run per pull request: a new push cancels the previous one.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
   pull-requests: write

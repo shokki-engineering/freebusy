@@ -11,6 +11,12 @@ on:
     branches: [main]
   pull_request:
 
+# One run per branch or pull request: a new push cancels the run still going
+# for the previous one.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 

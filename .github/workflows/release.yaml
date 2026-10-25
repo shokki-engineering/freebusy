@@ -26,6 +26,12 @@ on:
   push:
     tags: ["v*.*.*"]
 
+# Releases queue rather than cancel: stopping one part-way would leave some
+# artifacts published and others not.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
   packages: write
