@@ -37,8 +37,6 @@ require (
 
 require (
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.17 // indirect
-	github.com/googleapis/gax-go/v2 v2.26.2 // indirect
 	github.com/oapi-codegen/runtime v1.8.0 // indirect
 	github.com/the-protobuf-project/cache v0.3.0 // indirect
 	github.com/the-protobuf-project/mcp v1.7.5 // indirect
