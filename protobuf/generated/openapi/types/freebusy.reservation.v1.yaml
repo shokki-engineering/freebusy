@@ -12,7 +12,7 @@ components:
             changed since (AIP-154).
           type: string
         name:
-          description: 'Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
+          description: 'Format: reservations/{reservation}'
           type: string
         reason:
           description: Why, in the canceller's words. Recorded, never parsed.
@@ -26,11 +26,6 @@ components:
         one reservation, so a retry -- with or without reservation_id -- finds the
         reservation the first attempt made instead of making a second.
       properties:
-        parent:
-          description: |-
-            The site the hold was taken at.
-            Format: organizationalUnits/{organizational_unit}
-          type: string
         reservation:
           description: |-
             The reservation to make. `hold` is required; `customer` and `attributes`
@@ -77,8 +72,8 @@ components:
               type: string
             hold:
               description: |-
-                The hold this reservation was made from, at the same site.
-                Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                The hold this reservation was made from.
+                Format: holds/{hold}
               type: string
             lastChange:
               description: |-
@@ -94,18 +89,18 @@ components:
               description: |-
                 The reservation name. Its id is the caller's reservation_id, or else the
                 id of the hold it was made from.
-                Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                Format: reservations/{reservation}
               type: string
             replacement:
               description: |-
                 The reservation replacing this one, set when RescheduleReservation began.
-                Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                Format: reservations/{reservation}
               type: string
             replaces:
               description: |-
                 The reservation this one replaced, set when it was made by
                 RescheduleReservation.
-                Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                Format: reservations/{reservation}
               type: string
             resources:
               description: |-
@@ -151,7 +146,6 @@ components:
       enum:
       - ERROR_REASON_UNSPECIFIED
       - ERROR_REASON_HOLD_NOT_FOUND
-      - ERROR_REASON_HOLD_AT_ANOTHER_SITE
       - ERROR_REASON_HOLD_LAPSED
       - ERROR_REASON_RESERVATION_ID_TAKEN
       - ERROR_REASON_RESERVATION_FAILED
@@ -166,7 +160,7 @@ components:
       description: Request message for ReservationService.GetReservation, AIP-131.
       properties:
         name:
-          description: 'Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
+          description: 'Format: reservations/{reservation}'
           type: string
       type: object
     freebusy.reservation.v1.ListReservationsRequest:
@@ -186,9 +180,6 @@ components:
           type: integer
         pageToken:
           description: Page token from a previous ListReservationsResponse.next_page_token.
-          type: string
-        parent:
-          description: 'Format: organizationalUnits/{organizational_unit}'
           type: string
       type: object
     freebusy.reservation.v1.ListReservationsResponse:
@@ -255,8 +246,8 @@ components:
                 type: string
               hold:
                 description: |-
-                  The hold this reservation was made from, at the same site.
-                  Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                  The hold this reservation was made from.
+                  Format: holds/{hold}
                 type: string
               lastChange:
                 description: |-
@@ -272,18 +263,18 @@ components:
                 description: |-
                   The reservation name. Its id is the caller's reservation_id, or else the
                   id of the hold it was made from.
-                  Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                  Format: reservations/{reservation}
                 type: string
               replacement:
                 description: |-
                   The reservation replacing this one, set when RescheduleReservation began.
-                  Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                  Format: reservations/{reservation}
                 type: string
               replaces:
                 description: |-
                   The reservation this one replaced, set when it was made by
                   RescheduleReservation.
-                  Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                  Format: reservations/{reservation}
                 type: string
               resources:
                 description: |-
@@ -325,15 +316,15 @@ components:
           type: string
         hold:
           description: |-
-            A live hold at the same site on the new window, taken by the caller with
+            A live hold on the new window, taken by the caller with
             HoldService.CreateHold. Taking it first is what makes the move safe: the
             new slot is secured before the old one is let go.
-            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+            Format: holds/{hold}
           type: string
         name:
           description: |-
             The confirmed reservation to move.
-            Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+            Format: reservations/{reservation}
           type: string
       type: object
     freebusy.reservation.v1.Reservation:
@@ -390,8 +381,8 @@ components:
           type: string
         hold:
           description: |-
-            The hold this reservation was made from, at the same site.
-            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+            The hold this reservation was made from.
+            Format: holds/{hold}
           type: string
         lastChange:
           description: |-
@@ -407,18 +398,18 @@ components:
           description: |-
             The reservation name. Its id is the caller's reservation_id, or else the
             id of the hold it was made from.
-            Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+            Format: reservations/{reservation}
           type: string
         replacement:
           description: |-
             The reservation replacing this one, set when RescheduleReservation began.
-            Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+            Format: reservations/{reservation}
           type: string
         replaces:
           description: |-
             The reservation this one replaced, set when it was made by
             RescheduleReservation.
-            Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+            Format: reservations/{reservation}
           type: string
         resources:
           description: |-
@@ -568,8 +559,8 @@ components:
               type: string
             hold:
               description: |-
-                The hold this reservation was made from, at the same site.
-                Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                The hold this reservation was made from.
+                Format: holds/{hold}
               type: string
             lastChange:
               description: |-
@@ -585,18 +576,18 @@ components:
               description: |-
                 The reservation name. Its id is the caller's reservation_id, or else the
                 id of the hold it was made from.
-                Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                Format: reservations/{reservation}
               type: string
             replacement:
               description: |-
                 The reservation replacing this one, set when RescheduleReservation began.
-                Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                Format: reservations/{reservation}
               type: string
             replaces:
               description: |-
                 The reservation this one replaced, set when it was made by
                 RescheduleReservation.
-                Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                Format: reservations/{reservation}
               type: string
             resources:
               description: |-
@@ -665,7 +656,6 @@ info:
             string replacement "OUTPUT_ONLY"
             Change last_change "OUTPUT_ONLY"
         }
-        OrganizationalUnit ||--o{ Reservation : "reservations"
         Reservation }o--|| Hold : "hold"
         Reservation }o--o{ Resource : "resources"
         Reservation }o--o| User : "customer"
@@ -736,7 +726,6 @@ info:
               string replacement "OUTPUT_ONLY"
               Change last_change "OUTPUT_ONLY"
           }
-          OrganizationalUnit ||--o{ Reservation : "reservations"
           Reservation }o--|| Hold : "hold"
           Reservation }o--o{ Resource : "resources"
           Reservation }o--o| User : "customer"

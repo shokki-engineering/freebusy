@@ -50,7 +50,7 @@ type WebhookServiceClient interface {
 	GetWebhook(ctx context.Context, in *GetWebhookRequest, opts ...grpc.CallOption) (*Webhook, error)
 	// Lists webhooks, without their secrets.
 	ListWebhooks(ctx context.Context, in *ListWebhooksRequest, opts ...grpc.CallOption) (*ListWebhooksResponse, error)
-	// Updates a webhook: its endpoint, event types or site.
+	// Updates a webhook: its endpoint or event types.
 	UpdateWebhook(ctx context.Context, in *UpdateWebhookRequest, opts ...grpc.CallOption) (*Webhook, error)
 	// Stops sending a webhook changes. Changes made while it is paused are not
 	// sent; deliveries already pending wait. Idempotent.
@@ -205,7 +205,7 @@ type WebhookServiceServer interface {
 	GetWebhook(context.Context, *GetWebhookRequest) (*Webhook, error)
 	// Lists webhooks, without their secrets.
 	ListWebhooks(context.Context, *ListWebhooksRequest) (*ListWebhooksResponse, error)
-	// Updates a webhook: its endpoint, event types or site.
+	// Updates a webhook: its endpoint or event types.
 	UpdateWebhook(context.Context, *UpdateWebhookRequest) (*Webhook, error)
 	// Stops sending a webhook changes. Changes made while it is paused are not
 	// sent; deliveries already pending wait. Idempotent.

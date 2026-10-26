@@ -86,14 +86,6 @@
             "nullable": "nonNullable",
             "description": null
           },
-          "organizational_unit_id": {
-            "name": "organizational_unit_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
           "quantity": {
             "name": "quantity",
             "type": {
@@ -151,15 +143,7 @@
             "id"
           ]
         },
-        "foreignRelations": {
-          "fk_holds_organizational_unit_id": {
-            "foreignSchema": "orgunit",
-            "foreignTable": "organizational_units",
-            "columnMapping": {
-              "organizational_unit_id": "id"
-            }
-          }
-        },
+        "foreignRelations": {},
         "description": null
       },
       "allocation_resource": {
@@ -214,14 +198,6 @@
             "nullable": "nonNullable",
             "description": null
           },
-          "organizational_unit_id": {
-            "name": "organizational_unit_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
           "resource": {
             "name": "resource",
             "type": {
@@ -245,13 +221,6 @@
           ]
         },
         "foreignRelations": {
-          "fk_resource_organizational_unit_id": {
-            "foreignSchema": "orgunit",
-            "foreignTable": "organizational_units",
-            "columnMapping": {
-              "organizational_unit_id": "id"
-            }
-          },
           "fk_resource_resource": {
             "foreignSchema": "resource",
             "foreignTable": "entity",
@@ -320,14 +289,6 @@
               "scalarType": "text"
             },
             "nullable": "nonNullable",
-            "description": null
-          },
-          "organization": {
-            "name": "organization",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
             "description": null
           },
           "organizational_unit": {
@@ -4158,14 +4119,6 @@
             "nullable": "nonNullable",
             "description": null
           },
-          "organizational_unit_id": {
-            "name": "organizational_unit_id",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
           "replacement": {
             "name": "replacement",
             "type": {
@@ -4223,15 +4176,7 @@
             "id"
           ]
         },
-        "foreignRelations": {
-          "fk_resource_organizational_unit_id": {
-            "foreignSchema": "orgunit",
-            "foreignTable": "organizational_units",
-            "columnMapping": {
-              "organizational_unit_id": "id"
-            }
-          }
-        },
+        "foreignRelations": {},
         "description": null
       },
       "resource_entity": {
@@ -7918,14 +7863,6 @@
             "nullable": "nonNullable",
             "description": null
           },
-          "organizational_unit": {
-            "name": "organizational_unit",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
           "previous_secret": {
             "name": "previous_secret",
             "type": {
@@ -7981,15 +7918,7 @@
             "id"
           ]
         },
-        "foreignRelations": {
-          "fk_resource_organizational_unit": {
-            "foreignSchema": "orgunit",
-            "foreignTable": "organizational_units",
-            "columnMapping": {
-              "organizational_unit": "name"
-            }
-          }
-        },
+        "foreignRelations": {},
         "description": null
       }
     },

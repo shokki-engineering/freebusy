@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organizational_unit/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
@@ -34,22 +33,10 @@ const acrossCalendars = "calendars/-"
 // engine counts those but never offers them -- with their calendars' zones,
 // ordered by name.
 func (s *Store) Resources(ctx context.Context, q allocation.ResourceQuery) ([]allocation.ResourceRecord, error) {
-	// One scope: sites, an organization's sites, or calendars. Each is
-	// batched by key, so a large one is read in parts side by side.
+	// Calendars scope the read, batched by key, so a large scope is read in
+	// parts side by side.
 	scopeField, scope := "", []string(nil)
-	switch {
-	case len(q.OrganizationalUnits) > 0:
-		scopeField, scope = "organizational_unit", q.OrganizationalUnits
-	case q.Organization != "":
-		units, err := s.Sites(ctx, q.Organization)
-		if err != nil {
-			return nil, err
-		}
-		if len(units) == 0 {
-			return nil, nil
-		}
-		scopeField, scope = "organizational_unit", units
-	case len(q.Calendars) > 0:
+	if len(q.Calendars) > 0 {
 		scopeField, scope = "calendar", q.Calendars
 	}
 	var where []filterx.Condition
@@ -117,27 +104,6 @@ func (s *Store) Resources(ctx context.Context, q allocation.ResourceQuery) ([]al
 		out = append(out, allocation.ResourceRecord{Resource: r, TimeZone: zones[r.GetCalendar()]})
 	}
 	return out, nil
-}
-
-// Sites returns the names of an organization's live sites, in name order.
-func (s *Store) Sites(ctx context.Context, organization string) ([]string, error) {
-	units, err := listAll(func(token string) ([]*organizational_unitv1.OrganizationalUnit, string, error) {
-		return s.units.List(ctx, repox.ListInput{
-			PageSize:  1000,
-			PageToken: token,
-			OrderBy:   "name",
-			// A site stores its organization's full name, organizations/{id}.
-			Where: []filterx.Condition{{Field: "organization", Op: filterx.OpEq, Value: organization}},
-		})
-	})
-	if err != nil {
-		return nil, err
-	}
-	names := make([]string, len(units))
-	for i, u := range units {
-		names[i] = u.GetName()
-	}
-	return names, nil
 }
 
 // Availability reads every live VAVAILABILITY on the calendars.

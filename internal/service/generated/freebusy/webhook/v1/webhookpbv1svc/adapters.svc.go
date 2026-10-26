@@ -46,7 +46,6 @@ func eventWebhook(m *webhookpbv1.Webhook) events.Webhook {
 		Name:           m.GetName(),
 		URI:            m.GetUri(),
 		EventTypes:     m.GetEventTypes(),
-		Scope:          m.GetOrganizationalUnit(),
 		Paused:         m.GetState() == webhookpbv1.WebhookState_WEBHOOK_STATE_PAUSED,
 		Secret:         m.GetSecret(),
 		PreviousSecret: m.GetPreviousSecret(),

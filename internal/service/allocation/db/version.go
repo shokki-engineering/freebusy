@@ -29,14 +29,14 @@ const versionKey = "version"
 const versionTTL = 48 * time.Hour
 
 // inputVersion is the version of the engine's static inputs: resources,
-// sites, calendars and their availability. It is the same signal the list
+// calendars and their availability. It is the same signal the list
 // caches move on (repox.Conn.Changes), kept per process and, when the cache
 // is on, in the cache too, so a write on one instance moves every instance's
 // version.
 //
-// It is one version for the whole deployment, not one per site: a resource's
-// name does not say which site it is at, and these records change rarely
-// next to the holds and events that are read fresh on every request.
+// It is one version for the whole deployment, not one per resource: these
+// records change rarely next to the holds and events that are read fresh on
+// every request.
 type inputVersion struct {
 	local  atomic.Uint64
 	shared *cache.DB
@@ -79,18 +79,15 @@ func (v *inputVersion) current(ctx context.Context) (string, error) {
 }
 
 // staticInput reports whether a written record's name is one the engine
-// caches: a resource, a site or organization, a calendar, or a calendar's
-// availability. Events, holds, allocations and reservations are read fresh and
+// caches: a resource, a calendar, or a calendar's availability. Events, holds, allocations and reservations are read fresh and
 // do not move it.
 func staticInput(name string) bool {
 	segs := strings.Split(name, "/")
 	switch {
 	case len(segs) < 2:
 		return false
-	case segs[0] == "resources", segs[0] == "organizations":
+	case segs[0] == "resources":
 		return true
-	case segs[0] == "organizationalUnits":
-		return len(segs) == 2
 	case segs[0] == "calendars":
 		return len(segs) == 2 || segs[2] == "availabilities"
 	}
@@ -98,7 +95,7 @@ func staticInput(name string) bool {
 }
 
 // InputVersion is the version of the engine's static inputs; it changes on
-// every write to a resource, site, organization, calendar or availability
+// every write to a resource, calendar or availability
 // committed through this connection's repositories, on any instance sharing
 // the cache.
 func (s *Store) InputVersion(ctx context.Context) (string, error) {

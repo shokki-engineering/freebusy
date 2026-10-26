@@ -36,8 +36,6 @@ type AllocationResource struct {
 	Id string `graphql:"id"`
 	// Name selects the "name" field.
 	Name string `graphql:"name"`
-	// OrganizationalUnitId selects the "organizationalUnitId" field.
-	OrganizationalUnitId string `graphql:"organizationalUnitId"`
 	// Resource selects the "resource" field.
 	Resource string `graphql:"resource"`
 	// StartTime selects the "startTime" field.
@@ -115,17 +113,6 @@ type AllocationResourceAggExp struct {
 		// Min selects the "min" field; nil when the column is NULL.
 		Min *string `graphql:"min"`
 	} `graphql:"name"`
-	// OrganizationalUnitId selects the "organizationalUnitId" field.
-	OrganizationalUnitId struct {
-		// Count selects the "_count" field.
-		Count graphql.Int64 `graphql:"_count"`
-		// CountDistinct selects the "_count_distinct" field.
-		CountDistinct graphql.Int64 `graphql:"_count_distinct"`
-		// Max selects the "max" field; nil when the column is NULL.
-		Max *string `graphql:"max"`
-		// Min selects the "min" field; nil when the column is NULL.
-		Min *string `graphql:"min"`
-	} `graphql:"organizationalUnitId"`
 	// Resource selects the "resource" field.
 	Resource struct {
 		// Count selects the "_count" field.
@@ -168,8 +155,6 @@ type DeleteAllocationResourceByIdResponse struct {
 		Id string `graphql:"id"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnitId selects the "organizationalUnitId" field.
-		OrganizationalUnitId string `graphql:"organizationalUnitId"`
 		// Resource selects the "resource" field.
 		Resource string `graphql:"resource"`
 		// StartTime selects the "startTime" field.
@@ -195,8 +180,6 @@ type InsertAllocationResourceResponse struct {
 		Id string `graphql:"id"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnitId selects the "organizationalUnitId" field.
-		OrganizationalUnitId string `graphql:"organizationalUnitId"`
 		// Resource selects the "resource" field.
 		Resource string `graphql:"resource"`
 		// StartTime selects the "startTime" field.
@@ -222,8 +205,6 @@ type UpdateAllocationResourceByIdResponse struct {
 		Id string `graphql:"id"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnitId selects the "organizationalUnitId" field.
-		OrganizationalUnitId string `graphql:"organizationalUnitId"`
 		// Resource selects the "resource" field.
 		Resource string `graphql:"resource"`
 		// StartTime selects the "startTime" field.

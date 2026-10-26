@@ -19,8 +19,6 @@ definition:
       type: String_1!
     - name: name
       type: String_1!
-    - name: organizationalUnitId
-      type: String_1!
     - name: resource
       type: String_1!
     - name: startTime
@@ -50,9 +48,6 @@ definition:
         name:
           column:
             name: name
-        organizationalUnitId:
-          column:
-            name: organizational_unit_id
         resource:
           column:
             name: resource
@@ -75,7 +70,6 @@ definition:
           - hold
           - id
           - name
-          - organizationalUnitId
           - resource
           - startTime
 

@@ -253,7 +253,7 @@ func (h hooks) ValidateWebhook(ctx context.Context, op servicex.Op, m *webhookpb
 			}
 		}
 		if len(paths) == 0 { // "*": every field the update may change
-			for _, p := range []string{"display_name", "uri", "event_types", "organizational_unit"} {
+			for _, p := range []string{"display_name", "uri", "event_types"} {
 				fd := fields.ByName(protoreflect.Name(p))
 				next.ProtoReflect().Set(fd, m.ProtoReflect().Get(fd))
 			}

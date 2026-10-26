@@ -19,10 +19,10 @@ components:
         `expire_time` passes, with no sweeper write needed, because every read
         filters on it.
 
-        It sits under the site and names its hold, rather than nesting under the
-        hold: the engine asks about allocations by resource and time across a whole
-        site, never hold by hold, and a hold with child resources would owe
-        DeleteHold a `force` flag guarding rows no caller can see.
+        It is top-level and names its hold, rather than nesting under the hold: the
+        engine asks about allocations by resource and time, never hold by hold, and
+        a hold with child resources would owe DeleteHold a `force` flag guarding
+        rows no caller can see.
       properties:
         createTime:
           description: Creation timestamp.
@@ -44,12 +44,12 @@ components:
         hold:
           description: |-
             The hold that took it. Deleting the hold deletes its allocations with it.
-            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+            Format: holds/{hold}
           type: string
         name:
           description: |-
-            The allocation name, under the site whose resource it takes.
-            Format: organizationalUnits/{organizational_unit}/allocations/{allocation}
+            The allocation name.
+            Format: allocations/{allocation}
           type: string
         resource:
           description: |-
@@ -128,11 +128,6 @@ components:
         displayName:
           description: The resource's display name, echoed for the same reason.
           type: string
-        organizationalUnit:
-          description: |-
-            The site it belongs to.
-            Format: organizationalUnits/{organizational_unit}
-          type: string
         resource:
           description: |-
             The free resource.
@@ -170,8 +165,8 @@ components:
     freebusy.allocation.v1.BatchComputeAvailabilityRequest:
       description: |-
         Request message for AllocationService.BatchComputeAvailability. Each entry is
-        a full ComputeAvailabilityRequest, so sites, windows and granularities may
-        differ within one batch.
+        a full ComputeAvailabilityRequest, so resources, windows and granularities
+        may differ within one batch.
       properties:
         requests:
           description: |-
@@ -185,8 +180,9 @@ components:
                   An AIP-160 filter over each resource's search record (ResourceDay): its
                   `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
                   `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-                  `display_name` (a bare word matches it) and `organizational_unit`. Terms
-                  are ANDed unless joined with OR. Empty matches every resource.
+                  `display_name` (a bare word matches it) and `organizational_unit` (the
+                  resource's own, as data). Terms are ANDed unless joined with OR. Empty
+                  matches every resource.
                   Only matching resources are computed over or counted.
                 type: string
               granularity:
@@ -198,18 +194,13 @@ components:
                 type: string
               includeFreeResources:
                 description: |-
-                  Populate AvailabilityBucket.free_resources. Off by default: a large site
+                  Populate AvailabilityBucket.free_resources. Off by default: a large pool
                   would otherwise repeat every resource name in every bucket.
                 type: boolean
-              parent:
-                description: |-
-                  The site whose resources to compute over.
-                  Format: organizationalUnits/{organizational_unit}
-                type: string
               resources:
                 description: |-
                   Restrict the computation to these resources. Empty means every resource
-                  the site holds.
+                  `filter` matches.
                   Format: resources/{resource}
                 items:
                   type: string
@@ -220,8 +211,8 @@ components:
               timeZone:
                 description: |-
                   IANA time zone the day boundaries are drawn in, e.g. "Asia/Kolkata".
-                  Defaults to the site's zone. Required in effect for DAY granularity, since
-                  "a night" has no meaning without one.
+                  Defaults to the zone of the first resource's calendar. Required in effect
+                  for DAY granularity, since "a night" has no meaning without one.
                 type: string
               window:
                 description: The window to compute over.
@@ -325,14 +316,10 @@ components:
             An AIP-160 filter over each resource's search record (ResourceDay): its
             `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
             `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-            `display_name` (a bare word matches it) and `organizational_unit`. Terms
-            are ANDed unless joined with OR. Empty matches every resource.
+            `display_name` (a bare word matches it) and `organizational_unit` (the
+            resource's own, as data). Terms are ANDed unless joined with OR. Empty
+            matches every resource.
             Only matching resources are checked.
-          type: string
-        parent:
-          description: |-
-            The site whose resources to check.
-            Format: organizationalUnits/{organizational_unit}
           type: string
         quantity:
           description: How many resources are needed. Defaults to 1.
@@ -340,8 +327,8 @@ components:
           type: integer
         resources:
           description: |-
-            Restrict the check to these resources. Empty means every resource the site
-            holds.
+            Restrict the check to these resources. Empty means every resource
+            `filter` matches.
             Format: resources/{resource}
           items:
             type: string
@@ -423,8 +410,9 @@ components:
             An AIP-160 filter over each resource's search record (ResourceDay): its
             `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
             `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-            `display_name` (a bare word matches it) and `organizational_unit`. Terms
-            are ANDed unless joined with OR. Empty matches every resource.
+            `display_name` (a bare word matches it) and `organizational_unit` (the
+            resource's own, as data). Terms are ANDed unless joined with OR. Empty
+            matches every resource.
             Only matching resources are computed over or counted.
           type: string
         granularity:
@@ -436,18 +424,13 @@ components:
           type: string
         includeFreeResources:
           description: |-
-            Populate AvailabilityBucket.free_resources. Off by default: a large site
+            Populate AvailabilityBucket.free_resources. Off by default: a large pool
             would otherwise repeat every resource name in every bucket.
           type: boolean
-        parent:
-          description: |-
-            The site whose resources to compute over.
-            Format: organizationalUnits/{organizational_unit}
-          type: string
         resources:
           description: |-
             Restrict the computation to these resources. Empty means every resource
-            the site holds.
+            `filter` matches.
             Format: resources/{resource}
           items:
             type: string
@@ -458,8 +441,8 @@ components:
         timeZone:
           description: |-
             IANA time zone the day boundaries are drawn in, e.g. "Asia/Kolkata".
-            Defaults to the site's zone. Required in effect for DAY granularity, since
-            "a night" has no meaning without one.
+            Defaults to the zone of the first resource's calendar. Required in effect
+            for DAY granularity, since "a night" has no meaning without one.
           type: string
         window:
           description: The window to compute over.
@@ -559,8 +542,8 @@ components:
         hold:
           description: |-
             The hold to take. Its window is required; quantity defaults to 1 and
-            candidate_resources empty offers every resource the site holds. Supply
-            idempotency_key to make a retry safe.
+            candidate_resources empty offers every resource candidate_filter matches.
+            Supply idempotency_key to make a retry safe.
           properties:
             candidateFilter:
               description: |-
@@ -573,7 +556,7 @@ components:
             candidateResources:
               description: |-
                 Candidate resources the allocator may choose from, supplied on create.
-                Empty offers every resource the site holds. Immutable: the choice is made
+                Empty offers every resource, narrowed by `candidate_filter`. Immutable: the choice is made
                 once, and re-offering a different set is a different allocation.
                 Format: resources/{resource}
               items:
@@ -601,9 +584,9 @@ components:
               type: string
             name:
               description: |-
-                The hold name. Nested under the site whose resources it takes, so a hold
-                is listed and swept per site without joining through every resource.
-                Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                The hold name. Top-level: a hold takes resources wherever they are, and
+                grouping them by place is the business of whatever is built on top.
+                Format: holds/{hold}
               type: string
             quantity:
               description: |-
@@ -614,8 +597,7 @@ components:
             replaces:
               description: |-
                 The hold of the reservation this hold is taken to replace with
-                RescheduleReservation: that reservation's `hold`, converted and at the
-                same site. Its claims do not count against this hold, so a new window
+                RescheduleReservation: that reservation's `hold`, converted. Its claims do not count against this hold, so a new window
                 overlapping the old one -- an extension, a shift by an hour -- can keep
                 the same resources. Until the move completes this hold claims only the
                 time the old one does not; RescheduleReservation hands the rest over in
@@ -623,7 +605,7 @@ components:
                 Such a hold can only be used to reschedule that reservation. (A hold,
                 though no resource_reference says so: AIP-121 allows no cycle of mutable
                 references, and this one is a hold naming a hold.)
-                Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                Format: holds/{hold}
               type: string
             resources:
               description: |-
@@ -676,11 +658,6 @@ components:
             Client-assigned id, becoming the last segment of the hold name. The server
             generates one when empty.
           type: string
-        parent:
-          description: |-
-            The site whose resources may be taken.
-            Format: organizationalUnits/{organizational_unit}
-          type: string
       type: object
     freebusy.allocation.v1.DeleteHoldRequest:
       description: Request message for HoldService.DeleteHold, AIP-135.
@@ -693,7 +670,7 @@ components:
         name:
           description: |-
             Name of the hold to delete.
-            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+            Format: holds/{hold}
           type: string
       type: object
     freebusy.allocation.v1.ErrorReason:
@@ -739,7 +716,7 @@ components:
         name:
           description: |-
             Name of the hold to extend.
-            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+            Format: holds/{hold}
           type: string
       type: object
     freebusy.allocation.v1.FacetBucket:
@@ -760,7 +737,7 @@ components:
         name:
           description: |-
             Name of the hold to retrieve.
-            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+            Format: holds/{hold}
           type: string
       type: object
     freebusy.allocation.v1.Hold:
@@ -793,7 +770,7 @@ components:
         candidateResources:
           description: |-
             Candidate resources the allocator may choose from, supplied on create.
-            Empty offers every resource the site holds. Immutable: the choice is made
+            Empty offers every resource, narrowed by `candidate_filter`. Immutable: the choice is made
             once, and re-offering a different set is a different allocation.
             Format: resources/{resource}
           items:
@@ -821,9 +798,9 @@ components:
           type: string
         name:
           description: |-
-            The hold name. Nested under the site whose resources it takes, so a hold
-            is listed and swept per site without joining through every resource.
-            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+            The hold name. Top-level: a hold takes resources wherever they are, and
+            grouping them by place is the business of whatever is built on top.
+            Format: holds/{hold}
           type: string
         quantity:
           description: |-
@@ -834,8 +811,7 @@ components:
         replaces:
           description: |-
             The hold of the reservation this hold is taken to replace with
-            RescheduleReservation: that reservation's `hold`, converted and at the
-            same site. Its claims do not count against this hold, so a new window
+            RescheduleReservation: that reservation's `hold`, converted. Its claims do not count against this hold, so a new window
             overlapping the old one -- an extension, a shift by an hour -- can keep
             the same resources. Until the move completes this hold claims only the
             time the old one does not; RescheduleReservation hands the rest over in
@@ -843,7 +819,7 @@ components:
             Such a hold can only be used to reschedule that reservation. (A hold,
             though no resource_reference says so: AIP-121 allows no cycle of mutable
             references, and this one is a hold naming a hold.)
-            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+            Format: holds/{hold}
           type: string
         resources:
           description: |-
@@ -951,11 +927,6 @@ components:
         pageToken:
           description: Page token from a previous ListHoldsResponse.next_page_token.
           type: string
-        parent:
-          description: |-
-            The site whose holds to list.
-            Format: organizationalUnits/{organizational_unit}
-          type: string
       type: object
     freebusy.allocation.v1.ListHoldsResponse:
       description: Response message for HoldService.ListHolds, AIP-132.
@@ -992,7 +963,7 @@ components:
               candidateResources:
                 description: |-
                   Candidate resources the allocator may choose from, supplied on create.
-                  Empty offers every resource the site holds. Immutable: the choice is made
+                  Empty offers every resource, narrowed by `candidate_filter`. Immutable: the choice is made
                   once, and re-offering a different set is a different allocation.
                   Format: resources/{resource}
                 items:
@@ -1020,9 +991,9 @@ components:
                 type: string
               name:
                 description: |-
-                  The hold name. Nested under the site whose resources it takes, so a hold
-                  is listed and swept per site without joining through every resource.
-                  Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                  The hold name. Top-level: a hold takes resources wherever they are, and
+                  grouping them by place is the business of whatever is built on top.
+                  Format: holds/{hold}
                 type: string
               quantity:
                 description: |-
@@ -1033,8 +1004,7 @@ components:
               replaces:
                 description: |-
                   The hold of the reservation this hold is taken to replace with
-                  RescheduleReservation: that reservation's `hold`, converted and at the
-                  same site. Its claims do not count against this hold, so a new window
+                  RescheduleReservation: that reservation's `hold`, converted. Its claims do not count against this hold, so a new window
                   overlapping the old one -- an extension, a shift by an hour -- can keep
                   the same resources. Until the move completes this hold claims only the
                   time the old one does not; RescheduleReservation hands the rest over in
@@ -1042,7 +1012,7 @@ components:
                   Such a hold can only be used to reschedule that reservation. (A hold,
                   though no resource_reference says so: AIP-121 allows no cycle of mutable
                   references, and this one is a hold naming a hold.)
-                  Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                  Format: holds/{hold}
                 type: string
               resources:
                 description: |-
@@ -1106,7 +1076,7 @@ components:
         name:
           description: |-
             Name of the hold to release.
-            Format: organizationalUnits/{organizational_unit}/holds/{hold}
+            Format: holds/{hold}
           type: string
       type: object
     freebusy.allocation.v1.ResourceDay:
@@ -1114,10 +1084,10 @@ components:
         A ResourceDay is one resource's standing free time on one UTC day: the
         availability read model SearchAvailability, ComputeAvailability,
         CheckAvailability and CreateHold read their candidates from, instead of
-        evaluating every resource an operator has.
+        evaluating every resource there is.
 
         Storage-only, and derived: no RPC takes or returns it. It is a projection
-        of the resources, their sites, calendars, RFC 7953 availability, RFC 5545
+        of the resources, their calendars, RFC 7953 availability, RFC 5545
         events and the claims of converted holds, rewritten in the same transaction
         as every write to those (on Hasura, a single write projects in a request of
         its own right after it), for every day of a rolling horizon. `free` is
@@ -1204,11 +1174,10 @@ components:
             The share of the day that is free, from 0 to 1, for ordering by how open
             a resource is.
           type: number
-        organization:
-          description: The organization of the resource's site, "organizations/{organization}".
-          type: string
         organizationalUnit:
-          description: The resource's site, "organizationalUnits/{organizational_unit}".
+          description: |-
+            The resource's own organizational_unit, copied as data for filtering:
+            freebusy does not check or scope by it.
           type: string
         resource:
           description: |-
@@ -1223,9 +1192,9 @@ components:
       type: object
     freebusy.allocation.v1.SearchAvailabilityRequest:
       description: |-
-        Request message for AllocationService.SearchAvailability. Sweeps a whole
-        operator for resources free across a window, where ComputeAvailability
-        answers for one site already chosen.
+        Request message for AllocationService.SearchAvailability. Searches every
+        resource for those free across a window, where ComputeAvailability counts
+        over resources already chosen.
       properties:
         facets:
           description: |-
@@ -1241,8 +1210,9 @@ components:
             An AIP-160 filter over each resource's search record (ResourceDay): its
             `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
             `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-            `display_name` (a bare word matches it) and `organizational_unit`. Terms
-            are ANDed unless joined with OR. Empty matches every resource.
+            `display_name` (a bare word matches it) and `organizational_unit` (the
+            resource's own, as data). Terms are ANDed unless joined with OR. Empty
+            matches every resource.
           type: string
         orderBy:
           description: |-
@@ -1251,16 +1221,8 @@ components:
             the window's first UTC day that is free) and `attributes.max_occupancy`
             (the booking profile's, as a number), each optionally followed by
             ` desc`, e.g. `free_fraction desc, display_name`. Defaults to
-            `organizational_unit, resource`. When quantity is above 1, matches are
-            grouped by site first, and the order applies within a site.
+            `resource`.
           type: string
-        organizationalUnits:
-          description: |-
-            Restrict to sites, e.g. one car park or one venue. Empty searches all.
-            Format: organizationalUnits/{organizational_unit}
-          items:
-            type: string
-          type: array
         pageSize:
           description: Maximum matches to return. Defaults to 50, capped at 1000.
           format: int32
@@ -1270,17 +1232,6 @@ components:
             Page token from a previous SearchAvailabilityResponse.next_page_token.
             Every other field must be the same as in the call that returned it.
           type: string
-        parent:
-          description: |-
-            The operator to search within.
-            Format: organizations/{organization}
-          type: string
-        quantity:
-          description: |-
-            How many resources must be free together at one site for it to match.
-            Defaults to 1.
-          format: int32
-          type: integer
         resourceTypes:
           description: |-
             Restrict to RESOURCE-TYPE values, RFC 9073 section 6.3, e.g. "room" or
@@ -1354,11 +1305,6 @@ components:
             properties:
               displayName:
                 description: The resource's display name, echoed for the same reason.
-                type: string
-              organizationalUnit:
-                description: |-
-                  The site it belongs to.
-                  Format: organizationalUnits/{organizational_unit}
                 type: string
               resource:
                 description: |-
@@ -1493,10 +1439,8 @@ info:
             Timestamp create_time "OUTPUT_ONLY"
             string hold FK "OUTPUT_ONLY"
         }
-        OrganizationalUnit ||--o{ Hold : "holds"
         Hold }o--o{ Resource : "resources"
         Hold }o--o{ Resource : "candidate_resources"
-        OrganizationalUnit ||--o{ Allocation : "allocations"
         Allocation }o--|| Resource : "resource"
         Allocation }o--o| Hold : "hold"
     ```
@@ -1533,10 +1477,8 @@ info:
               Timestamp create_time "OUTPUT_ONLY"
               string hold FK "OUTPUT_ONLY"
           }
-          OrganizationalUnit ||--o{ Hold : "holds"
           Hold }o--o{ Resource : "resources"
           Hold }o--o{ Resource : "candidate_resources"
-          OrganizationalUnit ||--o{ Allocation : "allocations"
           Allocation }o--|| Resource : "resource"
           Allocation }o--o| Hold : "hold"
     title: Resources

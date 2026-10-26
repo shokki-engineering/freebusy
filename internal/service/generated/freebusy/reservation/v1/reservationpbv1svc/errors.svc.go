@@ -29,8 +29,6 @@ const ErrorDomain = "freebusy.dev"
 const (
 	// ReasonHoldNotFound (INVALID_ARGUMENT): The reservation's `hold` does not exist, or `CreateHold`'s `hold.replaces` names one that does not.
 	ReasonHoldNotFound = "HOLD_NOT_FOUND"
-	// ReasonHoldAtAnotherSite (INVALID_ARGUMENT): The hold is at a different site from the reservation's parent, or `CreateHold`'s `hold.replaces` is a hold at another site.
-	ReasonHoldAtAnotherSite = "HOLD_AT_ANOTHER_SITE"
 	// ReasonHoldLapsed (FAILED_PRECONDITION): The hold lapsed before the reservation was confirmed; the reservation failed.
 	ReasonHoldLapsed = "HOLD_LAPSED"
 	// ReasonReservationIDTaken (ALREADY_EXISTS): `reservation_id` names a reservation made from another hold.
@@ -60,7 +58,6 @@ func Kinds() []problem.Kind {
 func Reasons() []problem.Reason {
 	return []problem.Reason{
 		{Name: ReasonHoldNotFound, Code: codes.InvalidArgument, Description: "The reservation's `hold` does not exist, or `CreateHold`'s `hold.replaces` names one that does not."},
-		{Name: ReasonHoldAtAnotherSite, Code: codes.InvalidArgument, Description: "The hold is at a different site from the reservation's parent, or `CreateHold`'s `hold.replaces` is a hold at another site."},
 		{Name: ReasonHoldLapsed, Code: codes.FailedPrecondition, Description: "The hold lapsed before the reservation was confirmed; the reservation failed."},
 		{Name: ReasonReservationIDTaken, Code: codes.AlreadyExists, Description: "`reservation_id` names a reservation made from another hold."},
 		{Name: ReasonReservationFailed, Code: codes.FailedPrecondition, Description: "`CancelReservation` on a reservation that failed; it holds nothing."},
@@ -94,12 +91,6 @@ func Retryable(reason string) bool {
 // proto's: "Take a hold first with `CreateHold`; for `replaces`, send the reservation's `hold`.".
 func NewHoldNotFound(field, what string) *problem.Problem {
 	return &problem.Problem{Reason: ReasonHoldNotFound, Field: field, What: what, Fix: "Take a hold first with `CreateHold`; for `replaces`, send the reservation's `hold`."}
-}
-
-// NewHoldAtAnotherSite is a HOLD_AT_ANOTHER_SITE problem; its fix defaults to the
-// proto's: "Send the hold's own site as `parent`; a hold replaces only a booking at its own site.".
-func NewHoldAtAnotherSite(field, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonHoldAtAnotherSite, Field: field, What: what, Fix: "Send the hold's own site as `parent`; a hold replaces only a booking at its own site."}
 }
 
 // NewHoldLapsed is a HOLD_LAPSED problem; its fix defaults to the

@@ -23,15 +23,14 @@ import (
 // Filter fields for AllocationResource. Build predicates like CreateTime.Eq(v) and combine
 // them with And/Or/Not.
 var (
-	CreateTime           = graphql.StringField{Col: "createTime"}
-	EndTime              = graphql.StringField{Col: "endTime"}
-	ExpireTime           = graphql.StringField{Col: "expireTime"}
-	Hold                 = graphql.StringField{Col: "hold"}
-	Id                   = graphql.StringField{Col: "id"}
-	Name                 = graphql.StringField{Col: "name"}
-	OrganizationalUnitId = graphql.StringField{Col: "organizationalUnitId"}
-	Resource             = graphql.StringField{Col: "resource"}
-	StartTime            = graphql.StringField{Col: "startTime"}
+	CreateTime = graphql.StringField{Col: "createTime"}
+	EndTime    = graphql.StringField{Col: "endTime"}
+	ExpireTime = graphql.StringField{Col: "expireTime"}
+	Hold       = graphql.StringField{Col: "hold"}
+	Id         = graphql.StringField{Col: "id"}
+	Name       = graphql.StringField{Col: "name"}
+	Resource   = graphql.StringField{Col: "resource"}
+	StartTime  = graphql.StringField{Col: "startTime"}
 )
 
 // And matches rows satisfying every predicate.

@@ -9,11 +9,9 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"slices"
-	"sort"
 	"sync"
 	"time"
 
-	"github.com/shokki-engineering/freebusy/internal/database/gorm/filterx"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 	"github.com/shokki-engineering/freebusy/internal/service/generated/servicex"
 	"github.com/shokki-engineering/freebusy/internal/service/rpc"
@@ -113,7 +111,7 @@ func NewServer(store Store, opts ...Option) *Server {
 	return s
 }
 
-// ComputeAvailability buckets a site's free resources over a window.
+// ComputeAvailability buckets free resources over a window.
 func (s *Server) ComputeAvailability(ctx context.Context, req *allocationpbv1.ComputeAvailabilityRequest) (*allocationpbv1.ComputeAvailabilityResponse, error) {
 	var out *allocationpbv1.ComputeAvailabilityResponse
 	err := rpc.Traced(ctx, "AllocationService", "ComputeAvailability", func(ctx context.Context) error {
@@ -134,13 +132,13 @@ func (s *Server) compute(ctx context.Context, req *allocationpbv1.ComputeAvailab
 	if err != nil {
 		return nil, err
 	}
-	scope, restricted, err := s.scopeOf(ctx, req.GetParent(), req.GetResources(), req.GetFilter(), "filter")
+	scope, restricted, err := s.scopeOf(ctx, req.GetResources(), req.GetFilter(), "filter")
 	if err != nil {
 		return nil, err
 	}
-	st := &site{zone: time.UTC}
+	st := &inputs{zone: time.UTC}
 	if !restricted || len(scope) > 0 {
-		if st, err = s.gather(ctx, ResourceQuery{OrganizationalUnits: []string{req.GetParent()}, Names: scope}, window, s.now()); err != nil {
+		if st, err = s.gather(ctx, ResourceQuery{Names: scope}, window, s.now()); err != nil {
 			return nil, err
 		}
 	}
@@ -150,7 +148,7 @@ func (s *Server) compute(ctx context.Context, req *allocationpbv1.ComputeAvailab
 		if lerr != nil {
 			return nil, servicex.BadField("INVALID_TIME_ZONE", "time_zone",
 				fmt.Sprintf("time_zone %q is not a time zone", tz),
-				"Use an IANA zone name such as Europe/London or America/New_York, or leave it empty to read the site's own zone")
+				"Use an IANA zone name such as Europe/London or America/New_York, or leave it empty for the zone of the first resource's calendar")
 		}
 		loc = l
 	}
@@ -217,16 +215,16 @@ func (s *Server) CheckAvailability(ctx context.Context, req *allocationpbv1.Chec
 // offers, and over every resource in scope when they are not enough, so a
 // refusal always carries the reason of each resource asked about.
 func (s *Server) check(ctx context.Context, req *allocationpbv1.CheckAvailabilityRequest, window engine.Span, now time.Time) (engine.CheckResult, error) {
-	site, quantity := req.GetParent(), max(int(req.GetQuantity()), 1)
+	quantity := max(int(req.GetQuantity()), 1)
 	if err := validFilter(req.GetFilter(), "filter"); err != nil {
 		return engine.CheckResult{}, err
 	}
-	cands, ok, err := s.modelCandidates(ctx, site, req.GetResources(), req.GetFilter(), window, now)
+	cands, ok, err := s.modelCandidates(ctx, req.GetResources(), req.GetFilter(), window, now)
 	if err != nil {
 		return engine.CheckResult{}, err
 	}
 	if ok && len(cands) >= quantity {
-		st, err := s.gather(ctx, ResourceQuery{OrganizationalUnits: []string{site}, Names: cands}, horizon(window), now)
+		st, err := s.gather(ctx, ResourceQuery{Names: cands}, horizon(window), now)
 		if err != nil {
 			return engine.CheckResult{}, err
 		}
@@ -234,13 +232,13 @@ func (s *Server) check(ctx context.Context, req *allocationpbv1.CheckAvailabilit
 			return res, nil
 		}
 	}
-	scope, restricted, err := s.scopeOf(ctx, site, req.GetResources(), req.GetFilter(), "filter")
+	scope, restricted, err := s.scopeOf(ctx, req.GetResources(), req.GetFilter(), "filter")
 	if err != nil {
 		return engine.CheckResult{}, err
 	}
 	var resources []engine.Resource
 	if !restricted || len(scope) > 0 {
-		st, err := s.gather(ctx, ResourceQuery{OrganizationalUnits: []string{site}, Names: scope}, horizon(window), now)
+		st, err := s.gather(ctx, ResourceQuery{Names: scope}, horizon(window), now)
 		if err != nil {
 			return engine.CheckResult{}, err
 		}
@@ -273,9 +271,7 @@ func (s *Server) BatchComputeAvailability(ctx context.Context, req *allocationpb
 	return out, err
 }
 
-// SearchAvailability sweeps an operator's sites for resources free across a
-// window. A site matches only if it has `quantity` free together, so a family
-// asking for three rooms is never shown a site with one.
+// SearchAvailability finds the resources free across a window.
 func (s *Server) SearchAvailability(ctx context.Context, req *allocationpbv1.SearchAvailabilityRequest) (*allocationpbv1.SearchAvailabilityResponse, error) {
 	var out *allocationpbv1.SearchAvailabilityResponse
 	err := rpc.Traced(ctx, "AllocationService", "SearchAvailability", func(ctx context.Context) error {
@@ -306,51 +302,52 @@ func (s *Server) SearchAvailability(ctx context.Context, req *allocationpbv1.Sea
 	return out, err
 }
 
-// searchParallel is how many sites one search evaluates side by side.
-const searchParallel = 4
+// searchChunk is how many resources one step of a search beyond the read
+// model evaluates together, reading their bookings in one batch.
+const searchChunk = 64
 
-// search answers SearchAvailability site by site, in the order the answer is
-// paged in -- sites by name, resources by name within a site -- and stops as
+// search answers SearchAvailability without the read model: every resource
+// the search selects, in name order, evaluated a chunk at a time, stopping as
 // soon as it has the page asked for and one match past it, which is all it
-// needs to know whether there is a next page. Page boundaries are the ones a
-// search of every site would have drawn: a site's matches are all taken or
-// none are, and only sites before the stop are read.
+// needs to know whether there is a next page.
 func (s *Server) search(ctx context.Context, req *allocationpbv1.SearchAvailabilityRequest, window engine.Span) (*allocationpbv1.SearchAvailabilityResponse, error) {
 	now := s.now()
-	quantity := max(int(req.GetQuantity()), 1)
 	limit, offset := rpc.PageBounds(req.GetPageSize(), req.GetPageToken())
 	need := offset + limit + 1
 
-	sites, err := s.searchSites(ctx, req)
+	q := ResourceQuery{Types: req.GetResourceTypes()}
+	if f := req.GetFilter(); f != "" {
+		names, err := s.filterNames(ctx, nil, f, "filter")
+		if err != nil || len(names) == 0 {
+			return &allocationpbv1.SearchAvailabilityResponse{}, err
+		}
+		q.Names = names
+	}
+	statics, err := s.staticInputs(ctx, q, false)
 	if err != nil {
 		return nil, err
 	}
-	var names []string
-	if f := req.GetFilter(); f != "" {
-		where := []filterx.Condition{{Field: "organization", Op: filterx.OpEq, Value: req.GetParent()}}
-		if names, err = s.filterNames(ctx, where, f, "filter"); err != nil || len(names) == 0 {
-			return &allocationpbv1.SearchAvailabilityResponse{}, err
-		}
-	}
 	var all []*allocationpbv1.AvailabilityMatch
-	for i := 0; i < len(sites) && len(all) < need; i += searchParallel {
-		batch := sites[i:min(i+searchParallel, len(sites))]
-		found := make([][]*allocationpbv1.AvailabilityMatch, len(batch))
-		errs := make([]error, len(batch))
-		var wg sync.WaitGroup
-		for j, ou := range batch {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				found[j], errs[j] = s.searchSite(ctx, ou, req.GetResourceTypes(), names, window, now, quantity)
-			}()
+	for chunk := range slices.Chunk(statics, searchChunk) {
+		if len(all) >= need {
+			break
 		}
-		wg.Wait()
-		for j := range batch {
-			if errs[j] != nil {
-				return nil, errs[j]
+		st, err := s.assemble(ctx, chunk, horizon(window), now, nil)
+		if err != nil {
+			return nil, err
+		}
+		for i, r := range st.resources {
+			if r.Why(window, now) != engine.ReasonNone {
+				continue
 			}
-			all = append(all, found[j]...)
+			res := st.records[i].Resource
+			all = append(all, &allocationpbv1.AvailabilityMatch{
+				Resource: r.Name,
+				Window:   intervalOf(window),
+				// A copy: the record may be cached and shared.
+				ResourceTypes: slices.Clone(res.GetResourceTypes()),
+				DisplayName:   res.GetDisplayName(),
+			})
 		}
 	}
 
@@ -363,63 +360,6 @@ func (s *Server) search(ctx context.Context, req *allocationpbv1.SearchAvailabil
 		}
 	}
 	return out, nil
-}
-
-// searchSites are the sites a search covers, in name order.
-func (s *Server) searchSites(ctx context.Context, req *allocationpbv1.SearchAvailabilityRequest) ([]string, error) {
-	if ous := req.GetOrganizationalUnits(); len(ous) > 0 {
-		sites := slices.Clone(ous)
-		slices.Sort(sites)
-		return slices.Compact(sites), nil
-	}
-	if vs, ok := s.store.(VersionedStore); ok {
-		version, err := vs.InputVersion(ctx)
-		if err == nil {
-			return s.orgSites(ctx, vs, req.GetParent(), version)
-		}
-		return vs.Sites(ctx, req.GetParent())
-	}
-	// A store that cannot list sites: read the organization's resources once
-	// and take the sites from them.
-	recs, err := s.store.Resources(ctx, ResourceQuery{Organization: req.GetParent(), Types: req.GetResourceTypes()})
-	if err != nil {
-		return nil, err
-	}
-	var sites []string
-	for _, r := range recs {
-		sites = append(sites, r.Resource.GetOrganizationalUnit())
-	}
-	slices.Sort(sites)
-	return slices.Compact(sites), nil
-}
-
-// searchSite returns one site's matches in name order, or none when fewer than
-// quantity are free together.
-func (s *Server) searchSite(ctx context.Context, ou string, resourceTypes, names []string, window engine.Span, now time.Time, quantity int) ([]*allocationpbv1.AvailabilityMatch, error) {
-	st, err := s.gather(ctx, ResourceQuery{OrganizationalUnits: []string{ou}, Types: resourceTypes, Names: names}, horizon(window), now)
-	if err != nil {
-		return nil, err
-	}
-	var ms []*allocationpbv1.AvailabilityMatch
-	for i, r := range st.resources {
-		if r.Why(window, now) != engine.ReasonNone {
-			continue
-		}
-		res := st.records[i].Resource
-		ms = append(ms, &allocationpbv1.AvailabilityMatch{
-			Resource:           r.Name,
-			OrganizationalUnit: res.GetOrganizationalUnit(),
-			Window:             intervalOf(window),
-			// A copy: the record may be cached and shared.
-			ResourceTypes: slices.Clone(res.GetResourceTypes()),
-			DisplayName:   res.GetDisplayName(),
-		})
-	}
-	if len(ms) < quantity {
-		return nil, nil
-	}
-	sort.Slice(ms, func(i, j int) bool { return ms[i].GetResource() < ms[j].GetResource() })
-	return ms, nil
 }
 
 // spanOf validates and converts a request window. Both ends are required: an

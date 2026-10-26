@@ -144,7 +144,7 @@ paths:
         patch:
             tags:
                 - WebhookService
-            description: 'Updates a webhook: its endpoint, event types or site.'
+            description: 'Updates a webhook: its endpoint or event types.'
             operationId: WebhookService_UpdateWebhook
             parameters:
                 - name: webhook
@@ -156,7 +156,7 @@ paths:
                 - name: updateMask
                   in: query
                   description: |-
-                    Fields to update: display_name, uri, event_types, organizational_unit.
+                    Fields to update: display_name, uri, event_types.
                      Empty updates every one of them.
                   schema:
                     type: string
@@ -426,8 +426,8 @@ components:
                     type: string
                     description: |-
                         The record that changed.
-                         Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
-                         or organizationalUnits/{organizational_unit}/holds/{hold}
+                         Format: reservations/{reservation}
+                         or holds/{hold}
                 payload:
                     readOnly: true
                     type: string
@@ -600,13 +600,6 @@ components:
                          last_change is CHANGE_DETAILS (freebusy.reservation.updated);
                          resources, calendars, events and availabilities created, updated and
                          deleted.
-                organizationalUnit:
-                    type: string
-                    description: |-
-                        Limits events to one site's holds, reservations and resources. Empty
-                         sends every site's. Calendars, events and availabilities belong to no
-                         site, so a webhook limited to one is not sent them.
-                         Format: organizationalUnits/{organizational_unit}
                 state:
                     readOnly: true
                     type: integer

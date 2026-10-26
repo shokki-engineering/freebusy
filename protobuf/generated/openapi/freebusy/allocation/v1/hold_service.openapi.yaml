@@ -23,19 +23,13 @@ info:
 servers:
     - url: https://freebusy.shokki.engineering
 paths:
-    /v1/organizationalUnits/{organizationalUnit}/holds:
+    /v1/holds:
         get:
             tags:
                 - HoldService
-            description: Lists the holds taken at a site.
+            description: Lists holds.
             operationId: HoldService_ListHolds
             parameters:
-                - name: organizationalUnit
-                  in: path
-                  description: The organizationalUnit id.
-                  required: true
-                  schema:
-                    type: string
                 - name: pageSize
                   in: query
                   description: Maximum holds to return. Defaults to 50, capped at 1000.
@@ -79,12 +73,6 @@ paths:
                  hold rather than taking a second one.
             operationId: HoldService_CreateHold
             parameters:
-                - name: organizationalUnit
-                  in: path
-                  description: The organizationalUnit id.
-                  required: true
-                  schema:
-                    type: string
                 - name: holdId
                   in: query
                   description: |-
@@ -111,7 +99,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/organizationalUnits/{organizationalUnit}/holds/{hold}:
+    /v1/holds/{hold}:
         get:
             tags:
                 - HoldService
@@ -123,12 +111,6 @@ paths:
                  caller never sees an ACTIVE hold that no longer reserves anything.
             operationId: HoldService_GetHold
             parameters:
-                - name: organizationalUnit
-                  in: path
-                  description: The organizationalUnit id.
-                  required: true
-                  schema:
-                    type: string
                 - name: hold
                   in: path
                   description: The hold id.
@@ -159,12 +141,6 @@ paths:
                  never freed by a path that leaves no audit trail.
             operationId: HoldService_DeleteHold
             parameters:
-                - name: organizationalUnit
-                  in: path
-                  description: The organizationalUnit id.
-                  required: true
-                  schema:
-                    type: string
                 - name: hold
                   in: path
                   description: The hold id.
@@ -188,7 +164,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/organizationalUnits/{organizationalUnit}/holds/{hold}:extend:
+    /v1/holds/{hold}:extend:
         post:
             tags:
                 - HoldService
@@ -200,12 +176,6 @@ paths:
                  ACTIVE -- an expired hold is gone, not extendable.
             operationId: HoldService_ExtendHold
             parameters:
-                - name: organizationalUnit
-                  in: path
-                  description: The organizationalUnit id.
-                  required: true
-                  schema:
-                    type: string
                 - name: hold
                   in: path
                   description: The hold id.
@@ -231,7 +201,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/organizationalUnits/{organizationalUnit}/holds/{hold}:release:
+    /v1/holds/{hold}:release:
         post:
             tags:
                 - HoldService
@@ -242,12 +212,6 @@ paths:
                  changes nothing, because the caller's intent is already satisfied.
             operationId: HoldService_ReleaseHold
             parameters:
-                - name: organizationalUnit
-                  in: path
-                  description: The organizationalUnit id.
-                  required: true
-                  schema:
-                    type: string
                 - name: hold
                   in: path
                   description: The hold id.
@@ -285,7 +249,7 @@ components:
                     type: string
                     description: |-
                         Name of the hold to extend.
-                         Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                         Format: holds/{hold}
                 duration:
                     pattern: ^-?(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,9})?s$
                     type: string
@@ -314,9 +278,9 @@ components:
                 name:
                     type: string
                     description: |-
-                        The hold name. Nested under the site whose resources it takes, so a hold
-                         is listed and swept per site without joining through every resource.
-                         Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                        The hold name. Top-level: a hold takes resources wherever they are, and
+                         grouping them by place is the business of whatever is built on top.
+                         Format: holds/{hold}
                 resources:
                     readOnly: true
                     type: array
@@ -340,7 +304,7 @@ components:
                         type: string
                     description: |-
                         Candidate resources the allocator may choose from, supplied on create.
-                         Empty offers every resource the site holds. Immutable: the choice is made
+                         Empty offers every resource, narrowed by `candidate_filter`. Immutable: the choice is made
                          once, and re-offering a different set is a different allocation.
                          Format: resources/{resource}
                 quantity:
@@ -385,8 +349,7 @@ components:
                     type: string
                     description: |-
                         The hold of the reservation this hold is taken to replace with
-                         RescheduleReservation: that reservation's `hold`, converted and at the
-                         same site. Its claims do not count against this hold, so a new window
+                         RescheduleReservation: that reservation's `hold`, converted. Its claims do not count against this hold, so a new window
                          overlapping the old one -- an extension, a shift by an hour -- can keep
                          the same resources. Until the move completes this hold claims only the
                          time the old one does not; RescheduleReservation hands the rest over in
@@ -394,7 +357,7 @@ components:
                          Such a hold can only be used to reschedule that reservation. (A hold,
                          though no resource_reference says so: AIP-121 allows no cycle of mutable
                          references, and this one is a hold naming a hold.)
-                         Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                         Format: holds/{hold}
                 candidateFilter:
                     type: string
                     description: |-
@@ -467,7 +430,7 @@ components:
                     type: string
                     description: |-
                         Name of the hold to release.
-                         Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                         Format: holds/{hold}
                 etag:
                     type: string
                     description: |-

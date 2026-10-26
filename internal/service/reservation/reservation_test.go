@@ -23,8 +23,6 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-const site = "organizationalUnits/club"
-
 // memStore is an in-memory Store with the compare-and-set Transition the real
 // stores give.
 type memStore struct {
@@ -62,7 +60,7 @@ func (m *memStore) FindByHold(_ context.Context, hold string) (*reservationpbv1.
 	return nil, repox.ErrNotFound
 }
 
-func (m *memStore) List(context.Context, string, repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
+func (m *memStore) List(context.Context, repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
 	return nil, "", nil
 }
 
@@ -230,7 +228,7 @@ func newFixture() *fixture {
 }
 
 func (f *fixture) hold(id string, state allocationpbv1.HoldState) string {
-	name := site + "/holds/" + id
+	name := "holds/" + id
 	f.holds.holds[name] = &allocationpbv1.Hold{
 		Name:      name,
 		State:     state,
@@ -245,7 +243,7 @@ func (f *fixture) hold(id string, state allocationpbv1.HoldState) string {
 
 func (f *fixture) create(hold string) (*reservationpbv1.Reservation, error) {
 	return f.srv.CreateReservation(context.Background(), &reservationpbv1.CreateReservationRequest{
-		Parent: site, Reservation: &reservationpbv1.Reservation{Hold: hold, Customer: "users/ana"},
+		Reservation: &reservationpbv1.Reservation{Hold: hold, Customer: "users/ana"},
 	})
 }
 
@@ -256,7 +254,7 @@ func TestCreateConfirmsAndIsIdempotent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if r.GetName() != site+"/reservations/h1" || r.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED {
+	if r.GetName() != "reservations/h1" || r.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED {
 		t.Fatalf("got %s %v", r.GetName(), r.GetState())
 	}
 	if f.holds.holds[h].GetState() != allocationpbv1.HoldState_HOLD_STATE_CONVERTED {
@@ -280,8 +278,8 @@ func TestCreateRejectsLapsedOrForeignHold(t *testing.T) {
 	if len(f.store.rows) != 0 {
 		t.Fatal("a lapsed hold should leave no reservation behind")
 	}
-	if _, err := f.create("organizationalUnits/other/holds/h1"); status.Code(err) != codes.InvalidArgument {
-		t.Fatalf("foreign hold: %v", err)
+	if _, err := f.create("holds/missing"); status.Code(err) != codes.InvalidArgument {
+		t.Fatalf("missing hold: %v", err)
 	}
 }
 
@@ -292,7 +290,7 @@ func TestHoldLapsingMidCreateFails(t *testing.T) {
 	if _, err := f.create(h); status.Code(err) != codes.FailedPrecondition {
 		t.Fatalf("got %v", err)
 	}
-	r, _ := f.store.Get(context.Background(), site+"/reservations/h1")
+	r, _ := f.store.Get(context.Background(), "reservations/h1")
 	if r.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_FAILED {
 		t.Fatalf("state %v", r.GetState())
 	}
@@ -305,7 +303,7 @@ func TestReconcilerFinishesInterruptedCreate(t *testing.T) {
 	if _, err := f.create(h); err == nil {
 		t.Fatal("expected the interrupted create to fail")
 	}
-	r, _ := f.store.Get(context.Background(), site+"/reservations/h1")
+	r, _ := f.store.Get(context.Background(), "reservations/h1")
 	if r.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_PENDING {
 		t.Fatalf("state %v", r.GetState())
 	}
@@ -316,7 +314,7 @@ func TestReconcilerFinishesInterruptedCreate(t *testing.T) {
 	if n, err := f.srv.Reconcile(context.Background()); n != 1 || err != nil {
 		t.Fatalf("reconcile: %d %v", n, err)
 	}
-	r, _ = f.store.Get(context.Background(), site+"/reservations/h1")
+	r, _ = f.store.Get(context.Background(), "reservations/h1")
 	if r.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED {
 		t.Fatalf("after reconcile: %v", r.GetState())
 	}
@@ -406,7 +404,7 @@ func TestRescheduleMovesAndLinks(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if rep.GetName() != site+"/reservations/h2" || rep.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED ||
+	if rep.GetName() != "reservations/h2" || rep.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED ||
 		rep.GetReplaces() != old.GetName() || rep.GetCustomer() != "users/ana" {
 		t.Fatalf("replacement %v", rep)
 	}
@@ -471,7 +469,7 @@ func TestReconcilerFinishesInterruptedReschedule(t *testing.T) {
 	if s := f.get(t, old.GetName()).GetState(); s != reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED {
 		t.Fatalf("after reconcile original %v", s)
 	}
-	if s := f.get(t, site+"/reservations/h2").GetState(); s != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED {
+	if s := f.get(t, "reservations/h2").GetState(); s != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED {
 		t.Fatalf("after reconcile replacement %v", s)
 	}
 }
@@ -494,7 +492,7 @@ func TestRescheduleOntoCancelledReplacementReverts(t *testing.T) {
 
 func (f *fixture) createAs(hold, id string) (*reservationpbv1.Reservation, error) {
 	return f.srv.CreateReservation(context.Background(), &reservationpbv1.CreateReservationRequest{
-		Parent: site, ReservationId: id, Reservation: &reservationpbv1.Reservation{Hold: hold},
+		ReservationId: id, Reservation: &reservationpbv1.Reservation{Hold: hold},
 	})
 }
 
@@ -502,7 +500,7 @@ func TestReservationID(t *testing.T) {
 	f := newFixture()
 	h1 := f.hold("h1", allocationpbv1.HoldState_HOLD_STATE_ACTIVE)
 	r, err := f.createAs(h1, "court-booking-1")
-	if err != nil || r.GetName() != site+"/reservations/court-booking-1" || r.GetHold() != h1 {
+	if err != nil || r.GetName() != "reservations/court-booking-1" || r.GetHold() != h1 {
 		t.Fatalf("custom id: %v %v", r, err)
 	}
 	// The same hold under another id is the same reservation, not a second.
@@ -518,7 +516,7 @@ func TestReservationID(t *testing.T) {
 	// Moving a custom-named reservation still works, and finds the
 	// replacement by its hold.
 	rep, err := f.move(r.GetName(), h2)
-	if err != nil || rep.GetName() != site+"/reservations/h2" || rep.GetReplaces() != r.GetName() {
+	if err != nil || rep.GetName() != "reservations/h2" || rep.GetReplaces() != r.GetName() {
 		t.Fatalf("move: %v %v", rep, err)
 	}
 }

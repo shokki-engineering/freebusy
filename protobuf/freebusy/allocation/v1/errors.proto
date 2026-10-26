@@ -27,7 +27,7 @@ enum ErrorReason {
   ERROR_REASON_INVALID_TIME_ZONE = 1 [(service.v1.error_reason) = {
     code: "INVALID_ARGUMENT"
     description: "`time_zone` is not an IANA zone name."
-    fix: "Use one such as `Europe/London`, or leave it empty for the site's own."
+    fix: "Use one such as `Europe/London`, or leave it empty for the zone of the first resource's calendar."
     detail: DETAIL_KIND_BAD_REQUEST
   }];
 
@@ -84,7 +84,7 @@ enum ErrorReason {
   ERROR_REASON_INVALID_FACET = 7 [(service.v1.error_reason) = {
     code: "INVALID_ARGUMENT"
     description: "`SearchAvailability`'s `facets` names a field resources cannot be counted by."
-    fix: "Count by `resource_types`, `organizational_unit`, `organization`, `display_name` or `attributes.<path>`."
+    fix: "Count by `resource_types`, `organizational_unit`, `display_name` or `attributes.<path>`."
     detail: DETAIL_KIND_BAD_REQUEST
   }];
 
@@ -112,7 +112,7 @@ enum ErrorReason {
   ERROR_REASON_ENGINE_BUSY = 10 [(service.v1.error_reason) = {
     code: "RESOURCE_EXHAUSTED"
     description: "`SearchAvailability`, `ComputeAvailability`, `BatchComputeAvailability`, `CheckAvailability` or `CreateHold`: as many availability evaluations as the server runs at once (`[engine] max_evaluations`) were running, and none finished within `[engine] admission_wait_ms`. Nothing was read or written."
-    fix: "Retry after a short randomized backoff; a narrower request (a resource type, fewer sites, a smaller page) is cheaper."
+    fix: "Retry after a short randomized backoff; a narrower request (a resource type, a tighter filter, a smaller page) is cheaper."
     retryable: true
     sentinel: true
   }];

@@ -77,31 +77,18 @@ func NewGraphQLAllocationRepository(svc *freebusyql.Service) *GraphQLAllocationR
 	return &GraphQLAllocationRepository{Svc: svc}
 }
 
-// Create persists in under parent and returns the stored record.
-func (r *GraphQLAllocationRepository) Create(ctx context.Context, parent string, in *allocationpbv1.Allocation) (*allocationpbv1.Allocation, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, err
-	}
+// Create persists in and returns the stored record.
+func (r *GraphQLAllocationRepository) Create(ctx context.Context, in *allocationpbv1.Allocation) (*allocationpbv1.Allocation, error) {
 	id := repox.NewULID()
-	rowID := id
 	if in.GetName() != "" {
-		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "allocations")
+		ids, err := repox.SplitName(in.GetName(), "allocations")
 		if err != nil {
 			return nil, err
-		}
-		for i := range parentIDs {
-			if ids[i] != parentIDs[i] {
-				return nil, fmt.Errorf("%w: name %q is not under parent %q", repox.ErrInvalidArgument, in.GetName(), parent)
-			}
 		}
 		id = ids[len(ids)-1]
 	}
 	in = proto.Clone(in).(*allocationpbv1.Allocation)
-	in.Name = FormatAllocationName(parentIDs[0], id)
-	// The id is unique only under the parent, so the row is keyed by a
-	// surrogate of its own: the id itself only when it was minted here.
-	id = rowID
+	in.Name = FormatAllocationName(id)
 	if h := r.Hooks.BeforeCreate; h != nil {
 		if err := h(ctx, in); err != nil {
 			return nil, err
@@ -109,7 +96,6 @@ func (r *GraphQLAllocationRepository) Create(ctx context.Context, parent string,
 	}
 	ci := allocationToCreateInput(in)
 	ci.Id = id
-	ci.OrganizationalUnitId = parentIDs[0]
 	now := tsToStr(timestamppb.New(time.Now().UTC()))
 	ci.CreateTime = now
 	if _, err := r.Svc.Mutation.Allocation.Resource.Create(ctx, ci); err != nil {
@@ -120,37 +106,20 @@ func (r *GraphQLAllocationRepository) Create(ctx context.Context, parent string,
 
 // Get returns the record addressed by its resource name.
 func (r *GraphQLAllocationRepository) Get(ctx context.Context, name string) (*allocationpbv1.Allocation, error) {
-	row, err := r.find(ctx, name)
+	ids, err := repox.SplitName(name, "allocations")
 	if err != nil {
 		return nil, err
 	}
-	return r.toProto(ctx, row, nil)
+	return r.get(ctx, ids[len(ids)-1])
 }
 
-// rowID returns the surrogate key of the row named name, looked up by name:
-// the id is unique only under the parent, so it is not the key.
-// repox.ErrNotFound when there is no such row.
-func (r *GraphQLAllocationRepository) rowID(ctx context.Context, name string) (string, error) {
-	row, err := r.find(ctx, name)
+// rowID returns the surrogate key of the row named name: its bare id.
+func (r *GraphQLAllocationRepository) rowID(_ context.Context, name string) (string, error) {
+	ids, err := repox.SplitName(name, "allocations")
 	if err != nil {
 		return "", err
 	}
-	return row.Id, nil
-}
-
-// find reads the row named name; repox.ErrNotFound when there is none.
-func (r *GraphQLAllocationRepository) find(ctx context.Context, name string) (*resourceql.AllocationResource, error) {
-	if _, err := repox.SplitName(name, "organizationalUnits", "allocations"); err != nil {
-		return nil, err
-	}
-	row, err := r.Svc.Query.Allocation.Resource.Find(ctx, resourceql.List().Where(resourceql.Name.Eq(name)))
-	if err != nil {
-		return nil, mapGraphQLErr(err)
-	}
-	if row == nil {
-		return nil, repox.ErrNotFound
-	}
-	return row, nil
+	return ids[len(ids)-1], nil
 }
 
 // get loads by surrogate key — the private read every generated method
@@ -179,17 +148,9 @@ func (r *GraphQLAllocationRepository) toProto(ctx context.Context, row *resource
 	return out, nil
 }
 
-// List returns one page of records under parent.
-func (r *GraphQLAllocationRepository) List(ctx context.Context, parent string, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, "", err
-	}
-	// AIP-159: "-" for the parent reads across every parent.
-	if parentIDs[len(parentIDs)-1] == "-" {
-		return r.list(ctx, in)
-	}
-	return r.list(ctx, in, resourceql.OrganizationalUnitId.Eq(parentIDs[len(parentIDs)-1]))
+// List returns one page of records.
+func (r *GraphQLAllocationRepository) List(ctx context.Context, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error) {
+	return r.list(ctx, in)
 }
 
 func (r *GraphQLAllocationRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*allocationpbv1.Allocation, string, error) {
@@ -242,11 +203,18 @@ func (r *GraphQLAllocationRepository) UpdateWithOutputOnly(ctx context.Context, 
 // update is Update's write, with the server-owned fields outputPaths names
 // (UpdateWithOutputOnly) merged into its patch.
 func (r *GraphQLAllocationRepository) update(ctx context.Context, in *allocationpbv1.Allocation, paths, outputPaths []string) (*allocationpbv1.Allocation, error) {
-	row, err := r.find(ctx, in.GetName())
+	ids, err := repox.SplitName(in.GetName(), "allocations")
 	if err != nil {
 		return nil, err
 	}
-	id := row.Id
+	id := ids[len(ids)-1]
+	row, err := r.Svc.Query.Allocation.Resource.Get(ctx, id)
+	if err != nil {
+		return nil, mapGraphQLErr(err)
+	}
+	if row == nil {
+		return nil, repox.ErrNotFound
+	}
 	existingPB := allocationFromRow(row)
 	merged := proto.Clone(existingPB).(*allocationpbv1.Allocation)
 	applyAllocationMask(merged, in, paths)
@@ -270,34 +238,22 @@ func (r *GraphQLAllocationRepository) update(ctx context.Context, in *allocation
 	return r.get(ctx, id)
 }
 
-// newInput builds the insert a Batch queues for in under parent, and
+// newInput builds the insert a Batch queues for in, and
 // the record it stands for, named: the same resolution Create applies.
-func (r *GraphQLAllocationRepository) newInput(parent string, in *allocationpbv1.Allocation) (resourceql.CreateInput, *allocationpbv1.Allocation, error) {
+func (r *GraphQLAllocationRepository) newInput(in *allocationpbv1.Allocation) (resourceql.CreateInput, *allocationpbv1.Allocation, error) {
 	var ci resourceql.CreateInput
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return ci, nil, err
-	}
 	id := repox.NewULID()
-	rowID := id
 	if in.GetName() != "" {
-		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "allocations")
+		ids, err := repox.SplitName(in.GetName(), "allocations")
 		if err != nil {
 			return ci, nil, err
-		}
-		for i := range parentIDs {
-			if ids[i] != parentIDs[i] {
-				return ci, nil, fmt.Errorf("%w: name %q is not under parent %q", repox.ErrInvalidArgument, in.GetName(), parent)
-			}
 		}
 		id = ids[len(ids)-1]
 	}
 	in = proto.Clone(in).(*allocationpbv1.Allocation)
-	in.Name = FormatAllocationName(parentIDs[0], id)
-	id = rowID // keyed as Create keys it
+	in.Name = FormatAllocationName(id)
 	ci = allocationToCreateInput(in)
 	ci.Id = id
-	ci.OrganizationalUnitId = parentIDs[0]
 	now := tsToStr(timestamppb.New(time.Now().UTC()))
 	ci.CreateTime = now
 	return ci, in, nil
@@ -366,7 +322,7 @@ func (r *GraphQLAllocationRepository) UpdateOutputOnly(ctx context.Context, in *
 
 // Delete removes the record addressed by its resource name.
 func (r *GraphQLAllocationRepository) Delete(ctx context.Context, name string) error {
-	if _, err := repox.SplitName(name, "organizationalUnits", "allocations"); err != nil {
+	if _, err := repox.SplitName(name, "allocations"); err != nil {
 		return err
 	}
 	if h := r.Hooks.BeforeDelete; h != nil {
@@ -397,7 +353,7 @@ func (r *GraphQLAllocationRepository) remove(ctx context.Context, id string) err
 // repox.ListByKeys.
 func (r *GraphQLAllocationRepository) ListByKeys(ctx context.Context, field string, keys []string, in repox.ListInput) ([]*allocationpbv1.Allocation, error) {
 	return repox.ListByKeys(ctx, field, keys, in, func(ctx context.Context, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error) {
-		return r.List(ctx, "organizationalUnits/-", in)
+		return r.List(ctx, in)
 	})
 }
 
@@ -422,31 +378,18 @@ func NewGraphQLHoldRepository(svc *freebusyql.Service) *GraphQLHoldRepository {
 	return &GraphQLHoldRepository{Svc: svc}
 }
 
-// Create persists in under parent and returns the stored record.
-func (r *GraphQLHoldRepository) Create(ctx context.Context, parent string, in *allocationpbv1.Hold) (*allocationpbv1.Hold, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, err
-	}
+// Create persists in and returns the stored record.
+func (r *GraphQLHoldRepository) Create(ctx context.Context, in *allocationpbv1.Hold) (*allocationpbv1.Hold, error) {
 	id := repox.NewULID()
-	rowID := id
 	if in.GetName() != "" {
-		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds")
+		ids, err := repox.SplitName(in.GetName(), "holds")
 		if err != nil {
 			return nil, err
-		}
-		for i := range parentIDs {
-			if ids[i] != parentIDs[i] {
-				return nil, fmt.Errorf("%w: name %q is not under parent %q", repox.ErrInvalidArgument, in.GetName(), parent)
-			}
 		}
 		id = ids[len(ids)-1]
 	}
 	in = proto.Clone(in).(*allocationpbv1.Hold)
-	in.Name = FormatHoldName(parentIDs[0], id)
-	// The id is unique only under the parent, so the row is keyed by a
-	// surrogate of its own: the id itself only when it was minted here.
-	id = rowID
+	in.Name = FormatHoldName(id)
 	if h := r.Hooks.BeforeCreate; h != nil {
 		if err := h(ctx, in); err != nil {
 			return nil, err
@@ -454,7 +397,6 @@ func (r *GraphQLHoldRepository) Create(ctx context.Context, parent string, in *a
 	}
 	ci := holdToCreateInput(in)
 	ci.Id = id
-	ci.OrganizationalUnitId = parentIDs[0]
 	ci.Etag = repox.NewULID()
 	now := tsToStr(timestamppb.New(time.Now().UTC()))
 	ci.CreateTime = now
@@ -467,37 +409,20 @@ func (r *GraphQLHoldRepository) Create(ctx context.Context, parent string, in *a
 
 // Get returns the record addressed by its resource name.
 func (r *GraphQLHoldRepository) Get(ctx context.Context, name string) (*allocationpbv1.Hold, error) {
-	row, err := r.find(ctx, name)
+	ids, err := repox.SplitName(name, "holds")
 	if err != nil {
 		return nil, err
 	}
-	return r.toProto(ctx, row, nil)
+	return r.get(ctx, ids[len(ids)-1])
 }
 
-// rowID returns the surrogate key of the row named name, looked up by name:
-// the id is unique only under the parent, so it is not the key.
-// repox.ErrNotFound when there is no such row.
-func (r *GraphQLHoldRepository) rowID(ctx context.Context, name string) (string, error) {
-	row, err := r.find(ctx, name)
+// rowID returns the surrogate key of the row named name: its bare id.
+func (r *GraphQLHoldRepository) rowID(_ context.Context, name string) (string, error) {
+	ids, err := repox.SplitName(name, "holds")
 	if err != nil {
 		return "", err
 	}
-	return row.Id, nil
-}
-
-// find reads the row named name; repox.ErrNotFound when there is none.
-func (r *GraphQLHoldRepository) find(ctx context.Context, name string) (*holdsql.AllocationHolds, error) {
-	if _, err := repox.SplitName(name, "organizationalUnits", "holds"); err != nil {
-		return nil, err
-	}
-	row, err := r.Svc.Query.Allocation.Holds.Find(ctx, holdsql.List().Where(holdsql.Name.Eq(name)))
-	if err != nil {
-		return nil, mapGraphQLErr(err)
-	}
-	if row == nil {
-		return nil, repox.ErrNotFound
-	}
-	return row, nil
+	return ids[len(ids)-1], nil
 }
 
 // get loads by surrogate key — the private read every generated method
@@ -526,17 +451,9 @@ func (r *GraphQLHoldRepository) toProto(ctx context.Context, row *holdsql.Alloca
 	return out, nil
 }
 
-// List returns one page of records under parent.
-func (r *GraphQLHoldRepository) List(ctx context.Context, parent string, in repox.ListInput) ([]*allocationpbv1.Hold, string, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, "", err
-	}
-	// AIP-159: "-" for the parent reads across every parent.
-	if parentIDs[len(parentIDs)-1] == "-" {
-		return r.list(ctx, in)
-	}
-	return r.list(ctx, in, holdsql.OrganizationalUnitId.Eq(parentIDs[len(parentIDs)-1]))
+// List returns one page of records.
+func (r *GraphQLHoldRepository) List(ctx context.Context, in repox.ListInput) ([]*allocationpbv1.Hold, string, error) {
+	return r.list(ctx, in)
 }
 
 func (r *GraphQLHoldRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*allocationpbv1.Hold, string, error) {
@@ -589,11 +506,18 @@ func (r *GraphQLHoldRepository) UpdateWithOutputOnly(ctx context.Context, in *al
 // update is Update's write, with the server-owned fields outputPaths names
 // (UpdateWithOutputOnly) merged into its patch.
 func (r *GraphQLHoldRepository) update(ctx context.Context, in *allocationpbv1.Hold, paths, outputPaths []string) (*allocationpbv1.Hold, error) {
-	row, err := r.find(ctx, in.GetName())
+	ids, err := repox.SplitName(in.GetName(), "holds")
 	if err != nil {
 		return nil, err
 	}
-	id := row.Id
+	id := ids[len(ids)-1]
+	row, err := r.Svc.Query.Allocation.Holds.Get(ctx, id)
+	if err != nil {
+		return nil, mapGraphQLErr(err)
+	}
+	if row == nil {
+		return nil, repox.ErrNotFound
+	}
 	existingPB := holdFromRow(row)
 	merged := proto.Clone(existingPB).(*allocationpbv1.Hold)
 	applyHoldMask(merged, in, paths)
@@ -625,34 +549,22 @@ func (r *GraphQLHoldRepository) update(ctx context.Context, in *allocationpbv1.H
 	return r.get(ctx, id)
 }
 
-// newInput builds the insert a Batch queues for in under parent, and
+// newInput builds the insert a Batch queues for in, and
 // the record it stands for, named: the same resolution Create applies.
-func (r *GraphQLHoldRepository) newInput(parent string, in *allocationpbv1.Hold) (holdsql.CreateInput, *allocationpbv1.Hold, error) {
+func (r *GraphQLHoldRepository) newInput(in *allocationpbv1.Hold) (holdsql.CreateInput, *allocationpbv1.Hold, error) {
 	var ci holdsql.CreateInput
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return ci, nil, err
-	}
 	id := repox.NewULID()
-	rowID := id
 	if in.GetName() != "" {
-		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds")
+		ids, err := repox.SplitName(in.GetName(), "holds")
 		if err != nil {
 			return ci, nil, err
-		}
-		for i := range parentIDs {
-			if ids[i] != parentIDs[i] {
-				return ci, nil, fmt.Errorf("%w: name %q is not under parent %q", repox.ErrInvalidArgument, in.GetName(), parent)
-			}
 		}
 		id = ids[len(ids)-1]
 	}
 	in = proto.Clone(in).(*allocationpbv1.Hold)
-	in.Name = FormatHoldName(parentIDs[0], id)
-	id = rowID // keyed as Create keys it
+	in.Name = FormatHoldName(id)
 	ci = holdToCreateInput(in)
 	ci.Id = id
-	ci.OrganizationalUnitId = parentIDs[0]
 	ci.Etag = repox.NewULID()
 	now := tsToStr(timestamppb.New(time.Now().UTC()))
 	ci.CreateTime = now
@@ -751,7 +663,7 @@ func (r *GraphQLHoldRepository) UpdateOutputOnly(ctx context.Context, in *alloca
 
 // Delete removes the record addressed by its resource name.
 func (r *GraphQLHoldRepository) Delete(ctx context.Context, name string) error {
-	if _, err := repox.SplitName(name, "organizationalUnits", "holds"); err != nil {
+	if _, err := repox.SplitName(name, "holds"); err != nil {
 		return err
 	}
 	if h := r.Hooks.BeforeDelete; h != nil {
@@ -782,7 +694,7 @@ func (r *GraphQLHoldRepository) remove(ctx context.Context, id string) error {
 // repox.ListByKeys.
 func (r *GraphQLHoldRepository) ListByKeys(ctx context.Context, field string, keys []string, in repox.ListInput) ([]*allocationpbv1.Hold, error) {
 	return repox.ListByKeys(ctx, field, keys, in, func(ctx context.Context, in repox.ListInput) ([]*allocationpbv1.Hold, string, error) {
-		return r.List(ctx, "organizationalUnits/-", in)
+		return r.List(ctx, in)
 	})
 }
 
@@ -815,9 +727,9 @@ func (b *graphQLBatch) rowID(ctx context.Context, name string, resolve func(cont
 }
 
 // CreateAllocation queues a create and returns the name the record will have.
-func (b *graphQLBatch) CreateAllocation(parent string, in *allocationpbv1.Allocation) (string, error) {
+func (b *graphQLBatch) CreateAllocation(in *allocationpbv1.Allocation) (string, error) {
 	r := &GraphQLAllocationRepository{Svc: b.svc}
-	ci, named, err := r.newInput(parent, in)
+	ci, named, err := r.newInput(in)
 	if err != nil {
 		return "", err
 	}
@@ -837,7 +749,7 @@ func (b *graphQLBatch) CreateAllocation(parent string, in *allocationpbv1.Alloca
 // UpdateAllocation queues Update; in.Etag, when set, guards it inside the
 // batch's request (see updateOps).
 func (b *graphQLBatch) UpdateAllocation(in *allocationpbv1.Allocation, paths []string) {
-	if _, err := repox.SplitName(in.GetName(), "organizationalUnits", "allocations"); err != nil {
+	if _, err := repox.SplitName(in.GetName(), "allocations"); err != nil {
 		b.u.Fail(err)
 		return
 	}
@@ -856,7 +768,7 @@ func (b *graphQLBatch) UpdateAllocation(in *allocationpbv1.Allocation, paths []s
 // UpdateAllocationWithOutputOnly queues UpdateWithOutputOnly; in.Etag, when
 // set, guards it inside the batch's request, as UpdateAllocation's does.
 func (b *graphQLBatch) UpdateAllocationWithOutputOnly(in *allocationpbv1.Allocation, paths, outputPaths []string) {
-	if _, err := repox.SplitName(in.GetName(), "organizationalUnits", "allocations"); err != nil {
+	if _, err := repox.SplitName(in.GetName(), "allocations"); err != nil {
 		b.u.Fail(err)
 		return
 	}
@@ -879,7 +791,7 @@ func (b *graphQLBatch) UpdateAllocationOutputOnly(in *allocationpbv1.Allocation,
 		b.u.Fail(fmt.Errorf("%w: UpdateOutputOnly needs the fields to write", repox.ErrInvalidArgument))
 		return
 	}
-	if _, err := repox.SplitName(in.GetName(), "organizationalUnits", "allocations"); err != nil {
+	if _, err := repox.SplitName(in.GetName(), "allocations"); err != nil {
 		b.u.Fail(err)
 		return
 	}
@@ -899,7 +811,7 @@ func (b *graphQLBatch) UpdateAllocationOutputOnly(in *allocationpbv1.Allocation,
 // DeleteAllocation queues the record's removal for good. A record already
 // gone is not an error.
 func (b *graphQLBatch) DeleteAllocation(name string) {
-	if _, err := repox.SplitName(name, "organizationalUnits", "allocations"); err != nil {
+	if _, err := repox.SplitName(name, "allocations"); err != nil {
 		b.u.Fail(err)
 		return
 	}
@@ -920,9 +832,9 @@ func (b *graphQLBatch) DeleteAllocation(name string) {
 }
 
 // CreateHold queues a create and returns the name the record will have.
-func (b *graphQLBatch) CreateHold(parent string, in *allocationpbv1.Hold) (string, error) {
+func (b *graphQLBatch) CreateHold(in *allocationpbv1.Hold) (string, error) {
 	r := &GraphQLHoldRepository{Svc: b.svc}
-	ci, named, err := r.newInput(parent, in)
+	ci, named, err := r.newInput(in)
 	if err != nil {
 		return "", err
 	}
@@ -942,7 +854,7 @@ func (b *graphQLBatch) CreateHold(parent string, in *allocationpbv1.Hold) (strin
 // UpdateHold queues Update; in.Etag, when set, guards it inside the
 // batch's request (see updateOps).
 func (b *graphQLBatch) UpdateHold(in *allocationpbv1.Hold, paths []string) {
-	if _, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds"); err != nil {
+	if _, err := repox.SplitName(in.GetName(), "holds"); err != nil {
 		b.u.Fail(err)
 		return
 	}
@@ -961,7 +873,7 @@ func (b *graphQLBatch) UpdateHold(in *allocationpbv1.Hold, paths []string) {
 // UpdateHoldWithOutputOnly queues UpdateWithOutputOnly; in.Etag, when
 // set, guards it inside the batch's request, as UpdateHold's does.
 func (b *graphQLBatch) UpdateHoldWithOutputOnly(in *allocationpbv1.Hold, paths, outputPaths []string) {
-	if _, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds"); err != nil {
+	if _, err := repox.SplitName(in.GetName(), "holds"); err != nil {
 		b.u.Fail(err)
 		return
 	}
@@ -984,7 +896,7 @@ func (b *graphQLBatch) UpdateHoldOutputOnly(in *allocationpbv1.Hold, paths []str
 		b.u.Fail(fmt.Errorf("%w: UpdateOutputOnly needs the fields to write", repox.ErrInvalidArgument))
 		return
 	}
-	if _, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds"); err != nil {
+	if _, err := repox.SplitName(in.GetName(), "holds"); err != nil {
 		b.u.Fail(err)
 		return
 	}
@@ -1017,7 +929,7 @@ func (b *graphQLBatch) UpdateHoldOutputOnly(in *allocationpbv1.Hold, paths []str
 // DeleteHold queues the record's removal for good. A record already
 // gone is not an error.
 func (b *graphQLBatch) DeleteHold(name string) {
-	if _, err := repox.SplitName(name, "organizationalUnits", "holds"); err != nil {
+	if _, err := repox.SplitName(name, "holds"); err != nil {
 		b.u.Fail(err)
 		return
 	}

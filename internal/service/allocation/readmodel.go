@@ -127,16 +127,15 @@ func readAll(ctx context.Context, d DaySearcher, in repox.SearchInput) ([]string
 	}
 }
 
-// modelCandidates are the resources at site, among names (all when empty)
-// and matching filter, whose rows say they are free for window. ok is false
+// modelCandidates are the resources among names (all when empty) and
+// matching filter, whose rows say they are free for window. ok is false
 // when the read model cannot answer -- none configured, or window outside
 // its horizon -- and the caller evaluates every resource in scope.
-func (s *Server) modelCandidates(ctx context.Context, site string, names []string, filter string, window engine.Span, now time.Time) (cands []string, ok bool, err error) {
+func (s *Server) modelCandidates(ctx context.Context, names []string, filter string, window engine.Span, now time.Time) (cands []string, ok bool, err error) {
 	if s.days == nil || !s.days.Covers(window, now) {
 		return nil, false, nil
 	}
 	in := windowInput(window)
-	in.Where = append(in.Where, filterx.Condition{Field: "organizational_unit", Op: filterx.OpEq, Value: site})
 	if len(names) > 0 {
 		in.Where = append(in.Where, filterx.In("resource", names...))
 	}
@@ -167,17 +166,16 @@ func (s *Server) filterNames(ctx context.Context, where []filterx.Condition, fil
 	return names, nil
 }
 
-// scopeOf is the resources a site call may consider: names, narrowed by
-// filter. restricted reports that the scope is the list returned even when
+// scopeOf is the resources a call may consider: names, narrowed by filter. restricted reports that the scope is the list returned even when
 // it is empty (a filter nothing matches), rather than every resource.
-func (s *Server) scopeOf(ctx context.Context, site string, names []string, filter, field string) (scope []string, restricted bool, err error) {
+func (s *Server) scopeOf(ctx context.Context, names []string, filter, field string) (scope []string, restricted bool, err error) {
 	if filter == "" {
 		return names, len(names) > 0, nil
 	}
 	if err := validFilter(filter, field); err != nil {
 		return nil, false, err
 	}
-	where := []filterx.Condition{{Field: "organizational_unit", Op: filterx.OpEq, Value: site}}
+	var where []filterx.Condition
 	if len(names) > 0 {
 		where = append(where, filterx.In("resource", names...))
 	}
@@ -230,9 +228,6 @@ type searchToken struct {
 	Page string `json:"p,omitempty"`
 	// Skip is how many of that page's matches earlier pages returned.
 	Skip int `json:"s,omitempty"`
-	// Site, when quantity is above 1, is a site already known to have
-	// quantity matches, so its rest are returned without counting again.
-	Site string `json:"o,omitempty"`
 }
 
 func (t searchToken) encode() string {
@@ -258,7 +253,7 @@ func decodeSearchToken(s string) (searchToken, error) {
 
 // facetable are the fields SearchAvailability counts by, besides any
 // attributes.<path>.
-var facetable = []string{"resource_types", "organizational_unit", "organization", "display_name"}
+var facetable = []string{"resource_types", "organizational_unit", "display_name"}
 
 // checkSearch validates SearchAvailability's filter, order_by and facets.
 func checkSearch(req *allocationpbv1.SearchAvailabilityRequest) error {
@@ -274,19 +269,16 @@ func checkSearch(req *allocationpbv1.SearchAvailabilityRequest) error {
 	for _, f := range req.GetFacets() {
 		if !slices.Contains(facetable, f) && !strings.HasPrefix(f, "attributes.") {
 			return servicex.BadField("INVALID_FACET", "facets", fmt.Sprintf("cannot count resources by %q", f),
-				"Count by resource_types, organizational_unit, organization, display_name or attributes.<path>")
+				"Count by resource_types, organizational_unit, display_name or attributes.<path>")
 		}
 	}
 	return nil
 }
 
 // searchModel answers SearchAvailability from the read model: candidate rows
-// in the requested order, a page at a time, each evaluated by the engine, and
-// with quantity above 1 a site's matches returned only when it has quantity
-// of them.
+// in the requested order, a page at a time, each evaluated by the engine.
 func (s *Server) searchModel(ctx context.Context, req *allocationpbv1.SearchAvailabilityRequest, window engine.Span) (*allocationpbv1.SearchAvailabilityResponse, error) {
 	now := s.now()
-	quantity := max(int(req.GetQuantity()), 1)
 	limit, _ := rpc.PageBounds(req.GetPageSize(), "")
 	tok, err := decodeSearchToken(req.GetPageToken())
 	if err != nil {
@@ -294,10 +286,6 @@ func (s *Server) searchModel(ctx context.Context, req *allocationpbv1.SearchAvai
 	}
 	searcher := cmp.Or[DaySearcher](s.searcher, s.pg)
 	in := windowInput(window)
-	in.Where = append(in.Where, filterx.Condition{Field: "organization", Op: filterx.OpEq, Value: req.GetParent()})
-	if ous := req.GetOrganizationalUnits(); len(ous) > 0 {
-		in.Where = append(in.Where, filterx.In("organizational_unit", ous...))
-	}
 	// resource_types is a text[] column. Over Hasura (a deployment without
 	// Postgres configured) the DDN metadata has no array comparison, so the
 	// types are matched on the rows read; pages may then come back short.
@@ -326,43 +314,12 @@ func (s *Server) searchModel(ctx context.Context, req *allocationpbv1.SearchAvai
 		out.Facets = append(out.Facets, sf)
 	}
 
-	in.OrderBy = cmp.Or(req.GetOrderBy(), "organizational_unit, resource")
-	if quantity > 1 && req.GetOrderBy() != "" {
-		in.OrderBy = "organizational_unit, " + req.GetOrderBy()
-	}
+	in.OrderBy = cmp.Or(req.GetOrderBy(), "resource")
 	in.PageSize = int32(min(max(2*limit, 100), candidatePage))
-	in.ReadMask = []string{"resource", "organizational_unit", "resource_types", "display_name"}
+	in.ReadMask = []string{"resource", "resource_types", "display_name"}
 
-	type entry struct {
-		m    *allocationpbv1.AvailabilityMatch
-		page string
-		idx  int
-	}
-	done := false
-	// accept returns e, or, when the page is full, makes e where the next
-	// page starts.
-	accept := func(e entry, site string) {
-		if len(out.Matches) == limit {
-			out.NextPageToken = searchToken{Page: e.page, Skip: e.idx, Site: site}.encode()
-			done = true
-			return
-		}
-		out.Matches = append(out.Matches, e.m)
-	}
-	var group []entry
-	groupSite := ""
-	flush := func() {
-		if len(group) >= quantity || (groupSite != "" && groupSite == tok.Site) {
-			for _, e := range group {
-				if accept(e, groupSite); done {
-					break
-				}
-			}
-		}
-		group = nil
-	}
 	page, skip := tok.Page, tok.Skip
-	for !done {
+	for {
 		in.PageToken = page
 		rows, next, err := searcher.SearchDays(ctx, in)
 		if err != nil {
@@ -372,36 +329,20 @@ func (s *Server) searchModel(ctx context.Context, req *allocationpbv1.SearchAvai
 		if err != nil {
 			return nil, err
 		}
-		for i, m := range matches {
-			if i < skip {
-				continue
+		for i := skip; i < len(matches); i++ {
+			if len(out.Matches) == limit {
+				// The page is full: the next one starts at this match.
+				out.NextPageToken = searchToken{Page: page, Skip: i}.encode()
+				return out, nil
 			}
-			e := entry{m: m, page: page, idx: i}
-			if quantity == 1 {
-				if accept(e, ""); done {
-					break
-				}
-				continue
-			}
-			if m.GetOrganizationalUnit() != groupSite {
-				if flush(); done {
-					break
-				}
-				groupSite = m.GetOrganizationalUnit()
-			}
-			group = append(group, e)
+			out.Matches = append(out.Matches, matches[i])
 		}
 		skip = 0
-		if done {
-			break
-		}
 		if next == "" {
-			flush()
-			break
+			return out, nil
 		}
 		page = next
 	}
-	return out, nil
 }
 
 // verifyRows evaluates candidate rows for window and returns, in the rows'
@@ -411,18 +352,14 @@ func (s *Server) verifyRows(ctx context.Context, d DaySearcher, rows []*allocati
 		return nil, nil
 	}
 	names := make([]string, 0, len(rows))
-	var sites []string
 	for _, r := range rows {
 		names = append(names, r.GetResource())
-		if !slices.Contains(sites, r.GetOrganizationalUnit()) {
-			sites = append(sites, r.GetOrganizationalUnit())
-		}
 	}
 	names, err := s.lastDayCovers(ctx, d, names, window)
 	if err != nil || len(names) == 0 {
 		return nil, err
 	}
-	st, err := s.gather(ctx, ResourceQuery{OrganizationalUnits: sites, Names: names}, horizon(window), now)
+	st, err := s.gather(ctx, ResourceQuery{Names: names}, horizon(window), now)
 	if err != nil {
 		return nil, err
 	}
@@ -438,11 +375,10 @@ func (s *Server) verifyRows(ctx context.Context, d DaySearcher, rows []*allocati
 			continue
 		}
 		out = append(out, &allocationpbv1.AvailabilityMatch{
-			Resource:           r.GetResource(),
-			OrganizationalUnit: r.GetOrganizationalUnit(),
-			Window:             intervalOf(window),
-			ResourceTypes:      r.GetResourceTypes(),
-			DisplayName:        r.GetDisplayName(),
+			Resource:      r.GetResource(),
+			Window:        intervalOf(window),
+			ResourceTypes: r.GetResourceTypes(),
+			DisplayName:   r.GetDisplayName(),
 		})
 	}
 	return out, nil

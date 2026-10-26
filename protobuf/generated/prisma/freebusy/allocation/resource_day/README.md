@@ -25,13 +25,12 @@ Schema file: [`resource_day.postgres.prisma`](./resource_day.postgres.prisma)
 
 ### `ResourceDay` → `resource_days`
 
-A ResourceDay is one resource's standing free time on one UTC day: the availability read model SearchAvailability, ComputeAvailability, CheckAvailability and CreateHold read their candidates from, instead of evaluating every resource an operator has. Storage-only, and derived: no RPC takes or returns it. It is a projection of the resources, their sites, calendars, RFC 7953 availability, RFC 5545 events and the claims of converted holds, rewritten in the same transaction as every write to those (on Hasura, a single write projects in a request of its own right after it), for every day of a rolling horizon. `free` is offered time less booked time; live holds are not subtracted, and neither is a resource's booking policy applied, because both change with the clock. The engine evaluates every candidate the projection returns before answering, so an answer never depends on the projection being current; a stale row can only make a search miss a resource or read one it then drops.
+A ResourceDay is one resource's standing free time on one UTC day: the availability read model SearchAvailability, ComputeAvailability, CheckAvailability and CreateHold read their candidates from, instead of evaluating every resource there is. Storage-only, and derived: no RPC takes or returns it. It is a projection of the resources, their calendars, RFC 7953 availability, RFC 5545 events and the claims of converted holds, rewritten in the same transaction as every write to those (on Hasura, a single write projects in a request of its own right after it), for every day of a rolling horizon. `free` is offered time less booked time; live holds are not subtracted, and neither is a resource's booking policy applied, because both change with the clock. The engine evaluates every candidate the projection returns before answering, so an answer never depends on the projection being current; a stale row can only make a search miss a resource or read one it then drops.
 
 | Column | Type | Null |
 | --- | --- | --- |
 | `id` | `TEXT` | not null |
 | `resource` | `TEXT` | not null |
-| `organization` | `TEXT` | not null |
 | `organizational_unit` | `TEXT` | not null |
 | `day` | `DATE` | not null |
 | `free` | `TSTZMULTIRANGE` | not null |

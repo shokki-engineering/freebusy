@@ -9,7 +9,6 @@ Domain `freebusy.dev`.
 | Reason | Code | Means | Do | Retry? |
 |---|---|---|---|---|
 | `HOLD_NOT_FOUND` | `INVALID_ARGUMENT` | The reservation's `hold` does not exist, or `CreateHold`'s `hold.replaces` names one that does not. | Take a hold first with `CreateHold`; for `replaces`, send the reservation's `hold`. | No |
-| `HOLD_AT_ANOTHER_SITE` | `INVALID_ARGUMENT` | The hold is at a different site from the reservation's parent, or `CreateHold`'s `hold.replaces` is a hold at another site. | Send the hold's own site as `parent`; a hold replaces only a booking at its own site. | No |
 | `HOLD_LAPSED` | `FAILED_PRECONDITION` | The hold lapsed before the reservation was confirmed; the reservation failed. | Take a new hold and create the reservation again; hold longer, or `ExtendHold`. | No |
 | `RESERVATION_ID_TAKEN` | `ALREADY_EXISTS` | `reservation_id` names a reservation made from another hold. | Choose another id, or leave it empty. | No |
 | `RESERVATION_FAILED` | `FAILED_PRECONDITION` | `CancelReservation` on a reservation that failed; it holds nothing. | Nothing to do. | No |

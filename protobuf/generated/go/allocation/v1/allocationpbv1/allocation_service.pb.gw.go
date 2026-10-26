@@ -42,21 +42,12 @@ func request_AllocationService_ComputeAvailability_0(ctx context.Context, marsha
 	var (
 		protoReq ComputeAvailabilityRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["parent"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "parent")
-	}
-	protoReq.Parent, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "parent", err)
 	}
 	msg, err := client.ComputeAvailability(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -66,18 +57,9 @@ func local_request_AllocationService_ComputeAvailability_0(ctx context.Context, 
 	var (
 		protoReq ComputeAvailabilityRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	val, ok := pathParams["parent"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "parent")
-	}
-	protoReq.Parent, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "parent", err)
 	}
 	msg, err := server.ComputeAvailability(ctx, &protoReq)
 	return msg, metadata, err
@@ -87,21 +69,12 @@ func request_AllocationService_CheckAvailability_0(ctx context.Context, marshale
 	var (
 		protoReq CheckAvailabilityRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["parent"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "parent")
-	}
-	protoReq.Parent, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "parent", err)
 	}
 	msg, err := client.CheckAvailability(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -111,18 +84,9 @@ func local_request_AllocationService_CheckAvailability_0(ctx context.Context, ma
 	var (
 		protoReq CheckAvailabilityRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	val, ok := pathParams["parent"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "parent")
-	}
-	protoReq.Parent, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "parent", err)
 	}
 	msg, err := server.CheckAvailability(ctx, &protoReq)
 	return msg, metadata, err
@@ -159,21 +123,12 @@ func request_AllocationService_SearchAvailability_0(ctx context.Context, marshal
 	var (
 		protoReq SearchAvailabilityRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["parent"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "parent")
-	}
-	protoReq.Parent, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "parent", err)
 	}
 	msg, err := client.SearchAvailability(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -183,18 +138,9 @@ func local_request_AllocationService_SearchAvailability_0(ctx context.Context, m
 	var (
 		protoReq SearchAvailabilityRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	val, ok := pathParams["parent"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "parent")
-	}
-	protoReq.Parent, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "parent", err)
 	}
 	msg, err := server.SearchAvailability(ctx, &protoReq)
 	return msg, metadata, err
@@ -212,7 +158,7 @@ func RegisterAllocationServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.AllocationService/ComputeAvailability", runtime.WithHTTPPathPattern("/v1/{parent=organizationalUnits/*}:computeAvailability"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.AllocationService/ComputeAvailability", runtime.WithHTTPPathPattern("/v1/resources:computeAvailability"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -232,7 +178,7 @@ func RegisterAllocationServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.AllocationService/CheckAvailability", runtime.WithHTTPPathPattern("/v1/{parent=organizationalUnits/*}:checkAvailability"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.AllocationService/CheckAvailability", runtime.WithHTTPPathPattern("/v1/resources:checkAvailability"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -272,7 +218,7 @@ func RegisterAllocationServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.AllocationService/SearchAvailability", runtime.WithHTTPPathPattern("/v1/{parent=organizations/*}:searchAvailability"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.AllocationService/SearchAvailability", runtime.WithHTTPPathPattern("/v1/resources:searchAvailability"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -330,7 +276,7 @@ func RegisterAllocationServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.AllocationService/ComputeAvailability", runtime.WithHTTPPathPattern("/v1/{parent=organizationalUnits/*}:computeAvailability"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.AllocationService/ComputeAvailability", runtime.WithHTTPPathPattern("/v1/resources:computeAvailability"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -347,7 +293,7 @@ func RegisterAllocationServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.AllocationService/CheckAvailability", runtime.WithHTTPPathPattern("/v1/{parent=organizationalUnits/*}:checkAvailability"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.AllocationService/CheckAvailability", runtime.WithHTTPPathPattern("/v1/resources:checkAvailability"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -381,7 +327,7 @@ func RegisterAllocationServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.AllocationService/SearchAvailability", runtime.WithHTTPPathPattern("/v1/{parent=organizations/*}:searchAvailability"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.AllocationService/SearchAvailability", runtime.WithHTTPPathPattern("/v1/resources:searchAvailability"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -398,10 +344,10 @@ func RegisterAllocationServiceHandlerClient(ctx context.Context, mux *runtime.Se
 }
 
 var (
-	pattern_AllocationService_ComputeAvailability_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2}, []string{"v1", "organizationalUnits", "parent"}, "computeAvailability"))
-	pattern_AllocationService_CheckAvailability_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2}, []string{"v1", "organizationalUnits", "parent"}, "checkAvailability"))
+	pattern_AllocationService_ComputeAvailability_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "resources"}, "computeAvailability"))
+	pattern_AllocationService_CheckAvailability_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "resources"}, "checkAvailability"))
 	pattern_AllocationService_BatchComputeAvailability_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "resources"}, "batchCompute"))
-	pattern_AllocationService_SearchAvailability_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2}, []string{"v1", "organizations", "parent"}, "searchAvailability"))
+	pattern_AllocationService_SearchAvailability_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "resources"}, "searchAvailability"))
 )
 
 var (

@@ -28,11 +28,10 @@ func reservationFlow(t *testing.T, c *e2eClients) {
 	t.Helper()
 	ctx := context.Background()
 
-	site := c.site(t, "e2e-"+c.suffix)
 	resource := "resources/e2e-" + c.suffix
 	if _, err := c.resources.CreateResource(ctx, &resourcev1.CreateResourceRequest{
 		ResourceId: "e2e-" + c.suffix,
-		Resource:   &resourcev1.Resource{OrganizationalUnit: site, ResourceTypes: []string{"e2e"}},
+		Resource:   &resourcev1.Resource{ResourceTypes: []string{"e2e"}},
 	}); err != nil {
 		t.Fatalf("seed resource: %v", err)
 	}
@@ -42,7 +41,7 @@ func reservationFlow(t *testing.T, c *e2eClients) {
 	window := &interval.Interval{StartTime: timestamppb.New(start), EndTime: timestamppb.New(start.Add(2 * time.Hour))}
 	free := func() int32 {
 		t.Helper()
-		res, err := c.availability.CheckAvailability(ctx, &allocationpbv1.CheckAvailabilityRequest{Parent: site, Window: window})
+		res, err := c.availability.CheckAvailability(ctx, &allocationpbv1.CheckAvailabilityRequest{Resources: []string{resource}, Window: window})
 		if err != nil {
 			t.Fatalf("CheckAvailability: %v", err)
 		}
@@ -52,18 +51,17 @@ func reservationFlow(t *testing.T, c *e2eClients) {
 		t.Fatalf("before booking: %d free, want 1", n)
 	}
 
-	hold, err := c.holds.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Parent: site, Hold: &allocationpbv1.Hold{Window: window}})
+	hold, err := c.holds.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Hold: &allocationpbv1.Hold{Window: window, CandidateResources: []string{resource}}})
 	if err != nil {
 		t.Fatalf("CreateHold: %v", err)
 	}
 	if hold.GetState() != allocationpbv1.HoldState_HOLD_STATE_ACTIVE || len(hold.GetResources()) != 1 || hold.GetResources()[0] != resource {
 		t.Fatalf("hold %v", hold)
 	}
-	_, err = c.holds.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Parent: site, Hold: &allocationpbv1.Hold{Window: window}})
+	_, err = c.holds.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Hold: &allocationpbv1.Hold{Window: window, CandidateResources: []string{resource}}})
 	wantCode(t, err, codes.FailedPrecondition, "a second hold on a taken resource")
 
 	r, err := c.reservations.CreateReservation(ctx, &reservationpbv1.CreateReservationRequest{
-		Parent:      site,
 		Reservation: &reservationpbv1.Reservation{Hold: hold.GetName(), Customer: "users/e2e-" + c.suffix},
 	})
 	if err != nil || r.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED {

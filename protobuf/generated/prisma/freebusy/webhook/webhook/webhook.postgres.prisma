@@ -32,9 +32,6 @@ model Webhook {
   /// The event types sent, e.g. "freebusy.reservation.confirmed" or "freebusy.event.deleted". Empty sends every type. A type is "freebusy.<record>.<what happened>": holds are active, released, expired and converted; reservations pending, confirmed, cancelling, cancelled, failed, rescheduling and rescheduled, and updated exactly when UpdateReservation changed its customer or attributes -- the reservation's last_change is CHANGE_DETAILS (freebusy.reservation.updated); resources, calendars, events and availabilities created, updated and deleted.
   eventTypes String[] @map("event_types")
 
-  /// Limits events to one site's holds, reservations and resources. Empty sends every site's. Calendars, events and availabilities belong to no site, so a webhook limited to one is not sent them. Format: organizationalUnits/{organizational_unit} Foreign key to orgunit.organizational_units(name) in database rfc (discovered, constraint only, no relation).
-  organizationalUnit String? @map("organizational_unit")
-
   /// Whether changes are sent. Set by PauseWebhook and ResumeWebhook; pausing keeps the webhook and its history.
   state WebhookState? @default(ACTIVE) @map("state")
 
@@ -61,8 +58,6 @@ model Webhook {
 
   /// Index on [update_time].
   @@index([updateTime])
-  /// Index on [organizational_unit].
-  @@index([organizationalUnit])
   /// GIN index: tag containment (@>) cannot use a B-tree.
   @@index([eventTypes], type: Gin)
   /// Maps the model to the "resource" table in the database.

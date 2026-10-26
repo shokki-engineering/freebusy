@@ -128,8 +128,8 @@ type process struct {
 
 // start runs the binary from a scratch directory whose dev overlay is the
 // repository's, with HTTP on, ports of its own, provider chosen, and delivery
-// rounds every second.
-func start(t *testing.T, provider string) *process {
+// rounds every second. env adds FREEBUSY_ variables on top of the caller's.
+func start(t *testing.T, provider string, env ...string) *process {
 	t.Helper()
 	bin := build(t)
 	root := repoRoot(t)
@@ -176,7 +176,7 @@ func start(t *testing.T, provider string) *process {
 	cmd := exec.Command(bin)
 	cmd.Dir = dir
 	cmd.Stdout, cmd.Stderr = out, out
-	cmd.Env = os.Environ()
+	cmd.Env = append(os.Environ(), env...)
 	if err := cmd.Start(); err != nil {
 		t.Fatal(err)
 	}
@@ -296,8 +296,16 @@ func (s *process) call(method, path string, body any, want int) map[string]any {
 	return out
 }
 
+// corsOrigin is the one origin the binary suite's server allows.
+const corsOrigin = "https://app.freebusy.test"
+
 func binaryFlow(t *testing.T, provider string) {
-	s := start(t, provider)
+	s := start(t, provider,
+		"FREEBUSY_SERVER__CORS__ENABLED=true",
+		"FREEBUSY_SERVER__CORS__ALLOWED_ORIGINS="+corsOrigin,
+		"FREEBUSY_SERVER__CORS__MAX_AGE_SECONDS=120",
+	)
+	t.Run("cors", func(t *testing.T) { browserCORS(t, s) })
 	rec := &receiver{}
 	endpoint := httptest.NewServer(rec)
 	defer endpoint.Close()
@@ -333,14 +341,8 @@ func binaryFlow(t *testing.T, provider string) {
 
 	// A resource created over REST reaches the receiver through the server's
 	// own delivery loop, signed.
-	// Nothing is booked outside a site, and no site exists outside an
-	// organization: both are created over REST first.
-	org := s.call("POST", "/v1/organizations?organizationId=bin-org-"+suffix,
-		map[string]any{"displayNames": []string{"Binary e2e"}}, http.StatusOK)["name"].(string)
-	site := s.call("POST", "/v1/organizationalUnits?organizationalUnitId=bin-"+suffix,
-		map[string]any{"displayNames": []string{"Binary e2e"}, "organization": org}, http.StatusOK)["name"].(string)
 	s.call("POST", "/v1/resources?resourceId=bin-court-"+suffix,
-		map[string]any{"displayName": "Court", "organizationalUnit": site}, http.StatusOK)
+		map[string]any{"displayName": "Court"}, http.StatusOK)
 	arrived := func(eventType string) func() bool {
 		return func() bool {
 			rec.mu.Lock()
@@ -408,7 +410,7 @@ func binaryFlow(t *testing.T, provider string) {
 	for _, want := range []string{
 		"webhook_service-create_webhook_v1", "webhook_service-rotate_webhook_secret_v1", "webhook_service-retry_delivery_v1",
 		"allocation_service-check_availability_v1", "reservation_service-create_reservation_v1",
-		"organizations-get_organization_v1", "events-create_event_v1",
+		"resources-get_resource_v1", "events-create_event_v1",
 	} {
 		if !strings.Contains(strings.Join(names, " "), want) {
 			t.Fatalf("MCP tools at /mcp %v lack %s", names, want)
@@ -426,9 +428,9 @@ func binaryFlow(t *testing.T, provider string) {
 		t.Fatalf("MCP accepted an invalid parent: %v %v", err, toolText(res))
 	}
 	// A tool of another service answers on the same session.
-	res, err = session.CallTool(context.Background(), &mcp.CallToolParams{Name: "organizations-list_organizations_v1", Arguments: map[string]any{}})
+	res, err = session.CallTool(context.Background(), &mcp.CallToolParams{Name: "resources-list_resources_v1", Arguments: map[string]any{}})
 	if err != nil || res.IsError {
-		t.Fatalf("MCP list_organizations at /mcp: %v %v", err, toolText(res))
+		t.Fatalf("MCP list_resources at /mcp: %v %v", err, toolText(res))
 	}
 	// Each service still answers at its own path too, until those retire.
 	own := dialMCP(t, fmt.Sprintf("http://127.0.0.1:%d%s", s.mcp, webhookpbv1.WebhookServiceMCPDefaultBasePath))
@@ -497,6 +499,60 @@ func statelessMCP(t *testing.T, endpoint, hook string) {
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusMethodNotAllowed {
 		t.Fatalf("stateless MCP GET stream: %d, want 405", resp.StatusCode)
+	}
+}
+
+// browserCORS is what a browser SDK on another origin meets at the REST
+// gateway: a preflight answered without reaching a handler, then a GET whose
+// response it may read -- and nothing for an origin not on the list.
+func browserCORS(t *testing.T, s *process) {
+	send := func(method, origin string, header map[string]string) *http.Response {
+		t.Helper()
+		req, err := http.NewRequest(method, s.base+"/v1/webhooks?pageSize=1", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		req.Header.Set("Origin", origin)
+		for k, v := range header {
+			req.Header.Set(k, v)
+		}
+		resp, err := client.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		_, _ = io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
+		return resp
+	}
+	preflight := map[string]string{
+		"Access-Control-Request-Method":  "GET",
+		"Access-Control-Request-Headers": "content-type, x-goog-api-client",
+	}
+	vary := func(resp *http.Response) bool {
+		return strings.Contains(strings.Join(resp.Header.Values("Vary"), ","), "Origin")
+	}
+
+	resp := send("OPTIONS", corsOrigin, preflight)
+	if resp.StatusCode != http.StatusNoContent ||
+		resp.Header.Get("Access-Control-Allow-Origin") != corsOrigin ||
+		!strings.Contains(resp.Header.Get("Access-Control-Allow-Methods"), "GET") ||
+		!strings.Contains(strings.ToLower(resp.Header.Get("Access-Control-Allow-Headers")), "x-goog-api-client") ||
+		resp.Header.Get("Access-Control-Max-Age") != "120" || !vary(resp) {
+		t.Fatalf("preflight from %s: %d %v", corsOrigin, resp.StatusCode, resp.Header)
+	}
+	resp = send("GET", corsOrigin, nil)
+	if resp.StatusCode != http.StatusOK || resp.Header.Get("Access-Control-Allow-Origin") != corsOrigin || !vary(resp) {
+		t.Fatalf("GET from %s: %d %v", corsOrigin, resp.StatusCode, resp.Header)
+	}
+
+	const other = "https://elsewhere.test"
+	resp = send("OPTIONS", other, preflight)
+	if resp.StatusCode != http.StatusForbidden || resp.Header.Get("Access-Control-Allow-Origin") != "" {
+		t.Fatalf("preflight from %s: %d %v", other, resp.StatusCode, resp.Header)
+	}
+	resp = send("GET", other, nil)
+	if got := resp.Header.Get("Access-Control-Allow-Origin"); got != "" {
+		t.Fatalf("GET from %s carried Access-Control-Allow-Origin %q", other, got)
 	}
 }
 

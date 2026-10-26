@@ -66,23 +66,14 @@ components:
       type: object
     freebusy.shared.v1.ErrorReason:
       description: |-
-        The reasons freebusy returns for the directory (organizations, sites) and the
-        calendars, events and availability freebusy serves, and any call: the
+        The reasons freebusy returns for the resources, calendars, events and
+        availability freebusy serves, and any call: the
         google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.dev domain. They are
         part of the API: clients branch on them, never on a message.
         protoc-gen-service renders them as Go constants, sentinels and the tables of
         docs/errors.md.
       enum:
       - ERROR_REASON_UNSPECIFIED
-      - ERROR_REASON_ORGANIZATION_REQUIRED
-      - ERROR_REASON_ORGANIZATION_NOT_FOUND
-      - ERROR_REASON_ORGANIZATION_DELETED
-      - ERROR_REASON_ORGANIZATION_HAS_SITES
-      - ERROR_REASON_SITE_REQUIRED
-      - ERROR_REASON_SITE_NOT_FOUND
-      - ERROR_REASON_SITE_DELETED
-      - ERROR_REASON_SITE_WITHOUT_ORGANIZATION
-      - ERROR_REASON_SITE_HAS_RESOURCES
       - ERROR_REASON_CALENDAR_NOT_FOUND
       - ERROR_REASON_CALENDAR_DELETED
       - ERROR_REASON_CALENDAR_NOT_EMPTY

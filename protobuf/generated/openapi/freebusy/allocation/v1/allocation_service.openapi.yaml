@@ -24,7 +24,37 @@ info:
 servers:
     - url: https://freebusy.shokki.engineering
 paths:
-    /v1/organizationalUnits/{organizationalUnit}:checkAvailability:
+    /v1/resources:batchCompute:
+        post:
+            tags:
+                - AllocationService
+            description: |-
+                Runs several availability computations in one round trip.
+
+                 Each entry is independent and may name different resources, a different
+                 window or granularity. Capped at 50 entries, because each one fans out across every
+                 candidate resource's calendar.
+            operationId: AllocationService_BatchComputeAvailability
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/BatchComputeAvailabilityRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/BatchComputeAvailabilityResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/resources:checkAvailability:
         post:
             tags:
                 - AllocationService
@@ -34,13 +64,6 @@ paths:
                  Advisory, not a reservation: the answer can be stale the instant it is
                  returned. CreateHold is what actually secures anything.
             operationId: AllocationService_CheckAvailability
-            parameters:
-                - name: organizationalUnit
-                  in: path
-                  description: The organizationalUnit id.
-                  required: true
-                  schema:
-                    type: string
             requestBody:
                 content:
                     application/json:
@@ -60,19 +83,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/organizationalUnits/{organizationalUnit}:computeAvailability:
+    /v1/resources:computeAvailability:
         post:
             tags:
                 - AllocationService
-            description: Computes availability across a site's resources, bucketed by slot or day.
+            description: Computes availability across resources, bucketed by slot or day.
             operationId: AllocationService_ComputeAvailability
-            parameters:
-                - name: organizationalUnit
-                  in: path
-                  description: The organizationalUnit id.
-                  required: true
-                  schema:
-                    type: string
             requestBody:
                 content:
                     application/json:
@@ -92,24 +108,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/organizations/{organization}:searchAvailability:
+    /v1/resources:searchAvailability:
         post:
             tags:
                 - AllocationService
             description: |-
-                Sweeps an operator for resources free across a window.
+                Searches every resource for those free across a window.
 
-                 The search entry point, where ComputeAvailability answers for a site the
-                 caller has already chosen. Paginated, since a large operator may match
+                 The search entry point, where ComputeAvailability counts over resources
+                 the caller has already chosen. Paginated, since a search may match
                  thousands of resources.
             operationId: AllocationService_SearchAvailability
-            parameters:
-                - name: organization
-                  in: path
-                  description: The organization id.
-                  required: true
-                  schema:
-                    type: string
             requestBody:
                 content:
                     application/json:
@@ -123,36 +132,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/SearchAvailabilityResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /v1/resources:batchCompute:
-        post:
-            tags:
-                - AllocationService
-            description: |-
-                Runs several availability computations in one round trip.
-
-                 Each entry is independent and may name a different site, window or
-                 granularity. Capped at 50 entries, because each one fans out across every
-                 candidate resource's calendar.
-            operationId: AllocationService_BatchComputeAvailability
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/BatchComputeAvailabilityRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/BatchComputeAvailabilityResponse'
                 default:
                     description: Default error response
                     content:
@@ -205,11 +184,6 @@ components:
                     description: |-
                         The free resource.
                          Format: resources/{resource}
-                organizationalUnit:
-                    type: string
-                    description: |-
-                        The site it belongs to.
-                         Format: organizationalUnits/{organizational_unit}
                 window:
                     allOf:
                         - $ref: '#/components/schemas/Interval'
@@ -239,8 +213,8 @@ components:
                          call can trigger.
             description: |-
                 Request message for AllocationService.BatchComputeAvailability. Each entry is
-                 a full ComputeAvailabilityRequest, so sites, windows and granularities may
-                 differ within one batch.
+                 a full ComputeAvailabilityRequest, so resources, windows and granularities
+                 may differ within one batch.
         BatchComputeAvailabilityResponse:
             type: object
             properties:
@@ -252,22 +226,16 @@ components:
             description: Response message for AllocationService.BatchComputeAvailability.
         CheckAvailabilityRequest:
             required:
-                - parent
                 - window
             type: object
             properties:
-                parent:
-                    type: string
-                    description: |-
-                        The site whose resources to check.
-                         Format: organizationalUnits/{organizational_unit}
                 resources:
                     type: array
                     items:
                         type: string
                     description: |-
-                        Restrict the check to these resources. Empty means every resource the site
-                         holds.
+                        Restrict the check to these resources. Empty means every resource
+                         `filter` matches.
                          Format: resources/{resource}
                 window:
                     allOf:
@@ -283,8 +251,9 @@ components:
                         An AIP-160 filter over each resource's search record (ResourceDay): its
                          `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
                          `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-                         `display_name` (a bare word matches it) and `organizational_unit`. Terms
-                         are ANDed unless joined with OR. Empty matches every resource.
+                         `display_name` (a bare word matches it) and `organizational_unit` (the
+                         resource's own, as data). Terms are ANDed unless joined with OR. Empty
+                         matches every resource.
                          Only matching resources are checked.
             description: Request message for AllocationService.CheckAvailability.
         CheckAvailabilityResponse:
@@ -313,22 +282,16 @@ components:
             description: Response message for AllocationService.CheckAvailability.
         ComputeAvailabilityRequest:
             required:
-                - parent
                 - window
             type: object
             properties:
-                parent:
-                    type: string
-                    description: |-
-                        The site whose resources to compute over.
-                         Format: organizationalUnits/{organizational_unit}
                 resources:
                     type: array
                     items:
                         type: string
                     description: |-
                         Restrict the computation to these resources. Empty means every resource
-                         the site holds.
+                         `filter` matches.
                          Format: resources/{resource}
                 window:
                     allOf:
@@ -346,12 +309,12 @@ components:
                     type: string
                     description: |-
                         IANA time zone the day boundaries are drawn in, e.g. "Asia/Kolkata".
-                         Defaults to the site's zone. Required in effect for DAY granularity, since
-                         "a night" has no meaning without one.
+                         Defaults to the zone of the first resource's calendar. Required in effect
+                         for DAY granularity, since "a night" has no meaning without one.
                 includeFreeResources:
                     type: boolean
                     description: |-
-                        Populate AvailabilityBucket.free_resources. Off by default: a large site
+                        Populate AvailabilityBucket.free_resources. Off by default: a large pool
                          would otherwise repeat every resource name in every bucket.
                 filter:
                     type: string
@@ -359,8 +322,9 @@ components:
                         An AIP-160 filter over each resource's search record (ResourceDay): its
                          `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
                          `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-                         `display_name` (a bare word matches it) and `organizational_unit`. Terms
-                         are ANDed unless joined with OR. Empty matches every resource.
+                         `display_name` (a bare word matches it) and `organizational_unit` (the
+                         resource's own, as data). Terms are ANDed unless joined with OR. Empty
+                         matches every resource.
                          Only matching resources are computed over or counted.
             description: Request message for AllocationService.ComputeAvailability.
         ComputeAvailabilityResponse:
@@ -422,26 +386,13 @@ components:
                  When both start and end are unspecified, the interval matches any time.
         SearchAvailabilityRequest:
             required:
-                - parent
                 - window
             type: object
             properties:
-                parent:
-                    type: string
-                    description: |-
-                        The operator to search within.
-                         Format: organizations/{organization}
                 window:
                     allOf:
                         - $ref: '#/components/schemas/Interval'
                     description: The window that must be free.
-                organizationalUnits:
-                    type: array
-                    items:
-                        type: string
-                    description: |-
-                        Restrict to sites, e.g. one car park or one venue. Empty searches all.
-                         Format: organizationalUnits/{organizational_unit}
                 resourceTypes:
                     type: array
                     items:
@@ -450,12 +401,6 @@ components:
                         Restrict to RESOURCE-TYPE values, RFC 9073 section 6.3, e.g. "room" or
                          "parking-bay": a resource matches when it carries any of them. Empty
                          matches every type.
-                quantity:
-                    type: integer
-                    description: |-
-                        How many resources must be free together at one site for it to match.
-                         Defaults to 1.
-                    format: int32
                 pageSize:
                     type: integer
                     description: Maximum matches to return. Defaults to 50, capped at 1000.
@@ -471,8 +416,9 @@ components:
                         An AIP-160 filter over each resource's search record (ResourceDay): its
                          `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
                          `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-                         `display_name` (a bare word matches it) and `organizational_unit`. Terms
-                         are ANDed unless joined with OR. Empty matches every resource.
+                         `display_name` (a bare word matches it) and `organizational_unit` (the
+                         resource's own, as data). Terms are ANDed unless joined with OR. Empty
+                         matches every resource.
                 orderBy:
                     type: string
                     description: |-
@@ -481,8 +427,7 @@ components:
                          the window's first UTC day that is free) and `attributes.max_occupancy`
                          (the booking profile's, as a number), each optionally followed by
                          ` desc`, e.g. `free_fraction desc, display_name`. Defaults to
-                         `organizational_unit, resource`. When quantity is above 1, matches are
-                         grouped by site first, and the order applies within a site.
+                         `resource`.
                 facets:
                     type: array
                     items:
@@ -493,9 +438,9 @@ components:
                          `organizational_unit` or an `attributes.<path>`, e.g.
                          ["resource_types", "attributes.view"]. At most 10.
             description: |-
-                Request message for AllocationService.SearchAvailability. Sweeps a whole
-                 operator for resources free across a window, where ComputeAvailability
-                 answers for one site already chosen.
+                Request message for AllocationService.SearchAvailability. Searches every
+                 resource for those free across a window, where ComputeAvailability counts
+                 over resources already chosen.
         SearchAvailabilityResponse:
             type: object
             properties:

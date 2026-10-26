@@ -74,17 +74,17 @@ func ReservationEventType(r *reservationpbv1.Reservation) string {
 }
 
 // ReservationFeedSpec reads Reservation changes through repo, ordered by
-// update time, across every parent (organizationalUnits/-), for runtime-go's events
+// update time, for runtime-go's events
 // dispatcher. Wrap it to change what an event is called or carries.
 func ReservationFeedSpec(repo reservation.ReservationRepository) events.FeedSpec[*reservationpbv1.Reservation] {
 	return events.FeedSpec[*reservationpbv1.Reservation]{
 		ID:       "freebusy.reservation",
 		ReadMask: []string{"name", "etag", "update_time", "create_time", "state"},
 		List: func(ctx context.Context, q events.Query) ([]*reservationpbv1.Reservation, string, error) {
-			return repo.List(ctx, "organizationalUnits/-", servicex.FeedInput(q))
+			return repo.List(ctx, servicex.FeedInput(q))
 		},
 		Change: func(r *reservationpbv1.Reservation) events.Change {
-			return events.Change{Type: ReservationEventType(r), Time: servicex.Time(r.GetUpdateTime()), Scope: servicex.Scope(r.GetName(), "organizationalUnits")}
+			return events.Change{Type: ReservationEventType(r), Time: servicex.Time(r.GetUpdateTime())}
 		},
 		Data: func(r *reservationpbv1.Reservation) ([]byte, error) { return protojson.Marshal(r) },
 	}

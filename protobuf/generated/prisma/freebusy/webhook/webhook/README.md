@@ -34,7 +34,6 @@ A Webhook sends an HTTPS endpoint each change to holds, reservations and the inv
 | `display_name` | `VARCHAR(255)` | nullable |
 | `uri` | `VARCHAR(255)` | not null |
 | `event_types` | `VARCHAR(255)[]` | nullable |
-| `organizational_unit` | `VARCHAR(255)` | nullable |
 | `state` | `WebhookState` | nullable |
 | `secret` | `VARCHAR(255)` | nullable |
 | `previous_secret` | `VARCHAR(255)` | nullable |

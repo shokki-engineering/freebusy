@@ -16,13 +16,13 @@ import (
 )
 
 func TestToStatusErrProblem(t *testing.T) {
-	err := ToStatusErr(fmt.Errorf("wrapped: %w", servicex.BadField("ORGANIZATION_REQUIRED", "organizational_unit.organization",
-		"an organizational unit belongs to an organization", "Create one first")))
+	err := ToStatusErr(fmt.Errorf("wrapped: %w", servicex.BadField("WINDOW_INCOMPLETE", "window",
+		"a window needs both start_time and end_time", "Send both")))
 	st := status.Convert(err)
 	if st.Code() != codes.InvalidArgument {
 		t.Fatalf("code = %v", st.Code())
 	}
-	if want := "An organizational unit belongs to an organization. Create one first."; st.Message() != want {
+	if want := "A window needs both start_time and end_time. Send both."; st.Message() != want {
 		t.Fatalf("message = %q, want %q", st.Message(), want)
 	}
 	var reason, field string
@@ -34,7 +34,7 @@ func TestToStatusErrProblem(t *testing.T) {
 			field = d.GetFieldViolations()[0].GetField()
 		}
 	}
-	if reason != "ORGANIZATION_REQUIRED" || field != "organizational_unit.organization" {
+	if reason != "WINDOW_INCOMPLETE" || field != "window" {
 		t.Fatalf("details: reason %q, field %q", reason, field)
 	}
 }
@@ -52,7 +52,7 @@ func TestToStatusErrReference(t *testing.T) {
 		reason  string
 		subject string
 	}{
-		{repox.ForeignKeyError(errors.New(`ERROR: insert or update on table "holds" violates foreign key constraint "fk_holds_organizational_unit_id" (SQLSTATE 23503)`)), repox.ReasonForeignKey, ""},
+		{repox.ForeignKeyError(errors.New(`ERROR: insert or update on table "resource" violates foreign key constraint "fk_resource_resource" (SQLSTATE 23503)`)), repox.ReasonForeignKey, ""},
 		{&repox.ReferenceError{Err: repox.ErrReferenceNotFound, Field: "customer", ResourceType: "example.com/User", Name: "users/ann"}, repox.ReasonReferenceNotFound, "users/ann"},
 		{&repox.ReferenceError{Err: repox.ErrReferenced, ResourceType: "the-protobuf-project.org/Resource", Name: "resources/court-1"}, repox.ReasonReferenced, "resources/court-1"},
 	}
@@ -76,7 +76,7 @@ func TestToStatusErrReference(t *testing.T) {
 		}
 	}
 	st := status.Convert(ToStatusErr(cases[0].err))
-	if want := "The write names a resource that does not exist, or removes one that something still refers to (constraint fk_holds_organizational_unit_id); create the referenced resource first, or remove what refers to it."; st.Message() != want {
+	if want := "The write names a resource that does not exist, or removes one that something still refers to (constraint fk_resource_resource); create the referenced resource first, or remove what refers to it."; st.Message() != want {
 		t.Errorf("message %q", st.Message())
 	}
 }

@@ -36,12 +36,9 @@ const (
 // race is handled.
 type CreateHoldRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The site whose resources may be taken.
-	// Format: organizationalUnits/{organizational_unit}
-	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// The hold to take. Its window is required; quantity defaults to 1 and
-	// candidate_resources empty offers every resource the site holds. Supply
-	// idempotency_key to make a retry safe.
+	// candidate_resources empty offers every resource candidate_filter matches.
+	// Supply idempotency_key to make a retry safe.
 	Hold *Hold `protobuf:"bytes,2,opt,name=hold,proto3" json:"hold,omitempty"`
 	// Client-assigned id, becoming the last segment of the hold name. The server
 	// generates one when empty.
@@ -80,13 +77,6 @@ func (*CreateHoldRequest) Descriptor() ([]byte, []int) {
 	return file_freebusy_allocation_v1_hold_messages_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CreateHoldRequest) GetParent() string {
-	if x != nil {
-		return x.Parent
-	}
-	return ""
-}
-
 func (x *CreateHoldRequest) GetHold() *Hold {
 	if x != nil {
 		return x.Hold
@@ -105,7 +95,7 @@ func (x *CreateHoldRequest) GetHoldId() string {
 type GetHoldRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Name of the hold to retrieve.
-	// Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	// Format: holds/{hold}
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -151,9 +141,6 @@ func (x *GetHoldRequest) GetName() string {
 // Request message for HoldService.ListHolds, AIP-132.
 type ListHoldsRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The site whose holds to list.
-	// Format: organizationalUnits/{organizational_unit}
-	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// Maximum holds to return. Defaults to 50, capped at 1000.
 	PageSize int32 `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Page token from a previous ListHoldsResponse.next_page_token.
@@ -193,13 +180,6 @@ func (x *ListHoldsRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ListHoldsRequest.ProtoReflect.Descriptor instead.
 func (*ListHoldsRequest) Descriptor() ([]byte, []int) {
 	return file_freebusy_allocation_v1_hold_messages_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *ListHoldsRequest) GetParent() string {
-	if x != nil {
-		return x.Parent
-	}
-	return ""
 }
 
 func (x *ListHoldsRequest) GetPageSize() int32 {
@@ -282,7 +262,7 @@ func (x *ListHoldsResponse) GetNextPageToken() string {
 type ExtendHoldRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Name of the hold to extend.
-	// Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	// Format: holds/{hold}
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// How much further out to push expire_time, measured from now rather than
 	// from the current deadline, so repeated extensions cannot accumulate.
@@ -349,7 +329,7 @@ func (x *ExtendHoldRequest) GetEtag() string {
 type ReleaseHoldRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Name of the hold to release.
-	// Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	// Format: holds/{hold}
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Opaque version read from the hold; the release is rejected if the hold
 	// changed since (AIP-154).
@@ -406,7 +386,7 @@ func (x *ReleaseHoldRequest) GetEtag() string {
 type DeleteHoldRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Name of the hold to delete.
-	// Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	// Format: holds/{hold}
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Opaque version read from the hold; the delete is rejected if the hold
 	// changed since (AIP-154).
@@ -463,37 +443,35 @@ var File_freebusy_allocation_v1_hold_messages_proto protoreflect.FileDescriptor
 
 const file_freebusy_allocation_v1_hold_messages_proto_rawDesc = "" +
 	"\n" +
-	"*freebusy/allocation/v1/hold_messages.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a'freebusy/allocation/v1/allocation.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\"\xd0\x01\n" +
-	"\x11CreateHoldRequest\x12^\n" +
-	"\x06parent\x18\x01 \x01(\tBF\xe2A\x01\x02\xfaA\x1d\x12\x1bfreebusy.allocation.v1/Hold\xbaH\x1fr\x1d2\x1b^organizationalUnits/[^/]+$R\x06parent\x12<\n" +
+	"*freebusy/allocation/v1/hold_messages.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a'freebusy/allocation/v1/allocation.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\"~\n" +
+	"\x11CreateHoldRequest\x12<\n" +
 	"\x04hold\x18\x02 \x01(\v2\x1c.freebusy.allocation.v1.HoldB\n" +
 	"\xe2A\x01\x02\xbaH\x03\xc8\x01\x01R\x04hold\x12\x1d\n" +
-	"\ahold_id\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\x06holdId\"x\n" +
-	"\x0eGetHoldRequest\x12f\n" +
-	"\x04name\x18\x01 \x01(\tBR\xe2A\x01\x02\xfaA\x1d\n" +
-	"\x1bfreebusy.allocation.v1/Hold\xbaH+r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\x04name\"\xe2\x01\n" +
-	"\x10ListHoldsRequest\x12^\n" +
-	"\x06parent\x18\x01 \x01(\tBF\xe2A\x01\x02\xfaA\x1d\x12\x1bfreebusy.allocation.v1/Hold\xbaH\x1fr\x1d2\x1b^organizationalUnits/[^/]+$R\x06parent\x12+\n" +
+	"\ahold_id\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\x06holdIdJ\x04\b\x01\x10\x02R\x06parent\"^\n" +
+	"\x0eGetHoldRequest\x12L\n" +
+	"\x04name\x18\x01 \x01(\tB8\xe2A\x01\x02\xfaA\x1d\n" +
+	"\x1bfreebusy.allocation.v1/Hold\xbaH\x11r\x0f2\r^holds/[^/]+$R\x04name\"\x90\x01\n" +
+	"\x10ListHoldsRequest\x12+\n" +
 	"\tpage_size\x18\x02 \x01(\x05B\x0e\xe2A\x01\x01\xbaH\a\x1a\x05\x18\xe8\a(\x00R\bpageSize\x12#\n" +
 	"\n" +
 	"page_token\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\tpageToken\x12\x1c\n" +
-	"\x06filter\x18\x04 \x01(\tB\x04\xe2A\x01\x01R\x06filter\"o\n" +
+	"\x06filter\x18\x04 \x01(\tB\x04\xe2A\x01\x01R\x06filterJ\x04\b\x01\x10\x02R\x06parent\"o\n" +
 	"\x11ListHoldsResponse\x122\n" +
 	"\x05holds\x18\x01 \x03(\v2\x1c.freebusy.allocation.v1.HoldR\x05holds\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xd8\x01\n" +
-	"\x11ExtendHoldRequest\x12f\n" +
-	"\x04name\x18\x01 \x01(\tBR\xe2A\x01\x02\xfaA\x1d\n" +
-	"\x1bfreebusy.allocation.v1/Hold\xbaH+r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\x04name\x12A\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xbe\x01\n" +
+	"\x11ExtendHoldRequest\x12L\n" +
+	"\x04name\x18\x01 \x01(\tB8\xe2A\x01\x02\xfaA\x1d\n" +
+	"\x1bfreebusy.allocation.v1/Hold\xbaH\x11r\x0f2\r^holds/[^/]+$R\x04name\x12A\n" +
 	"\bduration\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\n" +
 	"\xe2A\x01\x02\xbaH\x03\xc8\x01\x01R\bduration\x12\x18\n" +
-	"\x04etag\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\x04etag\"\x96\x01\n" +
-	"\x12ReleaseHoldRequest\x12f\n" +
-	"\x04name\x18\x01 \x01(\tBR\xe2A\x01\x02\xfaA\x1d\n" +
-	"\x1bfreebusy.allocation.v1/Hold\xbaH+r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\x04name\x12\x18\n" +
-	"\x04etag\x18\x02 \x01(\tB\x04\xe2A\x01\x01R\x04etag\"\x95\x01\n" +
-	"\x11DeleteHoldRequest\x12f\n" +
-	"\x04name\x18\x01 \x01(\tBR\xe2A\x01\x02\xfaA\x1d\n" +
-	"\x1bfreebusy.allocation.v1/Hold\xbaH+r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\x04name\x12\x18\n" +
+	"\x04etag\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\x04etag\"|\n" +
+	"\x12ReleaseHoldRequest\x12L\n" +
+	"\x04name\x18\x01 \x01(\tB8\xe2A\x01\x02\xfaA\x1d\n" +
+	"\x1bfreebusy.allocation.v1/Hold\xbaH\x11r\x0f2\r^holds/[^/]+$R\x04name\x12\x18\n" +
+	"\x04etag\x18\x02 \x01(\tB\x04\xe2A\x01\x01R\x04etag\"{\n" +
+	"\x11DeleteHoldRequest\x12L\n" +
+	"\x04name\x18\x01 \x01(\tB8\xe2A\x01\x02\xfaA\x1d\n" +
+	"\x1bfreebusy.allocation.v1/Hold\xbaH\x11r\x0f2\r^holds/[^/]+$R\x04name\x12\x18\n" +
 	"\x04etag\x18\x02 \x01(\tB\x04\xe2A\x01\x01R\x04etagB\x93\x02\n" +
 	"\x1acom.freebusy.allocation.v1B\x11HoldMessagesProtoP\x01Zhgithub.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
 

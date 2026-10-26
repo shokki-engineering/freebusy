@@ -16,11 +16,11 @@ services:
       ComputeAvailability:
         request: ComputeAvailabilityRequest
         response: ComputeAvailabilityResponse
-        http: POST /v1/{parent=organizationalUnits/*}:computeAvailability
+        http: POST /v1/resources:computeAvailability
       CheckAvailability:
         request: CheckAvailabilityRequest
         response: CheckAvailabilityResponse
-        http: POST /v1/{parent=organizationalUnits/*}:checkAvailability
+        http: POST /v1/resources:checkAvailability
       BatchComputeAvailability:
         request: BatchComputeAvailabilityRequest
         response: BatchComputeAvailabilityResponse
@@ -28,7 +28,7 @@ services:
       SearchAvailability:
         request: SearchAvailabilityRequest
         response: SearchAvailabilityResponse
-        http: POST /v1/{parent=organizations/*}:searchAvailability
+        http: POST /v1/resources:searchAvailability
     events: []
     errors:
       - reason: INVALID_TIME_ZONE
@@ -87,27 +87,27 @@ services:
       CreateHold:
         request: CreateHoldRequest
         response: Hold
-        http: POST /v1/{parent=organizationalUnits/*}/holds
+        http: POST /v1/holds
       GetHold:
         request: GetHoldRequest
         response: Hold
-        http: GET /v1/{name=organizationalUnits/*/holds/*}
+        http: GET /v1/{name=holds/*}
       ListHolds:
         request: ListHoldsRequest
         response: ListHoldsResponse
-        http: GET /v1/{parent=organizationalUnits/*}/holds
+        http: GET /v1/holds
       ExtendHold:
         request: ExtendHoldRequest
         response: Hold
-        http: POST /v1/{name=organizationalUnits/*/holds/*}:extend
+        http: POST /v1/{name=holds/*}:extend
       ReleaseHold:
         request: ReleaseHoldRequest
         response: Hold
-        http: POST /v1/{name=organizationalUnits/*/holds/*}:release
+        http: POST /v1/{name=holds/*}:release
       DeleteHold:
         request: DeleteHoldRequest
         response: google.protobuf.Empty
-        http: DELETE /v1/{name=organizationalUnits/*/holds/*}
+        http: DELETE /v1/{name=holds/*}
     events:
       - freebusy.hold.expired
       - freebusy.hold.active

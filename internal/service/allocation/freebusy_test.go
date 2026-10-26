@@ -16,7 +16,7 @@ func TestFreeBusySplitsByFBType(t *testing.T) {
 	f.share()
 	all := func(a, b float64) *allocationpbv1.Hold {
 		h, err := f.srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
-			Parent: club, Hold: &allocationpbv1.Hold{Window: win(a, b), Quantity: 3},
+			Hold: &allocationpbv1.Hold{Window: win(a, b), Quantity: 3},
 		})
 		if err != nil {
 			t.Fatal(err)

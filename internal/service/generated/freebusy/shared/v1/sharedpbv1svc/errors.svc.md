@@ -8,15 +8,6 @@ Domain `freebusy.dev`.
 
 | Reason | Code | Means | Do | Retry? |
 |---|---|---|---|---|
-| `ORGANIZATION_REQUIRED` | `INVALID_ARGUMENT` | A site (organizational unit) must belong to an organization, and the request names none. | Create the organization first and send its name. | No |
-| `ORGANIZATION_NOT_FOUND` | `NOT_FOUND` | The organization named does not exist. | Check the name, or `ListOrganizations`. | No |
-| `ORGANIZATION_DELETED` | `NOT_FOUND` | The organization is deleted; a site under it cannot serve or be restored. Returned as `NOT_FOUND`, or `FAILED_PRECONDITION` on `UndeleteOrganizationalUnit`. | `UndeleteOrganization` first, or use a live one. | No |
-| `ORGANIZATION_HAS_SITES` | `FAILED_PRECONDITION` | An organization with sites cannot be deleted. | Delete or move its sites first. | No |
-| `SITE_REQUIRED` | `INVALID_ARGUMENT` | A resource is booked at a site, and the request names none. | Send its `organizational_unit`. | No |
-| `SITE_NOT_FOUND` | `NOT_FOUND` | The site named does not exist. | Check the name, or `ListOrganizationalUnits`. | No |
-| `SITE_DELETED` | `NOT_FOUND` | The site is deleted. | `UndeleteOrganizationalUnit`, or use a live site. | No |
-| `SITE_WITHOUT_ORGANIZATION` | `FAILED_PRECONDITION` | The site belongs to no organization, so nothing is served there. | Set its `organization`. | No |
-| `SITE_HAS_RESOURCES` | `FAILED_PRECONDITION` | A site with resources cannot be deleted. | Delete or move its resources first. | No |
 | `CALENDAR_NOT_FOUND` | `NOT_FOUND` | The calendar named does not exist. | Check the parent, or `ListCalendars`. | No |
 | `CALENDAR_DELETED` | `FAILED_PRECONDITION` | Nothing can be added to a deleted calendar. | `UndeleteCalendar`, or use a live one. | No |
 | `CALENDAR_NOT_EMPTY` | `FAILED_PRECONDITION` | The calendar still has events or availability. | Send `force=true`, or delete them first. | No |

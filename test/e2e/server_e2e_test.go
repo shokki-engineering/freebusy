@@ -22,8 +22,6 @@
 package e2e
 
 import (
-	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc4519/organization/v1/organizationv1grpc"
-	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc4519/organizational_unit/v1/organizational_unitv1grpc"
 	"context"
 	"fmt"
 	"net"
@@ -69,8 +67,6 @@ func TestE2E_Hasura(t *testing.T) {
 // a test run should not leave rows behind.
 type e2eClients struct {
 	suffix         string
-	organizations  organizationv1grpc.OrganizationsClient
-	units          organizational_unitv1grpc.OrganizationalUnitsClient
 	availability   allocationpbv1.AllocationServiceClient
 	holds          allocationpbv1.HoldServiceClient
 	reservations   reservationpbv1.ReservationServiceClient
@@ -89,8 +85,6 @@ func serverLifecycle(t *testing.T, cc *grpc.ClientConn, repos directory.Reposito
 	t.Helper()
 	c := &e2eClients{
 		suffix:         fmt.Sprintf("%d", time.Now().UnixNano()%1_000_000_000),
-		organizations:  organizationv1grpc.NewOrganizationsClient(cc),
-		units:          organizational_unitv1grpc.NewOrganizationalUnitsClient(cc),
 		availability:   allocationpbv1.NewAllocationServiceClient(cc),
 		holds:          allocationpbv1.NewHoldServiceClient(cc),
 		reservations:   reservationpbv1.NewReservationServiceClient(cc),
@@ -103,7 +97,6 @@ func serverLifecycle(t *testing.T, cc *grpc.ClientConn, repos directory.Reposito
 	}
 
 	rejectionFlow(t, c)
-	tenancyFlow(t, c)
 	reservationFlow(t, c)
 	inventoryFlow(t, c)
 	splitFlow(t, c)
@@ -121,10 +114,9 @@ func rejectionFlow(t *testing.T, c *e2eClients) {
 	wantCode(t, err, codes.InvalidArgument, "malformed reservation name")
 
 	_, err = c.holds.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{
-		Parent: "properties/p1",
-		Hold:   &allocationpbv1.Hold{},
+		Hold: &allocationpbv1.Hold{Replaces: "properties/p1"},
 	})
-	wantCode(t, err, codes.InvalidArgument, "a hold's parent must be a site")
+	wantCode(t, err, codes.InvalidArgument, "a hold may replace only a hold")
 }
 
 // wantCode asserts err carries the expected gRPC status code.

@@ -18,9 +18,9 @@ package directory
 // has expired. A stale expire_time therefore never purges anything.
 //
 // Children go before parents -- events and availability, calendars,
-// resources, sites, organizations -- and PurgeExpired keeps any record
-// something still refers to (a child row, deleted or not, or a foreign key
-// from freebusy's own tables, such as a hold's site), so nothing is purged
+// resources -- and PurgeExpired keeps any record something still refers to
+// (a child row, deleted or not, or a foreign key from freebusy's own tables,
+// such as an allocation's resource), so nothing is purged
 // out from under a record that names it. Kept records are counted in
 // freebusy.purge.kept and wait for a later sweep.
 
@@ -29,8 +29,6 @@ import (
 	"errors"
 	"time"
 
-	organizationv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organization/v1"
-	organizational_unitv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organizational_unit/v1"
 	calendarv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
 	eventv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	availabilityv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
@@ -91,9 +89,6 @@ func NewPurger(repos Repositories, retention time.Duration, meter telemetry.Mete
 	resources := func(ctx context.Context, in repox.ListInput) ([]deletable, string, error) {
 		return records(repos.Resources.List(ctx, in))
 	}
-	units := func(ctx context.Context, in repox.ListInput) ([]deletable, string, error) {
-		return records(repos.OrganizationalUnits.List(ctx, in))
-	}
 	if meter == nil {
 		meter = telemetry.NoopMeter
 	}
@@ -140,26 +135,6 @@ func NewPurger(repos Repositories, retention time.Duration, meter telemetry.Mete
 					return err
 				},
 				purgeExpired: repos.Resources.PurgeExpired,
-			},
-			{
-				kind: "organizational_unit",
-				list: units,
-				expire: func(ctx context.Context, name, etag string, at *timestamppb.Timestamp) error {
-					_, err := repos.OrganizationalUnits.UpdateOutputOnly(ctx, &organizational_unitv1.OrganizationalUnit{Name: name, Etag: etag, ExpireTime: at}, []string{"expire_time"})
-					return err
-				},
-				purgeExpired: repos.OrganizationalUnits.PurgeExpired,
-			},
-			{
-				kind: "organization",
-				list: func(ctx context.Context, in repox.ListInput) ([]deletable, string, error) {
-					return records(repos.Organizations.List(ctx, in))
-				},
-				expire: func(ctx context.Context, name, etag string, at *timestamppb.Timestamp) error {
-					_, err := repos.Organizations.UpdateOutputOnly(ctx, &organizationv1.Organization{Name: name, Etag: etag, ExpireTime: at}, []string{"expire_time"})
-					return err
-				},
-				purgeExpired: repos.Organizations.PurgeExpired,
 			},
 		}}
 }

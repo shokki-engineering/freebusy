@@ -60,8 +60,6 @@ type Services struct {
 	Allocation     *allocation.Server
 	Reservations   *reservation.Server
 	Webhooks       *webhook.Server
-	Organizations  *directory.OrganizationServer
-	Units          *directory.OrganizationalUnitServer
 	Resources      *directory.ResourceServer
 	Calendars      *directory.CalendarServer
 	Availabilities *directory.AvailabilityServer
@@ -72,8 +70,6 @@ type Services struct {
 	// it rebuilds and extends itself.
 	ReadModel *allocation.DayProjection
 
-	// Sites decides whether a site or an organization a call names is live.
-	Sites *directory.Sites
 	// Purger ends soft deletes once their retention passes.
 	Purger *directory.Purger
 
@@ -123,13 +119,10 @@ func New(conn *database.Connection, s Settings) *Services {
 		ReadModel:      readModel,
 		Reservations:   reservation.NewServer(reservationStore(conn), engine),
 		Webhooks:       webhook.NewServer(webhook.NewRepositories(conn.Repox()), s.Webhooks),
-		Organizations:  directory.NewOrganizationServer(repos),
-		Units:          directory.NewOrganizationalUnitServer(repos),
 		Resources:      directory.NewResourceServer(repos),
 		Calendars:      directory.NewCalendarServer(repos, engine),
 		Availabilities: directory.NewAvailabilityServer(repos),
 		Events:         directory.NewEventServer(repos),
-		Sites:          directory.NewSites(repos),
 		Purger:         directory.NewPurger(repos, s.Retention, telemetry.Meter()),
 		search:         s.OpenSearch,
 	}
@@ -139,14 +132,12 @@ func New(conn *database.Connection, s Settings) *Services {
 // through after request validation (protovalidate, which runtime-go's
 // grpc.WithValidation and grpc.NewValidationInterceptor put first): hints
 // rewrites the generic errors anything after it returns into ones naming what
-// to do; sites refuses a call naming a site or organization that is missing
-// or deleted; then `request_id` is honoured on every RPC that declares it --
+// to do; then `request_id` is honoured on every RPC that declares it --
 // so a request that was never going to be served cannot claim an idempotency
 // key. The server and the e2e harness run this one list.
 func (s *Services) Interceptors() []grpc.UnaryServerInterceptor {
 	return []grpc.UnaryServerInterceptor{
 		hints.New(hints.Options{Product: "freebusy"}).Interceptor(),
-		sitesInterceptor(s.Sites),
 		idempotencyInterceptor(s.Conn),
 	}
 }

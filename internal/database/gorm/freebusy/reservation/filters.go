@@ -35,7 +35,7 @@ var ReservationFilterSpec = filterx.Spec{
 		"customer":      {Column: "customer", Kind: filterx.KindText},
 		"end_time":      {Column: "end_time", Kind: filterx.KindTimestamp},
 		"etag":          {Column: "etag", Kind: filterx.KindText},
-		"hold":          {Column: "hold", Kind: filterx.KindText},
+		"hold":          {Column: "hold", Kind: filterx.KindRef},
 		"last_change":   {Column: "last_change", Kind: filterx.KindEnum, EnumPrefix: "CHANGE_"},
 		"name":          {Column: "name", Kind: filterx.KindText},
 		"replacement":   {Column: "replacement", Kind: filterx.KindText},
@@ -45,7 +45,7 @@ var ReservationFilterSpec = filterx.Spec{
 		"state":         {Column: "state", Kind: filterx.KindEnum, EnumPrefix: "RESERVATION_STATE_"},
 		"update_time":   {Column: "update_time", Kind: filterx.KindTimestamp},
 	},
-	Search: []string{"customer", "hold"},
+	Search: []string{"customer"},
 	Sort: map[string]filterx.SortSpec{
 		"cancel_reason": {Column: "cancel_reason", Kind: filterx.KindText},
 		"cancel_time":   {Column: "cancel_time", Kind: filterx.KindTimestamp},

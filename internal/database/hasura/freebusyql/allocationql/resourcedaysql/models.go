@@ -39,8 +39,6 @@ type AllocationResourceDays struct {
 	FreeFraction *float64 `graphql:"freeFraction"`
 	// Id selects the "id" field.
 	Id string `graphql:"id"`
-	// Organization selects the "organization" field; nil when the column is NULL.
-	Organization *string `graphql:"organization"`
 	// OrganizationalUnit selects the "organizationalUnit" field; nil when the column is NULL.
 	OrganizationalUnit *string `graphql:"organizationalUnit"`
 	// Resource selects the "resource" field.
@@ -141,17 +139,6 @@ type AllocationResourceDaysAggExp struct {
 		// Min selects the "min" field; nil when the column is NULL.
 		Min *string `graphql:"min"`
 	} `graphql:"id"`
-	// Organization selects the "organization" field.
-	Organization struct {
-		// Count selects the "_count" field.
-		Count graphql.Int64 `graphql:"_count"`
-		// CountDistinct selects the "_count_distinct" field.
-		CountDistinct graphql.Int64 `graphql:"_count_distinct"`
-		// Max selects the "max" field; nil when the column is NULL.
-		Max *string `graphql:"max"`
-		// Min selects the "min" field; nil when the column is NULL.
-		Min *string `graphql:"min"`
-	} `graphql:"organization"`
 	// OrganizationalUnit selects the "organizationalUnit" field.
 	OrganizationalUnit struct {
 		// Count selects the "_count" field.
@@ -229,8 +216,6 @@ type DeleteAllocationResourceDaysByIdResponse struct {
 		FreeFraction *float64 `graphql:"freeFraction"`
 		// Id selects the "id" field.
 		Id string `graphql:"id"`
-		// Organization selects the "organization" field; nil when the column is NULL.
-		Organization *string `graphql:"organization"`
 		// OrganizationalUnit selects the "organizationalUnit" field; nil when the column is NULL.
 		OrganizationalUnit *string `graphql:"organizationalUnit"`
 		// Resource selects the "resource" field.
@@ -262,8 +247,6 @@ type InsertAllocationResourceDaysResponse struct {
 		FreeFraction *float64 `graphql:"freeFraction"`
 		// Id selects the "id" field.
 		Id string `graphql:"id"`
-		// Organization selects the "organization" field; nil when the column is NULL.
-		Organization *string `graphql:"organization"`
 		// OrganizationalUnit selects the "organizationalUnit" field; nil when the column is NULL.
 		OrganizationalUnit *string `graphql:"organizationalUnit"`
 		// Resource selects the "resource" field.
@@ -295,8 +278,6 @@ type UpdateAllocationResourceDaysByIdResponse struct {
 		FreeFraction *float64 `graphql:"freeFraction"`
 		// Id selects the "id" field.
 		Id string `graphql:"id"`
-		// Organization selects the "organization" field; nil when the column is NULL.
-		Organization *string `graphql:"organization"`
 		// OrganizationalUnit selects the "organizationalUnit" field; nil when the column is NULL.
 		OrganizationalUnit *string `graphql:"organizationalUnit"`
 		// Resource selects the "resource" field.

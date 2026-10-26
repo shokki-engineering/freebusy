@@ -30,7 +30,7 @@ service ReservationService {
   option (google.api.default_host) = "freebusy.shokki.engineering";
   // Hand-written, not generated: every method drives the reservation state
   // machine and the hold it converts, and its reads are served through the
-  // site's list cache.
+  // list cache.
   option (service.v1.service) = {skip: true};
   option (mcp.v1.service) = {
     app: {
@@ -48,15 +48,14 @@ service ReservationService {
   // hold has lapsed or been released.
   rpc CreateReservation(CreateReservationRequest) returns (Reservation) {
     option (google.api.http) = {
-      post: "/v1/{parent=organizationalUnits/*}/reservations"
+      post: "/v1/reservations"
       body: "reservation"
     };
-    option (google.api.method_signature) = "parent,reservation,reservation_id";
+    option (google.api.method_signature) = "reservation,reservation_id";
     option (mcp.v1.tool) = {
       description:
         "Confirm a live hold as a reservation: the booking, and the last step. "
-        "parent: the hold's site, organizationalUnits/{site}. reservation.hold: "
-        "the hold's name. Optional: reservation.customer (users/{user}), "
+        "reservation.hold: the hold's name. Optional: reservation.customer (users/{user}), "
         "reservation.attributes (any JSON object kept with it). Safe to retry: a "
         "hold backs at most one reservation. Fails with HOLD_NOT_ACTIVE once the "
         "hold has expired or been released: take a new hold."
@@ -65,19 +64,18 @@ service ReservationService {
 
   // Retrieves one reservation.
   rpc GetReservation(GetReservationRequest) returns (Reservation) {
-    option (google.api.http) = {get: "/v1/{name=organizationalUnits/*/reservations/*}"};
+    option (google.api.http) = {get: "/v1/{name=reservations/*}"};
     option (google.api.method_signature) = "name";
     option (mcp.v1.tool) = {description: "Get a reservation."};
   }
 
-  // Lists a site's reservations.
+  // Lists reservations.
   rpc ListReservations(ListReservationsRequest) returns (ListReservationsResponse) {
-    option (google.api.http) = {get: "/v1/{parent=organizationalUnits/*}/reservations"};
-    option (google.api.method_signature) = "parent";
+    option (google.api.http) = {get: "/v1/reservations"};
+    option (google.api.method_signature) = "";
     option (mcp.v1.tool) = {
       description:
-        "List a site's reservations. parent: organizationalUnits/{site}. filter "
-        "per AIP-160, e.g. state = RESERVATION_STATE_CONFIRMED; order_by per "
+        "List reservations. filter per AIP-160, e.g. state = RESERVATION_STATE_CONFIRMED; order_by per "
         "AIP-132; page_size defaults to 50."
     };
   }
@@ -91,14 +89,14 @@ service ReservationService {
   // reservation is confirmed.
   rpc UpdateReservation(UpdateReservationRequest) returns (Reservation) {
     option (google.api.http) = {
-      patch: "/v1/{reservation.name=organizationalUnits/*/reservations/*}"
+      patch: "/v1/{reservation.name=reservations/*}"
       body: "reservation"
     };
     option (google.api.method_signature) = "reservation,update_mask";
     option (mcp.v1.tool) = {
       description:
         "Change who a confirmed reservation is for, or what is kept with it. "
-        "reservation.name: organizationalUnits/{site}/reservations/{reservation}. "
+        "reservation.name: reservations/{reservation}. "
         "update_mask is required, comma-separated: customer (users/{user}, empty "
         "to clear), attributes (any JSON object; replaces the old one whole), "
         "e.g. \"customer,attributes\". Send reservation.etag, as "
@@ -114,14 +112,14 @@ service ReservationService {
   // nothing.
   rpc CancelReservation(CancelReservationRequest) returns (Reservation) {
     option (google.api.http) = {
-      post: "/v1/{name=organizationalUnits/*/reservations/*}:cancel"
+      post: "/v1/{name=reservations/*}:cancel"
       body: "*"
     };
     option (google.api.method_signature) = "name";
     option (mcp.v1.tool) = {
       description:
         "Cancel a confirmed reservation and free its resources. name: "
-        "organizationalUnits/{site}/reservations/{reservation}. reason is "
+        "reservations/{reservation}. reason is "
         "optional and kept as cancel_reason."
     };
   }
@@ -140,17 +138,17 @@ service ReservationService {
   // repeating the call with the same hold returns the same replacement.
   rpc RescheduleReservation(RescheduleReservationRequest) returns (Reservation) {
     option (google.api.http) = {
-      post: "/v1/{name=organizationalUnits/*/reservations/*}:reschedule"
+      post: "/v1/{name=reservations/*}:reschedule"
       body: "*"
     };
     option (google.api.method_signature) = "name,hold";
     option (mcp.v1.tool) = {
       description:
         "Move a confirmed reservation to a new time: first call hold_service-create_hold_v1 for the "
-        "new window at the same site, with hold.replaces set to this reservation's "
+        "new window, with hold.replaces set to this reservation's "
         "hold so a window overlapping the old one can keep the same resources, "
         "then call this with hold set to the new hold's name. name: "
-        "organizationalUnits/{site}/reservations/{reservation}. The old slot is "
+        "reservations/{reservation}. The old slot is "
         "freed only once the new one is confirmed, so the booking is never lost."
     };
   }

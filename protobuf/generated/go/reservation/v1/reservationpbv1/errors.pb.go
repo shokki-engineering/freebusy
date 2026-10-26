@@ -37,9 +37,6 @@ const (
 	// The reservation's hold does not exist, or CreateHold's hold.replaces names
 	// one that does not.
 	ErrorReason_ERROR_REASON_HOLD_NOT_FOUND ErrorReason = 1
-	// The hold is at a different site from the reservation's parent, or
-	// CreateHold's hold.replaces is a hold at another site.
-	ErrorReason_ERROR_REASON_HOLD_AT_ANOTHER_SITE ErrorReason = 2
 	// The hold lapsed before the reservation was confirmed; the reservation
 	// failed.
 	ErrorReason_ERROR_REASON_HOLD_LAPSED ErrorReason = 3
@@ -68,7 +65,6 @@ var (
 	ErrorReason_name = map[int32]string{
 		0:  "ERROR_REASON_UNSPECIFIED",
 		1:  "ERROR_REASON_HOLD_NOT_FOUND",
-		2:  "ERROR_REASON_HOLD_AT_ANOTHER_SITE",
 		3:  "ERROR_REASON_HOLD_LAPSED",
 		4:  "ERROR_REASON_RESERVATION_ID_TAKEN",
 		5:  "ERROR_REASON_RESERVATION_FAILED",
@@ -82,7 +78,6 @@ var (
 	ErrorReason_value = map[string]int32{
 		"ERROR_REASON_UNSPECIFIED":               0,
 		"ERROR_REASON_HOLD_NOT_FOUND":            1,
-		"ERROR_REASON_HOLD_AT_ANOTHER_SITE":      2,
 		"ERROR_REASON_HOLD_LAPSED":               3,
 		"ERROR_REASON_RESERVATION_ID_TAKEN":      4,
 		"ERROR_REASON_RESERVATION_FAILED":        5,
@@ -126,13 +121,11 @@ var File_freebusy_reservation_v1_errors_proto protoreflect.FileDescriptor
 
 const file_freebusy_reservation_v1_errors_proto_rawDesc = "" +
 	"\n" +
-	"$freebusy/reservation/v1/errors.proto\x12\x17freebusy.reservation.v1\x1a\x1cservice/v1/annotations.proto*\xe4\x12\n" +
+	"$freebusy/reservation/v1/errors.proto\x12\x17freebusy.reservation.v1\x1a\x1cservice/v1/annotations.proto*\xf5\x10\n" +
 	"\vErrorReason\x12\x1c\n" +
 	"\x18ERROR_REASON_UNSPECIFIED\x10\x00\x12\xf5\x01\n" +
 	"\x1bERROR_REASON_HOLD_NOT_FOUND\x10\x01\x1a\xd3\x01\xea\xf0\x19\xce\x01\n" +
-	"\x10INVALID_ARGUMENT\x12cThe reservation's `hold` does not exist, or `CreateHold`'s `hold.replaces` names one that does not.\x1aSTake a hold first with `CreateHold`; for `replaces`, send the reservation's `hold`. \x01\x12\x95\x02\n" +
-	"!ERROR_REASON_HOLD_AT_ANOTHER_SITE\x10\x02\x1a\xed\x01\xea\xf0\x19\xe8\x01\n" +
-	"\x10INVALID_ARGUMENT\x12{The hold is at a different site from the reservation's parent, or `CreateHold`'s `hold.replaces` is a hold at another site.\x1aUSend the hold's own site as `parent`; a hold replaces only a booking at its own site. \x01\x12\xdb\x01\n" +
+	"\x10INVALID_ARGUMENT\x12cThe reservation's `hold` does not exist, or `CreateHold`'s `hold.replaces` names one that does not.\x1aSTake a hold first with `CreateHold`; for `replaces`, send the reservation's `hold`. \x01\x12\xdb\x01\n" +
 	"\x18ERROR_REASON_HOLD_LAPSED\x10\x03\x1a\xbc\x01\xea\xf0\x19\xb7\x01\n" +
 	"\x13FAILED_PRECONDITION\x12MThe hold lapsed before the reservation was confirmed; the reservation failed.\x1aOTake a new hold and create the reservation again; hold longer, or `ExtendHold`. \x03\x12\xa2\x01\n" +
 	"!ERROR_REASON_RESERVATION_ID_TAKEN\x10\x04\x1a{\xea\xf0\x19w\n" +
@@ -152,7 +145,7 @@ const file_freebusy_reservation_v1_errors_proto_rawDesc = "" +
 	"\x13FAILED_PRECONDITION\x12IThe new slot could not be booked; the reservation keeps its original one.\x1a'Take a fresh hold and reschedule again. \x03\x12\xa0\x02\n" +
 	" ERROR_REASON_HOLD_FOR_RESCHEDULE\x10\v\x1a\xf9\x01\xea\xf0\x19\xf4\x01\n" +
 	"\x13FAILED_PRECONDITION\x12\x84\x01The hold was taken to replace a booking (`hold.replaces`), so it can only be used to reschedule the reservation made from that hold.\x1aT`RescheduleReservation` that reservation onto it, or take a hold without `replaces`. \x03\x1a\x12\xe2\xf0\x19\x0e\n" +
-	"\ffreebusy.devB\x95\x02\n" +
+	"\ffreebusy.dev\"\x04\b\x02\x10\x02*!ERROR_REASON_HOLD_AT_ANOTHER_SITEB\x95\x02\n" +
 	"\x1bcom.freebusy.reservation.v1B\vErrorsProtoP\x01Zkgithub.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
 
 var (

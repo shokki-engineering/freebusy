@@ -162,7 +162,7 @@ func TestUpdateOnlyConfirmed(t *testing.T) {
 	if f.store.writes != 0 {
 		t.Fatalf("%d writes to reservations that cannot be updated", f.store.writes)
 	}
-	if _, err := f.update(&reservationpbv1.Reservation{Name: site + "/reservations/missing"}, "customer"); status.Code(err) != codes.NotFound {
+	if _, err := f.update(&reservationpbv1.Reservation{Name: "reservations/missing"}, "customer"); status.Code(err) != codes.NotFound {
 		t.Fatalf("missing reservation: %v", err)
 	}
 }
@@ -176,7 +176,7 @@ func TestUpdateFinishesPending(t *testing.T) {
 	if _, err := f.create(h); err == nil {
 		t.Fatal("expected the interrupted create to fail")
 	}
-	name := site + "/reservations/h1"
+	name := "reservations/h1"
 	got, err := f.update(&reservationpbv1.Reservation{Name: name, Customer: "users/ben"}, "customer")
 	if err != nil || got.GetState() != reservationpbv1.ReservationState_RESERVATION_STATE_CONFIRMED || got.GetCustomer() != "users/ben" {
 		t.Fatalf("update of a pending reservation: %v %v", got, err)

@@ -49,9 +49,9 @@ const (
 // a client guess that races.
 type Hold struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The hold name. Nested under the site whose resources it takes, so a hold
-	// is listed and swept per site without joining through every resource.
-	// Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	// The hold name. Top-level: a hold takes resources wherever they are, and
+	// grouping them by place is the business of whatever is built on top.
+	// Format: holds/{hold}
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The concrete resources this hold has taken, one per unit of `quantity`.
 	// Chosen by the server from the candidates the request offered.
@@ -63,7 +63,7 @@ type Hold struct {
 	// Stored as text, its two ends in RFC 3339 joined by "/".
 	Window *interval.Interval `protobuf:"bytes,3,opt,name=window,proto3" json:"window,omitempty"`
 	// Candidate resources the allocator may choose from, supplied on create.
-	// Empty offers every resource the site holds. Immutable: the choice is made
+	// Empty offers every resource, narrowed by `candidate_filter`. Immutable: the choice is made
 	// once, and re-offering a different set is a different allocation.
 	// Format: resources/{resource}
 	CandidateResources []string `protobuf:"bytes,12,rep,name=candidate_resources,json=candidateResources,proto3" json:"candidate_resources,omitempty"`
@@ -86,8 +86,7 @@ type Hold struct {
 	// Opaque version for optimistic concurrency (AIP-154); echo on update/delete.
 	Etag string `protobuf:"bytes,11,opt,name=etag,proto3" json:"etag,omitempty"`
 	// The hold of the reservation this hold is taken to replace with
-	// RescheduleReservation: that reservation's `hold`, converted and at the
-	// same site. Its claims do not count against this hold, so a new window
+	// RescheduleReservation: that reservation's `hold`, converted. Its claims do not count against this hold, so a new window
 	// overlapping the old one -- an extension, a shift by an hour -- can keep
 	// the same resources. Until the move completes this hold claims only the
 	// time the old one does not; RescheduleReservation hands the rest over in
@@ -95,7 +94,7 @@ type Hold struct {
 	// Such a hold can only be used to reschedule that reservation. (A hold,
 	// though no resource_reference says so: AIP-121 allows no cycle of mutable
 	// references, and this one is a hold naming a hold.)
-	// Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	// Format: holds/{hold}
 	Replaces string `protobuf:"bytes,13,opt,name=replaces,proto3" json:"replaces,omitempty"`
 	// An AIP-160 filter narrowing the resources the allocator may choose from,
 	// supplied on create, alongside `candidate_resources`: the same filter
@@ -242,14 +241,14 @@ func (x *Hold) GetCandidateFilter() string {
 // `expire_time` passes, with no sweeper write needed, because every read
 // filters on it.
 //
-// It sits under the site and names its hold, rather than nesting under the
-// hold: the engine asks about allocations by resource and time across a whole
-// site, never hold by hold, and a hold with child resources would owe
-// DeleteHold a `force` flag guarding rows no caller can see.
+// It is top-level and names its hold, rather than nesting under the hold: the
+// engine asks about allocations by resource and time, never hold by hold, and
+// a hold with child resources would owe DeleteHold a `force` flag guarding
+// rows no caller can see.
 type Allocation struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The allocation name, under the site whose resource it takes.
-	// Format: organizationalUnits/{organizational_unit}/allocations/{allocation}
+	// The allocation name.
+	// Format: allocations/{allocation}
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The resource taken.
 	// Format: resources/{resource}
@@ -266,7 +265,7 @@ type Allocation struct {
 	// Creation timestamp.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
 	// The hold that took it. Deleting the hold deletes its allocations with it.
-	// Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	// Format: holds/{hold}
 	Hold          string `protobuf:"bytes,7,opt,name=hold,proto3" json:"hold,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -506,9 +505,6 @@ type AvailabilityMatch struct {
 	// The free resource.
 	// Format: resources/{resource}
 	Resource string `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
-	// The site it belongs to.
-	// Format: organizationalUnits/{organizational_unit}
-	OrganizationalUnit string `protobuf:"bytes,2,opt,name=organizational_unit,json=organizationalUnit,proto3" json:"organizational_unit,omitempty"`
 	// The span it is free for, which may be narrower than the searched window.
 	Window *interval.Interval `protobuf:"bytes,3,opt,name=window,proto3" json:"window,omitempty"`
 	// RESOURCE-TYPE values carried by the resource, RFC 9073 section 6.3, echoed
@@ -553,13 +549,6 @@ func (*AvailabilityMatch) Descriptor() ([]byte, []int) {
 func (x *AvailabilityMatch) GetResource() string {
 	if x != nil {
 		return x.Resource
-	}
-	return ""
-}
-
-func (x *AvailabilityMatch) GetOrganizationalUnit() string {
-	if x != nil {
-		return x.OrganizationalUnit
 	}
 	return ""
 }
@@ -700,9 +689,9 @@ var File_freebusy_allocation_v1_allocation_proto protoreflect.FileDescriptor
 
 const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	"\n" +
-	"'freebusy/allocation/v1/allocation.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a\"freebusy/allocation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1agoogle/type/interval.proto\x1a\x1cservice/v1/annotations.proto\x1a\x1astore/v1/annotations.proto\"\xb1\b\n" +
-	"\x04Hold\x12I\n" +
-	"\x04name\x18\x01 \x01(\tB5\xe2A\x01\b\xbaH.\xd8\x01\x01r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\x04name\x12H\n" +
+	"'freebusy/allocation/v1/allocation.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1bentity/v1/annotations.proto\x1a\"freebusy/allocation/v1/enums.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1agoogle/type/interval.proto\x1a\x1cservice/v1/annotations.proto\x1a\x1astore/v1/annotations.proto\"\xbe\a\n" +
+	"\x04Hold\x12/\n" +
+	"\x04name\x18\x01 \x01(\tB\x1b\xe2A\x01\b\xbaH\x14\xd8\x01\x01r\x0f2\r^holds/[^/]+$R\x04name\x12H\n" +
 	"\tresources\x18\x02 \x03(\tB*\xe2A\x01\x03\xfaA#\n" +
 	"!the-protobuf-project.org/ResourceR\tresources\x124\n" +
 	"\x06window\x18\x03 \x01(\v2\x15.google.type.IntervalB\x05\xe2A\x02\x02\x05R\x06window\x12\\\n" +
@@ -718,15 +707,15 @@ const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	"\vupdate_time\x18\n" +
 	" \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"updateTime\x12\x18\n" +
-	"\x04etag\x18\v \x01(\tB\x04\xe2A\x01\x03R\x04etag\x12R\n" +
-	"\breplaces\x18\r \x01(\tB6\xe2A\x02\x01\x05\xbaH.\xd8\x01\x01r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\breplaces\x12B\n" +
+	"\x04etag\x18\v \x01(\tB\x04\xe2A\x01\x03R\x04etag\x128\n" +
+	"\breplaces\x18\r \x01(\tB\x1c\xe2A\x02\x01\x05\xbaH\x14\xd8\x01\x01r\x0f2\r^holds/[^/]+$R\breplaces\x12B\n" +
 	"\x10candidate_filter\x18\x0e \x01(\tB\x17\xe2A\x02\x01\x05\xbaH\x05r\x03\x18\x80\x10ڵ\x18\x06\n" +
-	"\x04TEXTR\x0fcandidateFilter:\xd3\x01\xeaAb\n" +
-	"\x1bfreebusy.allocation.v1/Hold\x126organizationalUnits/{organizational_unit}/holds/{hold}*\x05holds2\x04hold\xca\xf3\x18'\x18\x01*\x14\n" +
+	"\x04TEXTR\x0fcandidateFilter:\x94\x01\xeaA8\n" +
+	"\x1bfreebusy.allocation.v1/Hold\x12\fholds/{hold}*\x05holds2\x04hold\xca\xf3\x18'\x18\x01*\x14\n" +
 	"\x05state\n" +
 	"\vexpire_time*\r\n" +
-	"\vupdate_time\xd2\xf0\x19?\n" +
-	"\rfreebusy.hold\x12\acreated\x12\aupdated\x12\adeleted\x1a\x13organizational_unitJ\x04\b\a\x10\b\"\x81\x05\n" +
+	"\vupdate_time\xd2\xf0\x19*\n" +
+	"\rfreebusy.hold\x12\acreated\x12\aupdated\x12\adeletedJ\x04\b\a\x10\b\"\xd6\x04\n" +
 	"\n" +
 	"Allocation\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12F\n" +
@@ -740,8 +729,8 @@ const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	"\vcreate_time\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"createTime\x128\n" +
 	"\x04hold\x18\a \x01(\tB$\xe2A\x01\x03\xfaA\x1d\n" +
-	"\x1bfreebusy.allocation.v1/HoldR\x04hold:\xd2\x01\xeaA\x80\x01\n" +
-	"!freebusy.allocation.v1/Allocation\x12BorganizationalUnits/{organizational_unit}/allocations/{allocation}*\vallocations2\n" +
+	"\x1bfreebusy.allocation.v1/HoldR\x04hold:\xa7\x01\xeaAV\n" +
+	"!freebusy.allocation.v1/Allocation\x12\x18allocations/{allocation}*\vallocations2\n" +
 	"allocationҵ\x18\"\x12 \n" +
 	"\bresource\x12\n" +
 	"start_time\x1a\bend_time\xca\xf3\x18$\x18\x01* \n" +
@@ -761,15 +750,13 @@ const file_freebusy_allocation_v1_allocation_proto_rawDesc = "" +
 	"\x04code\x18\x01 \x01(\x0e2,.freebusy.allocation.v1.UnbookableReasonCodeR\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12B\n" +
 	"\bresource\x18\x03 \x01(\tB&\xfaA#\n" +
-	"!the-protobuf-project.org/ResourceR\bresource\"\xb3\x02\n" +
+	"!the-protobuf-project.org/ResourceR\bresource\"\xeb\x01\n" +
 	"\x11AvailabilityMatch\x12B\n" +
 	"\bresource\x18\x01 \x01(\tB&\xfaA#\n" +
-	"!the-protobuf-project.org/ResourceR\bresource\x12a\n" +
-	"\x13organizational_unit\x18\x02 \x01(\tB0\xfaA-\n" +
-	"+the-protobuf-project.org/OrganizationalUnitR\x12organizationalUnit\x12-\n" +
+	"!the-protobuf-project.org/ResourceR\bresource\x12-\n" +
 	"\x06window\x18\x03 \x01(\v2\x15.google.type.IntervalR\x06window\x12%\n" +
 	"\x0eresource_types\x18\x04 \x03(\tR\rresourceTypes\x12!\n" +
-	"\fdisplay_name\x18\x05 \x01(\tR\vdisplayName\"b\n" +
+	"\fdisplay_name\x18\x05 \x01(\tR\vdisplayNameJ\x04\b\x02\x10\x03R\x13organizational_unit\"b\n" +
 	"\vSearchFacet\x12\x14\n" +
 	"\x05field\x18\x01 \x01(\tR\x05field\x12=\n" +
 	"\abuckets\x18\x02 \x03(\v2#.freebusy.allocation.v1.FacetBucketR\abuckets\"9\n" +

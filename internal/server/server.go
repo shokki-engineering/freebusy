@@ -96,6 +96,15 @@ func serviceOptions(svc *Service) ([]grpc.Option, error) {
 		// any replica answers any MCP request.
 		opts = append(opts, grpc.WithStatelessMCP())
 	}
+	cors, err := corsOption(config.Get().Server.CORS)
+	if err != nil {
+		return nil, err
+	}
+	if cors != nil {
+		// Browsers on the allowed origins may call the HTTP port; preflights
+		// are answered before any gateway handler runs.
+		opts = append(opts, cors)
+	}
 	tlsCfg := config.Get().Server.TLS
 	if tlsCfg.Enabled() {
 		if _, err := tls.LoadX509KeyPair(tlsCfg.CertFile, tlsCfg.KeyFile); err != nil {

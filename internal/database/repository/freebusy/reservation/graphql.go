@@ -76,31 +76,18 @@ func NewGraphQLReservationRepository(svc *freebusyql.Service) *GraphQLReservatio
 	return &GraphQLReservationRepository{Svc: svc}
 }
 
-// Create persists in under parent and returns the stored record.
-func (r *GraphQLReservationRepository) Create(ctx context.Context, parent string, in *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, err
-	}
+// Create persists in and returns the stored record.
+func (r *GraphQLReservationRepository) Create(ctx context.Context, in *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
 	id := repox.NewULID()
-	rowID := id
 	if in.GetName() != "" {
-		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "reservations")
+		ids, err := repox.SplitName(in.GetName(), "reservations")
 		if err != nil {
 			return nil, err
-		}
-		for i := range parentIDs {
-			if ids[i] != parentIDs[i] {
-				return nil, fmt.Errorf("%w: name %q is not under parent %q", repox.ErrInvalidArgument, in.GetName(), parent)
-			}
 		}
 		id = ids[len(ids)-1]
 	}
 	in = proto.Clone(in).(*reservationpbv1.Reservation)
-	in.Name = FormatReservationName(parentIDs[0], id)
-	// The id is unique only under the parent, so the row is keyed by a
-	// surrogate of its own: the id itself only when it was minted here.
-	id = rowID
+	in.Name = FormatReservationName(id)
 	if h := r.Hooks.BeforeCreate; h != nil {
 		if err := h(ctx, in); err != nil {
 			return nil, err
@@ -108,7 +95,6 @@ func (r *GraphQLReservationRepository) Create(ctx context.Context, parent string
 	}
 	ci := reservationToCreateInput(in)
 	ci.Id = id
-	ci.OrganizationalUnitId = parentIDs[0]
 	ci.Etag = repox.NewULID()
 	now := tsToStr(timestamppb.New(time.Now().UTC()))
 	ci.CreateTime = now
@@ -121,37 +107,20 @@ func (r *GraphQLReservationRepository) Create(ctx context.Context, parent string
 
 // Get returns the record addressed by its resource name.
 func (r *GraphQLReservationRepository) Get(ctx context.Context, name string) (*reservationpbv1.Reservation, error) {
-	row, err := r.find(ctx, name)
+	ids, err := repox.SplitName(name, "reservations")
 	if err != nil {
 		return nil, err
 	}
-	return r.toProto(ctx, row, nil)
+	return r.get(ctx, ids[len(ids)-1])
 }
 
-// rowID returns the surrogate key of the row named name, looked up by name:
-// the id is unique only under the parent, so it is not the key.
-// repox.ErrNotFound when there is no such row.
-func (r *GraphQLReservationRepository) rowID(ctx context.Context, name string) (string, error) {
-	row, err := r.find(ctx, name)
+// rowID returns the surrogate key of the row named name: its bare id.
+func (r *GraphQLReservationRepository) rowID(_ context.Context, name string) (string, error) {
+	ids, err := repox.SplitName(name, "reservations")
 	if err != nil {
 		return "", err
 	}
-	return row.Id, nil
-}
-
-// find reads the row named name; repox.ErrNotFound when there is none.
-func (r *GraphQLReservationRepository) find(ctx context.Context, name string) (*resourceql.ReservationResource, error) {
-	if _, err := repox.SplitName(name, "organizationalUnits", "reservations"); err != nil {
-		return nil, err
-	}
-	row, err := r.Svc.Query.Reservation.Resource.Find(ctx, resourceql.List().Where(resourceql.Name.Eq(name)))
-	if err != nil {
-		return nil, mapGraphQLErr(err)
-	}
-	if row == nil {
-		return nil, repox.ErrNotFound
-	}
-	return row, nil
+	return ids[len(ids)-1], nil
 }
 
 // get loads by surrogate key — the private read every generated method
@@ -180,17 +149,9 @@ func (r *GraphQLReservationRepository) toProto(ctx context.Context, row *resourc
 	return out, nil
 }
 
-// List returns one page of records under parent.
-func (r *GraphQLReservationRepository) List(ctx context.Context, parent string, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, "", err
-	}
-	// AIP-159: "-" for the parent reads across every parent.
-	if parentIDs[len(parentIDs)-1] == "-" {
-		return r.list(ctx, in)
-	}
-	return r.list(ctx, in, resourceql.OrganizationalUnitId.Eq(parentIDs[len(parentIDs)-1]))
+// List returns one page of records.
+func (r *GraphQLReservationRepository) List(ctx context.Context, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
+	return r.list(ctx, in)
 }
 
 func (r *GraphQLReservationRepository) list(ctx context.Context, in repox.ListInput, scope ...graphql.Predicate) ([]*reservationpbv1.Reservation, string, error) {
@@ -243,11 +204,18 @@ func (r *GraphQLReservationRepository) UpdateWithOutputOnly(ctx context.Context,
 // update is Update's write, with the server-owned fields outputPaths names
 // (UpdateWithOutputOnly) merged into its patch.
 func (r *GraphQLReservationRepository) update(ctx context.Context, in *reservationpbv1.Reservation, paths, outputPaths []string) (*reservationpbv1.Reservation, error) {
-	row, err := r.find(ctx, in.GetName())
+	ids, err := repox.SplitName(in.GetName(), "reservations")
 	if err != nil {
 		return nil, err
 	}
-	id := row.Id
+	id := ids[len(ids)-1]
+	row, err := r.Svc.Query.Reservation.Resource.Get(ctx, id)
+	if err != nil {
+		return nil, mapGraphQLErr(err)
+	}
+	if row == nil {
+		return nil, repox.ErrNotFound
+	}
 	existingPB := reservationFromRow(row)
 	merged := proto.Clone(existingPB).(*reservationpbv1.Reservation)
 	applyReservationMask(merged, in, paths)
@@ -279,34 +247,22 @@ func (r *GraphQLReservationRepository) update(ctx context.Context, in *reservati
 	return r.get(ctx, id)
 }
 
-// newInput builds the insert a Batch queues for in under parent, and
+// newInput builds the insert a Batch queues for in, and
 // the record it stands for, named: the same resolution Create applies.
-func (r *GraphQLReservationRepository) newInput(parent string, in *reservationpbv1.Reservation) (resourceql.CreateInput, *reservationpbv1.Reservation, error) {
+func (r *GraphQLReservationRepository) newInput(in *reservationpbv1.Reservation) (resourceql.CreateInput, *reservationpbv1.Reservation, error) {
 	var ci resourceql.CreateInput
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return ci, nil, err
-	}
 	id := repox.NewULID()
-	rowID := id
 	if in.GetName() != "" {
-		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "reservations")
+		ids, err := repox.SplitName(in.GetName(), "reservations")
 		if err != nil {
 			return ci, nil, err
-		}
-		for i := range parentIDs {
-			if ids[i] != parentIDs[i] {
-				return ci, nil, fmt.Errorf("%w: name %q is not under parent %q", repox.ErrInvalidArgument, in.GetName(), parent)
-			}
 		}
 		id = ids[len(ids)-1]
 	}
 	in = proto.Clone(in).(*reservationpbv1.Reservation)
-	in.Name = FormatReservationName(parentIDs[0], id)
-	id = rowID // keyed as Create keys it
+	in.Name = FormatReservationName(id)
 	ci = reservationToCreateInput(in)
 	ci.Id = id
-	ci.OrganizationalUnitId = parentIDs[0]
 	ci.Etag = repox.NewULID()
 	now := tsToStr(timestamppb.New(time.Now().UTC()))
 	ci.CreateTime = now
@@ -405,7 +361,7 @@ func (r *GraphQLReservationRepository) UpdateOutputOnly(ctx context.Context, in 
 
 // Delete removes the record addressed by its resource name.
 func (r *GraphQLReservationRepository) Delete(ctx context.Context, name string) error {
-	if _, err := repox.SplitName(name, "organizationalUnits", "reservations"); err != nil {
+	if _, err := repox.SplitName(name, "reservations"); err != nil {
 		return err
 	}
 	if h := r.Hooks.BeforeDelete; h != nil {
@@ -436,7 +392,7 @@ func (r *GraphQLReservationRepository) remove(ctx context.Context, id string) er
 // repox.ListByKeys.
 func (r *GraphQLReservationRepository) ListByKeys(ctx context.Context, field string, keys []string, in repox.ListInput) ([]*reservationpbv1.Reservation, error) {
 	return repox.ListByKeys(ctx, field, keys, in, func(ctx context.Context, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
-		return r.List(ctx, "organizationalUnits/-", in)
+		return r.List(ctx, in)
 	})
 }
 
@@ -469,9 +425,9 @@ func (b *graphQLBatch) rowID(ctx context.Context, name string, resolve func(cont
 }
 
 // CreateReservation queues a create and returns the name the record will have.
-func (b *graphQLBatch) CreateReservation(parent string, in *reservationpbv1.Reservation) (string, error) {
+func (b *graphQLBatch) CreateReservation(in *reservationpbv1.Reservation) (string, error) {
 	r := &GraphQLReservationRepository{Svc: b.svc}
-	ci, named, err := r.newInput(parent, in)
+	ci, named, err := r.newInput(in)
 	if err != nil {
 		return "", err
 	}
@@ -491,7 +447,7 @@ func (b *graphQLBatch) CreateReservation(parent string, in *reservationpbv1.Rese
 // UpdateReservation queues Update; in.Etag, when set, guards it inside the
 // batch's request (see updateOps).
 func (b *graphQLBatch) UpdateReservation(in *reservationpbv1.Reservation, paths []string) {
-	if _, err := repox.SplitName(in.GetName(), "organizationalUnits", "reservations"); err != nil {
+	if _, err := repox.SplitName(in.GetName(), "reservations"); err != nil {
 		b.u.Fail(err)
 		return
 	}
@@ -510,7 +466,7 @@ func (b *graphQLBatch) UpdateReservation(in *reservationpbv1.Reservation, paths 
 // UpdateReservationWithOutputOnly queues UpdateWithOutputOnly; in.Etag, when
 // set, guards it inside the batch's request, as UpdateReservation's does.
 func (b *graphQLBatch) UpdateReservationWithOutputOnly(in *reservationpbv1.Reservation, paths, outputPaths []string) {
-	if _, err := repox.SplitName(in.GetName(), "organizationalUnits", "reservations"); err != nil {
+	if _, err := repox.SplitName(in.GetName(), "reservations"); err != nil {
 		b.u.Fail(err)
 		return
 	}
@@ -533,7 +489,7 @@ func (b *graphQLBatch) UpdateReservationOutputOnly(in *reservationpbv1.Reservati
 		b.u.Fail(fmt.Errorf("%w: UpdateOutputOnly needs the fields to write", repox.ErrInvalidArgument))
 		return
 	}
-	if _, err := repox.SplitName(in.GetName(), "organizationalUnits", "reservations"); err != nil {
+	if _, err := repox.SplitName(in.GetName(), "reservations"); err != nil {
 		b.u.Fail(err)
 		return
 	}
@@ -566,7 +522,7 @@ func (b *graphQLBatch) UpdateReservationOutputOnly(in *reservationpbv1.Reservati
 // DeleteReservation queues the record's removal for good. A record already
 // gone is not an error.
 func (b *graphQLBatch) DeleteReservation(name string) {
-	if _, err := repox.SplitName(name, "organizationalUnits", "reservations"); err != nil {
+	if _, err := repox.SplitName(name, "reservations"); err != nil {
 		b.u.Fail(err)
 		return
 	}

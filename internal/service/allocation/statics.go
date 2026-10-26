@@ -14,18 +14,16 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// VersionedStore is a Store whose static inputs -- resources, sites,
-// calendars and their availability -- carry a version that moves on every
-// write to them. The Server caches those inputs, converted, per site and
-// version, and reads them again only when the version moves. A Store without
-// it is read in full on every request.
+// VersionedStore is a Store whose static inputs -- resources, calendars and
+// their availability -- carry a version that moves on every write to them.
+// The Server caches those inputs, converted, per resource and version, and
+// reads them again only when the version moves. A Store without it is read in
+// full on every request.
 type VersionedStore interface {
 	Store
 	// InputVersion is the current version. An error means it cannot be
 	// told, and nothing cached is used.
 	InputVersion(ctx context.Context) (string, error)
-	// Sites returns an organization's live sites, in name order.
-	Sites(ctx context.Context, organization string) ([]string, error)
 }
 
 // staticResource is one resource's static inputs, converted: everything the
@@ -46,45 +44,93 @@ type staticResource struct {
 // outage on another instance). Holds never depend on it; see verifyPicked.
 const staticsMaxAge = 2 * time.Minute
 
-// staticsMaxSites bounds the sites cached at once. Past it the oldest entry
-// is dropped.
-const staticsMaxSites = 4096
+// staticsMaxResources bounds the resources cached at once. Past it the cache
+// starts over.
+const staticsMaxResources = 65536
 
-// siteEntry is one site's cached inputs, or the load filling it.
-type siteEntry struct {
+// resourceEntry is one resource's cached inputs.
+type resourceEntry struct {
 	version string
 	loaded  time.Time
-	done    chan struct{}
-	res     []staticResource
-	err     error
+	res     staticResource
 }
 
-// statics caches converted static inputs per site.
+// poolEntry is the names of every resource, cached.
+type poolEntry struct {
+	version string
+	loaded  time.Time
+	names   []string
+}
+
+// statics caches converted static inputs per resource, and the names of
+// every resource for a request that names none.
 type statics struct {
-	mu    sync.Mutex
-	sites map[string]*siteEntry
-	orgs  map[string]*orgEntry
-}
-
-type orgEntry struct {
-	version string
-	loaded  time.Time
-	sites   []string
+	mu        sync.Mutex
+	resources map[string]*resourceEntry
+	pool      *poolEntry
 }
 
 func newStatics() *statics {
-	return &statics{sites: map[string]*siteEntry{}, orgs: map[string]*orgEntry{}}
+	return &statics{resources: map[string]*resourceEntry{}}
 }
 
-// drop forgets a site's entry, so the next read loads it again.
-func (c *statics) drop(site string) {
+// drop forgets names' entries, so the next read loads them again.
+func (c *statics) drop(names []string) {
 	c.mu.Lock()
-	delete(c.sites, site)
+	for _, n := range names {
+		delete(c.resources, n)
+	}
 	c.mu.Unlock()
 }
 
+// lookup returns the entries of names cached under version, and the names
+// that are not.
+func (c *statics) lookup(names []string, version string, now time.Time) (hit []staticResource, miss []string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	for _, n := range names {
+		e := c.resources[n]
+		if e == nil || e.version != version || now.Sub(e.loaded) >= staticsMaxAge {
+			miss = append(miss, n)
+			continue
+		}
+		hit = append(hit, e.res)
+	}
+	return hit, miss
+}
+
+// store caches res under version; with all, res is every resource there is.
+func (c *statics) store(res []staticResource, version string, now time.Time, all bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if len(c.resources)+len(res) > staticsMaxResources {
+		clear(c.resources)
+	}
+	for _, r := range res {
+		c.resources[r.rec.Resource.GetName()] = &resourceEntry{version: version, loaded: now, res: r}
+	}
+	if all {
+		names := make([]string, len(res))
+		for i, r := range res {
+			names[i] = r.rec.Resource.GetName()
+		}
+		c.pool = &poolEntry{version: version, loaded: now, names: names}
+	}
+}
+
+// poolNames returns the names of every resource cached under version.
+func (c *statics) poolNames(version string, now time.Time) ([]string, bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.pool == nil || c.pool.version != version || now.Sub(c.pool.loaded) >= staticsMaxAge {
+		return nil, false
+	}
+	return c.pool.names, true
+}
+
 // staticInputs returns the static inputs of the resources q selects, from the
-// cache when the store is versioned and fresh is false, in name order.
+// cache when the store is versioned and fresh is false, in name order. Only
+// the resources the cache lacks are read, in one batch.
 func (s *Server) staticInputs(ctx context.Context, q ResourceQuery, fresh bool) ([]staticResource, error) {
 	vs, ok := s.store.(VersionedStore)
 	if !ok || fresh || len(q.Calendars) > 0 {
@@ -94,34 +140,37 @@ func (s *Server) staticInputs(ctx context.Context, q ResourceQuery, fresh bool) 
 	if err != nil {
 		return s.readStatics(ctx, q)
 	}
-	sites := q.OrganizationalUnits
-	if len(sites) == 0 && q.Organization != "" {
-		if sites, err = s.orgSites(ctx, vs, q.Organization, version); err != nil {
-			return nil, err
+	now := time.Now()
+	names := q.Names
+	if len(names) == 0 {
+		if names, ok = s.statics.poolNames(version, now); !ok {
+			all, err := s.readStatics(ctx, ResourceQuery{})
+			if err != nil {
+				return nil, err
+			}
+			s.statics.store(all, version, now, true)
+			return slices.DeleteFunc(all, func(r staticResource) bool { return !selected(r.rec, q) }), nil
 		}
 	}
-	if len(sites) == 0 {
-		// No scope the cache is keyed by: read what was asked.
-		return s.readStatics(ctx, q)
-	}
-	var out []staticResource
-	for _, site := range sites {
-		res, err := s.siteStatics(ctx, site, version)
+	out, miss := s.statics.lookup(names, version, now)
+	if len(miss) > 0 {
+		read, err := s.readStatics(ctx, ResourceQuery{Names: miss})
 		if err != nil {
 			return nil, err
 		}
-		for _, r := range res {
-			if selected(r.rec, q) {
-				out = append(out, r)
-			}
-		}
+		s.statics.store(read, version, now, false)
+		out = append(out, read...)
 	}
-	if len(sites) > 1 {
-		slices.SortFunc(out, func(a, b staticResource) int {
-			return strings.Compare(a.rec.Resource.GetName(), b.rec.Resource.GetName())
-		})
-	}
-	return out, nil
+	// Every entry is one of names already; only the types are left to apply.
+	types := ResourceQuery{Types: q.Types}
+	out = slices.DeleteFunc(out, func(r staticResource) bool { return !selected(r.rec, types) })
+	slices.SortFunc(out, func(a, b staticResource) int {
+		return strings.Compare(a.rec.Resource.GetName(), b.rec.Resource.GetName())
+	})
+	// A name asked for twice is one resource.
+	return slices.CompactFunc(out, func(a, b staticResource) bool {
+		return a.rec.Resource.GetName() == b.rec.Resource.GetName()
+	}), nil
 }
 
 // selected applies q's Names and Types to one cached resource.
@@ -134,95 +183,6 @@ func selected(rec ResourceRecord, q ResourceQuery) bool {
 		return false
 	}
 	return true
-}
-
-// orgSites returns an organization's sites, cached under version.
-func (s *Server) orgSites(ctx context.Context, vs VersionedStore, org, version string) ([]string, error) {
-	now := time.Now()
-	s.statics.mu.Lock()
-	e := s.statics.orgs[org]
-	s.statics.mu.Unlock()
-	if e != nil && e.version == version && now.Sub(e.loaded) < staticsMaxAge {
-		return e.sites, nil
-	}
-	sites, err := vs.Sites(ctx, org)
-	if err != nil {
-		return nil, err
-	}
-	s.statics.mu.Lock()
-	if len(s.statics.orgs) >= staticsMaxSites {
-		clear(s.statics.orgs)
-	}
-	s.statics.orgs[org] = &orgEntry{version: version, loaded: now, sites: sites}
-	s.statics.mu.Unlock()
-	return sites, nil
-}
-
-// siteStatics returns one site's inputs under version, loading them once when
-// they are missing or stale however many callers ask at the same time.
-func (s *Server) siteStatics(ctx context.Context, site, version string) ([]staticResource, error) {
-	c := s.statics
-	for {
-		c.mu.Lock()
-		e := c.sites[site]
-		if e != nil {
-			select {
-			case <-e.done:
-				if e.err == nil && e.version == version && time.Since(e.loaded) < staticsMaxAge {
-					c.mu.Unlock()
-					return e.res, nil
-				}
-				// Stale or failed: replace it below.
-			default:
-				if e.version == version {
-					c.mu.Unlock()
-					select {
-					case <-e.done:
-						continue
-					case <-ctx.Done():
-						return nil, ctx.Err()
-					}
-				}
-			}
-		}
-		e = &siteEntry{version: version, done: make(chan struct{})}
-		if len(c.sites) >= staticsMaxSites {
-			c.evictOldestLocked()
-		}
-		c.sites[site] = e
-		c.mu.Unlock()
-
-		// The load is shared, so it must outlive the caller who started it.
-		e.res, e.err = s.readStatics(context.WithoutCancel(ctx), ResourceQuery{OrganizationalUnits: []string{site}})
-		e.loaded = time.Now()
-		close(e.done)
-		if e.err != nil {
-			c.mu.Lock()
-			if c.sites[site] == e {
-				delete(c.sites, site)
-			}
-			c.mu.Unlock()
-		}
-		return e.res, e.err
-	}
-}
-
-func (c *statics) evictOldestLocked() {
-	var oldest string
-	var at time.Time
-	for k, e := range c.sites {
-		select {
-		case <-e.done:
-		default:
-			continue
-		}
-		if oldest == "" || e.loaded.Before(at) {
-			oldest, at = k, e.loaded
-		}
-	}
-	if oldest != "" {
-		delete(c.sites, oldest)
-	}
 }
 
 // readStatics reads the static inputs of the resources q selects from the

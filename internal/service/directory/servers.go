@@ -5,12 +5,9 @@ package directory
 
 // servers.go assembles the generated AIP servers (protoc-gen-service) with
 // freebusy's hooks: the standard methods, their checks and their errors are
-// generated; what is here is the tenancy rule and the methods that are more
-// than CRUD.
+// generated; what is here is the methods that are more than CRUD.
 
 import (
-	"github.com/shokki-engineering/freebusy/internal/service/generated/protobuf/rfc4519/organization/v1/organizationv1svc"
-	"github.com/shokki-engineering/freebusy/internal/service/generated/protobuf/rfc4519/organizational_unit/v1/organizational_unitv1svc"
 	"github.com/shokki-engineering/freebusy/internal/service/generated/protobuf/rfc5545/calendar/v1/calendarv1svc"
 	"github.com/shokki-engineering/freebusy/internal/service/generated/protobuf/rfc5545/event/v1/eventv1svc"
 	"github.com/shokki-engineering/freebusy/internal/service/generated/protobuf/rfc7953/availability/v1/availabilityv1svc"
@@ -22,36 +19,13 @@ import (
 // opts are every server's options: freebusy's translator and tracing.
 func opts() []servicex.Option { return rpc.ServerOptions() }
 
-// OrganizationServer serves RFC 4519 organizations.
-type OrganizationServer struct {
-	*organizationv1svc.OrganizationsServer
-}
-
-// NewOrganizationServer returns an OrganizationServer over repos.
-func NewOrganizationServer(repos Repositories) *OrganizationServer {
-	return &OrganizationServer{organizationv1svc.NewOrganizationsServer(
-		organizationv1svc.OrganizationsRepositories{Organizations: repos.Organizations}, orgHooks{repos: repos}, opts()...)}
-}
-
-// OrganizationalUnitServer serves RFC 4519 organizational units: sites.
-type OrganizationalUnitServer struct {
-	*organizational_unitv1svc.OrganizationalUnitsServer
-}
-
-// NewOrganizationalUnitServer returns an OrganizationalUnitServer over repos.
-func NewOrganizationalUnitServer(repos Repositories) *OrganizationalUnitServer {
-	return &OrganizationalUnitServer{organizational_unitv1svc.NewOrganizationalUnitsServer(
-		organizational_unitv1svc.OrganizationalUnitsRepositories{OrganizationalUnits: repos.OrganizationalUnits},
-		siteHooks{repos: repos, sites: NewSites(repos)}, opts()...)}
-}
-
 // ResourceServer serves RFC 9073 resources.
 type ResourceServer struct{ *resourcev1svc.ResourcesServer }
 
 // NewResourceServer returns a ResourceServer over repos.
 func NewResourceServer(repos Repositories) *ResourceServer {
 	return &ResourceServer{resourcev1svc.NewResourcesServer(
-		resourcev1svc.ResourcesRepositories{Resources: repos.Resources}, resourceHooks{sites: NewSites(repos)}, opts()...)}
+		resourcev1svc.ResourcesRepositories{Resources: repos.Resources}, resourcev1svc.NopResourcesHooks{}, opts()...)}
 }
 
 // CalendarServer serves RFC 5545 calendars and answers free/busy for them.

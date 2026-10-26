@@ -19,8 +19,6 @@ definition:
       type: String_1!
     - name: name
       type: String_1!
-    - name: organizationalUnitId
-      type: String_1!
     - name: resource
       type: String_1!
     - name: startTime
@@ -50,9 +48,6 @@ definition:
         name:
           column:
             name: name
-        organizationalUnitId:
-          column:
-            name: organizational_unit_id
         resource:
           column:
             name: resource
@@ -75,7 +70,6 @@ definition:
           - hold
           - id
           - name
-          - organizationalUnitId
           - resource
           - startTime
 
@@ -99,8 +93,6 @@ definition:
         - fieldName: id
           booleanExpressionType: TextBoolExp
         - fieldName: name
-          booleanExpressionType: TextBoolExp
-        - fieldName: organizationalUnitId
           booleanExpressionType: TextBoolExp
         - fieldName: resource
           booleanExpressionType: TextBoolExp
@@ -135,8 +127,6 @@ definition:
           aggregateExpression: TextAggExp
         - fieldName: name
           aggregateExpression: TextAggExp
-        - fieldName: organizationalUnitId
-          aggregateExpression: TextAggExp
         - fieldName: resource
           aggregateExpression: TextAggExp
         - fieldName: startTime
@@ -167,8 +157,6 @@ definition:
         - fieldName: id
           orderByExpression: String1OrderByExp
         - fieldName: name
-          orderByExpression: String1OrderByExp
-        - fieldName: organizationalUnitId
           orderByExpression: String1OrderByExp
         - fieldName: resource
           orderByExpression: String1OrderByExp

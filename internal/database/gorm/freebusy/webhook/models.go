@@ -57,7 +57,7 @@ type Delivery struct {
 	EventID *string `gorm:"column:event_id" json:"event_id,omitempty"`
 	// The CloudEvents type, e.g. "freebusy.reservation.confirmed".
 	EventType *string `gorm:"column:event_type" json:"event_type,omitempty"`
-	// The record that changed. Format: organizationalUnits/{organizational_unit}/reservations/{reservation} or organizationalUnits/{organizational_unit}/holds/{hold}
+	// The record that changed. Format: reservations/{reservation} or holds/{hold}
 	Subject *string `gorm:"column:subject" json:"subject,omitempty"`
 	// The request body sent: a CloudEvents 1.0 JSON document whose data is the record as it stood.
 	Payload *string `gorm:"column:payload" json:"payload,omitempty"`
@@ -114,8 +114,6 @@ type Webhook struct {
 	URI string `gorm:"column:uri;not null" json:"uri" validate:"required"`
 	// The event types sent, e.g. "freebusy.reservation.confirmed" or "freebusy.event.deleted". Empty sends every type. A type is "freebusy.<record>.<what happened>": holds are active, released, expired and converted; reservations pending, confirmed, cancelling, cancelled, failed, rescheduling and rescheduled, and updated exactly when UpdateReservation changed its customer or attributes -- the reservation's last_change is CHANGE_DETAILS (freebusy.reservation.updated); resources, calendars, events and availabilities created, updated and deleted.
 	EventTypes pq.StringArray `gorm:"column:event_types;type:text[];index:idx_resource_event_types_gin,type:gin" json:"event_types,omitempty"`
-	// Limits events to one site's holds, reservations and resources. Empty sends every site's. Calendars, events and availabilities belong to no site, so a webhook limited to one is not sent them. Format: organizationalUnits/{organizational_unit} Foreign key to orgunit.organizational_units(name) in database rfc (discovered, constraint only, no relation).
-	OrganizationalUnit *string `gorm:"column:organizational_unit;index:idx_resource_organizational_unit" json:"organizational_unit,omitempty"`
 	// Whether changes are sent. Set by PauseWebhook and ResumeWebhook; pausing keeps the webhook and its history.
 	State *WebhookState `gorm:"column:state;default:'ACTIVE';check:chk_resource_state,state IN ('ACTIVE','PAUSED')" json:"state,omitempty"`
 	// The key every delivery is signed with, in the Standard Webhooks form: a "whsec_" prefix and the encoded key. Returned by CreateWebhook and RotateWebhookSecret only; every other read leaves it empty.

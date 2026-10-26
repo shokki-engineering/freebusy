@@ -60,7 +60,7 @@ type HoldServiceClient interface {
 	// EXPIRED here even if the sweeper has not yet written that state, so a
 	// caller never sees an ACTIVE hold that no longer reserves anything.
 	GetHold(ctx context.Context, in *GetHoldRequest, opts ...grpc.CallOption) (*Hold, error)
-	// Lists the holds taken at a site.
+	// Lists holds.
 	ListHolds(ctx context.Context, in *ListHoldsRequest, opts ...grpc.CallOption) (*ListHoldsResponse, error)
 	// Pushes a hold's expiry further out.
 	//
@@ -178,7 +178,7 @@ type HoldServiceServer interface {
 	// EXPIRED here even if the sweeper has not yet written that state, so a
 	// caller never sees an ACTIVE hold that no longer reserves anything.
 	GetHold(context.Context, *GetHoldRequest) (*Hold, error)
-	// Lists the holds taken at a site.
+	// Lists holds.
 	ListHolds(context.Context, *ListHoldsRequest) (*ListHoldsResponse, error)
 	// Pushes a hold's expiry further out.
 	//

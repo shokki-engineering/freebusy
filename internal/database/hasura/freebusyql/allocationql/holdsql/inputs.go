@@ -38,8 +38,6 @@ type CreateInput struct {
 	IdempotencyKey string `json:"idempotencyKey,omitzero"`
 	// Name sets the "name" column (required).
 	Name string `json:"name"`
-	// OrganizationalUnitId sets the "organizationalUnitId" column (required).
-	OrganizationalUnitId string `json:"organizationalUnitId"`
 	// Quantity sets the "quantity" column; the zero value is omitted (column default / NULL).
 	Quantity int32 `json:"quantity,omitzero"`
 	// Replaces sets the "replaces" column; the zero value is omitted (column default / NULL).
@@ -72,8 +70,6 @@ type UpdateInput struct {
 	IdempotencyKey graphql.Nullable[string] `json:"idempotencyKey"`
 	// Update the 'name' column in the 'allocation_holds' collection.
 	Name graphql.Nullable[string] `json:"name"`
-	// Update the 'organizational_unit_id' column in the 'allocation_holds' collection.
-	OrganizationalUnitId graphql.Nullable[string] `json:"organizationalUnitId"`
 	// Update the 'quantity' column in the 'allocation_holds' collection.
 	Quantity graphql.Nullable[int32] `json:"quantity"`
 	// Update the 'replaces' column in the 'allocation_holds' collection.

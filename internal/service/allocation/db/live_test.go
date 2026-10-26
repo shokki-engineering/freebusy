@@ -13,8 +13,9 @@ package db
 //	  go test ./internal/service/allocation/db/ -run Live -v
 //
 // The database URL is needed for both runs: fixtures are seeded through GORM,
-// and the Hasura engine serves the same Postgres. Each run seeds its own site
-// under fresh ULIDs, so runs never collide; rows are left behind.
+// and the Hasura engine serves the same Postgres. Each run seeds its own courts
+// under fresh ULIDs and asks only about them, so runs never collide; rows are
+// left behind.
 
 import (
 	"context"
@@ -69,18 +70,22 @@ func liveDB(t *testing.T) *gorm.DB {
 	return db
 }
 
-// site is one seeded padel club: three courts, each on its own calendar, open
+// club is one seeded padel club: three courts, each on its own calendar, open
 // 08:00-22:00 daily in IST; court-1 has an opaque booking 18:00-19:00; court-3
-// declares a one-hour minimum.
-type site struct {
-	ou     string
+// declares a one-hour minimum. Every court carries the run in its
+// STRUCTURED-DATA, so a search can be narrowed to this run's courts.
+type club struct {
+	run    string
 	courts []string
 }
 
-func seed(t *testing.T, db *gorm.DB) site {
+// only is a filter matching this run's courts alone.
+func (c club) only() string { return `attributes.run = "` + c.run + `"` }
+
+func seed(t *testing.T, db *gorm.DB) club {
 	t.Helper()
 	run := ulid.Generate().String()
-	s := site{ou: live.Site(t, db, "it-"+run)}
+	s := club{run: run}
 	create := func(v any) {
 		t.Helper()
 		if err := db.Omit(clause.Associations).Create(v).Error; err != nil {
@@ -97,11 +102,14 @@ func seed(t *testing.T, db *gorm.DB) site {
 		calID := "cal-" + id
 		create(&calendar.Calendar{ID: calID, Name: "calendars/" + calID, DisplayName: id, TimeZoneID: ptr("Asia/Kolkata")})
 		res := &resource.Resource{
-			ID: id, Name: "resources/" + id, CalendarID: &calID,
-			OrganizationalUnitID: ptr("it-" + run), ResourceTypes: []string{"padel-court"},
+			ID: id, Name: "resources/" + id, CalendarID: &calID, ResourceTypes: []string{"padel-court"},
 		}
 		create(res)
 		s.courts = append(s.courts, res.Name)
+		create(&resource.StructuredData{
+			ID: ulid.Generate().String(), ResourceID: id,
+			Text: ptr(`{"run":"` + run + `"}`), ValueCase: ptr(resource.StructuredDataValueCaseText),
+		})
 		if i == 2 {
 			create(&resource.StructuredData{
 				ID: ulid.Generate().String(), ResourceID: id, Schema: ptr(rfc.ProfileSchemaURI),
@@ -171,7 +179,7 @@ func TestLiveEngine(t *testing.T) {
 
 			t.Run("compute", func(t *testing.T) {
 				res, err := srv.ComputeAvailability(ctx, &allocationpbv1.ComputeAvailabilityRequest{
-					Parent: s.ou, Window: win(7, 10), SlotDuration: durationpb.New(time.Hour),
+					Resources: s.courts, Window: win(7, 10), SlotDuration: durationpb.New(time.Hour),
 					Granularity: allocationpbv1.AvailabilityGranularity_AVAILABILITY_GRANULARITY_SLOT,
 				})
 				if err != nil {
@@ -182,7 +190,7 @@ func TestLiveEngine(t *testing.T) {
 					t.Fatalf("07-10 free %v, want %v", got, want)
 				}
 				res, err = srv.ComputeAvailability(ctx, &allocationpbv1.ComputeAvailabilityRequest{
-					Parent: s.ou, Window: win(17, 20), SlotDuration: durationpb.New(time.Hour),
+					Resources: s.courts, Window: win(17, 20), SlotDuration: durationpb.New(time.Hour),
 					Granularity: allocationpbv1.AvailabilityGranularity_AVAILABILITY_GRANULARITY_SLOT,
 				})
 				if err != nil {
@@ -194,7 +202,7 @@ func TestLiveEngine(t *testing.T) {
 			})
 
 			t.Run("check explains", func(t *testing.T) {
-				res, err := srv.CheckAvailability(ctx, &allocationpbv1.CheckAvailabilityRequest{Parent: s.ou, Window: win(18, 19), Quantity: 3})
+				res, err := srv.CheckAvailability(ctx, &allocationpbv1.CheckAvailabilityRequest{Resources: s.courts, Window: win(18, 19), Quantity: 3})
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -206,7 +214,7 @@ func TestLiveEngine(t *testing.T) {
 					t.Fatalf("bookable=%v reasons=%v", res.GetBookable(), reasons)
 				}
 				res, err = srv.CheckAvailability(ctx, &allocationpbv1.CheckAvailabilityRequest{
-					Parent: s.ou, Window: win(12, 12.5), Resources: []string{s.courts[2]},
+					Window: win(12, 12.5), Resources: []string{s.courts[2]},
 				})
 				if err != nil {
 					t.Fatal(err)
@@ -224,8 +232,7 @@ func TestLiveEngine(t *testing.T) {
 				for range callers {
 					wg.Go(func() {
 						_, err := srv.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{
-							Parent: s.ou,
-							Hold:   &allocationpbv1.Hold{Window: win(20, 21), CandidateResources: []string{s.courts[1]}},
+							Hold: &allocationpbv1.Hold{Window: win(20, 21), CandidateResources: []string{s.courts[1]}},
 						})
 						mu.Lock()
 						defer mu.Unlock()
@@ -247,7 +254,7 @@ func TestLiveEngine(t *testing.T) {
 
 			t.Run("lifecycle", func(t *testing.T) {
 				h, err := srv.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{
-					Parent: s.ou, Hold: &allocationpbv1.Hold{Window: win(10, 11), Quantity: 3, IdempotencyKey: "it-" + ulid.Generate().String()},
+					Hold: &allocationpbv1.Hold{Window: win(10, 11), Quantity: 3, CandidateResources: s.courts, IdempotencyKey: "it-" + ulid.Generate().String()},
 				})
 				if err != nil {
 					t.Fatal(err)
@@ -256,7 +263,7 @@ func TestLiveEngine(t *testing.T) {
 					t.Fatalf("hold %v", h)
 				}
 				again, err := srv.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{
-					Parent: s.ou, Hold: &allocationpbv1.Hold{Window: win(10, 11), Quantity: 3, IdempotencyKey: h.GetIdempotencyKey()},
+					Hold: &allocationpbv1.Hold{Window: win(10, 11), Quantity: 3, CandidateResources: s.courts, IdempotencyKey: h.GetIdempotencyKey()},
 				})
 				if err != nil || again.GetName() != h.GetName() {
 					t.Fatalf("idempotent retry: %v %v", again.GetName(), err)
@@ -264,7 +271,7 @@ func TestLiveEngine(t *testing.T) {
 				if n := free(t, srv, s, 10, 11); n != 0 {
 					t.Fatalf("held: %d free", n)
 				}
-				list, err := srv.ListHolds(ctx, &allocationpbv1.ListHoldsRequest{Parent: s.ou, Filter: `state = HOLD_STATE_ACTIVE`})
+				list, err := srv.ListHolds(ctx, &allocationpbv1.ListHoldsRequest{Filter: `state = HOLD_STATE_ACTIVE AND idempotency_key = "` + h.GetIdempotencyKey() + `"`})
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -298,7 +305,7 @@ func TestLiveEngine(t *testing.T) {
 					t.Fatalf("after delete: %v", err)
 				}
 
-				c, err := srv.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Parent: s.ou, Hold: &allocationpbv1.Hold{Window: win(14, 15)}})
+				c, err := srv.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Hold: &allocationpbv1.Hold{Window: win(14, 15), CandidateResources: s.courts}})
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -312,7 +319,7 @@ func TestLiveEngine(t *testing.T) {
 
 			t.Run("expiry", func(t *testing.T) {
 				quick := allocation.NewServer(store, allocation.WithHoldTTL(time.Second))
-				h, err := quick.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Parent: s.ou, Hold: &allocationpbv1.Hold{Window: win(16, 17), Quantity: 3}})
+				h, err := quick.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Hold: &allocationpbv1.Hold{Window: win(16, 17), Quantity: 3, CandidateResources: s.courts}})
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -335,9 +342,9 @@ func TestLiveEngine(t *testing.T) {
 	}
 }
 
-func free(t *testing.T, srv *allocation.Server, s site, a, b float64) int32 {
+func free(t *testing.T, srv *allocation.Server, s club, a, b float64) int32 {
 	t.Helper()
-	res, err := srv.CheckAvailability(context.Background(), &allocationpbv1.CheckAvailabilityRequest{Parent: s.ou, Window: win(a, b)})
+	res, err := srv.CheckAvailability(context.Background(), &allocationpbv1.CheckAvailabilityRequest{Resources: s.courts, Window: win(a, b)})
 	if err != nil {
 		t.Fatal(err)
 	}

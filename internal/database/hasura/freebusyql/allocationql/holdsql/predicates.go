@@ -23,19 +23,18 @@ import (
 // Filter fields for AllocationHolds. Build predicates like CandidateFilter.Eq(v) and combine
 // them with And/Or/Not.
 var (
-	CandidateFilter      = graphql.StringField{Col: "candidateFilter"}
-	CreateTime           = graphql.StringField{Col: "createTime"}
-	Etag                 = graphql.StringField{Col: "etag"}
-	ExpireTime           = graphql.StringField{Col: "expireTime"}
-	Id                   = graphql.StringField{Col: "id"}
-	IdempotencyKey       = graphql.StringField{Col: "idempotencyKey"}
-	Name                 = graphql.StringField{Col: "name"}
-	OrganizationalUnitId = graphql.StringField{Col: "organizationalUnitId"}
-	Quantity             = graphql.Int64Field{Col: "quantity"}
-	Replaces             = graphql.StringField{Col: "replaces"}
-	State                = graphql.StringField{Col: "state"}
-	UpdateTime           = graphql.StringField{Col: "updateTime"}
-	Window               = graphql.StringField{Col: "window"}
+	CandidateFilter = graphql.StringField{Col: "candidateFilter"}
+	CreateTime      = graphql.StringField{Col: "createTime"}
+	Etag            = graphql.StringField{Col: "etag"}
+	ExpireTime      = graphql.StringField{Col: "expireTime"}
+	Id              = graphql.StringField{Col: "id"}
+	IdempotencyKey  = graphql.StringField{Col: "idempotencyKey"}
+	Name            = graphql.StringField{Col: "name"}
+	Quantity        = graphql.Int64Field{Col: "quantity"}
+	Replaces        = graphql.StringField{Col: "replaces"}
+	State           = graphql.StringField{Col: "state"}
+	UpdateTime      = graphql.StringField{Col: "updateTime"}
+	Window          = graphql.StringField{Col: "window"}
 )
 
 // And matches rows satisfying every predicate.

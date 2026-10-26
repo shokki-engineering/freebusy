@@ -46,11 +46,7 @@ const rescheduleAttempts = 3
 // A crash between any two steps leaves the original RESCHEDULING, which the
 // reconciler carries forward with exactly this logic (finishReschedule).
 func (s *Server) reschedule(ctx context.Context, req *reservationpbv1.RescheduleReservationRequest) (*reservationpbv1.Reservation, error) {
-	site := "organizationalUnits/" + SiteID(req.GetName())
-	replacement, err := reservationFor(site, req.GetHold())
-	if err != nil {
-		return nil, err
-	}
+	replacement := reservationFor(req.GetHold())
 	// If the new hold already backs a reservation -- the caller reserved it,
 	// or an earlier attempt at this move got that far -- that is the
 	// replacement, whatever it was named.
@@ -62,7 +58,7 @@ func (s *Server) reschedule(ctx context.Context, req *reservationpbv1.Reschedule
 	if replacement == req.GetName() {
 		return nil, servicex.BadField("SAME_HOLD", "hold",
 			fmt.Sprintf("reservation %s was made from %s, so moving it there changes nothing", req.GetName(), req.GetHold()),
-			"Take a new hold for the new window with "+hints.Call("CreateHold", map[string]string{"parent": siteOf(req.GetName())})+
+			"Take a new hold for the new window with "+hints.Call("CreateHold", nil)+
 				" and reschedule onto that")
 	}
 
@@ -118,12 +114,11 @@ func (s *Server) finishReschedule(ctx context.Context, old *reservationpbv1.Rese
 		return s.store.Get(ctx, replacement)
 	}
 
-	site := "organizationalUnits/" + SiteID(old.GetName())
 	newHold, err := s.replacementHold(ctx, old)
 	if err != nil {
 		return nil, err
 	}
-	rep, err := s.open(ctx, site, newHold, lastSegment(replacement), &reservationpbv1.Reservation{
+	rep, err := s.open(ctx, newHold, lastSegment(replacement), &reservationpbv1.Reservation{
 		Customer:   old.GetCustomer(),
 		Attributes: old.GetAttributes(),
 		Replaces:   old.GetName(),
@@ -169,7 +164,7 @@ func (s *Server) revertReschedule(ctx context.Context, old *reservationpbv1.Rese
 	return servicex.Blocked("REPLACEMENT_FAILED", hints.TypeOf(old.GetName()), old.GetName(),
 		fmt.Sprintf("the new slot could not be booked, so reservation %s keeps its original one", old.GetName()),
 		"Its new hold most likely lapsed: take a fresh hold with "+
-			hints.Call("CreateHold", map[string]string{"parent": siteOf(old.GetName())})+" and reschedule again")
+			hints.Call("CreateHold", nil)+" and reschedule again")
 }
 
 // replacementHold is the hold a move is onto. A replacement that exists says
@@ -180,7 +175,7 @@ func (s *Server) replacementHold(ctx context.Context, old *reservationpbv1.Reser
 	case err == nil:
 		return rep.GetHold(), nil
 	case errors.Is(err, repox.ErrNotFound):
-		return HoldName(SiteID(old.GetName()), lastSegment(old.GetReplacement())), nil
+		return HoldName(lastSegment(old.GetReplacement())), nil
 	}
 	return "", err
 }

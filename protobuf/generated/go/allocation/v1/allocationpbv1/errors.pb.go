@@ -163,11 +163,11 @@ var File_freebusy_allocation_v1_errors_proto protoreflect.FileDescriptor
 
 const file_freebusy_allocation_v1_errors_proto_rawDesc = "" +
 	"\n" +
-	"#freebusy/allocation/v1/errors.proto\x12\x16freebusy.allocation.v1\x1a\x1cservice/v1/annotations.proto*\xa9%\n" +
+	"#freebusy/allocation/v1/errors.proto\x12\x16freebusy.allocation.v1\x1a\x1cservice/v1/annotations.proto*\xb9%\n" +
 	"\vErrorReason\x12\x1c\n" +
-	"\x18ERROR_REASON_UNSPECIFIED\x10\x00\x12\xad\x01\n" +
-	"\x1eERROR_REASON_INVALID_TIME_ZONE\x10\x01\x1a\x88\x01\xea\xf0\x19\x83\x01\n" +
-	"\x10INVALID_ARGUMENT\x12%`time_zone` is not an IANA zone name.\x1aFUse one such as `Europe/London`, or leave it empty for the site's own. \x01\x12\xb1\x01\n" +
+	"\x18ERROR_REASON_UNSPECIFIED\x10\x00\x12\xc8\x01\n" +
+	"\x1eERROR_REASON_INVALID_TIME_ZONE\x10\x01\x1a\xa3\x01\xea\xf0\x19\x9e\x01\n" +
+	"\x10INVALID_ARGUMENT\x12%`time_zone` is not an IANA zone name.\x1aaUse one such as `Europe/London`, or leave it empty for the zone of the first resource's calendar. \x01\x12\xb1\x01\n" +
 	"\x1dERROR_REASON_TOO_MANY_BUCKETS\x10\x02\x1a\x8d\x01\xea\xf0\x19\x88\x01\n" +
 	"\x10INVALID_ARGUMENT\x121The window would be answered in too many buckets.\x1a?A shorter window, a longer `slot_duration`, or day granularity. \x01\x12\x91\x03\n" +
 	"\x1bERROR_REASON_INVALID_FILTER\x10\x03\x1a\xef\x02\xea\xf0\x19\xea\x02\n" +
@@ -177,16 +177,16 @@ const file_freebusy_allocation_v1_errors_proto_rawDesc = "" +
 	"\x1dERROR_REASON_INVALID_ORDER_BY\x10\x05\x1a\xfc\x01\xea\xf0\x19\xf7\x01\n" +
 	"\x10INVALID_ARGUMENT\x12u`SearchAvailability`'s `order_by` names a field matches cannot be ordered by, or a direction other than `asc`/`desc`.\x1ajOrder by `resource`, `organizational_unit`, `display_name`, `free_fraction` or `attributes.max_occupancy`. \x01\x12\xac\x03\n" +
 	"!ERROR_REASON_ORDER_BY_UNSUPPORTED\x10\x06\x1a\x84\x03\xea\xf0\x19\xff\x02\n" +
-	"\x10INVALID_ARGUMENT\x12\xf2\x01`SearchAvailability`'s `order_by` is valid, but orders by an attribute path (`attributes.max_occupancy`) that the backend the search records are read on cannot sort by: DDN's order_by, on a Hasura-only deployment, has no JSON path expression.\x1atOrder by `resource`, `organizational_unit`, `display_name` or `free_fraction`, or configure Postgres for the server. \x01\x12\xf3\x01\n" +
-	"\x1aERROR_REASON_INVALID_FACET\x10\a\x1a\xd2\x01\xea\xf0\x19\xcd\x01\n" +
-	"\x10INVALID_ARGUMENT\x12M`SearchAvailability`'s `facets` names a field resources cannot be counted by.\x1ahCount by `resource_types`, `organizational_unit`, `organization`, `display_name` or `attributes.<path>`. \x01\x12\xce\x01\n" +
+	"\x10INVALID_ARGUMENT\x12\xf2\x01`SearchAvailability`'s `order_by` is valid, but orders by an attribute path (`attributes.max_occupancy`) that the backend the search records are read on cannot sort by: DDN's order_by, on a Hasura-only deployment, has no JSON path expression.\x1atOrder by `resource`, `organizational_unit`, `display_name` or `free_fraction`, or configure Postgres for the server. \x01\x12\xe3\x01\n" +
+	"\x1aERROR_REASON_INVALID_FACET\x10\a\x1a\xc2\x01\xea\xf0\x19\xbd\x01\n" +
+	"\x10INVALID_ARGUMENT\x12M`SearchAvailability`'s `facets` names a field resources cannot be counted by.\x1aXCount by `resource_types`, `organizational_unit`, `display_name` or `attributes.<path>`. \x01\x12\xce\x01\n" +
 	"\x1fERROR_REASON_INVALID_PAGE_TOKEN\x10\b\x1a\xa8\x01\xea\xf0\x19\xa3\x01\n" +
 	"\x10INVALID_ARGUMENT\x12;`SearchAvailability`'s `page_token` is not one it returned.\x1aPSend `next_page_token` unchanged, with the same other fields, or leave it empty. \x01\x12\x98\x02\n" +
 	"\"ERROR_REASON_WINDOW_BEYOND_HORIZON\x10\t\x1a\xef\x01\xea\xf0\x19\xea\x01\n" +
-	"\x10INVALID_ARGUMENT\x12\x8f\x01`SearchAvailability` with `order_by` or `facets` for a window outside the search records' horizon (yesterday to `[search] horizon_days` ahead).\x1aBSearch inside the horizon, or leave `order_by` and `facets` empty. \x01\x12\xde\x03\n" +
+	"\x10INVALID_ARGUMENT\x12\x8f\x01`SearchAvailability` with `order_by` or `facets` for a window outside the search records' horizon (yesterday to `[search] horizon_days` ahead).\x1aBSearch inside the horizon, or leave `order_by` and `facets` empty. \x01\x12\xe3\x03\n" +
 	"\x18ERROR_REASON_ENGINE_BUSY\x10\n" +
-	"\x1a\xbf\x03\xea\xf0\x19\xba\x03\n" +
-	"\x12RESOURCE_EXHAUSTED\x12\xa8\x02`SearchAvailability`, `ComputeAvailability`, `BatchComputeAvailability`, `CheckAvailability` or `CreateHold`: as many availability evaluations as the server runs at once (`[engine] max_evaluations`) were running, and none finished within `[engine] admission_wait_ms`. Nothing was read or written.\x1auRetry after a short randomized backoff; a narrower request (a resource type, fewer sites, a smaller page) is cheaper.(\x010\x01\x12\x92\x02\n" +
+	"\x1a\xc4\x03\xea\xf0\x19\xbf\x03\n" +
+	"\x12RESOURCE_EXHAUSTED\x12\xa8\x02`SearchAvailability`, `ComputeAvailability`, `BatchComputeAvailability`, `CheckAvailability` or `CreateHold`: as many availability evaluations as the server runs at once (`[engine] max_evaluations`) were running, and none finished within `[engine] admission_wait_ms`. Nothing was read or written.\x1azRetry after a short randomized backoff; a narrower request (a resource type, a tighter filter, a smaller page) is cheaper.(\x010\x01\x12\x92\x02\n" +
 	"\x1fERROR_REASON_CAPACITY_EXHAUSTED\x10\v\x1a\xec\x01\xea\xf0\x19\xe7\x01\n" +
 	"\x13FAILED_PRECONDITION\x12\x80\x01`CreateHold`: fewer resources are free for the whole window than were asked for. The race for the last one is lost this way too.\x1aKAsk for fewer, or another window; `ComputeAvailability` shows what is free.0\x01\x12\xea\x02\n" +
 	"!ERROR_REASON_OUTSIDE_AVAILABILITY\x10\f\x1a\xc2\x02\xea\xf0\x19\xbd\x02\n" +

@@ -823,17 +823,16 @@ func (r *GormWebhookRepository) reads(db *gorm.DB, in repox.ListInput) *gorm.DB 
 // webhookColumns are the row's columns by the field each stores, for
 // a read mask to leave out.
 var webhookColumns = map[string][]string{
-	"display_name":        {"display_name"},
-	"uri":                 {"uri"},
-	"event_types":         {"event_types"},
-	"organizational_unit": {"organizational_unit"},
-	"state":               {"state"},
-	"secret":              {"secret"},
-	"previous_secret":     {"previous_secret"},
-	"rotate_time":         {"rotate_time"},
-	"create_time":         {"create_time"},
-	"update_time":         {"update_time"},
-	"etag":                {"etag"},
+	"display_name":    {"display_name"},
+	"uri":             {"uri"},
+	"event_types":     {"event_types"},
+	"state":           {"state"},
+	"secret":          {"secret"},
+	"previous_secret": {"previous_secret"},
+	"rotate_time":     {"rotate_time"},
+	"create_time":     {"create_time"},
+	"update_time":     {"update_time"},
+	"etag":            {"etag"},
 }
 
 // Update persists the masked fields of in; an empty mask replaces every
@@ -894,7 +893,6 @@ func (r *GormWebhookRepository) updateTx(ctx context.Context, tx *gorm.DB, key s
 	existing.DisplayName = next.DisplayName
 	existing.URI = next.URI
 	existing.EventTypes = next.EventTypes
-	existing.OrganizationalUnit = next.OrganizationalUnit
 	if len(outputPaths) > 0 {
 		paths := outputPaths
 		if repox.InMask(paths, "state") {

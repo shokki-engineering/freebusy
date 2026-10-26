@@ -10,7 +10,8 @@ package db
 //	FREEBUSY_TEST_GRAPHQL_URL=http://localhost:3280/graphql \
 //	  go test ./internal/service/reservation/db/ -run Live -v
 //
-// Fixtures are seeded through GORM for both runs. Each run seeds its own site.
+// Fixtures are seeded through GORM for both runs. Each run seeds its own court
+// and asks only about it.
 
 import (
 	"context"
@@ -78,18 +79,16 @@ func backends(t *testing.T) (*gorm.DB, map[string]backend) {
 	return gdb, out
 }
 
-// seed creates one site with one court and no published availability, which
-// the engine reads as always open.
-func seed(t *testing.T, db *gorm.DB) (site, court string) {
+// seed creates one court with no published availability, which the engine
+// reads as always open.
+func seed(t *testing.T, db *gorm.DB) (court string) {
 	t.Helper()
 	run := ulid.Generate().String()
-	ou := "it-" + run
-	live.Site(t, db, ou)
-	res := &resource.Resource{ID: "court-" + run, Name: "resources/court-" + run, OrganizationalUnitID: &ou, ResourceTypes: []string{"padel-court"}}
+	res := &resource.Resource{ID: "court-" + run, Name: "resources/court-" + run, ResourceTypes: []string{"padel-court"}}
 	if err := db.Omit(clause.Associations).Create(res).Error; err != nil {
 		t.Fatal(err)
 	}
-	return "organizationalUnits/" + ou, res.Name
+	return res.Name
 }
 
 func TestLiveReservations(t *testing.T) {
@@ -102,12 +101,12 @@ func TestLiveReservations(t *testing.T) {
 	for name, b := range bs {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
-			site, _ := seed(t, db)
+			court := []string{seed(t, db)}
 			engine := allocation.NewServer(b.alloc, allocation.WithHoldTTL(holdTTL))
 			srv := reservation.NewServer(b.res, engine)
 			hold := func(h int) *allocationpbv1.Hold {
 				t.Helper()
-				out, err := engine.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Parent: site, Hold: &allocationpbv1.Hold{Window: win(h)}})
+				out, err := engine.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Hold: &allocationpbv1.Hold{Window: win(h), CandidateResources: court}})
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -115,7 +114,7 @@ func TestLiveReservations(t *testing.T) {
 			}
 			free := func(h int) int32 {
 				t.Helper()
-				res, err := engine.CheckAvailability(ctx, &allocationpbv1.CheckAvailabilityRequest{Parent: site, Window: win(h)})
+				res, err := engine.CheckAvailability(ctx, &allocationpbv1.CheckAvailabilityRequest{Resources: court, Window: win(h)})
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -124,7 +123,6 @@ func TestLiveReservations(t *testing.T) {
 			create := func(holdName string) (*reservationpbv1.Reservation, error) {
 				attrs, _ := structpb.NewStruct(map[string]any{"players": 4})
 				return srv.CreateReservation(ctx, &reservationpbv1.CreateReservationRequest{
-					Parent:      site,
 					Reservation: &reservationpbv1.Reservation{Hold: holdName, Customer: "users/ana", Attributes: attrs},
 				})
 			}
@@ -152,8 +150,7 @@ func TestLiveReservations(t *testing.T) {
 				}
 
 				list, err := srv.ListReservations(ctx, &reservationpbv1.ListReservationsRequest{
-					Parent: site,
-					Filter: `state = RESERVATION_STATE_CONFIRMED AND start_time >= "` + start.UTC().Format(time.RFC3339) + `"`,
+					Filter: `state = RESERVATION_STATE_CONFIRMED AND hold = "` + h.GetName() + `"`,
 				})
 				if err != nil {
 					t.Fatal(err)
@@ -195,7 +192,7 @@ func TestLiveReservations(t *testing.T) {
 
 			t.Run("reconciler finishes a stranded create", func(t *testing.T) {
 				h := hold(14)
-				name := site + "/reservations/" + h.GetName()[len(site+"/holds/"):]
+				name := "reservations/" + h.GetName()[len("holds/"):]
 				if _, err := b.res.Insert(ctx, &reservationpbv1.Reservation{
 					Name: name, Hold: h.GetName(), Resources: h.GetResources(),
 					StartTime: h.GetWindow().GetStartTime(), EndTime: h.GetWindow().GetEndTime(),
@@ -269,17 +266,17 @@ func TestLiveReservations(t *testing.T) {
 			})
 
 			t.Run("extend in place", func(t *testing.T) {
-				// The site has one court: extending 22:00-23:00 to 22:00-24:00
+				// There is one court: extending 22:00-23:00 to 22:00-24:00
 				// can only keep it if the booking's own claim does not count.
 				r, err := create(hold(22).GetName())
 				if err != nil {
 					t.Fatal(err)
 				}
 				longer := &interval.Interval{StartTime: win(22).GetStartTime(), EndTime: win(23).GetEndTime()}
-				if _, err := engine.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Parent: site, Hold: &allocationpbv1.Hold{Window: longer}}); status.Code(err) != codes.FailedPrecondition {
+				if _, err := engine.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Hold: &allocationpbv1.Hold{Window: longer, CandidateResources: court}}); status.Code(err) != codes.FailedPrecondition {
 					t.Fatalf("a plain hold over the booking's own time: %v, want FailedPrecondition", err)
 				}
-				nh, err := engine.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Parent: site, Hold: &allocationpbv1.Hold{Window: longer, Replaces: r.GetHold()}})
+				nh, err := engine.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Hold: &allocationpbv1.Hold{Window: longer, CandidateResources: court, Replaces: r.GetHold()}})
 				if err != nil {
 					t.Fatalf("hold replacing the booking: %v", err)
 				}
@@ -323,7 +320,7 @@ func TestLiveReservations(t *testing.T) {
 				for i := range 8 {
 					wg.Go(func() {
 						h, err := engine.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{
-							Parent: site, Hold: &allocationpbv1.Hold{Window: win(22), IdempotencyKey: key},
+							Hold: &allocationpbv1.Hold{Window: win(22), CandidateResources: court, IdempotencyKey: key},
 						})
 						names[i], errs[i] = h.GetName(), err
 					})

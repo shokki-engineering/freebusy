@@ -256,7 +256,6 @@ func webhookToCreateInput(in *webhookpbv1.Webhook) resourceql.CreateInput {
 	ci.DisplayName = in.GetDisplayName()
 	ci.Uri = in.GetUri()
 	ci.EventTypes = strSliceToPtrs(in.GetEventTypes())
-	ci.OrganizationalUnit = in.GetOrganizationalUnit()
 	if v := in.GetState(); v != 0 {
 		ci.State = strings.TrimPrefix(in.GetState().String(), "WEBHOOK_STATE_")
 	}
@@ -279,11 +278,6 @@ func webhookToUpdatePatch(merged *webhookpbv1.Webhook) resourceql.UpdateInput {
 	}
 	patch.Uri = graphql.Value(merged.GetUri())
 	patch.EventTypes = graphql.Value(strSliceToPtrs(merged.GetEventTypes()))
-	if v := merged.GetOrganizationalUnit(); v != "" {
-		patch.OrganizationalUnit = graphql.Value(v)
-	} else {
-		patch.OrganizationalUnit = graphql.Null[string]()
-	}
 	return patch
 }
 
@@ -339,7 +333,6 @@ func webhookFromRow(row *resourceql.WebhookResource) *webhookpbv1.Webhook {
 	out.DisplayName = repox.Deref(row.DisplayName)
 	out.Uri = row.Uri
 	out.EventTypes = strPtrsToSlice(row.EventTypes)
-	out.OrganizationalUnit = repox.Deref(row.OrganizationalUnit)
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)

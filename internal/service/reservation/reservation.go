@@ -57,24 +57,21 @@ func (s *Server) CreateReservation(ctx context.Context, req *reservationpbv1.Cre
 
 func (s *Server) create(ctx context.Context, req *reservationpbv1.CreateReservationRequest) (*reservationpbv1.Reservation, error) {
 	in := req.GetReservation()
-	return s.open(ctx, req.GetParent(), in.GetHold(), req.GetReservationId(), &reservationpbv1.Reservation{
+	return s.open(ctx, in.GetHold(), req.GetReservationId(), &reservationpbv1.Reservation{
 		Customer:   in.GetCustomer(),
 		Attributes: in.GetAttributes(),
 	})
 }
 
-// open makes, or finishes making, the reservation for a hold at parent, named
+// open makes, or finishes making, the reservation for a hold, named
 // id when given and after the hold otherwise. CreateReservation and
 // RescheduleReservation's replacement both come through here; tmpl carries
 // the fields the caller chose (customer, attributes, and for a replacement,
 // replaces).
-func (s *Server) open(ctx context.Context, parent, holdName, id string, tmpl *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
-	name, err := reservationFor(parent, holdName)
-	if err != nil {
-		return nil, err
-	}
+func (s *Server) open(ctx context.Context, holdName, id string, tmpl *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
+	name := reservationFor(holdName)
 	if id != "" {
-		name = parent + "/reservations/" + id
+		name = "reservations/" + id
 	}
 
 	// A retry, or a second caller with the same hold: finish and return what
@@ -90,7 +87,7 @@ func (s *Server) open(ctx context.Context, parent, holdName, id string, tmpl *re
 		return nil, servicex.BadField("HOLD_NOT_FOUND", "reservation.hold",
 			fmt.Sprintf("hold %s does not exist", holdName),
 			"A reservation is made from a live hold: take one first with "+
-				hints.Call("CreateHold", map[string]string{"parent": parent})+
+				hints.Call("CreateHold", nil)+
 				" and send the name it returns as reservation.hold")
 	}
 	if err != nil {
@@ -102,7 +99,7 @@ func (s *Server) open(ctx context.Context, parent, holdName, id string, tmpl *re
 		word := strings.ToLower(strings.TrimPrefix(h.GetState().String(), "HOLD_STATE_"))
 		return nil, servicex.Blocked("HOLD_NOT_ACTIVE", hints.TypeOf(holdName), holdName,
 			fmt.Sprintf("hold %s is %s, so it no longer holds the resources", holdName, word),
-			"Take a new hold with "+hints.Call("CreateHold", map[string]string{"parent": parent})+
+			"Take a new hold with "+hints.Call("CreateHold", nil)+
 				" and create the reservation from it; if settling takes long, ExtendHold before expire_time")
 	}
 
@@ -122,7 +119,7 @@ func (s *Server) open(ctx context.Context, parent, holdName, id string, tmpl *re
 			return nil, servicex.Blocked("HOLD_FOR_RESCHEDULE", hints.TypeOf(holdName), holdName,
 				fmt.Sprintf("hold %s was taken to replace the booking of hold %s, so it can only reschedule the reservation made from that hold", holdName, replaced),
 				"Reschedule that reservation onto it with RescheduleReservation, or take a hold without replaces with "+
-					hints.Call("CreateHold", map[string]string{"parent": parent}))
+					hints.Call("CreateHold", nil))
 		}
 	}
 
@@ -161,18 +158,10 @@ func (s *Server) open(ctx context.Context, parent, holdName, id string, tmpl *re
 	return s.advance(ctx, created)
 }
 
-// reservationFor names the reservation a hold at parent becomes by default:
-// same site, same id. It also checks the hold is at parent.
-func reservationFor(parent, holdName string) (string, error) {
-	prefix := parent + "/holds/"
-	if !strings.HasPrefix(holdName, prefix) || strings.Contains(holdName[len(prefix):], "/") {
-		return "", servicex.BadField("HOLD_AT_ANOTHER_SITE", "reservation.hold",
-			fmt.Sprintf("hold %q is not a hold at %s", holdName, parent),
-			"A reservation is made at the site its hold is at: send parent = the hold's site ("+
-				parent+"/holds/{hold} for this parent), or take a hold here with "+
-				hints.Call("CreateHold", map[string]string{"parent": parent}))
-	}
-	return parent + "/reservations/" + holdName[len(prefix):], nil
+// reservationFor names the reservation a hold becomes by default: the
+// hold's id.
+func reservationFor(holdName string) string {
+	return "reservations/" + lastSegment(holdName)
 }
 
 // advance carries a reservation in a transient state through to the state it
@@ -207,7 +196,7 @@ func (s *Server) confirm(ctx context.Context, r *reservationpbv1.Reservation) (*
 		}
 		return nil, servicex.Blocked("HOLD_LAPSED", hints.TypeOf(r.GetHold()), r.GetHold(),
 			fmt.Sprintf("hold %s lapsed before the reservation could be confirmed, so reservation %s failed", r.GetHold(), r.GetName()),
-			"Take a new hold with "+hints.Call("CreateHold", map[string]string{"parent": siteOf(r.GetName())})+
+			"Take a new hold with "+hints.Call("CreateHold", nil)+
 				" and create the reservation again; hold for longer, or ExtendHold, if settling takes time")
 	case err != nil:
 		return nil, err
@@ -269,11 +258,11 @@ func (s *Server) GetReservation(ctx context.Context, req *reservationpbv1.GetRes
 	return out, err
 }
 
-// ListReservations returns a page of a site's reservations.
+// ListReservations returns a page of reservations.
 func (s *Server) ListReservations(ctx context.Context, req *reservationpbv1.ListReservationsRequest) (*reservationpbv1.ListReservationsResponse, error) {
 	var out *reservationpbv1.ListReservationsResponse
 	err := rpc.Traced(ctx, "ReservationService", "ListReservations", func(ctx context.Context) error {
-		items, next, err := s.store.List(ctx, req.GetParent(), repox.ListInput{
+		items, next, err := s.store.List(ctx, repox.ListInput{
 			PageSize:  req.GetPageSize(),
 			PageToken: req.GetPageToken(),
 			Filter:    req.GetFilter(),
@@ -404,14 +393,4 @@ func (s *Server) StartReconciler(ctx context.Context, interval time.Duration, lo
 			}
 		}
 	}()
-}
-
-// siteOf is the site a reservation or hold name sits under:
-// "organizationalUnits/o/reservations/r" is "organizationalUnits/o".
-func siteOf(name string) string {
-	segs := strings.SplitN(name, "/", 3)
-	if len(segs) < 2 {
-		return name
-	}
-	return segs[0] + "/" + segs[1]
 }

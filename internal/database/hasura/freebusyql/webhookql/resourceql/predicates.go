@@ -23,18 +23,17 @@ import (
 // Filter fields for WebhookResource. Build predicates like CreateTime.Eq(v) and combine
 // them with And/Or/Not.
 var (
-	CreateTime         = graphql.StringField{Col: "createTime"}
-	DisplayName        = graphql.StringField{Col: "displayName"}
-	Etag               = graphql.StringField{Col: "etag"}
-	Id                 = graphql.StringField{Col: "id"}
-	Name               = graphql.StringField{Col: "name"}
-	OrganizationalUnit = graphql.StringField{Col: "organizationalUnit"}
-	PreviousSecret     = graphql.StringField{Col: "previousSecret"}
-	RotateTime         = graphql.StringField{Col: "rotateTime"}
-	Secret             = graphql.StringField{Col: "secret"}
-	State              = graphql.StringField{Col: "state"}
-	UpdateTime         = graphql.StringField{Col: "updateTime"}
-	Uri                = graphql.StringField{Col: "uri"}
+	CreateTime     = graphql.StringField{Col: "createTime"}
+	DisplayName    = graphql.StringField{Col: "displayName"}
+	Etag           = graphql.StringField{Col: "etag"}
+	Id             = graphql.StringField{Col: "id"}
+	Name           = graphql.StringField{Col: "name"}
+	PreviousSecret = graphql.StringField{Col: "previousSecret"}
+	RotateTime     = graphql.StringField{Col: "rotateTime"}
+	Secret         = graphql.StringField{Col: "secret"}
+	State          = graphql.StringField{Col: "state"}
+	UpdateTime     = graphql.StringField{Col: "updateTime"}
+	Uri            = graphql.StringField{Col: "uri"}
 )
 
 // And matches rows satisfying every predicate.

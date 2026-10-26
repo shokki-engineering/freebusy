@@ -28,20 +28,20 @@ import (
 )
 
 // AllocationRepository is the provider-agnostic persistence surface for
-// Allocation (organizationalUnits/{organizational_unit}/allocations/{allocation}): full-message writes, AIP-160/AIP-132 lists with
+// Allocation (allocations/{allocation}): full-message writes, AIP-160/AIP-132 lists with
 // opaque page tokens, field-mask updates, and etag optimistic concurrency.
 type AllocationRepository interface {
-	// Create persists m under parent and returns the stored record.
-	Create(ctx context.Context, parent string, m *allocationpbv1.Allocation) (*allocationpbv1.Allocation, error)
+	// Create persists m and returns the stored record.
+	Create(ctx context.Context, m *allocationpbv1.Allocation) (*allocationpbv1.Allocation, error)
 	// Get returns the record addressed by its resource name, or
 	// repox.ErrNotFound.
 	Get(ctx context.Context, name string) (*allocationpbv1.Allocation, error)
-	// List returns one page of records under parent.
-	List(ctx context.Context, parent string, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error)
+	// List returns one page of records.
+	List(ctx context.Context, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error)
 	// ListByKeys reads every record whose filter field field is one of keys
 	// -- a batched read by name, by parent, by any text, enum or reference
 	// field -- in statements of at most repox.KeysPerRead keys, at most
-	// repox.ReadParallelism at once, across every parent. in narrows
+	// repox.ReadParallelism at once. in narrows
 	// each read; its page fields are ignored. See repox.ListByKeys for the
 	// order records come back in.
 	ListByKeys(ctx context.Context, field string, keys []string, in repox.ListInput) ([]*allocationpbv1.Allocation, error)
@@ -82,20 +82,20 @@ type AllocationHooks struct {
 }
 
 // HoldRepository is the provider-agnostic persistence surface for
-// Hold (organizationalUnits/{organizational_unit}/holds/{hold}): full-message writes, AIP-160/AIP-132 lists with
+// Hold (holds/{hold}): full-message writes, AIP-160/AIP-132 lists with
 // opaque page tokens, field-mask updates, and etag optimistic concurrency.
 type HoldRepository interface {
-	// Create persists m under parent and returns the stored record.
-	Create(ctx context.Context, parent string, m *allocationpbv1.Hold) (*allocationpbv1.Hold, error)
+	// Create persists m and returns the stored record.
+	Create(ctx context.Context, m *allocationpbv1.Hold) (*allocationpbv1.Hold, error)
 	// Get returns the record addressed by its resource name, or
 	// repox.ErrNotFound.
 	Get(ctx context.Context, name string) (*allocationpbv1.Hold, error)
-	// List returns one page of records under parent.
-	List(ctx context.Context, parent string, in repox.ListInput) ([]*allocationpbv1.Hold, string, error)
+	// List returns one page of records.
+	List(ctx context.Context, in repox.ListInput) ([]*allocationpbv1.Hold, string, error)
 	// ListByKeys reads every record whose filter field field is one of keys
 	// -- a batched read by name, by parent, by any text, enum or reference
 	// field -- in statements of at most repox.KeysPerRead keys, at most
-	// repox.ReadParallelism at once, across every parent. in narrows
+	// repox.ReadParallelism at once. in narrows
 	// each read; its page fields are ignored. See repox.ListByKeys for the
 	// order records come back in.
 	ListByKeys(ctx context.Context, field string, keys []string, in repox.ListInput) ([]*allocationpbv1.Hold, error)
@@ -148,7 +148,7 @@ type Repositories struct {
 // Hooks do not run for queued writes.
 type Batch interface {
 	// CreateAllocation queues a create and returns the name the record will have.
-	CreateAllocation(parent string, m *allocationpbv1.Allocation) (string, error)
+	CreateAllocation(m *allocationpbv1.Allocation) (string, error)
 	// UpdateAllocation queues Update: the masked fields of m, every mutable
 	// field when paths is empty. m.Etag, when set, guards it; a guard that
 	// fails fails the whole Commit with repox.ErrConflict.
@@ -163,7 +163,7 @@ type Batch interface {
 	// gone is not an error.
 	DeleteAllocation(name string)
 	// CreateHold queues a create and returns the name the record will have.
-	CreateHold(parent string, m *allocationpbv1.Hold) (string, error)
+	CreateHold(m *allocationpbv1.Hold) (string, error)
 	// UpdateHold queues Update: the masked fields of m, every mutable
 	// field when paths is empty. m.Etag, when set, guards it; a guard that
 	// fails fails the whole Commit with repox.ErrConflict.
@@ -453,8 +453,8 @@ type observedAllocationRepository struct {
 	changes repox.ChangeObserver
 }
 
-func (o *observedAllocationRepository) Create(ctx context.Context, parent string, m *allocationpbv1.Allocation) (*allocationpbv1.Allocation, error) {
-	out, err := o.AllocationRepository.Create(ctx, parent, m)
+func (o *observedAllocationRepository) Create(ctx context.Context, m *allocationpbv1.Allocation) (*allocationpbv1.Allocation, error) {
+	out, err := o.AllocationRepository.Create(ctx, m)
 	o.created(ctx, m, out)
 	return out, err
 }
@@ -507,8 +507,8 @@ type observedHoldRepository struct {
 	changes repox.ChangeObserver
 }
 
-func (o *observedHoldRepository) Create(ctx context.Context, parent string, m *allocationpbv1.Hold) (*allocationpbv1.Hold, error) {
-	out, err := o.HoldRepository.Create(ctx, parent, m)
+func (o *observedHoldRepository) Create(ctx context.Context, m *allocationpbv1.Hold) (*allocationpbv1.Hold, error) {
+	out, err := o.HoldRepository.Create(ctx, m)
 	o.created(ctx, m, out)
 	return out, err
 }
@@ -572,10 +572,10 @@ func changedAllocation(name string, op repox.ChangeOp, rec *allocationpbv1.Alloc
 	return []repox.Change{c}
 }
 
-func (p *projectedAllocationRepository) Create(ctx context.Context, parent string, m *allocationpbv1.Allocation) (out *allocationpbv1.Allocation, err error) {
+func (p *projectedAllocationRepository) Create(ctx context.Context, m *allocationpbv1.Allocation) (out *allocationpbv1.Allocation, err error) {
 	err = p.run(ctx, func(r AllocationRepository) ([]repox.Change, error) {
 		var err error
-		out, err = r.Create(ctx, parent, m)
+		out, err = r.Create(ctx, m)
 		return changedAllocation(out.GetName(), repox.ChangeCreate, out), err
 	})
 	return out, err
@@ -650,10 +650,10 @@ func changedHold(name string, op repox.ChangeOp, rec *allocationpbv1.Hold) []rep
 	return []repox.Change{c}
 }
 
-func (p *projectedHoldRepository) Create(ctx context.Context, parent string, m *allocationpbv1.Hold) (out *allocationpbv1.Hold, err error) {
+func (p *projectedHoldRepository) Create(ctx context.Context, m *allocationpbv1.Hold) (out *allocationpbv1.Hold, err error) {
 	err = p.run(ctx, func(r HoldRepository) ([]repox.Change, error) {
 		var err error
-		out, err = r.Create(ctx, parent, m)
+		out, err = r.Create(ctx, m)
 		return changedHold(out.GetName(), repox.ChangeCreate, out), err
 	})
 	return out, err

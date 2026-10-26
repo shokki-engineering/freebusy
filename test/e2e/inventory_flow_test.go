@@ -30,7 +30,6 @@ func inventoryFlow(t *testing.T, c *e2eClients) {
 	t.Helper()
 	ctx := context.Background()
 	id := "inv-" + c.suffix
-	site := c.site(t, id)
 	day := time.Now().UTC().AddDate(0, 0, 40).Truncate(24 * time.Hour)
 	at := func(h int) time.Time { return day.Add(time.Duration(h) * time.Hour) }
 	span := func(a, b time.Time) *interval.Interval {
@@ -57,7 +56,7 @@ func inventoryFlow(t *testing.T, c *e2eClients) {
 
 	res, err := c.resources.CreateResource(ctx, &resourcev1.CreateResourceRequest{
 		ResourceId: id,
-		Resource:   &resourcev1.Resource{DisplayName: "court", Calendar: cal.GetName(), OrganizationalUnit: site, ResourceTypes: []string{"court"}},
+		Resource:   &resourcev1.Resource{DisplayName: "court", Calendar: cal.GetName(), ResourceTypes: []string{"court-" + id}},
 	})
 	if err != nil {
 		t.Fatalf("CreateResource: %v", err)
@@ -102,7 +101,7 @@ func inventoryFlow(t *testing.T, c *e2eClients) {
 	// maintenance at 10:00, free at 12:00.
 	free := func(a, b time.Time) int32 {
 		t.Helper()
-		r, err := c.availability.CheckAvailability(ctx, &allocationpbv1.CheckAvailabilityRequest{Parent: site, Window: span(a, b)})
+		r, err := c.availability.CheckAvailability(ctx, &allocationpbv1.CheckAvailabilityRequest{Resources: []string{res.GetName()}, Window: span(a, b)})
 		if err != nil {
 			t.Fatalf("CheckAvailability: %v", err)
 		}
@@ -112,15 +111,15 @@ func inventoryFlow(t *testing.T, c *e2eClients) {
 		t.Fatalf("free at 07, 10, 12: %v, want [0 0 1]", got)
 	}
 
-	// Searching the whole organization, no site named, finds the same court.
+	// Searching every resource by its type finds the same court.
 	found, err := c.availability.SearchAvailability(ctx, &allocationpbv1.SearchAvailabilityRequest{
-		Parent: "organizations/" + id + "-org", Window: span(at(12), at(13)), ResourceTypes: []string{"court"},
+		Window: span(at(12), at(13)), ResourceTypes: []string{"court-" + id},
 	})
 	if err != nil || len(found.GetMatches()) != 1 || found.GetMatches()[0].GetResource() != res.GetName() {
-		t.Fatalf("SearchAvailability across the organization: %v, %v; want %s", found.GetMatches(), err, res.GetName())
+		t.Fatalf("SearchAvailability: %v, %v; want %s", found.GetMatches(), err, res.GetName())
 	}
 
-	hold, err := c.holds.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Parent: site, Hold: &allocationpbv1.Hold{Window: span(at(12), at(13))}})
+	hold, err := c.holds.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Hold: &allocationpbv1.Hold{Window: span(at(12), at(13)), CandidateResources: []string{res.GetName()}}})
 	if err != nil {
 		t.Fatalf("CreateHold: %v", err)
 	}

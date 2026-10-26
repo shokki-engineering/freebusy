@@ -22,19 +22,18 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
-// FormatReservationName builds "organizationalUnits/{organizational_unit}/reservations/{reservation}" from bare ids.
-func FormatReservationName(organizationalUnit, reservation string) string {
-	return "organizationalUnits" + "/" + organizationalUnit + "/" + "reservations" + "/" + reservation
+// FormatReservationName builds "reservations/{reservation}" from bare ids.
+func FormatReservationName(reservation string) string {
+	return "reservations" + "/" + reservation
 }
 
-// ParseReservationName splits a "organizationalUnits/{organizational_unit}/reservations/{reservation}" resource name into its bare ids,
+// ParseReservationName splits a "reservations/{reservation}" resource name into its bare ids,
 // rejecting other shapes with repox.ErrInvalidArgument.
-func ParseReservationName(name string) (organizationalUnit, reservation string, err error) {
-	ids, err := repox.SplitName(name, "organizationalUnits", "reservations")
+func ParseReservationName(name string) (reservation string, err error) {
+	ids, err := repox.SplitName(name, "reservations")
 	if err != nil {
 		return
 	}
-	organizationalUnit = ids[0]
-	reservation = ids[1]
+	reservation = ids[0]
 	return
 }

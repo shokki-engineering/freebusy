@@ -19,8 +19,6 @@ definition:
       type: String_1!
     - name: name
       type: String_1!
-    - name: organizationalUnit
-      type: String_1
     - name: previousSecret
       type: String_1
     - name: rotateTime
@@ -58,9 +56,6 @@ definition:
         name:
           column:
             name: name
-        organizationalUnit:
-          column:
-            name: organizational_unit
         previousSecret:
           column:
             name: previous_secret
@@ -95,7 +90,6 @@ definition:
           - eventTypes
           - id
           - name
-          - organizationalUnit
           - previousSecret
           - rotateTime
           - secret

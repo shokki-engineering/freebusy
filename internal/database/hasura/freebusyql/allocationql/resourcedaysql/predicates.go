@@ -29,7 +29,6 @@ var (
 	DisplayName        = graphql.StringField{Col: "displayName"}
 	FreeFraction       = graphql.FloatField{Col: "freeFraction"}
 	Id                 = graphql.StringField{Col: "id"}
-	Organization       = graphql.StringField{Col: "organization"}
 	OrganizationalUnit = graphql.StringField{Col: "organizationalUnit"}
 	Resource           = graphql.StringField{Col: "resource"}
 	RowVersion         = graphql.Int64Field{Col: "rowVersion"}

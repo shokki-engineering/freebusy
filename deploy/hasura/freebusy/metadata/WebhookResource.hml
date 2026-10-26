@@ -19,8 +19,6 @@ definition:
       type: String_1!
     - name: name
       type: String_1!
-    - name: organizationalUnit
-      type: String_1
     - name: previousSecret
       type: String_1
     - name: rotateTime
@@ -58,9 +56,6 @@ definition:
         name:
           column:
             name: name
-        organizationalUnit:
-          column:
-            name: organizational_unit
         previousSecret:
           column:
             name: previous_secret
@@ -95,7 +90,6 @@ definition:
           - eventTypes
           - id
           - name
-          - organizationalUnit
           - previousSecret
           - rotateTime
           - secret
@@ -121,8 +115,6 @@ definition:
         - fieldName: id
           booleanExpressionType: TextBoolExp
         - fieldName: name
-          booleanExpressionType: TextBoolExp
-        - fieldName: organizationalUnit
           booleanExpressionType: TextBoolExp
         - fieldName: previousSecret
           booleanExpressionType: TextBoolExp
@@ -163,8 +155,6 @@ definition:
           aggregateExpression: TextAggExp
         - fieldName: name
           aggregateExpression: TextAggExp
-        - fieldName: organizationalUnit
-          aggregateExpression: TextAggExp
         - fieldName: previousSecret
           aggregateExpression: TextAggExp
         - fieldName: rotateTime
@@ -201,8 +191,6 @@ definition:
         - fieldName: id
           orderByExpression: String1OrderByExp
         - fieldName: name
-          orderByExpression: String1OrderByExp
-        - fieldName: organizationalUnit
           orderByExpression: String1OrderByExp
         - fieldName: previousSecret
           orderByExpression: String1OrderByExp

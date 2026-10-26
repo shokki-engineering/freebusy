@@ -30,8 +30,8 @@ import (
 // createAttempts bounds how often CreateHold re-plans after losing a race.
 // Each loss means another caller took a resource between the read and the
 // write; re-reading picks the next best one, or finds there is none left and
-// reports exhaustion. Running out of attempts means the site is contended hard
-// enough that the caller should hear about it.
+// reports exhaustion. Running out of attempts means the resources are
+// contended hard enough that the caller should hear about it.
 const createAttempts = 6
 
 // backoffBase is the first re-plan's maximum wait, doubling each attempt.
@@ -55,7 +55,6 @@ func (s *Server) CreateHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 }
 
 func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldRequest) (*allocationpbv1.Hold, error) {
-	parent := req.GetParent()
 	in := req.GetHold()
 	window, err := spanOf(in.GetWindow())
 	if err != nil {
@@ -71,7 +70,7 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 		if key == "" {
 			return nil, nil
 		}
-		prev, err := s.store.FindHold(ctx, parent, key)
+		prev, err := s.store.FindHold(ctx, key)
 		switch {
 		case err == nil:
 			return s.authoritative(prev), nil
@@ -87,7 +86,7 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 		// Derived, not random: two concurrent calls with one key then race
 		// for one name, the store's uniqueness picks a winner, and the loser
 		// returns the winner's hold below. A random id would let both win.
-		id = keyedID(parent, in.GetIdempotencyKey())
+		id = keyedID(in.GetIdempotencyKey())
 	default:
 		id = ulid.Generate().String()
 	}
@@ -95,13 +94,13 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 	// A hold replacing a booking leaves that booking's own claim out of
 	// what it competes with, so a window overlapping it can keep its
 	// resources.
-	kept, err := s.replaced(ctx, parent, in.GetReplaces())
+	kept, err := s.replaced(ctx, in.GetReplaces())
 	if err != nil {
 		return nil, err
 	}
 	// The resources the hold may take: its candidates, narrowed by its
 	// filter. restricted with an empty scope is a filter nothing matches.
-	scope, restricted, err := s.scopeOf(ctx, parent, in.GetCandidateResources(), in.GetCandidateFilter(), "hold.candidate_filter")
+	scope, restricted, err := s.scopeOf(ctx, in.GetCandidateResources(), in.GetCandidateFilter(), "hold.candidate_filter")
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +111,7 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 			return prev, err
 		}
 		now := s.now()
-		picked, res, retry, err := s.plan(ctx, parent, scope, restricted, in.GetCandidateFilter(), window, quantity, now, fresh, kept)
+		picked, res, retry, err := s.plan(ctx, scope, restricted, in.GetCandidateFilter(), window, quantity, now, fresh, kept)
 		if err != nil {
 			return nil, err
 		}
@@ -126,10 +125,10 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 			if prev, err := prior(); prev != nil || err != nil {
 				return prev, err
 			}
-			return nil, unbookable(parent, res, quantity)
+			return nil, unbookable(res, quantity)
 		}
 		hold := &allocationpbv1.Hold{
-			Name:               parent + "/holds/" + id,
+			Name:               "holds/" + id,
 			Resources:          picked,
 			Window:             intervalOf(window),
 			CandidateResources: in.GetCandidateResources(),
@@ -140,7 +139,7 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 			IdempotencyKey:     in.GetIdempotencyKey(),
 			Replaces:           in.GetReplaces(),
 		}
-		created, err := s.store.InsertHold(ctx, parent, hold)
+		created, err := s.store.InsertHold(ctx, hold)
 		if err == nil {
 			return created, nil
 		}
@@ -163,32 +162,32 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 
 // plan chooses a hold's resources: from the candidates the read model says
 // are free when there are enough of them -- a handful of resources read
-// instead of the whole site -- and from every resource in scope when they
+// instead of every one in scope -- and from every resource in scope when they
 // fall short or the read model cannot answer, so a hold never depends on it
 // being current, and a refusal always comes from the whole scope.
-func (s *Server) plan(ctx context.Context, parent string, scope []string, restricted bool, filter string, window engine.Span, quantity int, now time.Time, fresh bool, kept map[string]engine.Spans) (picked []string, res engine.CheckResult, retry bool, err error) {
+func (s *Server) plan(ctx context.Context, scope []string, restricted bool, filter string, window engine.Span, quantity int, now time.Time, fresh bool, kept map[string]engine.Spans) (picked []string, res engine.CheckResult, retry bool, err error) {
 	if restricted && len(scope) == 0 {
 		return nil, engine.Check(nil, window, quantity, now), false, nil
 	}
 	// A replacing hold competes without its booking's own claims, which the
 	// read model counts as booked: plan it from the whole scope.
 	if kept == nil {
-		cands, ok, err := s.modelCandidates(ctx, parent, scope, filter, window, now)
+		cands, ok, err := s.modelCandidates(ctx, scope, filter, window, now)
 		if err != nil {
 			return nil, res, false, err
 		}
 		if ok && len(cands) >= quantity {
-			picked, res, retry, err = s.pick(ctx, parent, cands, window, quantity, now, fresh, kept)
+			picked, res, retry, err = s.pick(ctx, cands, window, quantity, now, fresh, kept)
 			if err != nil || retry || picked != nil {
 				return picked, res, retry, err
 			}
 		}
 	}
-	return s.pick(ctx, parent, scope, window, quantity, now, fresh, kept)
+	return s.pick(ctx, scope, window, quantity, now, fresh, kept)
 }
 
 // pick plans one CreateHold attempt under admission control: it gathers the
-// site, checks the window, and chooses quantity resources, spreading
+// candidates, checks the window, and chooses quantity resources, spreading
 // concurrent callers across equally good ones (engine.Pick). nil picked with
 // no error is a window that cannot be held, and res says why.
 //
@@ -200,14 +199,13 @@ func (s *Server) plan(ctx context.Context, parent string, scope []string, restri
 //
 // kept is time a booking the hold replaces keeps on its resources, which the
 // plan does not count as booked.
-func (s *Server) pick(ctx context.Context, parent string, candidates []string, window engine.Span, quantity int, now time.Time, fresh bool, kept map[string]engine.Spans) (picked []string, res engine.CheckResult, retry bool, err error) {
+func (s *Server) pick(ctx context.Context, candidates []string, window engine.Span, quantity int, now time.Time, fresh bool, kept map[string]engine.Spans) (picked []string, res engine.CheckResult, retry bool, err error) {
 	release, err := s.admit.acquire(ctx, "CreateHold")
 	if err != nil {
 		return nil, res, false, err
 	}
 	defer release()
-	q := ResourceQuery{OrganizationalUnits: []string{parent}, Names: candidates}
-	st, err := s.gatherFrom(ctx, q, horizon(window), now, fresh, kept)
+	st, err := s.gatherFrom(ctx, ResourceQuery{Names: candidates}, horizon(window), now, fresh, kept)
 	if err != nil {
 		return nil, res, false, err
 	}
@@ -222,12 +220,12 @@ func (s *Server) pick(ctx context.Context, parent string, candidates []string, w
 	}
 	picked = engine.Pick(res.Fits, quantity, s.shuffle)
 	if cached {
-		ok, err := s.verifyPicked(ctx, parent, st, picked)
+		ok, err := s.verifyPicked(ctx, st, picked)
 		if err != nil {
 			return nil, res, false, err
 		}
 		if !ok {
-			s.statics.drop(parent)
+			s.statics.drop(picked)
 			return nil, res, true, nil
 		}
 	}
@@ -250,8 +248,8 @@ func staticRefusal(res engine.CheckResult) bool {
 
 // verifyPicked reads the chosen resources' static inputs from the database and
 // reports whether they match the cached ones the plan was made from.
-func (s *Server) verifyPicked(ctx context.Context, parent string, st *site, picked []string) (bool, error) {
-	got, err := s.readStatics(ctx, ResourceQuery{OrganizationalUnits: []string{parent}, Names: picked})
+func (s *Server) verifyPicked(ctx context.Context, st *inputs, picked []string) (bool, error) {
+	got, err := s.readStatics(ctx, ResourceQuery{Names: picked})
 	if err != nil {
 		return false, err
 	}
@@ -274,28 +272,26 @@ func (s *Server) verifyPicked(ctx context.Context, parent string, st *site, pick
 // unbookable is the problem with a window that cannot be held: outside the
 // published availability of every resource asked about, or offered but not
 // enough of it free.
-func unbookable(parent string, res engine.CheckResult, quantity int) error {
+func unbookable(res engine.CheckResult, quantity int) error {
 	if outsideAvailability(res) {
 		return &problem.Problem{
 			Kind: allocationpbv1svc.ErrCapacityExhausted, Reason: "OUTSIDE_AVAILABILITY",
-			ResourceType: hints.TypeOf(parent), ResourceName: parent,
 			What: "the window is outside the published availability of every resource asked about: nothing is offered then",
-			Fix: "Ask for a window inside opening hours -- " + hints.Call("ComputeAvailability", map[string]string{"parent": parent}) +
+			Fix: "Ask for a window inside opening hours -- " + hints.Call("ComputeAvailability", nil) +
 				" shows what is offered and free when",
 		}
 	}
 	return &problem.Problem{
 		Kind: allocationpbv1svc.ErrCapacityExhausted, Reason: allocationpbv1svc.ReasonCapacityExhausted,
-		ResourceType: hints.TypeOf(parent), ResourceName: parent,
 		What: fmt.Sprintf("only %d of the %d resources asked for are free for that whole window", len(res.Candidates), quantity),
-		Fix: "Ask for fewer, or another window -- " + hints.Call("ComputeAvailability", map[string]string{"parent": parent}) +
+		Fix: "Ask for fewer, or another window -- " + hints.Call("ComputeAvailability", nil) +
 			" shows what is free when, and CheckAvailability says why a window is not",
 	}
 }
 
 // outsideAvailability reports whether no resource was offered for the window
 // at all: every one refused as outside its availability, or deleted, and at
-// least one of them for availability. A site with no resources is not
+// least one of them for availability. A scope with no resources is not
 // outside availability; it has nothing to offer.
 func outsideAvailability(res engine.CheckResult) bool {
 	outside := false
@@ -313,16 +309,10 @@ func outsideAvailability(res engine.CheckResult) bool {
 
 // replaced is the time the booking a new hold replaces keeps, by resource:
 // the window of that hold, the reservation's, on each of its resources. It
-// must be a converted hold at the same site still keeping them; nil when
-// name is empty.
-func (s *Server) replaced(ctx context.Context, parent, name string) (map[string]engine.Spans, error) {
+// must be a converted hold still keeping them; nil when name is empty.
+func (s *Server) replaced(ctx context.Context, name string) (map[string]engine.Spans, error) {
 	if name == "" {
 		return nil, nil
-	}
-	if siteOf(name) != parent {
-		return nil, servicex.BadField("HOLD_AT_ANOTHER_SITE", "hold.replaces",
-			fmt.Sprintf("hold %q is not a hold at %s", name, parent),
-			"A hold can replace only a booking at its own site: send the hold of a reservation at "+parent)
 	}
 	stored, err := s.store.GetHold(ctx, name)
 	if errors.Is(err, repox.ErrNotFound) {
@@ -375,10 +365,10 @@ func (s *Server) HandOver(ctx context.Context, from, to string, at time.Time) (*
 	})
 }
 
-// keyedID derives a hold id from a site and an idempotency key: 26 lowercase
-// hex characters of their SHA-256, the length of a ULID so names stay uniform.
-func keyedID(parent, key string) string {
-	sum := sha256.Sum256([]byte(parent + "\x00" + key))
+// keyedID derives a hold id from an idempotency key: 26 lowercase hex
+// characters of its SHA-256, the length of a ULID so names stay uniform.
+func keyedID(key string) string {
+	sum := sha256.Sum256([]byte(key))
 	return hex.EncodeToString(sum[:13])
 }
 
@@ -396,11 +386,11 @@ func (s *Server) GetHold(ctx context.Context, req *allocationpbv1.GetHoldRequest
 	return out, err
 }
 
-// ListHolds returns a page of a site's holds, with expiry applied.
+// ListHolds returns a page of holds, with expiry applied.
 func (s *Server) ListHolds(ctx context.Context, req *allocationpbv1.ListHoldsRequest) (*allocationpbv1.ListHoldsResponse, error) {
 	var out *allocationpbv1.ListHoldsResponse
 	err := rpc.Traced(ctx, "HoldService", "ListHolds", func(ctx context.Context) error {
-		items, next, err := s.store.ListHolds(ctx, req.GetParent(), repox.ListInput{
+		items, next, err := s.store.ListHolds(ctx, repox.ListInput{
 			PageSize:  req.GetPageSize(),
 			PageToken: req.GetPageToken(),
 			Filter:    req.GetFilter(),
@@ -457,7 +447,7 @@ func (s *Server) ReleaseHold(ctx context.Context, req *allocationpbv1.ReleaseHol
 			return rpc.ToStatusErr(servicex.Blocked("HOLD_CONVERTED", hints.TypeOf(h.GetName()), h.GetName(),
 				fmt.Sprintf("hold %s became a reservation, and releasing it would free resources that are booked", h.GetName()),
 				"Cancel the reservation instead with CancelReservation; "+
-					hints.Call("ListReservations", map[string]string{"parent": siteOf(h.GetName())})+
+					hints.Call("ListReservations", nil)+
 					" with filter hold = \""+h.GetName()+"\" finds it"))
 		}
 		now := s.now()
@@ -644,20 +634,10 @@ func (s *Server) StartHoldSweeper(ctx context.Context, interval time.Duration, l
 func notActive(name string, state allocationpbv1.HoldState) error {
 	word := strings.ToLower(strings.TrimPrefix(state.String(), "HOLD_STATE_"))
 	fix := "A hold that has " + word + " holds nothing: take a new one with " +
-		hints.Call("CreateHold", map[string]string{"parent": siteOf(name)}) +
+		hints.Call("CreateHold", nil) +
 		" and act on that; to keep a hold alive while you settle, ExtendHold it before expire_time"
 	if state == allocationpbv1.HoldState_HOLD_STATE_CONVERTED {
 		word, fix = "converted into a reservation", "Act on the reservation it became instead"
 	}
 	return servicex.Blocked("HOLD_NOT_ACTIVE", hints.TypeOf(name), name, fmt.Sprintf("hold %s is %s, not active", name, word), fix)
-}
-
-// siteOf is the site a hold or reservation name sits under:
-// "organizationalUnits/o/holds/h" is "organizationalUnits/o".
-func siteOf(name string) string {
-	segs := strings.SplitN(name, "/", 3)
-	if len(segs) < 2 {
-		return name
-	}
-	return segs[0] + "/" + segs[1]
 }

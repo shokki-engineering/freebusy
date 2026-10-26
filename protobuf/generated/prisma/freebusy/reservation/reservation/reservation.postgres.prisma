@@ -34,14 +34,14 @@ model Reservation {
   /// Unique identifier for the record.
   id String @id @default(ulid()) @map("id")
 
-  /// The reservation name. Its id is the caller's reservation_id, or else the id of the hold it was made from. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  /// The reservation name. Its id is the caller's reservation_id, or else the id of the hold it was made from. Format: reservations/{reservation}
   name String @unique @map("name")
 
-  /// The hold this reservation was made from, at the same site. Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  /// The hold this reservation was made from. Format: holds/{hold}
   holdID String @map("hold")
 
   /// Relation to Hold via hold.
-  hold Hold @relation(fields: [holdID], references: [name])
+  hold Hold @relation(fields: [holdID], references: [id])
 
   /// Start of the reserved window, copied from the hold.
   startTime DateTime? @freebusy.Timestamptz(6) @map("start_time")
@@ -76,17 +76,14 @@ model Reservation {
   /// Opaque version for optimistic concurrency (AIP-154); echo on cancel.
   etag String? @map("etag")
 
-  /// The reservation this one replaced, set when it was made by RescheduleReservation. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  /// The reservation this one replaced, set when it was made by RescheduleReservation. Format: reservations/{reservation}
   replaces String? @map("replaces")
 
-  /// The reservation replacing this one, set when RescheduleReservation began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  /// The reservation replacing this one, set when RescheduleReservation began. Format: reservations/{reservation}
   replacement String? @map("replacement")
 
   /// What the last write to this reservation changed. A webhook is sent freebusy.reservation.updated exactly when it is CHANGE_DETAILS, and the event of the new state otherwise.
   lastChange Change? @default(STATE) @map("last_change")
-
-  /// Parent reference to OrganizationalUnit (from the AIP resource pattern). Foreign key to orgunit.organizational_units(id) in database rfc (discovered, constraint only, no relation).
-  organizationalUnitID String @map("organizational_unit_id")
 
   /// The resources taken, copied from the hold. Format: resources/{resource}
   resources String[] @map("resources")
@@ -99,8 +96,6 @@ model Reservation {
   @@index([state, updateTime])
   /// Index on [customer].
   @@index([customer])
-  /// Composite index on [organizational_unit_id, id].
-  @@index([organizationalUnitID, id])
   /// GIN index: case-insensitive contains (ILIKE '%…%') cannot use a B-tree.
   @@index([customer(ops: raw("gin_trgm_ops"))], type: Gin)
   /// GIN index: tag containment (@>) cannot use a B-tree.

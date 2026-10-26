@@ -43,8 +43,8 @@ type Store interface {
 	// A hold backs at most one: the stores enforce it with a unique index.
 	FindByHold(ctx context.Context, hold string) (*reservationpbv1.Reservation, error)
 
-	// List returns a page of a site's reservations, AIP-160 filtered.
-	List(ctx context.Context, parent string, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error)
+	// List returns a page of reservations, AIP-160 filtered.
+	List(ctx context.Context, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error)
 
 	// Insert writes a new reservation exactly as given (name included), or
 	// fails with repox.ErrAlreadyExists when the name, or the hold, is taken.
@@ -63,7 +63,7 @@ type Store interface {
 	// that changes a field the engine does not own.
 	Update(ctx context.Context, r *reservationpbv1.Reservation, from []reservationpbv1.ReservationState, paths []string) (*reservationpbv1.Reservation, error)
 
-	// Stuck returns up to limit reservations, across every site, left PENDING,
+	// Stuck returns up to limit reservations left PENDING,
 	// CANCELLING or RESCHEDULING since before cutoff.
 	Stuck(ctx context.Context, cutoff time.Time, limit int) ([]*reservationpbv1.Reservation, error)
 }

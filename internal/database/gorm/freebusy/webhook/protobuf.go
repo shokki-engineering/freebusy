@@ -197,7 +197,6 @@ func WebhookToProto(m *Webhook) *webhookpbv1.Webhook {
 	out.DisplayName = fromPtr(m.DisplayName)
 	out.Uri = m.URI
 	out.EventTypes = []string(m.EventTypes)
-	out.OrganizationalUnit = fromPtr(m.OrganizationalUnit)
 	out.State = WebhookStatePtrToProto(m.State)
 	out.Secret = fromPtr(m.Secret)
 	out.PreviousSecret = fromPtr(m.PreviousSecret)
@@ -220,7 +219,6 @@ func WebhookFromProto(pb *webhookpbv1.Webhook) *Webhook {
 	m.DisplayName = toPtr(pb.GetDisplayName())
 	m.URI = pb.GetUri()
 	m.EventTypes = pq.StringArray(pb.GetEventTypes())
-	m.OrganizationalUnit = toPtr(pb.GetOrganizationalUnit())
 	m.State = WebhookStatePtrFromProto(pb.GetState())
 	m.Secret = toPtr(pb.GetSecret())
 	m.PreviousSecret = toPtr(pb.GetPreviousSecret())

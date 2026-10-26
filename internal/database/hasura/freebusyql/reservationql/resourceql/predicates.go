@@ -23,24 +23,23 @@ import (
 // Filter fields for ReservationResource. Build predicates like Attributes.Eq(v) and combine
 // them with And/Or/Not.
 var (
-	Attributes           = graphql.JSONField{Col: "attributes"}
-	CancelReason         = graphql.StringField{Col: "cancelReason"}
-	CancelTime           = graphql.StringField{Col: "cancelTime"}
-	ConfirmTime          = graphql.StringField{Col: "confirmTime"}
-	CreateTime           = graphql.StringField{Col: "createTime"}
-	Customer             = graphql.StringField{Col: "customer"}
-	EndTime              = graphql.StringField{Col: "endTime"}
-	Etag                 = graphql.StringField{Col: "etag"}
-	Hold                 = graphql.StringField{Col: "hold"}
-	Id                   = graphql.StringField{Col: "id"}
-	LastChange           = graphql.StringField{Col: "lastChange"}
-	Name                 = graphql.StringField{Col: "name"}
-	OrganizationalUnitId = graphql.StringField{Col: "organizationalUnitId"}
-	Replacement          = graphql.StringField{Col: "replacement"}
-	Replaces             = graphql.StringField{Col: "replaces"}
-	StartTime            = graphql.StringField{Col: "startTime"}
-	State                = graphql.StringField{Col: "state"}
-	UpdateTime           = graphql.StringField{Col: "updateTime"}
+	Attributes   = graphql.JSONField{Col: "attributes"}
+	CancelReason = graphql.StringField{Col: "cancelReason"}
+	CancelTime   = graphql.StringField{Col: "cancelTime"}
+	ConfirmTime  = graphql.StringField{Col: "confirmTime"}
+	CreateTime   = graphql.StringField{Col: "createTime"}
+	Customer     = graphql.StringField{Col: "customer"}
+	EndTime      = graphql.StringField{Col: "endTime"}
+	Etag         = graphql.StringField{Col: "etag"}
+	Hold         = graphql.StringField{Col: "hold"}
+	Id           = graphql.StringField{Col: "id"}
+	LastChange   = graphql.StringField{Col: "lastChange"}
+	Name         = graphql.StringField{Col: "name"}
+	Replacement  = graphql.StringField{Col: "replacement"}
+	Replaces     = graphql.StringField{Col: "replaces"}
+	StartTime    = graphql.StringField{Col: "startTime"}
+	State        = graphql.StringField{Col: "state"}
+	UpdateTime   = graphql.StringField{Col: "updateTime"}
 )
 
 // And matches rows satisfying every predicate.

@@ -122,9 +122,9 @@ func Retryable(reason string) bool {
 }
 
 // NewInvalidTimeZone is a INVALID_TIME_ZONE problem; its fix defaults to the
-// proto's: "Use one such as `Europe/London`, or leave it empty for the site's own.".
+// proto's: "Use one such as `Europe/London`, or leave it empty for the zone of the first resource's calendar.".
 func NewInvalidTimeZone(field, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonInvalidTimeZone, Field: field, What: what, Fix: "Use one such as `Europe/London`, or leave it empty for the site's own."}
+	return &problem.Problem{Reason: ReasonInvalidTimeZone, Field: field, What: what, Fix: "Use one such as `Europe/London`, or leave it empty for the zone of the first resource's calendar."}
 }
 
 // NewTooManyBuckets is a TOO_MANY_BUCKETS problem; its fix defaults to the
@@ -158,9 +158,9 @@ func NewOrderByUnsupported(field, what string) *problem.Problem {
 }
 
 // NewInvalidFacet is a INVALID_FACET problem; its fix defaults to the
-// proto's: "Count by `resource_types`, `organizational_unit`, `organization`, `display_name` or `attributes.<path>`.".
+// proto's: "Count by `resource_types`, `organizational_unit`, `display_name` or `attributes.<path>`.".
 func NewInvalidFacet(field, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonInvalidFacet, Field: field, What: what, Fix: "Count by `resource_types`, `organizational_unit`, `organization`, `display_name` or `attributes.<path>`."}
+	return &problem.Problem{Reason: ReasonInvalidFacet, Field: field, What: what, Fix: "Count by `resource_types`, `organizational_unit`, `display_name` or `attributes.<path>`."}
 }
 
 // NewInvalidPageToken is a INVALID_PAGE_TOKEN problem; its fix defaults to the
@@ -176,9 +176,9 @@ func NewWindowBeyondHorizon(field, what string) *problem.Problem {
 }
 
 // NewEngineBusy is a ENGINE_BUSY problem; its fix defaults to the
-// proto's: "Retry after a short randomized backoff; a narrower request (a resource type, fewer sites, a smaller page) is cheaper.".
+// proto's: "Retry after a short randomized backoff; a narrower request (a resource type, a tighter filter, a smaller page) is cheaper.".
 func NewEngineBusy(what string) *problem.Problem {
-	return &problem.Problem{Kind: ErrEngineBusy, Reason: ReasonEngineBusy, What: what, Fix: "Retry after a short randomized backoff; a narrower request (a resource type, fewer sites, a smaller page) is cheaper."}
+	return &problem.Problem{Kind: ErrEngineBusy, Reason: ReasonEngineBusy, What: what, Fix: "Retry after a short randomized backoff; a narrower request (a resource type, a tighter filter, a smaller page) is cheaper."}
 }
 
 // NewCapacityExhausted is a CAPACITY_EXHAUSTED problem; its fix defaults to the

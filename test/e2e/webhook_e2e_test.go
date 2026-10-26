@@ -1,8 +1,8 @@
 // Copyright 2026 Srikanth K.
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// The webhook suite: a receiver on localhost subscribed to one site's
-// reservations, sent what changes there, signed, on both backends.
+// The webhook suite: a receiver on localhost subscribed to reservations,
+// sent what changes, signed, on both backends.
 //
 //	FREEBUSY_TEST_POSTGRES_DSN=... FREEBUSY_TEST_GRAPHQL_URL=... go test ./internal/e2e/ -run Webhook -v
 package e2e
@@ -30,7 +30,6 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/service/webhook"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1"
-	"github.com/shokki-engineering/freebusy/test/live"
 	"github.com/the-protobuf-project/runtime-go/events"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -101,9 +100,6 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 	defer endpoint.Close()
 
 	suffix := fmt.Sprintf("%d", time.Now().UnixNano()%1_000_000_000)
-	// A webhook names its site, which must exist: both backends share the one
-	// database, seeded through GORM.
-	site := live.Site(t, openTestGorm(t), "wh-"+suffix)
 
 	// Validation: https only (http to loopback in development), no
 	// credentials in the URL, known event types.
@@ -129,7 +125,7 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 	hook, err := srv.CreateWebhook(ctx, &webhookpbv1.CreateWebhookRequest{
 		WebhookId: "wh-" + suffix,
 		Webhook: &webhookpbv1.Webhook{
-			DisplayName: "test receiver", Uri: endpoint.URL + "/hook", OrganizationalUnit: site,
+			DisplayName: "test receiver", Uri: endpoint.URL + "/hook",
 			EventTypes: []string{"freebusy.reservation.confirmed", "freebusy.reservation.cancelled"},
 		},
 	})
@@ -143,22 +139,6 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 		t.Fatalf("created webhook: secret %q, state %v", hook.GetSecret(), hook.GetState())
 	}
 	rec.secret = hook.GetSecret()
-	// A webhook for every site names none, which the site foreign key
-	// allows; one naming a site that does not exist is refused.
-	everySite, err := srv.CreateWebhook(ctx, &webhookpbv1.CreateWebhookRequest{
-		WebhookId: "wh-all-" + suffix, Webhook: &webhookpbv1.Webhook{Uri: endpoint.URL + "/all", EventTypes: []string{"freebusy.hold.expired"}},
-	})
-	if err != nil {
-		t.Fatalf("CreateWebhook for every site: %v", err)
-	}
-	if _, err := srv.DeleteWebhook(ctx, &webhookpbv1.DeleteWebhookRequest{Name: everySite.GetName(), Force: true}); err != nil {
-		t.Fatal(err)
-	}
-	if _, err := srv.CreateWebhook(ctx, &webhookpbv1.CreateWebhookRequest{
-		WebhookId: "wh-nowhere-" + suffix, Webhook: &webhookpbv1.Webhook{Uri: endpoint.URL + "/x", OrganizationalUnit: "organizationalUnits/nowhere-" + suffix},
-	}); status.Code(err) != codes.FailedPrecondition {
-		t.Fatalf("CreateWebhook naming a missing site: %v, want FailedPrecondition", err)
-	}
 	if got, _ := srv.GetWebhook(ctx, &webhookpbv1.GetWebhookRequest{Name: hook.GetName()}); got.GetSecret() != "" {
 		t.Fatal("GetWebhook returned the secret")
 	}
@@ -176,13 +156,15 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 		t.Fatalf("UpdateWebhook of the secret: %v", err)
 	}
 
+	// deliveries are this run's: other suites' reservations in the shared
+	// database reach the webhook too.
 	deliveries := func() []*webhookpbv1.Delivery {
 		t.Helper()
 		res, err := srv.ListDeliveries(ctx, &webhookpbv1.ListDeliveriesRequest{Parent: hook.GetName()})
 		if err != nil {
 			t.Fatal(err)
 		}
-		return res.GetDeliveries()
+		return slices.DeleteFunc(res.GetDeliveries(), func(d *webhookpbv1.Delivery) bool { return !strings.HasSuffix(d.GetSubject(), suffix) })
 	}
 	round := func() {
 		t.Helper()
@@ -192,9 +174,9 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 	}
 
 	// A PENDING reservation is a type this webhook did not ask for.
-	name := site + "/reservations/r" + suffix
-	res, err := reservations.Create(ctx, site, &reservationpbv1.Reservation{
-		Name: name, Hold: site + "/holds/h" + suffix, State: reservationpbv1.ReservationState_RESERVATION_STATE_PENDING,
+	name := "reservations/r" + suffix
+	res, err := reservations.Create(ctx, &reservationpbv1.Reservation{
+		Name: name, Hold: "holds/h" + suffix, State: reservationpbv1.ReservationState_RESERVATION_STATE_PENDING,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -322,7 +304,7 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 		t.Fatalf("a delivery outlived its webhook: %v", err)
 	}
 
-	// Inventory: a webhook of every site is sent a resource's life.
+	// Inventory: a webhook is sent a resource's life.
 	inv, err := srv.CreateWebhook(ctx, &webhookpbv1.CreateWebhookRequest{
 		WebhookId: "inv-" + suffix,
 		Webhook:   &webhookpbv1.Webhook{Uri: endpoint.URL + "/inventory", EventTypes: []string{"freebusy.resource.created", "freebusy.resource.updated", "freebusy.resource.deleted"}},
@@ -373,7 +355,7 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 	edits, err := srv.CreateWebhook(ctx, &webhookpbv1.CreateWebhookRequest{
 		WebhookId: "edits-" + suffix,
 		Webhook: &webhookpbv1.Webhook{
-			Uri: endpoint.URL + "/edits", OrganizationalUnit: site,
+			Uri:        endpoint.URL + "/edits",
 			EventTypes: []string{"freebusy.reservation.confirmed", "freebusy.reservation.updated"},
 		},
 	})
@@ -383,9 +365,9 @@ func webhookFlow(t *testing.T, conn *database.Connection) {
 	defer func() {
 		_, _ = srv.DeleteWebhook(ctx, &webhookpbv1.DeleteWebhookRequest{Name: edits.GetName(), Force: true})
 	}()
-	edited := site + "/reservations/e" + suffix
-	er, err := reservations.Create(ctx, site, &reservationpbv1.Reservation{
-		Name: edited, Hold: site + "/holds/e" + suffix, State: reservationpbv1.ReservationState_RESERVATION_STATE_PENDING,
+	edited := "reservations/e" + suffix
+	er, err := reservations.Create(ctx, &reservationpbv1.Reservation{
+		Name: edited, Hold: "holds/e" + suffix, State: reservationpbv1.ReservationState_RESERVATION_STATE_PENDING,
 	})
 	if err != nil {
 		t.Fatal(err)

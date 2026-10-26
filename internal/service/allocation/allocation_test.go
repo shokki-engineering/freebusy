@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"reflect"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -27,8 +28,6 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
-
-const club = "organizationalUnits/club"
 
 // day is the Monday the fixtures are set on, in UTC.
 var day = time.Date(2026, 11, 2, 0, 0, 0, 0, time.UTC)
@@ -66,10 +65,9 @@ func newFixture(t *testing.T) *fixture {
 // booking STRUCTURED-DATA when non-empty.
 func (f *fixture) addResource(id, profile string) {
 	res := &resourcev1.Resource{
-		Name:               "resources/" + id,
-		Calendar:           "calendars/club-" + id,
-		OrganizationalUnit: club,
-		ResourceTypes:      []string{"padel-court"},
+		Name:          "resources/" + id,
+		Calendar:      "calendars/club-" + id,
+		ResourceTypes: []string{"padel-court"},
 	}
 	if profile != "" {
 		res.StructuredData = []*resourcev1.StructuredData{{
@@ -108,7 +106,6 @@ func TestComputeAvailabilitySlots(t *testing.T) {
 	f := newFixture(t)
 	f.share()
 	res, err := f.srv.ComputeAvailability(ctx(), &allocationpbv1.ComputeAvailabilityRequest{
-		Parent:       club,
 		Window:       win(7, 10),
 		Granularity:  allocationpbv1.AvailabilityGranularity_AVAILABILITY_GRANULARITY_SLOT,
 		SlotDuration: durationpb.New(time.Hour),
@@ -129,7 +126,7 @@ func TestComputeAvailabilitySlots(t *testing.T) {
 	}
 
 	res, err = f.srv.ComputeAvailability(ctx(), &allocationpbv1.ComputeAvailabilityRequest{
-		Parent: club, Window: win(17, 20), SlotDuration: durationpb.New(time.Hour),
+		Window: win(17, 20), SlotDuration: durationpb.New(time.Hour),
 		Granularity: allocationpbv1.AvailabilityGranularity_AVAILABILITY_GRANULARITY_SLOT,
 	})
 	if err != nil {
@@ -144,7 +141,7 @@ func TestCheckAvailabilityExplains(t *testing.T) {
 	f := newFixture(t)
 	f.share()
 	res, err := f.srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{
-		Parent: club, Window: win(18, 19), Quantity: 3,
+		Window: win(18, 19), Quantity: 3,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -166,7 +163,7 @@ func TestCreateHoldAllocatesAndExhausts(t *testing.T) {
 	f := newFixture(t)
 	f.share()
 	h, err := f.srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
-		Parent: club, Hold: &allocationpbv1.Hold{Window: win(19, 20), Quantity: 2},
+		Hold: &allocationpbv1.Hold{Window: win(19, 20), Quantity: 2},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -180,7 +177,7 @@ func TestCreateHoldAllocatesAndExhausts(t *testing.T) {
 	}
 
 	_, err = f.srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
-		Parent: club, Hold: &allocationpbv1.Hold{Window: win(19, 20), Quantity: 2},
+		Hold: &allocationpbv1.Hold{Window: win(19, 20), Quantity: 2},
 	})
 	if c, r := reasonOf(t, err); c != codes.FailedPrecondition || r != allocationpbv1svc.ReasonCapacityExhausted {
 		t.Fatalf("second hold: %v %q", c, r)
@@ -191,7 +188,7 @@ func TestCreateHoldIdempotent(t *testing.T) {
 	f := newFixture(t)
 	f.share()
 	req := &allocationpbv1.CreateHoldRequest{
-		Parent: club, Hold: &allocationpbv1.Hold{Window: win(10, 11), IdempotencyKey: "cart-42"},
+		Hold: &allocationpbv1.Hold{Window: win(10, 11), IdempotencyKey: "cart-42"},
 	}
 	a, err := f.srv.CreateHold(ctx(), req)
 	if err != nil {
@@ -212,8 +209,8 @@ func TestCreateHoldReplansAfterLosingRace(t *testing.T) {
 	// Between the read and the write, someone else takes court-1 -- the court
 	// best fit would have picked.
 	f.store.beforeInsert = func() {
-		_, err := f.store.InsertHold(ctx(), club, &allocationpbv1.Hold{
-			Name: club + "/holds/rival", Resources: []string{"resources/court-1"}, Window: win(19, 20),
+		_, err := f.store.InsertHold(ctx(), &allocationpbv1.Hold{
+			Name: "holds/rival", Resources: []string{"resources/court-1"}, Window: win(19, 20),
 			ExpireTime: timestamppb.New(f.clock.Add(time.Hour)), State: allocationpbv1.HoldState_HOLD_STATE_ACTIVE,
 		})
 		if err != nil {
@@ -221,7 +218,7 @@ func TestCreateHoldReplansAfterLosingRace(t *testing.T) {
 		}
 	}
 	h, err := f.srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
-		Parent: club, Hold: &allocationpbv1.Hold{Window: win(19, 20)},
+		Hold: &allocationpbv1.Hold{Window: win(19, 20)},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -235,13 +232,13 @@ func TestHoldExpiryFreesWithoutSweeper(t *testing.T) {
 	f := newFixture(t)
 	f.share()
 	h, err := f.srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
-		Parent: club, Hold: &allocationpbv1.Hold{Window: win(10, 11), Quantity: 3},
+		Hold: &allocationpbv1.Hold{Window: win(10, 11), Quantity: 3},
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 	check := func() int32 {
-		res, err := f.srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Parent: club, Window: win(10, 11)})
+		res, err := f.srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Window: win(10, 11)})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -271,7 +268,7 @@ func TestReleaseDeleteConvert(t *testing.T) {
 	f.share()
 	take := func() *allocationpbv1.Hold {
 		h, err := f.srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
-			Parent: club, Hold: &allocationpbv1.Hold{Window: win(12, 13)},
+			Hold: &allocationpbv1.Hold{Window: win(12, 13)},
 		})
 		if err != nil {
 			t.Fatal(err)
@@ -297,7 +294,7 @@ func TestReleaseDeleteConvert(t *testing.T) {
 		t.Fatal(err)
 	}
 	f.clock = f.clock.Add(24 * time.Hour) // long past any TTL
-	res, err := f.srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Parent: club, Window: win(12, 13)})
+	res, err := f.srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Window: win(12, 13)})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -313,7 +310,7 @@ func TestPolicyFromStructuredData(t *testing.T) {
 	f := newFixture(t)
 	f.store.resources = nil
 	f.addResource("court-9", `{"min_duration":"PT1H","min_notice":"PT2H"}`)
-	res, err := f.srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Parent: club, Window: win(10, 10.5)})
+	res, err := f.srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Window: win(10, 10.5)})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -338,7 +335,6 @@ func TestDayBucketsInSiteZone(t *testing.T) {
 	out := time.Date(2026, 11, 5, 11, 0, 0, 0, kolkata)
 	f.store.events["calendars/club-room-101"] = []*eventv1.Event{busy(in.AddDate(0, 0, 1), in.AddDate(0, 0, 2))}
 	res, err := f.srv.ComputeAvailability(ctx(), &allocationpbv1.ComputeAvailabilityRequest{
-		Parent: club,
 		Window: &interval.Interval{StartTime: timestamppb.New(in), EndTime: timestamppb.New(out)},
 	})
 	if err != nil {
@@ -356,24 +352,24 @@ func TestDayBucketsInSiteZone(t *testing.T) {
 	}
 }
 
-func TestSearchRequiresQuantityPerSite(t *testing.T) {
+// Search returns every free resource, in name order, and never one that is
+// booked.
+func TestSearchFindsFreeResources(t *testing.T) {
 	f := newFixture(t)
 	f.share()
-	other := &resourcev1.Resource{Name: "resources/solo", Calendar: "calendars/solo", OrganizationalUnit: "organizationalUnits/annex", ResourceTypes: []string{"padel-court"}}
-	f.store.resources = append(f.store.resources, ResourceRecord{Resource: other})
-	res, err := f.srv.SearchAvailability(ctx(), &allocationpbv1.SearchAvailabilityRequest{
-		Parent: "organizations/acme", Window: win(10, 11), Quantity: 2,
-	})
+	booked := &resourcev1.Resource{Name: "resources/solo", Calendar: "calendars/solo", ResourceTypes: []string{"padel-court"}}
+	f.store.resources = append(f.store.resources, ResourceRecord{Resource: booked})
+	f.store.events["calendars/solo"] = []*eventv1.Event{busy(hr(0), hr(24))}
+	res, err := f.srv.SearchAvailability(ctx(), &allocationpbv1.SearchAvailabilityRequest{Window: win(10, 11)})
 	if err != nil {
 		t.Fatal(err)
 	}
+	var got []string
 	for _, m := range res.GetMatches() {
-		if m.GetOrganizationalUnit() == "organizationalUnits/annex" {
-			t.Fatal("a site with one free court matched a request for two")
-		}
+		got = append(got, m.GetResource())
 	}
-	if len(res.GetMatches()) != 3 {
-		t.Fatalf("matches %d, want the club's 3", len(res.GetMatches()))
+	if want := []string{"resources/court-1", "resources/court-2", "resources/court-3"}; !slices.Equal(got, want) {
+		t.Fatalf("matches %v, want %v", got, want)
 	}
 }
 
@@ -439,7 +435,7 @@ func equal(a, b []int32) bool {
 func TestConvertIdempotentAndEndConversion(t *testing.T) {
 	f := newFixture(t)
 	f.share()
-	h, err := f.srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{Parent: club, Hold: &allocationpbv1.Hold{Window: win(12, 13), Quantity: 3}})
+	h, err := f.srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{Hold: &allocationpbv1.Hold{Window: win(12, 13), Quantity: 3}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -449,7 +445,7 @@ func TestConvertIdempotentAndEndConversion(t *testing.T) {
 		}
 	}
 	free := func() int32 {
-		res, err := f.srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Parent: club, Window: win(12, 13)})
+		res, err := f.srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Window: win(12, 13)})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -482,7 +478,7 @@ func TestConcurrentIdempotentCreatesTakeOneHold(t *testing.T) {
 	for i := range 8 {
 		wg.Go(func() {
 			h, err := f.srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
-				Parent: club, Hold: &allocationpbv1.Hold{Window: win(10, 11), IdempotencyKey: "cart-7"},
+				Hold: &allocationpbv1.Hold{Window: win(10, 11), IdempotencyKey: "cart-7"},
 			})
 			names[i], errs[i] = h.GetName(), err
 		})

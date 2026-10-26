@@ -18,10 +18,10 @@ option java_package = "engineering.shokki.freebusy.allocation.v1";
 // A ResourceDay is one resource's standing free time on one UTC day: the
 // availability read model SearchAvailability, ComputeAvailability,
 // CheckAvailability and CreateHold read their candidates from, instead of
-// evaluating every resource an operator has.
+// evaluating every resource there is.
 //
 // Storage-only, and derived: no RPC takes or returns it. It is a projection
-// of the resources, their sites, calendars, RFC 7953 availability, RFC 5545
+// of the resources, their calendars, RFC 7953 availability, RFC 5545
 // events and the claims of converted holds, rewritten in the same transaction
 // as every write to those (on Hasura, a single write projects in a request of
 // its own right after it), for every day of a rolling horizon. `free` is
@@ -35,7 +35,6 @@ message ResourceDay {
   option (store.v1.projection) = {
     sources: [
       "the-protobuf-project.org/Resource",
-      "the-protobuf-project.org/OrganizationalUnit",
       "the-protobuf-project.org/Calendar",
       "the-protobuf-project.org/Availability",
       "the-protobuf-project.org/Event",
@@ -50,12 +49,6 @@ message ResourceDay {
     indexes: [
       {
         fields: [
-          "organization",
-          "day"
-        ]
-      },
-      {
-        fields: [
           "organizational_unit",
           "day"
         ]
@@ -64,13 +57,11 @@ message ResourceDay {
         fields: ["calendar"]
       },
       {
-        // The page index: equality on the organization and the day, then
-        // the default order (site, resource), so a search reads its page
-        // straight from the index instead of sorting every match.
+        // The page index: equality on the day, then the default order
+        // (resource), so a search reads its page straight from the index
+        // instead of sorting every match.
         fields: [
-          "organization",
           "day",
-          "organizational_unit",
           "resource"
         ]
       }
@@ -81,10 +72,11 @@ message ResourceDay {
   // projection row must never keep its source from being purged.
   string resource = 1;
 
-  // The organization of the resource's site, "organizations/{organization}".
-  string organization = 2;
+  reserved 2;
+  reserved "organization";
 
-  // The resource's site, "organizationalUnits/{organizational_unit}".
+  // The resource's own organizational_unit, copied as data for filtering:
+  // freebusy does not check or scope by it.
   string organizational_unit = 3;
 
   // The UTC calendar day this row covers.

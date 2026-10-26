@@ -44,7 +44,6 @@ func TestLiveOpenSearch(t *testing.T) {
 	var feedErrs []error
 	conn.Projections.Feed = o.Feed(func(_ context.Context, err error) { feedErrs = append(feedErrs, err) })
 	store := New(conn)
-	org := "organizations/" + s.ou[len("organizationalUnits/"):] + "-org"
 
 	// The backfill reaches OpenSearch through the feed.
 	if _, err := dp.RebuildResources(ctx, conn.Repox(), s.courts); err != nil {
@@ -73,22 +72,22 @@ func TestLiveOpenSearch(t *testing.T) {
 		}
 	}
 	out := searchUntil(s.courts[1:], &allocationpbv1.SearchAvailabilityRequest{
-		Parent: org, Window: win(18, 19), Facets: []string{"resource_types", "attributes.min_duration"},
+		Filter: s.only(), Window: win(18, 19), Facets: []string{"resource_types", "attributes.min_duration"},
 	})
 	if f := out.GetFacets(); len(f) != 2 || len(f[0].GetBuckets()) != 1 || f[0].GetBuckets()[0].GetCount() != 2 {
 		t.Fatalf("facets %v", f)
 	}
-	searchUntil(s.courts[2:], &allocationpbv1.SearchAvailabilityRequest{Parent: org, Window: win(9, 10), Filter: `attributes.min_duration = "PT1H"`})
+	searchUntil(s.courts[2:], &allocationpbv1.SearchAvailabilityRequest{Window: win(9, 10), Filter: s.only() + ` AND attributes.min_duration = "PT1H"`})
 
 	// A converted hold reaches the copy through the same feed.
-	h, err := srv.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Parent: s.ou, Hold: &allocationpbv1.Hold{Window: win(10, 11), CandidateResources: s.courts[1:2]}})
+	h, err := srv.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Hold: &allocationpbv1.Hold{Window: win(10, 11), CandidateResources: s.courts[1:2]}})
 	if err != nil {
 		t.Fatal(err)
 	}
 	if _, err := srv.ConvertHold(ctx, h.GetName()); err != nil {
 		t.Fatal(err)
 	}
-	searchUntil([]string{s.courts[0], s.courts[2]}, &allocationpbv1.SearchAvailabilityRequest{Parent: org, Window: win(10, 11)})
+	searchUntil([]string{s.courts[0], s.courts[2]}, &allocationpbv1.SearchAvailabilityRequest{Filter: s.only(), Window: win(10, 11)})
 
 	// Reindex reloads the copy behind the alias.
 	res, err := o.Reindex(ctx, conn.SearchConn())
@@ -106,11 +105,11 @@ func TestLiveOpenSearch(t *testing.T) {
 	if empty, err := dp.Empty(ctx, conn.SearchConn()); err != nil || empty {
 		t.Fatalf("read model Empty() = %v, %v after a rebuild", empty, err)
 	}
-	searchUntil([]string{s.courts[0], s.courts[2]}, &allocationpbv1.SearchAvailabilityRequest{Parent: org, Window: win(10, 11)})
+	searchUntil([]string{s.courts[0], s.courts[2]}, &allocationpbv1.SearchAvailabilityRequest{Filter: s.only(), Window: win(10, 11)})
 	// Served by OpenSearch itself: with a Postgres that always fails behind
 	// it, the read still answers.
 	strict := allocation.NewServer(store, allocation.WithReadModel(dp, conn.SearchConn()), allocation.WithSearcher(o.Searcher(noPostgres{}, nil)))
-	if out, err := strict.SearchAvailability(ctx, &allocationpbv1.SearchAvailabilityRequest{Parent: org, Window: win(10, 11), Facets: []string{"resource_types"}}); err != nil || len(out.GetMatches()) != 2 {
+	if out, err := strict.SearchAvailability(ctx, &allocationpbv1.SearchAvailabilityRequest{Filter: s.only(), Window: win(10, 11), Facets: []string{"resource_types"}}); err != nil || len(out.GetMatches()) != 2 {
 		t.Fatalf("OpenSearch alone: %v, %v", names(out.GetMatches()), err)
 	}
 	if err := o.Close(ctx); err != nil {
@@ -124,7 +123,7 @@ func TestLiveOpenSearch(t *testing.T) {
 	}
 	srv = allocation.NewServer(store, allocation.WithReadModel(dp, conn.SearchConn()),
 		allocation.WithSearcher(down.Searcher(allocation.PostgresDays(conn.SearchConn()), nil)))
-	searchUntil([]string{s.courts[0], s.courts[2]}, &allocationpbv1.SearchAvailabilityRequest{Parent: org, Window: win(10, 11), Facets: []string{"resource_types"}})
+	searchUntil([]string{s.courts[0], s.courts[2]}, &allocationpbv1.SearchAvailabilityRequest{Filter: s.only(), Window: win(10, 11), Facets: []string{"resource_types"}})
 }
 
 // noPostgres is a fallback that always fails.

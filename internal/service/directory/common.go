@@ -26,8 +26,6 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/availability"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/calendar"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/event"
-	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/organization"
-	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/orgunit"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/resource"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
@@ -46,12 +44,10 @@ type FreeBusyQuerier interface {
 
 // Repositories are the generated repositories the servers persist through.
 type Repositories struct {
-	Organizations       organization.OrganizationRepository
-	OrganizationalUnits orgunit.OrganizationalUnitRepository
-	Resources           resource.ResourceRepository
-	Calendars           calendar.CalendarRepository
-	Availabilities      availability.AvailabilityRepository
-	Events              event.EventRepository
+	Resources      resource.ResourceRepository
+	Calendars      calendar.CalendarRepository
+	Availabilities availability.AvailabilityRepository
+	Events         event.EventRepository
 
 	// conn and retention build Writes over the same connection, deleting
 	// with the same retention as the repositories.
@@ -63,14 +59,12 @@ type Repositories struct {
 // connection carries.
 func NewRepositories(conn repox.Conn, retention time.Duration) Repositories {
 	return Repositories{
-		Organizations:       organization.New(conn, organization.WithRetention(retention)).Organizations,
-		OrganizationalUnits: orgunit.New(conn, orgunit.WithRetention(retention)).OrganizationalUnits,
-		Resources:           resource.New(conn, resource.WithRetention(retention)).Resources,
-		Calendars:           calendar.New(conn, calendar.WithRetention(retention)).Calendars,
-		Availabilities:      availability.New(conn, availability.WithRetention(retention)).Availabilities,
-		Events:              event.New(conn, event.WithRetention(retention)).Events,
-		conn:                conn,
-		retention:           retention,
+		Resources:      resource.New(conn, resource.WithRetention(retention)).Resources,
+		Calendars:      calendar.New(conn, calendar.WithRetention(retention)).Calendars,
+		Availabilities: availability.New(conn, availability.WithRetention(retention)).Availabilities,
+		Events:         event.New(conn, event.WithRetention(retention)).Events,
+		conn:           conn,
+		retention:      retention,
 	}
 }
 
@@ -154,7 +148,7 @@ func PrepareCreate(m proto.Message, name string) error {
 // requiredSet refuses m when a field the proto marks REQUIRED (AIP-203) is
 // unset, naming every such field at once -- so a caller fixes them in one
 // round trip rather than one per error -- under the request field that
-// carries m (organization.display_names).
+// carries m (calendar.display_name).
 //
 // The RFC protos mark these with google.api.field_behavior alone, not with a
 // buf.validate rule, so request validation lets them through; without this
@@ -182,8 +176,8 @@ func requiredSet(m proto.Message) error {
 		fmt.Sprintf("%s are required", strings.Join(missing, ", ")), "Set each of them and send the request again")
 }
 
-// snake is a message name as its request field: OrganizationalUnit is
-// organizational_unit.
+// snake is a message name as its request field: StructuredData is
+// structured_data.
 func snake(name string) string {
 	var b strings.Builder
 	for i, r := range name {

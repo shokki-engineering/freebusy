@@ -15,7 +15,7 @@
 //
 // store — https://github.com/the-protobuf-project/store
 
-/// A ResourceDay is one resource's standing free time on one UTC day: the availability read model SearchAvailability, ComputeAvailability, CheckAvailability and CreateHold read their candidates from, instead of evaluating every resource an operator has. Storage-only, and derived: no RPC takes or returns it. It is a projection of the resources, their sites, calendars, RFC 7953 availability, RFC 5545 events and the claims of converted holds, rewritten in the same transaction as every write to those (on Hasura, a single write projects in a request of its own right after it), for every day of a rolling horizon. `free` is offered time less booked time; live holds are not subtracted, and neither is a resource's booking policy applied, because both change with the clock. The engine evaluates every candidate the projection returns before answering, so an answer never depends on the projection being current; a stale row can only make a search miss a resource or read one it then drops.
+/// A ResourceDay is one resource's standing free time on one UTC day: the availability read model SearchAvailability, ComputeAvailability, CheckAvailability and CreateHold read their candidates from, instead of evaluating every resource there is. Storage-only, and derived: no RPC takes or returns it. It is a projection of the resources, their calendars, RFC 7953 availability, RFC 5545 events and the claims of converted holds, rewritten in the same transaction as every write to those (on Hasura, a single write projects in a request of its own right after it), for every day of a rolling horizon. `free` is offered time less booked time; live holds are not subtracted, and neither is a resource's booking policy applied, because both change with the clock. The engine evaluates every candidate the projection returns before answering, so an answer never depends on the projection being current; a stale row can only make a search miss a resource or read one it then drops.
 model ResourceDay {
   /// The row's key: its key fields' values as a JSON array.
   id String @id @map("id")
@@ -23,10 +23,7 @@ model ResourceDay {
   /// The resource, "resources/{resource}". Not a resource reference: a projection row must never keep its source from being purged.
   resource String @map("resource")
 
-  /// The organization of the resource's site, "organizations/{organization}".
-  organization String @map("organization")
-
-  /// The resource's site, "organizationalUnits/{organizational_unit}".
+  /// The resource's own organizational_unit, copied as data for filtering: freebusy does not check or scope by it.
   organizationalUnit String @map("organizational_unit")
 
   /// The UTC calendar day this row covers.
@@ -55,14 +52,12 @@ model ResourceDay {
 
   /// Unique constraint on [resource, day].
   @@unique([resource, day])
-  /// Composite index on [organization, day, id].
-  @@index([organization, day, id])
   /// Composite index on [organizational_unit, day, id].
   @@index([organizationalUnit, day, id])
   /// Composite index on [calendar, id].
   @@index([calendar, id])
-  /// Composite index on [organization, day, organizational_unit, resource, id].
-  @@index([organization, day, organizationalUnit, resource, id])
+  /// Composite index on [day, resource, id].
+  @@index([day, resource, id])
   /// GIN index: tag containment (@>) cannot use a B-tree.
   @@index([resourceTypes], type: Gin)
   /// GIN index: jsonb containment (@>) on attribute paths cannot use a B-tree.

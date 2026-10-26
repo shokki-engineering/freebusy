@@ -4,8 +4,8 @@
 package database_test
 
 // The reservation list cache on a real Redis, over both backends: a page is
-// served from the cache until a write through the repositories reaches its
-// site, and then never again.
+// served from the cache until a write through the repositories reaches the
+// collection, and then never again.
 //
 //	FREEBUSY_TEST_REDIS_ADDR=127.0.0.1:6379 FREEBUSY_TEST_DATABASE_URL=... \
 //	FREEBUSY_TEST_GRAPHQL_URL=http://localhost:3280/graphql \
@@ -53,15 +53,13 @@ func TestLiveListCache(t *testing.T) {
 			unseen := reservation.New(raw).Reservations
 			lists := conn.Caches.Reservations.Wrap(observed)
 
-			// Both backends share one database; the site is seeded through GORM.
-			site := live.Site(t, conns["gorm"].Gorm, "listcache-"+ulid.Generate().String())
-			// Every record this run makes carries tag, so a List across sites
-			// can be narrowed to them.
+			// Every record this run makes carries tag, so a List can be
+			// narrowed to them.
 			tag := "listcache-" + ulid.Generate().String()
 			var made []string
 			create := func(repo reservation.ReservationRepository) string {
 				t.Helper()
-				r, err := repo.Create(ctx, site, &reservationpbv1.Reservation{Hold: "holds/" + ulid.Generate().String(), Customer: tag})
+				r, err := repo.Create(ctx, &reservationpbv1.Reservation{Hold: "holds/" + ulid.Generate().String(), Customer: tag})
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -73,13 +71,9 @@ func TestLiveListCache(t *testing.T) {
 					_ = unseen.Delete(ctx, n)
 				}
 			})
-			list := func(parent string) []string {
+			list := func() []string {
 				t.Helper()
-				in := repox.ListInput{PageSize: 50}
-				if parent != site {
-					in.Filter = `customer = "` + tag + `"`
-				}
-				page, _, err := lists.List(ctx, parent, in)
+				page, _, err := lists.List(ctx, repox.ListInput{PageSize: 50, Filter: `customer = "` + tag + `"`})
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -90,23 +84,23 @@ func TestLiveListCache(t *testing.T) {
 				slices.Sort(names)
 				return names
 			}
-			want := func(parent string, names ...string) {
+			want := func(names ...string) {
 				t.Helper()
 				names = slices.Clone(names)
 				slices.Sort(names)
-				if got := list(parent); !slices.Equal(got, names) {
-					t.Fatalf("List(%s) = %v, want %v", parent, got, names)
+				if got := list(); !slices.Equal(got, names) {
+					t.Fatalf("List = %v, want %v", got, names)
 				}
 			}
 
 			a, b := create(observed), create(observed)
-			want(site, a, b)
+			want(a, b)
 
 			// Behind the cache's back: the cached page is what is served.
 			hidden := create(unseen)
-			want(site, a, b)
+			want(a, b)
 
-			// A write the repositories report moves the site on, and the next
+			// A write the repositories report moves the collection on, and the next
 			// List is the database's -- the hidden row included.
 			got, err := observed.Get(ctx, a)
 			if err != nil {
@@ -116,16 +110,16 @@ func TestLiveListCache(t *testing.T) {
 			if _, err := observed.Update(ctx, got, []string{"customer"}); err != nil {
 				t.Fatal(err)
 			}
-			want(site, a, b, hidden)
+			want(a, b, hidden)
 
 			if err := observed.Delete(ctx, b); err != nil {
 				t.Fatal(err)
 			}
-			want(site, a, hidden)
+			want(a, hidden)
 
 			// A Batch on the connection reports what it committed.
 			batch := reservation.NewBatch(conn.Repox())
-			c, err := batch.CreateReservation(site, &reservationpbv1.Reservation{Hold: "holds/" + ulid.Generate().String(), Customer: tag})
+			c, err := batch.CreateReservation(&reservationpbv1.Reservation{Hold: "holds/" + ulid.Generate().String(), Customer: tag})
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -133,16 +127,13 @@ func TestLiveListCache(t *testing.T) {
 				t.Fatal(err)
 			}
 			made = append(made, c)
-			want(site, a, hidden, c)
+			want(a, hidden, c)
 
-			// Across sites (AIP-159 "-"): cached, and moved on by a write under
-			// any site.
-			const across = "organizationalUnits/-"
-			want(across, a, hidden, c)
+			// And again: cached until the next write it hears of.
 			hidden2 := create(unseen)
-			want(across, a, hidden, c)
+			want(a, hidden, c)
 			d := create(observed)
-			want(across, a, hidden, c, hidden2, d)
+			want(a, hidden, c, hidden2, d)
 		})
 	}
 }

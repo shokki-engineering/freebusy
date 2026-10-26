@@ -46,13 +46,12 @@ A Hold is a temporary, expiring claim on one or more bookable resources for a wi
 | `etag` | `VARCHAR(255)` | nullable |
 | `replaces` | `VARCHAR(255)` | nullable |
 | `candidate_filter` | `TEXT` | nullable |
-| `organizational_unit_id` | `CHAR(26)` | not null |
 | `resources` | `VARCHAR(255)[]` | nullable |
 | `candidate_resources` | `VARCHAR(255)[]` | nullable |
 
 ### `Allocation` → `resource`
 
-An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it. It sits under the site and names its hold, rather than nesting under the hold: the engine asks about allocations by resource and time across a whole site, never hold by hold, and a hold with child resources would owe DeleteHold a `force` flag guarding rows no caller can see.
+An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it. It is top-level and names its hold, rather than nesting under the hold: the engine asks about allocations by resource and time, never hold by hold, and a hold with child resources would owe DeleteHold a `force` flag guarding rows no caller can see.
 
 | Column | Type | Null |
 | --- | --- | --- |
@@ -63,5 +62,4 @@ An Allocation is one resource taken by one hold for one span: the row the engine
 | `end_time` | `TIMESTAMPTZ` | not null |
 | `expire_time` | `TIMESTAMPTZ` | nullable |
 | `create_time` | `TIMESTAMPTZ` | not null |
-| `hold` | `VARCHAR(255)` | nullable |
-| `organizational_unit_id` | `CHAR(26)` | not null |
+| `hold` | `CHAR(26)` | nullable |

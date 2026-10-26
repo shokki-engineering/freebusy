@@ -49,6 +49,25 @@ path = "/mcp"
 # are unaffected; so are stdio and sse.
 stateless = true
 
+[server.cors]
+# Lets browsers on other origins call the HTTP port (REST gateway, CalDAV,
+# /health) -- what a browser SDK needs. Not applied to the MCP port.
+enabled = false
+# allowed_origins: exact origins ("https://app.example.com") or "*" for any.
+allowed_origins = []
+# allowed_methods / allowed_headers: empty takes the defaults -- GET, POST,
+# PATCH, PUT, DELETE, OPTIONS; and what a GAPIC browser client sends:
+# content-type, authorization, x-goog-api-client, x-goog-request-params,
+# x-goog-user-project, x-api-key. "*" in allowed_headers echoes the request.
+allowed_methods = []
+allowed_headers = []
+# exposed_headers: response headers a browser script may read.
+exposed_headers = []
+# allow_credentials: cookies / HTTP auth from the browser. Refused with "*".
+allow_credentials = false
+# max_age_seconds: how long a browser caches a preflight (0 = its default).
+max_age_seconds = 600
+
 [server.tls]
 # Required when experimental_http3 = true. Provide the PEM cert/key at deploy time.
 cert_file = ""

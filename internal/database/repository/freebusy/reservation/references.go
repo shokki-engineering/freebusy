@@ -41,7 +41,7 @@ func ReferrerSources(repos Repositories) []repox.ReferrerSource {
 			TargetType:   "users.shokki.engineering/User",
 			OnDelete:     repox.OnDeleteAllow,
 			List: func(ctx context.Context, target string, pageSize int32, pageToken string) ([]string, string, error) {
-				rows, next, err := repos.Reservations.List(ctx, "organizationalUnits/-", repox.ListInput{
+				rows, next, err := repos.Reservations.List(ctx, repox.ListInput{
 					PageSize:    pageSize,
 					PageToken:   pageToken,
 					ShowDeleted: true,
@@ -64,7 +64,7 @@ func ReferrerSources(repos Repositories) []repox.ReferrerSource {
 // gone. Types with no resolver are counted as unchecked.
 func ReconcileReservationReferences(ctx context.Context, repo ReservationRepository, refs *repox.References, opts repox.ReconcileOptions) (repox.ReconcileReport, error) {
 	return repox.Reconcile(ctx, refs, opts, func(ctx context.Context, pageSize int32, token string) ([]repox.StoredReference, string, error) {
-		rows, next, err := repo.List(ctx, "organizationalUnits/-", repox.ListInput{
+		rows, next, err := repo.List(ctx, repox.ListInput{
 			PageSize:    pageSize,
 			PageToken:   token,
 			ShowDeleted: true,

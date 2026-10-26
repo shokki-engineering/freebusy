@@ -162,8 +162,8 @@ func listVersionKey(scope string) string { return "version:" + scope }
 // share a key.
 const reservationListNamespace = "freebusy.reservation.v1.reservation.list"
 
-// reservationCollections are the collections of "organizationalUnits/{organizational_unit}/reservations/{reservation}".
-var reservationCollections = []string{"organizationalUnits", "reservations"}
+// reservationCollections are the collections of "reservations/{reservation}".
+var reservationCollections = []string{"reservations"}
 
 // OpenReservationListCache selects the cache database ReservationListCache expects.
 func OpenReservationListCache(ctx context.Context, p cache.Provider) (*cache.DB, error) {
@@ -206,8 +206,7 @@ func (c *ReservationListCache) Wrap(inner reservation.ReservationRepository) res
 	return &cachedReservationList{ReservationRepository: inner, c: c}
 }
 
-// Changed moves the parent of a written Reservation on to a new version, and
-// the version of lists across parents with it. Names of any other resource
+// Changed moves the parent of a written Reservation on to a new version. Names of any other resource
 // are ignored, so one observer list can carry every list cache.
 func (c *ReservationListCache) Changed(ctx context.Context, name string) {
 	parent, ok := listParent(name, reservationCollections)
@@ -215,7 +214,6 @@ func (c *ReservationListCache) Changed(ctx context.Context, name string) {
 		return
 	}
 	c.rotate(ctx, listScope(parent))
-	c.rotate(ctx, listAnyParent)
 }
 
 func (c *ReservationListCache) rotate(ctx context.Context, scope string) {
@@ -249,8 +247,8 @@ type cachedReservationList struct {
 }
 
 // List serves the page from the cache, or lists it and caches it.
-func (l *cachedReservationList) List(ctx context.Context, parent string, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
-	return l.list(ctx, parent, in)
+func (l *cachedReservationList) List(ctx context.Context, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
+	return l.list(ctx, "", in)
 }
 
 func (l *cachedReservationList) list(ctx context.Context, parent string, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
@@ -269,7 +267,7 @@ func (l *cachedReservationList) list(ctx context.Context, parent string, in repo
 		}
 	}
 
-	items, next, err := l.ReservationRepository.List(ctx, parent, in)
+	items, next, err := l.ReservationRepository.List(ctx, in)
 	if err != nil || !ok {
 		return items, next, err
 	}

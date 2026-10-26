@@ -28,20 +28,20 @@ import (
 )
 
 // ReservationRepository is the provider-agnostic persistence surface for
-// Reservation (organizationalUnits/{organizational_unit}/reservations/{reservation}): full-message writes, AIP-160/AIP-132 lists with
+// Reservation (reservations/{reservation}): full-message writes, AIP-160/AIP-132 lists with
 // opaque page tokens, field-mask updates, and etag optimistic concurrency.
 type ReservationRepository interface {
-	// Create persists m under parent and returns the stored record.
-	Create(ctx context.Context, parent string, m *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error)
+	// Create persists m and returns the stored record.
+	Create(ctx context.Context, m *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error)
 	// Get returns the record addressed by its resource name, or
 	// repox.ErrNotFound.
 	Get(ctx context.Context, name string) (*reservationpbv1.Reservation, error)
-	// List returns one page of records under parent.
-	List(ctx context.Context, parent string, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error)
+	// List returns one page of records.
+	List(ctx context.Context, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error)
 	// ListByKeys reads every record whose filter field field is one of keys
 	// -- a batched read by name, by parent, by any text, enum or reference
 	// field -- in statements of at most repox.KeysPerRead keys, at most
-	// repox.ReadParallelism at once, across every parent. in narrows
+	// repox.ReadParallelism at once. in narrows
 	// each read; its page fields are ignored. See repox.ListByKeys for the
 	// order records come back in.
 	ListByKeys(ctx context.Context, field string, keys []string, in repox.ListInput) ([]*reservationpbv1.Reservation, error)
@@ -93,7 +93,7 @@ type Repositories struct {
 // Hooks do not run for queued writes.
 type Batch interface {
 	// CreateReservation queues a create and returns the name the record will have.
-	CreateReservation(parent string, m *reservationpbv1.Reservation) (string, error)
+	CreateReservation(m *reservationpbv1.Reservation) (string, error)
 	// UpdateReservation queues Update: the masked fields of m, every mutable
 	// field when paths is empty. m.Etag, when set, guards it; a guard that
 	// fails fails the whole Commit with repox.ErrConflict.
@@ -315,8 +315,8 @@ type observedReservationRepository struct {
 	changes repox.ChangeObserver
 }
 
-func (o *observedReservationRepository) Create(ctx context.Context, parent string, m *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
-	out, err := o.ReservationRepository.Create(ctx, parent, m)
+func (o *observedReservationRepository) Create(ctx context.Context, m *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
+	out, err := o.ReservationRepository.Create(ctx, m)
 	o.created(ctx, m, out)
 	return out, err
 }
@@ -380,10 +380,10 @@ func changedReservation(name string, op repox.ChangeOp, rec *reservationpbv1.Res
 	return []repox.Change{c}
 }
 
-func (p *projectedReservationRepository) Create(ctx context.Context, parent string, m *reservationpbv1.Reservation) (out *reservationpbv1.Reservation, err error) {
+func (p *projectedReservationRepository) Create(ctx context.Context, m *reservationpbv1.Reservation) (out *reservationpbv1.Reservation, err error) {
 	err = p.run(ctx, func(r ReservationRepository) ([]repox.Change, error) {
 		var err error
-		out, err = r.Create(ctx, parent, m)
+		out, err = r.Create(ctx, m)
 		return changedReservation(out.GetName(), repox.ChangeCreate, out), err
 	})
 	return out, err
@@ -441,11 +441,11 @@ type guardedReservationRepository struct {
 	refs *repox.References
 }
 
-func (g *guardedReservationRepository) Create(ctx context.Context, parent string, m *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
+func (g *guardedReservationRepository) Create(ctx context.Context, m *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
 	if err := resolveReservationReferences(ctx, g.refs, m, nil); err != nil {
 		return nil, err
 	}
-	return g.ReservationRepository.Create(ctx, parent, m)
+	return g.ReservationRepository.Create(ctx, m)
 }
 
 func (g *guardedReservationRepository) Update(ctx context.Context, m *reservationpbv1.Reservation, paths []string) (*reservationpbv1.Reservation, error) {

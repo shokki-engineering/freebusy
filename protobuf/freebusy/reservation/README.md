@@ -33,7 +33,6 @@ erDiagram
         string replacement "OUTPUT_ONLY"
         Change last_change "OUTPUT_ONLY"
     }
-    OrganizationalUnit ||--o{ Reservation : "reservations"
     Reservation }o--|| Hold : "hold"
     Reservation }o--o{ Resource : "resources"
     Reservation }o--o| User : "customer"
@@ -41,7 +40,7 @@ erDiagram
 
 | Resource | Type | Pattern |
 | --- | --- | --- |
-| [`Reservation`](#reservation) | `freebusy.reservation.v1/Reservation` | `organizationalUnits/{organizational_unit}/reservations/{reservation}` |
+| [`Reservation`](#reservation) | `freebusy.reservation.v1/Reservation` | `reservations/{reservation}` |
 
 ## Flows
 
@@ -97,12 +96,12 @@ what RescheduleReservation does.
 
 | Method | Request | Response | HTTP | Description |
 | --- | --- | --- | --- | --- |
-| `CreateReservation` | [`CreateReservationRequest`](#createreservationrequest) | [`Reservation`](#reservation) | `POST /v1/{parent=organizationalUnits/*}/reservations` | Makes a reservation from a live hold, converting the hold so its resources stay taken.<br><br>Idempotent: a hold backs at most one reservation, so a retry returns the reservation the first call made. Fails with FAILED_PRECONDITION when the hold has lapsed or been released. |
-| `GetReservation` | [`GetReservationRequest`](#getreservationrequest) | [`Reservation`](#reservation) | `GET /v1/{name=organizationalUnits/*/reservations/*}` | Retrieves one reservation. |
-| `ListReservations` | [`ListReservationsRequest`](#listreservationsrequest) | [`ListReservationsResponse`](#listreservationsresponse) | `GET /v1/{parent=organizationalUnits/*}/reservations` | Lists a site's reservations. |
-| `UpdateReservation` | [`UpdateReservationRequest`](#updatereservationrequest) | [`Reservation`](#reservation) | `PATCH /v1/{reservation.name=organizationalUnits/*/reservations/*}` | Updates a confirmed reservation's customer or attributes, AIP-134.<br><br>update_mask is required and may name only `customer` and `attributes`; everything else is the engine's, and is changed by CancelReservation or RescheduleReservation. `reservation.etag`, when set, must match the stored one (AIP-154). Fails with FAILED_PRECONDITION unless the reservation is confirmed. |
-| `CancelReservation` | [`CancelReservationRequest`](#cancelreservationrequest) | [`Reservation`](#reservation) | `POST /v1/{name=organizationalUnits/*/reservations/*}:cancel` | Cancels a reservation, freeing its resources.<br><br>Idempotent: cancelling a cancelled reservation succeeds and changes nothing. |
-| `RescheduleReservation` | [`RescheduleReservationRequest`](#reschedulereservationrequest) | [`Reservation`](#reservation) | `POST /v1/{name=organizationalUnits/*/reservations/*}:reschedule` | Moves a confirmed reservation onto a new hold, returning the reservation that replaces it.<br><br>The replacement is a new reservation made from the new hold, linked both ways (`replaces`, `replacement`); the original ends RESCHEDULED. The original keeps its resources until the replacement is confirmed, so a failure part-way -- the new hold lapsing, a crash -- leaves the customer with their old booking, never with neither. A new hold taken with `replaces` naming the original's hold may overlap the original's window on the same resources -- an extension in place -- and the overlap passes to the replacement in the same write that frees the original. Idempotent: repeating the call with the same hold returns the same replacement. |
+| `CreateReservation` | [`CreateReservationRequest`](#createreservationrequest) | [`Reservation`](#reservation) | `POST /v1/reservations` | Makes a reservation from a live hold, converting the hold so its resources stay taken.<br><br>Idempotent: a hold backs at most one reservation, so a retry returns the reservation the first call made. Fails with FAILED_PRECONDITION when the hold has lapsed or been released. |
+| `GetReservation` | [`GetReservationRequest`](#getreservationrequest) | [`Reservation`](#reservation) | `GET /v1/{name=reservations/*}` | Retrieves one reservation. |
+| `ListReservations` | [`ListReservationsRequest`](#listreservationsrequest) | [`ListReservationsResponse`](#listreservationsresponse) | `GET /v1/reservations` | Lists reservations. |
+| `UpdateReservation` | [`UpdateReservationRequest`](#updatereservationrequest) | [`Reservation`](#reservation) | `PATCH /v1/{reservation.name=reservations/*}` | Updates a confirmed reservation's customer or attributes, AIP-134.<br><br>update_mask is required and may name only `customer` and `attributes`; everything else is the engine's, and is changed by CancelReservation or RescheduleReservation. `reservation.etag`, when set, must match the stored one (AIP-154). Fails with FAILED_PRECONDITION unless the reservation is confirmed. |
+| `CancelReservation` | [`CancelReservationRequest`](#cancelreservationrequest) | [`Reservation`](#reservation) | `POST /v1/{name=reservations/*}:cancel` | Cancels a reservation, freeing its resources.<br><br>Idempotent: cancelling a cancelled reservation succeeds and changes nothing. |
+| `RescheduleReservation` | [`RescheduleReservationRequest`](#reschedulereservationrequest) | [`Reservation`](#reservation) | `POST /v1/{name=reservations/*}:reschedule` | Moves a confirmed reservation onto a new hold, returning the reservation that replaces it.<br><br>The replacement is a new reservation made from the new hold, linked both ways (`replaces`, `replacement`); the original ends RESCHEDULED. The original keeps its resources until the replacement is confirmed, so a failure part-way -- the new hold lapsing, a crash -- leaves the customer with their old booking, never with neither. A new hold taken with `replaces` naming the original's hold may overlap the original's window on the same resources -- an extension in place -- and the overlap passes to the replacement in the same write that frees the original. Idempotent: repeating the call with the same hold returns the same replacement. |
 
 #### Flow: Reschedule a reservation
 
@@ -169,12 +168,12 @@ are what would tie it to one vertical, and none of them is here: money belongs t
 service, both referenced by name (AIP-215), and anything else a vertical
 needs to remember rides in `attributes`.
 
-Resource `freebusy.reservation.v1/Reservation`, pattern `organizationalUnits/{organizational_unit}/reservations/{reservation}`.
+Resource `freebusy.reservation.v1/Reservation`, pattern `reservations/{reservation}`.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | `IDENTIFIER` | The reservation name. Its id is the caller's reservation_id, or else the id of the hold it was made from. Format: organizationalUnits/{organizational_unit}/reservations/{reservation} |
-| `hold` | `string` | `REQUIRED`, `IMMUTABLE` | The hold this reservation was made from, at the same site. Format: organizationalUnits/{organizational_unit}/holds/{hold} References `freebusy.allocation.v1/Hold`. |
+| `name` | `string` | `IDENTIFIER` | The reservation name. Its id is the caller's reservation_id, or else the id of the hold it was made from. Format: reservations/{reservation} |
+| `hold` | `string` | `REQUIRED`, `IMMUTABLE` | The hold this reservation was made from. Format: holds/{hold} References `freebusy.allocation.v1/Hold`. |
 | `resources` | repeated `string` | `OUTPUT_ONLY` | The resources taken, copied from the hold. Format: resources/{resource} References `the-protobuf-project.org/Resource`. |
 | `start_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | Start of the reserved window, copied from the hold. |
 | `end_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | End of the reserved window, exclusive, copied from the hold. |
@@ -187,8 +186,8 @@ Resource `freebusy.reservation.v1/Reservation`, pattern `organizationalUnits/{or
 | `confirm_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | When it was confirmed. |
 | `cancel_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | When it was cancelled. |
 | `etag` | `string` | `OUTPUT_ONLY` | Opaque version for optimistic concurrency (AIP-154); echo on cancel. |
-| `replaces` | `string` | `OUTPUT_ONLY` | The reservation this one replaced, set when it was made by RescheduleReservation. Format: organizationalUnits/{organizational_unit}/reservations/{reservation} |
-| `replacement` | `string` | `OUTPUT_ONLY` | The reservation replacing this one, set when RescheduleReservation began. Format: organizationalUnits/{organizational_unit}/reservations/{reservation} |
+| `replaces` | `string` | `OUTPUT_ONLY` | The reservation this one replaced, set when it was made by RescheduleReservation. Format: reservations/{reservation} |
+| `replacement` | `string` | `OUTPUT_ONLY` | The reservation replacing this one, set when RescheduleReservation began. Format: reservations/{reservation} |
 | `last_change` | [`Reservation.Change`](#reservationchange) | `OUTPUT_ONLY` | What the last write to this reservation changed. A webhook is sent freebusy.reservation.updated exactly when it is CHANGE_DETAILS, and the event of the new state otherwise. |
 
 ### CreateReservationRequest
@@ -201,7 +200,6 @@ reservation the first attempt made instead of making a second.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `parent` | `string` | `REQUIRED` | The site the hold was taken at. Format: organizationalUnits/{organizational_unit} Parent of `freebusy.reservation.v1/Reservation`. |
 | `reservation` | [`Reservation`](#reservation) | `REQUIRED` | The reservation to make. `hold` is required; `customer` and `attributes` are optional. |
 | `reservation_id` | `string` | `OPTIONAL` | Client-assigned id, becoming the last segment of the reservation name. Defaults to the hold's id. A hold backs at most one reservation whatever its id, so naming a hold that already has one returns that reservation. |
 
@@ -211,7 +209,7 @@ Request message for ReservationService.GetReservation, AIP-131.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | `REQUIRED` | Format: organizationalUnits/{organizational_unit}/reservations/{reservation} References `freebusy.reservation.v1/Reservation`. |
+| `name` | `string` | `REQUIRED` | Format: reservations/{reservation} References `freebusy.reservation.v1/Reservation`. |
 
 ### ListReservationsRequest
 
@@ -219,7 +217,6 @@ Request message for ReservationService.ListReservations, AIP-132.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `parent` | `string` | `REQUIRED` | Format: organizationalUnits/{organizational_unit} Parent of `freebusy.reservation.v1/Reservation`. |
 | `page_size` | `int32` | `OPTIONAL` | Maximum reservations to return. Defaults to 50, capped at 1000. |
 | `page_token` | `string` | `OPTIONAL` | Page token from a previous ListReservationsResponse.next_page_token. |
 | `filter` | `string` | `OPTIONAL` | Filter expression, AIP-160, e.g. `state = RESERVATION_STATE_CONFIRMED AND start_time >= "2026-11-10T00:00:00Z"`. |
@@ -254,7 +251,7 @@ Request message for ReservationService.CancelReservation.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | `REQUIRED` | Format: organizationalUnits/{organizational_unit}/reservations/{reservation} References `freebusy.reservation.v1/Reservation`. |
+| `name` | `string` | `REQUIRED` | Format: reservations/{reservation} References `freebusy.reservation.v1/Reservation`. |
 | `reason` | `string` | `OPTIONAL` | Why, in the canceller's words. Recorded, never parsed. |
 | `etag` | `string` | `OPTIONAL` | Opaque version read from the reservation; the cancel is rejected if it changed since (AIP-154). |
 
@@ -264,8 +261,8 @@ Request message for ReservationService.RescheduleReservation.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | `REQUIRED` | The confirmed reservation to move. Format: organizationalUnits/{organizational_unit}/reservations/{reservation} References `freebusy.reservation.v1/Reservation`. |
-| `hold` | `string` | `REQUIRED` | A live hold at the same site on the new window, taken by the caller with HoldService.CreateHold. Taking it first is what makes the move safe: the new slot is secured before the old one is let go. Format: organizationalUnits/{organizational_unit}/holds/{hold} References `freebusy.allocation.v1/Hold`. |
+| `name` | `string` | `REQUIRED` | The confirmed reservation to move. Format: reservations/{reservation} References `freebusy.reservation.v1/Reservation`. |
+| `hold` | `string` | `REQUIRED` | A live hold on the new window, taken by the caller with HoldService.CreateHold. Taking it first is what makes the move safe: the new slot is secured before the old one is let go. Format: holds/{hold} References `freebusy.allocation.v1/Hold`. |
 | `etag` | `string` | `OPTIONAL` | Opaque version read from the reservation; the move is rejected if it changed since (AIP-154). |
 
 ## Enums
@@ -338,7 +335,6 @@ Go constants, sentinels and the tables of docs/errors.md.
 | --- | --- | --- |
 | `ERROR_REASON_UNSPECIFIED` | 0 | Unset; never returned. |
 | `ERROR_REASON_HOLD_NOT_FOUND` | 1 | The reservation's hold does not exist, or CreateHold's hold.replaces names one that does not. |
-| `ERROR_REASON_HOLD_AT_ANOTHER_SITE` | 2 | The hold is at a different site from the reservation's parent, or CreateHold's hold.replaces is a hold at another site. |
 | `ERROR_REASON_HOLD_LAPSED` | 3 | The hold lapsed before the reservation was confirmed; the reservation failed. |
 | `ERROR_REASON_RESERVATION_ID_TAKEN` | 4 | reservation_id names a reservation made from another hold. |
 | `ERROR_REASON_RESERVATION_FAILED` | 5 | CancelReservation on a reservation that failed; it holds nothing. |

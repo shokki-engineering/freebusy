@@ -148,8 +148,8 @@ fact sheets) are just media with type DOCUMENT — they are not a separate type.
 
 ### ErrorReason
 
-The reasons freebusy returns for the directory (organizations, sites) and the
-calendars, events and availability freebusy serves, and any call: the
+The reasons freebusy returns for the resources, calendars, events and
+availability freebusy serves, and any call: the
 google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.dev domain. They are
 part of the API: clients branch on them, never on a message.
 protoc-gen-service renders them as Go constants, sentinels and the tables of
@@ -158,15 +158,6 @@ docs/errors.md.
 | Value | Number | Description |
 | --- | --- | --- |
 | `ERROR_REASON_UNSPECIFIED` | 0 | Unset; never returned. |
-| `ERROR_REASON_ORGANIZATION_REQUIRED` | 1 | A site (organizational unit) must belong to an organization, and the request names none. |
-| `ERROR_REASON_ORGANIZATION_NOT_FOUND` | 2 | The organization named does not exist. |
-| `ERROR_REASON_ORGANIZATION_DELETED` | 3 | The organization is deleted; a site under it cannot serve or be restored. |
-| `ERROR_REASON_ORGANIZATION_HAS_SITES` | 4 | An organization with sites cannot be deleted. |
-| `ERROR_REASON_SITE_REQUIRED` | 5 | A resource is booked at a site, and the request names none. |
-| `ERROR_REASON_SITE_NOT_FOUND` | 6 | The site named does not exist. |
-| `ERROR_REASON_SITE_DELETED` | 7 | The site is deleted. |
-| `ERROR_REASON_SITE_WITHOUT_ORGANIZATION` | 8 | The site belongs to no organization, so nothing is served there. |
-| `ERROR_REASON_SITE_HAS_RESOURCES` | 9 | A site with resources cannot be deleted. |
 | `ERROR_REASON_CALENDAR_NOT_FOUND` | 10 | The calendar named does not exist. |
 | `ERROR_REASON_CALENDAR_DELETED` | 11 | Nothing can be added to a deleted calendar. |
 | `ERROR_REASON_CALENDAR_NOT_EMPTY` | 12 | The calendar still has events or availability. |

@@ -186,8 +186,8 @@ func (e EngineConfig) AdmissionWait() time.Duration {
 	return time.Duration(e.AdmissionWaitMS) * time.Millisecond
 }
 
-// RetentionConfig ends soft deletes (AIP-164): organizations, sites,
-// resources, calendars, events and availability deleted longer ago than
+// RetentionConfig ends soft deletes (AIP-164): resources, calendars, events
+// and availability deleted longer ago than
 // DeletedDays are purged for good, and expire_time says when.
 type RetentionConfig struct {
 	// Purge runs the purger on this server. Safe on several servers at once.
@@ -300,6 +300,9 @@ type ServerConfig struct {
 	HTTP ListenConfig `koanf:"http"`
 	// MCP is the MCP server listener and transport.
 	MCP MCPConfig `koanf:"mcp"`
+	// CORS lets browsers on other origins call the HTTP port (the REST
+	// gateway, CalDAV and /health). Off by default.
+	CORS CORSConfig `koanf:"cors"`
 	// ShutdownTimeoutSeconds bounds how long a stop waits for in-flight
 	// requests -- HTTP gateways first, then gRPC -- before cutting them off.
 	// 0 keeps the runtime's default (20 s). Keep it below the orchestrator's
@@ -324,6 +327,38 @@ type TLSConfig struct {
 
 // Enabled reports whether both a certificate and key are configured.
 func (t TLSConfig) Enabled() bool { return t.CertFile != "" && t.KeyFile != "" }
+
+// CORSConfig is the cross-origin policy for the HTTP port. The server maps it
+// onto runtime-go's grpc.CORSPolicy; the MCP port is a separate listener and
+// is not covered. Lists set from the environment are comma-separated:
+// FREEBUSY_SERVER__CORS__ALLOWED_ORIGINS=https://a.example,https://b.example.
+type CORSConfig struct {
+	// Enabled turns the policy on. Off, no CORS headers are sent and browsers
+	// on other origins cannot read responses.
+	Enabled bool `koanf:"enabled"`
+	// AllowedOrigins are exact origins (scheme://host[:port]) or "*" for any.
+	AllowedOrigins []string `koanf:"allowed_origins"`
+	// AllowedMethods answer preflights. Empty means GET, POST, PATCH, PUT,
+	// DELETE, OPTIONS.
+	AllowedMethods []string `koanf:"allowed_methods"`
+	// AllowedHeaders answer preflights. Empty means what a GAPIC browser
+	// client sends: content-type, authorization, x-goog-api-client,
+	// x-goog-request-params, x-goog-user-project, x-api-key.
+	AllowedHeaders []string `koanf:"allowed_headers"`
+	// ExposedHeaders are response headers a browser script may read.
+	ExposedHeaders []string `koanf:"exposed_headers"`
+	// AllowCredentials lets browsers send cookies and HTTP authentication.
+	// It cannot be combined with the "*" origin.
+	AllowCredentials bool `koanf:"allow_credentials"`
+	// MaxAgeSeconds is how long a browser may cache a preflight; 0 sends no
+	// Access-Control-Max-Age.
+	MaxAgeSeconds int `koanf:"max_age_seconds"`
+}
+
+// MaxAge is MaxAgeSeconds as a duration.
+func (c CORSConfig) MaxAge() time.Duration {
+	return time.Duration(c.MaxAgeSeconds) * time.Second
+}
 
 // ListenConfig is a network host/port pair.
 type ListenConfig struct {

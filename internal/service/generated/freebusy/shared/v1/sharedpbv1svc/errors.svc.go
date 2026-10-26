@@ -29,24 +29,6 @@ const ErrorDomain = "freebusy.dev"
 
 // The reasons, as ErrorInfo carries them. They are part of the API.
 const (
-	// ReasonOrganizationRequired (INVALID_ARGUMENT): A site (organizational unit) must belong to an organization, and the request names none.
-	ReasonOrganizationRequired = "ORGANIZATION_REQUIRED"
-	// ReasonOrganizationNotFound (NOT_FOUND): The organization named does not exist.
-	ReasonOrganizationNotFound = "ORGANIZATION_NOT_FOUND"
-	// ReasonOrganizationDeleted (NOT_FOUND): The organization is deleted; a site under it cannot serve or be restored. Returned as `NOT_FOUND`, or `FAILED_PRECONDITION` on `UndeleteOrganizationalUnit`.
-	ReasonOrganizationDeleted = "ORGANIZATION_DELETED"
-	// ReasonOrganizationHasSites (FAILED_PRECONDITION): An organization with sites cannot be deleted.
-	ReasonOrganizationHasSites = "ORGANIZATION_HAS_SITES"
-	// ReasonSiteRequired (INVALID_ARGUMENT): A resource is booked at a site, and the request names none.
-	ReasonSiteRequired = "SITE_REQUIRED"
-	// ReasonSiteNotFound (NOT_FOUND): The site named does not exist.
-	ReasonSiteNotFound = "SITE_NOT_FOUND"
-	// ReasonSiteDeleted (NOT_FOUND): The site is deleted.
-	ReasonSiteDeleted = "SITE_DELETED"
-	// ReasonSiteWithoutOrganization (FAILED_PRECONDITION): The site belongs to no organization, so nothing is served there.
-	ReasonSiteWithoutOrganization = "SITE_WITHOUT_ORGANIZATION"
-	// ReasonSiteHasResources (FAILED_PRECONDITION): A site with resources cannot be deleted.
-	ReasonSiteHasResources = "SITE_HAS_RESOURCES"
 	// ReasonCalendarNotFound (NOT_FOUND): The calendar named does not exist.
 	ReasonCalendarNotFound = "CALENDAR_NOT_FOUND"
 	// ReasonCalendarDeleted (FAILED_PRECONDITION): Nothing can be added to a deleted calendar.
@@ -92,15 +74,6 @@ func Kinds() []problem.Kind {
 // Reasons declare every reason, with its code and meaning.
 func Reasons() []problem.Reason {
 	return []problem.Reason{
-		{Name: ReasonOrganizationRequired, Code: codes.InvalidArgument, Description: "A site (organizational unit) must belong to an organization, and the request names none."},
-		{Name: ReasonOrganizationNotFound, Code: codes.NotFound, Description: "The organization named does not exist."},
-		{Name: ReasonOrganizationDeleted, Code: codes.NotFound, Description: "The organization is deleted; a site under it cannot serve or be restored. Returned as `NOT_FOUND`, or `FAILED_PRECONDITION` on `UndeleteOrganizationalUnit`."},
-		{Name: ReasonOrganizationHasSites, Code: codes.FailedPrecondition, Description: "An organization with sites cannot be deleted."},
-		{Name: ReasonSiteRequired, Code: codes.InvalidArgument, Description: "A resource is booked at a site, and the request names none."},
-		{Name: ReasonSiteNotFound, Code: codes.NotFound, Description: "The site named does not exist."},
-		{Name: ReasonSiteDeleted, Code: codes.NotFound, Description: "The site is deleted."},
-		{Name: ReasonSiteWithoutOrganization, Code: codes.FailedPrecondition, Description: "The site belongs to no organization, so nothing is served there."},
-		{Name: ReasonSiteHasResources, Code: codes.FailedPrecondition, Description: "A site with resources cannot be deleted."},
 		{Name: ReasonCalendarNotFound, Code: codes.NotFound, Description: "The calendar named does not exist."},
 		{Name: ReasonCalendarDeleted, Code: codes.FailedPrecondition, Description: "Nothing can be added to a deleted calendar."},
 		{Name: ReasonCalendarNotEmpty, Code: codes.FailedPrecondition, Description: "The calendar still has events or availability."},
@@ -133,60 +106,6 @@ func Retryable(reason string) bool {
 	switch reason {
 	}
 	return false
-}
-
-// NewOrganizationRequired is a ORGANIZATION_REQUIRED problem; its fix defaults to the
-// proto's: "Create the organization first and send its name.".
-func NewOrganizationRequired(field, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonOrganizationRequired, Field: field, What: what, Fix: "Create the organization first and send its name."}
-}
-
-// NewOrganizationNotFound is a ORGANIZATION_NOT_FOUND problem; its fix defaults to the
-// proto's: "Check the name, or `ListOrganizations`.".
-func NewOrganizationNotFound(resourceType, name, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonOrganizationNotFound, ResourceType: resourceType, ResourceName: name, What: what, Fix: "Check the name, or `ListOrganizations`."}
-}
-
-// NewOrganizationDeleted is a ORGANIZATION_DELETED problem; its fix defaults to the
-// proto's: "`UndeleteOrganization` first, or use a live one.".
-func NewOrganizationDeleted(resourceType, name, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonOrganizationDeleted, ResourceType: resourceType, ResourceName: name, What: what, Fix: "`UndeleteOrganization` first, or use a live one."}
-}
-
-// NewOrganizationHasSites is a ORGANIZATION_HAS_SITES problem; its fix defaults to the
-// proto's: "Delete or move its sites first.".
-func NewOrganizationHasSites(resourceType, name, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonOrganizationHasSites, ResourceType: resourceType, ResourceName: name, What: what, Fix: "Delete or move its sites first."}
-}
-
-// NewSiteRequired is a SITE_REQUIRED problem; its fix defaults to the
-// proto's: "Send its `organizational_unit`.".
-func NewSiteRequired(field, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonSiteRequired, Field: field, What: what, Fix: "Send its `organizational_unit`."}
-}
-
-// NewSiteNotFound is a SITE_NOT_FOUND problem; its fix defaults to the
-// proto's: "Check the name, or `ListOrganizationalUnits`.".
-func NewSiteNotFound(resourceType, name, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonSiteNotFound, ResourceType: resourceType, ResourceName: name, What: what, Fix: "Check the name, or `ListOrganizationalUnits`."}
-}
-
-// NewSiteDeleted is a SITE_DELETED problem; its fix defaults to the
-// proto's: "`UndeleteOrganizationalUnit`, or use a live site.".
-func NewSiteDeleted(resourceType, name, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonSiteDeleted, ResourceType: resourceType, ResourceName: name, What: what, Fix: "`UndeleteOrganizationalUnit`, or use a live site."}
-}
-
-// NewSiteWithoutOrganization is a SITE_WITHOUT_ORGANIZATION problem; its fix defaults to the
-// proto's: "Set its `organization`.".
-func NewSiteWithoutOrganization(resourceType, name, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonSiteWithoutOrganization, ResourceType: resourceType, ResourceName: name, What: what, Fix: "Set its `organization`."}
-}
-
-// NewSiteHasResources is a SITE_HAS_RESOURCES problem; its fix defaults to the
-// proto's: "Delete or move its resources first.".
-func NewSiteHasResources(resourceType, name, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonSiteHasResources, ResourceType: resourceType, ResourceName: name, What: what, Fix: "Delete or move its resources first."}
 }
 
 // NewCalendarNotFound is a CALENDAR_NOT_FOUND problem; its fix defaults to the

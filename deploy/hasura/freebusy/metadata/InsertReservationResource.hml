@@ -31,8 +31,6 @@ definition:
       type: String_1
     - name: name
       type: String_1!
-    - name: organizationalUnitId
-      type: String_1!
     - name: replacement
       type: String_1
     - name: replaces
@@ -88,9 +86,6 @@ definition:
         name:
           column:
             name: name
-        organizationalUnitId:
-          column:
-            name: organizational_unit_id
         replacement:
           column:
             name: replacement
@@ -131,7 +126,6 @@ definition:
           - id
           - lastChange
           - name
-          - organizationalUnitId
           - replacement
           - replaces
           - resources

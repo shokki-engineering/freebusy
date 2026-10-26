@@ -25,8 +25,8 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// The reasons freebusy returns for the directory (organizations, sites) and the
-// calendars, events and availability freebusy serves, and any call: the
+// The reasons freebusy returns for the resources, calendars, events and
+// availability freebusy serves, and any call: the
 // google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.dev domain. They are
 // part of the API: clients branch on them, never on a message.
 // protoc-gen-service renders them as Go constants, sentinels and the tables of
@@ -36,25 +36,6 @@ type ErrorReason int32
 const (
 	// Unset; never returned.
 	ErrorReason_ERROR_REASON_UNSPECIFIED ErrorReason = 0
-	// A site (organizational unit) must belong to an organization, and the request
-	// names none.
-	ErrorReason_ERROR_REASON_ORGANIZATION_REQUIRED ErrorReason = 1
-	// The organization named does not exist.
-	ErrorReason_ERROR_REASON_ORGANIZATION_NOT_FOUND ErrorReason = 2
-	// The organization is deleted; a site under it cannot serve or be restored.
-	ErrorReason_ERROR_REASON_ORGANIZATION_DELETED ErrorReason = 3
-	// An organization with sites cannot be deleted.
-	ErrorReason_ERROR_REASON_ORGANIZATION_HAS_SITES ErrorReason = 4
-	// A resource is booked at a site, and the request names none.
-	ErrorReason_ERROR_REASON_SITE_REQUIRED ErrorReason = 5
-	// The site named does not exist.
-	ErrorReason_ERROR_REASON_SITE_NOT_FOUND ErrorReason = 6
-	// The site is deleted.
-	ErrorReason_ERROR_REASON_SITE_DELETED ErrorReason = 7
-	// The site belongs to no organization, so nothing is served there.
-	ErrorReason_ERROR_REASON_SITE_WITHOUT_ORGANIZATION ErrorReason = 8
-	// A site with resources cannot be deleted.
-	ErrorReason_ERROR_REASON_SITE_HAS_RESOURCES ErrorReason = 9
 	// The calendar named does not exist.
 	ErrorReason_ERROR_REASON_CALENDAR_NOT_FOUND ErrorReason = 10
 	// Nothing can be added to a deleted calendar.
@@ -98,15 +79,6 @@ const (
 var (
 	ErrorReason_name = map[int32]string{
 		0:  "ERROR_REASON_UNSPECIFIED",
-		1:  "ERROR_REASON_ORGANIZATION_REQUIRED",
-		2:  "ERROR_REASON_ORGANIZATION_NOT_FOUND",
-		3:  "ERROR_REASON_ORGANIZATION_DELETED",
-		4:  "ERROR_REASON_ORGANIZATION_HAS_SITES",
-		5:  "ERROR_REASON_SITE_REQUIRED",
-		6:  "ERROR_REASON_SITE_NOT_FOUND",
-		7:  "ERROR_REASON_SITE_DELETED",
-		8:  "ERROR_REASON_SITE_WITHOUT_ORGANIZATION",
-		9:  "ERROR_REASON_SITE_HAS_RESOURCES",
 		10: "ERROR_REASON_CALENDAR_NOT_FOUND",
 		11: "ERROR_REASON_CALENDAR_DELETED",
 		12: "ERROR_REASON_CALENDAR_NOT_EMPTY",
@@ -123,30 +95,21 @@ var (
 		23: "ERROR_REASON_UNIMPLEMENTED",
 	}
 	ErrorReason_value = map[string]int32{
-		"ERROR_REASON_UNSPECIFIED":               0,
-		"ERROR_REASON_ORGANIZATION_REQUIRED":     1,
-		"ERROR_REASON_ORGANIZATION_NOT_FOUND":    2,
-		"ERROR_REASON_ORGANIZATION_DELETED":      3,
-		"ERROR_REASON_ORGANIZATION_HAS_SITES":    4,
-		"ERROR_REASON_SITE_REQUIRED":             5,
-		"ERROR_REASON_SITE_NOT_FOUND":            6,
-		"ERROR_REASON_SITE_DELETED":              7,
-		"ERROR_REASON_SITE_WITHOUT_ORGANIZATION": 8,
-		"ERROR_REASON_SITE_HAS_RESOURCES":        9,
-		"ERROR_REASON_CALENDAR_NOT_FOUND":        10,
-		"ERROR_REASON_CALENDAR_DELETED":          11,
-		"ERROR_REASON_CALENDAR_NOT_EMPTY":        12,
-		"ERROR_REASON_NAME_NOT_UNDER_PARENT":     13,
-		"ERROR_REASON_NOT_RECURRING":             14,
-		"ERROR_REASON_SERIES_NOT_FOUND":          15,
-		"ERROR_REASON_NOT_AN_INSTANCE":           16,
-		"ERROR_REASON_RANGE_NOT_SUPPORTED":       17,
-		"ERROR_REASON_INVALID_EVENT":             18,
-		"ERROR_REASON_UNSUPPORTED_RECURRENCE":    19,
-		"ERROR_REASON_WINDOW_INCOMPLETE":         20,
-		"ERROR_REASON_WINDOW_BACKWARDS":          21,
-		"ERROR_REASON_WINDOW_TOO_LONG":           22,
-		"ERROR_REASON_UNIMPLEMENTED":             23,
+		"ERROR_REASON_UNSPECIFIED":            0,
+		"ERROR_REASON_CALENDAR_NOT_FOUND":     10,
+		"ERROR_REASON_CALENDAR_DELETED":       11,
+		"ERROR_REASON_CALENDAR_NOT_EMPTY":     12,
+		"ERROR_REASON_NAME_NOT_UNDER_PARENT":  13,
+		"ERROR_REASON_NOT_RECURRING":          14,
+		"ERROR_REASON_SERIES_NOT_FOUND":       15,
+		"ERROR_REASON_NOT_AN_INSTANCE":        16,
+		"ERROR_REASON_RANGE_NOT_SUPPORTED":    17,
+		"ERROR_REASON_INVALID_EVENT":          18,
+		"ERROR_REASON_UNSUPPORTED_RECURRENCE": 19,
+		"ERROR_REASON_WINDOW_INCOMPLETE":      20,
+		"ERROR_REASON_WINDOW_BACKWARDS":       21,
+		"ERROR_REASON_WINDOW_TOO_LONG":        22,
+		"ERROR_REASON_UNIMPLEMENTED":          23,
 	}
 )
 
@@ -181,27 +144,9 @@ var File_freebusy_shared_v1_errors_proto protoreflect.FileDescriptor
 
 const file_freebusy_shared_v1_errors_proto_rawDesc = "" +
 	"\n" +
-	"\x1ffreebusy/shared/v1/errors.proto\x12\x12freebusy.shared.v1\x1a\x1cservice/v1/annotations.proto*\xf5\"\n" +
+	"\x1ffreebusy/shared/v1/errors.proto\x12\x12freebusy.shared.v1\x1a\x1cservice/v1/annotations.proto*\xd6\x19\n" +
 	"\vErrorReason\x12\x1c\n" +
-	"\x18ERROR_REASON_UNSPECIFIED\x10\x00\x12\xce\x01\n" +
-	"\"ERROR_REASON_ORGANIZATION_REQUIRED\x10\x01\x1a\xa5\x01\xea\xf0\x19\xa0\x01\n" +
-	"\x10INVALID_ARGUMENT\x12XA site (organizational unit) must belong to an organization, and the request names none.\x1a0Create the organization first and send its name. \x01\x12\x8b\x01\n" +
-	"#ERROR_REASON_ORGANIZATION_NOT_FOUND\x10\x02\x1ab\xea\xf0\x19^\n" +
-	"\tNOT_FOUND\x12&The organization named does not exist.\x1a'Check the name, or `ListOrganizations`. \x02\x12\x8b\x02\n" +
-	"!ERROR_REASON_ORGANIZATION_DELETED\x10\x03\x1a\xe3\x01\xea\xf0\x19\xde\x01\n" +
-	"\tNOT_FOUND\x12\x9c\x01The organization is deleted; a site under it cannot serve or be restored. Returned as `NOT_FOUND`, or `FAILED_PRECONDITION` on `UndeleteOrganizationalUnit`.\x1a0`UndeleteOrganization` first, or use a live one. \x02\x12\x94\x01\n" +
-	"#ERROR_REASON_ORGANIZATION_HAS_SITES\x10\x04\x1ak\xea\xf0\x19g\n" +
-	"\x13FAILED_PRECONDITION\x12-An organization with sites cannot be deleted.\x1a\x1fDelete or move its sites first. \x03\x12\x96\x01\n" +
-	"\x1aERROR_REASON_SITE_REQUIRED\x10\x05\x1av\xea\xf0\x19r\n" +
-	"\x10INVALID_ARGUMENT\x12;A resource is booked at a site, and the request names none.\x1a\x1fSend its `organizational_unit`. \x01\x12\x81\x01\n" +
-	"\x1bERROR_REASON_SITE_NOT_FOUND\x10\x06\x1a`\xea\xf0\x19\\\n" +
-	"\tNOT_FOUND\x12\x1eThe site named does not exist.\x1a-Check the name, or `ListOrganizationalUnits`. \x02\x12y\n" +
-	"\x19ERROR_REASON_SITE_DELETED\x10\a\x1aZ\xea\xf0\x19V\n" +
-	"\tNOT_FOUND\x12\x14The site is deleted.\x1a1`UndeleteOrganizationalUnit`, or use a live site. \x02\x12\xa2\x01\n" +
-	"&ERROR_REASON_SITE_WITHOUT_ORGANIZATION\x10\b\x1av\xea\xf0\x19r\n" +
-	"\x13FAILED_PRECONDITION\x12@The site belongs to no organization, so nothing is served there.\x1a\x17Set its `organization`. \x03\x12\x8f\x01\n" +
-	"\x1fERROR_REASON_SITE_HAS_RESOURCES\x10\t\x1aj\xea\xf0\x19f\n" +
-	"\x13FAILED_PRECONDITION\x12(A site with resources cannot be deleted.\x1a#Delete or move its resources first. \x03\x12\x81\x01\n" +
+	"\x18ERROR_REASON_UNSPECIFIED\x10\x00\x12\x81\x01\n" +
 	"\x1fERROR_REASON_CALENDAR_NOT_FOUND\x10\n" +
 	"\x1a\\\xea\xf0\x19X\n" +
 	"\tNOT_FOUND\x12\"The calendar named does not exist.\x1a%Check the parent, or `ListCalendars`. \x02\x12\x93\x01\n" +
@@ -231,7 +176,7 @@ const file_freebusy_shared_v1_errors_proto_rawDesc = "" +
 	"\x10INVALID_ARGUMENT\x12+The window is longer than one call answers.\x1a\"Split it into consecutive windows. \x01\x12z\n" +
 	"\x1aERROR_REASON_UNIMPLEMENTED\x10\x17\x1aZ\xea\xf0\x19V\n" +
 	"\rUNIMPLEMENTED\x120The call, or this use of it, is not implemented.\x1a\x11Read the message.0\x01\x1a\x12\xe2\xf0\x19\x0e\n" +
-	"\ffreebusy.devB\xed\x01\n" +
+	"\ffreebusy.dev\"\x04\b\x01\x10\t*\"ERROR_REASON_ORGANIZATION_REQUIRED*#ERROR_REASON_ORGANIZATION_NOT_FOUND*!ERROR_REASON_ORGANIZATION_DELETED*#ERROR_REASON_ORGANIZATION_HAS_SITES*\x1aERROR_REASON_SITE_REQUIRED*\x1bERROR_REASON_SITE_NOT_FOUND*\x19ERROR_REASON_SITE_DELETED*&ERROR_REASON_SITE_WITHOUT_ORGANIZATION*\x1fERROR_REASON_SITE_HAS_RESOURCESB\xed\x01\n" +
 	"\x16com.freebusy.shared.v1B\vErrorsProtoP\x01Z\\github.com/shokki-engineering/freebusy/protobuf/generated/go/shared/v1/sharedpbv1;sharedpbv1\xa2\x02\x03FSX\xaa\x02\x12Freebusy.Shared.V1\xca\x02\x12Freebusy\\Shared\\V1\xe2\x02\x1eFreebusy\\Shared\\V1\\GPBMetadata\xea\x02\x14Freebusy::Shared::V1b\x06proto3"
 
 var (

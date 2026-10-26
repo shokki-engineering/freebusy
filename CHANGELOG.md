@@ -16,6 +16,58 @@ pre-release and does not move the images' `latest` tag.
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking:** freebusy is a top-level booking engine with no tenants or
+  sites. Holds, allocations and reservations are top-level collections
+  (`holds/{hold}`, `allocations/{allocation}`, `reservations/{reservation}`;
+  `POST /v1/holds`, `POST /v1/reservations`), and `CreateHold`, `ListHolds`,
+  `CreateReservation` and `ListReservations` take no `parent`.
+  `ComputeAvailability`, `CheckAvailability` and `SearchAvailability` are
+  `POST /v1/resources:computeAvailability`, `:checkAvailability` and
+  `:searchAvailability`, narrowed by `resources`, `resource_types` and
+  `filter` instead of a site or an organization. Grouping resources into
+  venues, properties or tenants belongs to whatever is built on top; a
+  resource's own `organizational_unit` stays, as data a filter can match.
+- Holds taken with one idempotency key are the same hold everywhere, not per
+  site.
+
+### Removed
+
+- The `Organizations` and `OrganizationalUnits` services, the check that
+  refused calls naming a missing or deleted site, and the error reasons that
+  went with it (`ORGANIZATION_*`, `SITE_*`, `HOLD_AT_ANOTHER_SITE`).
+- `SearchAvailabilityRequest.parent`, `organizational_units` and `quantity`
+  (a match needed that many free at one site), and
+  `AvailabilityMatch.organizational_unit`.
+- `Webhook.organizational_unit`: a webhook is sent every change of the types
+  it asks for.
+- The read model's `organization` column. Migration
+  `20261026062717_top_level_engine` drops it and the site columns of holds,
+  allocations, reservations and webhooks;
+  `20261026070000_top_level_engine_names` renames existing holds, allocations
+  and reservations (and the names rows keep of them) to the top-level form,
+  refusing to run if two sites used one id.
+
+### Added
+
+- CORS for the HTTP port, so browser clients (the TypeScript SDK in fallback
+  mode) can call the REST gateway from other origins: `[server.cors]` with
+  `enabled` (default false), `allowed_origins` (exact origins or `*`),
+  `allowed_methods`, `allowed_headers` (defaulting to what a GAPIC browser
+  client sends), `exposed_headers`, `allow_credentials` (refused with `*`) and
+  `max_age_seconds`; `FREEBUSY_SERVER__CORS__*` take comma-separated lists.
+  Preflights are answered before any handler runs, and every response varies
+  on `Origin`. Served by runtime-go's `grpc.WithCORS`; the MCP port is not
+  covered. Helm `cors.*` values and Compose `FREEBUSY_CORS_*` variables wire
+  it. See "Calling freebusy from a browser" in the README.
+- A release pushes the API's buf module to the BSR, labelled with the tag
+  (secret `BUF_TOKEN`), and Minerva, the GitHub App installed on the SDK
+  repositories (variable `MINERVA_APP_ID`, secret `MINERVA_PRIVATE_KEY`),
+  tells `freebusy-go`, `freebusy-typescript` and `freebusy-python` through
+  `the-protobuf-project/sdk/dispatch`; each regenerates from that label and
+  opens a pull request. Both steps are skipped until their secrets exist.
+
 ## [1.0.0-rc.1] - 2026-10-24
 
 ### Added

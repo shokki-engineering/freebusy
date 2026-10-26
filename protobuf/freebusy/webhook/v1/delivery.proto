@@ -54,8 +54,8 @@ message Delivery {
   string event_type = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The record that changed.
-  // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
-  // or organizationalUnits/{organizational_unit}/holds/{hold}
+  // Format: reservations/{reservation}
+  // or holds/{hold}
   string subject = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The request body sent: a CloudEvents 1.0 JSON document whose data is the

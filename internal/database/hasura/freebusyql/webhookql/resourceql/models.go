@@ -38,8 +38,6 @@ type DeleteWebhookResourceByIdResponse struct {
 		Id string `graphql:"id"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnit selects the "organizationalUnit" field; nil when the column is NULL.
-		OrganizationalUnit *string `graphql:"organizationalUnit"`
 		// PreviousSecret selects the "previousSecret" field; nil when the column is NULL.
 		PreviousSecret *string `graphql:"previousSecret"`
 		// RotateTime selects the "rotateTime" field; nil when the column is NULL.
@@ -73,8 +71,6 @@ type InsertWebhookResourceResponse struct {
 		Id string `graphql:"id"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnit selects the "organizationalUnit" field; nil when the column is NULL.
-		OrganizationalUnit *string `graphql:"organizationalUnit"`
 		// PreviousSecret selects the "previousSecret" field; nil when the column is NULL.
 		PreviousSecret *string `graphql:"previousSecret"`
 		// RotateTime selects the "rotateTime" field; nil when the column is NULL.
@@ -108,8 +104,6 @@ type UpdateWebhookResourceByIdResponse struct {
 		Id string `graphql:"id"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnit selects the "organizationalUnit" field; nil when the column is NULL.
-		OrganizationalUnit *string `graphql:"organizationalUnit"`
 		// PreviousSecret selects the "previousSecret" field; nil when the column is NULL.
 		PreviousSecret *string `graphql:"previousSecret"`
 		// RotateTime selects the "rotateTime" field; nil when the column is NULL.
@@ -141,8 +135,6 @@ type WebhookResource struct {
 	Id string `graphql:"id"`
 	// Name selects the "name" field.
 	Name string `graphql:"name"`
-	// OrganizationalUnit selects the "organizationalUnit" field; nil when the column is NULL.
-	OrganizationalUnit *string `graphql:"organizationalUnit"`
 	// PreviousSecret selects the "previousSecret" field; nil when the column is NULL.
 	PreviousSecret *string `graphql:"previousSecret"`
 	// RotateTime selects the "rotateTime" field; nil when the column is NULL.
@@ -217,17 +209,6 @@ type WebhookResourceAggExp struct {
 		// Min selects the "min" field; nil when the column is NULL.
 		Min *string `graphql:"min"`
 	} `graphql:"name"`
-	// OrganizationalUnit selects the "organizationalUnit" field.
-	OrganizationalUnit struct {
-		// Count selects the "_count" field.
-		Count graphql.Int64 `graphql:"_count"`
-		// CountDistinct selects the "_count_distinct" field.
-		CountDistinct graphql.Int64 `graphql:"_count_distinct"`
-		// Max selects the "max" field; nil when the column is NULL.
-		Max *string `graphql:"max"`
-		// Min selects the "min" field; nil when the column is NULL.
-		Min *string `graphql:"min"`
-	} `graphql:"organizationalUnit"`
 	// PreviousSecret selects the "previousSecret" field.
 	PreviousSecret struct {
 		// Count selects the "_count" field.

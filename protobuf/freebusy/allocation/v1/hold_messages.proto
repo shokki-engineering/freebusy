@@ -24,17 +24,12 @@ option java_package = "engineering.shokki.freebusy.allocation.v1";
 // deliberately no separate Allocate method, so there is one place where the
 // race is handled.
 message CreateHoldRequest {
-  // The site whose resources may be taken.
-  // Format: organizationalUnits/{organizational_unit}
-  string parent = 1 [
-    (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).child_type = "freebusy.allocation.v1/Hold",
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+$"
-  ];
+  reserved 1;
+  reserved "parent";
 
   // The hold to take. Its window is required; quantity defaults to 1 and
-  // candidate_resources empty offers every resource the site holds. Supply
-  // idempotency_key to make a retry safe.
+  // candidate_resources empty offers every resource candidate_filter matches.
+  // Supply idempotency_key to make a retry safe.
   Hold hold = 2 [
     (google.api.field_behavior) = REQUIRED,
     (buf.validate.field).required = true
@@ -48,23 +43,18 @@ message CreateHoldRequest {
 // Request message for HoldService.GetHold, AIP-131.
 message GetHoldRequest {
   // Name of the hold to retrieve.
-  // Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  // Format: holds/{hold}
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "freebusy.allocation.v1/Hold",
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/holds/[^/]+$"
+    (buf.validate.field).string.pattern = "^holds/[^/]+$"
   ];
 }
 
 // Request message for HoldService.ListHolds, AIP-132.
 message ListHoldsRequest {
-  // The site whose holds to list.
-  // Format: organizationalUnits/{organizational_unit}
-  string parent = 1 [
-    (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).child_type = "freebusy.allocation.v1/Hold",
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+$"
-  ];
+  reserved 1;
+  reserved "parent";
 
   // Maximum holds to return. Defaults to 50, capped at 1000.
   int32 page_size = 2 [
@@ -95,11 +85,11 @@ message ListHoldsResponse {
 // Request message for HoldService.ExtendHold.
 message ExtendHoldRequest {
   // Name of the hold to extend.
-  // Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  // Format: holds/{hold}
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "freebusy.allocation.v1/Hold",
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/holds/[^/]+$"
+    (buf.validate.field).string.pattern = "^holds/[^/]+$"
   ];
 
   // How much further out to push expire_time, measured from now rather than
@@ -117,11 +107,11 @@ message ExtendHoldRequest {
 // Request message for HoldService.ReleaseHold.
 message ReleaseHoldRequest {
   // Name of the hold to release.
-  // Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  // Format: holds/{hold}
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "freebusy.allocation.v1/Hold",
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/holds/[^/]+$"
+    (buf.validate.field).string.pattern = "^holds/[^/]+$"
   ];
 
   // Opaque version read from the hold; the release is rejected if the hold
@@ -132,11 +122,11 @@ message ReleaseHoldRequest {
 // Request message for HoldService.DeleteHold, AIP-135.
 message DeleteHoldRequest {
   // Name of the hold to delete.
-  // Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  // Format: holds/{hold}
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "freebusy.allocation.v1/Hold",
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/holds/[^/]+$"
+    (buf.validate.field).string.pattern = "^holds/[^/]+$"
   ];
 
   // Opaque version read from the hold; the delete is rejected if the hold

@@ -23,8 +23,6 @@ definition:
       type: String_1
     - name: name
       type: String_1!
-    - name: organizationalUnitId
-      type: String_1!
     - name: quantity
       type: Int32
     - name: replaces
@@ -68,9 +66,6 @@ definition:
         name:
           column:
             name: name
-        organizationalUnitId:
-          column:
-            name: organizational_unit_id
         quantity:
           column:
             name: quantity
@@ -107,7 +102,6 @@ definition:
           - id
           - idempotencyKey
           - name
-          - organizationalUnitId
           - quantity
           - replaces
           - resources
@@ -137,8 +131,6 @@ definition:
         - fieldName: idempotencyKey
           booleanExpressionType: TextBoolExp
         - fieldName: name
-          booleanExpressionType: TextBoolExp
-        - fieldName: organizationalUnitId
           booleanExpressionType: TextBoolExp
         - fieldName: quantity
           booleanExpressionType: Int4BoolExp
@@ -181,8 +173,6 @@ definition:
           aggregateExpression: TextAggExp
         - fieldName: name
           aggregateExpression: TextAggExp
-        - fieldName: organizationalUnitId
-          aggregateExpression: TextAggExp
         - fieldName: quantity
           aggregateExpression: Int4AggExp
         - fieldName: replaces
@@ -221,8 +211,6 @@ definition:
         - fieldName: idempotencyKey
           orderByExpression: String1OrderByExp
         - fieldName: name
-          orderByExpression: String1OrderByExp
-        - fieldName: organizationalUnitId
           orderByExpression: String1OrderByExp
         - fieldName: quantity
           orderByExpression: Int32OrderByExp

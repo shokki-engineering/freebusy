@@ -34,9 +34,6 @@ const (
 // reservation the first attempt made instead of making a second.
 type CreateReservationRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The site the hold was taken at.
-	// Format: organizationalUnits/{organizational_unit}
-	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// The reservation to make. `hold` is required; `customer` and `attributes`
 	// are optional.
 	Reservation *Reservation `protobuf:"bytes,2,opt,name=reservation,proto3" json:"reservation,omitempty"`
@@ -78,13 +75,6 @@ func (*CreateReservationRequest) Descriptor() ([]byte, []int) {
 	return file_freebusy_reservation_v1_reservation_messages_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CreateReservationRequest) GetParent() string {
-	if x != nil {
-		return x.Parent
-	}
-	return ""
-}
-
 func (x *CreateReservationRequest) GetReservation() *Reservation {
 	if x != nil {
 		return x.Reservation
@@ -102,7 +92,7 @@ func (x *CreateReservationRequest) GetReservationId() string {
 // Request message for ReservationService.GetReservation, AIP-131.
 type GetReservationRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+	// Format: reservations/{reservation}
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -148,8 +138,6 @@ func (x *GetReservationRequest) GetName() string {
 // Request message for ReservationService.ListReservations, AIP-132.
 type ListReservationsRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Format: organizationalUnits/{organizational_unit}
-	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// Maximum reservations to return. Defaults to 50, capped at 1000.
 	PageSize int32 `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// Page token from a previous ListReservationsResponse.next_page_token.
@@ -191,13 +179,6 @@ func (x *ListReservationsRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ListReservationsRequest.ProtoReflect.Descriptor instead.
 func (*ListReservationsRequest) Descriptor() ([]byte, []int) {
 	return file_freebusy_reservation_v1_reservation_messages_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *ListReservationsRequest) GetParent() string {
-	if x != nil {
-		return x.Parent
-	}
-	return ""
 }
 
 func (x *ListReservationsRequest) GetPageSize() int32 {
@@ -350,7 +331,7 @@ func (x *UpdateReservationRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 // Request message for ReservationService.CancelReservation.
 type CancelReservationRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+	// Format: reservations/{reservation}
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Why, in the canceller's words. Recorded, never parsed.
 	Reason string `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
@@ -416,12 +397,12 @@ func (x *CancelReservationRequest) GetEtag() string {
 type RescheduleReservationRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The confirmed reservation to move.
-	// Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+	// Format: reservations/{reservation}
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// A live hold at the same site on the new window, taken by the caller with
+	// A live hold on the new window, taken by the caller with
 	// HoldService.CreateHold. Taking it first is what makes the move safe: the
 	// new slot is secured before the old one is let go.
-	// Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	// Format: holds/{hold}
 	Hold string `protobuf:"bytes,2,opt,name=hold,proto3" json:"hold,omitempty"`
 	// Opaque version read from the reservation; the move is rejected if it
 	// changed since (AIP-154).
@@ -485,42 +466,40 @@ var File_freebusy_reservation_v1_reservation_messages_proto protoreflect.FileDes
 
 const file_freebusy_reservation_v1_reservation_messages_proto_rawDesc = "" +
 	"\n" +
-	"2freebusy/reservation/v1/reservation_messages.proto\x12\x17freebusy.reservation.v1\x1a\x1bbuf/validate/validate.proto\x1a)freebusy/reservation/v1/reservation.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a google/protobuf/field_mask.proto\"\xb1\x02\n" +
-	"\x18CreateReservationRequest\x12f\n" +
-	"\x06parent\x18\x01 \x01(\tBN\xe2A\x01\x02\xfaA%\x12#freebusy.reservation.v1/Reservation\xbaH\x1fr\x1d2\x1b^organizationalUnits/[^/]+$R\x06parent\x12R\n" +
+	"2freebusy/reservation/v1/reservation_messages.proto\x12\x17freebusy.reservation.v1\x1a\x1bbuf/validate/validate.proto\x1a)freebusy/reservation/v1/reservation.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a google/protobuf/field_mask.proto\"\xd7\x01\n" +
+	"\x18CreateReservationRequest\x12R\n" +
 	"\vreservation\x18\x02 \x01(\v2$.freebusy.reservation.v1.ReservationB\n" +
 	"\xe2A\x01\x02\xbaH\x03\xc8\x01\x01R\vreservation\x12Y\n" +
-	"\x0ereservation_id\x18\x03 \x01(\tB2\xe2A\x01\x01\xbaH+\xd8\x01\x01r&2$^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$R\rreservationId\"\x8e\x01\n" +
-	"\x15GetReservationRequest\x12u\n" +
-	"\x04name\x18\x01 \x01(\tBa\xe2A\x01\x02\xfaA%\n" +
-	"#freebusy.reservation.v1/Reservation\xbaH2r02.^organizationalUnits/[^/]+/reservations/[^/]+$R\x04name\"\x92\x02\n" +
-	"\x17ListReservationsRequest\x12f\n" +
-	"\x06parent\x18\x01 \x01(\tBN\xe2A\x01\x02\xfaA%\x12#freebusy.reservation.v1/Reservation\xbaH\x1fr\x1d2\x1b^organizationalUnits/[^/]+$R\x06parent\x12+\n" +
+	"\x0ereservation_id\x18\x03 \x01(\tB2\xe2A\x01\x01\xbaH+\xd8\x01\x01r&2$^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$R\rreservationIdJ\x04\b\x01\x10\x02R\x06parent\"t\n" +
+	"\x15GetReservationRequest\x12[\n" +
+	"\x04name\x18\x01 \x01(\tBG\xe2A\x01\x02\xfaA%\n" +
+	"#freebusy.reservation.v1/Reservation\xbaH\x18r\x162\x14^reservations/[^/]+$R\x04name\"\xb8\x01\n" +
+	"\x17ListReservationsRequest\x12+\n" +
 	"\tpage_size\x18\x02 \x01(\x05B\x0e\xe2A\x01\x01\xbaH\a\x1a\x05\x18\xe8\a(\x00R\bpageSize\x12#\n" +
 	"\n" +
 	"page_token\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\tpageToken\x12\x1c\n" +
 	"\x06filter\x18\x04 \x01(\tB\x04\xe2A\x01\x01R\x06filter\x12\x1f\n" +
-	"\border_by\x18\x05 \x01(\tB\x04\xe2A\x01\x01R\aorderBy\"\x8c\x01\n" +
+	"\border_by\x18\x05 \x01(\tB\x04\xe2A\x01\x01R\aorderByJ\x04\b\x01\x10\x02R\x06parent\"\x8c\x01\n" +
 	"\x18ListReservationsResponse\x12H\n" +
 	"\freservations\x18\x01 \x03(\v2$.freebusy.reservation.v1.ReservationR\freservations\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xef\x04\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xab\x04\n" +
 	"\x18UpdateReservationRequest\x12R\n" +
 	"\vreservation\x18\x01 \x01(\v2$.freebusy.reservation.v1.ReservationB\n" +
 	"\xe2A\x01\x02\xbaH\x03\xd8\x01\x03R\vreservation\x12A\n" +
 	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskB\x04\xe2A\x01\x01R\n" +
-	"updateMask:\xbb\x03\xbaH\xb7\x03\x1a\xe2\x01\n" +
-	"\x17update_reservation.name\x12]reservation.name must be organizationalUnits/{organizational_unit}/reservations/{reservation}\x1ahhas(this.reservation) && this.reservation.name.matches('^organizationalUnits/[^/]+/reservations/[^/]+$')\x1a\xcf\x01\n" +
-	"\x1bupdate_reservation.customer\x12?reservation.customer must be users/{user}, or empty to clear it\x1ao!has(this.reservation) || this.reservation.customer == '' || this.reservation.customer.matches('^users/[^/]+$')\"\xd1\x01\n" +
-	"\x18CancelReservationRequest\x12u\n" +
-	"\x04name\x18\x01 \x01(\tBa\xe2A\x01\x02\xfaA%\n" +
-	"#freebusy.reservation.v1/Reservation\xbaH2r02.^organizationalUnits/[^/]+/reservations/[^/]+$R\x04name\x12$\n" +
+	"updateMask:\xf7\x02\xbaH\xf3\x02\x1a\x9e\x01\n" +
+	"\x17update_reservation.name\x123reservation.name must be reservations/{reservation}\x1aNhas(this.reservation) && this.reservation.name.matches('^reservations/[^/]+$')\x1a\xcf\x01\n" +
+	"\x1bupdate_reservation.customer\x12?reservation.customer must be users/{user}, or empty to clear it\x1ao!has(this.reservation) || this.reservation.customer == '' || this.reservation.customer.matches('^users/[^/]+$')\"\xb7\x01\n" +
+	"\x18CancelReservationRequest\x12[\n" +
+	"\x04name\x18\x01 \x01(\tBG\xe2A\x01\x02\xfaA%\n" +
+	"#freebusy.reservation.v1/Reservation\xbaH\x18r\x162\x14^reservations/[^/]+$R\x04name\x12$\n" +
 	"\x06reason\x18\x02 \x01(\tB\f\xe2A\x01\x01\xbaH\x05r\x03\x18\x80\bR\x06reason\x12\x18\n" +
-	"\x04etag\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\x04etag\"\x97\x02\n" +
-	"\x1cRescheduleReservationRequest\x12u\n" +
-	"\x04name\x18\x01 \x01(\tBa\xe2A\x01\x02\xfaA%\n" +
-	"#freebusy.reservation.v1/Reservation\xbaH2r02.^organizationalUnits/[^/]+/reservations/[^/]+$R\x04name\x12f\n" +
-	"\x04hold\x18\x02 \x01(\tBR\xe2A\x01\x02\xfaA\x1d\n" +
-	"\x1bfreebusy.allocation.v1/Hold\xbaH+r)2'^organizationalUnits/[^/]+/holds/[^/]+$R\x04hold\x12\x18\n" +
+	"\x04etag\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\x04etag\"\xe3\x01\n" +
+	"\x1cRescheduleReservationRequest\x12[\n" +
+	"\x04name\x18\x01 \x01(\tBG\xe2A\x01\x02\xfaA%\n" +
+	"#freebusy.reservation.v1/Reservation\xbaH\x18r\x162\x14^reservations/[^/]+$R\x04name\x12L\n" +
+	"\x04hold\x18\x02 \x01(\tB8\xe2A\x01\x02\xfaA\x1d\n" +
+	"\x1bfreebusy.allocation.v1/Hold\xbaH\x11r\x0f2\r^holds/[^/]+$R\x04hold\x12\x18\n" +
 	"\x04etag\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\x04etagB\xa2\x02\n" +
 	"\x1bcom.freebusy.reservation.v1B\x18ReservationMessagesProtoP\x01Zkgithub.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
 

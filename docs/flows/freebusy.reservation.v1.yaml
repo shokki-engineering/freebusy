@@ -19,27 +19,27 @@ services:
       CreateReservation:
         request: CreateReservationRequest
         response: Reservation
-        http: POST /v1/{parent=organizationalUnits/*}/reservations
+        http: POST /v1/reservations
       GetReservation:
         request: GetReservationRequest
         response: Reservation
-        http: GET /v1/{name=organizationalUnits/*/reservations/*}
+        http: GET /v1/{name=reservations/*}
       ListReservations:
         request: ListReservationsRequest
         response: ListReservationsResponse
-        http: GET /v1/{parent=organizationalUnits/*}/reservations
+        http: GET /v1/reservations
       UpdateReservation:
         request: UpdateReservationRequest
         response: Reservation
-        http: PATCH /v1/{reservation.name=organizationalUnits/*/reservations/*}
+        http: PATCH /v1/{reservation.name=reservations/*}
       CancelReservation:
         request: CancelReservationRequest
         response: Reservation
-        http: POST /v1/{name=organizationalUnits/*/reservations/*}:cancel
+        http: POST /v1/{name=reservations/*}:cancel
       RescheduleReservation:
         request: RescheduleReservationRequest
         response: Reservation
-        http: POST /v1/{name=organizationalUnits/*/reservations/*}:reschedule
+        http: POST /v1/{name=reservations/*}:reschedule
     events:
       - freebusy.reservation.confirmed
       - freebusy.reservation.updated
@@ -53,9 +53,6 @@ services:
       - reason: HOLD_NOT_FOUND
         code: INVALID_ARGUMENT
         description: The reservation's `hold` does not exist, or `CreateHold`'s `hold.replaces` names one that does not.
-      - reason: HOLD_AT_ANOTHER_SITE
-        code: INVALID_ARGUMENT
-        description: The hold is at a different site from the reservation's parent, or `CreateHold`'s `hold.replaces` is a hold at another site.
       - reason: HOLD_LAPSED
         code: FAILED_PRECONDITION
         description: The hold lapsed before the reservation was confirmed; the reservation failed.

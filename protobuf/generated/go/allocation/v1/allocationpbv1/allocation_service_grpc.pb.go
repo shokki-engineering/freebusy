@@ -45,7 +45,7 @@ const (
 // Every operation is a custom method (AIP-136): they compute rather than fetch,
 // so they take neither the standard-method names nor their shapes.
 type AllocationServiceClient interface {
-	// Computes availability across a site's resources, bucketed by slot or day.
+	// Computes availability across resources, bucketed by slot or day.
 	ComputeAvailability(ctx context.Context, in *ComputeAvailabilityRequest, opts ...grpc.CallOption) (*ComputeAvailabilityResponse, error)
 	// Checks one exact window for one exact quantity, with reasons when it fails.
 	//
@@ -54,14 +54,14 @@ type AllocationServiceClient interface {
 	CheckAvailability(ctx context.Context, in *CheckAvailabilityRequest, opts ...grpc.CallOption) (*CheckAvailabilityResponse, error)
 	// Runs several availability computations in one round trip.
 	//
-	// Each entry is independent and may name a different site, window or
-	// granularity. Capped at 50 entries, because each one fans out across every
+	// Each entry is independent and may name different resources, a different
+	// window or granularity. Capped at 50 entries, because each one fans out across every
 	// candidate resource's calendar.
 	BatchComputeAvailability(ctx context.Context, in *BatchComputeAvailabilityRequest, opts ...grpc.CallOption) (*BatchComputeAvailabilityResponse, error)
-	// Sweeps an operator for resources free across a window.
+	// Searches every resource for those free across a window.
 	//
-	// The search entry point, where ComputeAvailability answers for a site the
-	// caller has already chosen. Paginated, since a large operator may match
+	// The search entry point, where ComputeAvailability counts over resources
+	// the caller has already chosen. Paginated, since a search may match
 	// thousands of resources.
 	SearchAvailability(ctx context.Context, in *SearchAvailabilityRequest, opts ...grpc.CallOption) (*SearchAvailabilityResponse, error)
 }
@@ -131,7 +131,7 @@ func (c *allocationServiceClient) SearchAvailability(ctx context.Context, in *Se
 // Every operation is a custom method (AIP-136): they compute rather than fetch,
 // so they take neither the standard-method names nor their shapes.
 type AllocationServiceServer interface {
-	// Computes availability across a site's resources, bucketed by slot or day.
+	// Computes availability across resources, bucketed by slot or day.
 	ComputeAvailability(context.Context, *ComputeAvailabilityRequest) (*ComputeAvailabilityResponse, error)
 	// Checks one exact window for one exact quantity, with reasons when it fails.
 	//
@@ -140,14 +140,14 @@ type AllocationServiceServer interface {
 	CheckAvailability(context.Context, *CheckAvailabilityRequest) (*CheckAvailabilityResponse, error)
 	// Runs several availability computations in one round trip.
 	//
-	// Each entry is independent and may name a different site, window or
-	// granularity. Capped at 50 entries, because each one fans out across every
+	// Each entry is independent and may name different resources, a different
+	// window or granularity. Capped at 50 entries, because each one fans out across every
 	// candidate resource's calendar.
 	BatchComputeAvailability(context.Context, *BatchComputeAvailabilityRequest) (*BatchComputeAvailabilityResponse, error)
-	// Sweeps an operator for resources free across a window.
+	// Searches every resource for those free across a window.
 	//
-	// The search entry point, where ComputeAvailability answers for a site the
-	// caller has already chosen. Paginated, since a large operator may match
+	// The search entry point, where ComputeAvailability counts over resources
+	// the caller has already chosen. Paginated, since a search may match
 	// thousands of resources.
 	SearchAvailability(context.Context, *SearchAvailabilityRequest) (*SearchAvailabilityResponse, error)
 	mustEmbedUnimplementedAllocationServiceServer()

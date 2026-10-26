@@ -22,15 +22,15 @@ import (
 // candidate look equally tight.
 const horizonPad = 24 * time.Hour
 
-// site is one request's inputs, gathered and converted.
-type site struct {
+// inputs are one request's inputs, gathered and converted.
+type inputs struct {
 	resources []engine.Resource
 	// records are parallel to resources.
 	records []ResourceRecord
 	// statics are parallel to resources: what each was built from.
 	statics []staticResource
-	// zone is the first resource's calendar zone, the "site's zone" requests
-	// default to.
+	// zone is the first resource's calendar zone, the zone requests default
+	// to.
 	zone *time.Location
 }
 
@@ -38,18 +38,18 @@ type site struct {
 // span, and converts it.
 //
 // The static inputs -- resources, calendars, availability -- come from the
-// per-site cache when the store is versioned (statics.go), unless fresh is
-// set. Bookings are read on every call: events and claims, each batched
+// per-resource cache when the store is versioned (statics.go), unless fresh
+// is set. Bookings are read on every call: events and claims, each batched
 // across every resource and read side by side, so cost grows with the rows
 // returned, not with round trips.
-func (s *Server) gather(ctx context.Context, q ResourceQuery, span engine.Span, now time.Time) (*site, error) {
+func (s *Server) gather(ctx context.Context, q ResourceQuery, span engine.Span, now time.Time) (*inputs, error) {
 	return s.gatherFrom(ctx, q, span, now, false, nil)
 }
 
 // gatherFrom is gather, reading the static inputs from the database when
 // fresh is set, and leaving kept -- a replaced booking's own claims, by
 // resource -- out of what is booked.
-func (s *Server) gatherFrom(ctx context.Context, q ResourceQuery, span engine.Span, now time.Time, fresh bool, kept map[string]engine.Spans) (*site, error) {
+func (s *Server) gatherFrom(ctx context.Context, q ResourceQuery, span engine.Span, now time.Time, fresh bool, kept map[string]engine.Spans) (*inputs, error) {
 	statics, err := s.staticInputs(ctx, q, fresh)
 	if err != nil {
 		return nil, err
@@ -61,8 +61,8 @@ func (s *Server) gatherFrom(ctx context.Context, q ResourceQuery, span engine.Sp
 // engine's view of them, less kept. Claims of different holds on one resource
 // never overlap (the no_overlap constraint), so taking kept out of the
 // converted claims removes exactly the replaced booking's.
-func (s *Server) assemble(ctx context.Context, statics []staticResource, span engine.Span, now time.Time, kept map[string]engine.Spans) (*site, error) {
-	out := &site{zone: time.UTC, statics: statics}
+func (s *Server) assemble(ctx context.Context, statics []staticResource, span engine.Span, now time.Time, kept map[string]engine.Spans) (*inputs, error) {
+	out := &inputs{zone: time.UTC, statics: statics}
 	if len(statics) == 0 {
 		return out, nil
 	}

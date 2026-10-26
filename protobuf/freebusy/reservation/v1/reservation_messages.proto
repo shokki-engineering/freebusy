@@ -22,13 +22,8 @@ option java_package = "engineering.shokki.freebusy.reservation.v1";
 // one reservation, so a retry -- with or without reservation_id -- finds the
 // reservation the first attempt made instead of making a second.
 message CreateReservationRequest {
-  // The site the hold was taken at.
-  // Format: organizationalUnits/{organizational_unit}
-  string parent = 1 [
-    (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).child_type = "freebusy.reservation.v1/Reservation",
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+$"
-  ];
+  reserved 1;
+  reserved "parent";
 
   // The reservation to make. `hold` is required; `customer` and `attributes`
   // are optional.
@@ -49,22 +44,18 @@ message CreateReservationRequest {
 
 // Request message for ReservationService.GetReservation, AIP-131.
 message GetReservationRequest {
-  // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  // Format: reservations/{reservation}
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "freebusy.reservation.v1/Reservation",
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/reservations/[^/]+$"
+    (buf.validate.field).string.pattern = "^reservations/[^/]+$"
   ];
 }
 
 // Request message for ReservationService.ListReservations, AIP-132.
 message ListReservationsRequest {
-  // Format: organizationalUnits/{organizational_unit}
-  string parent = 1 [
-    (google.api.field_behavior) = REQUIRED,
-    (google.api.resource_reference).child_type = "freebusy.reservation.v1/Reservation",
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+$"
-  ];
+  reserved 1;
+  reserved "parent";
 
   // Maximum reservations to return. Defaults to 50, capped at 1000.
   int32 page_size = 2 [
@@ -104,8 +95,8 @@ message ListReservationsResponse {
 message UpdateReservationRequest {
   option (buf.validate.message).cel = {
     id: "update_reservation.name"
-    message: "reservation.name must be organizationalUnits/{organizational_unit}/reservations/{reservation}"
-    expression: "has(this.reservation) && this.reservation.name.matches('^organizationalUnits/[^/]+/reservations/[^/]+$')"
+    message: "reservation.name must be reservations/{reservation}"
+    expression: "has(this.reservation) && this.reservation.name.matches('^reservations/[^/]+$')"
   };
   option (buf.validate.message).cel = {
     id: "update_reservation.customer"
@@ -129,11 +120,11 @@ message UpdateReservationRequest {
 
 // Request message for ReservationService.CancelReservation.
 message CancelReservationRequest {
-  // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  // Format: reservations/{reservation}
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "freebusy.reservation.v1/Reservation",
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/reservations/[^/]+$"
+    (buf.validate.field).string.pattern = "^reservations/[^/]+$"
   ];
 
   // Why, in the canceller's words. Recorded, never parsed.
@@ -150,21 +141,21 @@ message CancelReservationRequest {
 // Request message for ReservationService.RescheduleReservation.
 message RescheduleReservationRequest {
   // The confirmed reservation to move.
-  // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  // Format: reservations/{reservation}
   string name = 1 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "freebusy.reservation.v1/Reservation",
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/reservations/[^/]+$"
+    (buf.validate.field).string.pattern = "^reservations/[^/]+$"
   ];
 
-  // A live hold at the same site on the new window, taken by the caller with
+  // A live hold on the new window, taken by the caller with
   // HoldService.CreateHold. Taking it first is what makes the move safe: the
   // new slot is secured before the old one is let go.
-  // Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  // Format: holds/{hold}
   string hold = 2 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.resource_reference).type = "freebusy.allocation.v1/Hold",
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/holds/[^/]+$"
+    (buf.validate.field).string.pattern = "^holds/[^/]+$"
   ];
 
   // Opaque version read from the reservation; the move is rejected if it

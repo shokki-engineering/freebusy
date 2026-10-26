@@ -5,16 +5,7 @@ load("@rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "live",
-    srcs = [
-        "livetest.go",
-        "site.go",
-    ],
+    srcs = ["livetest.go"],
     importpath = "github.com/shokki-engineering/freebusy/test/live",
     visibility = ["//visibility:public"],
-    deps = [
-        "//internal/database/gorm/rfc/organization",
-        "//internal/database/gorm/rfc/orgunit",
-        "@io_gorm_gorm//:gorm",
-        "@io_gorm_gorm//clause",
-    ],
 )

@@ -99,6 +99,24 @@ telemetry:
 webhooks:
   enabled: true
 
+# Lets browsers on other origins (a page using the TypeScript SDK) call the
+# REST gateway on the http port. Not applied to the MCP port. Empty lists
+# take the server's defaults -- methods GET, POST, PATCH, PUT, DELETE,
+# OPTIONS; headers content-type, authorization, x-goog-api-client,
+# x-goog-request-params, x-goog-user-project, x-api-key.
+cors:
+  enabled: false
+  # Exact origins ("https://app.example.com") or "*" for any.
+  allowedOrigins: []
+  allowedMethods: []
+  allowedHeaders: []
+  # Response headers a browser script may read.
+  exposedHeaders: []
+  # Cookies / HTTP auth from the browser; refused with the "*" origin.
+  allowCredentials: false
+  # How long a browser caches a preflight answer.
+  maxAgeSeconds: 600
+
 # Any other setting, as FREEBUSY_<SECTION>__<KEY>: value.
 extraEnv: {}
 

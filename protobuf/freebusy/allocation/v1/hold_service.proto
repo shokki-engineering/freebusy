@@ -51,17 +51,17 @@ service HoldService {
   // hold rather than taking a second one.
   rpc CreateHold(CreateHoldRequest) returns (Hold) {
     option (google.api.http) = {
-      post: "/v1/{parent=organizationalUnits/*}/holds"
+      post: "/v1/holds"
       body: "hold"
     };
-    option (google.api.method_signature) = "parent,hold,hold_id";
+    option (google.api.method_signature) = "hold,hold_id";
     option (mcp.v1.tool) = {
       description:
-        "Claim resources at a site for a window while the booking is settled "
-        "(payment, forms): the second step of booking. parent: "
-        "organizationalUnits/{site}. hold.window: start_time and end_time, RFC "
-        "3339. hold.quantity defaults to 1; freebusy picks which resources, from "
-        "hold.candidate_resources if given. Set hold.idempotency_key so a retry "
+        "Claim resources for a window while the booking is settled (payment, "
+        "forms): the second step of booking. hold.window: start_time and "
+        "end_time, RFC 3339. hold.quantity defaults to 1; freebusy picks which "
+        "resources, from hold.candidate_resources and hold.candidate_filter if "
+        "given. Set hold.idempotency_key so a retry "
         "returns the same hold. The hold lasts 15 minutes (expire_time): confirm "
         "it with reservation_service-create_reservation_v1 before then, or hold_service-extend_hold_v1. Fails with "
         "CAPACITY_EXHAUSTED when too few are free. To move or extend a booking, "
@@ -77,14 +77,14 @@ service HoldService {
   // EXPIRED here even if the sweeper has not yet written that state, so a
   // caller never sees an ACTIVE hold that no longer reserves anything.
   rpc GetHold(GetHoldRequest) returns (Hold) {
-    option (google.api.http) = {get: "/v1/{name=organizationalUnits/*/holds/*}"};
+    option (google.api.http) = {get: "/v1/{name=holds/*}"};
     option (google.api.method_signature) = "name";
   }
 
-  // Lists the holds taken at a site.
+  // Lists holds.
   rpc ListHolds(ListHoldsRequest) returns (ListHoldsResponse) {
-    option (google.api.http) = {get: "/v1/{parent=organizationalUnits/*}/holds"};
-    option (google.api.method_signature) = "parent";
+    option (google.api.http) = {get: "/v1/holds"};
+    option (google.api.method_signature) = "";
   }
 
   // Pushes a hold's expiry further out.
@@ -94,7 +94,7 @@ service HoldService {
   // ACTIVE -- an expired hold is gone, not extendable.
   rpc ExtendHold(ExtendHoldRequest) returns (Hold) {
     option (google.api.http) = {
-      post: "/v1/{name=organizationalUnits/*/holds/*}:extend"
+      post: "/v1/{name=holds/*}:extend"
       body: "*"
     };
     option (google.api.method_signature) = "name,duration";
@@ -102,7 +102,7 @@ service HoldService {
       description:
         "Move a live hold's expire_time to now plus duration (at most 24 hours), "
         "when settling needs longer. name: "
-        "organizationalUnits/{site}/holds/{hold}."
+        "holds/{hold}."
     };
   }
 
@@ -112,14 +112,14 @@ service HoldService {
   // changes nothing, because the caller's intent is already satisfied.
   rpc ReleaseHold(ReleaseHoldRequest) returns (Hold) {
     option (google.api.http) = {
-      post: "/v1/{name=organizationalUnits/*/holds/*}:release"
+      post: "/v1/{name=holds/*}:release"
       body: "*"
     };
     option (google.api.method_signature) = "name";
     option (mcp.v1.tool) = {
       description:
         "Give up a live hold, freeing its resources at once. name: "
-        "organizationalUnits/{site}/holds/{hold}. A hold that became a "
+        "holds/{hold}. A hold that became a "
         "reservation cannot be released: reservation_service-cancel_reservation_v1 instead."
     };
   }
@@ -130,7 +130,7 @@ service HoldService {
   // ReleaseHold for that. Deleting an ACTIVE hold is rejected, so inventory is
   // never freed by a path that leaves no audit trail.
   rpc DeleteHold(DeleteHoldRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {delete: "/v1/{name=organizationalUnits/*/holds/*}"};
+    option (google.api.http) = {delete: "/v1/{name=holds/*}"};
     option (google.api.method_signature) = "name";
   }
 }

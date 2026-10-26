@@ -52,31 +52,18 @@ func NewGormReservationRepository(db *gorm.DB) *GormReservationRepository {
 	return &GormReservationRepository{DB: db}
 }
 
-// Create persists in under parent and returns the stored record.
-func (r *GormReservationRepository) Create(ctx context.Context, parent string, in *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, err
-	}
+// Create persists in and returns the stored record.
+func (r *GormReservationRepository) Create(ctx context.Context, in *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
 	id := repox.NewULID()
-	rowID := id
 	if in.GetName() != "" {
-		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "reservations")
+		ids, err := repox.SplitName(in.GetName(), "reservations")
 		if err != nil {
 			return nil, err
-		}
-		for i := range parentIDs {
-			if ids[i] != parentIDs[i] {
-				return nil, fmt.Errorf("%w: name %q is not under parent %q", repox.ErrInvalidArgument, in.GetName(), parent)
-			}
 		}
 		id = ids[len(ids)-1]
 	}
 	in = proto.Clone(in).(*reservationpbv1.Reservation)
-	in.Name = FormatReservationName(parentIDs[0], id)
-	// The id is unique only under the parent, so the row is keyed by a
-	// surrogate of its own: the id itself only when it was minted here.
-	id = rowID
+	in.Name = FormatReservationName(id)
 	if h := r.Hooks.BeforeCreate; h != nil {
 		if err := h(ctx, in); err != nil {
 			return nil, err
@@ -85,13 +72,14 @@ func (r *GormReservationRepository) Create(ctx context.Context, parent string, i
 	m := reservation.ReservationFromProto(in)
 	m.ID = id
 	m.Name = in.GetName()
-	m.OrganizationalUnitID = parentIDs[0]
-	m.HoldID = in.GetHold()
+	if v := in.GetHold(); v != "" {
+		m.HoldID = repox.LastSegment(v)
+	}
 	m.Etag = repox.Ptr(repox.NewULID())
 	if err := reservation.NewReservationStore(r.DB).Create(ctx, m); err != nil {
 		return nil, repox.MapGormErr(err)
 	}
-	return r.get(ctx, m.Name)
+	return r.get(ctx, id)
 }
 
 // Get returns the record addressed by its resource name.
@@ -103,20 +91,20 @@ func (r *GormReservationRepository) Get(ctx context.Context, name string) (*rese
 	return r.get(ctx, key)
 }
 
-// rowKey validates name and returns what its row is found by: the name
-// itself, because the id is unique only under the parent.
+// rowKey validates name and returns what its row is found by: the bare id.
 func (r *GormReservationRepository) rowKey(name string) (string, error) {
-	if _, err := repox.SplitName(name, "organizationalUnits", "reservations"); err != nil {
+	ids, err := repox.SplitName(name, "reservations")
+	if err != nil {
 		return "", err
 	}
-	return name, nil
+	return ids[len(ids)-1], nil
 }
 
 // get loads by row key (rowKey) — the private read every generated method
 // re-reads through, so Tier-2 overrides of Get never re-enter generated writes.
 func (r *GormReservationRepository) get(ctx context.Context, key string) (*reservationpbv1.Reservation, error) {
 	var m reservation.Reservation
-	if err := r.DB.WithContext(ctx).First(&m, "name = ?", key).Error; err != nil {
+	if err := r.DB.WithContext(ctx).First(&m, "id = ?", key).Error; err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.toProto(ctx, &m)
@@ -126,7 +114,9 @@ func (r *GormReservationRepository) get(ctx context.Context, key string) (*reser
 // AfterRead hook.
 func (r *GormReservationRepository) toProto(ctx context.Context, m *reservation.Reservation) (*reservationpbv1.Reservation, error) {
 	out := reservation.ReservationToProto(m)
-	out.Hold = m.HoldID
+	if m.HoldID != "" {
+		out.Hold = "holds/" + m.HoldID
+	}
 	if h := r.Hooks.AfterRead; h != nil {
 		if err := h(ctx, out); err != nil {
 			return nil, err
@@ -135,19 +125,9 @@ func (r *GormReservationRepository) toProto(ctx context.Context, m *reservation.
 	return out, nil
 }
 
-// List returns one page of records under parent.
-func (r *GormReservationRepository) List(ctx context.Context, parent string, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, "", err
-	}
-	// AIP-159: "-" for the parent reads across every parent; narrow with a
-	// Where on the parent field instead.
-	if parentIDs[len(parentIDs)-1] == "-" {
-		return r.list(ctx, r.DB, in)
-	}
-	scope := r.DB.Where("organizational_unit_id = ?", parentIDs[len(parentIDs)-1])
-	return r.list(ctx, scope, in)
+// List returns one page of records.
+func (r *GormReservationRepository) List(ctx context.Context, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
+	return r.list(ctx, r.DB, in)
 }
 
 func (r *GormReservationRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
@@ -253,7 +233,7 @@ func (r *GormReservationRepository) UpdateWithOutputOnly(ctx context.Context, in
 // server-owned fields written alongside (UpdateWithOutputOnly); nil for Update.
 func (r *GormReservationRepository) updateTx(ctx context.Context, tx *gorm.DB, key string, in *reservationpbv1.Reservation, paths, outputPaths []string) error {
 	var existing reservation.Reservation
-	if err := tx.WithContext(ctx).Clauses(clause.Locking{Strength: "UPDATE"}).First(&existing, "name = ?", key).Error; err != nil {
+	if err := tx.WithContext(ctx).Clauses(clause.Locking{Strength: "UPDATE"}).First(&existing, "id = ?", key).Error; err != nil {
 		return err
 	}
 	id := existing.ID
@@ -264,7 +244,9 @@ func (r *GormReservationRepository) updateTx(ctx context.Context, tx *gorm.DB, k
 	existingPB := reservation.ReservationToProto(&existing)
 	{
 		m, out := &existing, existingPB
-		out.Hold = m.HoldID
+		if m.HoldID != "" {
+			out.Hold = "holds/" + m.HoldID
+		}
 	}
 	merged := proto.Clone(existingPB).(*reservationpbv1.Reservation)
 	applyReservationMask(merged, in, paths)
@@ -277,7 +259,7 @@ func (r *GormReservationRepository) updateTx(ctx context.Context, tx *gorm.DB, k
 	next := reservation.ReservationFromProto(merged)
 	_ = next
 	existing.Name = next.Name
-	existing.HoldID = merged.GetHold()
+	existing.HoldID = repox.LastSegment(merged.GetHold())
 	existing.Customer = next.Customer
 	existing.Attributes = next.Attributes
 	if len(outputPaths) > 0 {
@@ -345,7 +327,7 @@ func (r *GormReservationRepository) updateOutputOnlyTx(ctx context.Context, tx *
 		var existing reservation.Reservation
 		// FOR UPDATE, as in updateTx: concurrent writers holding one etag
 		// take turns, and only the first passes the guard.
-		if err := tx.WithContext(ctx).Clauses(clause.Locking{Strength: "UPDATE"}).First(&existing, "name = ?", key).Error; err != nil {
+		if err := tx.WithContext(ctx).Clauses(clause.Locking{Strength: "UPDATE"}).First(&existing, "id = ?", key).Error; err != nil {
 			return err
 		}
 		if in.GetEtag() != "" && existing.Etag != nil && *existing.Etag != in.GetEtag() {
@@ -387,35 +369,25 @@ func (r *GormReservationRepository) updateOutputOnlyTx(ctx context.Context, tx *
 	}
 }
 
-// newRow builds the row a Batch inserts for in under parent, and the
+// newRow builds the row a Batch inserts for in, and the
 // record it stands for, named: the same resolution Create applies.
-func (r *GormReservationRepository) newRow(parent string, in *reservationpbv1.Reservation) (*reservation.Reservation, *reservationpbv1.Reservation, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, nil, err
-	}
+func (r *GormReservationRepository) newRow(in *reservationpbv1.Reservation) (*reservation.Reservation, *reservationpbv1.Reservation, error) {
 	id := repox.NewULID()
-	rowID := id
 	if in.GetName() != "" {
-		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "reservations")
+		ids, err := repox.SplitName(in.GetName(), "reservations")
 		if err != nil {
 			return nil, nil, err
-		}
-		for i := range parentIDs {
-			if ids[i] != parentIDs[i] {
-				return nil, nil, fmt.Errorf("%w: name %q is not under parent %q", repox.ErrInvalidArgument, in.GetName(), parent)
-			}
 		}
 		id = ids[len(ids)-1]
 	}
 	in = proto.Clone(in).(*reservationpbv1.Reservation)
-	in.Name = FormatReservationName(parentIDs[0], id)
-	id = rowID // keyed as Create keys it
+	in.Name = FormatReservationName(id)
 	m := reservation.ReservationFromProto(in)
 	m.ID = id
 	m.Name = in.GetName()
-	m.OrganizationalUnitID = parentIDs[0]
-	m.HoldID = in.GetHold()
+	if v := in.GetHold(); v != "" {
+		m.HoldID = repox.LastSegment(v)
+	}
 	m.Etag = repox.Ptr(repox.NewULID())
 	return m, in, nil
 }
@@ -432,7 +404,7 @@ func (r *GormReservationRepository) Delete(ctx context.Context, name string) err
 		}
 	}
 	var existing reservation.Reservation
-	if err := r.DB.WithContext(ctx).First(&existing, "name = ?", key).Error; err != nil {
+	if err := r.DB.WithContext(ctx).First(&existing, "id = ?", key).Error; err != nil {
 		return repox.MapGormErr(err)
 	}
 	return repox.MapGormErr(reservation.NewReservationStore(r.DB).DeleteByID(ctx, existing.ID))
@@ -442,7 +414,7 @@ func (r *GormReservationRepository) Delete(ctx context.Context, name string) err
 // repox.ListByKeys.
 func (r *GormReservationRepository) ListByKeys(ctx context.Context, field string, keys []string, in repox.ListInput) ([]*reservationpbv1.Reservation, error) {
 	return repox.ListByKeys(ctx, field, keys, in, func(ctx context.Context, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
-		return r.List(ctx, "organizationalUnits/-", in)
+		return r.List(ctx, in)
 	})
 }
 
@@ -460,9 +432,9 @@ type gormBatch struct {
 func (b *gormBatch) Commit(ctx context.Context) error { return b.u.Commit(ctx) }
 
 // CreateReservation queues a create and returns the name the record will have.
-func (b *gormBatch) CreateReservation(parent string, in *reservationpbv1.Reservation) (string, error) {
+func (b *gormBatch) CreateReservation(in *reservationpbv1.Reservation) (string, error) {
 	r := &GormReservationRepository{DB: b.db}
-	m, named, err := r.newRow(parent, in)
+	m, named, err := r.newRow(in)
 	if err != nil {
 		return "", err
 	}
@@ -531,7 +503,7 @@ func (b *gormBatch) DeleteReservation(name string) {
 	}
 	queueReservationDelete(b.u, name, true)
 	b.u.QueueGorm(nil, func(ctx context.Context, tx *gorm.DB) error {
-		return tx.WithContext(ctx).Delete(&reservation.Reservation{}, "name = ?", key).Error
+		return tx.WithContext(ctx).Delete(&reservation.Reservation{}, "id = ?", key).Error
 	})
 	b.u.Record(repox.Change{Type: "freebusy.reservation.v1/Reservation", Name: name, Op: repox.ChangeDelete, LoadPrior: repox.PriorOf(name, getReservation)})
 }

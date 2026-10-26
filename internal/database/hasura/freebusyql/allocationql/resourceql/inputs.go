@@ -34,8 +34,6 @@ type CreateInput struct {
 	Id string `json:"id"`
 	// Name sets the "name" column (required).
 	Name string `json:"name"`
-	// OrganizationalUnitId sets the "organizationalUnitId" column (required).
-	OrganizationalUnitId string `json:"organizationalUnitId"`
 	// Resource sets the "resource" column (required).
 	Resource string `json:"resource"`
 	// StartTime sets the "startTime" column (required).
@@ -56,8 +54,6 @@ type UpdateInput struct {
 	Id graphql.Nullable[string] `json:"id"`
 	// Update the 'name' column in the 'allocation_resource' collection.
 	Name graphql.Nullable[string] `json:"name"`
-	// Update the 'organizational_unit_id' column in the 'allocation_resource' collection.
-	OrganizationalUnitId graphql.Nullable[string] `json:"organizationalUnitId"`
 	// Update the 'resource' column in the 'allocation_resource' collection.
 	Resource graphql.Nullable[string] `json:"resource"`
 	// Update the 'start_time' column in the 'allocation_resource' collection.

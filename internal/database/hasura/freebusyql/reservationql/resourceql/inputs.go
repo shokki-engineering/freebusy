@@ -47,8 +47,6 @@ type CreateInput struct {
 	LastChange string `json:"lastChange,omitzero"`
 	// Name sets the "name" column (required).
 	Name string `json:"name"`
-	// OrganizationalUnitId sets the "organizationalUnitId" column (required).
-	OrganizationalUnitId string `json:"organizationalUnitId"`
 	// Replacement sets the "replacement" column; the zero value is omitted (column default / NULL).
 	Replacement string `json:"replacement,omitzero"`
 	// Replaces sets the "replaces" column; the zero value is omitted (column default / NULL).
@@ -89,8 +87,6 @@ type UpdateInput struct {
 	LastChange graphql.Nullable[string] `json:"lastChange"`
 	// Update the 'name' column in the 'reservation_resource' collection.
 	Name graphql.Nullable[string] `json:"name"`
-	// Update the 'organizational_unit_id' column in the 'reservation_resource' collection.
-	OrganizationalUnitId graphql.Nullable[string] `json:"organizationalUnitId"`
 	// Update the 'replacement' column in the 'reservation_resource' collection.
 	Replacement graphql.Nullable[string] `json:"replacement"`
 	// Update the 'replaces' column in the 'reservation_resource' collection.

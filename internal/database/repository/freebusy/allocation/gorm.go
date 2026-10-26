@@ -52,31 +52,18 @@ func NewGormAllocationRepository(db *gorm.DB) *GormAllocationRepository {
 	return &GormAllocationRepository{DB: db}
 }
 
-// Create persists in under parent and returns the stored record.
-func (r *GormAllocationRepository) Create(ctx context.Context, parent string, in *allocationpbv1.Allocation) (*allocationpbv1.Allocation, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, err
-	}
+// Create persists in and returns the stored record.
+func (r *GormAllocationRepository) Create(ctx context.Context, in *allocationpbv1.Allocation) (*allocationpbv1.Allocation, error) {
 	id := repox.NewULID()
-	rowID := id
 	if in.GetName() != "" {
-		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "allocations")
+		ids, err := repox.SplitName(in.GetName(), "allocations")
 		if err != nil {
 			return nil, err
-		}
-		for i := range parentIDs {
-			if ids[i] != parentIDs[i] {
-				return nil, fmt.Errorf("%w: name %q is not under parent %q", repox.ErrInvalidArgument, in.GetName(), parent)
-			}
 		}
 		id = ids[len(ids)-1]
 	}
 	in = proto.Clone(in).(*allocationpbv1.Allocation)
-	in.Name = FormatAllocationName(parentIDs[0], id)
-	// The id is unique only under the parent, so the row is keyed by a
-	// surrogate of its own: the id itself only when it was minted here.
-	id = rowID
+	in.Name = FormatAllocationName(id)
 	if h := r.Hooks.BeforeCreate; h != nil {
 		if err := h(ctx, in); err != nil {
 			return nil, err
@@ -85,14 +72,13 @@ func (r *GormAllocationRepository) Create(ctx context.Context, parent string, in
 	m := allocation.AllocationFromProto(in)
 	m.ID = id
 	m.Name = in.GetName()
-	m.OrganizationalUnitID = parentIDs[0]
 	if v := in.GetHold(); v != "" {
-		m.HoldID = repox.Ptr(v)
+		m.HoldID = repox.Ptr(repox.LastSegment(v))
 	}
 	if err := allocation.NewAllocationStore(r.DB).Create(ctx, m); err != nil {
 		return nil, repox.MapGormErr(err)
 	}
-	return r.get(ctx, m.Name)
+	return r.get(ctx, id)
 }
 
 // Get returns the record addressed by its resource name.
@@ -104,20 +90,20 @@ func (r *GormAllocationRepository) Get(ctx context.Context, name string) (*alloc
 	return r.get(ctx, key)
 }
 
-// rowKey validates name and returns what its row is found by: the name
-// itself, because the id is unique only under the parent.
+// rowKey validates name and returns what its row is found by: the bare id.
 func (r *GormAllocationRepository) rowKey(name string) (string, error) {
-	if _, err := repox.SplitName(name, "organizationalUnits", "allocations"); err != nil {
+	ids, err := repox.SplitName(name, "allocations")
+	if err != nil {
 		return "", err
 	}
-	return name, nil
+	return ids[len(ids)-1], nil
 }
 
 // get loads by row key (rowKey) — the private read every generated method
 // re-reads through, so Tier-2 overrides of Get never re-enter generated writes.
 func (r *GormAllocationRepository) get(ctx context.Context, key string) (*allocationpbv1.Allocation, error) {
 	var m allocation.Allocation
-	if err := r.DB.WithContext(ctx).First(&m, "name = ?", key).Error; err != nil {
+	if err := r.DB.WithContext(ctx).First(&m, "id = ?", key).Error; err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.toProto(ctx, &m)
@@ -127,8 +113,8 @@ func (r *GormAllocationRepository) get(ctx context.Context, key string) (*alloca
 // AfterRead hook.
 func (r *GormAllocationRepository) toProto(ctx context.Context, m *allocation.Allocation) (*allocationpbv1.Allocation, error) {
 	out := allocation.AllocationToProto(m)
-	if m.HoldID != nil {
-		out.Hold = *m.HoldID
+	if m.HoldID != nil && *m.HoldID != "" {
+		out.Hold = "holds/" + *m.HoldID
 	}
 	if h := r.Hooks.AfterRead; h != nil {
 		if err := h(ctx, out); err != nil {
@@ -138,19 +124,9 @@ func (r *GormAllocationRepository) toProto(ctx context.Context, m *allocation.Al
 	return out, nil
 }
 
-// List returns one page of records under parent.
-func (r *GormAllocationRepository) List(ctx context.Context, parent string, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, "", err
-	}
-	// AIP-159: "-" for the parent reads across every parent; narrow with a
-	// Where on the parent field instead.
-	if parentIDs[len(parentIDs)-1] == "-" {
-		return r.list(ctx, r.DB, in)
-	}
-	scope := r.DB.Where("organizational_unit_id = ?", parentIDs[len(parentIDs)-1])
-	return r.list(ctx, scope, in)
+// List returns one page of records.
+func (r *GormAllocationRepository) List(ctx context.Context, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error) {
+	return r.list(ctx, r.DB, in)
 }
 
 func (r *GormAllocationRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error) {
@@ -246,7 +222,7 @@ func (r *GormAllocationRepository) UpdateWithOutputOnly(ctx context.Context, in 
 // server-owned fields written alongside (UpdateWithOutputOnly); nil for Update.
 func (r *GormAllocationRepository) updateTx(ctx context.Context, tx *gorm.DB, key string, in *allocationpbv1.Allocation, paths, outputPaths []string) error {
 	var existing allocation.Allocation
-	if err := tx.WithContext(ctx).Clauses(clause.Locking{Strength: "UPDATE"}).First(&existing, "name = ?", key).Error; err != nil {
+	if err := tx.WithContext(ctx).Clauses(clause.Locking{Strength: "UPDATE"}).First(&existing, "id = ?", key).Error; err != nil {
 		return err
 	}
 	id := existing.ID
@@ -254,8 +230,8 @@ func (r *GormAllocationRepository) updateTx(ctx context.Context, tx *gorm.DB, ke
 	existingPB := allocation.AllocationToProto(&existing)
 	{
 		m, out := &existing, existingPB
-		if m.HoldID != nil {
-			out.Hold = *m.HoldID
+		if m.HoldID != nil && *m.HoldID != "" {
+			out.Hold = "holds/" + *m.HoldID
 		}
 	}
 	merged := proto.Clone(existingPB).(*allocationpbv1.Allocation)
@@ -273,7 +249,7 @@ func (r *GormAllocationRepository) updateTx(ctx context.Context, tx *gorm.DB, ke
 	existing.StartTime = next.StartTime
 	existing.EndTime = next.EndTime
 	if v := merged.GetHold(); v != "" {
-		existing.HoldID = repox.Ptr(v)
+		existing.HoldID = repox.Ptr(repox.LastSegment(v))
 	} else {
 		existing.HoldID = nil
 	}
@@ -314,7 +290,7 @@ func (r *GormAllocationRepository) updateOutputOnlyTx(ctx context.Context, tx *g
 		var existing allocation.Allocation
 		// FOR UPDATE, as in updateTx: concurrent writers holding one etag
 		// take turns, and only the first passes the guard.
-		if err := tx.WithContext(ctx).Clauses(clause.Locking{Strength: "UPDATE"}).First(&existing, "name = ?", key).Error; err != nil {
+		if err := tx.WithContext(ctx).Clauses(clause.Locking{Strength: "UPDATE"}).First(&existing, "id = ?", key).Error; err != nil {
 			return err
 		}
 		next := allocation.AllocationFromProto(in)
@@ -325,36 +301,24 @@ func (r *GormAllocationRepository) updateOutputOnlyTx(ctx context.Context, tx *g
 	}
 }
 
-// newRow builds the row a Batch inserts for in under parent, and the
+// newRow builds the row a Batch inserts for in, and the
 // record it stands for, named: the same resolution Create applies.
-func (r *GormAllocationRepository) newRow(parent string, in *allocationpbv1.Allocation) (*allocation.Allocation, *allocationpbv1.Allocation, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, nil, err
-	}
+func (r *GormAllocationRepository) newRow(in *allocationpbv1.Allocation) (*allocation.Allocation, *allocationpbv1.Allocation, error) {
 	id := repox.NewULID()
-	rowID := id
 	if in.GetName() != "" {
-		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "allocations")
+		ids, err := repox.SplitName(in.GetName(), "allocations")
 		if err != nil {
 			return nil, nil, err
-		}
-		for i := range parentIDs {
-			if ids[i] != parentIDs[i] {
-				return nil, nil, fmt.Errorf("%w: name %q is not under parent %q", repox.ErrInvalidArgument, in.GetName(), parent)
-			}
 		}
 		id = ids[len(ids)-1]
 	}
 	in = proto.Clone(in).(*allocationpbv1.Allocation)
-	in.Name = FormatAllocationName(parentIDs[0], id)
-	id = rowID // keyed as Create keys it
+	in.Name = FormatAllocationName(id)
 	m := allocation.AllocationFromProto(in)
 	m.ID = id
 	m.Name = in.GetName()
-	m.OrganizationalUnitID = parentIDs[0]
 	if v := in.GetHold(); v != "" {
-		m.HoldID = repox.Ptr(v)
+		m.HoldID = repox.Ptr(repox.LastSegment(v))
 	}
 	return m, in, nil
 }
@@ -371,7 +335,7 @@ func (r *GormAllocationRepository) Delete(ctx context.Context, name string) erro
 		}
 	}
 	var existing allocation.Allocation
-	if err := r.DB.WithContext(ctx).First(&existing, "name = ?", key).Error; err != nil {
+	if err := r.DB.WithContext(ctx).First(&existing, "id = ?", key).Error; err != nil {
 		return repox.MapGormErr(err)
 	}
 	return repox.MapGormErr(allocation.NewAllocationStore(r.DB).DeleteByID(ctx, existing.ID))
@@ -381,7 +345,7 @@ func (r *GormAllocationRepository) Delete(ctx context.Context, name string) erro
 // repox.ListByKeys.
 func (r *GormAllocationRepository) ListByKeys(ctx context.Context, field string, keys []string, in repox.ListInput) ([]*allocationpbv1.Allocation, error) {
 	return repox.ListByKeys(ctx, field, keys, in, func(ctx context.Context, in repox.ListInput) ([]*allocationpbv1.Allocation, string, error) {
-		return r.List(ctx, "organizationalUnits/-", in)
+		return r.List(ctx, in)
 	})
 }
 
@@ -410,31 +374,18 @@ func NewGormHoldRepository(db *gorm.DB) *GormHoldRepository {
 	return &GormHoldRepository{DB: db}
 }
 
-// Create persists in under parent and returns the stored record.
-func (r *GormHoldRepository) Create(ctx context.Context, parent string, in *allocationpbv1.Hold) (*allocationpbv1.Hold, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, err
-	}
+// Create persists in and returns the stored record.
+func (r *GormHoldRepository) Create(ctx context.Context, in *allocationpbv1.Hold) (*allocationpbv1.Hold, error) {
 	id := repox.NewULID()
-	rowID := id
 	if in.GetName() != "" {
-		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds")
+		ids, err := repox.SplitName(in.GetName(), "holds")
 		if err != nil {
 			return nil, err
-		}
-		for i := range parentIDs {
-			if ids[i] != parentIDs[i] {
-				return nil, fmt.Errorf("%w: name %q is not under parent %q", repox.ErrInvalidArgument, in.GetName(), parent)
-			}
 		}
 		id = ids[len(ids)-1]
 	}
 	in = proto.Clone(in).(*allocationpbv1.Hold)
-	in.Name = FormatHoldName(parentIDs[0], id)
-	// The id is unique only under the parent, so the row is keyed by a
-	// surrogate of its own: the id itself only when it was minted here.
-	id = rowID
+	in.Name = FormatHoldName(id)
 	if h := r.Hooks.BeforeCreate; h != nil {
 		if err := h(ctx, in); err != nil {
 			return nil, err
@@ -443,12 +394,11 @@ func (r *GormHoldRepository) Create(ctx context.Context, parent string, in *allo
 	m := allocation.HoldFromProto(in)
 	m.ID = id
 	m.Name = in.GetName()
-	m.OrganizationalUnitID = parentIDs[0]
 	m.Etag = repox.Ptr(repox.NewULID())
 	if err := allocation.NewHoldStore(r.DB).Create(ctx, m); err != nil {
 		return nil, repox.MapGormErr(err)
 	}
-	return r.get(ctx, m.Name)
+	return r.get(ctx, id)
 }
 
 // Get returns the record addressed by its resource name.
@@ -460,20 +410,20 @@ func (r *GormHoldRepository) Get(ctx context.Context, name string) (*allocationp
 	return r.get(ctx, key)
 }
 
-// rowKey validates name and returns what its row is found by: the name
-// itself, because the id is unique only under the parent.
+// rowKey validates name and returns what its row is found by: the bare id.
 func (r *GormHoldRepository) rowKey(name string) (string, error) {
-	if _, err := repox.SplitName(name, "organizationalUnits", "holds"); err != nil {
+	ids, err := repox.SplitName(name, "holds")
+	if err != nil {
 		return "", err
 	}
-	return name, nil
+	return ids[len(ids)-1], nil
 }
 
 // get loads by row key (rowKey) — the private read every generated method
 // re-reads through, so Tier-2 overrides of Get never re-enter generated writes.
 func (r *GormHoldRepository) get(ctx context.Context, key string) (*allocationpbv1.Hold, error) {
 	var m allocation.Hold
-	if err := r.DB.WithContext(ctx).First(&m, "name = ?", key).Error; err != nil {
+	if err := r.DB.WithContext(ctx).First(&m, "id = ?", key).Error; err != nil {
 		return nil, repox.MapGormErr(err)
 	}
 	return r.toProto(ctx, &m)
@@ -491,19 +441,9 @@ func (r *GormHoldRepository) toProto(ctx context.Context, m *allocation.Hold) (*
 	return out, nil
 }
 
-// List returns one page of records under parent.
-func (r *GormHoldRepository) List(ctx context.Context, parent string, in repox.ListInput) ([]*allocationpbv1.Hold, string, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, "", err
-	}
-	// AIP-159: "-" for the parent reads across every parent; narrow with a
-	// Where on the parent field instead.
-	if parentIDs[len(parentIDs)-1] == "-" {
-		return r.list(ctx, r.DB, in)
-	}
-	scope := r.DB.Where("organizational_unit_id = ?", parentIDs[len(parentIDs)-1])
-	return r.list(ctx, scope, in)
+// List returns one page of records.
+func (r *GormHoldRepository) List(ctx context.Context, in repox.ListInput) ([]*allocationpbv1.Hold, string, error) {
+	return r.list(ctx, r.DB, in)
 }
 
 func (r *GormHoldRepository) list(ctx context.Context, scope *gorm.DB, in repox.ListInput) ([]*allocationpbv1.Hold, string, error) {
@@ -605,7 +545,7 @@ func (r *GormHoldRepository) UpdateWithOutputOnly(ctx context.Context, in *alloc
 // server-owned fields written alongside (UpdateWithOutputOnly); nil for Update.
 func (r *GormHoldRepository) updateTx(ctx context.Context, tx *gorm.DB, key string, in *allocationpbv1.Hold, paths, outputPaths []string) error {
 	var existing allocation.Hold
-	if err := tx.WithContext(ctx).Clauses(clause.Locking{Strength: "UPDATE"}).First(&existing, "name = ?", key).Error; err != nil {
+	if err := tx.WithContext(ctx).Clauses(clause.Locking{Strength: "UPDATE"}).First(&existing, "id = ?", key).Error; err != nil {
 		return err
 	}
 	id := existing.ID
@@ -675,7 +615,7 @@ func (r *GormHoldRepository) updateOutputOnlyTx(ctx context.Context, tx *gorm.DB
 		var existing allocation.Hold
 		// FOR UPDATE, as in updateTx: concurrent writers holding one etag
 		// take turns, and only the first passes the guard.
-		if err := tx.WithContext(ctx).Clauses(clause.Locking{Strength: "UPDATE"}).First(&existing, "name = ?", key).Error; err != nil {
+		if err := tx.WithContext(ctx).Clauses(clause.Locking{Strength: "UPDATE"}).First(&existing, "id = ?", key).Error; err != nil {
 			return err
 		}
 		if in.GetEtag() != "" && existing.Etag != nil && *existing.Etag != in.GetEtag() {
@@ -696,34 +636,22 @@ func (r *GormHoldRepository) updateOutputOnlyTx(ctx context.Context, tx *gorm.DB
 	}
 }
 
-// newRow builds the row a Batch inserts for in under parent, and the
+// newRow builds the row a Batch inserts for in, and the
 // record it stands for, named: the same resolution Create applies.
-func (r *GormHoldRepository) newRow(parent string, in *allocationpbv1.Hold) (*allocation.Hold, *allocationpbv1.Hold, error) {
-	parentIDs, err := repox.SplitName(parent, "organizationalUnits")
-	if err != nil {
-		return nil, nil, err
-	}
+func (r *GormHoldRepository) newRow(in *allocationpbv1.Hold) (*allocation.Hold, *allocationpbv1.Hold, error) {
 	id := repox.NewULID()
-	rowID := id
 	if in.GetName() != "" {
-		ids, err := repox.SplitName(in.GetName(), "organizationalUnits", "holds")
+		ids, err := repox.SplitName(in.GetName(), "holds")
 		if err != nil {
 			return nil, nil, err
-		}
-		for i := range parentIDs {
-			if ids[i] != parentIDs[i] {
-				return nil, nil, fmt.Errorf("%w: name %q is not under parent %q", repox.ErrInvalidArgument, in.GetName(), parent)
-			}
 		}
 		id = ids[len(ids)-1]
 	}
 	in = proto.Clone(in).(*allocationpbv1.Hold)
-	in.Name = FormatHoldName(parentIDs[0], id)
-	id = rowID // keyed as Create keys it
+	in.Name = FormatHoldName(id)
 	m := allocation.HoldFromProto(in)
 	m.ID = id
 	m.Name = in.GetName()
-	m.OrganizationalUnitID = parentIDs[0]
 	m.Etag = repox.Ptr(repox.NewULID())
 	return m, in, nil
 }
@@ -740,7 +668,7 @@ func (r *GormHoldRepository) Delete(ctx context.Context, name string) error {
 		}
 	}
 	var existing allocation.Hold
-	if err := r.DB.WithContext(ctx).First(&existing, "name = ?", key).Error; err != nil {
+	if err := r.DB.WithContext(ctx).First(&existing, "id = ?", key).Error; err != nil {
 		return repox.MapGormErr(err)
 	}
 	return repox.MapGormErr(allocation.NewHoldStore(r.DB).DeleteByID(ctx, existing.ID))
@@ -750,7 +678,7 @@ func (r *GormHoldRepository) Delete(ctx context.Context, name string) error {
 // repox.ListByKeys.
 func (r *GormHoldRepository) ListByKeys(ctx context.Context, field string, keys []string, in repox.ListInput) ([]*allocationpbv1.Hold, error) {
 	return repox.ListByKeys(ctx, field, keys, in, func(ctx context.Context, in repox.ListInput) ([]*allocationpbv1.Hold, string, error) {
-		return r.List(ctx, "organizationalUnits/-", in)
+		return r.List(ctx, in)
 	})
 }
 
@@ -768,9 +696,9 @@ type gormBatch struct {
 func (b *gormBatch) Commit(ctx context.Context) error { return b.u.Commit(ctx) }
 
 // CreateAllocation queues a create and returns the name the record will have.
-func (b *gormBatch) CreateAllocation(parent string, in *allocationpbv1.Allocation) (string, error) {
+func (b *gormBatch) CreateAllocation(in *allocationpbv1.Allocation) (string, error) {
 	r := &GormAllocationRepository{DB: b.db}
-	m, named, err := r.newRow(parent, in)
+	m, named, err := r.newRow(in)
 	if err != nil {
 		return "", err
 	}
@@ -839,15 +767,15 @@ func (b *gormBatch) DeleteAllocation(name string) {
 	}
 	queueAllocationDelete(b.u, name, true)
 	b.u.QueueGorm(nil, func(ctx context.Context, tx *gorm.DB) error {
-		return tx.WithContext(ctx).Delete(&allocation.Allocation{}, "name = ?", key).Error
+		return tx.WithContext(ctx).Delete(&allocation.Allocation{}, "id = ?", key).Error
 	})
 	b.u.Record(repox.Change{Type: "freebusy.allocation.v1/Allocation", Name: name, Op: repox.ChangeDelete, LoadPrior: repox.PriorOf(name, getAllocation)})
 }
 
 // CreateHold queues a create and returns the name the record will have.
-func (b *gormBatch) CreateHold(parent string, in *allocationpbv1.Hold) (string, error) {
+func (b *gormBatch) CreateHold(in *allocationpbv1.Hold) (string, error) {
 	r := &GormHoldRepository{DB: b.db}
-	m, named, err := r.newRow(parent, in)
+	m, named, err := r.newRow(in)
 	if err != nil {
 		return "", err
 	}
@@ -916,7 +844,7 @@ func (b *gormBatch) DeleteHold(name string) {
 	}
 	queueHoldDelete(b.u, name, true)
 	b.u.QueueGorm(nil, func(ctx context.Context, tx *gorm.DB) error {
-		return tx.WithContext(ctx).Delete(&allocation.Hold{}, "name = ?", key).Error
+		return tx.WithContext(ctx).Delete(&allocation.Hold{}, "id = ?", key).Error
 	})
 	b.u.Record(repox.Change{Type: "freebusy.allocation.v1/Hold", Name: name, Op: repox.ChangeDelete, LoadPrior: repox.PriorOf(name, getHold)})
 }

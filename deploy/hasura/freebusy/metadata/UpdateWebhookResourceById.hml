@@ -197,38 +197,6 @@ definition:
 kind: ObjectType
 version: v1
 definition:
-  name: UpdateColumnWebhookResourceOrganizationalUnit
-  description: Update the 'organizational_unit' column in the 'webhook_resource' collection
-  fields:
-    - name: set
-      type: String_1
-      description: Set the column to this value
-  graphql:
-    typeName: UpdateColumnWebhookResourceOrganizationalUnit
-    inputTypeName: UpdateColumnWebhookResourceOrganizationalUnitInput
-  dataConnectorTypeMapping:
-    - dataConnectorName: freebusy_pgsql
-      dataConnectorObjectType: update_column_webhook_resource_organizational_unit
-      fieldMapping:
-        set:
-          column:
-            name: _set
-
----
-kind: TypePermissions
-version: v1
-definition:
-  typeName: UpdateColumnWebhookResourceOrganizationalUnit
-  permissions:
-    - role: admin
-      output:
-        allowedFields:
-          - set
-
----
-kind: ObjectType
-version: v1
-definition:
   name: UpdateColumnWebhookResourcePreviousSecret
   description: Update the 'previous_secret' column in the 'webhook_resource' collection
   fields:
@@ -442,10 +410,6 @@ definition:
     - name: name
       type: UpdateColumnWebhookResourceName
       description: Update the 'name' column in the 'webhook_resource' collection.
-    - name: organizationalUnit
-      type: UpdateColumnWebhookResourceOrganizationalUnit
-      description: Update the 'organizational_unit' column in the 'webhook_resource'
-        collection.
     - name: previousSecret
       type: UpdateColumnWebhookResourcePreviousSecret
       description: Update the 'previous_secret' column in the 'webhook_resource' collection.
@@ -489,9 +453,6 @@ definition:
         name:
           column:
             name: name
-        organizationalUnit:
-          column:
-            name: organizational_unit
         previousSecret:
           column:
             name: previous_secret
@@ -526,7 +487,6 @@ definition:
           - eventTypes
           - id
           - name
-          - organizationalUnit
           - previousSecret
           - rotateTime
           - secret

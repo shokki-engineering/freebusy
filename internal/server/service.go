@@ -4,8 +4,8 @@
 // Package server is the transport/bootstrap layer: it assembles freebusy's
 // services on one database connection (assembly.go), puts them on the hybrid
 // gRPC/HTTP/MCP server through the generated registrations (register.go), and
-// builds the unary interceptor chain every surface runs them behind -- hints,
-// the site check (sites.go) and idempotency. The server and the e2e suites
+// builds the unary interceptor chain every surface runs them behind -- hints
+// and idempotency. The server and the e2e suites
 // assemble freebusy here, so the two cannot drift.
 package server
 
@@ -14,8 +14,6 @@ import (
 	"context"
 	"time"
 
-	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc4519/organization/v1/organizationv1grpc"
-	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc4519/organizational_unit/v1/organizational_unitv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/calendar/v1/calendarv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc5545/event/v1/eventv1grpc"
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc7953/availability/v1/availabilityv1grpc"
@@ -41,8 +39,6 @@ type Service struct {
 	allocationpbv1.HoldServiceServer
 	reservationpbv1.ReservationServiceServer
 	webhookpbv1.WebhookServiceServer
-	organizationv1grpc.OrganizationsServer
-	organizational_unitv1grpc.OrganizationalUnitsServer
 	resourcev1grpc.ResourcesServer
 	calendarv1grpc.CalendarsServer
 	availabilityv1grpc.AvailabilitiesServer
@@ -71,17 +67,15 @@ func (s *Service) Close(ctx context.Context) error {
 // NewService wraps the assembled services as the registered Service.
 func NewService(services *Services) *Service {
 	return &Service{
-		AllocationServiceServer:   services.Allocation,
-		HoldServiceServer:         services.Allocation,
-		ReservationServiceServer:  services.Reservations,
-		WebhookServiceServer:      services.Webhooks,
-		OrganizationsServer:       services.Organizations,
-		OrganizationalUnitsServer: services.Units,
-		ResourcesServer:           services.Resources,
-		CalendarsServer:           services.Calendars,
-		AvailabilitiesServer:      services.Availabilities,
-		EventsServer:              services.Events,
-		services:                  services,
+		AllocationServiceServer:  services.Allocation,
+		HoldServiceServer:        services.Allocation,
+		ReservationServiceServer: services.Reservations,
+		WebhookServiceServer:     services.Webhooks,
+		ResourcesServer:          services.Resources,
+		CalendarsServer:          services.Calendars,
+		AvailabilitiesServer:     services.Availabilities,
+		EventsServer:             services.Events,
+		services:                 services,
 	}
 }
 

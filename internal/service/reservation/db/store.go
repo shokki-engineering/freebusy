@@ -43,9 +43,6 @@ func New(conn *database.Connection) *Store {
 	return s
 }
 
-// acrossSites is the AIP-159 wildcard parent: reservations of every site.
-const acrossSites = "organizationalUnits/-"
-
 // Get returns one reservation.
 func (s *Store) Get(ctx context.Context, name string) (*reservationpbv1.Reservation, error) {
 	return s.reservations.Get(ctx, name)
@@ -54,7 +51,7 @@ func (s *Store) Get(ctx context.Context, name string) (*reservationpbv1.Reservat
 // FindByHold returns the reservation a hold backs. A hold backs at most one:
 // the reservation table's unique index on hold enforces it.
 func (s *Store) FindByHold(ctx context.Context, hold string) (*reservationpbv1.Reservation, error) {
-	found, _, err := s.reservations.List(ctx, acrossSites, repox.ListInput{
+	found, _, err := s.reservations.List(ctx, repox.ListInput{
 		PageSize: 1,
 		Where:    []filterx.Condition{{Field: "hold", Op: filterx.OpEq, Value: hold}},
 	})
@@ -67,9 +64,9 @@ func (s *Store) FindByHold(ctx context.Context, hold string) (*reservationpbv1.R
 	return found[0], nil
 }
 
-// List returns a page of a site's reservations.
-func (s *Store) List(ctx context.Context, parent string, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
-	return s.lists.List(ctx, parent, in)
+// List returns a page of reservations.
+func (s *Store) List(ctx context.Context, in repox.ListInput) ([]*reservationpbv1.Reservation, string, error) {
+	return s.lists.List(ctx, in)
 }
 
 // Insert writes r exactly as given, server-owned fields included, its
@@ -78,7 +75,7 @@ func (s *Store) List(ctx context.Context, parent string, in repox.ListInput) ([]
 func (s *Store) Insert(ctx context.Context, r *reservationpbv1.Reservation) (*reservationpbv1.Reservation, error) {
 	r = proto.Clone(r).(*reservationpbv1.Reservation)
 	r.LastChange = reservationpbv1.Reservation_CHANGE_STATE
-	return s.reservations.Create(ctx, siteOf(r.GetName()), r)
+	return s.reservations.Create(ctx, r)
 }
 
 // transition applies a change when the stored state is one of from and, when
@@ -120,10 +117,10 @@ func (s *Store) Update(ctx context.Context, r *reservationpbv1.Reservation, from
 	return s.reservations.UpdateWithOutputOnly(ctx, next, paths, []string{"last_change"})
 }
 
-// Stuck returns up to limit reservations, across every site, left PENDING,
+// Stuck returns up to limit reservations left PENDING,
 // CANCELLING or RESCHEDULING since before cutoff, oldest first.
 func (s *Store) Stuck(ctx context.Context, cutoff time.Time, limit int) ([]*reservationpbv1.Reservation, error) {
-	found, _, err := s.reservations.List(ctx, acrossSites, repox.ListInput{
+	found, _, err := s.reservations.List(ctx, repox.ListInput{
 		PageSize: int32(limit),
 		OrderBy:  "update_time",
 		Where: []filterx.Condition{
@@ -132,18 +129,4 @@ func (s *Store) Stuck(ctx context.Context, cutoff time.Time, limit int) ([]*rese
 		},
 	})
 	return found, err
-}
-
-// siteOf is the site a reservation name sits under.
-// "organizationalUnits/o/reservations/r" -> "organizationalUnits/o".
-func siteOf(name string) string {
-	n := 0
-	for i := range len(name) {
-		if name[i] == '/' {
-			if n++; n == 2 {
-				return name[:i]
-			}
-		}
-	}
-	return name
 }

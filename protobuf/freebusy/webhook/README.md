@@ -41,7 +41,6 @@ erDiagram
         string display_name "OPTIONAL"
         string uri "REQUIRED"
         string[] event_types "OPTIONAL"
-        string organizational_unit FK "OPTIONAL"
         WebhookState state "OUTPUT_ONLY"
         string secret "OUTPUT_ONLY"
         string previous_secret "OUTPUT_ONLY"
@@ -51,7 +50,6 @@ erDiagram
         string etag "OUTPUT_ONLY"
     }
     Webhook ||--o{ Delivery : "deliveries"
-    Webhook }o--o| OrganizationalUnit : "organizational_unit"
 ```
 
 | Resource | Type | Pattern |
@@ -72,7 +70,7 @@ inventory, and shows what was sent to each.
 | `CreateWebhook` | [`CreateWebhookRequest`](#createwebhookrequest) | [`Webhook`](#webhook) | `POST /v1/webhooks` | Creates a webhook. The response carries its signing secret, which no later read returns. |
 | `GetWebhook` | [`GetWebhookRequest`](#getwebhookrequest) | [`Webhook`](#webhook) | `GET /v1/{name=webhooks/*}` | Retrieves one webhook, without its secret. |
 | `ListWebhooks` | [`ListWebhooksRequest`](#listwebhooksrequest) | [`ListWebhooksResponse`](#listwebhooksresponse) | `GET /v1/webhooks` | Lists webhooks, without their secrets. |
-| `UpdateWebhook` | [`UpdateWebhookRequest`](#updatewebhookrequest) | [`Webhook`](#webhook) | `PATCH /v1/{webhook.name=webhooks/*}` | Updates a webhook: its endpoint, event types or site. |
+| `UpdateWebhook` | [`UpdateWebhookRequest`](#updatewebhookrequest) | [`Webhook`](#webhook) | `PATCH /v1/{webhook.name=webhooks/*}` | Updates a webhook: its endpoint or event types. |
 | `PauseWebhook` | [`PauseWebhookRequest`](#pausewebhookrequest) | [`Webhook`](#webhook) | `POST /v1/{name=webhooks/*}:pause` | Stops sending a webhook changes. Changes made while it is paused are not sent; deliveries already pending wait. Idempotent. |
 | `ResumeWebhook` | [`ResumeWebhookRequest`](#resumewebhookrequest) | [`Webhook`](#webhook) | `POST /v1/{name=webhooks/*}:resume` | Starts sending a paused webhook changes again, from now on. Idempotent. |
 | `DeleteWebhook` | [`DeleteWebhookRequest`](#deletewebhookrequest) | `google.protobuf.Empty` | `DELETE /v1/{name=webhooks/*}` | Deletes a webhook; with force, its deliveries too. |
@@ -130,7 +128,7 @@ Resource `freebusy.webhook.v1/Delivery`, pattern `webhooks/{webhook}/deliveries/
 | `name` | `string` | `IDENTIFIER` | The delivery name. The final segment is a digest of (webhook, event_id). Format: webhooks/{webhook}/deliveries/{delivery} |
 | `event_id` | `string` | `OUTPUT_ONLY` | The CloudEvents id, the same for every webhook sent this change: a digest of the record's name and etag. Receivers deduplicate on it. |
 | `event_type` | `string` | `OUTPUT_ONLY` | The CloudEvents type, e.g. "freebusy.reservation.confirmed". |
-| `subject` | `string` | `OUTPUT_ONLY` | The record that changed. Format: organizationalUnits/{organizational_unit}/reservations/{reservation} or organizationalUnits/{organizational_unit}/holds/{hold} |
+| `subject` | `string` | `OUTPUT_ONLY` | The record that changed. Format: reservations/{reservation} or holds/{hold} |
 | `payload` | `string` | `OUTPUT_ONLY` | The request body sent: a CloudEvents 1.0 JSON document whose data is the record as it stood. |
 | `state` | [`DeliveryState`](#deliverystate) | `OUTPUT_ONLY` | Where sending stands. |
 | `attempt_count` | `int32` | `OUTPUT_ONLY` | Attempts made so far. |
@@ -180,7 +178,6 @@ Resource `freebusy.webhook.v1/Webhook`, pattern `webhooks/{webhook}`.
 | `display_name` | `string` | `OPTIONAL` | Human-readable name, for the operator's own reference. |
 | `uri` | `string` | `REQUIRED` | The endpoint each event is POSTed to. HTTPS, except to a loopback host when the server allows insecure endpoints for development. Required on create; an update that leaves it out keeps the current one. |
 | `event_types` | repeated `string` | `OPTIONAL` | The event types sent, e.g. "freebusy.reservation.confirmed" or "freebusy.event.deleted". Empty sends every type. A type is "freebusy.<record>.<what happened>": holds are active, released, expired and converted; reservations pending, confirmed, cancelling, cancelled, failed, rescheduling and rescheduled, and updated exactly when UpdateReservation changed its customer or attributes -- the reservation's last_change is CHANGE_DETAILS (freebusy.reservation.updated); resources, calendars, events and availabilities created, updated and deleted. |
-| `organizational_unit` | `string` | `OPTIONAL` | Limits events to one site's holds, reservations and resources. Empty sends every site's. Calendars, events and availabilities belong to no site, so a webhook limited to one is not sent them. Format: organizationalUnits/{organizational_unit} References `the-protobuf-project.org/OrganizationalUnit`. |
 | `state` | [`WebhookState`](#webhookstate) | `OUTPUT_ONLY` | Whether changes are sent. Set by PauseWebhook and ResumeWebhook; pausing keeps the webhook and its history. |
 | `secret` | `string` | `OUTPUT_ONLY` | The key every delivery is signed with, in the Standard Webhooks form: a "whsec_" prefix and the encoded key. Returned by CreateWebhook and RotateWebhookSecret only; every other read leaves it empty. |
 | `previous_secret` | `string` | `OUTPUT_ONLY` | The key the secret replaced, which also signs deliveries for a day after a rotation so a receiver can switch keys without dropping one. Never returned. |
@@ -231,7 +228,7 @@ Request message for WebhookService.UpdateWebhook, AIP-134.
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
 | `webhook` | [`Webhook`](#webhook) | `REQUIRED` | The webhook, its name identifying which. `etag`, when set, must match. |
-| `update_mask` | `google.protobuf.FieldMask` | `OPTIONAL` | Fields to update: display_name, uri, event_types, organizational_unit. Empty updates every one of them. |
+| `update_mask` | `google.protobuf.FieldMask` | `OPTIONAL` | Fields to update: display_name, uri, event_types. Empty updates every one of them. |
 
 ### DeleteWebhookRequest
 

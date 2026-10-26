@@ -15,6 +15,7 @@ import (
 
 	availabilityv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	resourcev1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
+	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 	"github.com/shokki-engineering/freebusy/internal/service/generated/freebusy/allocation/v1/allocationpbv1svc"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"google.golang.org/grpc/codes"
@@ -27,6 +28,8 @@ type versionedStore struct {
 	*memStore
 	version       atomic.Int64
 	resourceReads atomic.Int64
+	// claimed counts the resources whose claims were read.
+	claimed atomic.Int64
 	// slowInsert delays every InsertHold, so concurrent callers all plan
 	// before any of them writes, as they do against a real database.
 	slowInsert time.Duration
@@ -36,15 +39,9 @@ func (v *versionedStore) InputVersion(context.Context) (string, error) {
 	return strconv.FormatInt(v.version.Load(), 10), nil
 }
 
-func (v *versionedStore) Sites(_ context.Context, _ string) ([]string, error) {
-	v.mu.Lock()
-	defer v.mu.Unlock()
-	var out []string
-	for _, r := range v.resources {
-		out = append(out, r.Resource.GetOrganizationalUnit())
-	}
-	slices.Sort(out)
-	return slices.Compact(out), nil
+func (v *versionedStore) Claims(ctx context.Context, resources []string, window engine.Span, now time.Time) (Claims, error) {
+	v.claimed.Add(int64(len(resources)))
+	return v.memStore.Claims(ctx, resources, window, now)
 }
 
 func (v *versionedStore) Resources(ctx context.Context, q ResourceQuery) ([]ResourceRecord, error) {
@@ -52,12 +49,12 @@ func (v *versionedStore) Resources(ctx context.Context, q ResourceQuery) ([]Reso
 	return v.memStore.Resources(ctx, q)
 }
 
-func (v *versionedStore) InsertHold(ctx context.Context, parent string, h *allocationpbv1.Hold) (*allocationpbv1.Hold, error) {
+func (v *versionedStore) InsertHold(ctx context.Context, h *allocationpbv1.Hold) (*allocationpbv1.Hold, error) {
 	time.Sleep(v.slowInsert)
-	return v.memStore.InsertHold(ctx, parent, h)
+	return v.memStore.InsertHold(ctx, h)
 }
 
-// garage is n interchangeable bays at one site, open 06:00-23:00.
+// garage is n interchangeable bays, open 06:00-23:00.
 func garage(t *testing.T, n int) (*versionedStore, func() time.Time) {
 	t.Helper()
 	m := newMemStore()
@@ -67,8 +64,7 @@ func garage(t *testing.T, n int) (*versionedStore, func() time.Time) {
 	m.avail["calendars/bays"] = []*availabilityv1.Availability{opens(hr(6), hr(23), "FREQ=DAILY")}
 	for i := range n {
 		m.resources = append(m.resources, ResourceRecord{Resource: &resourcev1.Resource{
-			Name: fmt.Sprintf("resources/bay-%02d", i), Calendar: "calendars/bays",
-			OrganizationalUnit: club, ResourceTypes: []string{"parking-bay"},
+			Name: fmt.Sprintf("resources/bay-%03d", i), Calendar: "calendars/bays", ResourceTypes: []string{"parking-bay"},
 		}})
 	}
 	return &versionedStore{memStore: m}, now
@@ -90,7 +86,7 @@ func TestConcurrentHoldsSpreadAcrossEqualResources(t *testing.T) {
 			defer wg.Done()
 			<-start
 			_, err := srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
-				Parent: club, Hold: &allocationpbv1.Hold{Window: win(8, 10), Quantity: 1},
+				Hold: &allocationpbv1.Hold{Window: win(8, 10), Quantity: 1},
 			})
 			if err == nil {
 				ok.Add(1)
@@ -116,7 +112,7 @@ func TestCreateHoldOutsideAvailability(t *testing.T) {
 	store, now := garage(t, 3)
 	srv := NewServer(store, WithClock(now))
 	_, err := srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
-		Parent: club, Hold: &allocationpbv1.Hold{Window: win(22, 24), Quantity: 1},
+		Hold: &allocationpbv1.Hold{Window: win(22, 24), Quantity: 1},
 	})
 	if c, r := reasonOf(t, err); c != codes.FailedPrecondition || r != "OUTSIDE_AVAILABILITY" {
 		t.Fatalf("outside hours: %v %q (%v)", c, r, err)
@@ -124,13 +120,13 @@ func TestCreateHoldOutsideAvailability(t *testing.T) {
 	// Inside hours but taken: still CAPACITY_EXHAUSTED.
 	for range 3 {
 		if _, err := srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
-			Parent: club, Hold: &allocationpbv1.Hold{Window: win(9, 10)},
+			Hold: &allocationpbv1.Hold{Window: win(9, 10)},
 		}); err != nil {
 			t.Fatal(err)
 		}
 	}
 	_, err = srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
-		Parent: club, Hold: &allocationpbv1.Hold{Window: win(9, 10)},
+		Hold: &allocationpbv1.Hold{Window: win(9, 10)},
 	})
 	if c, r := reasonOf(t, err); c != codes.FailedPrecondition || r != allocationpbv1svc.ReasonCapacityExhausted {
 		t.Fatalf("taken: %v %q", c, r)
@@ -144,7 +140,7 @@ func TestStaticInputsCachedByVersion(t *testing.T) {
 	srv := NewServer(store, WithClock(now))
 	check := func() *allocationpbv1.CheckAvailabilityResponse {
 		t.Helper()
-		res, err := srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Parent: club, Window: win(9, 10), Quantity: 1})
+		res, err := srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Window: win(9, 10), Quantity: 1})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -171,7 +167,7 @@ func TestStaticInputsCachedByVersion(t *testing.T) {
 	store.avail["calendars/bays"] = []*availabilityv1.Availability{opens(hr(6), hr(23), "FREQ=DAILY")}
 	store.mu.Unlock()
 	if _, err := srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
-		Parent: club, Hold: &allocationpbv1.Hold{Window: win(9, 10)},
+		Hold: &allocationpbv1.Hold{Window: win(9, 10)},
 	}); err != nil {
 		t.Fatalf("a hold planned from stale inputs was refused instead of re-read: %v", err)
 	}
@@ -180,7 +176,7 @@ func TestStaticInputsCachedByVersion(t *testing.T) {
 	store.avail["calendars/bays"] = []*availabilityv1.Availability{opens(hr(12), hr(13), "FREQ=DAILY")}
 	store.mu.Unlock()
 	_, err := srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
-		Parent: club, Hold: &allocationpbv1.Hold{Window: win(15, 16)},
+		Hold: &allocationpbv1.Hold{Window: win(15, 16)},
 	})
 	if c, r := reasonOf(t, err); c != codes.FailedPrecondition || r != "OUTSIDE_AVAILABILITY" {
 		t.Fatalf("a hold on a closed garage, planned from a stale cache: %v %q", c, r)
@@ -196,44 +192,35 @@ func TestAdmissionTurnsAwayWhenBusy(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Parent: club, Window: win(9, 10)})
+	_, err = srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Window: win(9, 10)})
 	if c, r := reasonOf(t, err); c != codes.ResourceExhausted || r != allocationpbv1svc.ReasonEngineBusy {
 		t.Fatalf("busy: %v %q", c, r)
 	}
 	release()
-	if _, err := srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Parent: club, Window: win(9, 10)}); err != nil {
+	if _, err := srv.CheckAvailability(ctx(), &allocationpbv1.CheckAvailabilityRequest{Window: win(9, 10)}); err != nil {
 		t.Fatalf("after release: %v", err)
 	}
 }
 
-// Search stops once it has the page and one match more, and its pages are
-// the ones a search of every site would have drawn.
+// Search beyond the read model stops once it has the page and one match
+// more, and its pages are the ones a search of every resource would draw.
 func TestSearchStopsAtPage(t *testing.T) {
-	store, now := garage(t, 0)
-	for s := range 5 {
-		for i := range 4 {
-			store.resources = append(store.resources, ResourceRecord{Resource: &resourcev1.Resource{
-				Name: fmt.Sprintf("resources/s%d-r%d", s, i), Calendar: "calendars/bays",
-				OrganizationalUnit: fmt.Sprintf("organizationalUnits/s%d", s), ResourceTypes: []string{"court"},
-			}})
-		}
-	}
+	store, now := garage(t, 4*searchChunk)
 	srv := NewServer(store, WithClock(now))
 	var got []string
 	token := ""
 	for page := 0; ; page++ {
-		before := store.resourceReads.Load()
+		before := store.claimed.Load()
 		res, err := srv.SearchAvailability(ctx(), &allocationpbv1.SearchAvailabilityRequest{
-			Parent: "organizations/acme", Window: win(9, 10), Quantity: 1, PageSize: 3, PageToken: token,
+			Window: win(9, 10), PageSize: 100, PageToken: token,
 		})
 		if err != nil {
 			t.Fatal(err)
 		}
-		if page == 0 && store.resourceReads.Load()-before > 1 {
-			// 3 + 1 matches are in the first site (4) -- but sites are read
-			// searchParallel at a time, so allow that batch and no more.
-			if store.resourceReads.Load()-before > searchParallel {
-				t.Fatalf("first page read %d sites", store.resourceReads.Load()-before)
+		if page == 0 {
+			// 100 + 1 matches are in the first two chunks.
+			if n := store.claimed.Load() - before; n > 2*searchChunk {
+				t.Fatalf("first page read the bookings of %d resources, want at most %d", n, 2*searchChunk)
 			}
 		}
 		for _, m := range res.GetMatches() {
@@ -243,7 +230,7 @@ func TestSearchStopsAtPage(t *testing.T) {
 			break
 		}
 	}
-	if len(got) != 20 || !slices.IsSorted(got) {
-		t.Fatalf("paged %d matches %v, want all 20 in order", len(got), got)
+	if len(got) != 4*searchChunk || !slices.IsSorted(got) {
+		t.Fatalf("paged %d matches, want all %d in order", len(got), 4*searchChunk)
 	}
 }

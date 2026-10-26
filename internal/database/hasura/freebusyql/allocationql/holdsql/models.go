@@ -40,8 +40,6 @@ type AllocationHolds struct {
 	IdempotencyKey *string `graphql:"idempotencyKey"`
 	// Name selects the "name" field.
 	Name string `graphql:"name"`
-	// OrganizationalUnitId selects the "organizationalUnitId" field.
-	OrganizationalUnitId string `graphql:"organizationalUnitId"`
 	// Quantity selects the "quantity" field; nil when the column is NULL.
 	Quantity *int32 `graphql:"quantity"`
 	// Replaces selects the "replaces" field; nil when the column is NULL.
@@ -138,17 +136,6 @@ type AllocationHoldsAggExp struct {
 		// Min selects the "min" field; nil when the column is NULL.
 		Min *string `graphql:"min"`
 	} `graphql:"name"`
-	// OrganizationalUnitId selects the "organizationalUnitId" field.
-	OrganizationalUnitId struct {
-		// Count selects the "_count" field.
-		Count graphql.Int64 `graphql:"_count"`
-		// CountDistinct selects the "_count_distinct" field.
-		CountDistinct graphql.Int64 `graphql:"_count_distinct"`
-		// Max selects the "max" field; nil when the column is NULL.
-		Max *string `graphql:"max"`
-		// Min selects the "min" field; nil when the column is NULL.
-		Min *string `graphql:"min"`
-	} `graphql:"organizationalUnitId"`
 	// Quantity selects the "quantity" field.
 	Quantity struct {
 		// Count selects the "_count" field.
@@ -250,8 +237,6 @@ type DeleteAllocationHoldsByIdResponse struct {
 		IdempotencyKey *string `graphql:"idempotencyKey"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnitId selects the "organizationalUnitId" field.
-		OrganizationalUnitId string `graphql:"organizationalUnitId"`
 		// Quantity selects the "quantity" field; nil when the column is NULL.
 		Quantity *int32 `graphql:"quantity"`
 		// Replaces selects the "replaces" field; nil when the column is NULL.
@@ -289,8 +274,6 @@ type InsertAllocationHoldsResponse struct {
 		IdempotencyKey *string `graphql:"idempotencyKey"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnitId selects the "organizationalUnitId" field.
-		OrganizationalUnitId string `graphql:"organizationalUnitId"`
 		// Quantity selects the "quantity" field; nil when the column is NULL.
 		Quantity *int32 `graphql:"quantity"`
 		// Replaces selects the "replaces" field; nil when the column is NULL.
@@ -328,8 +311,6 @@ type UpdateAllocationHoldsByIdResponse struct {
 		IdempotencyKey *string `graphql:"idempotencyKey"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnitId selects the "organizationalUnitId" field.
-		OrganizationalUnitId string `graphql:"organizationalUnitId"`
 		// Quantity selects the "quantity" field; nil when the column is NULL.
 		Quantity *int32 `graphql:"quantity"`
 		// Replaces selects the "replaces" field; nil when the column is NULL.

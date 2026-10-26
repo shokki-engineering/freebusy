@@ -30,6 +30,7 @@ flowchart LR
 - [Running in production](#running-in-production)
 - [Configuration](#configuration)
 - [Using the API](#using-the-api)
+- [Calling freebusy from a browser](#calling-freebusy-from-a-browser)
 - [Search](#search)
 - [Performance](#performance)
 - [Webhooks](#webhooks)
@@ -44,7 +45,7 @@ flowchart LR
 
 ## What it is for
 
-Anything booked by time, in any quantity, from any number of sites:
+Anything booked by time, in any quantity:
 
 | Use case | Resources | Booked by |
 |---|---|---|
@@ -72,17 +73,20 @@ one industry lives elsewhere and refers to freebusy by name:
 
 ```mermaid
 flowchart TD
-    ORG["Organization<br/><i>the operator</i>"] --> OU["Organizational unit<br/><i>a site: a club, a car park, a clinic</i>"]
-    OU --> RES["Resource · RFC 9073<br/><i>the bookable thing, typed: padel-court, desk, van</i>"]
+    RES["Resource · RFC 9073<br/><i>the bookable thing, typed: padel-court, desk, van</i>"]
     RES --> CAL["Calendar · RFC 5545<br/><i>its timeline, in its time zone</i>"]
     CAL --> AV["Availability · RFC 7953<br/><i>when it is offered: opening hours</i>"]
     CAL --> EV["Events · RFC 5545<br/><i>when it is busy: maintenance, imported bookings</i>"]
-    OU --> HOLD["Hold<br/><i>a short claim on N resources for a window</i>"]
+    RES --> HOLD["Hold<br/><i>a short claim on N resources for a window</i>"]
     HOLD --> RSV["Reservation<br/><i>a hold made permanent</i>"]
 ```
 
+- **One pool, no tenants.** Every resource is in one pool; a request names the
+  resources it means -- by name, by type, or with a filter over their
+  attributes. Grouping them into venues, properties or tenants belongs to
+  whatever is built on top.
 - **Resources are booked by type and quantity, not by name.** A caller asks for
-  "two padel courts at this site, 18:00–19:00"; the engine picks which two,
+  "two of these padel courts, 18:00–19:00"; the engine picks which two,
   preferring the ones that leave the fewest unusable gaps.
 - **Free time** is what a resource's availability offers, less its calendar's
   events and less what live holds and reservations claim. Recurring events
@@ -102,13 +106,8 @@ flowchart TD
 - **Booking rules** — minimum and maximum length, how far ahead, how late —
   come from each resource's RFC 9073 `STRUCTURED-DATA`. freebusy never needs to
   know what a "night" or a "session" means to you.
-- **Nothing is served outside a live organization.** Every site names its
-  organization, every resource its site, and a call naming a site or an
-  organization that does not exist — or is soft-deleted — is answered
-  `NOT_FOUND` on every surface (gRPC, REST, MCP). Deleting an organization
-  that still has sites, or a site that still has resources, is refused.
-- **Deletes are soft, then final.** A deleted organization, site, resource,
-  calendar, event or availability stays restorable with `Undelete` for
+- **Deletes are soft, then final.** A deleted resource, calendar, event or
+  availability stays restorable with `Undelete` for
   `[retention] deleted_days` (30 by default), and its `expire_time` says until
   when; after that it is purged for good, children before parents.
 - **No double booking, ever.** A Postgres exclusion constraint refuses two
@@ -170,8 +169,8 @@ sequenceDiagram
     participant W as Your webhook endpoint
 
     C->>F: SearchAvailability(type, quantity, window)
-    F-->>C: sites with enough free
-    C->>F: CreateHold(site, window, quantity, idempotency_key)
+    F-->>C: resources free for the window
+    C->>F: CreateHold(candidates, window, quantity, idempotency_key)
     F-->>C: Hold ACTIVE, expires in N minutes
     F--)W: freebusy.hold.active
     C->>P: take payment
@@ -437,6 +436,7 @@ underscore as a level, so `FREEBUSY_SERVER_ENABLE_HTTP` would mean
 | `[server]` | `environment`, `enable_http`, `enable_mcp`, `enable_health` |
 | `[server.grpc]`, `[server.http]`, `[server.mcp]` | `host`, `port`; MCP's `transport`, `path` (default `/mcp`) and `stateless` (default `true`: streamable HTTP without sessions, at `path` and each service's own path) |
 | `[server.tls]` | `cert_file`, `key_file` — when set, gRPC and HTTP both serve TLS |
+| `[server.cors]` | `enabled` (false), `allowed_origins`, `allowed_methods`, `allowed_headers`, `exposed_headers`, `allow_credentials` (false), `max_age_seconds` (600) — browser access to the HTTP port; see [Calling freebusy from a browser](#calling-freebusy-from-a-browser) |
 | `[database]` | `provider`: `gorm` or `hasura` |
 | `[database.postgres]` | `host`, `port`, `user`, `password`, `dbname`, `sslmode`, pool sizes |
 | `[database.hasura]` | `url` of the engine's GraphQL endpoint |
@@ -469,7 +469,6 @@ empty server to a confirmed booking with `curl`, step by step.
 | `AllocationService` | `ComputeAvailability`, `CheckAvailability`, `BatchComputeAvailability`, `SearchAvailability` |
 | `HoldService` | `CreateHold`, `GetHold`, `ListHolds`, `ExtendHold`, `ReleaseHold`, `DeleteHold` |
 | `ReservationService` | `CreateReservation`, `GetReservation`, `ListReservations`, `UpdateReservation`, `CancelReservation`, `RescheduleReservation` |
-| `Organizations`, `OrganizationalUnits` | the tenants and their sites (RFC 4519): create, get, list, update, and soft delete with `Undelete` (AIP-164) |
 | `WebhookService` | webhooks (create, update, pause, resume, rotate secret, delete) and their deliveries (list, get, retry) |
 | `Resources`, `Calendars`, `Availabilities`, `Events` | the inventory, plus `QueryFreeBusy` and `ExpandEvent` |
 
@@ -496,21 +495,20 @@ lifecycles. The flows and lifecycles are written in
 `just gen docs` renders them); the same diagrams ride in the OpenAPI spec's
 descriptions and under `x-mermaid`.
 
-**Setting up.** Create an organization, then a site (an organizational unit)
-naming it. Nothing can be published or booked before both exist.
-
 **Publishing inventory.** Create a calendar (with its time zone), a resource
-on it (`resource_types`, `organizational_unit`, and its booking rules in
-`structured_data`), availability for its opening hours, and events for
+on it (`resource_types`, any attributes in `structured_data` -- its booking
+rules among them), availability for its opening hours, and events for
 closures. All of it can also be written by any calendar app over CalDAV.
 
 **Booking.**
 
-1. **Ask** — `SearchAvailability` across sites, `ComputeAvailability` for one
-   site's slots or days, `CheckAvailability` for one exact window (with the
-   reasons when the answer is no). `SearchAvailability`'s `resource_types`
+1. **Ask** — `SearchAvailability` across every resource, `ComputeAvailability`
+   for chosen resources' slots or days, `CheckAvailability` for one exact
+   window (with the reasons when the answer is no). Each takes a list of
+   resources and a `filter` to narrow what it considers. `SearchAvailability`'s `resource_types`
    matches a resource carrying *any* of the types listed.
-2. **Hold** — `CreateHold` with a window, a quantity and an
+2. **Hold** — `CreateHold` with a window, a quantity, the
+   `candidate_resources` or `candidate_filter` it may take from, and an
    `idempotency_key`. `ExtendHold` and `ReleaseHold` change it.
 3. **Settle** — payment, forms, approvals: in your services.
 4. **Reserve** — `CreateReservation` from the hold. Safe to retry: a hold
@@ -531,6 +529,57 @@ Errors follow AIP-193: `INVALID_ARGUMENT` for a bad request,
 `etag`, and every one carries a stable `reason` to branch on.
 [docs/errors.md](docs/errors.md) lists them all, with what to do about each.
 
+## Calling freebusy from a browser
+
+A page served from another origin -- a booking widget, an admin console, the
+TypeScript SDK in its browser mode -- can only read freebusy's answers if the
+REST gateway says so with CORS headers. That is off by default; turn it on
+for the origins you serve pages from:
+
+```toml
+[server.cors]
+enabled = true
+allowed_origins = ["https://book.example.com", "http://localhost:5173"]
+```
+
+```sh
+FREEBUSY_SERVER__CORS__ENABLED=true
+FREEBUSY_SERVER__CORS__ALLOWED_ORIGINS=https://book.example.com,http://localhost:5173
+```
+
+(Helm: `cors.enabled`, `cors.allowedOrigins`, ...; Compose:
+`FREEBUSY_CORS_ENABLED`, `FREEBUSY_CORS_ALLOWED_ORIGINS` in `.env`.)
+
+- **Origins** are exact -- `scheme://host[:port]`, compared without regard to
+  case or a trailing slash -- or `*` for any origin. There are no partial
+  wildcards: `https://*.example.com` matches nothing.
+- **Methods** default to `GET, POST, PATCH, PUT, DELETE, OPTIONS`, every verb
+  the REST paths use.
+- **Headers** default to what a GAPIC client's browser transport sends:
+  `content-type`, `authorization`, `x-goog-api-client`,
+  `x-goog-request-params`, `x-goog-user-project`, `x-api-key`. Name your own
+  in `allowed_headers` (which replaces the defaults), or `*` to allow whatever
+  a preflight asks for. `exposed_headers` lists response headers a script may
+  read.
+- **Credentials** (`allow_credentials = true`: cookies, HTTP authentication)
+  need listed origins; the server refuses to start with `*` and credentials.
+- **Preflights** (`OPTIONS` with `Access-Control-Request-Method`) are
+  answered by the server before any API handler runs: `204` with the policy
+  for an allowed origin and method, `403` with no CORS headers otherwise.
+  `max_age_seconds` lets the browser cache that answer. Every response
+  carries `Vary: Origin`.
+
+The policy covers the whole HTTP port -- the REST gateway, CalDAV and
+`/health` -- and nothing else. gRPC needs no CORS (browsers cannot speak it),
+and the MCP port is a separate listener that is not covered: MCP clients are
+agents, not web pages.
+
+With the TypeScript SDK, run the client in its fallback mode -- `fallback:
+true`, which google-gax serves as HTTP/JSON over `fetch` (`'rest'` is accepted
+too) -- pointed at the gateway (`apiEndpoint` and `port`, plus `protocol:
+'http'` for a plaintext local server). It calls the same REST paths `curl`
+uses, with the headers above.
+
 ## Search
 
 `SearchAvailability`, `ComputeAvailability`, `CheckAvailability` and
@@ -538,7 +587,8 @@ Errors follow AIP-193: `INVALID_ARGUMENT` for a bad request,
 table `allocation.resource_days`, one row per resource per UTC day
 (`freebusy.allocation.v1.ResourceDay`), holding the resource's standing free
 time that day -- what its RFC 7953 availability offers, less confirmed events
-and converted holds -- plus its site, organization, `resource_types`,
+and converted holds -- plus its `organizational_unit` (the resource's own,
+as data), `resource_types`,
 `display_name` and `attributes` (every JSON object in its STRUCTURED-DATA,
 merged). A search asks Postgres for the rows whose free time contains the
 window (a GiST index on a `tstzmultirange`), then the engine evaluates only
@@ -550,7 +600,7 @@ resource in scope, so neither ever depends on the read model being current.
 
 **Kept current.** The rows are generated by protoc-gen-store's projection
 support and written in the same transaction as every write to a resource, its
-site, calendar, availability, events or allocations (`internal/service/
+calendar, availability, events or allocations (`internal/service/
 allocation/resourceday.go` computes them with `engine.FreeIntervals`). A
 write recomputes only what it touches: an event its calendar's resources on
 its days, a converted hold its resources on its days, a resource its whole
@@ -583,17 +633,17 @@ any `attributes.<path>`, `resource_types`, `display_name` (a bare word),
 `hold.candidate_filter`, `CreateHold`. `SearchAvailability` also takes
 `order_by` (`resource`, `organizational_unit`, `display_name`,
 `free_fraction`, `attributes.max_occupancy`) and `facets` (counts by `resource_types`,
-`organizational_unit`, `organization`, `display_name` or `attributes.<path>`,
+`organizational_unit`, `display_name` or `attributes.<path>`,
 from the rows, live holds not subtracted):
 
 ```sh
-curl -s localhost:8080/v1/organizations/acme:searchAvailability -d '{
+curl -s localhost:8080/v1/resources:searchAvailability -d '{
   "window": {"startTime": "2026-11-20T15:00:00Z", "endTime": "2026-11-22T11:00:00Z"},
   "filter": "resource_types:\"hotel-room\" AND attributes.view = \"river\" AND attributes.max_occupancy >= 2",
   "orderBy": "free_fraction desc",
   "facets": ["attributes.view", "resource_types"]
 }'
-curl -s localhost:8080/v1/organizationalUnits/riverside/holds -d '{
+curl -s localhost:8080/v1/holds -d '{
   "window": {"startTime": "2026-11-08T07:00:00Z", "endTime": "2026-11-08T09:00:00Z"},
   "candidateFilter": "attributes.charger_kw >= 22"
 }'
@@ -631,7 +681,8 @@ always read Postgres. Compose: `--profile search` (single node, security off,
 Secret's `opensearch-username` / `opensearch-password`.
 
 Measured in process on a laptop (2,000 resources in 20 sites, Postgres 18,
-median of 15):
+median of 15), against 1.0.0-rc.1, whose calls were scoped to a site or an
+organization; a site-wide call is now one narrowed by resources or a filter:
 
 | Call | Everything free | 98% booked at the window |
 |---|---|---|
@@ -650,7 +701,8 @@ is when an operator-wide search is slow. A filtered search with a facet:
 
 ## Performance
 
-Load-tested before 1.0.0 with k6 against the chart on kind, on one laptop.
+Load-tested before 1.0.0 (on 1.0.0-rc.1, whose calls were scoped to a site
+or an organization) with k6 against the chart on kind, on one laptop.
 **These are single-laptop numbers**: the server, Postgres, Redis and k6 share
 one machine's CPUs, so treat them as a floor and as a guide to where the time
 goes, not as a capacity plan.
@@ -721,8 +773,7 @@ then run k6 in the cluster against `http://freebusy:8080`.
 
 freebusy's tables reference each other and the RFC tables they share a
 database with through foreign keys, generated from the protos'
-`resource_reference`s (a reservation's site, a resource's organization, an
-allocation's resource). Existing databases get them `NOT VALID`, so rows
+`resource_reference`s (an allocation's resource, a reservation's hold). Existing databases get them `NOT VALID`, so rows
 written before them are not checked; new writes are. A write naming a missing
 resource, or a delete of one still named, fails with `FAILED_PRECONDITION` /
 `FOREIGN_KEY_VIOLATION`; the purger keeps a soft-deleted record something
@@ -766,7 +817,7 @@ reschedule that fell through and left the booking where it was is sent as
 `confirmed` again, not as `updated`. Its data is the whole reservation, as
 `GetReservation` returns it.
 
-A webhook may limit itself to some types and to one site.
+A webhook may limit itself to some types.
 
 ```mermaid
 flowchart LR

@@ -81,13 +81,12 @@ A Hold is a temporary, expiring claim on one or more bookable resources for a wi
 | `etag` | `VARCHAR(255)` | nullable |
 | `replaces` | `VARCHAR(255)` | nullable |
 | `candidate_filter` | `TEXT` | nullable |
-| `organizational_unit_id` | `CHAR(26)` | not null |
 | `resources` | `VARCHAR(255)[]` | nullable |
 | `candidate_resources` | `VARCHAR(255)[]` | nullable |
 
 ### `Allocation` → `resource`
 
-An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it. It sits under the site and names its hold, rather than nesting under the hold: the engine asks about allocations by resource and time across a whole site, never hold by hold, and a hold with child resources would owe DeleteHold a `force` flag guarding rows no caller can see.
+An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it. It is top-level and names its hold, rather than nesting under the hold: the engine asks about allocations by resource and time, never hold by hold, and a hold with child resources would owe DeleteHold a `force` flag guarding rows no caller can see.
 
 | Column | Type | Null |
 | --- | --- | --- |
@@ -98,18 +97,16 @@ An Allocation is one resource taken by one hold for one span: the row the engine
 | `end_time` | `TIMESTAMPTZ` | not null |
 | `expire_time` | `TIMESTAMPTZ` | nullable |
 | `create_time` | `TIMESTAMPTZ` | not null |
-| `hold` | `VARCHAR(255)` | nullable |
-| `organizational_unit_id` | `CHAR(26)` | not null |
+| `hold` | `CHAR(26)` | nullable |
 
 ### `ResourceDay` → `resource_days`
 
-A ResourceDay is one resource's standing free time on one UTC day: the availability read model SearchAvailability, ComputeAvailability, CheckAvailability and CreateHold read their candidates from, instead of evaluating every resource an operator has. Storage-only, and derived: no RPC takes or returns it. It is a projection of the resources, their sites, calendars, RFC 7953 availability, RFC 5545 events and the claims of converted holds, rewritten in the same transaction as every write to those (on Hasura, a single write projects in a request of its own right after it), for every day of a rolling horizon. `free` is offered time less booked time; live holds are not subtracted, and neither is a resource's booking policy applied, because both change with the clock. The engine evaluates every candidate the projection returns before answering, so an answer never depends on the projection being current; a stale row can only make a search miss a resource or read one it then drops.
+A ResourceDay is one resource's standing free time on one UTC day: the availability read model SearchAvailability, ComputeAvailability, CheckAvailability and CreateHold read their candidates from, instead of evaluating every resource there is. Storage-only, and derived: no RPC takes or returns it. It is a projection of the resources, their calendars, RFC 7953 availability, RFC 5545 events and the claims of converted holds, rewritten in the same transaction as every write to those (on Hasura, a single write projects in a request of its own right after it), for every day of a rolling horizon. `free` is offered time less booked time; live holds are not subtracted, and neither is a resource's booking policy applied, because both change with the clock. The engine evaluates every candidate the projection returns before answering, so an answer never depends on the projection being current; a stale row can only make a search miss a resource or read one it then drops.
 
 | Column | Type | Null |
 | --- | --- | --- |
 | `id` | `TEXT` | not null |
 | `resource` | `TEXT` | not null |
-| `organization` | `TEXT` | not null |
 | `organizational_unit` | `TEXT` | not null |
 | `day` | `DATE` | not null |
 | `free` | `TSTZMULTIRANGE` | not null |
@@ -134,7 +131,7 @@ A Reservation is a confirmed booking: a hold made permanent. It is the last step
 | --- | --- | --- |
 | `id` | `CHAR(26)` | not null |
 | `name` | `VARCHAR(255)` | not null |
-| `hold` | `VARCHAR(255)` | not null |
+| `hold` | `CHAR(26)` | not null |
 | `start_time` | `TIMESTAMPTZ` | nullable |
 | `end_time` | `TIMESTAMPTZ` | nullable |
 | `customer` | `VARCHAR(255)` | nullable |
@@ -149,7 +146,6 @@ A Reservation is a confirmed booking: a hold made permanent. It is the last step
 | `replaces` | `VARCHAR(255)` | nullable |
 | `replacement` | `VARCHAR(255)` | nullable |
 | `last_change` | `Change` | nullable |
-| `organizational_unit_id` | `CHAR(26)` | not null |
 | `resources` | `VARCHAR(255)[]` | nullable |
 
 ### Enums
@@ -226,7 +222,6 @@ A Webhook sends an HTTPS endpoint each change to holds, reservations and the inv
 | `display_name` | `VARCHAR(255)` | nullable |
 | `uri` | `VARCHAR(255)` | not null |
 | `event_types` | `VARCHAR(255)[]` | nullable |
-| `organizational_unit` | `VARCHAR(255)` | nullable |
 | `state` | `WebhookState` | nullable |
 | `secret` | `VARCHAR(255)` | nullable |
 | `previous_secret` | `VARCHAR(255)` | nullable |

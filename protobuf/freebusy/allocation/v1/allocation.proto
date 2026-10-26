@@ -57,13 +57,13 @@ message Hold {
 
   option (google.api.resource) = {
     type: "freebusy.allocation.v1/Hold"
-    pattern: "organizationalUnits/{organizational_unit}/holds/{hold}"
+    pattern: "holds/{hold}"
     singular: "hold"
     plural: "holds"
   };
 
   // A hold's changes are its state changes: the change feed sends
-  // freebusy.hold.<state> to the webhooks of its site (and of every site).
+  // freebusy.hold.<state> to every webhook.
   option (service.v1.event) = {
     type: "freebusy.hold"
     omit: [
@@ -71,15 +71,14 @@ message Hold {
       "updated",
       "deleted"
     ]
-    scope: "organizational_unit"
   };
 
-  // The hold name. Nested under the site whose resources it takes, so a hold
-  // is listed and swept per site without joining through every resource.
-  // Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  // The hold name. Top-level: a hold takes resources wherever they are, and
+  // grouping them by place is the business of whatever is built on top.
+  // Format: holds/{hold}
   string name = 1 [
     (google.api.field_behavior) = IDENTIFIER,
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/holds/[^/]+$",
+    (buf.validate.field).string.pattern = "^holds/[^/]+$",
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
 
@@ -101,7 +100,7 @@ message Hold {
   ];
 
   // Candidate resources the allocator may choose from, supplied on create.
-  // Empty offers every resource the site holds. Immutable: the choice is made
+  // Empty offers every resource, narrowed by `candidate_filter`. Immutable: the choice is made
   // once, and re-offering a different set is a different allocation.
   // Format: resources/{resource}
   repeated string candidate_resources = 12 [
@@ -149,8 +148,7 @@ message Hold {
   string etag = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The hold of the reservation this hold is taken to replace with
-  // RescheduleReservation: that reservation's `hold`, converted and at the
-  // same site. Its claims do not count against this hold, so a new window
+  // RescheduleReservation: that reservation's `hold`, converted. Its claims do not count against this hold, so a new window
   // overlapping the old one -- an extension, a shift by an hour -- can keep
   // the same resources. Until the move completes this hold claims only the
   // time the old one does not; RescheduleReservation hands the rest over in
@@ -158,11 +156,11 @@ message Hold {
   // Such a hold can only be used to reschedule that reservation. (A hold,
   // though no resource_reference says so: AIP-121 allows no cycle of mutable
   // references, and this one is a hold naming a hold.)
-  // Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  // Format: holds/{hold}
   string replaces = 13 [
     (google.api.field_behavior) = OPTIONAL,
     (google.api.field_behavior) = IMMUTABLE,
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/holds/[^/]+$",
+    (buf.validate.field).string.pattern = "^holds/[^/]+$",
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
 
@@ -193,10 +191,10 @@ message Hold {
 // `expire_time` passes, with no sweeper write needed, because every read
 // filters on it.
 //
-// It sits under the site and names its hold, rather than nesting under the
-// hold: the engine asks about allocations by resource and time across a whole
-// site, never hold by hold, and a hold with child resources would owe
-// DeleteHold a `force` flag guarding rows no caller can see.
+// It is top-level and names its hold, rather than nesting under the hold: the
+// engine asks about allocations by resource and time, never hold by hold, and
+// a hold with child resources would owe DeleteHold a `force` flag guarding
+// rows no caller can see.
 message Allocation {
   option (entity.v1.table) = {
     id: ID_STRATEGY_ULID
@@ -225,13 +223,13 @@ message Allocation {
 
   option (google.api.resource) = {
     type: "freebusy.allocation.v1/Allocation"
-    pattern: "organizationalUnits/{organizational_unit}/allocations/{allocation}"
+    pattern: "allocations/{allocation}"
     singular: "allocation"
     plural: "allocations"
   };
 
-  // The allocation name, under the site whose resource it takes.
-  // Format: organizationalUnits/{organizational_unit}/allocations/{allocation}
+  // The allocation name.
+  // Format: allocations/{allocation}
   string name = 1 [(google.api.field_behavior) = IDENTIFIER];
 
   // The resource taken.
@@ -257,7 +255,7 @@ message Allocation {
   google.protobuf.Timestamp create_time = 6 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The hold that took it. Deleting the hold deletes its allocations with it.
-  // Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  // Format: holds/{hold}
   string hold = 7 [
     (google.api.field_behavior) = OUTPUT_ONLY,
     (google.api.resource_reference).type = "freebusy.allocation.v1/Hold"
@@ -309,9 +307,8 @@ message AvailabilityMatch {
   // Format: resources/{resource}
   string resource = 1 [(google.api.resource_reference).type = "the-protobuf-project.org/Resource"];
 
-  // The site it belongs to.
-  // Format: organizationalUnits/{organizational_unit}
-  string organizational_unit = 2 [(google.api.resource_reference).type = "the-protobuf-project.org/OrganizationalUnit"];
+  reserved 2;
+  reserved "organizational_unit";
 
   // The span it is free for, which may be narrower than the searched window.
   google.type.Interval window = 3;

@@ -112,10 +112,41 @@ func load() (*AppConfig, error) {
 	if cfg.Server.ShutdownTimeoutSeconds < 0 {
 		return nil, fmt.Errorf("config invalid: server.shutdown_timeout_seconds=%d (want 0 for the default, or more)", cfg.Server.ShutdownTimeoutSeconds)
 	}
+	// An environment variable sets a list as one comma-separated string.
+	cors := &cfg.Server.CORS
+	for _, list := range []*[]string{&cors.AllowedOrigins, &cors.AllowedMethods, &cors.AllowedHeaders, &cors.ExposedHeaders} {
+		*list = splitList(*list)
+	}
+	if c := cfg.Server.CORS; c.Enabled {
+		if len(c.AllowedOrigins) == 0 {
+			return nil, errors.New("config invalid: server.cors.enabled requires server.cors.allowed_origins")
+		}
+		if c.AllowCredentials && slices.Contains(c.AllowedOrigins, "*") {
+			return nil, errors.New(`config invalid: server.cors.allow_credentials cannot be combined with the "*" origin; list the origins instead`)
+		}
+		if c.MaxAgeSeconds < 0 {
+			return nil, fmt.Errorf("config invalid: server.cors.max_age_seconds=%d (want 0 or more)", c.MaxAgeSeconds)
+		}
+	}
 	if cfg.Server.ExperimentalHTTP3 && !cfg.Server.TLS.Enabled() {
 		return nil, errors.New("config invalid: server.experimental_http3 requires server.tls.cert_file and server.tls.key_file")
 	}
 	return cfg, nil
+}
+
+// splitList splits each entry of list on commas, trimming spaces and dropping
+// empty items, so ["a, b"] from an environment variable and ["a", "b"] from
+// TOML read the same.
+func splitList(list []string) []string {
+	var out []string
+	for _, entry := range list {
+		for item := range strings.SplitSeq(entry, ",") {
+			if item = strings.TrimSpace(item); item != "" {
+				out = append(out, item)
+			}
+		}
+	}
+	return out
 }
 
 // validMCPTransport reports whether t is one of the supported MCP transports.

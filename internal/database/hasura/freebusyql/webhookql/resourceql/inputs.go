@@ -34,8 +34,6 @@ type CreateInput struct {
 	Id string `json:"id"`
 	// Name sets the "name" column (required).
 	Name string `json:"name"`
-	// OrganizationalUnit sets the "organizationalUnit" column; the zero value is omitted (column default / NULL).
-	OrganizationalUnit string `json:"organizationalUnit,omitzero"`
 	// PreviousSecret sets the "previousSecret" column; the zero value is omitted (column default / NULL).
 	PreviousSecret string `json:"previousSecret,omitzero"`
 	// RotateTime sets the "rotateTime" column; the zero value is omitted (column default / NULL).
@@ -64,8 +62,6 @@ type UpdateInput struct {
 	Id graphql.Nullable[string] `json:"id"`
 	// Update the 'name' column in the 'webhook_resource' collection.
 	Name graphql.Nullable[string] `json:"name"`
-	// Update the 'organizational_unit' column in the 'webhook_resource' collection.
-	OrganizationalUnit graphql.Nullable[string] `json:"organizationalUnit"`
 	// Update the 'previous_secret' column in the 'webhook_resource' collection.
 	PreviousSecret graphql.Nullable[string] `json:"previousSecret"`
 	// Update the 'rotate_time' column in the 'webhook_resource' collection.

@@ -20,13 +20,13 @@ Over REST the same status comes wrapped in `error`, with the HTTP status as
   "error": {
     "code": 400,
     "status": "FAILED_PRECONDITION",
-    "message": "Hold organizationalUnits/riverside/holds/h1 is expired, so it no longer holds the resources. Take a new hold with CreateHold (POST /v1/organizationalUnits/riverside/holds) and create the reservation from it; if settling takes long, ExtendHold before expire_time.",
+    "message": "Hold holds/h1 is expired, so it no longer holds the resources. Take a new hold with CreateHold (POST /v1/holds) and create the reservation from it; if settling takes long, ExtendHold before expire_time.",
     "details": [
       { "@type": "type.googleapis.com/google.rpc.ErrorInfo",
         "reason": "HOLD_NOT_ACTIVE", "domain": "freebusy.dev" },
       { "@type": "type.googleapis.com/google.rpc.PreconditionFailure",
         "violations": [{ "type": "HOLD_NOT_ACTIVE",
-                         "subject": "organizationalUnits/riverside/holds/h1",
+                         "subject": "holds/h1",
                          "description": "…the same sentences as the message" }] }
     ]
   }
@@ -113,15 +113,6 @@ Domain `freebusy.dev`.
 
 | Reason | Code | Means | Do | Retry? |
 |---|---|---|---|---|
-| `ORGANIZATION_REQUIRED` | `INVALID_ARGUMENT` | A site (organizational unit) must belong to an organization, and the request names none. | Create the organization first and send its name. | No |
-| `ORGANIZATION_NOT_FOUND` | `NOT_FOUND` | The organization named does not exist. | Check the name, or `ListOrganizations`. | No |
-| `ORGANIZATION_DELETED` | `NOT_FOUND` | The organization is deleted; a site under it cannot serve or be restored. Returned as `NOT_FOUND`, or `FAILED_PRECONDITION` on `UndeleteOrganizationalUnit`. | `UndeleteOrganization` first, or use a live one. | No |
-| `ORGANIZATION_HAS_SITES` | `FAILED_PRECONDITION` | An organization with sites cannot be deleted. | Delete or move its sites first. | No |
-| `SITE_REQUIRED` | `INVALID_ARGUMENT` | A resource is booked at a site, and the request names none. | Send its `organizational_unit`. | No |
-| `SITE_NOT_FOUND` | `NOT_FOUND` | The site named does not exist. | Check the name, or `ListOrganizationalUnits`. | No |
-| `SITE_DELETED` | `NOT_FOUND` | The site is deleted. | `UndeleteOrganizationalUnit`, or use a live site. | No |
-| `SITE_WITHOUT_ORGANIZATION` | `FAILED_PRECONDITION` | The site belongs to no organization, so nothing is served there. | Set its `organization`. | No |
-| `SITE_HAS_RESOURCES` | `FAILED_PRECONDITION` | A site with resources cannot be deleted. | Delete or move its resources first. | No |
 | `CALENDAR_NOT_FOUND` | `NOT_FOUND` | The calendar named does not exist. | Check the parent, or `ListCalendars`. | No |
 | `CALENDAR_DELETED` | `FAILED_PRECONDITION` | Nothing can be added to a deleted calendar. | `UndeleteCalendar`, or use a live one. | No |
 | `CALENDAR_NOT_EMPTY` | `FAILED_PRECONDITION` | The calendar still has events or availability. | Send `force=true`, or delete them first. | No |
@@ -147,16 +138,16 @@ Domain `freebusy.dev`.
 
 | Reason | Code | Means | Do | Retry? |
 |---|---|---|---|---|
-| `INVALID_TIME_ZONE` | `INVALID_ARGUMENT` | `time_zone` is not an IANA zone name. | Use one such as `Europe/London`, or leave it empty for the site's own. | No |
+| `INVALID_TIME_ZONE` | `INVALID_ARGUMENT` | `time_zone` is not an IANA zone name. | Use one such as `Europe/London`, or leave it empty for the zone of the first resource's calendar. | No |
 | `TOO_MANY_BUCKETS` | `INVALID_ARGUMENT` | The window would be answered in too many buckets. | A shorter window, a longer `slot_duration`, or day granularity. | No |
 | `INVALID_FILTER` | `INVALID_ARGUMENT` | `filter` (or `hold.candidate_filter` on `CreateHold`) is not an AIP-160 filter over a resource's search record: a syntax error, or a field it does not have. `BadRequest` names the field. | Filter on `resource_types`, `display_name`, `organizational_unit` and `attributes.<path>`, e.g. `resource_types:"room" AND attributes.view = "river"`. | No |
 | `FILTER_UNSUPPORTED` | `INVALID_ARGUMENT` | The filter is valid, but the backend the search records are read on cannot evaluate it: on a Hasura-only deployment (no `[database.postgres]`), a `:` on `resource_types`, since DDN over ndc-postgres has no comparison on array columns. `BadRequest` names the field. | Pass the types in the request's `resource_types` field instead, or configure Postgres for the server. | No |
 | `INVALID_ORDER_BY` | `INVALID_ARGUMENT` | `SearchAvailability`'s `order_by` names a field matches cannot be ordered by, or a direction other than `asc`/`desc`. | Order by `resource`, `organizational_unit`, `display_name`, `free_fraction` or `attributes.max_occupancy`. | No |
 | `ORDER_BY_UNSUPPORTED` | `INVALID_ARGUMENT` | `SearchAvailability`'s `order_by` is valid, but orders by an attribute path (`attributes.max_occupancy`) that the backend the search records are read on cannot sort by: DDN's order_by, on a Hasura-only deployment, has no JSON path expression. | Order by `resource`, `organizational_unit`, `display_name` or `free_fraction`, or configure Postgres for the server. | No |
-| `INVALID_FACET` | `INVALID_ARGUMENT` | `SearchAvailability`'s `facets` names a field resources cannot be counted by. | Count by `resource_types`, `organizational_unit`, `organization`, `display_name` or `attributes.<path>`. | No |
+| `INVALID_FACET` | `INVALID_ARGUMENT` | `SearchAvailability`'s `facets` names a field resources cannot be counted by. | Count by `resource_types`, `organizational_unit`, `display_name` or `attributes.<path>`. | No |
 | `INVALID_PAGE_TOKEN` | `INVALID_ARGUMENT` | `SearchAvailability`'s `page_token` is not one it returned. | Send `next_page_token` unchanged, with the same other fields, or leave it empty. | No |
 | `WINDOW_BEYOND_HORIZON` | `INVALID_ARGUMENT` | `SearchAvailability` with `order_by` or `facets` for a window outside the search records' horizon (yesterday to `[search] horizon_days` ahead). | Search inside the horizon, or leave `order_by` and `facets` empty. | No |
-| `ENGINE_BUSY` | `RESOURCE_EXHAUSTED` | `SearchAvailability`, `ComputeAvailability`, `BatchComputeAvailability`, `CheckAvailability` or `CreateHold`: as many availability evaluations as the server runs at once (`[engine] max_evaluations`) were running, and none finished within `[engine] admission_wait_ms`. Nothing was read or written. | Retry after a short randomized backoff; a narrower request (a resource type, fewer sites, a smaller page) is cheaper. | Yes |
+| `ENGINE_BUSY` | `RESOURCE_EXHAUSTED` | `SearchAvailability`, `ComputeAvailability`, `BatchComputeAvailability`, `CheckAvailability` or `CreateHold`: as many availability evaluations as the server runs at once (`[engine] max_evaluations`) were running, and none finished within `[engine] admission_wait_ms`. Nothing was read or written. | Retry after a short randomized backoff; a narrower request (a resource type, a tighter filter, a smaller page) is cheaper. | Yes |
 | `CAPACITY_EXHAUSTED` | `FAILED_PRECONDITION` | `CreateHold`: fewer resources are free for the whole window than were asked for. The race for the last one is lost this way too. | Ask for fewer, or another window; `ComputeAvailability` shows what is free. | No |
 | `OUTSIDE_AVAILABILITY` | `FAILED_PRECONDITION` | `CreateHold`: the window is outside the published availability of every resource asked about (closed then), so nothing is offered at all. A window that is offered but taken is `CAPACITY_EXHAUSTED`. | Ask for a window inside opening hours; `ComputeAvailability` shows what is offered and free. | No |
 | `INVALID_HOLD_EXTENSION` | `INVALID_ARGUMENT` | `ExtendHold`'s `duration` is zero, negative or above the maximum. | Extend by less, again before it expires if needed. | No |
@@ -176,7 +167,6 @@ Domain `freebusy.dev`.
 | Reason | Code | Means | Do | Retry? |
 |---|---|---|---|---|
 | `HOLD_NOT_FOUND` | `INVALID_ARGUMENT` | The reservation's `hold` does not exist, or `CreateHold`'s `hold.replaces` names one that does not. | Take a hold first with `CreateHold`; for `replaces`, send the reservation's `hold`. | No |
-| `HOLD_AT_ANOTHER_SITE` | `INVALID_ARGUMENT` | The hold is at a different site from the reservation's parent, or `CreateHold`'s `hold.replaces` is a hold at another site. | Send the hold's own site as `parent`; a hold replaces only a booking at its own site. | No |
 | `HOLD_LAPSED` | `FAILED_PRECONDITION` | The hold lapsed before the reservation was confirmed; the reservation failed. | Take a new hold and create the reservation again; hold longer, or `ExtendHold`. | No |
 | `RESERVATION_ID_TAKEN` | `ALREADY_EXISTS` | `reservation_id` names a reservation made from another hold. | Choose another id, or leave it empty. | No |
 | `RESERVATION_FAILED` | `FAILED_PRECONDITION` | `CancelReservation` on a reservation that failed; it holds nothing. | Nothing to do. | No |

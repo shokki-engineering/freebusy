@@ -20,15 +20,11 @@ option java_package = "engineering.shokki.freebusy.allocation.v1";
 
 // Request message for AllocationService.ComputeAvailability.
 message ComputeAvailabilityRequest {
-  // The site whose resources to compute over.
-  // Format: organizationalUnits/{organizational_unit}
-  string parent = 1 [
-    (google.api.field_behavior) = REQUIRED,
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+$"
-  ];
+  reserved 1;
+  reserved "parent";
 
   // Restrict the computation to these resources. Empty means every resource
-  // the site holds.
+  // `filter` matches.
   // Format: resources/{resource}
   repeated string resources = 2 [
     (google.api.field_behavior) = OPTIONAL,
@@ -51,19 +47,20 @@ message ComputeAvailabilityRequest {
   google.protobuf.Duration slot_duration = 5 [(google.api.field_behavior) = OPTIONAL];
 
   // IANA time zone the day boundaries are drawn in, e.g. "Asia/Kolkata".
-  // Defaults to the site's zone. Required in effect for DAY granularity, since
-  // "a night" has no meaning without one.
+  // Defaults to the zone of the first resource's calendar. Required in effect
+  // for DAY granularity, since "a night" has no meaning without one.
   string time_zone = 6 [(google.api.field_behavior) = OPTIONAL];
 
-  // Populate AvailabilityBucket.free_resources. Off by default: a large site
+  // Populate AvailabilityBucket.free_resources. Off by default: a large pool
   // would otherwise repeat every resource name in every bucket.
   bool include_free_resources = 7 [(google.api.field_behavior) = OPTIONAL];
 
   // An AIP-160 filter over each resource's search record (ResourceDay): its
   // `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
   // `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-  // `display_name` (a bare word matches it) and `organizational_unit`. Terms
-  // are ANDed unless joined with OR. Empty matches every resource.
+  // `display_name` (a bare word matches it) and `organizational_unit` (the
+  // resource's own, as data). Terms are ANDed unless joined with OR. Empty
+  // matches every resource.
   // Only matching resources are computed over or counted.
   string filter = 8 [(google.api.field_behavior) = OPTIONAL];
 }
@@ -79,15 +76,11 @@ message ComputeAvailabilityResponse {
 
 // Request message for AllocationService.CheckAvailability.
 message CheckAvailabilityRequest {
-  // The site whose resources to check.
-  // Format: organizationalUnits/{organizational_unit}
-  string parent = 1 [
-    (google.api.field_behavior) = REQUIRED,
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+$"
-  ];
+  reserved 1;
+  reserved "parent";
 
-  // Restrict the check to these resources. Empty means every resource the site
-  // holds.
+  // Restrict the check to these resources. Empty means every resource
+  // `filter` matches.
   // Format: resources/{resource}
   repeated string resources = 2 [
     (google.api.field_behavior) = OPTIONAL,
@@ -109,8 +102,9 @@ message CheckAvailabilityRequest {
   // An AIP-160 filter over each resource's search record (ResourceDay): its
   // `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
   // `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-  // `display_name` (a bare word matches it) and `organizational_unit`. Terms
-  // are ANDed unless joined with OR. Empty matches every resource.
+  // `display_name` (a bare word matches it) and `organizational_unit` (the
+  // resource's own, as data). Terms are ANDed unless joined with OR. Empty
+  // matches every resource.
   // Only matching resources are checked.
   string filter = 5 [(google.api.field_behavior) = OPTIONAL];
 }
@@ -133,8 +127,8 @@ message CheckAvailabilityResponse {
 }
 
 // Request message for AllocationService.BatchComputeAvailability. Each entry is
-// a full ComputeAvailabilityRequest, so sites, windows and granularities may
-// differ within one batch.
+// a full ComputeAvailabilityRequest, so resources, windows and granularities
+// may differ within one batch.
 message BatchComputeAvailabilityRequest {
   // The computations to run. Capped at 50 to bound the calendar reads a single
   // call can trigger.
@@ -153,16 +147,12 @@ message BatchComputeAvailabilityResponse {
   repeated ComputeAvailabilityResponse responses = 1;
 }
 
-// Request message for AllocationService.SearchAvailability. Sweeps a whole
-// operator for resources free across a window, where ComputeAvailability
-// answers for one site already chosen.
+// Request message for AllocationService.SearchAvailability. Searches every
+// resource for those free across a window, where ComputeAvailability counts
+// over resources already chosen.
 message SearchAvailabilityRequest {
-  // The operator to search within.
-  // Format: organizations/{organization}
-  string parent = 1 [
-    (google.api.field_behavior) = REQUIRED,
-    (buf.validate.field).string.pattern = "^organizations/[^/]+$"
-  ];
+  reserved 1, 3, 5;
+  reserved "parent", "organizational_units", "quantity";
 
   // The window that must be free.
   google.type.Interval window = 2 [
@@ -170,24 +160,10 @@ message SearchAvailabilityRequest {
     (buf.validate.field).required = true
   ];
 
-  // Restrict to sites, e.g. one car park or one venue. Empty searches all.
-  // Format: organizationalUnits/{organizational_unit}
-  repeated string organizational_units = 3 [
-    (google.api.field_behavior) = OPTIONAL,
-    (google.api.resource_reference).type = "the-protobuf-project.org/OrganizationalUnit"
-  ];
-
   // Restrict to RESOURCE-TYPE values, RFC 9073 section 6.3, e.g. "room" or
   // "parking-bay": a resource matches when it carries any of them. Empty
   // matches every type.
   repeated string resource_types = 4 [(google.api.field_behavior) = OPTIONAL];
-
-  // How many resources must be free together at one site for it to match.
-  // Defaults to 1.
-  int32 quantity = 5 [
-    (google.api.field_behavior) = OPTIONAL,
-    (buf.validate.field).int32.gte = 0
-  ];
 
   // Maximum matches to return. Defaults to 50, capped at 1000.
   int32 page_size = 6 [
@@ -205,8 +181,9 @@ message SearchAvailabilityRequest {
   // An AIP-160 filter over each resource's search record (ResourceDay): its
   // `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
   // `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-  // `display_name` (a bare word matches it) and `organizational_unit`. Terms
-  // are ANDed unless joined with OR. Empty matches every resource.
+  // `display_name` (a bare word matches it) and `organizational_unit` (the
+  // resource's own, as data). Terms are ANDed unless joined with OR. Empty
+  // matches every resource.
   string filter = 8 [(google.api.field_behavior) = OPTIONAL];
 
   // AIP-132 order of the matches: a comma-separated list of `resource`,
@@ -214,8 +191,7 @@ message SearchAvailabilityRequest {
   // the window's first UTC day that is free) and `attributes.max_occupancy`
   // (the booking profile's, as a number), each optionally followed by
   // ` desc`, e.g. `free_fraction desc, display_name`. Defaults to
-  // `organizational_unit, resource`. When quantity is above 1, matches are
-  // grouped by site first, and the order applies within a site.
+  // `resource`.
   string order_by = 9 [(google.api.field_behavior) = OPTIONAL];
 
   // Fields to count matching resources by, returned in

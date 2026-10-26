@@ -26,6 +26,7 @@ go_test(
     name = "config_test",
     srcs = [
         "config_test.go",
+        "cors_test.go",
         "profile_test.go",
     ],
     embed = [":config"],

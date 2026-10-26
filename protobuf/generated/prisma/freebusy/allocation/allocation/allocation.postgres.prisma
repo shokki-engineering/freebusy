@@ -20,7 +20,7 @@ model Hold {
   /// Unique identifier for the record.
   id String @id @default(ulid()) @map("id")
 
-  /// The hold name. Nested under the site whose resources it takes, so a hold is listed and swept per site without joining through every resource. Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  /// The hold name. Top-level: a hold takes resources wherever they are, and grouping them by place is the business of whatever is built on top. Format: holds/{hold}
   name String @unique @map("name")
 
   /// The window held. Immutable: moving it is a different allocation, so release this hold and take another. Stored as text, its two ends in RFC 3339 joined by "/".
@@ -47,19 +47,16 @@ model Hold {
   /// Opaque version for optimistic concurrency (AIP-154); echo on update/delete.
   etag String? @map("etag")
 
-  /// The hold of the reservation this hold is taken to replace with RescheduleReservation: that reservation's `hold`, converted and at the same site. Its claims do not count against this hold, so a new window overlapping the old one -- an extension, a shift by an hour -- can keep the same resources. Until the move completes this hold claims only the time the old one does not; RescheduleReservation hands the rest over in the write that ends the old hold, so no one else can take it in between. Such a hold can only be used to reschedule that reservation. (A hold, though no resource_reference says so: AIP-121 allows no cycle of mutable references, and this one is a hold naming a hold.) Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  /// The hold of the reservation this hold is taken to replace with RescheduleReservation: that reservation's `hold`, converted. Its claims do not count against this hold, so a new window overlapping the old one -- an extension, a shift by an hour -- can keep the same resources. Until the move completes this hold claims only the time the old one does not; RescheduleReservation hands the rest over in the write that ends the old hold, so no one else can take it in between. Such a hold can only be used to reschedule that reservation. (A hold, though no resource_reference says so: AIP-121 allows no cycle of mutable references, and this one is a hold naming a hold.) Format: holds/{hold}
   replaces String? @map("replaces")
 
   /// An AIP-160 filter narrowing the resources the allocator may choose from, supplied on create, alongside `candidate_resources`: the same filter SearchAvailability takes, over each resource's `resource_types`, `attributes` (its STRUCTURED-DATA, e.g. `attributes.view = "river"`) and `display_name`. Empty narrows nothing. Immutable, like the candidates.
   candidateFilter String? @map("candidate_filter")
 
-  /// Parent reference to OrganizationalUnit (from the AIP resource pattern). Foreign key to orgunit.organizational_units(id) in database rfc (discovered, constraint only, no relation).
-  organizationalUnitID String @map("organizational_unit_id")
-
   /// The concrete resources this hold has taken, one per unit of `quantity`. Chosen by the server from the candidates the request offered. Format: resources/{resource}
   resources String[] @map("resources")
 
-  /// Candidate resources the allocator may choose from, supplied on create. Empty offers every resource the site holds. Immutable: the choice is made once, and re-offering a different set is a different allocation. Format: resources/{resource}
+  /// Candidate resources the allocator may choose from, supplied on create. Empty offers every resource, narrowed by `candidate_filter`. Immutable: the choice is made once, and re-offering a different set is a different allocation. Format: resources/{resource}
   candidateResources String[] @map("candidate_resources")
 
   /// Back-relation: Allocation records that reference this model via hold.
@@ -72,8 +69,6 @@ model Hold {
   @@index([updateTime])
   /// Composite index on [state, expire_time].
   @@index([state, expireTime])
-  /// Composite index on [organizational_unit_id, id].
-  @@index([organizationalUnitID, id])
   /// GIN index: case-insensitive contains (ILIKE '%…%') cannot use a B-tree.
   @@index([idempotencyKey(ops: raw("gin_trgm_ops"))], type: Gin)
   /// GIN index: tag containment (@>) cannot use a B-tree.
@@ -86,12 +81,12 @@ model Hold {
   @@schema("allocation")
 }
 
-/// An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it. It sits under the site and names its hold, rather than nesting under the hold: the engine asks about allocations by resource and time across a whole site, never hold by hold, and a hold with child resources would owe DeleteHold a `force` flag guarding rows no caller can see.
+/// An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it. It is top-level and names its hold, rather than nesting under the hold: the engine asks about allocations by resource and time, never hold by hold, and a hold with child resources would owe DeleteHold a `force` flag guarding rows no caller can see.
 model Allocation {
   /// Unique identifier for the record.
   id String @id @default(ulid()) @map("id")
 
-  /// The allocation name, under the site whose resource it takes. Format: organizationalUnits/{organizational_unit}/allocations/{allocation}
+  /// The allocation name. Format: allocations/{allocation}
   name String @unique @map("name")
 
   /// The resource taken. Format: resources/{resource} Foreign key to resource.entity(name) in database rfc (discovered, constraint only, no relation).
@@ -109,21 +104,16 @@ model Allocation {
   /// Creation timestamp.
   createTime DateTime @default(now()) @freebusy.Timestamptz(6) @map("create_time")
 
-  /// The hold that took it. Deleting the hold deletes its allocations with it. Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  /// The hold that took it. Deleting the hold deletes its allocations with it. Format: holds/{hold}
   holdID String? @map("hold")
 
   /// Relation to Hold via hold.
-  hold Hold? @relation(fields: [holdID], references: [name])
-
-  /// Parent reference to OrganizationalUnit (from the AIP resource pattern). Foreign key to orgunit.organizational_units(id) in database rfc (discovered, constraint only, no relation).
-  organizationalUnitID String @map("organizational_unit_id")
+  hold Hold? @relation(fields: [holdID], references: [id])
 
   /// Composite index on [resource, start_time, end_time].
   @@index([resource, startTime, endTime])
   /// Index on [resource].
   @@index([resource])
-  /// Composite index on [organizational_unit_id, id].
-  @@index([organizationalUnitID, id])
   /// Index on [hold].
   @@index([holdID])
   /// Maps the model to the "resource" table in the database.

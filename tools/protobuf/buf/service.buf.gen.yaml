@@ -101,12 +101,9 @@ inputs:
   # to the BSR head, and a regen then rewrites every RFC stub to whatever
   # upstream last pushed.
   - module: buf.build/the-protobuf-project/rfc:cc82b3b15066438ba44e89dad69e9f8a
-    # Only the RFC services freebusy serves get servers: the directory
-    # (Organizations, OrganizationalUnits), Resources, and the calendar
-    # services (Calendars, Events, Availabilities).
+    # Only the RFC services freebusy serves get servers: Resources and the
+    # calendar services (Calendars, Events, Availabilities).
     types:
-      - protobuf.rfc4519.organization.v1.Organizations
-      - protobuf.rfc4519.organizational_unit.v1.OrganizationalUnits
       - protobuf.rfc9073.resource.v1.Resources
       - protobuf.rfc5545.calendar.v1.Calendars
       - protobuf.rfc5545.event.v1.Events

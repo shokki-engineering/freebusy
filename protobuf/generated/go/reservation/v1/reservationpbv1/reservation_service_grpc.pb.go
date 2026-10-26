@@ -53,7 +53,7 @@ type ReservationServiceClient interface {
 	CreateReservation(ctx context.Context, in *CreateReservationRequest, opts ...grpc.CallOption) (*Reservation, error)
 	// Retrieves one reservation.
 	GetReservation(ctx context.Context, in *GetReservationRequest, opts ...grpc.CallOption) (*Reservation, error)
-	// Lists a site's reservations.
+	// Lists reservations.
 	ListReservations(ctx context.Context, in *ListReservationsRequest, opts ...grpc.CallOption) (*ListReservationsResponse, error)
 	// Updates a confirmed reservation's customer or attributes, AIP-134.
 	//
@@ -174,7 +174,7 @@ type ReservationServiceServer interface {
 	CreateReservation(context.Context, *CreateReservationRequest) (*Reservation, error)
 	// Retrieves one reservation.
 	GetReservation(context.Context, *GetReservationRequest) (*Reservation, error)
-	// Lists a site's reservations.
+	// Lists reservations.
 	ListReservations(context.Context, *ListReservationsRequest) (*ListReservationsResponse, error)
 	// Updates a confirmed reservation's customer or attributes, AIP-134.
 	//

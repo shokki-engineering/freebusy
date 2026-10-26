@@ -21,14 +21,12 @@ import (
 	"slices"
 	"time"
 
-	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organizational_unit/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
 	"github.com/shokki-engineering/freebusy/internal/database/gorm/filterx"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/freebusy/allocation"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
-	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/orgunit"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"google.golang.org/genproto/googleapis/type/date"
@@ -39,7 +37,6 @@ import (
 // repositories report their writes.
 const (
 	typeResource     = "the-protobuf-project.org/Resource"
-	typeUnit         = "the-protobuf-project.org/OrganizationalUnit"
 	typeCalendar     = "the-protobuf-project.org/Calendar"
 	typeAvailability = "the-protobuf-project.org/Availability"
 	typeEvent        = "the-protobuf-project.org/Event"
@@ -107,19 +104,18 @@ func (p *DayProjection) Covers(window engine.Span, now time.Time) bool {
 }
 
 // targets are the resources a write changes and the days it changes them on:
-// named resources, and every resource on a calendar or at a site.
+// named resources, and every resource on a calendar.
 type targets struct {
 	resources map[string]engine.Spans
 	calendars map[string]engine.Spans
-	units     map[string]engine.Spans
 }
 
 func newTargets() targets {
-	return targets{resources: map[string]engine.Spans{}, calendars: map[string]engine.Spans{}, units: map[string]engine.Spans{}}
+	return targets{resources: map[string]engine.Spans{}, calendars: map[string]engine.Spans{}}
 }
 
 func (t targets) empty() bool {
-	return len(t.resources) == 0 && len(t.calendars) == 0 && len(t.units) == 0
+	return len(t.resources) == 0 && len(t.calendars) == 0
 }
 
 func add(m map[string]engine.Spans, key string, s engine.Span) {
@@ -142,13 +138,6 @@ func (p *DayProjection) targetsOf(changes []repox.Change) targets {
 			add(t.resources, c.Name, h)
 			if r, ok := c.Prior.(*resourcev1.Resource); ok && r.GetName() != "" {
 				add(t.resources, r.GetName(), h)
-			}
-		case typeUnit:
-			// Only the organization of a site is in the read model.
-			before, _ := c.Prior.(*organizational_unitv1.OrganizationalUnit)
-			after, _ := c.Record.(*organizational_unitv1.OrganizationalUnit)
-			if before == nil || after == nil || after.GetOrganization() == "" || before.GetOrganization() != after.GetOrganization() {
-				add(t.units, c.Name, h)
 			}
 		case typeCalendar:
 			add(t.calendars, c.Name, h)
@@ -280,9 +269,6 @@ func (p *DayProjection) rows(ctx context.Context, read repox.Conn, t targets, ch
 	if err := expand(ResourceQuery{Calendars: keys(t.calendars)}, t.calendars, (*resourcev1.Resource).GetCalendar); err != nil {
 		return out, err
 	}
-	if err := expand(ResourceQuery{OrganizationalUnits: keys(t.units)}, t.units, (*resourcev1.Resource).GetOrganizationalUnit); err != nil {
-		return out, err
-	}
 	if len(want) == 0 {
 		return out, nil
 	}
@@ -320,8 +306,8 @@ func (p *DayProjection) rows(ctx context.Context, read repox.Conn, t targets, ch
 // names for each.
 func (p *DayProjection) compute(ctx context.Context, read repox.Conn, store Store, recs []ResourceRecord, want map[string]engine.Spans, changes []repox.Change) ([]*allocationpbv1.ResourceDay, error) {
 	var span engine.Span
-	var names, calendars, units []string
-	seenCal, seenUnit := map[string]bool{}, map[string]bool{}
+	var names, calendars []string
+	seenCal := map[string]bool{}
 	for _, r := range recs {
 		n := r.Resource.GetName()
 		names = append(names, n)
@@ -336,10 +322,6 @@ func (p *DayProjection) compute(ctx context.Context, read repox.Conn, store Stor
 			seenCal[c] = true
 			calendars = append(calendars, c)
 		}
-		if u := r.Resource.GetOrganizationalUnit(); u != "" && !seenUnit[u] {
-			seenUnit[u] = true
-			units = append(units, u)
-		}
 	}
 	avs, err := store.Availability(ctx, calendars)
 	if err != nil {
@@ -350,10 +332,6 @@ func (p *DayProjection) compute(ctx context.Context, read repox.Conn, store Stor
 		return nil, err
 	}
 	claims, err := store.Claims(ctx, names, span, p.now())
-	if err != nil {
-		return nil, err
-	}
-	orgs, err := organizations(ctx, read, units)
 	if err != nil {
 		return nil, err
 	}
@@ -390,7 +368,6 @@ func (p *DayProjection) compute(ctx context.Context, read repox.Conn, store Stor
 				var secs time.Duration
 				row := &allocationpbv1.ResourceDay{
 					Resource:           n,
-					Organization:       orgs[res.GetOrganizationalUnit()],
 					OrganizationalUnit: res.GetOrganizationalUnit(),
 					Day:                &date.Date{Year: int32(d.Year()), Month: int32(d.Month()), Day: int32(d.Day())},
 					ResourceTypes:      slices.Clone(res.GetResourceTypes()),
@@ -469,22 +446,6 @@ func overlay(converted map[string]engine.Spans, avs map[string][]*availabilityv1
 		}
 	}
 	return out
-}
-
-// organizations maps each site to its organization.
-func organizations(ctx context.Context, read repox.Conn, units []string) (map[string]string, error) {
-	out := map[string]string{}
-	if len(units) == 0 {
-		return out, nil
-	}
-	found, err := orgunit.New(read).OrganizationalUnits.ListByKeys(ctx, "name", units, repox.ListInput{ShowDeleted: true})
-	if err != nil {
-		return nil, err
-	}
-	for _, u := range found {
-		out[u.GetName()] = u.GetOrganization()
-	}
-	return out, nil
 }
 
 // attributesOf merges every JSON object the resource's STRUCTURED-DATA

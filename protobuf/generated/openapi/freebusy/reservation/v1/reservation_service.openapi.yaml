@@ -21,19 +21,13 @@ info:
 servers:
     - url: https://freebusy.shokki.engineering
 paths:
-    /v1/organizationalUnits/{organizationalUnit}/reservations:
+    /v1/reservations:
         get:
             tags:
                 - ReservationService
-            description: Lists a site's reservations.
+            description: Lists reservations.
             operationId: ReservationService_ListReservations
             parameters:
-                - name: organizationalUnit
-                  in: path
-                  description: The organizationalUnit id.
-                  required: true
-                  schema:
-                    type: string
                 - name: pageSize
                   in: query
                   description: Maximum reservations to return. Defaults to 50, capped at 1000.
@@ -82,12 +76,6 @@ paths:
                  hold has lapsed or been released.
             operationId: ReservationService_CreateReservation
             parameters:
-                - name: organizationalUnit
-                  in: path
-                  description: The organizationalUnit id.
-                  required: true
-                  schema:
-                    type: string
                 - name: reservationId
                   in: query
                   description: |-
@@ -115,19 +103,13 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/organizationalUnits/{organizationalUnit}/reservations/{reservation}:
+    /v1/reservations/{reservation}:
         get:
             tags:
                 - ReservationService
             description: Retrieves one reservation.
             operationId: ReservationService_GetReservation
             parameters:
-                - name: organizationalUnit
-                  in: path
-                  description: The organizationalUnit id.
-                  required: true
-                  schema:
-                    type: string
                 - name: reservation
                   in: path
                   description: The reservation id.
@@ -160,12 +142,6 @@ paths:
                  reservation is confirmed.
             operationId: ReservationService_UpdateReservation
             parameters:
-                - name: organizationalUnit
-                  in: path
-                  description: The organizationalUnit id.
-                  required: true
-                  schema:
-                    type: string
                 - name: reservation
                   in: path
                   description: The reservation id.
@@ -201,7 +177,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/organizationalUnits/{organizationalUnit}/reservations/{reservation}:cancel:
+    /v1/reservations/{reservation}:cancel:
         post:
             tags:
                 - ReservationService
@@ -212,12 +188,6 @@ paths:
                  nothing.
             operationId: ReservationService_CancelReservation
             parameters:
-                - name: organizationalUnit
-                  in: path
-                  description: The organizationalUnit id.
-                  required: true
-                  schema:
-                    type: string
                 - name: reservation
                   in: path
                   description: The reservation id.
@@ -243,7 +213,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /v1/organizationalUnits/{organizationalUnit}/reservations/{reservation}:reschedule:
+    /v1/reservations/{reservation}:reschedule:
         post:
             tags:
                 - ReservationService
@@ -262,12 +232,6 @@ paths:
                  repeating the call with the same hold returns the same replacement.
             operationId: ReservationService_RescheduleReservation
             parameters:
-                - name: organizationalUnit
-                  in: path
-                  description: The organizationalUnit id.
-                  required: true
-                  schema:
-                    type: string
                 - name: reservation
                   in: path
                   description: The reservation id.
@@ -302,7 +266,7 @@ components:
             properties:
                 name:
                     type: string
-                    description: 'Format: organizationalUnits/{organizational_unit}/reservations/{reservation}'
+                    description: 'Format: reservations/{reservation}'
                 reason:
                     type: string
                     description: Why, in the canceller's words. Recorded, never parsed.
@@ -342,14 +306,14 @@ components:
                     type: string
                     description: |-
                         The confirmed reservation to move.
-                         Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                         Format: reservations/{reservation}
                 hold:
                     type: string
                     description: |-
-                        A live hold at the same site on the new window, taken by the caller with
+                        A live hold on the new window, taken by the caller with
                          HoldService.CreateHold. Taking it first is what makes the move safe: the
                          new slot is secured before the old one is let go.
-                         Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                         Format: holds/{hold}
                 etag:
                     type: string
                     description: |-
@@ -366,12 +330,12 @@ components:
                     description: |-
                         The reservation name. Its id is the caller's reservation_id, or else the
                          id of the hold it was made from.
-                         Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                         Format: reservations/{reservation}
                 hold:
                     type: string
                     description: |-
-                        The hold this reservation was made from, at the same site.
-                         Format: organizationalUnits/{organizational_unit}/holds/{hold}
+                        The hold this reservation was made from.
+                         Format: holds/{hold}
                 resources:
                     readOnly: true
                     type: array
@@ -442,13 +406,13 @@ components:
                     description: |-
                         The reservation this one replaced, set when it was made by
                          RescheduleReservation.
-                         Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                         Format: reservations/{reservation}
                 replacement:
                     readOnly: true
                     type: string
                     description: |-
                         The reservation replacing this one, set when RescheduleReservation began.
-                         Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+                         Format: reservations/{reservation}
                 lastChange:
                     readOnly: true
                     type: integer

@@ -41,13 +41,13 @@ func feeds(r Repositories) []events.Feed {
 	return []events.Feed{
 		events.NewFeed(holds),
 		events.NewFeed(reservationFeed(r.Reservations)),
-		events.NewFeed(lifecycleFeed("resources", "resource", []string{"organizational_unit"},
+		events.NewFeed(lifecycleFeed("resources", "resource", nil,
 			func(ctx context.Context, q events.Query) ([]*resourcev1.Resource, string, error) {
 				return r.Resources.List(ctx, inventory(q))
 			},
 			func(m *resourcev1.Resource) (string, events.Change) {
 				return servicex.Lifecycle(m.GetCreateTime(), m.GetUpdateTime(), m.GetDeleteTime()),
-					events.Change{Time: servicex.Time(m.GetUpdateTime()), Scope: m.GetOrganizationalUnit()}
+					events.Change{Time: servicex.Time(m.GetUpdateTime())}
 			})),
 		events.NewFeed(lifecycleFeed("calendars", "calendar", nil,
 			func(ctx context.Context, q events.Query) ([]*calendarv1.Calendar, string, error) {

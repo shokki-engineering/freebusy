@@ -660,10 +660,6 @@ definition:
               type:
                 name: text
                 type: named
-            organizational_unit_id:
-              type:
-                name: text
-                type: named
             quantity:
               type:
                 type: nullable
@@ -700,12 +696,7 @@ definition:
               type:
                 name: text
                 type: named
-          foreign_keys:
-            fk_holds_organizational_unit_id:
-              column_mapping:
-                organizational_unit_id:
-                  - id
-              foreign_collection: orgunit_organizational_units
+          foreign_keys: {}
         allocation_resource:
           fields:
             create_time:
@@ -736,10 +727,6 @@ definition:
               type:
                 name: text
                 type: named
-            organizational_unit_id:
-              type:
-                name: text
-                type: named
             resource:
               type:
                 name: text
@@ -749,11 +736,6 @@ definition:
                 name: timestamptz
                 type: named
           foreign_keys:
-            fk_resource_organizational_unit_id:
-              column_mapping:
-                organizational_unit_id:
-                  - id
-              foreign_collection: orgunit_organizational_units
             fk_resource_resource:
               column_mapping:
                 resource:
@@ -797,12 +779,6 @@ definition:
               type:
                 name: text
                 type: named
-            organization:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
             organizational_unit:
               type:
                 type: nullable
@@ -3834,10 +3810,6 @@ definition:
               type:
                 name: text
                 type: named
-            organizational_unit_id:
-              type:
-                name: text
-                type: named
             quantity:
               type:
                 type: nullable
@@ -3929,12 +3901,6 @@ definition:
               type:
                 name: text
                 type: named
-            organization:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
             organizational_unit:
               type:
                 type: nullable
@@ -4005,10 +3971,6 @@ definition:
                 name: text
                 type: named
             name:
-              type:
-                name: text
-                type: named
-            organizational_unit_id:
               type:
                 name: text
                 type: named
@@ -7039,10 +7001,6 @@ definition:
                   name: text
                   type: named
             name:
-              type:
-                name: text
-                type: named
-            organizational_unit_id:
               type:
                 name: text
                 type: named
@@ -10095,12 +10053,6 @@ definition:
               type:
                 name: text
                 type: named
-            organizational_unit:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
             previous_secret:
               type:
                 type: nullable
@@ -10951,10 +10903,6 @@ definition:
               type:
                 name: text
                 type: named
-            organizational_unit_id:
-              type:
-                name: text
-                type: named
             replacement:
               type:
                 type: nullable
@@ -10993,12 +10941,7 @@ definition:
               type:
                 name: timestamptz
                 type: named
-          foreign_keys:
-            fk_resource_organizational_unit_id:
-              column_mapping:
-                organizational_unit_id:
-                  - id
-              foreign_collection: orgunit_organizational_units
+          foreign_keys: {}
         resource_entity:
           fields:
             calendar:
@@ -11924,13 +11867,6 @@ definition:
                 underlying_type:
                   name: update_column_allocation_holds_name
                   type: named
-            organizational_unit_id:
-              description: Update the 'organizational_unit_id' column in the 'allocation_holds' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_allocation_holds_organizational_unit_id
-                  type: named
             quantity:
               description: Update the 'quantity' column in the 'allocation_holds' collection.
               type:
@@ -12035,13 +11971,6 @@ definition:
                 underlying_type:
                   name: update_column_allocation_resource_name
                   type: named
-            organizational_unit_id:
-              description: Update the 'organizational_unit_id' column in the 'allocation_resource' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_allocation_resource_organizational_unit_id
-                  type: named
             resource:
               description: Update the 'resource' column in the 'allocation_resource' collection.
               type:
@@ -12124,13 +12053,6 @@ definition:
                 type: nullable
                 underlying_type:
                   name: update_column_allocation_resource_days_id
-                  type: named
-            organization:
-              description: Update the 'organization' column in the 'allocation_resource_days' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_allocation_resource_days_organization
                   type: named
             organizational_unit:
               description: Update the 'organizational_unit' column in the 'allocation_resource_days' collection.
@@ -13273,15 +13195,6 @@ definition:
                 name: text
                 type: named
           foreign_keys: {}
-        update_column_allocation_holds_organizational_unit_id:
-          description: Update the 'organizational_unit_id' column in the 'allocation_holds' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: text
-                type: named
-          foreign_keys: {}
         update_column_allocation_holds_quantity:
           description: Update the 'quantity' column in the 'allocation_holds' collection
           fields:
@@ -13428,17 +13341,6 @@ definition:
                 name: text
                 type: named
           foreign_keys: {}
-        update_column_allocation_resource_days_organization:
-          description: Update the 'organization' column in the 'allocation_resource_days' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-          foreign_keys: {}
         update_column_allocation_resource_days_organizational_unit:
           description: Update the 'organizational_unit' column in the 'allocation_resource_days' collection
           fields:
@@ -13525,15 +13427,6 @@ definition:
           foreign_keys: {}
         update_column_allocation_resource_name:
           description: Update the 'name' column in the 'allocation_resource' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: text
-                type: named
-          foreign_keys: {}
-        update_column_allocation_resource_organizational_unit_id:
-          description: Update the 'organizational_unit_id' column in the 'allocation_resource' collection
           fields:
             _set:
               description: Set the column to this value
@@ -17856,15 +17749,6 @@ definition:
                 name: text
                 type: named
           foreign_keys: {}
-        update_column_reservation_resource_organizational_unit_id:
-          description: Update the 'organizational_unit_id' column in the 'reservation_resource' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: text
-                type: named
-          foreign_keys: {}
         update_column_reservation_resource_replacement:
           description: Update the 'replacement' column in the 'reservation_resource' collection
           fields:
@@ -22035,17 +21919,6 @@ definition:
                 name: text
                 type: named
           foreign_keys: {}
-        update_column_webhook_resource_organizational_unit:
-          description: Update the 'organizational_unit' column in the 'webhook_resource' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-          foreign_keys: {}
         update_column_webhook_resource_previous_secret:
           description: Update the 'previous_secret' column in the 'webhook_resource' collection
           fields:
@@ -24647,13 +24520,6 @@ definition:
                 type: nullable
                 underlying_type:
                   name: update_column_reservation_resource_name
-                  type: named
-            organizational_unit_id:
-              description: Update the 'organizational_unit_id' column in the 'reservation_resource' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_reservation_resource_organizational_unit_id
                   type: named
             replacement:
               description: Update the 'replacement' column in the 'reservation_resource' collection.
@@ -28231,13 +28097,6 @@ definition:
                 underlying_type:
                   name: update_column_webhook_resource_name
                   type: named
-            organizational_unit:
-              description: Update the 'organizational_unit' column in the 'webhook_resource' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_webhook_resource_organizational_unit
-                  type: named
             previous_secret:
               description: Update the 'previous_secret' column in the 'webhook_resource' collection.
               type:
@@ -29751,12 +29610,6 @@ definition:
               type:
                 name: text
                 type: named
-            organizational_unit:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
             previous_secret:
               type:
                 type: nullable
@@ -29789,12 +29642,7 @@ definition:
               type:
                 name: text
                 type: named
-          foreign_keys:
-            fk_resource_organizational_unit:
-              column_mapping:
-                organizational_unit:
-                  - name
-              foreign_collection: orgunit_organizational_units
+          foreign_keys: {}
       procedures:
         - arguments:
             key_id:

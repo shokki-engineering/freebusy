@@ -51,8 +51,6 @@ type DeleteReservationResourceByIdResponse struct {
 		LastChange *string `graphql:"lastChange"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnitId selects the "organizationalUnitId" field.
-		OrganizationalUnitId string `graphql:"organizationalUnitId"`
 		// Replacement selects the "replacement" field; nil when the column is NULL.
 		Replacement *string `graphql:"replacement"`
 		// Replaces selects the "replaces" field; nil when the column is NULL.
@@ -98,8 +96,6 @@ type InsertReservationResourceResponse struct {
 		LastChange *string `graphql:"lastChange"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnitId selects the "organizationalUnitId" field.
-		OrganizationalUnitId string `graphql:"organizationalUnitId"`
 		// Replacement selects the "replacement" field; nil when the column is NULL.
 		Replacement *string `graphql:"replacement"`
 		// Replaces selects the "replaces" field; nil when the column is NULL.
@@ -143,8 +139,6 @@ type ReservationResource struct {
 	LastChange *string `graphql:"lastChange"`
 	// Name selects the "name" field.
 	Name string `graphql:"name"`
-	// OrganizationalUnitId selects the "organizationalUnitId" field.
-	OrganizationalUnitId string `graphql:"organizationalUnitId"`
 	// Replacement selects the "replacement" field; nil when the column is NULL.
 	Replacement *string `graphql:"replacement"`
 	// Replaces selects the "replaces" field; nil when the column is NULL.
@@ -292,17 +286,6 @@ type ReservationResourceAggExp struct {
 		// Min selects the "min" field; nil when the column is NULL.
 		Min *string `graphql:"min"`
 	} `graphql:"name"`
-	// OrganizationalUnitId selects the "organizationalUnitId" field.
-	OrganizationalUnitId struct {
-		// Count selects the "_count" field.
-		Count graphql.Int64 `graphql:"_count"`
-		// CountDistinct selects the "_count_distinct" field.
-		CountDistinct graphql.Int64 `graphql:"_count_distinct"`
-		// Max selects the "max" field; nil when the column is NULL.
-		Max *string `graphql:"max"`
-		// Min selects the "min" field; nil when the column is NULL.
-		Min *string `graphql:"min"`
-	} `graphql:"organizationalUnitId"`
 	// Replacement selects the "replacement" field.
 	Replacement struct {
 		// Count selects the "_count" field.
@@ -390,8 +373,6 @@ type UpdateReservationResourceByIdResponse struct {
 		LastChange *string `graphql:"lastChange"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnitId selects the "organizationalUnitId" field.
-		OrganizationalUnitId string `graphql:"organizationalUnitId"`
 		// Replacement selects the "replacement" field; nil when the column is NULL.
 		Replacement *string `graphql:"replacement"`
 		// Replaces selects the "replaces" field; nil when the column is NULL.

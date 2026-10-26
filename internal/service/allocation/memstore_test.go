@@ -53,9 +53,6 @@ func (m *memStore) Resources(_ context.Context, q ResourceQuery) ([]ResourceReco
 	var out []ResourceRecord
 	for _, r := range m.resources {
 		res := r.Resource
-		if len(q.OrganizationalUnits) > 0 && !slices.Contains(q.OrganizationalUnits, res.GetOrganizationalUnit()) {
-			continue
-		}
 		if len(q.Calendars) > 0 && !slices.Contains(q.Calendars, res.GetCalendar()) {
 			continue
 		}
@@ -122,7 +119,7 @@ func (m *memStore) claimsLocked(resources []string, window engine.Span, now time
 	return c
 }
 
-func (m *memStore) InsertHold(_ context.Context, _ string, h *allocationpbv1.Hold) (*allocationpbv1.Hold, error) {
+func (m *memStore) InsertHold(_ context.Context, h *allocationpbv1.Hold) (*allocationpbv1.Hold, error) {
 	if m.beforeInsert != nil {
 		f := m.beforeInsert
 		m.beforeInsert = nil
@@ -159,24 +156,24 @@ func (m *memStore) GetHold(_ context.Context, name string) (*allocationpbv1.Hold
 	return proto.Clone(h).(*allocationpbv1.Hold), nil
 }
 
-func (m *memStore) FindHold(_ context.Context, parent, key string) (*allocationpbv1.Hold, error) {
+func (m *memStore) FindHold(_ context.Context, key string) (*allocationpbv1.Hold, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	for _, n := range m.order {
 		h := m.holds[n]
-		if h != nil && h.GetIdempotencyKey() == key && len(n) > len(parent) && n[:len(parent)] == parent {
+		if h != nil && h.GetIdempotencyKey() == key {
 			return proto.Clone(h).(*allocationpbv1.Hold), nil
 		}
 	}
 	return nil, repox.ErrNotFound
 }
 
-func (m *memStore) ListHolds(_ context.Context, parent string, _ repox.ListInput) ([]*allocationpbv1.Hold, string, error) {
+func (m *memStore) ListHolds(_ context.Context, _ repox.ListInput) ([]*allocationpbv1.Hold, string, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	var out []*allocationpbv1.Hold
 	for _, n := range m.order {
-		if h := m.holds[n]; h != nil && n[:len(parent)] == parent {
+		if h := m.holds[n]; h != nil {
 			out = append(out, proto.Clone(h).(*allocationpbv1.Hold))
 		}
 	}

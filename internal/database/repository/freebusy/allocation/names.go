@@ -22,36 +22,34 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 )
 
-// FormatAllocationName builds "organizationalUnits/{organizational_unit}/allocations/{allocation}" from bare ids.
-func FormatAllocationName(organizationalUnit, allocation string) string {
-	return "organizationalUnits" + "/" + organizationalUnit + "/" + "allocations" + "/" + allocation
+// FormatAllocationName builds "allocations/{allocation}" from bare ids.
+func FormatAllocationName(allocation string) string {
+	return "allocations" + "/" + allocation
 }
 
-// ParseAllocationName splits a "organizationalUnits/{organizational_unit}/allocations/{allocation}" resource name into its bare ids,
+// ParseAllocationName splits a "allocations/{allocation}" resource name into its bare ids,
 // rejecting other shapes with repox.ErrInvalidArgument.
-func ParseAllocationName(name string) (organizationalUnit, allocation string, err error) {
-	ids, err := repox.SplitName(name, "organizationalUnits", "allocations")
+func ParseAllocationName(name string) (allocation string, err error) {
+	ids, err := repox.SplitName(name, "allocations")
 	if err != nil {
 		return
 	}
-	organizationalUnit = ids[0]
-	allocation = ids[1]
+	allocation = ids[0]
 	return
 }
 
-// FormatHoldName builds "organizationalUnits/{organizational_unit}/holds/{hold}" from bare ids.
-func FormatHoldName(organizationalUnit, hold string) string {
-	return "organizationalUnits" + "/" + organizationalUnit + "/" + "holds" + "/" + hold
+// FormatHoldName builds "holds/{hold}" from bare ids.
+func FormatHoldName(hold string) string {
+	return "holds" + "/" + hold
 }
 
-// ParseHoldName splits a "organizationalUnits/{organizational_unit}/holds/{hold}" resource name into its bare ids,
+// ParseHoldName splits a "holds/{hold}" resource name into its bare ids,
 // rejecting other shapes with repox.ErrInvalidArgument.
-func ParseHoldName(name string) (organizationalUnit, hold string, err error) {
-	ids, err := repox.SplitName(name, "organizationalUnits", "holds")
+func ParseHoldName(name string) (hold string, err error) {
+	ids, err := repox.SplitName(name, "holds")
 	if err != nil {
 		return
 	}
-	organizationalUnit = ids[0]
-	hold = ids[1]
+	hold = ids[0]
 	return
 }

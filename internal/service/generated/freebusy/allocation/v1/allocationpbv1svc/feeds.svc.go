@@ -60,17 +60,17 @@ func HoldEventType(r *allocationpbv1.Hold) string {
 }
 
 // HoldFeedSpec reads Hold changes through repo, ordered by
-// update time, across every parent (organizationalUnits/-), for runtime-go's events
+// update time, for runtime-go's events
 // dispatcher. Wrap it to change what an event is called or carries.
 func HoldFeedSpec(repo allocation.HoldRepository) events.FeedSpec[*allocationpbv1.Hold] {
 	return events.FeedSpec[*allocationpbv1.Hold]{
 		ID:       "freebusy.hold",
 		ReadMask: []string{"name", "etag", "update_time", "create_time", "state"},
 		List: func(ctx context.Context, q events.Query) ([]*allocationpbv1.Hold, string, error) {
-			return repo.List(ctx, "organizationalUnits/-", servicex.FeedInput(q))
+			return repo.List(ctx, servicex.FeedInput(q))
 		},
 		Change: func(r *allocationpbv1.Hold) events.Change {
-			return events.Change{Type: HoldEventType(r), Time: servicex.Time(r.GetUpdateTime()), Scope: servicex.Scope(r.GetName(), "organizationalUnits")}
+			return events.Change{Type: HoldEventType(r), Time: servicex.Time(r.GetUpdateTime())}
 		},
 		Data: func(r *allocationpbv1.Hold) ([]byte, error) { return protojson.Marshal(r) },
 	}

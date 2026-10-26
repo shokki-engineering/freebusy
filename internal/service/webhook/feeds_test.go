@@ -59,10 +59,10 @@ func TestReservationChange(t *testing.T) {
 		{reservationpbv1.ReservationState_RESERVATION_STATE_CANCELLED, stateChange, at(5000), "freebusy.reservation.cancelled"},
 		{reservationpbv1.ReservationState_RESERVATION_STATE_RESCHEDULED, stateChange, at(5000), "freebusy.reservation.rescheduled"},
 	} {
-		r := &reservationpbv1.Reservation{Name: "organizationalUnits/club/reservations/r1", State: c.state, LastChange: c.last, ConfirmTime: at(0), UpdateTime: c.update}
+		r := &reservationpbv1.Reservation{Name: "reservations/r1", State: c.state, LastChange: c.last, ConfirmTime: at(0), UpdateTime: c.update}
 		got := spec.Change(r)
-		if got.Type != c.want || got.Scope != "organizationalUnits/club" {
-			t.Errorf("Change(%v, %v) = %q scope %q, want %q", c.state, c.last, got.Type, got.Scope, c.want)
+		if got.Type != c.want || got.Scope != "" {
+			t.Errorf("Change(%v, %v) = %q scope %q, want %q unscoped", c.state, c.last, got.Type, got.Scope, c.want)
 		}
 	}
 }

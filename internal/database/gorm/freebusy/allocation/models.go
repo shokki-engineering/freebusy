@@ -42,8 +42,8 @@ const (
 // A Hold is a temporary, expiring claim on one or more bookable resources for a window, taken before payment or confirmation so two callers cannot be sold the same thing. Native, with no RFC behind it, and the comment says why (the same trade protobuf.shared.project.v1 records upstream). RFC 5545 section 3.2.12's PARTSTAT=TENTATIVE can express that a claim is provisional, and RFC 5546's iTIP can carry the request that created it, but neither specifies a lapse time, and an expiring claim is the one thing a commercial booking engine cannot do without. The resources held are RFC 9073 VRESOURCEs and the window is measured against their RFC 7953 availability; only the clock is ours. Holds are allocated, not requested: CreateHold names candidate resources and a quantity, and the server decides which concrete resources are taken. That keeps "which bay did I get" a server decision made under a lock, rather than a client guess that races.
 type Hold struct {
 	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null;index:idx_holds_organizational_unit_id_id,priority:2" json:"id"`
-	// The hold name. Nested under the site whose resources it takes, so a hold is listed and swept per site without joining through every resource. Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
+	// The hold name. Top-level: a hold takes resources wherever they are, and grouping them by place is the business of whatever is built on top. Format: holds/{hold}
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// The window held. Immutable: moving it is a different allocation, so release this hold and take another. Stored as text, its two ends in RFC 3339 joined by "/".
 	Window string `gorm:"column:window;not null" json:"window" validate:"required"`
@@ -61,27 +61,25 @@ type Hold struct {
 	UpdateTime time.Time `gorm:"column:update_time;type:timestamptz;not null;autoUpdateTime;index:idx_holds_update_time" json:"update_time"`
 	// Opaque version for optimistic concurrency (AIP-154); echo on update/delete.
 	Etag *string `gorm:"column:etag" json:"etag,omitempty"`
-	// The hold of the reservation this hold is taken to replace with RescheduleReservation: that reservation's `hold`, converted and at the same site. Its claims do not count against this hold, so a new window overlapping the old one -- an extension, a shift by an hour -- can keep the same resources. Until the move completes this hold claims only the time the old one does not; RescheduleReservation hands the rest over in the write that ends the old hold, so no one else can take it in between. Such a hold can only be used to reschedule that reservation. (A hold, though no resource_reference says so: AIP-121 allows no cycle of mutable references, and this one is a hold naming a hold.) Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	// The hold of the reservation this hold is taken to replace with RescheduleReservation: that reservation's `hold`, converted. Its claims do not count against this hold, so a new window overlapping the old one -- an extension, a shift by an hour -- can keep the same resources. Until the move completes this hold claims only the time the old one does not; RescheduleReservation hands the rest over in the write that ends the old hold, so no one else can take it in between. Such a hold can only be used to reschedule that reservation. (A hold, though no resource_reference says so: AIP-121 allows no cycle of mutable references, and this one is a hold naming a hold.) Format: holds/{hold}
 	Replaces *string `gorm:"column:replaces" json:"replaces,omitempty"`
 	// An AIP-160 filter narrowing the resources the allocator may choose from, supplied on create, alongside `candidate_resources`: the same filter SearchAvailability takes, over each resource's `resource_types`, `attributes` (its STRUCTURED-DATA, e.g. `attributes.view = "river"`) and `display_name`. Empty narrows nothing. Immutable, like the candidates.
 	CandidateFilter *string `gorm:"column:candidate_filter" json:"candidate_filter,omitempty"`
-	// Parent reference to OrganizationalUnit (from the AIP resource pattern). Foreign key to orgunit.organizational_units(id) in database rfc (discovered, constraint only, no relation).
-	OrganizationalUnitID string `gorm:"column:organizational_unit_id;not null;index:idx_holds_organizational_unit_id_id,priority:1" json:"organizational_unit_id" validate:"required"`
 	// The concrete resources this hold has taken, one per unit of `quantity`. Chosen by the server from the candidates the request offered. Format: resources/{resource}
 	Resources pq.StringArray `gorm:"column:resources;type:text[];index:idx_holds_resources_gin,type:gin" json:"resources,omitempty"`
-	// Candidate resources the allocator may choose from, supplied on create. Empty offers every resource the site holds. Immutable: the choice is made once, and re-offering a different set is a different allocation. Format: resources/{resource}
+	// Candidate resources the allocator may choose from, supplied on create. Empty offers every resource, narrowed by `candidate_filter`. Immutable: the choice is made once, and re-offering a different set is a different allocation. Format: resources/{resource}
 	CandidateResources pq.StringArray `gorm:"column:candidate_resources;type:text[];index:idx_holds_candidate_resources_gin,type:gin" json:"candidate_resources,omitempty"`
 	// Back-relation: Allocation records that reference this via hold.
-	Resource []Allocation `gorm:"foreignKey:HoldID;references:Name" json:"resource,omitempty"`
+	Resource []Allocation `gorm:"foreignKey:HoldID" json:"resource,omitempty"`
 }
 
 func (*Hold) TableName() string { return "allocation.holds" }
 
-// An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it. It sits under the site and names its hold, rather than nesting under the hold: the engine asks about allocations by resource and time across a whole site, never hold by hold, and a hold with child resources would owe DeleteHold a `force` flag guarding rows no caller can see.
+// An Allocation is one resource taken by one hold for one span: the row the engine counts when it asks what is already claimed. Storage-only. No RPC returns it -- callers see a Hold and its `resources` -- but a Hold cannot answer "who has bay 14 at 10:00" on its own: its window is one value and its resources a list, so an overlap query over holds would have to unpack both on every row. One row per resource, with the span as two indexed instants, makes that query a plain range scan on either backend. The span and `expire_time` are copies of the hold's, written in the same write as the hold. The copy is the point: a claim stops counting the instant `expire_time` passes, with no sweeper write needed, because every read filters on it. It is top-level and names its hold, rather than nesting under the hold: the engine asks about allocations by resource and time, never hold by hold, and a hold with child resources would owe DeleteHold a `force` flag guarding rows no caller can see.
 type Allocation struct {
 	// Unique identifier for the record.
-	ID string `gorm:"column:id;primaryKey;not null;index:idx_resource_organizational_unit_id_id,priority:2" json:"id"`
-	// The allocation name, under the site whose resource it takes. Format: organizationalUnits/{organizational_unit}/allocations/{allocation}
+	ID string `gorm:"column:id;primaryKey;not null" json:"id"`
+	// The allocation name. Format: allocations/{allocation}
 	Name string `gorm:"column:name;not null;uniqueIndex" json:"name" validate:"required"`
 	// The resource taken. Format: resources/{resource} Foreign key to resource.entity(name) in database rfc (discovered, constraint only, no relation).
 	Resource string `gorm:"column:resource;not null;index:idx_resource_resource_start_time_end_time,priority:1;index:idx_resource_resource" json:"resource" validate:"required"`
@@ -93,27 +91,23 @@ type Allocation struct {
 	ExpireTime *time.Time `gorm:"column:expire_time;type:timestamptz" json:"expire_time,omitempty"`
 	// Creation timestamp.
 	CreateTime time.Time `gorm:"column:create_time;type:timestamptz;not null;autoCreateTime" json:"create_time"`
-	// The hold that took it. Deleting the hold deletes its allocations with it. Format: organizationalUnits/{organizational_unit}/holds/{hold}
+	// The hold that took it. Deleting the hold deletes its allocations with it. Format: holds/{hold}
 	HoldID *string `gorm:"column:hold;index:idx_resource_hold" json:"hold,omitempty"`
-	Hold   *Hold   `gorm:"foreignKey:HoldID;references:Name" json:"hold_rel,omitempty"`
-	// Parent reference to OrganizationalUnit (from the AIP resource pattern). Foreign key to orgunit.organizational_units(id) in database rfc (discovered, constraint only, no relation).
-	OrganizationalUnitID string `gorm:"column:organizational_unit_id;not null;index:idx_resource_organizational_unit_id_id,priority:1" json:"organizational_unit_id" validate:"required"`
+	Hold   *Hold   `gorm:"foreignKey:HoldID" json:"hold_rel,omitempty"`
 }
 
 func (*Allocation) TableName() string { return "allocation.resource" }
 
-// A ResourceDay is one resource's standing free time on one UTC day: the availability read model SearchAvailability, ComputeAvailability, CheckAvailability and CreateHold read their candidates from, instead of evaluating every resource an operator has. Storage-only, and derived: no RPC takes or returns it. It is a projection of the resources, their sites, calendars, RFC 7953 availability, RFC 5545 events and the claims of converted holds, rewritten in the same transaction as every write to those (on Hasura, a single write projects in a request of its own right after it), for every day of a rolling horizon. `free` is offered time less booked time; live holds are not subtracted, and neither is a resource's booking policy applied, because both change with the clock. The engine evaluates every candidate the projection returns before answering, so an answer never depends on the projection being current; a stale row can only make a search miss a resource or read one it then drops.
+// A ResourceDay is one resource's standing free time on one UTC day: the availability read model SearchAvailability, ComputeAvailability, CheckAvailability and CreateHold read their candidates from, instead of evaluating every resource there is. Storage-only, and derived: no RPC takes or returns it. It is a projection of the resources, their calendars, RFC 7953 availability, RFC 5545 events and the claims of converted holds, rewritten in the same transaction as every write to those (on Hasura, a single write projects in a request of its own right after it), for every day of a rolling horizon. `free` is offered time less booked time; live holds are not subtracted, and neither is a resource's booking policy applied, because both change with the clock. The engine evaluates every candidate the projection returns before answering, so an answer never depends on the projection being current; a stale row can only make a search miss a resource or read one it then drops.
 type ResourceDay struct {
 	// The row's key: its key fields' values as a JSON array.
-	ID string `gorm:"column:id;primaryKey;not null;index:idx_resource_days_organization_day_id,priority:3;index:idx_resource_days_organizational_unit_day_id,priority:3;index:idx_resource_days_calendar_id,priority:2;index:idx_resource_days_organization_day_organizational_unit_resource_id,priority:5" json:"id"`
+	ID string `gorm:"column:id;primaryKey;not null;index:idx_resource_days_organizational_unit_day_id,priority:3;index:idx_resource_days_calendar_id,priority:2;index:idx_resource_days_day_resource_id,priority:3" json:"id"`
 	// The resource, "resources/{resource}". Not a resource reference: a projection row must never keep its source from being purged.
-	Resource string `gorm:"column:resource;not null;uniqueIndex:idx_resource_days_resource_day,priority:1;index:idx_resource_days_organization_day_organizational_unit_resource_id,priority:4" json:"resource" validate:"required"`
-	// The organization of the resource's site, "organizations/{organization}".
-	Organization string `gorm:"column:organization;index:idx_resource_days_organization_day_id,priority:1;index:idx_resource_days_organization_day_organizational_unit_resource_id,priority:1" json:"organization"`
-	// The resource's site, "organizationalUnits/{organizational_unit}".
-	OrganizationalUnit string `gorm:"column:organizational_unit;index:idx_resource_days_organizational_unit_day_id,priority:1;index:idx_resource_days_organization_day_organizational_unit_resource_id,priority:3" json:"organizational_unit"`
+	Resource string `gorm:"column:resource;not null;uniqueIndex:idx_resource_days_resource_day,priority:1;index:idx_resource_days_day_resource_id,priority:2" json:"resource" validate:"required"`
+	// The resource's own organizational_unit, copied as data for filtering: freebusy does not check or scope by it.
+	OrganizationalUnit string `gorm:"column:organizational_unit;index:idx_resource_days_organizational_unit_day_id,priority:1" json:"organizational_unit"`
 	// The UTC calendar day this row covers.
-	Day time.Time `gorm:"column:day;type:date;not null;uniqueIndex:idx_resource_days_resource_day,priority:2;index:idx_resource_days_organization_day_id,priority:2;index:idx_resource_days_organizational_unit_day_id,priority:2;index:idx_resource_days_organization_day_organizational_unit_resource_id,priority:2" json:"day" validate:"required"`
+	Day time.Time `gorm:"column:day;type:date;not null;uniqueIndex:idx_resource_days_resource_day,priority:2;index:idx_resource_days_organizational_unit_day_id,priority:2;index:idx_resource_days_day_resource_id,priority:1" json:"day" validate:"required"`
 	// The resource's free time within the day, [day 00:00Z, next day 00:00Z): offered by its availability, less confirmed events on its calendar and the claims of converted holds. Live holds are not subtracted.
 	Free string `gorm:"column:free;type:tstzmultirange;not null;index:idx_resource_days_free_gist,type:gist" json:"free" validate:"required"`
 	// RFC 9073 RESOURCE-TYPE values the resource carries.

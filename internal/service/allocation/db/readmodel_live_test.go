@@ -4,7 +4,7 @@
 package db
 
 // The availability read model (allocation.v1.ResourceDay) on each backend:
-// rebuilt for a seeded site, kept current by a converted hold's own write,
+// rebuilt for seeded courts, kept current by a converted hold's own write,
 // and read by search, check and hold, with filters and facets.
 //
 // On Hasura the read model is written through GraphQL: a Batch's projection
@@ -70,7 +70,7 @@ func TestLiveReadModel(t *testing.T) {
 			srv := allocation.NewServer(store, allocation.WithReadModel(dp, conn.SearchConn()))
 			search := conn.SearchConn()
 
-			// The site was seeded around the repositories: backfill it.
+			// The courts were seeded around the repositories: backfill them.
 			res, err := dp.RebuildResources(ctx, conn.Repox(), s.courts)
 			if err != nil {
 				t.Fatal(err)
@@ -89,10 +89,9 @@ func TestLiveReadModel(t *testing.T) {
 				t.Fatalf("court-1 free %v: want 08:00-18:00 and 19:00-22:00 IST", free)
 			}
 
-			org := "organizations/" + s.ou[len("organizationalUnits/"):] + "-org"
 			t.Run("search", func(t *testing.T) {
 				out, err := srv.SearchAvailability(ctx, &allocationpbv1.SearchAvailabilityRequest{
-					Parent: org, Window: win(18, 19), Facets: []string{"resource_types"},
+					Filter: s.only(), Window: win(18, 19), Facets: []string{"resource_types"},
 				})
 				if err != nil {
 					t.Fatal(err)
@@ -107,7 +106,7 @@ func TestLiveReadModel(t *testing.T) {
 				var paged []string
 				tok := ""
 				for {
-					out, err := srv.SearchAvailability(ctx, &allocationpbv1.SearchAvailabilityRequest{Parent: org, Window: win(9, 10), PageSize: 1, PageToken: tok})
+					out, err := srv.SearchAvailability(ctx, &allocationpbv1.SearchAvailabilityRequest{Filter: s.only(), Window: win(9, 10), PageSize: 1, PageToken: tok})
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -121,7 +120,7 @@ func TestLiveReadModel(t *testing.T) {
 				}
 				// A filter over STRUCTURED-DATA.
 				out, err = srv.SearchAvailability(ctx, &allocationpbv1.SearchAvailabilityRequest{
-					Parent: org, Window: win(9, 10), Filter: `attributes.min_duration = "PT1H"`,
+					Window: win(9, 10), Filter: s.only() + ` AND attributes.min_duration = "PT1H"`,
 				})
 				if err != nil {
 					t.Fatal(err)
@@ -129,19 +128,11 @@ func TestLiveReadModel(t *testing.T) {
 				if got := names(out.GetMatches()); !slices.Equal(got, s.courts[2:]) {
 					t.Fatalf("filtered search found %v, want %v", got, s.courts[2:])
 				}
-				// Quantity 3 at 18-19: only two free, the site does not match.
-				out, err = srv.SearchAvailability(ctx, &allocationpbv1.SearchAvailabilityRequest{Parent: org, Window: win(18, 19), Quantity: 3})
-				if err != nil {
-					t.Fatal(err)
-				}
-				if len(out.GetMatches()) != 0 {
-					t.Fatalf("quantity 3 matched %v, want nothing", names(out.GetMatches()))
-				}
 			})
 
 			t.Run("check", func(t *testing.T) {
 				out, err := srv.CheckAvailability(ctx, &allocationpbv1.CheckAvailabilityRequest{
-					Parent: s.ou, Window: win(9, 10), Filter: `attributes.min_duration = "PT1H"`, Quantity: 2,
+					Resources: s.courts, Window: win(9, 10), Filter: `attributes.min_duration = "PT1H"`, Quantity: 2,
 				})
 				if err != nil {
 					t.Fatal(err)
@@ -153,8 +144,7 @@ func TestLiveReadModel(t *testing.T) {
 
 			t.Run("hold converts into the read model", func(t *testing.T) {
 				h, err := srv.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{
-					Parent: s.ou,
-					Hold:   &allocationpbv1.Hold{Window: win(10, 11), CandidateFilter: `attributes.min_duration = "PT1H"`},
+					Hold: &allocationpbv1.Hold{Window: win(10, 11), CandidateResources: s.courts, CandidateFilter: `attributes.min_duration = "PT1H"`},
 				})
 				if err != nil {
 					t.Fatal(err)
@@ -172,7 +162,7 @@ func TestLiveReadModel(t *testing.T) {
 				if spans(dayRows(t, search, s.courts[2], at(10))[0]).AnyOverlap(engine.Span{Start: at(10), End: at(11)}) {
 					t.Fatal("the converted hold's window is still free in the read model")
 				}
-				out, err := srv.SearchAvailability(ctx, &allocationpbv1.SearchAvailabilityRequest{Parent: org, Window: win(10, 11)})
+				out, err := srv.SearchAvailability(ctx, &allocationpbv1.SearchAvailabilityRequest{Filter: s.only(), Window: win(10, 11)})
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -188,7 +178,7 @@ func TestLiveReadModel(t *testing.T) {
 			// of its own. Over Postgres all three work.
 			t.Run("backend limits", func(t *testing.T) {
 				out, err := srv.SearchAvailability(ctx, &allocationpbv1.SearchAvailabilityRequest{
-					Parent: org, Window: win(18, 19), ResourceTypes: []string{"padel-court"},
+					Filter: s.only(), Window: win(18, 19), ResourceTypes: []string{"padel-court"},
 				})
 				if err != nil {
 					t.Fatal(err)
@@ -200,8 +190,8 @@ func TestLiveReadModel(t *testing.T) {
 					req    *allocationpbv1.SearchAvailabilityRequest
 					reason string
 				}{
-					{&allocationpbv1.SearchAvailabilityRequest{Parent: org, Window: win(18, 19), Filter: `resource_types:"padel-court"`}, "FILTER_UNSUPPORTED"},
-					{&allocationpbv1.SearchAvailabilityRequest{Parent: org, Window: win(18, 19), OrderBy: "attributes.max_occupancy desc"}, "ORDER_BY_UNSUPPORTED"},
+					{&allocationpbv1.SearchAvailabilityRequest{Window: win(18, 19), Filter: s.only() + ` AND resource_types:"padel-court"`}, "FILTER_UNSUPPORTED"},
+					{&allocationpbv1.SearchAvailabilityRequest{Filter: s.only(), Window: win(18, 19), OrderBy: "attributes.max_occupancy desc"}, "ORDER_BY_UNSUPPORTED"},
 				} {
 					out, err := srv.SearchAvailability(ctx, tc.req)
 					if backend != "hasura" {
@@ -217,7 +207,7 @@ func TestLiveReadModel(t *testing.T) {
 			})
 
 			t.Run("bad filter", func(t *testing.T) {
-				_, err := srv.SearchAvailability(ctx, &allocationpbv1.SearchAvailabilityRequest{Parent: org, Window: win(9, 10), Filter: "nosuchfield = 1"})
+				_, err := srv.SearchAvailability(ctx, &allocationpbv1.SearchAvailabilityRequest{Window: win(9, 10), Filter: "nosuchfield = 1"})
 				if err == nil {
 					t.Fatal("a filter on an unknown field was accepted")
 				}

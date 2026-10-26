@@ -12,8 +12,8 @@ option java_multiple_files = true;
 option java_outer_classname = "ErrorsProto";
 option java_package = "engineering.shokki.freebusy.shared.v1";
 
-// The reasons freebusy returns for the directory (organizations, sites) and the
-// calendars, events and availability freebusy serves, and any call: the
+// The reasons freebusy returns for the resources, calendars, events and
+// availability freebusy serves, and any call: the
 // google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.dev domain. They are
 // part of the API: clients branch on them, never on a message.
 // protoc-gen-service renders them as Go constants, sentinels and the tables of
@@ -24,78 +24,8 @@ enum ErrorReason {
   // Unset; never returned.
   ERROR_REASON_UNSPECIFIED = 0;
 
-  // A site (organizational unit) must belong to an organization, and the request
-  // names none.
-  ERROR_REASON_ORGANIZATION_REQUIRED = 1 [(service.v1.error_reason) = {
-    code: "INVALID_ARGUMENT"
-    description: "A site (organizational unit) must belong to an organization, and the request names none."
-    fix: "Create the organization first and send its name."
-    detail: DETAIL_KIND_BAD_REQUEST
-  }];
-
-  // The organization named does not exist.
-  ERROR_REASON_ORGANIZATION_NOT_FOUND = 2 [(service.v1.error_reason) = {
-    code: "NOT_FOUND"
-    description: "The organization named does not exist."
-    fix: "Check the name, or `ListOrganizations`."
-    detail: DETAIL_KIND_RESOURCE_INFO
-  }];
-
-  // The organization is deleted; a site under it cannot serve or be restored.
-  ERROR_REASON_ORGANIZATION_DELETED = 3 [(service.v1.error_reason) = {
-    code: "NOT_FOUND"
-    description: "The organization is deleted; a site under it cannot serve or be restored. Returned as `NOT_FOUND`, or `FAILED_PRECONDITION` on `UndeleteOrganizationalUnit`."
-    fix: "`UndeleteOrganization` first, or use a live one."
-    detail: DETAIL_KIND_RESOURCE_INFO
-  }];
-
-  // An organization with sites cannot be deleted.
-  ERROR_REASON_ORGANIZATION_HAS_SITES = 4 [(service.v1.error_reason) = {
-    code: "FAILED_PRECONDITION"
-    description: "An organization with sites cannot be deleted."
-    fix: "Delete or move its sites first."
-    detail: DETAIL_KIND_PRECONDITION_FAILURE
-  }];
-
-  // A resource is booked at a site, and the request names none.
-  ERROR_REASON_SITE_REQUIRED = 5 [(service.v1.error_reason) = {
-    code: "INVALID_ARGUMENT"
-    description: "A resource is booked at a site, and the request names none."
-    fix: "Send its `organizational_unit`."
-    detail: DETAIL_KIND_BAD_REQUEST
-  }];
-
-  // The site named does not exist.
-  ERROR_REASON_SITE_NOT_FOUND = 6 [(service.v1.error_reason) = {
-    code: "NOT_FOUND"
-    description: "The site named does not exist."
-    fix: "Check the name, or `ListOrganizationalUnits`."
-    detail: DETAIL_KIND_RESOURCE_INFO
-  }];
-
-  // The site is deleted.
-  ERROR_REASON_SITE_DELETED = 7 [(service.v1.error_reason) = {
-    code: "NOT_FOUND"
-    description: "The site is deleted."
-    fix: "`UndeleteOrganizationalUnit`, or use a live site."
-    detail: DETAIL_KIND_RESOURCE_INFO
-  }];
-
-  // The site belongs to no organization, so nothing is served there.
-  ERROR_REASON_SITE_WITHOUT_ORGANIZATION = 8 [(service.v1.error_reason) = {
-    code: "FAILED_PRECONDITION"
-    description: "The site belongs to no organization, so nothing is served there."
-    fix: "Set its `organization`."
-    detail: DETAIL_KIND_PRECONDITION_FAILURE
-  }];
-
-  // A site with resources cannot be deleted.
-  ERROR_REASON_SITE_HAS_RESOURCES = 9 [(service.v1.error_reason) = {
-    code: "FAILED_PRECONDITION"
-    description: "A site with resources cannot be deleted."
-    fix: "Delete or move its resources first."
-    detail: DETAIL_KIND_PRECONDITION_FAILURE
-  }];
+  reserved 1 to 9;
+  reserved "ERROR_REASON_ORGANIZATION_REQUIRED", "ERROR_REASON_ORGANIZATION_NOT_FOUND", "ERROR_REASON_ORGANIZATION_DELETED", "ERROR_REASON_ORGANIZATION_HAS_SITES", "ERROR_REASON_SITE_REQUIRED", "ERROR_REASON_SITE_NOT_FOUND", "ERROR_REASON_SITE_DELETED", "ERROR_REASON_SITE_WITHOUT_ORGANIZATION", "ERROR_REASON_SITE_HAS_RESOURCES";
 
   // The calendar named does not exist.
   ERROR_REASON_CALENDAR_NOT_FOUND = 10 [(service.v1.error_reason) = {

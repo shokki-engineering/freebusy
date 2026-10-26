@@ -38,18 +38,16 @@ erDiagram
         Timestamp create_time "OUTPUT_ONLY"
         string hold FK "OUTPUT_ONLY"
     }
-    OrganizationalUnit ||--o{ Hold : "holds"
     Hold }o--o{ Resource : "resources"
     Hold }o--o{ Resource : "candidate_resources"
-    OrganizationalUnit ||--o{ Allocation : "allocations"
     Allocation }o--|| Resource : "resource"
     Allocation }o--o| Hold : "hold"
 ```
 
 | Resource | Type | Pattern |
 | --- | --- | --- |
-| [`Hold`](#hold) | `freebusy.allocation.v1/Hold` | `organizationalUnits/{organizational_unit}/holds/{hold}` |
-| [`Allocation`](#allocation) | `freebusy.allocation.v1/Allocation` | `organizationalUnits/{organizational_unit}/allocations/{allocation}` |
+| [`Hold`](#hold) | `freebusy.allocation.v1/Hold` | `holds/{hold}` |
+| [`Allocation`](#allocation) | `freebusy.allocation.v1/Allocation` | `allocations/{allocation}` |
 
 ## Services
 
@@ -70,10 +68,10 @@ so they take neither the standard-method names nor their shapes.
 
 | Method | Request | Response | HTTP | Description |
 | --- | --- | --- | --- | --- |
-| `ComputeAvailability` | [`ComputeAvailabilityRequest`](#computeavailabilityrequest) | [`ComputeAvailabilityResponse`](#computeavailabilityresponse) | `POST /v1/{parent=organizationalUnits/*}:computeAvailability` | Computes availability across a site's resources, bucketed by slot or day. |
-| `CheckAvailability` | [`CheckAvailabilityRequest`](#checkavailabilityrequest) | [`CheckAvailabilityResponse`](#checkavailabilityresponse) | `POST /v1/{parent=organizationalUnits/*}:checkAvailability` | Checks one exact window for one exact quantity, with reasons when it fails.<br><br>Advisory, not a reservation: the answer can be stale the instant it is returned. CreateHold is what actually secures anything. |
-| `BatchComputeAvailability` | [`BatchComputeAvailabilityRequest`](#batchcomputeavailabilityrequest) | [`BatchComputeAvailabilityResponse`](#batchcomputeavailabilityresponse) | `POST /v1/resources:batchCompute` | Runs several availability computations in one round trip.<br><br>Each entry is independent and may name a different site, window or granularity. Capped at 50 entries, because each one fans out across every candidate resource's calendar. |
-| `SearchAvailability` | [`SearchAvailabilityRequest`](#searchavailabilityrequest) | [`SearchAvailabilityResponse`](#searchavailabilityresponse) | `POST /v1/{parent=organizations/*}:searchAvailability` | Sweeps an operator for resources free across a window.<br><br>The search entry point, where ComputeAvailability answers for a site the caller has already chosen. Paginated, since a large operator may match thousands of resources. |
+| `ComputeAvailability` | [`ComputeAvailabilityRequest`](#computeavailabilityrequest) | [`ComputeAvailabilityResponse`](#computeavailabilityresponse) | `POST /v1/resources:computeAvailability` | Computes availability across resources, bucketed by slot or day. |
+| `CheckAvailability` | [`CheckAvailabilityRequest`](#checkavailabilityrequest) | [`CheckAvailabilityResponse`](#checkavailabilityresponse) | `POST /v1/resources:checkAvailability` | Checks one exact window for one exact quantity, with reasons when it fails.<br><br>Advisory, not a reservation: the answer can be stale the instant it is returned. CreateHold is what actually secures anything. |
+| `BatchComputeAvailability` | [`BatchComputeAvailabilityRequest`](#batchcomputeavailabilityrequest) | [`BatchComputeAvailabilityResponse`](#batchcomputeavailabilityresponse) | `POST /v1/resources:batchCompute` | Runs several availability computations in one round trip.<br><br>Each entry is independent and may name different resources, a different window or granularity. Capped at 50 entries, because each one fans out across every candidate resource's calendar. |
+| `SearchAvailability` | [`SearchAvailabilityRequest`](#searchavailabilityrequest) | [`SearchAvailabilityResponse`](#searchavailabilityresponse) | `POST /v1/resources:searchAvailability` | Searches every resource for those free across a window.<br><br>The search entry point, where ComputeAvailability counts over resources the caller has already chosen. Paginated, since a search may match thousands of resources. |
 
 ### HoldService
 
@@ -91,12 +89,12 @@ mutations are the two custom methods below.
 
 | Method | Request | Response | HTTP | Description |
 | --- | --- | --- | --- | --- |
-| `CreateHold` | [`CreateHoldRequest`](#createholdrequest) | [`Hold`](#hold) | `POST /v1/{parent=organizationalUnits/*}/holds` | Takes a hold, allocating concrete resources for the window.<br><br>The server chooses which resources are taken from the candidates offered, under a lock, so two callers racing for the last bay cannot both win. Requires an idempotency key: a retry after a timeout returns the original hold rather than taking a second one. |
-| `GetHold` | [`GetHoldRequest`](#getholdrequest) | [`Hold`](#hold) | `GET /v1/{name=organizationalUnits/*/holds/*}` | Retrieves one hold.<br><br>Authoritative on expiry: a hold whose expire_time has passed is reported EXPIRED here even if the sweeper has not yet written that state, so a caller never sees an ACTIVE hold that no longer reserves anything. |
-| `ListHolds` | [`ListHoldsRequest`](#listholdsrequest) | [`ListHoldsResponse`](#listholdsresponse) | `GET /v1/{parent=organizationalUnits/*}/holds` | Lists the holds taken at a site. |
-| `ExtendHold` | [`ExtendHoldRequest`](#extendholdrequest) | [`Hold`](#hold) | `POST /v1/{name=organizationalUnits/*/holds/*}:extend` | Pushes a hold's expiry further out.<br><br>Measured from now rather than from the current deadline, so repeated calls cannot accumulate an unbounded reservation. Fails on a hold that is not ACTIVE -- an expired hold is gone, not extendable. |
-| `ReleaseHold` | [`ReleaseHoldRequest`](#releaseholdrequest) | [`Hold`](#hold) | `POST /v1/{name=organizationalUnits/*/holds/*}:release` | Gives a hold up before it expires, freeing its resources immediately.<br><br>Idempotent: releasing an already-released or expired hold succeeds and changes nothing, because the caller's intent is already satisfied. |
-| `DeleteHold` | [`DeleteHoldRequest`](#deleteholdrequest) | `google.protobuf.Empty` | `DELETE /v1/{name=organizationalUnits/*/holds/*}` | Deletes a hold record.<br><br>Housekeeping for terminal holds, not a way to free resources -- use ReleaseHold for that. Deleting an ACTIVE hold is rejected, so inventory is never freed by a path that leaves no audit trail. |
+| `CreateHold` | [`CreateHoldRequest`](#createholdrequest) | [`Hold`](#hold) | `POST /v1/holds` | Takes a hold, allocating concrete resources for the window.<br><br>The server chooses which resources are taken from the candidates offered, under a lock, so two callers racing for the last bay cannot both win. Requires an idempotency key: a retry after a timeout returns the original hold rather than taking a second one. |
+| `GetHold` | [`GetHoldRequest`](#getholdrequest) | [`Hold`](#hold) | `GET /v1/{name=holds/*}` | Retrieves one hold.<br><br>Authoritative on expiry: a hold whose expire_time has passed is reported EXPIRED here even if the sweeper has not yet written that state, so a caller never sees an ACTIVE hold that no longer reserves anything. |
+| `ListHolds` | [`ListHoldsRequest`](#listholdsrequest) | [`ListHoldsResponse`](#listholdsresponse) | `GET /v1/holds` | Lists holds. |
+| `ExtendHold` | [`ExtendHoldRequest`](#extendholdrequest) | [`Hold`](#hold) | `POST /v1/{name=holds/*}:extend` | Pushes a hold's expiry further out.<br><br>Measured from now rather than from the current deadline, so repeated calls cannot accumulate an unbounded reservation. Fails on a hold that is not ACTIVE -- an expired hold is gone, not extendable. |
+| `ReleaseHold` | [`ReleaseHoldRequest`](#releaseholdrequest) | [`Hold`](#hold) | `POST /v1/{name=holds/*}:release` | Gives a hold up before it expires, freeing its resources immediately.<br><br>Idempotent: releasing an already-released or expired hold succeeds and changes nothing, because the caller's intent is already satisfied. |
+| `DeleteHold` | [`DeleteHoldRequest`](#deleteholdrequest) | `google.protobuf.Empty` | `DELETE /v1/{name=holds/*}` | Deletes a hold record.<br><br>Housekeeping for terminal holds, not a way to free resources -- use ReleaseHold for that. Deleting an ACTIVE hold is rejected, so inventory is never freed by a path that leaves no audit trail. |
 
 #### Flow: Hold expiry
 
@@ -148,14 +146,14 @@ a quantity, and the server decides which concrete resources are taken. That
 keeps "which bay did I get" a server decision made under a lock, rather than
 a client guess that races.
 
-Resource `freebusy.allocation.v1/Hold`, pattern `organizationalUnits/{organizational_unit}/holds/{hold}`.
+Resource `freebusy.allocation.v1/Hold`, pattern `holds/{hold}`.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | `IDENTIFIER` | The hold name. Nested under the site whose resources it takes, so a hold is listed and swept per site without joining through every resource. Format: organizationalUnits/{organizational_unit}/holds/{hold} |
+| `name` | `string` | `IDENTIFIER` | The hold name. Top-level: a hold takes resources wherever they are, and grouping them by place is the business of whatever is built on top. Format: holds/{hold} |
 | `resources` | repeated `string` | `OUTPUT_ONLY` | The concrete resources this hold has taken, one per unit of `quantity`. Chosen by the server from the candidates the request offered. Format: resources/{resource} References `the-protobuf-project.org/Resource`. |
 | `window` | `google.type.Interval` | `REQUIRED`, `IMMUTABLE` | The window held. Immutable: moving it is a different allocation, so release this hold and take another.<br><br>Stored as text, its two ends in RFC 3339 joined by "/". |
-| `candidate_resources` | repeated `string` | `OPTIONAL`, `IMMUTABLE` | Candidate resources the allocator may choose from, supplied on create. Empty offers every resource the site holds. Immutable: the choice is made once, and re-offering a different set is a different allocation. Format: resources/{resource} References `the-protobuf-project.org/Resource`. |
+| `candidate_resources` | repeated `string` | `OPTIONAL`, `IMMUTABLE` | Candidate resources the allocator may choose from, supplied on create. Empty offers every resource, narrowed by `candidate_filter`. Immutable: the choice is made once, and re-offering a different set is a different allocation. Format: resources/{resource} References `the-protobuf-project.org/Resource`. |
 | `quantity` | `int32` | `OPTIONAL`, `IMMUTABLE` | How many resources to take, supplied on create; defaults to 1. Once the hold is ACTIVE this equals the length of `resources`. |
 | `expire_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | When the hold lapses if nothing confirms it. Extend it with ExtendHold; past this instant the hold no longer reserves anything, whether or not the sweeper has yet marked it EXPIRED. |
 | `state` | [`HoldState`](#holdstate) | `OUTPUT_ONLY` | Lifecycle state. New holds start ACTIVE. |
@@ -163,7 +161,7 @@ Resource `freebusy.allocation.v1/Hold`, pattern `organizationalUnits/{organizati
 | `create_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | Creation timestamp. |
 | `update_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | Last-modification timestamp. |
 | `etag` | `string` | `OUTPUT_ONLY` | Opaque version for optimistic concurrency (AIP-154); echo on update/delete. |
-| `replaces` | `string` | `OPTIONAL`, `IMMUTABLE` | The hold of the reservation this hold is taken to replace with RescheduleReservation: that reservation's `hold`, converted and at the same site. Its claims do not count against this hold, so a new window overlapping the old one -- an extension, a shift by an hour -- can keep the same resources. Until the move completes this hold claims only the time the old one does not; RescheduleReservation hands the rest over in the write that ends the old hold, so no one else can take it in between. Such a hold can only be used to reschedule that reservation. (A hold, though no resource_reference says so: AIP-121 allows no cycle of mutable references, and this one is a hold naming a hold.) Format: organizationalUnits/{organizational_unit}/holds/{hold} |
+| `replaces` | `string` | `OPTIONAL`, `IMMUTABLE` | The hold of the reservation this hold is taken to replace with RescheduleReservation: that reservation's `hold`, converted. Its claims do not count against this hold, so a new window overlapping the old one -- an extension, a shift by an hour -- can keep the same resources. Until the move completes this hold claims only the time the old one does not; RescheduleReservation hands the rest over in the write that ends the old hold, so no one else can take it in between. Such a hold can only be used to reschedule that reservation. (A hold, though no resource_reference says so: AIP-121 allows no cycle of mutable references, and this one is a hold naming a hold.) Format: holds/{hold} |
 | `candidate_filter` | `string` | `OPTIONAL`, `IMMUTABLE` | An AIP-160 filter narrowing the resources the allocator may choose from, supplied on create, alongside `candidate_resources`: the same filter SearchAvailability takes, over each resource's `resource_types`, `attributes` (its STRUCTURED-DATA, e.g. `attributes.view = "river"`) and `display_name`. Empty narrows nothing. Immutable, like the candidates. |
 
 ### Allocation
@@ -182,22 +180,22 @@ write as the hold. The copy is the point: a claim stops counting the instant
 `expire_time` passes, with no sweeper write needed, because every read
 filters on it.
 
-It sits under the site and names its hold, rather than nesting under the
-hold: the engine asks about allocations by resource and time across a whole
-site, never hold by hold, and a hold with child resources would owe
-DeleteHold a `force` flag guarding rows no caller can see.
+It is top-level and names its hold, rather than nesting under the hold: the
+engine asks about allocations by resource and time, never hold by hold, and
+a hold with child resources would owe DeleteHold a `force` flag guarding
+rows no caller can see.
 
-Resource `freebusy.allocation.v1/Allocation`, pattern `organizationalUnits/{organizational_unit}/allocations/{allocation}`.
+Resource `freebusy.allocation.v1/Allocation`, pattern `allocations/{allocation}`.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | `IDENTIFIER` | The allocation name, under the site whose resource it takes. Format: organizationalUnits/{organizational_unit}/allocations/{allocation} |
+| `name` | `string` | `IDENTIFIER` | The allocation name. Format: allocations/{allocation} |
 | `resource` | `string` | `REQUIRED` | The resource taken. Format: resources/{resource} References `the-protobuf-project.org/Resource`. |
 | `start_time` | `google.protobuf.Timestamp` | `REQUIRED` | Start of the span taken, inclusive. A copy of the hold's window start. |
 | `end_time` | `google.protobuf.Timestamp` | `REQUIRED` | End of the span taken, exclusive. A copy of the hold's window end. |
 | `expire_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | When this claim stops counting. A copy of the hold's expire_time while it is ACTIVE; set to the release instant on release; unset once the hold is CONVERTED, which is the one outcome that keeps the resource taken. Always the server's to write, never a caller's. |
 | `create_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | Creation timestamp. |
-| `hold` | `string` | `OUTPUT_ONLY` | The hold that took it. Deleting the hold deletes its allocations with it. Format: organizationalUnits/{organizational_unit}/holds/{hold} References `freebusy.allocation.v1/Hold`. |
+| `hold` | `string` | `OUTPUT_ONLY` | The hold that took it. Deleting the hold deletes its allocations with it. Format: holds/{hold} References `freebusy.allocation.v1/Hold`. |
 
 ### AvailabilityBucket
 
@@ -233,7 +231,6 @@ One resource that satisfies a search, with the window it is free for.
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
 | `resource` | `string` | - | The free resource. Format: resources/{resource} References `the-protobuf-project.org/Resource`. |
-| `organizational_unit` | `string` | - | The site it belongs to. Format: organizationalUnits/{organizational_unit} References `the-protobuf-project.org/OrganizationalUnit`. |
 | `window` | `google.type.Interval` | - | The span it is free for, which may be narrower than the searched window. |
 | `resource_types` | repeated `string` | - | RESOURCE-TYPE values carried by the resource, RFC 9073 section 6.3, echoed so a caller can group results without re-fetching each resource. |
 | `display_name` | `string` | - | The resource's display name, echoed for the same reason. |
@@ -263,14 +260,13 @@ Request message for AllocationService.ComputeAvailability.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `parent` | `string` | `REQUIRED` | The site whose resources to compute over. Format: organizationalUnits/{organizational_unit} |
-| `resources` | repeated `string` | `OPTIONAL` | Restrict the computation to these resources. Empty means every resource the site holds. Format: resources/{resource} References `the-protobuf-project.org/Resource`. |
+| `resources` | repeated `string` | `OPTIONAL` | Restrict the computation to these resources. Empty means every resource `filter` matches. Format: resources/{resource} References `the-protobuf-project.org/Resource`. |
 | `window` | `google.type.Interval` | `REQUIRED` | The window to compute over. |
 | `granularity` | [`AvailabilityGranularity`](#availabilitygranularity) | `OPTIONAL` | How to slice the window. Defaults by window length. |
 | `slot_duration` | `google.protobuf.Duration` | `OPTIONAL` | Slot length for SLOT granularity. Ignored for DAY. |
-| `time_zone` | `string` | `OPTIONAL` | IANA time zone the day boundaries are drawn in, e.g. "Asia/Kolkata". Defaults to the site's zone. Required in effect for DAY granularity, since "a night" has no meaning without one. |
-| `include_free_resources` | `bool` | `OPTIONAL` | Populate AvailabilityBucket.free_resources. Off by default: a large site would otherwise repeat every resource name in every bucket. |
-| `filter` | `string` | `OPTIONAL` | An AIP-160 filter over each resource's search record (ResourceDay): its `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g. `attributes.view = "river" AND attributes.max_occupancy >= 3`), its `display_name` (a bare word matches it) and `organizational_unit`. Terms are ANDed unless joined with OR. Empty matches every resource. Only matching resources are computed over or counted. |
+| `time_zone` | `string` | `OPTIONAL` | IANA time zone the day boundaries are drawn in, e.g. "Asia/Kolkata". Defaults to the zone of the first resource's calendar. Required in effect for DAY granularity, since "a night" has no meaning without one. |
+| `include_free_resources` | `bool` | `OPTIONAL` | Populate AvailabilityBucket.free_resources. Off by default: a large pool would otherwise repeat every resource name in every bucket. |
+| `filter` | `string` | `OPTIONAL` | An AIP-160 filter over each resource's search record (ResourceDay): its `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g. `attributes.view = "river" AND attributes.max_occupancy >= 3`), its `display_name` (a bare word matches it) and `organizational_unit` (the resource's own, as data). Terms are ANDed unless joined with OR. Empty matches every resource. Only matching resources are computed over or counted. |
 
 ### ComputeAvailabilityResponse
 
@@ -287,11 +283,10 @@ Request message for AllocationService.CheckAvailability.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `parent` | `string` | `REQUIRED` | The site whose resources to check. Format: organizationalUnits/{organizational_unit} |
-| `resources` | repeated `string` | `OPTIONAL` | Restrict the check to these resources. Empty means every resource the site holds. Format: resources/{resource} References `the-protobuf-project.org/Resource`. |
+| `resources` | repeated `string` | `OPTIONAL` | Restrict the check to these resources. Empty means every resource `filter` matches. Format: resources/{resource} References `the-protobuf-project.org/Resource`. |
 | `window` | `google.type.Interval` | `REQUIRED` | The exact window to check. |
 | `quantity` | `int32` | `OPTIONAL` | How many resources are needed. Defaults to 1. |
-| `filter` | `string` | `OPTIONAL` | An AIP-160 filter over each resource's search record (ResourceDay): its `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g. `attributes.view = "river" AND attributes.max_occupancy >= 3`), its `display_name` (a bare word matches it) and `organizational_unit`. Terms are ANDed unless joined with OR. Empty matches every resource. Only matching resources are checked. |
+| `filter` | `string` | `OPTIONAL` | An AIP-160 filter over each resource's search record (ResourceDay): its `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g. `attributes.view = "river" AND attributes.max_occupancy >= 3`), its `display_name` (a bare word matches it) and `organizational_unit` (the resource's own, as data). Terms are ANDed unless joined with OR. Empty matches every resource. Only matching resources are checked. |
 
 ### CheckAvailabilityResponse
 
@@ -307,8 +302,8 @@ Response message for AllocationService.CheckAvailability.
 ### BatchComputeAvailabilityRequest
 
 Request message for AllocationService.BatchComputeAvailability. Each entry is
-a full ComputeAvailabilityRequest, so sites, windows and granularities may
-differ within one batch.
+a full ComputeAvailabilityRequest, so resources, windows and granularities
+may differ within one batch.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
@@ -324,21 +319,18 @@ Response message for AllocationService.BatchComputeAvailability.
 
 ### SearchAvailabilityRequest
 
-Request message for AllocationService.SearchAvailability. Sweeps a whole
-operator for resources free across a window, where ComputeAvailability
-answers for one site already chosen.
+Request message for AllocationService.SearchAvailability. Searches every
+resource for those free across a window, where ComputeAvailability counts
+over resources already chosen.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `parent` | `string` | `REQUIRED` | The operator to search within. Format: organizations/{organization} |
 | `window` | `google.type.Interval` | `REQUIRED` | The window that must be free. |
-| `organizational_units` | repeated `string` | `OPTIONAL` | Restrict to sites, e.g. one car park or one venue. Empty searches all. Format: organizationalUnits/{organizational_unit} References `the-protobuf-project.org/OrganizationalUnit`. |
 | `resource_types` | repeated `string` | `OPTIONAL` | Restrict to RESOURCE-TYPE values, RFC 9073 section 6.3, e.g. "room" or "parking-bay": a resource matches when it carries any of them. Empty matches every type. |
-| `quantity` | `int32` | `OPTIONAL` | How many resources must be free together at one site for it to match. Defaults to 1. |
 | `page_size` | `int32` | `OPTIONAL` | Maximum matches to return. Defaults to 50, capped at 1000. |
 | `page_token` | `string` | `OPTIONAL` | Page token from a previous SearchAvailabilityResponse.next_page_token. Every other field must be the same as in the call that returned it. |
-| `filter` | `string` | `OPTIONAL` | An AIP-160 filter over each resource's search record (ResourceDay): its `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g. `attributes.view = "river" AND attributes.max_occupancy >= 3`), its `display_name` (a bare word matches it) and `organizational_unit`. Terms are ANDed unless joined with OR. Empty matches every resource. |
-| `order_by` | `string` | `OPTIONAL` | AIP-132 order of the matches: a comma-separated list of `resource`, `organizational_unit`, `display_name`, `free_fraction` (the share of the window's first UTC day that is free) and `attributes.max_occupancy` (the booking profile's, as a number), each optionally followed by ` desc`, e.g. `free_fraction desc, display_name`. Defaults to `organizational_unit, resource`. When quantity is above 1, matches are grouped by site first, and the order applies within a site. |
+| `filter` | `string` | `OPTIONAL` | An AIP-160 filter over each resource's search record (ResourceDay): its `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g. `attributes.view = "river" AND attributes.max_occupancy >= 3`), its `display_name` (a bare word matches it) and `organizational_unit` (the resource's own, as data). Terms are ANDed unless joined with OR. Empty matches every resource. |
+| `order_by` | `string` | `OPTIONAL` | AIP-132 order of the matches: a comma-separated list of `resource`, `organizational_unit`, `display_name`, `free_fraction` (the share of the window's first UTC day that is free) and `attributes.max_occupancy` (the booking profile's, as a number), each optionally followed by ` desc`, e.g. `free_fraction desc, display_name`. Defaults to `resource`. |
 | `facets` | repeated `string` | `OPTIONAL` | Fields to count matching resources by, returned in SearchAvailabilityResponse.facets: `resource_types`, `organizational_unit` or an `attributes.<path>`, e.g. ["resource_types", "attributes.view"]. At most 10. |
 
 ### SearchAvailabilityResponse
@@ -363,8 +355,7 @@ race is handled.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `parent` | `string` | `REQUIRED` | The site whose resources may be taken. Format: organizationalUnits/{organizational_unit} Parent of `freebusy.allocation.v1/Hold`. |
-| `hold` | [`Hold`](#hold) | `REQUIRED` | The hold to take. Its window is required; quantity defaults to 1 and candidate_resources empty offers every resource the site holds. Supply idempotency_key to make a retry safe. |
+| `hold` | [`Hold`](#hold) | `REQUIRED` | The hold to take. Its window is required; quantity defaults to 1 and candidate_resources empty offers every resource candidate_filter matches. Supply idempotency_key to make a retry safe. |
 | `hold_id` | `string` | `OPTIONAL` | Client-assigned id, becoming the last segment of the hold name. The server generates one when empty. |
 
 ### GetHoldRequest
@@ -373,7 +364,7 @@ Request message for HoldService.GetHold, AIP-131.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | `REQUIRED` | Name of the hold to retrieve. Format: organizationalUnits/{organizational_unit}/holds/{hold} References `freebusy.allocation.v1/Hold`. |
+| `name` | `string` | `REQUIRED` | Name of the hold to retrieve. Format: holds/{hold} References `freebusy.allocation.v1/Hold`. |
 
 ### ListHoldsRequest
 
@@ -381,7 +372,6 @@ Request message for HoldService.ListHolds, AIP-132.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `parent` | `string` | `REQUIRED` | The site whose holds to list. Format: organizationalUnits/{organizational_unit} Parent of `freebusy.allocation.v1/Hold`. |
 | `page_size` | `int32` | `OPTIONAL` | Maximum holds to return. Defaults to 50, capped at 1000. |
 | `page_token` | `string` | `OPTIONAL` | Page token from a previous ListHoldsResponse.next_page_token. |
 | `filter` | `string` | `OPTIONAL` | Filter expression, AIP-160, over the hold's own fields, e.g. `state=HOLD_STATE_ACTIVE`. |
@@ -401,7 +391,7 @@ Request message for HoldService.ExtendHold.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | `REQUIRED` | Name of the hold to extend. Format: organizationalUnits/{organizational_unit}/holds/{hold} References `freebusy.allocation.v1/Hold`. |
+| `name` | `string` | `REQUIRED` | Name of the hold to extend. Format: holds/{hold} References `freebusy.allocation.v1/Hold`. |
 | `duration` | `google.protobuf.Duration` | `REQUIRED` | How much further out to push expire_time, measured from now rather than from the current deadline, so repeated extensions cannot accumulate. |
 | `etag` | `string` | `OPTIONAL` | Opaque version read from the hold; the extension is rejected if the hold changed since (AIP-154). |
 
@@ -411,7 +401,7 @@ Request message for HoldService.ReleaseHold.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | `REQUIRED` | Name of the hold to release. Format: organizationalUnits/{organizational_unit}/holds/{hold} References `freebusy.allocation.v1/Hold`. |
+| `name` | `string` | `REQUIRED` | Name of the hold to release. Format: holds/{hold} References `freebusy.allocation.v1/Hold`. |
 | `etag` | `string` | `OPTIONAL` | Opaque version read from the hold; the release is rejected if the hold changed since (AIP-154). |
 
 ### DeleteHoldRequest
@@ -420,7 +410,7 @@ Request message for HoldService.DeleteHold, AIP-135.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `name` | `string` | `REQUIRED` | Name of the hold to delete. Format: organizationalUnits/{organizational_unit}/holds/{hold} References `freebusy.allocation.v1/Hold`. |
+| `name` | `string` | `REQUIRED` | Name of the hold to delete. Format: holds/{hold} References `freebusy.allocation.v1/Hold`. |
 | `etag` | `string` | `OPTIONAL` | Opaque version read from the hold; the delete is rejected if the hold changed since (AIP-154). |
 
 ### ResourceDay
@@ -428,10 +418,10 @@ Request message for HoldService.DeleteHold, AIP-135.
 A ResourceDay is one resource's standing free time on one UTC day: the
 availability read model SearchAvailability, ComputeAvailability,
 CheckAvailability and CreateHold read their candidates from, instead of
-evaluating every resource an operator has.
+evaluating every resource there is.
 
 Storage-only, and derived: no RPC takes or returns it. It is a projection
-of the resources, their sites, calendars, RFC 7953 availability, RFC 5545
+of the resources, their calendars, RFC 7953 availability, RFC 5545
 events and the claims of converted holds, rewritten in the same transaction
 as every write to those (on Hasura, a single write projects in a request of
 its own right after it), for every day of a rolling horizon. `free` is
@@ -445,8 +435,7 @@ drops.
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
 | `resource` | `string` | - | The resource, "resources/{resource}". Not a resource reference: a projection row must never keep its source from being purged. |
-| `organization` | `string` | - | The organization of the resource's site, "organizations/{organization}". |
-| `organizational_unit` | `string` | - | The resource's site, "organizationalUnits/{organizational_unit}". |
+| `organizational_unit` | `string` | - | The resource's own organizational_unit, copied as data for filtering: freebusy does not check or scope by it. |
 | `day` | `google.type.Date` | - | The UTC calendar day this row covers. |
 | `free` | repeated `google.type.Interval` | - | The resource's free time within the day, [day 00:00Z, next day 00:00Z): offered by its availability, less confirmed events on its calendar and the claims of converted holds. Live holds are not subtracted. |
 | `resource_types` | repeated `string` | - | RFC 9073 RESOURCE-TYPE values the resource carries. |

@@ -36,7 +36,7 @@ A Reservation is a confirmed booking: a hold made permanent. It is the last step
 | --- | --- | --- |
 | `id` | `CHAR(26)` | not null |
 | `name` | `VARCHAR(255)` | not null |
-| `hold` | `VARCHAR(255)` | not null |
+| `hold` | `CHAR(26)` | not null |
 | `start_time` | `TIMESTAMPTZ` | nullable |
 | `end_time` | `TIMESTAMPTZ` | nullable |
 | `customer` | `VARCHAR(255)` | nullable |
@@ -51,7 +51,6 @@ A Reservation is a confirmed booking: a hold made permanent. It is the last step
 | `replaces` | `VARCHAR(255)` | nullable |
 | `replacement` | `VARCHAR(255)` | nullable |
 | `last_change` | `Change` | nullable |
-| `organizational_unit_id` | `CHAR(26)` | not null |
 | `resources` | `VARCHAR(255)[]` | nullable |
 
 ### Enums

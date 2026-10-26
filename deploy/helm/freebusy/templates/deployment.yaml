@@ -79,6 +79,26 @@ spec:
             - name: FREEBUSY_WEBHOOKS__PREVIOUS_SECRET_KEYS
               valueFrom:
                 secretKeyRef: { name: {{ $secret }}, key: webhook-previous-secret-keys, optional: true }
+            {{- with .Values.cors }}
+            {{- if .enabled }}
+            {{- if and .allowCredentials (has "*" .allowedOrigins) }}
+            {{- fail "cors.allowCredentials cannot be combined with the \"*\" origin; list the origins" }}
+            {{- end }}
+            - { name: FREEBUSY_SERVER__CORS__ENABLED, value: "true" }
+            - { name: FREEBUSY_SERVER__CORS__ALLOWED_ORIGINS, value: {{ required "cors.allowedOrigins is required when cors.enabled" (join "," .allowedOrigins) | quote }} }
+            {{- with .allowedMethods }}
+            - { name: FREEBUSY_SERVER__CORS__ALLOWED_METHODS, value: {{ join "," . | quote }} }
+            {{- end }}
+            {{- with .allowedHeaders }}
+            - { name: FREEBUSY_SERVER__CORS__ALLOWED_HEADERS, value: {{ join "," . | quote }} }
+            {{- end }}
+            {{- with .exposedHeaders }}
+            - { name: FREEBUSY_SERVER__CORS__EXPOSED_HEADERS, value: {{ join "," . | quote }} }
+            {{- end }}
+            - { name: FREEBUSY_SERVER__CORS__ALLOW_CREDENTIALS, value: {{ .allowCredentials | quote }} }
+            - { name: FREEBUSY_SERVER__CORS__MAX_AGE_SECONDS, value: {{ .maxAgeSeconds | int | quote }} }
+            {{- end }}
+            {{- end }}
             {{- if .Values.cache.enabled }}
             - { name: FREEBUSY_CACHE__ENABLED, value: "true" }
             - { name: FREEBUSY_CACHE__ADDRESS, value: {{ required "cache.address is required when cache.enabled" .Values.cache.address | quote }} }

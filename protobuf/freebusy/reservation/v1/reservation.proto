@@ -58,10 +58,10 @@ message Reservation {
     ]
   };
 
-  // A site's reservations are listed far more often than any one changes, and
-  // a site with years of them pays for every page. Pages are cached under the
-  // site's version, which every write to one of its reservations moves on, so
-  // a page is never served across a write the repositories made. The ttl bounds
+  // Reservations are listed far more often than any one changes, and years of
+  // them make every page expensive. Pages are cached under the collection's
+  // version, which every write to a reservation moves on, so a page is never
+  // served across a write the repositories made. The ttl bounds
   // the rest: a write that bypasses them is served stale for at most a minute.
   option (cache.v1.cache) = {
     list: {
@@ -72,39 +72,38 @@ message Reservation {
 
   option (google.api.resource) = {
     type: "freebusy.reservation.v1/Reservation"
-    pattern: "organizationalUnits/{organizational_unit}/reservations/{reservation}"
+    pattern: "reservations/{reservation}"
     singular: "reservation"
     plural: "reservations"
   };
 
   // A reservation's changes are its state changes, and the one write that is
   // not: an UpdateReservation of its details (last_change CHANGE_DETAILS),
-  // sent as freebusy.reservation.updated. Scoped by site.
+  // sent as freebusy.reservation.updated.
   option (service.v1.event) = {
     type: "freebusy.reservation"
     omit: [
       "created",
       "deleted"
     ]
-    scope: "organizational_unit"
   };
 
   // The reservation name. Its id is the caller's reservation_id, or else the
   // id of the hold it was made from.
-  // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  // Format: reservations/{reservation}
   string name = 1 [
     (google.api.field_behavior) = IDENTIFIER,
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/reservations/[^/]+$",
+    (buf.validate.field).string.pattern = "^reservations/[^/]+$",
     (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
   ];
 
-  // The hold this reservation was made from, at the same site.
-  // Format: organizationalUnits/{organizational_unit}/holds/{hold}
+  // The hold this reservation was made from.
+  // Format: holds/{hold}
   string hold = 2 [
     (google.api.field_behavior) = REQUIRED,
     (google.api.field_behavior) = IMMUTABLE,
     (google.api.resource_reference).type = "freebusy.allocation.v1/Hold",
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+/holds/[^/]+$",
+    (buf.validate.field).string.pattern = "^holds/[^/]+$",
     (store.v1.query) = {search: true}
   ];
 
@@ -165,11 +164,11 @@ message Reservation {
 
   // The reservation this one replaced, set when it was made by
   // RescheduleReservation.
-  // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  // Format: reservations/{reservation}
   string replaces = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The reservation replacing this one, set when RescheduleReservation began.
-  // Format: organizationalUnits/{organizational_unit}/reservations/{reservation}
+  // Format: reservations/{reservation}
   string replacement = 16 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // What a write to a reservation changed.

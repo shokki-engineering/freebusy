@@ -27,7 +27,6 @@ import (
 	"errors"
 	"fmt"
 	"slices"
-	"strings"
 	"time"
 
 	"github.com/shokki-engineering/freebusy/internal/database"
@@ -37,7 +36,6 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/availability"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/calendar"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/event"
-	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/orgunit"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/resource"
 	"github.com/shokki-engineering/freebusy/internal/service/allocation/engine"
 	"github.com/shokki-engineering/freebusy/internal/telemetry"
@@ -54,7 +52,6 @@ type Store struct {
 	calendars      calendar.CalendarRepository
 	availabilities availability.AvailabilityRepository
 	events         event.EventRepository
-	units          orgunit.OrganizationalUnitRepository
 	// version moves on every write to the engine's static inputs.
 	version *inputVersion
 }
@@ -90,14 +87,9 @@ func On(c repox.Conn) *Store {
 		calendars:      calendar.New(c).Calendars,
 		availabilities: availability.New(c).Availabilities,
 		events:         event.New(c).Events,
-		units:          orgunit.New(c).OrganizationalUnits,
 		version:        &inputVersion{},
 	}
 }
-
-// acrossSites is the AIP-159 wildcard parent: allocations and holds of every
-// site, narrowed by a Where.
-const acrossSites = "organizationalUnits/-"
 
 // listAll drains a paged List.
 func listAll[T any](list func(token string) ([]T, string, error)) ([]T, error) {
@@ -132,10 +124,10 @@ func (s *Store) claimsOverlapping(ctx context.Context, resources []string, windo
 // Batch. Lapsed claims in the way are deleted in the same batch, so a hold
 // that expired unswept never blocks one that wants its time. A live claim in
 // the way makes the no_overlap constraint refuse the batch: repox.ErrConflict.
-func (s *Store) InsertHold(ctx context.Context, parent string, h *allocationpbv1.Hold) (*allocationpbv1.Hold, error) {
+func (s *Store) InsertHold(ctx context.Context, h *allocationpbv1.Hold) (*allocationpbv1.Hold, error) {
 	window := [2]time.Time{h.GetWindow().GetStartTime().AsTime(), h.GetWindow().GetEndTime().AsTime()}
 	for attempt := 1; ; attempt++ {
-		name, err := s.insertHold(ctx, parent, h, window)
+		name, err := s.insertHold(ctx, h, window)
 		if err == nil {
 			return s.holds.Get(ctx, name)
 		}
@@ -168,7 +160,7 @@ const insertAttempts = 3
 // insertHold is one attempt: the hold and its allocations, in one batch with
 // the deletion of lapsed claims in the way, so the exclusion constraint never
 // sees them.
-func (s *Store) insertHold(ctx context.Context, parent string, h *allocationpbv1.Hold, window [2]time.Time) (string, error) {
+func (s *Store) insertHold(ctx context.Context, h *allocationpbv1.Hold, window [2]time.Time) (string, error) {
 	inWay, err := s.claimsOverlapping(ctx, h.GetResources(), window)
 	if err != nil {
 		return "", err
@@ -186,13 +178,13 @@ func (s *Store) insertHold(ctx context.Context, parent string, h *allocationpbv1
 			b.DeleteAllocation(a.GetName())
 		}
 	}
-	name, err := b.CreateHold(parent, h)
+	name, err := b.CreateHold(h)
 	if err != nil {
 		return "", err
 	}
 	for _, r := range h.GetResources() {
 		for _, sp := range (engine.Spans{{Start: window[0], End: window[1]}}).Subtract(kept[r]) {
-			if _, err := b.CreateAllocation(parent, &allocationpbv1.Allocation{
+			if _, err := b.CreateAllocation(&allocationpbv1.Allocation{
 				Resource:   r,
 				StartTime:  timestamppb.New(sp.Start),
 				EndTime:    timestamppb.New(sp.End),
@@ -245,10 +237,9 @@ func (s *Store) HandOver(ctx context.Context, from, etag, to string, at time.Tim
 	for _, a := range have {
 		held[a.GetResource()] = held[a.GetResource()].Union(engine.Spans{spanOf(a)})
 	}
-	parent, _, _ := strings.Cut(next.GetName(), "/holds/")
 	for _, r := range next.GetResources() {
 		for _, sp := range (engine.Spans{window}).Subtract(held[r]) {
-			if _, err := b.CreateAllocation(parent, &allocationpbv1.Allocation{
+			if _, err := b.CreateAllocation(&allocationpbv1.Allocation{
 				Resource:   r,
 				StartTime:  timestamppb.New(sp.Start),
 				EndTime:    timestamppb.New(sp.End),
@@ -286,9 +277,9 @@ func (s *Store) GetHold(ctx context.Context, name string) (*allocationpbv1.Hold,
 	return s.holds.Get(ctx, name)
 }
 
-// FindHold returns the oldest hold at parent carrying idempotency key.
-func (s *Store) FindHold(ctx context.Context, parent, key string) (*allocationpbv1.Hold, error) {
-	found, _, err := s.holds.List(ctx, parent, repox.ListInput{
+// FindHold returns the oldest hold carrying idempotency key.
+func (s *Store) FindHold(ctx context.Context, key string) (*allocationpbv1.Hold, error) {
+	found, _, err := s.holds.List(ctx, repox.ListInput{
 		PageSize: 1,
 		OrderBy:  "create_time",
 		Where:    []filterx.Condition{{Field: "idempotency_key", Op: filterx.OpEq, Value: key}},
@@ -302,9 +293,9 @@ func (s *Store) FindHold(ctx context.Context, parent, key string) (*allocationpb
 	return found[0], nil
 }
 
-// ListHolds pages a site's holds.
-func (s *Store) ListHolds(ctx context.Context, parent string, in repox.ListInput) ([]*allocationpbv1.Hold, string, error) {
-	return s.holds.List(ctx, parent, in)
+// ListHolds pages holds.
+func (s *Store) ListHolds(ctx context.Context, in repox.ListInput) ([]*allocationpbv1.Hold, string, error) {
+	return s.holds.List(ctx, in)
 }
 
 // UpdateHold moves a hold to state with expiry expire, guarded by etag, and
@@ -366,7 +357,7 @@ func (s *Store) DeleteHold(ctx context.Context, name, etag string) error {
 func (s *Store) ExpireHolds(ctx context.Context, now time.Time) (int64, error) {
 	cutoff := now.UTC().Format(time.RFC3339Nano)
 	lapsed, err := listAll(func(token string) ([]*allocationpbv1.Hold, string, error) {
-		return s.holds.List(ctx, acrossSites, repox.ListInput{
+		return s.holds.List(ctx, repox.ListInput{
 			PageSize:  1000,
 			PageToken: token,
 			Where: []filterx.Condition{
@@ -394,7 +385,7 @@ func (s *Store) ExpireHolds(ctx context.Context, now time.Time) (int64, error) {
 		}
 	}
 	stale, err := listAll(func(token string) ([]*allocationpbv1.Allocation, string, error) {
-		return s.allocations.List(ctx, acrossSites, repox.ListInput{
+		return s.allocations.List(ctx, repox.ListInput{
 			PageSize:  1000,
 			PageToken: token,
 			Where:     []filterx.Condition{{Field: "expire_time", Op: filterx.OpLte, Value: cutoff}},
@@ -418,7 +409,7 @@ func (s *Store) ExpireHolds(ctx context.Context, now time.Time) (int64, error) {
 // claimsOf returns the allocation rows a hold holds.
 func (s *Store) claimsOf(ctx context.Context, hold string) ([]*allocationpbv1.Allocation, error) {
 	return listAll(func(token string) ([]*allocationpbv1.Allocation, string, error) {
-		return s.allocations.List(ctx, acrossSites, repox.ListInput{
+		return s.allocations.List(ctx, repox.ListInput{
 			PageSize:  1000,
 			PageToken: token,
 			Where:     []filterx.Condition{{Field: "hold", Op: filterx.OpEq, Value: hold}},

@@ -43,8 +43,7 @@ service WebhookService {
         "Subscribe an https endpoint on the public internet to changes: holds, "
         "reservations, resources, calendars, events and availability, sent as "
         "signed CloudEvents. webhook.uri: the endpoint. webhook.event_types: e.g. "
-        "freebusy.reservation.confirmed; empty sends every type. "
-        "webhook.organizational_unit: only that site's changes. The response "
+        "freebusy.reservation.confirmed; empty sends every type. The response "
         "carries the signing secret, this once."
     };
   }
@@ -62,14 +61,14 @@ service WebhookService {
     option (mcp.v1.tool) = {description: "List webhooks."};
   }
 
-  // Updates a webhook: its endpoint, event types or site.
+  // Updates a webhook: its endpoint or event types.
   rpc UpdateWebhook(UpdateWebhookRequest) returns (Webhook) {
     option (google.api.http) = {
       patch: "/v1/{webhook.name=webhooks/*}"
       body: "webhook"
     };
     option (google.api.method_signature) = "webhook,update_mask";
-    option (mcp.v1.tool) = {description: "Change a webhook's endpoint, event types or site."};
+    option (mcp.v1.tool) = {description: "Change a webhook's endpoint or event types."};
   }
 
   // Stops sending a webhook changes. Changes made while it is paused are not

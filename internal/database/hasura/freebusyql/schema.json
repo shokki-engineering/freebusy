@@ -111,20 +111,6 @@
           }
         },
         {
-          "name": "organizationalUnitId",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          }
-        },
-        {
           "name": "quantity",
           "description": "",
           "args": [],
@@ -306,20 +292,6 @@
         },
         {
           "name": "name",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "TextAggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "organizationalUnitId",
           "description": "",
           "args": [],
           "type": {
@@ -530,16 +502,6 @@
           "defaultValue": null
         },
         {
-          "name": "organizationalUnitId",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "TextBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "quantity",
           "description": "",
           "type": {
@@ -728,16 +690,6 @@
           "defaultValue": null
         },
         {
-          "name": "organizationalUnitId",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "quantity",
           "description": "",
           "type": {
@@ -860,20 +812,6 @@
         },
         {
           "name": "name",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "organizationalUnitId",
           "description": "",
           "args": [],
           "type": {
@@ -1010,20 +948,6 @@
         },
         {
           "name": "name",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "TextAggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "organizationalUnitId",
           "description": "",
           "args": [],
           "type": {
@@ -1182,16 +1106,6 @@
           "defaultValue": null
         },
         {
-          "name": "organizationalUnitId",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "TextBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "resource",
           "description": "",
           "type": {
@@ -1300,16 +1214,6 @@
               "name": "String1",
               "ofType": null
             }
-          }
-        },
-        {
-          "name": "organization",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
           }
         },
         {
@@ -1474,20 +1378,6 @@
         },
         {
           "name": "id",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "TextAggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "organization",
           "description": "",
           "args": [],
           "type": {
@@ -1670,16 +1560,6 @@
           "defaultValue": null
         },
         {
-          "name": "organization",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "TextBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "organizationalUnit",
           "description": "",
           "type": {
@@ -1848,16 +1728,6 @@
           "defaultValue": null
         },
         {
-          "name": "organization",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "organizationalUnit",
           "description": "",
           "type": {
@@ -2007,16 +1877,6 @@
         },
         {
           "name": "name",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "organizationalUnitId",
           "description": "",
           "type": {
             "kind": "ENUM",
@@ -22579,20 +22439,6 @@
           "defaultValue": null
         },
         {
-          "name": "organizationalUnitId",
-          "description": "",
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          },
-          "defaultValue": null
-        },
-        {
           "name": "quantity",
           "description": "",
           "type": {
@@ -22803,16 +22649,6 @@
           "defaultValue": null
         },
         {
-          "name": "organization",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "organizationalUnit",
           "description": "",
           "type": {
@@ -22980,20 +22816,6 @@
         },
         {
           "name": "name",
-          "description": "",
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "organizationalUnitId",
           "description": "",
           "type": {
             "kind": "NON_NULL",
@@ -29792,20 +29614,6 @@
         },
         {
           "name": "name",
-          "description": "",
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "organizationalUnitId",
           "description": "",
           "type": {
             "kind": "NON_NULL",
@@ -36763,16 +36571,6 @@
               "name": "String1",
               "ofType": null
             }
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "organizationalUnit",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
           },
           "defaultValue": null
         },
@@ -66776,20 +66574,6 @@
           }
         },
         {
-          "name": "organizationalUnitId",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          }
-        },
-        {
           "name": "replacement",
           "description": "",
           "args": [],
@@ -67050,20 +66834,6 @@
           }
         },
         {
-          "name": "organizationalUnitId",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "TextAggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
           "name": "replacement",
           "description": "",
           "args": [],
@@ -67311,16 +67081,6 @@
           "defaultValue": null
         },
         {
-          "name": "organizationalUnitId",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "TextBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "replacement",
           "description": "",
           "type": {
@@ -67550,16 +67310,6 @@
         },
         {
           "name": "name",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "organizationalUnitId",
           "description": "",
           "type": {
             "kind": "ENUM",
@@ -86684,16 +86434,6 @@
           "defaultValue": null
         },
         {
-          "name": "organizationalUnitId",
-          "description": "Update the 'organizational_unit_id' column in the 'allocation_holds' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnAllocationHoldsOrganizationalUnitIdInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "quantity",
           "description": "Update the 'quantity' column in the 'allocation_holds' collection.",
           "type": {
@@ -86870,16 +86610,6 @@
           "defaultValue": null
         },
         {
-          "name": "organizationalUnitId",
-          "description": "Update the 'organizational_unit_id' column in the 'allocation_resource' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnAllocationResourceOrganizationalUnitIdInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "resource",
           "description": "Update the 'resource' column in the 'allocation_resource' collection.",
           "type": {
@@ -87021,16 +86751,6 @@
           "type": {
             "kind": "INPUT_OBJECT",
             "name": "UpdateColumnAllocationResourceDaysIdInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "organization",
-          "description": "Update the 'organization' column in the 'allocation_resource_days' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnAllocationResourceDaysOrganizationInput",
             "ofType": null
           },
           "defaultValue": null
@@ -88997,30 +88717,6 @@
     },
     {
       "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnAllocationHoldsOrganizationalUnitIdInput",
-      "description": "Update the 'organizational_unit_id' column in the 'allocation_holds' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
       "name": "UpdateColumnAllocationHoldsQuantityInput",
       "description": "Update the 'quantity' column in the 'allocation_holds' collection",
       "fields": null,
@@ -89329,26 +89025,6 @@
     },
     {
       "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnAllocationResourceDaysOrganizationInput",
-      "description": "Update the 'organization' column in the 'allocation_resource_days' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
       "name": "UpdateColumnAllocationResourceDaysOrganizationalUnitInput",
       "description": "Update the 'organizational_unit' column in the 'allocation_resource_days' collection",
       "fields": null,
@@ -89531,30 +89207,6 @@
       "kind": "INPUT_OBJECT",
       "name": "UpdateColumnAllocationResourceNameInput",
       "description": "Update the 'name' column in the 'allocation_resource' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnAllocationResourceOrganizationalUnitIdInput",
-      "description": "Update the 'organizational_unit_id' column in the 'allocation_resource' collection",
       "fields": null,
       "inputFields": [
         {
@@ -98293,30 +97945,6 @@
     },
     {
       "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnReservationResourceOrganizationalUnitIdInput",
-      "description": "Update the 'organizational_unit_id' column in the 'reservation_resource' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "SCALAR",
-              "name": "String1",
-              "ofType": null
-            }
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
       "name": "UpdateColumnReservationResourceReplacementInput",
       "description": "Update the 'replacement' column in the 'reservation_resource' collection",
       "fields": null,
@@ -106741,26 +106369,6 @@
     },
     {
       "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnWebhookResourceOrganizationalUnitInput",
-      "description": "Update the 'organizational_unit' column in the 'webhook_resource' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
       "name": "UpdateColumnWebhookResourcePreviousSecretInput",
       "description": "Update the 'previous_secret' column in the 'webhook_resource' collection",
       "fields": null,
@@ -111277,16 +110885,6 @@
           "type": {
             "kind": "INPUT_OBJECT",
             "name": "UpdateColumnReservationResourceNameInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "organizationalUnitId",
-          "description": "Update the 'organizational_unit_id' column in the 'reservation_resource' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnReservationResourceOrganizationalUnitIdInput",
             "ofType": null
           },
           "defaultValue": null
@@ -117575,16 +117173,6 @@
           "type": {
             "kind": "INPUT_OBJECT",
             "name": "UpdateColumnWebhookResourceNameInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "organizationalUnit",
-          "description": "Update the 'organizational_unit' column in the 'webhook_resource' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnWebhookResourceOrganizationalUnitInput",
             "ofType": null
           },
           "defaultValue": null
@@ -131523,16 +131111,6 @@
           }
         },
         {
-          "name": "organizationalUnit",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          }
-        },
-        {
           "name": "previousSecret",
           "description": "",
           "args": [],
@@ -131682,20 +131260,6 @@
         },
         {
           "name": "name",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "TextAggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "organizationalUnit",
           "description": "",
           "args": [],
           "type": {
@@ -131900,16 +131464,6 @@
           "defaultValue": null
         },
         {
-          "name": "organizationalUnit",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "TextBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "previousSecret",
           "description": "",
           "type": {
@@ -132079,16 +131633,6 @@
         },
         {
           "name": "name",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "organizationalUnit",
           "description": "",
           "type": {
             "kind": "ENUM",

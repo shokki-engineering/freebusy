@@ -38,27 +38,18 @@ var (
 	_ = metadata.Join
 )
 
-var filter_ReservationService_CreateReservation_0 = &utilities.DoubleArray{Encoding: map[string]int{"reservation": 0, "parent": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+var filter_ReservationService_CreateReservation_0 = &utilities.DoubleArray{Encoding: map[string]int{"reservation": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 
 func request_ReservationService_CreateReservation_0(ctx context.Context, marshaler runtime.Marshaler, client ReservationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq CreateReservationRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Reservation); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["parent"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "parent")
-	}
-	protoReq.Parent, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "parent", err)
 	}
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -74,18 +65,9 @@ func local_request_ReservationService_CreateReservation_0(ctx context.Context, m
 	var (
 		protoReq CreateReservationRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Reservation); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	val, ok := pathParams["parent"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "parent")
-	}
-	protoReq.Parent, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "parent", err)
 	}
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -136,24 +118,15 @@ func local_request_ReservationService_GetReservation_0(ctx context.Context, mars
 	return msg, metadata, err
 }
 
-var filter_ReservationService_ListReservations_0 = &utilities.DoubleArray{Encoding: map[string]int{"parent": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+var filter_ReservationService_ListReservations_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
 func request_ReservationService_ListReservations_0(ctx context.Context, marshaler runtime.Marshaler, client ReservationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq ListReservationsRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["parent"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "parent")
-	}
-	protoReq.Parent, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "parent", err)
 	}
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -169,16 +142,7 @@ func local_request_ReservationService_ListReservations_0(ctx context.Context, ma
 	var (
 		protoReq ListReservationsRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
-	val, ok := pathParams["parent"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "parent")
-	}
-	protoReq.Parent, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "parent", err)
-	}
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
@@ -372,7 +336,7 @@ func RegisterReservationServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/CreateReservation", runtime.WithHTTPPathPattern("/v1/{parent=organizationalUnits/*}/reservations"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/CreateReservation", runtime.WithHTTPPathPattern("/v1/reservations"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -392,7 +356,7 @@ func RegisterReservationServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/GetReservation", runtime.WithHTTPPathPattern("/v1/{name=organizationalUnits/*/reservations/*}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/GetReservation", runtime.WithHTTPPathPattern("/v1/{name=reservations/*}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -412,7 +376,7 @@ func RegisterReservationServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/ListReservations", runtime.WithHTTPPathPattern("/v1/{parent=organizationalUnits/*}/reservations"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/ListReservations", runtime.WithHTTPPathPattern("/v1/reservations"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -432,7 +396,7 @@ func RegisterReservationServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/UpdateReservation", runtime.WithHTTPPathPattern("/v1/{reservation.name=organizationalUnits/*/reservations/*}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/UpdateReservation", runtime.WithHTTPPathPattern("/v1/{reservation.name=reservations/*}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -452,7 +416,7 @@ func RegisterReservationServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/CancelReservation", runtime.WithHTTPPathPattern("/v1/{name=organizationalUnits/*/reservations/*}:cancel"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/CancelReservation", runtime.WithHTTPPathPattern("/v1/{name=reservations/*}:cancel"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -472,7 +436,7 @@ func RegisterReservationServiceHandlerServer(ctx context.Context, mux *runtime.S
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/RescheduleReservation", runtime.WithHTTPPathPattern("/v1/{name=organizationalUnits/*/reservations/*}:reschedule"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/RescheduleReservation", runtime.WithHTTPPathPattern("/v1/{name=reservations/*}:reschedule"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -530,7 +494,7 @@ func RegisterReservationServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/CreateReservation", runtime.WithHTTPPathPattern("/v1/{parent=organizationalUnits/*}/reservations"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/CreateReservation", runtime.WithHTTPPathPattern("/v1/reservations"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -547,7 +511,7 @@ func RegisterReservationServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/GetReservation", runtime.WithHTTPPathPattern("/v1/{name=organizationalUnits/*/reservations/*}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/GetReservation", runtime.WithHTTPPathPattern("/v1/{name=reservations/*}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -564,7 +528,7 @@ func RegisterReservationServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/ListReservations", runtime.WithHTTPPathPattern("/v1/{parent=organizationalUnits/*}/reservations"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/ListReservations", runtime.WithHTTPPathPattern("/v1/reservations"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -581,7 +545,7 @@ func RegisterReservationServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/UpdateReservation", runtime.WithHTTPPathPattern("/v1/{reservation.name=organizationalUnits/*/reservations/*}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/UpdateReservation", runtime.WithHTTPPathPattern("/v1/{reservation.name=reservations/*}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -598,7 +562,7 @@ func RegisterReservationServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/CancelReservation", runtime.WithHTTPPathPattern("/v1/{name=organizationalUnits/*/reservations/*}:cancel"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/CancelReservation", runtime.WithHTTPPathPattern("/v1/{name=reservations/*}:cancel"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -615,7 +579,7 @@ func RegisterReservationServiceHandlerClient(ctx context.Context, mux *runtime.S
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/RescheduleReservation", runtime.WithHTTPPathPattern("/v1/{name=organizationalUnits/*/reservations/*}:reschedule"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.reservation.v1.ReservationService/RescheduleReservation", runtime.WithHTTPPathPattern("/v1/{name=reservations/*}:reschedule"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -632,12 +596,12 @@ func RegisterReservationServiceHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_ReservationService_CreateReservation_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2, 2, 3}, []string{"v1", "organizationalUnits", "parent", "reservations"}, ""))
-	pattern_ReservationService_GetReservation_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 2, 2, 1, 0, 4, 4, 5, 3}, []string{"v1", "organizationalUnits", "reservations", "name"}, ""))
-	pattern_ReservationService_ListReservations_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2, 2, 3}, []string{"v1", "organizationalUnits", "parent", "reservations"}, ""))
-	pattern_ReservationService_UpdateReservation_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 2, 2, 1, 0, 4, 4, 5, 3}, []string{"v1", "organizationalUnits", "reservations", "reservation.name"}, ""))
-	pattern_ReservationService_CancelReservation_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 2, 2, 1, 0, 4, 4, 5, 3}, []string{"v1", "organizationalUnits", "reservations", "name"}, "cancel"))
-	pattern_ReservationService_RescheduleReservation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 2, 2, 1, 0, 4, 4, 5, 3}, []string{"v1", "organizationalUnits", "reservations", "name"}, "reschedule"))
+	pattern_ReservationService_CreateReservation_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "reservations"}, ""))
+	pattern_ReservationService_GetReservation_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2}, []string{"v1", "reservations", "name"}, ""))
+	pattern_ReservationService_ListReservations_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "reservations"}, ""))
+	pattern_ReservationService_UpdateReservation_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2}, []string{"v1", "reservations", "reservation.name"}, ""))
+	pattern_ReservationService_CancelReservation_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2}, []string{"v1", "reservations", "name"}, "cancel"))
+	pattern_ReservationService_RescheduleReservation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2}, []string{"v1", "reservations", "name"}, "reschedule"))
 )
 
 var (

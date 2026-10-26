@@ -31,14 +31,8 @@ enum ErrorReason {
     detail: DETAIL_KIND_BAD_REQUEST
   }];
 
-  // The hold is at a different site from the reservation's parent, or
-  // CreateHold's hold.replaces is a hold at another site.
-  ERROR_REASON_HOLD_AT_ANOTHER_SITE = 2 [(service.v1.error_reason) = {
-    code: "INVALID_ARGUMENT"
-    description: "The hold is at a different site from the reservation's parent, or `CreateHold`'s `hold.replaces` is a hold at another site."
-    fix: "Send the hold's own site as `parent`; a hold replaces only a booking at its own site."
-    detail: DETAIL_KIND_BAD_REQUEST
-  }];
+  reserved 2;
+  reserved "ERROR_REASON_HOLD_AT_ANOTHER_SITE";
 
   // The hold lapsed before the reservation was confirmed; the reservation
   // failed.

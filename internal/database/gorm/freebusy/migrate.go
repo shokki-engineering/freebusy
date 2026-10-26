@@ -95,26 +95,6 @@ type externalForeignKey struct {
 // MigrateExternal adds and ValidateExternal validates.
 var externalForeignKeys = []externalForeignKey{
 	{
-		name:   "fk_holds_organizational_unit_id",
-		table:  `"allocation"."holds"`,
-		target: `"orgunit"."organizational_units"`,
-		add: `-- "allocation"."holds".organizational_unit_id -> "orgunit"."organizational_units" (discovered, database rfc)
-DO $$
-BEGIN
-    IF to_regclass('"orgunit"."organizational_units"') IS NULL THEN
-        RAISE NOTICE 'skipping fk_holds_organizational_unit_id: "orgunit"."organizational_units" does not exist yet';
-    ELSIF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_holds_organizational_unit_id' AND conrelid = '"allocation"."holds"'::regclass) THEN
-        ALTER TABLE "allocation"."holds" ADD CONSTRAINT "fk_holds_organizational_unit_id" FOREIGN KEY ("organizational_unit_id") REFERENCES "orgunit"."organizational_units"("id") ON DELETE NO ACTION NOT VALID;
-    END IF;
-END $$;`,
-		validate: `DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_holds_organizational_unit_id' AND conrelid = to_regclass('"allocation"."holds"') AND NOT convalidated) THEN
-        ALTER TABLE "allocation"."holds" VALIDATE CONSTRAINT "fk_holds_organizational_unit_id";
-    END IF;
-END $$;`,
-	},
-	{
 		name:   "fk_resource_resource",
 		table:  `"allocation"."resource"`,
 		target: `"resource"."entity"`,
@@ -131,66 +111,6 @@ END $$;`,
 BEGIN
     IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_resource_resource' AND conrelid = to_regclass('"allocation"."resource"') AND NOT convalidated) THEN
         ALTER TABLE "allocation"."resource" VALIDATE CONSTRAINT "fk_resource_resource";
-    END IF;
-END $$;`,
-	},
-	{
-		name:   "fk_resource_organizational_unit_id",
-		table:  `"allocation"."resource"`,
-		target: `"orgunit"."organizational_units"`,
-		add: `-- "allocation"."resource".organizational_unit_id -> "orgunit"."organizational_units" (discovered, database rfc)
-DO $$
-BEGIN
-    IF to_regclass('"orgunit"."organizational_units"') IS NULL THEN
-        RAISE NOTICE 'skipping fk_resource_organizational_unit_id: "orgunit"."organizational_units" does not exist yet';
-    ELSIF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_resource_organizational_unit_id' AND conrelid = '"allocation"."resource"'::regclass) THEN
-        ALTER TABLE "allocation"."resource" ADD CONSTRAINT "fk_resource_organizational_unit_id" FOREIGN KEY ("organizational_unit_id") REFERENCES "orgunit"."organizational_units"("id") ON DELETE NO ACTION NOT VALID;
-    END IF;
-END $$;`,
-		validate: `DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_resource_organizational_unit_id' AND conrelid = to_regclass('"allocation"."resource"') AND NOT convalidated) THEN
-        ALTER TABLE "allocation"."resource" VALIDATE CONSTRAINT "fk_resource_organizational_unit_id";
-    END IF;
-END $$;`,
-	},
-	{
-		name:   "fk_resource_organizational_unit_id",
-		table:  `"reservation"."resource"`,
-		target: `"orgunit"."organizational_units"`,
-		add: `-- "reservation"."resource".organizational_unit_id -> "orgunit"."organizational_units" (discovered, database rfc)
-DO $$
-BEGIN
-    IF to_regclass('"orgunit"."organizational_units"') IS NULL THEN
-        RAISE NOTICE 'skipping fk_resource_organizational_unit_id: "orgunit"."organizational_units" does not exist yet';
-    ELSIF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_resource_organizational_unit_id' AND conrelid = '"reservation"."resource"'::regclass) THEN
-        ALTER TABLE "reservation"."resource" ADD CONSTRAINT "fk_resource_organizational_unit_id" FOREIGN KEY ("organizational_unit_id") REFERENCES "orgunit"."organizational_units"("id") ON DELETE NO ACTION NOT VALID;
-    END IF;
-END $$;`,
-		validate: `DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_resource_organizational_unit_id' AND conrelid = to_regclass('"reservation"."resource"') AND NOT convalidated) THEN
-        ALTER TABLE "reservation"."resource" VALIDATE CONSTRAINT "fk_resource_organizational_unit_id";
-    END IF;
-END $$;`,
-	},
-	{
-		name:   "fk_resource_organizational_unit",
-		table:  `"webhook"."resource"`,
-		target: `"orgunit"."organizational_units"`,
-		add: `-- "webhook"."resource".organizational_unit -> "orgunit"."organizational_units" (discovered, database rfc)
-DO $$
-BEGIN
-    IF to_regclass('"orgunit"."organizational_units"') IS NULL THEN
-        RAISE NOTICE 'skipping fk_resource_organizational_unit: "orgunit"."organizational_units" does not exist yet';
-    ELSIF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_resource_organizational_unit' AND conrelid = '"webhook"."resource"'::regclass) THEN
-        ALTER TABLE "webhook"."resource" ADD CONSTRAINT "fk_resource_organizational_unit" FOREIGN KEY ("organizational_unit") REFERENCES "orgunit"."organizational_units"("name") ON DELETE NO ACTION NOT VALID;
-    END IF;
-END $$;`,
-		validate: `DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_resource_organizational_unit' AND conrelid = to_regclass('"webhook"."resource"') AND NOT convalidated) THEN
-        ALTER TABLE "webhook"."resource" VALIDATE CONSTRAINT "fk_resource_organizational_unit";
     END IF;
 END $$;`,
 	},

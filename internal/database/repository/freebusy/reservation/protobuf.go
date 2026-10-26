@@ -106,7 +106,7 @@ func reservationToCreateInput(in *reservationpbv1.Reservation) resourceql.Create
 	var ci resourceql.CreateInput
 	ci.Name = in.GetName()
 	if v := in.GetHold(); v != "" {
-		ci.Hold = v
+		ci.Hold = repox.LastSegment(v)
 	}
 	ci.Customer = in.GetCustomer()
 	ci.Attributes = structToJSON(in.GetAttributes())
@@ -133,7 +133,7 @@ func reservationToCreateInput(in *reservationpbv1.Reservation) resourceql.Create
 func reservationToUpdatePatch(merged *reservationpbv1.Reservation) resourceql.UpdateInput {
 	var patch resourceql.UpdateInput
 	patch.Name = graphql.Value(merged.GetName())
-	patch.Hold = graphql.Value(merged.GetHold())
+	patch.Hold = graphql.Value(repox.LastSegment(merged.GetHold()))
 	if v := merged.GetCustomer(); v != "" {
 		patch.Customer = graphql.Value(v)
 	} else {
@@ -230,7 +230,9 @@ func reservationFromRow(row *resourceql.ReservationResource) *reservationpbv1.Re
 	}
 	out := &reservationpbv1.Reservation{}
 	out.Name = row.Name
-	out.Hold = row.Hold
+	if row.Hold != "" {
+		out.Hold = "holds/" + row.Hold
+	}
 	out.Customer = repox.Deref(row.Customer)
 	out.Attributes = jsonToStruct(row.Attributes)
 	out.Etag = repox.Deref(row.Etag)

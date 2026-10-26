@@ -3,22 +3,10 @@
 
 package reservation
 
-import "strings"
-
-// HoldName rebuilds a hold's name from the two parts a reservation row stores:
-// its site and the hold's id.
-func HoldName(siteID, holdID string) string {
-	if siteID == "" || holdID == "" {
+// HoldName rebuilds a hold's name from the id a reservation row stores.
+func HoldName(holdID string) string {
+	if holdID == "" {
 		return ""
 	}
-	return "organizationalUnits/" + siteID + "/holds/" + holdID
-}
-
-// SiteID is the organizational unit id in a reservation name,
-// "organizationalUnits/{ou}/reservations/{id}".
-func SiteID(name string) string {
-	if parts := strings.Split(name, "/"); len(parts) == 4 {
-		return parts[1]
-	}
-	return ""
+	return "holds/" + holdID
 }

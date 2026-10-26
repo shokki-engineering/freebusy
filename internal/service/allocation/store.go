@@ -24,16 +24,9 @@ import (
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 )
 
-// ResourceQuery selects the resources a request is about. Exactly one of
-// OrganizationalUnits, Organization or Calendars scopes it; Names and Types
-// narrow it.
+// ResourceQuery selects the resources a request is about: every resource,
+// narrowed by whichever fields are set.
 type ResourceQuery struct {
-	// OrganizationalUnits restricts to resources at these sites.
-	// Format: organizationalUnits/{organizational_unit}
-	OrganizationalUnits []string
-	// Organization restricts to resources at any site of this operator, used
-	// by SearchAvailability. Format: organizations/{organization}
-	Organization string
 	// Calendars restricts to resources scheduled on these calendars, used by
 	// QueryFreeBusy. Format: calendars/{calendar}
 	Calendars []string
@@ -94,7 +87,7 @@ type Store interface {
 	// A hold that replaces another (hold.Replaces) claims, on each resource,
 	// only the part of its window the replaced hold's claims leave free; the
 	// replaced hold's claims are no conflict.
-	InsertHold(ctx context.Context, parent string, hold *allocationpbv1.Hold) (*allocationpbv1.Hold, error)
+	InsertHold(ctx context.Context, hold *allocationpbv1.Hold) (*allocationpbv1.Hold, error)
 
 	// HandOver ends the converted hold from as of at, guarded by etag, and in
 	// the same write gives hold to -- which replaces it -- the rest of its
@@ -105,12 +98,12 @@ type Store interface {
 	// GetHold returns a hold by name as stored, without applying expiry.
 	GetHold(ctx context.Context, name string) (*allocationpbv1.Hold, error)
 
-	// FindHold returns the hold at parent carrying idempotency key, or
+	// FindHold returns the hold carrying idempotency key, or
 	// repox.ErrNotFound.
-	FindHold(ctx context.Context, parent, idempotencyKey string) (*allocationpbv1.Hold, error)
+	FindHold(ctx context.Context, idempotencyKey string) (*allocationpbv1.Hold, error)
 
-	// ListHolds returns a page of holds at parent.
-	ListHolds(ctx context.Context, parent string, in repox.ListInput) ([]*allocationpbv1.Hold, string, error)
+	// ListHolds returns a page of holds.
+	ListHolds(ctx context.Context, in repox.ListInput) ([]*allocationpbv1.Hold, string, error)
 
 	// UpdateHold changes a hold's state and expiry, and its allocations'
 	// expiry with it, if the stored etag still equals etag (empty skips the

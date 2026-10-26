@@ -10,8 +10,6 @@ import (
 	"testing"
 	"time"
 
-	organizationv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organization/v1"
-	organizational_unitv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organizational_unit/v1"
 	calendarv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1"
 	eventv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/event/v1"
 	availabilityv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7953/availability/v1"
@@ -21,14 +19,12 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/availability"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/calendar"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/event"
-	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/organization"
-	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/orgunit"
 	"github.com/shokki-engineering/freebusy/internal/database/repository/rfc/resource"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // row is one stored record in a fake table: its name, the parent it names
-// (organization or organizational_unit), and its AIP-164 times.
+// (a resource's calendar), and its AIP-164 times.
 type row struct {
 	name, parent, etag string
 	deleted, expire    *timestamppb.Timestamp
@@ -121,45 +117,24 @@ func (t *table) purgeExpired(now time.Time) (repox.PurgeResult, error) {
 	return res, nil
 }
 
-type fakeOrganizations struct {
-	organization.OrganizationRepository
+type fakeCalendars struct {
+	calendar.CalendarRepository
 	*table
 }
 
-func (f fakeOrganizations) List(_ context.Context, in repox.ListInput) ([]*organizationv1.Organization, string, error) {
-	var out []*organizationv1.Organization
+func (f fakeCalendars) List(_ context.Context, in repox.ListInput) ([]*calendarv1.Calendar, string, error) {
+	var out []*calendarv1.Calendar
 	for _, r := range f.list(in) {
-		out = append(out, &organizationv1.Organization{Name: r.name, Etag: r.etag, DeleteTime: r.deleted, ExpireTime: r.expire})
+		out = append(out, &calendarv1.Calendar{Name: r.name, Etag: r.etag, DeleteTime: r.deleted, ExpireTime: r.expire})
 	}
 	return out, "", nil
 }
 
-func (f fakeOrganizations) UpdateOutputOnly(_ context.Context, m *organizationv1.Organization, _ []string) (*organizationv1.Organization, error) {
+func (f fakeCalendars) UpdateOutputOnly(_ context.Context, m *calendarv1.Calendar, _ []string) (*calendarv1.Calendar, error) {
 	return m, f.expire(m.GetName(), m.GetEtag(), m.GetExpireTime())
 }
 
-func (f fakeOrganizations) PurgeExpired(_ context.Context, now time.Time) (repox.PurgeResult, error) {
-	return f.purgeExpired(now)
-}
-
-type fakeUnits struct {
-	orgunit.OrganizationalUnitRepository
-	*table
-}
-
-func (f fakeUnits) List(_ context.Context, in repox.ListInput) ([]*organizational_unitv1.OrganizationalUnit, string, error) {
-	var out []*organizational_unitv1.OrganizationalUnit
-	for _, r := range f.list(in) {
-		out = append(out, &organizational_unitv1.OrganizationalUnit{Name: r.name, Etag: r.etag, Organization: r.parent, DeleteTime: r.deleted, ExpireTime: r.expire})
-	}
-	return out, "", nil
-}
-
-func (f fakeUnits) UpdateOutputOnly(_ context.Context, m *organizational_unitv1.OrganizationalUnit, _ []string) (*organizational_unitv1.OrganizationalUnit, error) {
-	return m, f.expire(m.GetName(), m.GetEtag(), m.GetExpireTime())
-}
-
-func (f fakeUnits) PurgeExpired(_ context.Context, now time.Time) (repox.PurgeResult, error) {
+func (f fakeCalendars) PurgeExpired(_ context.Context, now time.Time) (repox.PurgeResult, error) {
 	return f.purgeExpired(now)
 }
 
@@ -171,7 +146,7 @@ type fakeResources struct {
 func (f fakeResources) List(_ context.Context, in repox.ListInput) ([]*resourcev1.Resource, string, error) {
 	var out []*resourcev1.Resource
 	for _, r := range f.list(in) {
-		out = append(out, &resourcev1.Resource{Name: r.name, Etag: r.etag, OrganizationalUnit: r.parent, DeleteTime: r.deleted, ExpireTime: r.expire})
+		out = append(out, &resourcev1.Resource{Name: r.name, Etag: r.etag, Calendar: r.parent, DeleteTime: r.deleted, ExpireTime: r.expire})
 	}
 	return out, "", nil
 }
@@ -184,17 +159,7 @@ func (f fakeResources) PurgeExpired(_ context.Context, now time.Time) (repox.Pur
 	return f.purgeExpired(now)
 }
 
-// The calendar tree is empty here; its fakes only list nothing.
-type emptyCalendars struct{ calendar.CalendarRepository }
-
-func (emptyCalendars) List(context.Context, repox.ListInput) ([]*calendarv1.Calendar, string, error) {
-	return nil, "", nil
-}
-
-func (emptyCalendars) PurgeExpired(context.Context, time.Time) (repox.PurgeResult, error) {
-	return repox.PurgeResult{}, nil
-}
-
+// Calendars hold no events or availability here; their fakes list nothing.
 type emptyEvents struct{ event.EventRepository }
 
 func (emptyEvents) List(context.Context, string, repox.ListInput) ([]*eventv1.Event, string, error) {
@@ -221,32 +186,27 @@ func TestPurgerSweep(t *testing.T) {
 	now := time.Date(2026, 11, 1, 0, 0, 0, 0, time.UTC)
 	ago := func(days int) *timestamppb.Timestamp { return timestamppb.New(now.AddDate(0, 0, -days)) }
 
-	orgs := newTable("",
-		// Due, but its site still has a row: it waits.
-		&row{name: "organizations/busy", deleted: ago(40)},
+	calendars := newTable("",
+		// Due, but a resource still names it: it waits.
+		&row{name: "calendars/busy", deleted: ago(40)},
 		// Due and nothing names it: purged.
-		&row{name: "organizations/gone", deleted: ago(31)},
+		&row{name: "calendars/gone", deleted: ago(31)},
 		// Deleted 10 days ago: kept, with expire_time stamped at day 30.
-		&row{name: "organizations/recent", deleted: ago(10)},
+		&row{name: "calendars/recent", deleted: ago(10)},
 		// Undeleted, but expire_time survived the restore: cleared, not purged.
-		&row{name: "organizations/restored", expire: ago(1)},
+		&row{name: "calendars/restored", expire: ago(1)},
 	)
-	units := newTable("organization",
-		&row{name: "organizationalUnits/kept", parent: "organizations/busy", deleted: ago(5)},
-		// Due, and its resource is due too: the resource goes first, then it.
-		&row{name: "organizationalUnits/old", parent: "organizations/other", deleted: ago(35)},
+	resources := newTable("calendar",
+		&row{name: "resources/kept", parent: "calendars/busy", deleted: ago(5)},
+		// Due: purged.
+		&row{name: "resources/court", parent: "calendars/other", deleted: ago(35)},
 	)
-	resources := newTable("organizational_unit",
-		&row{name: "resources/court", parent: "organizationalUnits/old", deleted: ago(35)},
-	)
-	orgs.referrers, units.referrers = []*table{units}, []*table{resources}
+	calendars.referrers = []*table{resources}
 	p := NewPurger(Repositories{
-		Organizations:       fakeOrganizations{table: orgs},
-		OrganizationalUnits: fakeUnits{table: units},
-		Resources:           fakeResources{table: resources},
-		Calendars:           emptyCalendars{},
-		Events:              emptyEvents{},
-		Availabilities:      emptyAvailabilities{},
+		Resources:      fakeResources{table: resources},
+		Calendars:      fakeCalendars{table: calendars},
+		Events:         emptyEvents{},
+		Availabilities: emptyAvailabilities{},
 	}, 30*24*time.Hour, nil)
 	p.now = func() time.Time { return now }
 
@@ -254,44 +214,43 @@ func TestPurgerSweep(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if n != 3 {
-		t.Errorf("purged %d records, want 3", n)
+	if n != 2 {
+		t.Errorf("purged %d records, want 2", n)
 	}
 	for tbl, want := range map[*table][]string{
-		orgs:      {"organizations/gone"},
-		units:     {"organizationalUnits/old"},
+		calendars: {"calendars/gone"},
 		resources: {"resources/court"},
 	} {
 		if !slices.Equal(tbl.purged, want) {
 			t.Errorf("purged %v, want %v", tbl.purged, want)
 		}
 	}
-	if r := orgs.rows["organizations/busy"]; r == nil {
-		t.Error("an organization a site still names was purged")
+	if r := calendars.rows["calendars/busy"]; r == nil {
+		t.Error("a calendar a resource still names was purged")
 	}
-	if got := orgs.rows["organizations/recent"].expire; got == nil || !got.AsTime().Equal(now.AddDate(0, 0, 20)) {
+	if got := calendars.rows["calendars/recent"].expire; got == nil || !got.AsTime().Equal(now.AddDate(0, 0, 20)) {
 		t.Errorf("recent expire_time = %v, want delete_time + 30 days", got)
 	}
-	if got := orgs.rows["organizations/restored"]; got == nil || got.expire != nil {
-		t.Errorf("restored organization = %+v, want kept with expire_time cleared", got)
+	if got := calendars.rows["calendars/restored"]; got == nil || got.expire != nil {
+		t.Errorf("restored calendar = %+v, want kept with expire_time cleared", got)
 	}
 
 	// A record stamped under another retention is restamped, not purged by
 	// its stale expire_time.
-	orgs.rows["organizations/recent"].expire = ago(1)
+	calendars.rows["calendars/recent"].expire = ago(1)
 	if _, err := p.Sweep(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	if got := orgs.rows["organizations/recent"]; got == nil || !got.expire.AsTime().Equal(now.AddDate(0, 0, 20)) {
+	if got := calendars.rows["calendars/recent"]; got == nil || !got.expire.AsTime().Equal(now.AddDate(0, 0, 20)) {
 		t.Errorf("recent after a stale expire_time = %+v, want kept and restamped", got)
 	}
 
 	// A second sweep finds nothing new to write.
-	etag := orgs.rows["organizations/recent"].etag
+	etag := calendars.rows["calendars/recent"].etag
 	if _, err := p.Sweep(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	if orgs.rows["organizations/recent"].etag != etag {
+	if calendars.rows["calendars/recent"].etag != etag {
 		t.Error("a second sweep rewrote an expire_time already correct")
 	}
 }

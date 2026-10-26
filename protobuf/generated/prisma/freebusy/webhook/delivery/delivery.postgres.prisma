@@ -29,7 +29,7 @@ model Delivery {
   /// The CloudEvents type, e.g. "freebusy.reservation.confirmed".
   eventType String? @map("event_type")
 
-  /// The record that changed. Format: organizationalUnits/{organizational_unit}/reservations/{reservation} or organizationalUnits/{organizational_unit}/holds/{hold}
+  /// The record that changed. Format: reservations/{reservation} or holds/{hold}
   subject String? @map("subject")
 
   /// The request body sent: a CloudEvents 1.0 JSON document whose data is the record as it stood.

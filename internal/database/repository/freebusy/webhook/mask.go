@@ -66,7 +66,4 @@ func applyWebhookMask(merged, in *webhookpbv1.Webhook, paths []string) {
 	if repox.InMask(paths, "event_types") {
 		merged.EventTypes = in.GetEventTypes()
 	}
-	if repox.InMask(paths, "organizational_unit") {
-		merged.OrganizationalUnit = in.GetOrganizationalUnit()
-	}
 }

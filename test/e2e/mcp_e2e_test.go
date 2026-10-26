@@ -3,10 +3,10 @@
 
 // This file end-to-end tests the MCP surface: the generated Serve*MCP path
 // with the server's unary interceptor chain threaded through — the regression
-// test for MCP tool calls bypassing protovalidate. It boots the organisation
+// test for MCP tool calls bypassing protovalidate. It boots the allocation
 // MCP service over streamable HTTP exactly as the hybrid server does (an
 // MCPServerConfig carrying UnaryInterceptor) and drives it with the real MCP
-// client: an invalid create must come back a validation error, a valid one
+// client: an invalid call must come back a validation error, a valid one
 // must round-trip, and cancelling the context must stop the listener.
 //
 // Gated like the other live suites (any provider works; gorm shown):
@@ -62,7 +62,7 @@ func TestMCP_ValidationAndLifecycle_Gorm(t *testing.T) {
 	endpoint := fmt.Sprintf("http://%s%s", addr, allocationpbv1.AllocationServiceMCPDefaultBasePath)
 	session := dialMCP(t, endpoint)
 
-	// An invalid call -- no site, no window -- must be rejected by the
+	// An invalid call -- no window -- must be rejected by the
 	// interceptor before the handler runs. The subject is the MCP surface and
 	// the interceptor, not the particular service.
 	res, err := session.CallTool(context.Background(), &mcp.CallToolParams{
@@ -75,17 +75,17 @@ func TestMCP_ValidationAndLifecycle_Gorm(t *testing.T) {
 	if !res.IsError {
 		t.Fatalf("invalid call was accepted: %v", res.Content)
 	}
-	if text := toolText(res); !strings.Contains(text, "parent") {
+	if text := toolText(res); !strings.Contains(text, "window") {
 		t.Fatalf("rejection does not read as a validation error: %q", text)
 	}
 
-	// A valid call round-trips. A site with no resources is a valid question
-	// with a definite answer: nothing is free.
+	// A valid call round-trips. A resource that does not exist is a valid
+	// question with a definite answer: nothing is free.
 	start := time.Now().UTC().AddDate(0, 0, 7).Truncate(time.Hour)
 	res, err = session.CallTool(context.Background(), &mcp.CallToolParams{
 		Name: "allocation_service-check_availability_v1",
 		Arguments: map[string]any{
-			"parent": fmt.Sprintf("organizationalUnits/mcp-e2e-%d", time.Now().UnixNano()%1_000_000_000),
+			"resources": []string{fmt.Sprintf("resources/mcp-e2e-%d", time.Now().UnixNano()%1_000_000_000)},
 			"window": map[string]any{
 				"start_time": start.Format(time.RFC3339),
 				"end_time":   start.Add(time.Hour).Format(time.RFC3339),
@@ -96,7 +96,7 @@ func TestMCP_ValidationAndLifecycle_Gorm(t *testing.T) {
 		t.Fatalf("valid call failed: err=%v content=%v", err, res.Content)
 	}
 	if text := toolText(res); strings.Contains(text, `"bookable": true`) || strings.Contains(text, `"bookable":true`) {
-		t.Fatalf("an empty site reported bookable: %s", text)
+		t.Fatalf("a missing resource reported bookable: %s", text)
 	}
 	_ = session.Close()
 

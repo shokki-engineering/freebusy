@@ -38,27 +38,18 @@ var (
 	_ = metadata.Join
 )
 
-var filter_HoldService_CreateHold_0 = &utilities.DoubleArray{Encoding: map[string]int{"hold": 0, "parent": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+var filter_HoldService_CreateHold_0 = &utilities.DoubleArray{Encoding: map[string]int{"hold": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 
 func request_HoldService_CreateHold_0(ctx context.Context, marshaler runtime.Marshaler, client HoldServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq CreateHoldRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Hold); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["parent"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "parent")
-	}
-	protoReq.Parent, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "parent", err)
 	}
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -74,18 +65,9 @@ func local_request_HoldService_CreateHold_0(ctx context.Context, marshaler runti
 	var (
 		protoReq CreateHoldRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Hold); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	val, ok := pathParams["parent"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "parent")
-	}
-	protoReq.Parent, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "parent", err)
 	}
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -136,24 +118,15 @@ func local_request_HoldService_GetHold_0(ctx context.Context, marshaler runtime.
 	return msg, metadata, err
 }
 
-var filter_HoldService_ListHolds_0 = &utilities.DoubleArray{Encoding: map[string]int{"parent": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+var filter_HoldService_ListHolds_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
 func request_HoldService_ListHolds_0(ctx context.Context, marshaler runtime.Marshaler, client HoldServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq ListHoldsRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["parent"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "parent")
-	}
-	protoReq.Parent, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "parent", err)
 	}
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
@@ -169,16 +142,7 @@ func local_request_HoldService_ListHolds_0(ctx context.Context, marshaler runtim
 	var (
 		protoReq ListHoldsRequest
 		metadata runtime.ServerMetadata
-		err      error
 	)
-	val, ok := pathParams["parent"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "parent")
-	}
-	protoReq.Parent, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "parent", err)
-	}
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
@@ -344,7 +308,7 @@ func RegisterHoldServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/CreateHold", runtime.WithHTTPPathPattern("/v1/{parent=organizationalUnits/*}/holds"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/CreateHold", runtime.WithHTTPPathPattern("/v1/holds"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -364,7 +328,7 @@ func RegisterHoldServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/GetHold", runtime.WithHTTPPathPattern("/v1/{name=organizationalUnits/*/holds/*}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/GetHold", runtime.WithHTTPPathPattern("/v1/{name=holds/*}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -384,7 +348,7 @@ func RegisterHoldServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/ListHolds", runtime.WithHTTPPathPattern("/v1/{parent=organizationalUnits/*}/holds"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/ListHolds", runtime.WithHTTPPathPattern("/v1/holds"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -404,7 +368,7 @@ func RegisterHoldServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/ExtendHold", runtime.WithHTTPPathPattern("/v1/{name=organizationalUnits/*/holds/*}:extend"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/ExtendHold", runtime.WithHTTPPathPattern("/v1/{name=holds/*}:extend"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -424,7 +388,7 @@ func RegisterHoldServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/ReleaseHold", runtime.WithHTTPPathPattern("/v1/{name=organizationalUnits/*/holds/*}:release"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/ReleaseHold", runtime.WithHTTPPathPattern("/v1/{name=holds/*}:release"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -444,7 +408,7 @@ func RegisterHoldServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/DeleteHold", runtime.WithHTTPPathPattern("/v1/{name=organizationalUnits/*/holds/*}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/DeleteHold", runtime.WithHTTPPathPattern("/v1/{name=holds/*}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -502,7 +466,7 @@ func RegisterHoldServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/CreateHold", runtime.WithHTTPPathPattern("/v1/{parent=organizationalUnits/*}/holds"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/CreateHold", runtime.WithHTTPPathPattern("/v1/holds"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -519,7 +483,7 @@ func RegisterHoldServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/GetHold", runtime.WithHTTPPathPattern("/v1/{name=organizationalUnits/*/holds/*}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/GetHold", runtime.WithHTTPPathPattern("/v1/{name=holds/*}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -536,7 +500,7 @@ func RegisterHoldServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/ListHolds", runtime.WithHTTPPathPattern("/v1/{parent=organizationalUnits/*}/holds"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/ListHolds", runtime.WithHTTPPathPattern("/v1/holds"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -553,7 +517,7 @@ func RegisterHoldServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/ExtendHold", runtime.WithHTTPPathPattern("/v1/{name=organizationalUnits/*/holds/*}:extend"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/ExtendHold", runtime.WithHTTPPathPattern("/v1/{name=holds/*}:extend"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -570,7 +534,7 @@ func RegisterHoldServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/ReleaseHold", runtime.WithHTTPPathPattern("/v1/{name=organizationalUnits/*/holds/*}:release"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/ReleaseHold", runtime.WithHTTPPathPattern("/v1/{name=holds/*}:release"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -587,7 +551,7 @@ func RegisterHoldServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/DeleteHold", runtime.WithHTTPPathPattern("/v1/{name=organizationalUnits/*/holds/*}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/freebusy.allocation.v1.HoldService/DeleteHold", runtime.WithHTTPPathPattern("/v1/{name=holds/*}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -604,12 +568,12 @@ func RegisterHoldServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 }
 
 var (
-	pattern_HoldService_CreateHold_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2, 2, 3}, []string{"v1", "organizationalUnits", "parent", "holds"}, ""))
-	pattern_HoldService_GetHold_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 2, 2, 1, 0, 4, 4, 5, 3}, []string{"v1", "organizationalUnits", "holds", "name"}, ""))
-	pattern_HoldService_ListHolds_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2, 2, 3}, []string{"v1", "organizationalUnits", "parent", "holds"}, ""))
-	pattern_HoldService_ExtendHold_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 2, 2, 1, 0, 4, 4, 5, 3}, []string{"v1", "organizationalUnits", "holds", "name"}, "extend"))
-	pattern_HoldService_ReleaseHold_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 2, 2, 1, 0, 4, 4, 5, 3}, []string{"v1", "organizationalUnits", "holds", "name"}, "release"))
-	pattern_HoldService_DeleteHold_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 2, 2, 1, 0, 4, 4, 5, 3}, []string{"v1", "organizationalUnits", "holds", "name"}, ""))
+	pattern_HoldService_CreateHold_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "holds"}, ""))
+	pattern_HoldService_GetHold_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2}, []string{"v1", "holds", "name"}, ""))
+	pattern_HoldService_ListHolds_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "holds"}, ""))
+	pattern_HoldService_ExtendHold_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2}, []string{"v1", "holds", "name"}, "extend"))
+	pattern_HoldService_ReleaseHold_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2}, []string{"v1", "holds", "name"}, "release"))
+	pattern_HoldService_DeleteHold_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 2, 5, 2}, []string{"v1", "holds", "name"}, ""))
 )
 
 var (

@@ -15,8 +15,6 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/database/repository/repox"
 	"github.com/shokki-engineering/freebusy/internal/service/generated/freebusy/allocation/v1/allocationpbv1svc"
 	"github.com/shokki-engineering/freebusy/internal/service/generated/freebusy/webhook/v1/webhookpbv1svc"
-	"github.com/shokki-engineering/freebusy/internal/service/generated/protobuf/rfc4519/organization/v1/organizationv1svc"
-	"github.com/shokki-engineering/freebusy/internal/service/generated/protobuf/rfc4519/organizational_unit/v1/organizational_unitv1svc"
 	"github.com/shokki-engineering/freebusy/internal/service/generated/protobuf/rfc5545/calendar/v1/calendarv1svc"
 	"github.com/shokki-engineering/freebusy/internal/service/generated/protobuf/rfc5545/event/v1/eventv1svc"
 	"github.com/shokki-engineering/freebusy/internal/service/generated/protobuf/rfc7953/availability/v1/availabilityv1svc"
@@ -34,8 +32,6 @@ func (s *Services) Options() []grpc.Option {
 	for _, o := range [][]grpc.Option{
 		allocationpbv1svc.RegisterAll(allocationpbv1svc.Servers{AllocationService: s.Allocation}),
 		webhookpbv1svc.RegisterAll(webhookpbv1svc.Servers{WebhookService: s.Webhooks}),
-		organizationv1svc.RegisterAll(organizationv1svc.Servers{Organizations: s.Organizations}),
-		organizational_unitv1svc.RegisterAll(organizational_unitv1svc.Servers{OrganizationalUnits: s.Units}),
 		resourcev1svc.RegisterAll(resourcev1svc.Servers{Resources: s.Resources}),
 		calendarv1svc.RegisterAll(calendarv1svc.Servers{Calendars: s.Calendars}),
 		availabilityv1svc.RegisterAll(availabilityv1svc.Servers{Availabilities: s.Availabilities}),
@@ -67,8 +63,6 @@ func (s *Services) Options() []grpc.Option {
 func (s *Services) Register(g *grpc.GRPCServer) {
 	allocationpbv1svc.RegisterGRPC(g, allocationpbv1svc.Servers{AllocationService: s.Allocation})
 	webhookpbv1svc.RegisterGRPC(g, webhookpbv1svc.Servers{WebhookService: s.Webhooks})
-	organizationv1svc.RegisterGRPC(g, organizationv1svc.Servers{Organizations: s.Organizations})
-	organizational_unitv1svc.RegisterGRPC(g, organizational_unitv1svc.Servers{OrganizationalUnits: s.Units})
 	resourcev1svc.RegisterGRPC(g, resourcev1svc.Servers{Resources: s.Resources})
 	calendarv1svc.RegisterGRPC(g, calendarv1svc.Servers{Calendars: s.Calendars})
 	availabilityv1svc.RegisterGRPC(g, availabilityv1svc.Servers{Availabilities: s.Availabilities})

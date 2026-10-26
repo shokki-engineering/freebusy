@@ -39,7 +39,7 @@ type ResourceDayWriter = repox.ProjectionWriter[*allocationpbv1.ResourceDay]
 type ResourceDayWriterFunc = repox.ProjectionWriterFunc[*allocationpbv1.ResourceDay]
 
 // ResourceDays is the ResourceDay projection ("allocation"."resource_days"): derived from
-// the-protobuf-project.org/Resource, the-protobuf-project.org/OrganizationalUnit, the-protobuf-project.org/Calendar, the-protobuf-project.org/Availability, the-protobuf-project.org/Event, freebusy.allocation.v1/Allocation, keyed by
+// the-protobuf-project.org/Resource, the-protobuf-project.org/Calendar, the-protobuf-project.org/Availability, the-protobuf-project.org/Event, freebusy.allocation.v1/Allocation, keyed by
 // resource, day. Kept current by every
 // repository write and Batch commit to a source once
 // ResourceDays.Projector(w) is on the connection's Projections.
@@ -58,7 +58,6 @@ var ResourceDays = &repox.Projection[*allocationpbv1.ResourceDay]{
 		VersionColumn: "row_version",
 		Columns: []repox.ProjectionColumn{
 			{Field: "resource", Column: "resource", Kind: repox.ColText, SQLType: "text"},
-			{Field: "organization", Column: "organization", Kind: repox.ColText, SQLType: "text"},
 			{Field: "organizational_unit", Column: "organizational_unit", Kind: repox.ColText, SQLType: "text"},
 			{Field: "day", Column: "day", Kind: repox.ColDate, SQLType: "date"},
 			{Field: "free", Column: "free", Kind: repox.ColMultirange, SQLType: "tstzmultirange"},
@@ -69,8 +68,8 @@ var ResourceDays = &repox.Projection[*allocationpbv1.ResourceDay]{
 			{Field: "free_fraction", Column: "free_fraction", Kind: repox.ColFloat, SQLType: "double precision"},
 		},
 		Range:      "free",
-		IndexLeads: []string{"resource", "organization", "organizational_unit", "calendar"},
-		Sources:    []string{"the-protobuf-project.org/Resource", "the-protobuf-project.org/OrganizationalUnit", "the-protobuf-project.org/Calendar", "the-protobuf-project.org/Availability", "the-protobuf-project.org/Event", "freebusy.allocation.v1/Allocation"},
+		IndexLeads: []string{"resource", "organizational_unit", "calendar", "day"},
+		Sources:    []string{"the-protobuf-project.org/Resource", "the-protobuf-project.org/Calendar", "the-protobuf-project.org/Availability", "the-protobuf-project.org/Event", "freebusy.allocation.v1/Allocation"},
 		Filter:     allocation.ResourceDayFilterSpec,
 	},
 	New: func() *allocationpbv1.ResourceDay { return new(allocationpbv1.ResourceDay) },

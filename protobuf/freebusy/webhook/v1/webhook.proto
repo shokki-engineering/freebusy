@@ -40,15 +40,8 @@ message Webhook {
     singular: "webhook"
     plural: "webhooks"
   };
-  // The record runtime-go's events dispatcher reads a subscription from; its
-  // scope is the site it is limited to.
-  option (service.v1.adapter) = {
-    role: ROLE_WEBHOOK
-    fields: {
-      key: "scope"
-      value: "organizational_unit"
-    }
-  };
+  // The record runtime-go's events dispatcher reads a subscription from.
+  option (service.v1.adapter) = {role: ROLE_WEBHOOK};
 
   // The webhook name.
   // Format: webhooks/{webhook}
@@ -87,16 +80,8 @@ message Webhook {
     (buf.validate.field).repeated.items.string.pattern = "^freebusy\\.[a-z]+\\.[a-z]+$"
   ];
 
-  // Limits events to one site's holds, reservations and resources. Empty
-  // sends every site's. Calendars, events and availabilities belong to no
-  // site, so a webhook limited to one is not sent them.
-  // Format: organizationalUnits/{organizational_unit}
-  string organizational_unit = 5 [
-    (google.api.field_behavior) = OPTIONAL,
-    (google.api.resource_reference).type = "the-protobuf-project.org/OrganizationalUnit",
-    (buf.validate.field).string.pattern = "^organizationalUnits/[^/]+$",
-    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
-  ];
+  reserved 5;
+  reserved "organizational_unit";
 
   // Whether changes are sent. Set by PauseWebhook and ResumeWebhook; pausing
   // keeps the webhook and its history.
