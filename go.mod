@@ -8,12 +8,12 @@ go 1.26.5
 replace github.com/shokki-engineering/freebusy/protobuf => ./protobuf
 
 require (
-	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261026071747-ca7aabdffc7b.1
-	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261026071747-ca7aabdffc7b.2
+	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261026071831-3aba0422074b.1
+	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261026071831-3aba0422074b.2
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.12.3
 	github.com/modelcontextprotocol/go-sdk v1.8.0
-	github.com/shokki-engineering/freebusy/protobuf v0.0.0-00010101000000-000000000000
+	github.com/shokki-engineering/freebusy/protobuf v0.0.0-20261026092803-9fda2eb96b4c
 	github.com/the-protobuf-project/runtime-go/cache v0.0.0-20261026065720-541ce4d35466
 	github.com/the-protobuf-project/runtime-go/grpc v0.0.0-20261026065720-541ce4d35466
 	github.com/the-protobuf-project/runtime-go/network v0.0.0-20261026065720-541ce4d35466
@@ -41,7 +41,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.26.2 // indirect
 	github.com/oapi-codegen/runtime v1.8.0 // indirect
 	github.com/the-protobuf-project/cache v0.3.0 // indirect
-	github.com/the-protobuf-project/mcp v1.7.4 // indirect
+	github.com/the-protobuf-project/mcp v1.7.5 // indirect
 	github.com/the-protobuf-project/service v0.1.0 // indirect
 )
 
@@ -83,7 +83,7 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.11.0
-	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/jackc/puddle/v2 v2.2.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/compress v1.20.3 // indirect
