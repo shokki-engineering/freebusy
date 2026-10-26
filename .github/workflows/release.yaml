@@ -67,7 +67,7 @@ jobs:
             *) echo "PRERELEASE=false" >> "$GITHUB_ENV" ;;
           esac
 
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
