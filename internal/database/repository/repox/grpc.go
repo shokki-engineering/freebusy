@@ -6,7 +6,7 @@
 // 	protoc-gen-store 1.6.5
 // 	protoc (unknown)
 //
-// database: rfc
+// database: freebusy
 // package:  repox
 //
 // Shared runtime for the generated proto-facing repositories.

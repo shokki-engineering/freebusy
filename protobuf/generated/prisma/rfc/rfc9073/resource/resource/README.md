@@ -30,7 +30,7 @@ Schema file: [`resource.postgres.prisma`](./resource.postgres.prisma)
 
 ### `ResourceResource` → `entity`
 
-Resource is the VRESOURCE component, RFC 9073 section 7.3 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.3>. Something bookable that is not a person and not a place: a projector, a meeting room, a parking bay, a minibus. RFC 5545 section 3.8.1.10 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.10> had a free-text RESOURCES property; section 7.3 is its structured replacement. A resource of its own, where `protobuf.rfc5545.event.v1.Resource` is a value object on an event. The two are the same component serving the two uses section 7.3 describes: the value object says *this booking needs a room*, and this says *here is the room*, addressable on its own so a catalogue can be listed, amended and retired independently of any booking. That is the test in `docs/adding-data.md` for a package rather than a field, and rule 8's for full CRUD. Neither replaces the other and both stay. A flat collection, "resources/{resource}", for the reason OrganizationalUnit is flat: section 7.3 defines the component's properties and says nothing about where it sits, so nesting it under a calendar or an organizational unit would assert a containment the RFC does not require. Reference: RFC 9073 "Event Publishing Extensions to iCalendar", section 7.3. https://www.rfc-editor.org/rfc/rfc9073.html#section-7.3
+Resource is the VRESOURCE component, RFC 9073 section 7.3 <https://www.rfc-editor.org/rfc/rfc9073.html#section-7.3>. Something bookable that is not a person and not a place: a projector, a meeting room, a parking bay, a minibus. RFC 5545 section 3.8.1.10 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.8.1.10> had a free-text RESOURCES property; section 7.3 is its structured replacement. A resource of its own, where `protobuf.rfc5545.event.v1.Resource` is a value object on an event. The two are the same component serving the two uses section 7.3 describes: the value object says *this booking needs a room*, and this says *here is the room*, addressable on its own so a catalogue can be listed, amended and retired independently of any booking. That is the test in `docs/adding-data.md` for a package rather than a field, and rule 8's for full CRUD. Neither replaces the other and both stay. A flat collection, "resources/{resource}": section 7.3 defines the component's properties and says nothing about where it sits, so nesting it under a calendar or anything else would assert a containment the RFC does not require. Grouping resources -- by site, operator or tenant -- is the consumer's, with whatever model it has for those. Reference: RFC 9073 "Event Publishing Extensions to iCalendar", section 7.3. https://www.rfc-editor.org/rfc/rfc9073.html#section-7.3
 
 | Column | Type | Null |
 | --- | --- | --- |
@@ -43,7 +43,6 @@ Resource is the VRESOURCE component, RFC 9073 section 7.3 <https://www.rfc-edito
 | `resource_types` | `VARCHAR(255)[]` | nullable |
 | `position` | `POINT` | nullable |
 | `calendar` | `CHAR(26)` | nullable |
-| `organizational_unit` | `VARCHAR(255)` | nullable |
 | `create_time` | `TIMESTAMPTZ` | not null |
 | `update_time` | `TIMESTAMPTZ` | not null |
 | `etag` | `VARCHAR(255)` | nullable |

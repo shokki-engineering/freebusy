@@ -42,8 +42,6 @@ type CreateInput struct {
 	Id string `json:"id"`
 	// Name sets the "name" column (required).
 	Name string `json:"name"`
-	// OrganizationalUnit sets the "organizationalUnit" column; the zero value is omitted (column default / NULL).
-	OrganizationalUnit string `json:"organizationalUnit,omitzero"`
 	// Position sets the "position" column; the zero value is omitted (column default / NULL).
 	Position string `json:"position,omitzero"`
 	// ResourceTypes sets the "resourceTypes" column; the zero value is omitted (column default / NULL).
@@ -76,8 +74,6 @@ type UpdateInput struct {
 	Id graphql.Nullable[string] `json:"id"`
 	// Update the 'name' column in the 'resource_entity' collection.
 	Name graphql.Nullable[string] `json:"name"`
-	// Update the 'organizational_unit' column in the 'resource_entity' collection.
-	OrganizationalUnit graphql.Nullable[string] `json:"organizationalUnit"`
 	// Update the 'position' column in the 'resource_entity' collection.
 	Position graphql.Nullable[string] `json:"position"`
 	// Update the 'resource_types' column in the 'resource_entity' collection.

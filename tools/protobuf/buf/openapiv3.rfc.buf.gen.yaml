@@ -17,7 +17,7 @@ managed:
       value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go
       module: buf.build/the-protobuf-project/rfc
 inputs:
-  - module: buf.build/the-protobuf-project/rfc:cc82b3b15066438ba44e89dad69e9f8a
+  - module: buf.build/the-protobuf-project/rfc:ca7aabdffc7b4c9683b653da6de51503
     types:
       - protobuf.rfc9073.resource.v1.Resources
       - protobuf.rfc5545.calendar.v1.Calendars

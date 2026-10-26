@@ -27,8 +27,6 @@ definition:
       type: String_1!
     - name: name
       type: String_1!
-    - name: organizationalUnit
-      type: String_1
     - name: position
       type: String_1
     - name: resourceTypes
@@ -74,9 +72,6 @@ definition:
         name:
           column:
             name: name
-        organizationalUnit:
-          column:
-            name: organizational_unit
         position:
           column:
             name: position
@@ -109,7 +104,6 @@ definition:
           - icalUid
           - id
           - name
-          - organizationalUnit
           - position
           - resourceTypes
           - uid

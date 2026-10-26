@@ -50,9 +50,6 @@ func applyResourceMask(merged, in *resourcev1.Resource, paths []string) {
 	if repox.InMask(paths, "calendar") {
 		merged.Calendar = in.GetCalendar()
 	}
-	if repox.InMask(paths, "organizational_unit") {
-		merged.OrganizationalUnit = in.GetOrganizationalUnit()
-	}
 	if repox.GroupTouched(paths, "structured_data") {
 		merged.StructuredData = in.GetStructuredData()
 	}

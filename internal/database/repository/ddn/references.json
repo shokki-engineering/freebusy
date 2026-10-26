@@ -98,32 +98,6 @@
       "byIdQuery": "unitResourceById"
     },
     {
-      "field": "insertResourceEntity",
-      "kind": "insert",
-      "resourceType": "the-protobuf-project.org/Resource",
-      "references": [
-        {
-          "field": "organizational_unit",
-          "column": "organizationalUnit",
-          "type": "the-protobuf-project.org/OrganizationalUnit",
-          "onDelete": "ON_DELETE_ALLOW"
-        }
-      ]
-    },
-    {
-      "field": "updateResourceEntityById",
-      "kind": "update",
-      "resourceType": "the-protobuf-project.org/Resource",
-      "references": [
-        {
-          "field": "organizational_unit",
-          "column": "organizationalUnit",
-          "type": "the-protobuf-project.org/OrganizationalUnit",
-          "onDelete": "ON_DELETE_ALLOW"
-        }
-      ]
-    },
-    {
       "field": "deleteResourceEntityById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Resource",

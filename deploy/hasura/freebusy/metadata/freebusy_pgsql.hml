@@ -6647,12 +6647,6 @@ definition:
               type:
                 name: text
                 type: named
-            organizational_unit:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
             position:
               type:
                 type: nullable
@@ -10220,12 +10214,6 @@ definition:
               type:
                 name: text
                 type: named
-            organizational_unit:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
             position:
               type:
                 type: nullable
@@ -16602,17 +16590,6 @@ definition:
                 name: text
                 type: named
           foreign_keys: {}
-        update_column_resource_entity_organizational_unit:
-          description: Update the 'organizational_unit' column in the 'resource_entity' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-          foreign_keys: {}
         update_column_resource_entity_position:
           description: Update the 'position' column in the 'resource_entity' collection
           fields:
@@ -22924,13 +22901,6 @@ definition:
                 type: nullable
                 underlying_type:
                   name: update_column_resource_entity_name
-                  type: named
-            organizational_unit:
-              description: Update the 'organizational_unit' column in the 'resource_entity' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_resource_entity_organizational_unit
                   type: named
             position:
               description: Update the 'position' column in the 'resource_entity' collection.

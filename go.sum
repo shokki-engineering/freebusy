@@ -1,9 +1,9 @@
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2 h1:NbnlmV26O7oZ1iM5tsCI+GEx+3ZSdrhvnKQ/eWSrLiY=
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2/go.mod h1:TCt1lluMFnctISJXvkIQ4x3ABrPuUKCWKyjKdkJNBpw=
-buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261024035057-cc82b3b15066.1 h1:eyB+2hkfiH2Xa4fE8R6dDT7dZIxP7HqFnle56vpTvQY=
-buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261024035057-cc82b3b15066.1/go.mod h1:ome8ysNLfg9fkBZx7ldpwmQC/dsXaploDrPhRdUoN6U=
-buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261024035057-cc82b3b15066.2 h1:7erA+HK/7a9ZVvN60Xh1b/vN2DmSnWSe9e5EXrV3XZg=
-buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261024035057-cc82b3b15066.2/go.mod h1:BgS6YLECIrB3HN5MHkAZHOEuIBYzm+EBm8z+hZX5Q/o=
+buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261026071747-ca7aabdffc7b.1 h1:8Ha6dnkkctxdmXmai695oPzQOhxmtDJKL4xmJf6Xc3Y=
+buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261026071747-ca7aabdffc7b.1/go.mod h1:N8S5LZwCwgDo5gKAo4FhXboUdIDwySriRVyDrAXjjok=
+buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261026071747-ca7aabdffc7b.2 h1:Q2X2PxSgPI1yC3Y2aDK2lfLqZq5F+Y+UBMiSBc9AkqM=
+buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261026071747-ca7aabdffc7b.2/go.mod h1:BgS6YLECIrB3HN5MHkAZHOEuIBYzm+EBm8z+hZX5Q/o=
 buf.build/go/protovalidate v1.4.0 h1:UjLrYbt5VX7+TMOs2+pG5FhZhIG1mSfK4EIopbb4LcM=
 buf.build/go/protovalidate v1.4.0/go.mod h1:8vJfzNT6NIG2qm3uFsJDXMlRmG+bQJzbcIn1Aa0vPGs=
 cel.dev/cel-go v0.32.0 h1:irvpFKr5EuGPyxeME03ERh0rii1TX+BDAnB9eL3IvNk=
@@ -101,6 +101,7 @@ github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+
 github.com/googleapis/enterprise-certificate-proxy v0.3.17 h1:73NfMHdiqo9JFU9+7a5ExpVa10/R29pXfZIaW559nrg=
 github.com/googleapis/enterprise-certificate-proxy v0.3.17/go.mod h1:rSEsBUemEBZEexP2y6jPp16LUmUbjmSbcPMQizR0o4k=
 github.com/googleapis/gax-go/v2 v2.26.2 h1:ydkmNXxj7bEmmeK5AihkKnWxyOyBR9TDebvp5L5izk8=
+github.com/googleapis/gax-go/v2 v2.26.2/go.mod h1:sMKqnMesnKH+3wiRJROcttA+cJoZoGbZl1vDQ8XYtGk=
 github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aNNg=
 github.com/gorilla/websocket v1.5.3/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/grafana/pyroscope-go v1.4.3 h1:XAfYZe5ie8eRTsKAMHQG60ESJjHBV5XUijk8vDvqalw=
@@ -331,6 +332,7 @@ golang.org/x/tools v0.52.0/go.mod h1:ItcP5UNaVGG+Yc4eIYmaFLNJ4soEopkx5Y2d4lcEurs
 gonum.org/v1/gonum v0.17.0 h1:VbpOemQlsSMrYmn7T2OUvQ4dqxQXU+ouZFQsZOx50z4=
 gonum.org/v1/gonum v0.17.0/go.mod h1:El3tOrEuMpv2UdMrbNlKEh9vd86bmQ6vqIcDwxEOc1E=
 google.golang.org/api v0.288.0 h1:glhO/J88obKP5I269W3hB73dvBKrjU56ZfmNlNXpgTU=
+google.golang.org/api v0.288.0/go.mod h1:lM2kYRzYUCBY91P9h6VF1PYmvhxii3O5hji37qRvIcY=
 google.golang.org/genproto v0.0.0-20261019180522-ce908d29299b h1:+t2qGqt6R8CO622uiX1JpnRvRvSOQoVRV0DiPzUjKXg=
 google.golang.org/genproto v0.0.0-20261019180522-ce908d29299b/go.mod h1:XRIfc1yr5xsbF8xFw5+g7SEmLJX/eQ7MMazTRbnMMvI=
 google.golang.org/genproto/googleapis/api v0.0.0-20261019180522-ce908d29299b h1:nB3spRIaSPtxJpxb0k41yljROvm2Jrwfs2pSNdKS5y8=

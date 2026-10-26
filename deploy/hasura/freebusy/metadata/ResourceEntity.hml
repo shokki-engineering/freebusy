@@ -27,8 +27,6 @@ definition:
       type: String_1!
     - name: name
       type: String_1!
-    - name: organizationalUnit
-      type: String_1
     - name: position
       type: String_1
     - name: resourceTypes
@@ -74,9 +72,6 @@ definition:
         name:
           column:
             name: name
-        organizationalUnit:
-          column:
-            name: organizational_unit
         position:
           column:
             name: position
@@ -109,7 +104,6 @@ definition:
           - icalUid
           - id
           - name
-          - organizationalUnit
           - position
           - resourceTypes
           - uid
@@ -143,8 +137,6 @@ definition:
         - fieldName: id
           booleanExpressionType: TextBoolExp
         - fieldName: name
-          booleanExpressionType: TextBoolExp
-        - fieldName: organizationalUnit
           booleanExpressionType: TextBoolExp
         - fieldName: position
           booleanExpressionType: TextBoolExp
@@ -189,8 +181,6 @@ definition:
           aggregateExpression: TextAggExp
         - fieldName: name
           aggregateExpression: TextAggExp
-        - fieldName: organizationalUnit
-          aggregateExpression: TextAggExp
         - fieldName: position
           aggregateExpression: TextAggExp
         - fieldName: uid
@@ -231,8 +221,6 @@ definition:
         - fieldName: id
           orderByExpression: String1OrderByExp
         - fieldName: name
-          orderByExpression: String1OrderByExp
-        - fieldName: organizationalUnit
           orderByExpression: String1OrderByExp
         - fieldName: position
           orderByExpression: String1OrderByExp

@@ -27,8 +27,8 @@ paths:
                  expire; do not construct or store them.
 
                  Filtering uses the AIP-160 expression language over the resource's own
-                 fields -- `organizational_unit="organizationalUnits/car-park-3"` lists
-                 what one site holds, and `resource_types:"room"` narrows by kind, since
+                 fields -- `resource_types:"room"` narrows by kind, and
+                 `calendar="calendars/bay-14"` finds what one calendar schedules, since
                  the collection is flat rather than nested. Results carry no guaranteed
                  order.
 
@@ -386,16 +386,7 @@ components:
                          free-standing resource is not, and without this field nothing can ask
                          when it is busy -- RFC 5545 section 3.6.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.4>'s free/busy query is addressed
                          to a calendar. The field exists despite having no RFC property behind it,
-                         the same trade OrganizationalUnit.organization records.
-                organizationalUnit:
-                    type: string
-                    description: |-
-                        The organizational unit this resource belongs to, e.g. the car park a bay
-                         is in.
-
-                         Native, for the reason above: left unset, a resource is undiscoverable
-                         from the unit that operates it, and listing what a site has is the first
-                         question a catalogue is asked.
+                         because a resource no calendar holds cannot be booked.
                 createTime:
                     readOnly: true
                     type: string
@@ -438,10 +429,11 @@ components:
                  test in `docs/adding-data.md` for a package rather than a field, and
                  rule 8's for full CRUD. Neither replaces the other and both stay.
 
-                 A flat collection, "resources/{resource}", for the reason
-                 OrganizationalUnit is flat: section 7.3 defines the component's properties
-                 and says nothing about where it sits, so nesting it under a calendar or an
-                 organizational unit would assert a containment the RFC does not require.
+                 A flat collection, "resources/{resource}": section 7.3 defines the
+                 component's properties and says nothing about where it sits, so nesting it
+                 under a calendar or anything else would assert a containment the RFC does
+                 not require. Grouping resources -- by site, operator or tenant -- is the
+                 consumer's, with whatever model it has for those.
 
                  Reference: RFC 9073 "Event Publishing Extensions to iCalendar", section 7.3.
                  https://www.rfc-editor.org/rfc/rfc9073.html#section-7.3

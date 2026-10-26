@@ -37,7 +37,7 @@ managed:
       module: buf.build/the-protobuf-project/rfc
 inputs:
   # Pinned to the commit buf.lock records, and the SDK versions in go.mod.
-  - module: buf.build/the-protobuf-project/rfc:cc82b3b15066438ba44e89dad69e9f8a
+  - module: buf.build/the-protobuf-project/rfc:ca7aabdffc7b4c9683b653da6de51503
     # freebusy has no organizations, organizational units or LDAP directory:
     # RFC 4519's packages are left out, so no table, repository or binding
     # exists for them.

@@ -14,8 +14,8 @@ deps:
     commit: 1c03cc2d5e394bf9bad4cebfb3968285
     digest: b5:c739c8b9c8dd6db60c192fa01eafd08e04e61409c64fab62714d058edad4a788c075a805caa33fe882986927bb54bad0c8797b5fda5119d7d49c9c6223770b97
   - name: buf.build/the-protobuf-project/rfc
-    commit: cc82b3b15066438ba44e89dad69e9f8a
-    digest: b5:bcacb4c78bf5dc5d3795f00b66f7ff45c64680e0ff2107d6212c889b8078230a6ece24864c37ecc97178b3803eb7dcdcd6c5e367e1a7994e6a36cda302c9672d
+    commit: ca7aabdffc7b4c9683b653da6de51503
+    digest: b5:a3028c80eb6f4126a03943cb3e9794d21df1badb84ab2cfc7683017092705fb201cefad1e440aadebeeeab8212bef23daee5967ab1b98163907833a0683bba4e
   - name: buf.build/the-protobuf-project/service
     commit: 762d14895f404b728d04fcbaa1604083
     digest: b5:3408407eb617b7ffb7fbdab0c5521f395cf255b159ace49ec94be4590fd7abd3ce71ca47ed3d5de74936d01c40dc5c3e7e10190f8390b88b073505c2f33d6c74

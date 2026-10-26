@@ -23,20 +23,19 @@ import (
 // Filter fields for ResourceEntity. Build predicates like Calendar.Eq(v) and combine
 // them with And/Or/Not.
 var (
-	Calendar           = graphql.StringField{Col: "calendar"}
-	CreateTime         = graphql.StringField{Col: "createTime"}
-	DeleteTime         = graphql.StringField{Col: "deleteTime"}
-	Description        = graphql.StringField{Col: "description"}
-	DisplayName        = graphql.StringField{Col: "displayName"}
-	Etag               = graphql.StringField{Col: "etag"}
-	ExpireTime         = graphql.StringField{Col: "expireTime"}
-	IcalUid            = graphql.StringField{Col: "icalUid"}
-	Id                 = graphql.StringField{Col: "id"}
-	Name               = graphql.StringField{Col: "name"}
-	OrganizationalUnit = graphql.StringField{Col: "organizationalUnit"}
-	Position           = graphql.StringField{Col: "position"}
-	Uid                = graphql.StringField{Col: "uid"}
-	UpdateTime         = graphql.StringField{Col: "updateTime"}
+	Calendar    = graphql.StringField{Col: "calendar"}
+	CreateTime  = graphql.StringField{Col: "createTime"}
+	DeleteTime  = graphql.StringField{Col: "deleteTime"}
+	Description = graphql.StringField{Col: "description"}
+	DisplayName = graphql.StringField{Col: "displayName"}
+	Etag        = graphql.StringField{Col: "etag"}
+	ExpireTime  = graphql.StringField{Col: "expireTime"}
+	IcalUid     = graphql.StringField{Col: "icalUid"}
+	Id          = graphql.StringField{Col: "id"}
+	Name        = graphql.StringField{Col: "name"}
+	Position    = graphql.StringField{Col: "position"}
+	Uid         = graphql.StringField{Col: "uid"}
+	UpdateTime  = graphql.StringField{Col: "updateTime"}
 )
 
 // And matches rows satisfying every predicate.

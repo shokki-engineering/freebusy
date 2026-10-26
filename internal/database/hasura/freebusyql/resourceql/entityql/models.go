@@ -46,8 +46,6 @@ type DeleteResourceEntityByIdResponse struct {
 		Id string `graphql:"id"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnit selects the "organizationalUnit" field; nil when the column is NULL.
-		OrganizationalUnit *string `graphql:"organizationalUnit"`
 		// Position selects the "position" field; nil when the column is NULL.
 		Position *string `graphql:"position"`
 		// ResourceTypes selects the "resourceTypes" field.
@@ -85,8 +83,6 @@ type InsertResourceEntityResponse struct {
 		Id string `graphql:"id"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnit selects the "organizationalUnit" field; nil when the column is NULL.
-		OrganizationalUnit *string `graphql:"organizationalUnit"`
 		// Position selects the "position" field; nil when the column is NULL.
 		Position *string `graphql:"position"`
 		// ResourceTypes selects the "resourceTypes" field.
@@ -122,8 +118,6 @@ type ResourceEntity struct {
 	Id string `graphql:"id"`
 	// Name selects the "name" field.
 	Name string `graphql:"name"`
-	// OrganizationalUnit selects the "organizationalUnit" field; nil when the column is NULL.
-	OrganizationalUnit *string `graphql:"organizationalUnit"`
 	// Position selects the "position" field; nil when the column is NULL.
 	Position *string `graphql:"position"`
 	// ResourceTypes selects the "resourceTypes" field.
@@ -249,17 +243,6 @@ type ResourceEntityAggExp struct {
 		// Min selects the "min" field; nil when the column is NULL.
 		Min *string `graphql:"min"`
 	} `graphql:"name"`
-	// OrganizationalUnit selects the "organizationalUnit" field.
-	OrganizationalUnit struct {
-		// Count selects the "_count" field.
-		Count graphql.Int64 `graphql:"_count"`
-		// CountDistinct selects the "_count_distinct" field.
-		CountDistinct graphql.Int64 `graphql:"_count_distinct"`
-		// Max selects the "max" field; nil when the column is NULL.
-		Max *string `graphql:"max"`
-		// Min selects the "min" field; nil when the column is NULL.
-		Min *string `graphql:"min"`
-	} `graphql:"organizationalUnit"`
 	// Position selects the "position" field.
 	Position struct {
 		// Count selects the "_count" field.
@@ -321,8 +304,6 @@ type UpdateResourceEntityByIdResponse struct {
 		Id string `graphql:"id"`
 		// Name selects the "name" field.
 		Name string `graphql:"name"`
-		// OrganizationalUnit selects the "organizationalUnit" field; nil when the column is NULL.
-		OrganizationalUnit *string `graphql:"organizationalUnit"`
 		// Position selects the "position" field; nil when the column is NULL.
 		Position *string `graphql:"position"`
 		// ResourceTypes selects the "resourceTypes" field.

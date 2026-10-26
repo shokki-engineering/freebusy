@@ -3787,14 +3787,6 @@
             "nullable": "nonNullable",
             "description": null
           },
-          "organizational_unit": {
-            "name": "organizational_unit",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
           "position": {
             "name": "position",
             "type": {

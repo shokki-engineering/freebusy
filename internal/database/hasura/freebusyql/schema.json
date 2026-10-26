@@ -28799,16 +28799,6 @@
           "defaultValue": null
         },
         {
-          "name": "organizationalUnit",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "position",
           "description": "",
           "type": {
@@ -62954,16 +62944,6 @@
           }
         },
         {
-          "name": "organizationalUnit",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          }
-        },
-        {
           "name": "position",
           "description": "",
           "args": [],
@@ -63176,20 +63156,6 @@
           }
         },
         {
-          "name": "organizationalUnit",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "TextAggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
           "name": "position",
           "description": "",
           "args": [],
@@ -63389,16 +63355,6 @@
           "defaultValue": null
         },
         {
-          "name": "organizationalUnit",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "TextBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "position",
           "description": "",
           "type": {
@@ -63588,16 +63544,6 @@
         },
         {
           "name": "name",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "organizationalUnit",
           "description": "",
           "type": {
             "kind": "ENUM",
@@ -92195,26 +92141,6 @@
     },
     {
       "kind": "INPUT_OBJECT",
-      "name": "UpdateColumnResourceEntityOrganizationalUnitInput",
-      "description": "Update the 'organizational_unit' column in the 'resource_entity' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "SCALAR",
-            "name": "String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
       "name": "UpdateColumnResourceEntityPositionInput",
       "description": "Update the 'position' column in the 'resource_entity' collection",
       "fields": null,
@@ -104317,16 +104243,6 @@
           "type": {
             "kind": "INPUT_OBJECT",
             "name": "UpdateColumnResourceEntityNameInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "organizationalUnit",
-          "description": "Update the 'organizational_unit' column in the 'resource_entity' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "UpdateColumnResourceEntityOrganizationalUnitInput",
             "ofType": null
           },
           "defaultValue": null

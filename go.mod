@@ -8,8 +8,8 @@ go 1.26.5
 replace github.com/shokki-engineering/freebusy/protobuf => ./protobuf
 
 require (
-	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261024035057-cc82b3b15066.1
-	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261024035057-cc82b3b15066.2
+	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261026071747-ca7aabdffc7b.1
+	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261026071747-ca7aabdffc7b.2
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.12.3
 	github.com/modelcontextprotocol/go-sdk v1.8.0

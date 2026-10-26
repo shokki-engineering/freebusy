@@ -191,19 +191,18 @@ func (r *GormResourceRepository) reads(db *gorm.DB, in repox.ListInput) *gorm.DB
 // resourceColumns are the row's columns by the field each stores, for
 // a read mask to leave out.
 var resourceColumns = map[string][]string{
-	"uid":                 {"uid"},
-	"ical_uid":            {"ical_uid"},
-	"display_name":        {"display_name"},
-	"description":         {"description"},
-	"resource_types":      {"resource_types"},
-	"position":            {"position"},
-	"calendar":            {"calendar"},
-	"organizational_unit": {"organizational_unit"},
-	"create_time":         {"create_time"},
-	"update_time":         {"update_time"},
-	"etag":                {"etag"},
-	"delete_time":         {"delete_time"},
-	"expire_time":         {"expire_time"},
+	"uid":            {"uid"},
+	"ical_uid":       {"ical_uid"},
+	"display_name":   {"display_name"},
+	"description":    {"description"},
+	"resource_types": {"resource_types"},
+	"position":       {"position"},
+	"calendar":       {"calendar"},
+	"create_time":    {"create_time"},
+	"update_time":    {"update_time"},
+	"etag":           {"etag"},
+	"delete_time":    {"delete_time"},
+	"expire_time":    {"expire_time"},
 }
 
 // Update persists the masked fields of in; an empty mask replaces every
@@ -278,7 +277,6 @@ func (r *GormResourceRepository) updateTx(ctx context.Context, tx *gorm.DB, key 
 	} else {
 		existing.CalendarID = nil
 	}
-	existing.OrganizationalUnit = next.OrganizationalUnit
 	if len(outputPaths) > 0 {
 		paths := outputPaths
 		if repox.InMask(paths, "uid") {
