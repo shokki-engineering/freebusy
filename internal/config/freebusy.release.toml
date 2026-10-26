@@ -10,7 +10,7 @@
 
 [app]
 name = "freebusy"
-version = "v1.0.0-rc.1"
+version = "v1.0.0-rc.2"
 description = "Generic availability and booking engine: compute availability, hold and reserve RFC 9073 resources."
 
 [server]

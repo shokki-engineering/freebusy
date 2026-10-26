@@ -16,6 +16,8 @@ pre-release and does not move the images' `latest` tag.
 
 ## [Unreleased]
 
+## [1.0.0-rc.2] - 2026-10-26
+
 ### Changed
 
 - **Breaking:** freebusy is a top-level booking engine with no tenants or

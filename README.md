@@ -246,11 +246,11 @@ chart in the registry, and the files on the GitHub release (each with a
 ```sh
 id='^https://github.com/shokki-engineering/freebusy/.github/workflows/release.yaml@refs/tags/v'
 iss=https://token.actions.githubusercontent.com
-cosign verify ghcr.io/shokki-engineering/freebusy:1.0.0-rc.1 \
+cosign verify ghcr.io/shokki-engineering/freebusy:1.0.0-rc.2 \
   --certificate-identity-regexp "$id" --certificate-oidc-issuer "$iss"
-cosign verify ghcr.io/shokki-engineering/charts/freebusy:1.0.0-rc.1 \
+cosign verify ghcr.io/shokki-engineering/charts/freebusy:1.0.0-rc.2 \
   --certificate-identity-regexp "$id" --certificate-oidc-issuer "$iss"
-cosign verify-blob freebusy-1.0.0-rc.1.tgz --bundle freebusy-1.0.0-rc.1.tgz.sigstore.json \
+cosign verify-blob freebusy-1.0.0-rc.2.tgz --bundle freebusy-1.0.0-rc.2.tgz.sigstore.json \
   --certificate-identity-regexp "$id" --certificate-oidc-issuer "$iss"
 ```
 
