@@ -4,7 +4,7 @@
 {{- if .Values.tests.enabled }}
 {{- $base := printf "http://%s:%v" (include "freebusy.fullname" .) .Values.service.httpPort }}
 # `helm test <release>`: through the Service, the server answers its health
-# check and a read API (a one-row page of organizations, which needs the
+# check and a read API (a one-row page of resources, which needs the
 # database). Read-only: it leaves nothing behind.
 apiVersion: v1
 kind: Pod
@@ -36,7 +36,7 @@ spec:
             if [ "$code" != 200 ]; then head -c 500 /tmp/body; echo; exit 1; fi
           }
           check {{ $base }}/health
-          check '{{ $base }}/v1/organizations?pageSize=1'
+          check '{{ $base }}/v1/resources?pageSize=1'
           echo ok
       resources:
         requests: { cpu: 10m, memory: 16Mi }

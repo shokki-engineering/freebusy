@@ -11,7 +11,7 @@ set -euo pipefail
 
 ns=${1:-freebusy}
 release=${2:-freebusy}
-url="http://$release:8080/v1/organizations?pageSize=1"
+url="http://$release:8080/v1/resources?pageSize=1"
 pod=rollout-probe
 
 kubectl -n "$ns" delete pod "$pod" --ignore-not-found --wait=true >/dev/null
