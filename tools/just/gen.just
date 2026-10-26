@@ -64,9 +64,13 @@ store:
     # buf runs the plugins once per input, so the freebusy run cannot see the
     # RFC module's tables. This image of the RFC module, at the commit
     # buf.lock pins, lets protoc-gen-store discover them (store.backend.yaml
-    # `references:`) and turn freebusy's references into foreign keys.
+    # `references:`) and turn freebusy's references into foreign keys. RFC
+    # 4519 (organizations, organizational units, the LDAP directory) is left
+    # out here as in the template: freebusy has none, so nothing may
+    # reference it.
     mkdir -p .cache/buf
-    buf build buf.build/the-protobuf-project/rfc:$(awk '/name: buf.build\/the-protobuf-project\/rfc$/ {getline; print $2}' buf.lock) -o .cache/buf/rfc.binpb
+    buf build buf.build/the-protobuf-project/rfc:$(awk '/name: buf.build\/the-protobuf-project\/rfc$/ {getline; print $2}' buf.lock) \
+        --exclude-path protobuf/rfc4519 -o .cache/buf/rfc.binpb
     buf generate --template tools/protobuf/buf/store.buf.gen.yaml
     # The generators clear their output directories, BUILD.bazel included.
     bazel run //:gazelle

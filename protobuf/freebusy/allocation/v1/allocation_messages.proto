@@ -57,10 +57,9 @@ message ComputeAvailabilityRequest {
 
   // An AIP-160 filter over each resource's search record (ResourceDay): its
   // `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
-  // `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-  // `display_name` (a bare word matches it) and `organizational_unit` (the
-  // resource's own, as data). Terms are ANDed unless joined with OR. Empty
-  // matches every resource.
+  // `attributes.view = "river" AND attributes.max_occupancy >= 3`) and its
+  // `display_name` (a bare word matches it). Terms are ANDed unless joined
+  // with OR. Empty matches every resource.
   // Only matching resources are computed over or counted.
   string filter = 8 [(google.api.field_behavior) = OPTIONAL];
 }
@@ -101,10 +100,9 @@ message CheckAvailabilityRequest {
 
   // An AIP-160 filter over each resource's search record (ResourceDay): its
   // `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
-  // `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-  // `display_name` (a bare word matches it) and `organizational_unit` (the
-  // resource's own, as data). Terms are ANDed unless joined with OR. Empty
-  // matches every resource.
+  // `attributes.view = "river" AND attributes.max_occupancy >= 3`) and its
+  // `display_name` (a bare word matches it). Terms are ANDed unless joined
+  // with OR. Empty matches every resource.
   // Only matching resources are checked.
   string filter = 5 [(google.api.field_behavior) = OPTIONAL];
 }
@@ -180,15 +178,14 @@ message SearchAvailabilityRequest {
 
   // An AIP-160 filter over each resource's search record (ResourceDay): its
   // `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
-  // `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-  // `display_name` (a bare word matches it) and `organizational_unit` (the
-  // resource's own, as data). Terms are ANDed unless joined with OR. Empty
-  // matches every resource.
+  // `attributes.view = "river" AND attributes.max_occupancy >= 3`) and its
+  // `display_name` (a bare word matches it). Terms are ANDed unless joined
+  // with OR. Empty matches every resource.
   string filter = 8 [(google.api.field_behavior) = OPTIONAL];
 
   // AIP-132 order of the matches: a comma-separated list of `resource`,
-  // `organizational_unit`, `display_name`, `free_fraction` (the share of
-  // the window's first UTC day that is free) and `attributes.max_occupancy`
+  // `display_name`, `free_fraction` (the share of the window's first UTC day
+  // that is free) and `attributes.max_occupancy`
   // (the booking profile's, as a number), each optionally followed by
   // ` desc`, e.g. `free_fraction desc, display_name`. Defaults to
   // `resource`.
@@ -196,7 +193,7 @@ message SearchAvailabilityRequest {
 
   // Fields to count matching resources by, returned in
   // SearchAvailabilityResponse.facets: `resource_types`,
-  // `organizational_unit` or an `attributes.<path>`, e.g.
+  // `display_name` or an `attributes.<path>`, e.g.
   // ["resource_types", "attributes.view"]. At most 10.
   repeated string facets = 10 [
     (google.api.field_behavior) = OPTIONAL,

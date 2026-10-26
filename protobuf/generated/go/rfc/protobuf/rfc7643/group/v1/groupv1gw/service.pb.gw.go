@@ -18,7 +18,7 @@ import (
 	"net/http"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/grpc/go/protobuf/rfc7643/group/v1/groupv1grpc"
-	groupv1_0 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/group/v1"
+	extGroupv1 "buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc7643/group/v1"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
 	"google.golang.org/grpc"
@@ -42,7 +42,7 @@ var (
 
 func request_Groups_GetGroup_0(ctx context.Context, marshaler runtime.Marshaler, client groupv1grpc.GroupsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq groupv1_0.GetGroupRequest
+		protoReq extGroupv1.GetGroupRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -63,7 +63,7 @@ func request_Groups_GetGroup_0(ctx context.Context, marshaler runtime.Marshaler,
 
 func local_request_Groups_GetGroup_0(ctx context.Context, marshaler runtime.Marshaler, server groupv1grpc.GroupsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq groupv1_0.GetGroupRequest
+		protoReq extGroupv1.GetGroupRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -83,7 +83,7 @@ var filter_Groups_ListGroups_0 = &utilities.DoubleArray{Encoding: map[string]int
 
 func request_Groups_ListGroups_0(ctx context.Context, marshaler runtime.Marshaler, client groupv1grpc.GroupsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq groupv1_0.ListGroupsRequest
+		protoReq extGroupv1.ListGroupsRequest
 		metadata runtime.ServerMetadata
 	)
 	if req.Body != nil {
@@ -101,7 +101,7 @@ func request_Groups_ListGroups_0(ctx context.Context, marshaler runtime.Marshale
 
 func local_request_Groups_ListGroups_0(ctx context.Context, marshaler runtime.Marshaler, server groupv1grpc.GroupsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq groupv1_0.ListGroupsRequest
+		protoReq extGroupv1.ListGroupsRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := req.ParseForm(); err != nil {
@@ -118,7 +118,7 @@ var filter_Groups_CreateGroup_0 = &utilities.DoubleArray{Encoding: map[string]in
 
 func request_Groups_CreateGroup_0(ctx context.Context, marshaler runtime.Marshaler, client groupv1grpc.GroupsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq groupv1_0.CreateGroupRequest
+		protoReq extGroupv1.CreateGroupRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Group); err != nil && !errors.Is(err, io.EOF) {
@@ -139,7 +139,7 @@ func request_Groups_CreateGroup_0(ctx context.Context, marshaler runtime.Marshal
 
 func local_request_Groups_CreateGroup_0(ctx context.Context, marshaler runtime.Marshaler, server groupv1grpc.GroupsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq groupv1_0.CreateGroupRequest
+		protoReq extGroupv1.CreateGroupRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq.Group); err != nil && !errors.Is(err, io.EOF) {
@@ -159,7 +159,7 @@ var filter_Groups_UpdateGroup_0 = &utilities.DoubleArray{Encoding: map[string]in
 
 func request_Groups_UpdateGroup_0(ctx context.Context, marshaler runtime.Marshaler, client groupv1grpc.GroupsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq groupv1_0.UpdateGroupRequest
+		protoReq extGroupv1.UpdateGroupRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -200,7 +200,7 @@ func request_Groups_UpdateGroup_0(ctx context.Context, marshaler runtime.Marshal
 
 func local_request_Groups_UpdateGroup_0(ctx context.Context, marshaler runtime.Marshaler, server groupv1grpc.GroupsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq groupv1_0.UpdateGroupRequest
+		protoReq extGroupv1.UpdateGroupRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -238,7 +238,7 @@ func local_request_Groups_UpdateGroup_0(ctx context.Context, marshaler runtime.M
 
 func request_Groups_DeleteGroup_0(ctx context.Context, marshaler runtime.Marshaler, client groupv1grpc.GroupsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq groupv1_0.DeleteGroupRequest
+		protoReq extGroupv1.DeleteGroupRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -259,7 +259,7 @@ func request_Groups_DeleteGroup_0(ctx context.Context, marshaler runtime.Marshal
 
 func local_request_Groups_DeleteGroup_0(ctx context.Context, marshaler runtime.Marshaler, server groupv1grpc.GroupsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq groupv1_0.DeleteGroupRequest
+		protoReq extGroupv1.DeleteGroupRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -277,7 +277,7 @@ func local_request_Groups_DeleteGroup_0(ctx context.Context, marshaler runtime.M
 
 func request_Groups_UndeleteGroup_0(ctx context.Context, marshaler runtime.Marshaler, client groupv1grpc.GroupsClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq groupv1_0.UndeleteGroupRequest
+		protoReq extGroupv1.UndeleteGroupRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -301,7 +301,7 @@ func request_Groups_UndeleteGroup_0(ctx context.Context, marshaler runtime.Marsh
 
 func local_request_Groups_UndeleteGroup_0(ctx context.Context, marshaler runtime.Marshaler, server groupv1grpc.GroupsServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq groupv1_0.UndeleteGroupRequest
+		protoReq extGroupv1.UndeleteGroupRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)

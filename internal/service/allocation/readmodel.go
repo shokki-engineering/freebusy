@@ -188,7 +188,7 @@ func validFilter(filter, field string) error {
 	if err := checkFilter(filter); err != nil {
 		return servicex.BadField("INVALID_FILTER", field,
 			fmt.Sprintf("%s %q is not a filter over resources: %v", field, filter, err),
-			`Use AIP-160 over resource_types, display_name, organizational_unit and attributes.<path>, e.g. resource_types:"room" AND attributes.view = "river"`)
+			`Use AIP-160 over resource_types, display_name and attributes.<path>, e.g. resource_types:"room" AND attributes.view = "river"`)
 	}
 	return nil
 }
@@ -204,7 +204,7 @@ func filterProblem(err error, field string) error {
 	}
 	if errors.Is(err, repox.ErrInvalidArgument) {
 		return servicex.BadField("INVALID_FILTER", field, fmt.Sprintf("%s is not a filter over resources: %v", field, err),
-			`Use AIP-160 over resource_types, display_name, organizational_unit and attributes.<path>`)
+			`Use AIP-160 over resource_types, display_name and attributes.<path>`)
 	}
 	return err
 }
@@ -216,7 +216,7 @@ func filterProblem(err error, field string) error {
 func searchProblem(err error, orderBy string) error {
 	if errors.Is(err, filterx.ErrUnsupported) && orderByPath(orderBy) {
 		return servicex.BadField("ORDER_BY_UNSUPPORTED", "order_by", fmt.Sprintf("order_by %q cannot be applied where this server searches resources: %v", orderBy, err),
-			"Order by resource, organizational_unit, display_name or free_fraction, or configure Postgres ([database.postgres]) for the search records")
+			"Order by resource, display_name or free_fraction, or configure Postgres ([database.postgres]) for the search records")
 	}
 	return filterProblem(err, "filter")
 }
@@ -253,7 +253,7 @@ func decodeSearchToken(s string) (searchToken, error) {
 
 // facetable are the fields SearchAvailability counts by, besides any
 // attributes.<path>.
-var facetable = []string{"resource_types", "organizational_unit", "display_name"}
+var facetable = []string{"resource_types", "display_name"}
 
 // checkSearch validates SearchAvailability's filter, order_by and facets.
 func checkSearch(req *allocationpbv1.SearchAvailabilityRequest) error {
@@ -263,13 +263,13 @@ func checkSearch(req *allocationpbv1.SearchAvailabilityRequest) error {
 	if o := req.GetOrderBy(); o != "" {
 		if err := checkOrderBy(o); err != nil {
 			return servicex.BadField("INVALID_ORDER_BY", "order_by", fmt.Sprintf("order_by %q: %v", o, err),
-				`Order by resource, organizational_unit, display_name, free_fraction or attributes.max_occupancy, each optionally followed by " desc"`)
+				`Order by resource, display_name, free_fraction or attributes.max_occupancy, each optionally followed by " desc"`)
 		}
 	}
 	for _, f := range req.GetFacets() {
 		if !slices.Contains(facetable, f) && !strings.HasPrefix(f, "attributes.") {
 			return servicex.BadField("INVALID_FACET", "facets", fmt.Sprintf("cannot count resources by %q", f),
-				"Count by resource_types, organizational_unit, display_name or attributes.<path>")
+				"Count by resource_types, display_name or attributes.<path>")
 		}
 	}
 	return nil

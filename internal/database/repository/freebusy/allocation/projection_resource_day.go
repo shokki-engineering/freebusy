@@ -58,7 +58,6 @@ var ResourceDays = &repox.Projection[*allocationpbv1.ResourceDay]{
 		VersionColumn: "row_version",
 		Columns: []repox.ProjectionColumn{
 			{Field: "resource", Column: "resource", Kind: repox.ColText, SQLType: "text"},
-			{Field: "organizational_unit", Column: "organizational_unit", Kind: repox.ColText, SQLType: "text"},
 			{Field: "day", Column: "day", Kind: repox.ColDate, SQLType: "date"},
 			{Field: "free", Column: "free", Kind: repox.ColMultirange, SQLType: "tstzmultirange"},
 			{Field: "resource_types", Column: "resource_types", Kind: repox.ColStrings, SQLType: "text[]"},
@@ -68,7 +67,7 @@ var ResourceDays = &repox.Projection[*allocationpbv1.ResourceDay]{
 			{Field: "free_fraction", Column: "free_fraction", Kind: repox.ColFloat, SQLType: "double precision"},
 		},
 		Range:      "free",
-		IndexLeads: []string{"resource", "organizational_unit", "calendar", "day"},
+		IndexLeads: []string{"resource", "calendar", "day"},
 		Sources:    []string{"the-protobuf-project.org/Resource", "the-protobuf-project.org/Calendar", "the-protobuf-project.org/Availability", "the-protobuf-project.org/Event", "freebusy.allocation.v1/Allocation"},
 		Filter:     allocation.ResourceDayFilterSpec,
 	},

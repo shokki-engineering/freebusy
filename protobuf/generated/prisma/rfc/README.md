@@ -9,7 +9,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 76 | 50 |
+| 72 | 50 |
 
 ## Entity relationships
 
@@ -145,9 +145,6 @@ erDiagram
         string id PK
         string contact_id FK
     }
-    LdapGroup {
-        string id PK
-    }
     Link {
         string id PK
         string event_id FK
@@ -164,10 +161,6 @@ erDiagram
         string id PK
         string group_id FK
     }
-    Membership {
-        string id PK
-        string ldap_group_id FK
-    }
     NameComponent {
         string id PK
         string name_id FK
@@ -176,11 +169,9 @@ erDiagram
         string id PK
         string contact_id FK
     }
-    OrganizationOrganization {
+    Organization {
         string id PK
-    }
-    OrganizationalUnit {
-        string id PK
+        string contact_id FK
     }
     Organizer {
         string id PK
@@ -218,7 +209,6 @@ erDiagram
     ResourceResource {
         string id PK
         string calendar FK
-        string organizational_unit FK
     }
     ResourceStructuredData {
         string id PK
@@ -319,10 +309,6 @@ erDiagram
     VcardName {
         string id PK
     }
-    VcardOrganization {
-        string id PK
-        string contact_id FK
-    }
     WeekdayNum {
         string id PK
         string recurrence_id FK
@@ -373,9 +359,9 @@ erDiagram
     Location }o--|| Event : "event_id"
     Location }o--|| Participant : "participant_id"
     Member }o--|| Group : "group_id"
-    Membership }o--|| LdapGroup : "ldap_group_id"
     NameComponent }o--|| CardName : "name_id"
     Nickname }o--|| Contact : "contact_id"
+    Organization }o--|| Contact : "contact_id"
     PackExtensionField }o--|| PackRecord : "record_id"
     PackRecord }o--|| Pack : "pack_id"
     Participant }o--|| Event : "event_id"
@@ -383,7 +369,6 @@ erDiagram
     Recurrence }o--|| EventCalendarTime : "until_id"
     Relation }o--|| Contact : "contact_id"
     ResourceResource }o--|| Calendar : "calendar"
-    ResourceResource }o--|| OrganizationalUnit : "organizational_unit"
     ResourceStructuredData }o--|| ResourceResource : "resource_id"
     Role }o--|| Contact : "contact_id"
     SocialProfile }o--|| Contact : "contact_id"
@@ -408,13 +393,11 @@ erDiagram
     Vcard }o--|| Contact : "contact_id"
     VcardAddress }o--|| Contact : "contact_id"
     VcardExtensionProperty }o--|| Contact : "contact_id"
-    VcardOrganization }o--|| Contact : "contact_id"
     WeekdayNum }o--|| Recurrence : "recurrence_id"
 ```
 
 ## Subfolders
 
-- [`rfc4519/`](./rfc4519/README.md)
 - [`rfc5545/`](./rfc5545/README.md)
 - [`rfc6350/`](./rfc6350/README.md)
 - [`rfc7643/`](./rfc7643/README.md)

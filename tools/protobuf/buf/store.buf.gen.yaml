@@ -23,18 +23,6 @@ managed:
     # (";resourcev1"), which buf cannot infer from a path ending in a version.
     # The names are the SDK's, not freebusy's, so no import is ever aliased.
     - file_option: go_package
-      path: protobuf/rfc4519/group/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/group/v1;groupv1
-    - file_option: go_package
-      path: protobuf/rfc4519/membership/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/membership/v1;membershipv1
-    - file_option: go_package
-      path: protobuf/rfc4519/organization/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organization/v1;organizationv1
-    - file_option: go_package
-      path: protobuf/rfc4519/organizational_unit/v1
-      value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc4519/organizational_unit/v1;organizational_unitv1
-    - file_option: go_package
       path: protobuf/rfc5545/calendar/v1
       value: buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc5545/calendar/v1;calendarv1
     - file_option: go_package
@@ -101,6 +89,11 @@ inputs:
   # to the BSR head, and a regen then rewrites every RFC stub to whatever
   # upstream last pushed.
   - module: buf.build/the-protobuf-project/rfc:cc82b3b15066438ba44e89dad69e9f8a
+    # freebusy has no organizations, organizational units or LDAP directory:
+    # RFC 4519's packages are left out, so no table, repository or binding
+    # exists for them.
+    exclude_paths:
+      - protobuf/rfc4519
 
 plugins:
   # strategy: all is required — store must see every proto file in one

@@ -30,24 +30,9 @@ datasources:
   # rule here every RFC resource collapses into one schema: protoc-gen-store
   # falls back to the AIP resource-type host, and every protobuf-rfc resource
   # declares the same one ("the-protobuf-project.org").
-  # organizational_unit is the only multi-word schema in either database, and a
-  # multi-word schema breaks the graphql target: DDN names a model by
-  # concatenating schema and table in PascalCase ("OrganizationalUnitResource"),
-  # and the target splits that at the first token — yielding "organizational" +
-  # "UnitResource" where the repository target expects "organizationalunit" +
-  # "resource". A single-word name removes the ambiguity. More specific than the
-  # protobuf.** rule below, so it wins.
-  - match: "protobuf.rfc4519.organizational_unit.**"
-    database: rfc
-    schema: orgunit
 
-  # RFC 4519 and RFC 7643 both define a group/v1, so {leaf} would put an LDAP
-  # group and a SCIM group in one "group" schema, and one generated Go package
-  # would import two packages both named groupv1 -- which only an import alias
-  # could resolve. Each gets a schema named for what its own RFC calls it.
-  - match: "protobuf.rfc4519.group.**"
-    database: rfc
-    schema: ldapgroup
+  # RFC 7643's group/v1 keeps the schema it had while RFC 4519's group/v1,
+  # now left out, shared the name "group".
   - match: "protobuf.rfc7643.group.**"
     database: rfc
     schema: scimgroup

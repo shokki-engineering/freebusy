@@ -7,7 +7,7 @@
 // 	protoc (unknown)
 //
 // database: rfc
-// schemas:  ldapgroup, membership, organization, orgunit, calendar, event, journal, todo, vcard, scimgroup, user, availability, pack, sensor, stream, unit, resource, card, project, common
+// schemas:  calendar, event, journal, todo, vcard, scimgroup, user, availability, pack, sensor, stream, unit, resource, card, project, common
 //
 // Connection URLs live in rfc.config.ts (Prisma 7 convention).
 // annotations: entity.v1 1.6.5, store.v1 1.6.5
@@ -17,7 +17,7 @@
 
 datasource rfc {
   provider = "postgresql"
-  schemas  = ["ldapgroup", "membership", "organization", "orgunit", "calendar", "event", "journal", "todo", "vcard", "scimgroup", "user", "availability", "pack", "sensor", "stream", "unit", "resource", "card", "project", "common"]
+  schemas  = ["calendar", "event", "journal", "todo", "vcard", "scimgroup", "user", "availability", "pack", "sensor", "stream", "unit", "resource", "card", "project", "common"]
 }
 
 generator client {

@@ -37,8 +37,6 @@ type CreateInput struct {
 	FreeFraction float64 `json:"freeFraction,omitzero"`
 	// Id sets the "id" column (required).
 	Id string `json:"id"`
-	// OrganizationalUnit sets the "organizationalUnit" column; the zero value is omitted (column default / NULL).
-	OrganizationalUnit string `json:"organizationalUnit,omitzero"`
 	// Resource sets the "resource" column (required).
 	Resource string `json:"resource"`
 	// ResourceTypes sets the "resourceTypes" column; the zero value is omitted (column default / NULL).
@@ -63,8 +61,6 @@ type UpdateInput struct {
 	FreeFraction graphql.Nullable[float64] `json:"freeFraction"`
 	// Update the 'id' column in the 'allocation_resource_days' collection.
 	Id graphql.Nullable[string] `json:"id"`
-	// Update the 'organizational_unit' column in the 'allocation_resource_days' collection.
-	OrganizationalUnit graphql.Nullable[string] `json:"organizationalUnit"`
 	// Update the 'resource' column in the 'allocation_resource_days' collection.
 	Resource graphql.Nullable[string] `json:"resource"`
 	// Update the 'resource_types' column in the 'allocation_resource_days' collection.

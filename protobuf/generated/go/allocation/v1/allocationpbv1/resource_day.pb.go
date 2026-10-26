@@ -49,9 +49,6 @@ type ResourceDay struct {
 	// The resource, "resources/{resource}". Not a resource reference: a
 	// projection row must never keep its source from being purged.
 	Resource string `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
-	// The resource's own organizational_unit, copied as data for filtering:
-	// freebusy does not check or scope by it.
-	OrganizationalUnit string `protobuf:"bytes,3,opt,name=organizational_unit,json=organizationalUnit,proto3" json:"organizational_unit,omitempty"`
 	// The UTC calendar day this row covers.
 	Day *date.Date `protobuf:"bytes,4,opt,name=day,proto3" json:"day,omitempty"`
 	// The resource's free time within the day, [day 00:00Z, next day 00:00Z):
@@ -114,13 +111,6 @@ func (x *ResourceDay) GetResource() string {
 	return ""
 }
 
-func (x *ResourceDay) GetOrganizationalUnit() string {
-	if x != nil {
-		return x.OrganizationalUnit
-	}
-	return ""
-}
-
 func (x *ResourceDay) GetDay() *date.Date {
 	if x != nil {
 		return x.Day
@@ -174,10 +164,9 @@ var File_freebusy_allocation_v1_resource_day_proto protoreflect.FileDescriptor
 
 const file_freebusy_allocation_v1_resource_day_proto_rawDesc = "" +
 	"\n" +
-	")freebusy/allocation/v1/resource_day.proto\x12\x16freebusy.allocation.v1\x1a\x1cgoogle/protobuf/struct.proto\x1a\x16google/type/date.proto\x1a\x1agoogle/type/interval.proto\x1a\x1astore/v1/annotations.proto\"\xc1\x05\n" +
+	")freebusy/allocation/v1/resource_day.proto\x12\x16freebusy.allocation.v1\x1a\x1cgoogle/protobuf/struct.proto\x1a\x16google/type/date.proto\x1a\x1agoogle/type/interval.proto\x1a\x1astore/v1/annotations.proto\"\x8f\x05\n" +
 	"\vResourceDay\x12\x1a\n" +
-	"\bresource\x18\x01 \x01(\tR\bresource\x12/\n" +
-	"\x13organizational_unit\x18\x03 \x01(\tR\x12organizationalUnit\x12#\n" +
+	"\bresource\x18\x01 \x01(\tR\bresource\x12#\n" +
 	"\x03day\x18\x04 \x01(\v2\x11.google.type.DateR\x03day\x12)\n" +
 	"\x04free\x18\x05 \x03(\v2\x15.google.type.IntervalR\x04free\x12%\n" +
 	"\x0eresource_types\x18\x06 \x03(\tR\rresourceTypes\x12P\n" +
@@ -188,13 +177,11 @@ const file_freebusy_allocation_v1_resource_day_proto_rawDesc = "" +
 	"\bcalendar\x18\b \x01(\tR\bcalendar\x12)\n" +
 	"\fdisplay_name\x18\t \x01(\tB\x06\xe2\xb5\x18\x02\x18\x01R\vdisplayName\x12#\n" +
 	"\rfree_fraction\x18\n" +
-	" \x01(\x01R\ffreeFraction:\x9b\x02\xf2\xb5\x18\x96\x02\x1a!the-protobuf-project.org/Resource\x1a!the-protobuf-project.org/Calendar\x1a%the-protobuf-project.org/Availability\x1a\x1ethe-protobuf-project.org/Event\x1a!freebusy.allocation.v1/Allocation\"\bresource\"\x03day*\x04free2\x1a\n" +
-	"\x13organizational_unit\n" +
-	"\x03day2\n" +
+	" \x01(\x01R\ffreeFraction:\xff\x01\xf2\xb5\x18\xfa\x01\x1a!the-protobuf-project.org/Resource\x1a!the-protobuf-project.org/Calendar\x1a%the-protobuf-project.org/Availability\x1a\x1ethe-protobuf-project.org/Event\x1a!freebusy.allocation.v1/Allocation\"\bresource\"\x03day*\x04free2\n" +
 	"\n" +
 	"\bcalendar2\x0f\n" +
 	"\x03day\n" +
-	"\bresourceB\x16freebusy_resource_daysJ\x04\b\x02\x10\x03R\forganizationB\x92\x02\n" +
+	"\bresourceB\x16freebusy_resource_daysJ\x04\b\x02\x10\x03J\x04\b\x03\x10\x04R\forganizationR\x13organizational_unitB\x92\x02\n" +
 	"\x1acom.freebusy.allocation.v1B\x10ResourceDayProtoP\x01Zhgithub.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
 
 var (

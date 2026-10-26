@@ -21,8 +21,6 @@ definition:
       type: Float64
     - name: id
       type: String_1!
-    - name: organizationalUnit
-      type: String_1
     - name: resource
       type: String_1!
     - name: resourceTypes
@@ -57,9 +55,6 @@ definition:
         id:
           column:
             name: id
-        organizationalUnit:
-          column:
-            name: organizational_unit
         resource:
           column:
             name: resource
@@ -86,7 +81,6 @@ definition:
           - free
           - freeFraction
           - id
-          - organizationalUnit
           - resource
           - resourceTypes
           - rowVersion

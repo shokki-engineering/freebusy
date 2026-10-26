@@ -36,7 +36,7 @@ enum VcardKind {
 }
 
 /// Organization is the ORG property, RFC 6350 section 6.6.4 <https://www.rfc-editor.org/rfc/rfc6350.html#section-6.6.4>. Semicolon-separated on the wire: the first component is the organization, the rest are progressively narrower units. Reference: RFC 6350 "vCard Format Specification", section 6.6.4. https://www.rfc-editor.org/rfc/rfc6350.html#section-6.6.4
-model VcardOrganization {
+model Organization {
   /// Unique identifier for the record.
   id String @id @default(ulid()) @map("id")
 

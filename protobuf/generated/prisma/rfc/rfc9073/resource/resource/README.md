@@ -19,16 +19,11 @@ erDiagram
     ResourceResource {
         string id PK
         string calendar FK
-        string organizational_unit FK
     }
     Calendar {
         string externalStub PK
     }
-    OrganizationalUnit {
-        string externalStub PK
-    }
     ResourceResource }o--|| Calendar : "calendar"
-    ResourceResource }o--|| OrganizationalUnit : "organizational_unit"
 ```
 
 Schema file: [`resource.postgres.prisma`](./resource.postgres.prisma)
@@ -48,7 +43,7 @@ Resource is the VRESOURCE component, RFC 9073 section 7.3 <https://www.rfc-edito
 | `resource_types` | `VARCHAR(255)[]` | nullable |
 | `position` | `POINT` | nullable |
 | `calendar` | `CHAR(26)` | nullable |
-| `organizational_unit` | `CHAR(26)` | nullable |
+| `organizational_unit` | `VARCHAR(255)` | nullable |
 | `create_time` | `TIMESTAMPTZ` | not null |
 | `update_time` | `TIMESTAMPTZ` | not null |
 | `etag` | `VARCHAR(255)` | nullable |

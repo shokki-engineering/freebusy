@@ -45,7 +45,7 @@ enum ErrorReason {
   ERROR_REASON_INVALID_FILTER = 3 [(service.v1.error_reason) = {
     code: "INVALID_ARGUMENT"
     description: "`filter` (or `hold.candidate_filter` on `CreateHold`) is not an AIP-160 filter over a resource's search record: a syntax error, or a field it does not have. `BadRequest` names the field."
-    fix: "Filter on `resource_types`, `display_name`, `organizational_unit` and `attributes.<path>`, e.g. `resource_types:\"room\" AND attributes.view = \"river\"`."
+    fix: "Filter on `resource_types`, `display_name` and `attributes.<path>`, e.g. `resource_types:\"room\" AND attributes.view = \"river\"`."
     detail: DETAIL_KIND_BAD_REQUEST
   }];
 
@@ -65,7 +65,7 @@ enum ErrorReason {
   ERROR_REASON_INVALID_ORDER_BY = 5 [(service.v1.error_reason) = {
     code: "INVALID_ARGUMENT"
     description: "`SearchAvailability`'s `order_by` names a field matches cannot be ordered by, or a direction other than `asc`/`desc`."
-    fix: "Order by `resource`, `organizational_unit`, `display_name`, `free_fraction` or `attributes.max_occupancy`."
+    fix: "Order by `resource`, `display_name`, `free_fraction` or `attributes.max_occupancy`."
     detail: DETAIL_KIND_BAD_REQUEST
   }];
 
@@ -76,7 +76,7 @@ enum ErrorReason {
   ERROR_REASON_ORDER_BY_UNSUPPORTED = 6 [(service.v1.error_reason) = {
     code: "INVALID_ARGUMENT"
     description: "`SearchAvailability`'s `order_by` is valid, but orders by an attribute path (`attributes.max_occupancy`) that the backend the search records are read on cannot sort by: DDN's order_by, on a Hasura-only deployment, has no JSON path expression."
-    fix: "Order by `resource`, `organizational_unit`, `display_name` or `free_fraction`, or configure Postgres for the server."
+    fix: "Order by `resource`, `display_name` or `free_fraction`, or configure Postgres for the server."
     detail: DETAIL_KIND_BAD_REQUEST
   }];
 
@@ -84,7 +84,7 @@ enum ErrorReason {
   ERROR_REASON_INVALID_FACET = 7 [(service.v1.error_reason) = {
     code: "INVALID_ARGUMENT"
     description: "`SearchAvailability`'s `facets` names a field resources cannot be counted by."
-    fix: "Count by `resource_types`, `organizational_unit`, `display_name` or `attributes.<path>`."
+    fix: "Count by `resource_types`, `display_name` or `attributes.<path>`."
     detail: DETAIL_KIND_BAD_REQUEST
   }];
 

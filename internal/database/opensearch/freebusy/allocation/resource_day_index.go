@@ -71,9 +71,6 @@ const resourceDayMapping = `{
     "id": {
       "type": "keyword"
     },
-    "organizational_unit": {
-      "type": "keyword"
-    },
     "resource": {
       "type": "keyword"
     },

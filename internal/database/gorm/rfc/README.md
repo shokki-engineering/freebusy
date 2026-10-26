@@ -11,7 +11,7 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 
 | Models | Enums |
 | ---: | ---: |
-| 76 | 50 |
+| 72 | 50 |
 
 ## Entity relationships
 
@@ -20,11 +20,11 @@ erDiagram
     direction LR
     Address {
         string id PK
-        string contact_id FK
+        string user_id FK
     }
     Address {
         string id PK
-        string user_id FK
+        string contact_id FK
     }
     Alarm {
         string id PK
@@ -60,10 +60,10 @@ erDiagram
     }
     CalendarTime {
         string id PK
+        string event_id FK
     }
     CalendarTime {
         string id PK
-        string event_id FK
     }
     CalendarTime {
         string id PK
@@ -109,19 +109,6 @@ erDiagram
     }
     ExtensionProperty {
         string id PK
-        string calendar_id FK
-    }
-    ExtensionProperty {
-        string id PK
-        string event_id FK
-    }
-    ExtensionProperty {
-        string id PK
-        string availability_id FK
-        string available_period_id FK
-    }
-    ExtensionProperty {
-        string id PK
         string journal_id FK
     }
     ExtensionProperty {
@@ -130,7 +117,20 @@ erDiagram
     }
     ExtensionProperty {
         string id PK
+        string availability_id FK
+        string available_period_id FK
+    }
+    ExtensionProperty {
+        string id PK
+        string event_id FK
+    }
+    ExtensionProperty {
+        string id PK
         string todo_id FK
+    }
+    ExtensionProperty {
+        string id PK
+        string calendar_id FK
     }
     Fraction {
         string id PK
@@ -159,9 +159,6 @@ erDiagram
         string id PK
         string contact_id FK
     }
-    LdapGroup {
-        string id PK
-    }
     Link {
         string id PK
         string event_id FK
@@ -177,10 +174,6 @@ erDiagram
     Member {
         string id PK
         string group_id FK
-    }
-    Membership {
-        string id PK
-        string ldap_group_id FK
     }
     Name {
         string id PK
@@ -201,13 +194,7 @@ erDiagram
     }
     Organization {
         string id PK
-    }
-    Organization {
-        string id PK
         string contact_id FK
-    }
-    OrganizationalUnit {
-        string id PK
     }
     Organizer {
         string id PK
@@ -228,10 +215,10 @@ erDiagram
     }
     Record {
         string id PK
-        string pack_id FK
     }
     Record {
         string id PK
+        string pack_id FK
     }
     Recurrence {
         string id PK
@@ -243,13 +230,12 @@ erDiagram
     }
     Resource {
         string id PK
-        string calendar FK
-        string organizational_unit FK
+        string event_id FK
+        string participant_id FK
     }
     Resource {
         string id PK
-        string event_id FK
-        string participant_id FK
+        string calendar FK
     }
     Role {
         string id PK
@@ -275,13 +261,13 @@ erDiagram
     }
     StructuredData {
         string id PK
-        string event_id FK
-        string participant_id FK
-        string location_id FK
         string resource_id FK
     }
     StructuredData {
         string id PK
+        string event_id FK
+        string participant_id FK
+        string location_id FK
         string resource_id FK
     }
     StyledDescription {
@@ -329,8 +315,8 @@ erDiagram
         string id PK
         string recurrence_id FK
     }
-    Address }o--|| Contact : "contact_id"
     Address }o--|| User : "user_id"
+    Address }o--|| Contact : "contact_id"
     Alarm }o--|| Event : "event_id"
     Attendee }o--|| Event : "event_id"
     Attendee }o--|| Alarm : "alarm_id"
@@ -358,13 +344,13 @@ erDiagram
     Event }o--|| Organizer : "organizer_id"
     ExtensionField }o--|| Record : "record_id"
     ExtensionField }o--|| Record : "record_id"
-    ExtensionProperty }o--|| Calendar : "calendar_id"
-    ExtensionProperty }o--|| Event : "event_id"
-    ExtensionProperty }o--|| Availability : "availability_id"
-    ExtensionProperty }o--|| AvailablePeriod : "available_period_id"
     ExtensionProperty }o--|| Journal : "journal_id"
     ExtensionProperty }o--|| Contact : "contact_id"
+    ExtensionProperty }o--|| Availability : "availability_id"
+    ExtensionProperty }o--|| AvailablePeriod : "available_period_id"
+    ExtensionProperty }o--|| Event : "event_id"
     ExtensionProperty }o--|| Todo : "todo_id"
+    ExtensionProperty }o--|| Calendar : "calendar_id"
     Geo }o--|| Contact : "contact_id"
     GrammaticalGender }o--|| Contact : "contact_id"
     InstantMessage }o--|| Contact : "contact_id"
@@ -375,7 +361,6 @@ erDiagram
     Location }o--|| Event : "event_id"
     Location }o--|| Participant : "participant_id"
     Member }o--|| Group : "group_id"
-    Membership }o--|| LdapGroup : "ldap_group_id"
     NameComponent }o--|| Name : "name_id"
     Nickname }o--|| Contact : "contact_id"
     Organization }o--|| Contact : "contact_id"
@@ -384,18 +369,17 @@ erDiagram
     Record }o--|| Pack : "pack_id"
     Recurrence }o--|| CalendarTime : "until_id"
     Relation }o--|| Contact : "contact_id"
-    Resource }o--|| Calendar : "calendar"
-    Resource }o--|| OrganizationalUnit : "organizational_unit"
     Resource }o--|| Event : "event_id"
     Resource }o--|| Participant : "participant_id"
+    Resource }o--|| Calendar : "calendar"
     Role }o--|| Contact : "contact_id"
     SocialProfile }o--|| Contact : "contact_id"
     StreamRecord }o--|| Stream : "stream_id"
     StreamRecord }o--|| Record : "record_id"
+    StructuredData }o--|| Resource : "resource_id"
     StructuredData }o--|| Event : "event_id"
     StructuredData }o--|| Participant : "participant_id"
     StructuredData }o--|| Location : "location_id"
-    StructuredData }o--|| Resource : "resource_id"
     StructuredData }o--|| Resource : "resource_id"
     StyledDescription }o--|| Event : "event_id"
     StyledDescription }o--|| Participant : "participant_id"
@@ -424,89 +408,6 @@ erDiagram
 - `gormx/gormx.go` — the shared runtime every store imports: `ListOptions`, the generic `Store[M]` interface every store satisfies, a `GenericStore[M]` engine that runs CRUD for any model with no per-entity code, and `EnsureSchemas`. Lets one generic engine drive every entity.
 - `telemetry/telemetry.go` — the first-party telemetry adapter: `New(o)` wraps an SDK handle as the `gormx.Telemetry` the stores observe through (`WithTelemetry(telemetry.New(o))`), and `Plugin(o)` is the SQL-level gorm plugin. Emitted with the `telemetry` opt; requires `github.com/the-protobuf-project/telemetry/telemetry-go`.
 - `Registry.Instrument(db, o)` in `migrate.go` — installs the generated telemetry gorm plugin so every query emits a span (and metric) through the SDK handle.
-
-## Schema `ldapgroup`
-
-### `LdapGroup` → `resource`
-
-LdapGroup is the LDAP 'groupOfNames' object class, RFC 4519 section 3.5 <https://www.rfc-editor.org/rfc/rfc4519.html#section-3.5>. Section 3.5 makes 'member' a mandatory multi-valued attribute of the group itself. This model deliberately does not: membership is Membership, a resource of its own. A repeated string of DNs cannot carry a role, cannot be created or revoked independently, and cannot be listed with a page token. Externalising it is the difference between a group that records who is in it and one that can answer why. A consequence: 'member' is mandatory in the RFC and absent here, so a LdapGroup with no Membership is representable in this API and is not a valid groupOfNames entry. The rule for an exporter: refuse, not synthesise. Section 3.5 gives no value that could stand in for an absent member -- inventing one (the group's own DN, an owner, a sentinel) asserts a membership nothing in this model states, which misleads every LDAP consumer of the export more than an explicit error would. An exporter targeting LDAP MUST reject a LdapGroup with zero Memberships rather than emit an invalid or fabricated entry. Reference: RFC 4519 "LDAP: Schema for User Applications", section 3.5. https://www.rfc-editor.org/rfc/rfc4519.html#section-3.5
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `name` | `VARCHAR(255)` | not null |
-| `uid` | `VARCHAR(255)` | nullable |
-| `display_names` | `VARCHAR(255)[]` | not null |
-| `descriptions` | `VARCHAR(255)[]` | nullable |
-| `owners` | `VARCHAR(255)[]` | nullable |
-| `organization` | `VARCHAR(255)` | nullable |
-| `business_categories` | `VARCHAR(255)[]` | nullable |
-| `create_time` | `TIMESTAMPTZ` | not null |
-| `update_time` | `TIMESTAMPTZ` | not null |
-| `etag` | `VARCHAR(255)` | nullable |
-| `delete_time` | `TIMESTAMPTZ` | nullable |
-| `expire_time` | `TIMESTAMPTZ` | nullable |
-
-## Schema `membership`
-
-### `Membership` → `resource`
-
-Membership is one entry's presence in a Group. This is the 'member' attribute of section 2.17 <https://www.rfc-editor.org/rfc/rfc4519.html#section-2.17> promoted to a resource. It exists because a membership carries attributes of its own -- at minimum a role -- and an attribute needs something to hang on. Section 3.6 offers 'groupOfUniqueNames' with 'uniqueMember' (section 2.40 <https://www.rfc-editor.org/rfc/rfc4519.html#section-2.40>), which appends an optional UID to the DN so a reused name does not silently inherit an old membership. The uid field below solves that problem more directly, so only 'member' is modelled. Reference: RFC 4519 "LDAP: Schema for User Applications", section 2.17. https://www.rfc-editor.org/rfc/rfc4519.html#section-2.17
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `name` | `VARCHAR(255)` | not null |
-| `uid` | `VARCHAR(255)` | nullable |
-| `member` | `VARCHAR(255)` | not null |
-| `role` | `VARCHAR(255)` | nullable |
-| `create_time` | `TIMESTAMPTZ` | not null |
-| `update_time` | `TIMESTAMPTZ` | not null |
-| `etag` | `VARCHAR(255)` | nullable |
-| `ldap_group_id` | `CHAR(26)` | not null |
-
-## Schema `organization`
-
-### `Organization` → `resource`
-
-Organization is the LDAP 'organization' object class, RFC 4519 section 3.8 <https://www.rfc-editor.org/rfc/rfc4519.html#section-3.8>. Attributes are repeated because LDAP attribute types are multi-valued by default. Section 3.8 lists twenty-one optional attributes; the four here are the ones that carry meaning outside a directory server. Reference: RFC 4519 "LDAP: Schema for User Applications", section 3.8. https://www.rfc-editor.org/rfc/rfc4519.html#section-3.8
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `name` | `VARCHAR(255)` | not null |
-| `uid` | `VARCHAR(255)` | nullable |
-| `display_names` | `VARCHAR(255)[]` | not null |
-| `descriptions` | `VARCHAR(255)[]` | nullable |
-| `business_categories` | `VARCHAR(255)[]` | nullable |
-| `see_also` | `VARCHAR(255)[]` | nullable |
-| `create_time` | `TIMESTAMPTZ` | not null |
-| `update_time` | `TIMESTAMPTZ` | not null |
-| `etag` | `VARCHAR(255)` | nullable |
-| `delete_time` | `TIMESTAMPTZ` | nullable |
-| `expire_time` | `TIMESTAMPTZ` | nullable |
-
-## Schema `orgunit`
-
-### `OrganizationalUnit` → `organizational_units`
-
-OrganizationalUnit is the LDAP 'organizationalUnit' object class, RFC 4519 section 3.11 <https://www.rfc-editor.org/rfc/rfc4519.html#section-3.11>. A flat resource, "organizationalUnits/{organizationalUnit}", not nested under Organization: section 3.11 defines MUST and MAY attributes and says nothing about DIT placement, so "organizations/{o}/organizationalUnits/{ou}" would assert a hierarchy the RFC does not require. Group faced the same question for its own optional 'o' reference and was built flat for the same reason -- this resource follows that precedent instead of inventing a new one. Attributes are repeated because LDAP attribute types are multi-valued by default. Section 3.11 lists twenty MAY attributes; the three modelled here -- description, businessCategory, seeAlso -- are the ones Organization already carries, kept identical rather than picking a different subset for two object classes whose optional attributes overlap this heavily. Reference: RFC 4519 "LDAP: Schema for User Applications", section 3.11. https://www.rfc-editor.org/rfc/rfc4519.html#section-3.11
-
-| Column | Type | Null |
-| --- | --- | --- |
-| `id` | `CHAR(26)` | not null |
-| `name` | `VARCHAR(255)` | not null |
-| `uid` | `VARCHAR(255)` | nullable |
-| `display_names` | `VARCHAR(255)[]` | not null |
-| `descriptions` | `VARCHAR(255)[]` | nullable |
-| `business_categories` | `VARCHAR(255)[]` | nullable |
-| `see_also` | `VARCHAR(255)[]` | nullable |
-| `organization` | `VARCHAR(255)` | nullable |
-| `create_time` | `TIMESTAMPTZ` | not null |
-| `update_time` | `TIMESTAMPTZ` | not null |
-| `etag` | `VARCHAR(255)` | nullable |
-| `delete_time` | `TIMESTAMPTZ` | nullable |
-| `expire_time` | `TIMESTAMPTZ` | nullable |
 
 ## Schema `calendar`
 
@@ -1653,7 +1554,7 @@ Resource is the VRESOURCE component, RFC 9073 section 7.3 <https://www.rfc-edito
 | `resource_types` | `VARCHAR(255)[]` | nullable |
 | `position` | `POINT` | nullable |
 | `calendar` | `CHAR(26)` | nullable |
-| `organizational_unit` | `CHAR(26)` | nullable |
+| `organizational_unit` | `VARCHAR(255)` | nullable |
 | `create_time` | `TIMESTAMPTZ` | not null |
 | `update_time` | `TIMESTAMPTZ` | not null |
 | `etag` | `VARCHAR(255)` | nullable |

@@ -48,12 +48,6 @@ message ResourceDay {
     search_index: "freebusy_resource_days"
     indexes: [
       {
-        fields: [
-          "organizational_unit",
-          "day"
-        ]
-      },
-      {
         fields: ["calendar"]
       },
       {
@@ -72,12 +66,8 @@ message ResourceDay {
   // projection row must never keep its source from being purged.
   string resource = 1;
 
-  reserved 2;
-  reserved "organization";
-
-  // The resource's own organizational_unit, copied as data for filtering:
-  // freebusy does not check or scope by it.
-  string organizational_unit = 3;
+  reserved 2, 3;
+  reserved "organization", "organizational_unit";
 
   // The UTC calendar day this row covers.
   google.type.Date day = 4;

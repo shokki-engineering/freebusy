@@ -134,9 +134,9 @@ func NewTooManyBuckets(field, what string) *problem.Problem {
 }
 
 // NewInvalidFilter is a INVALID_FILTER problem; its fix defaults to the
-// proto's: "Filter on `resource_types`, `display_name`, `organizational_unit` and `attributes.<path>`, e.g. `resource_types:\"room\" AND attributes.view = \"river\"`.".
+// proto's: "Filter on `resource_types`, `display_name` and `attributes.<path>`, e.g. `resource_types:\"room\" AND attributes.view = \"river\"`.".
 func NewInvalidFilter(field, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonInvalidFilter, Field: field, What: what, Fix: "Filter on `resource_types`, `display_name`, `organizational_unit` and `attributes.<path>`, e.g. `resource_types:\"room\" AND attributes.view = \"river\"`."}
+	return &problem.Problem{Reason: ReasonInvalidFilter, Field: field, What: what, Fix: "Filter on `resource_types`, `display_name` and `attributes.<path>`, e.g. `resource_types:\"room\" AND attributes.view = \"river\"`."}
 }
 
 // NewFilterUnsupported is a FILTER_UNSUPPORTED problem; its fix defaults to the
@@ -146,21 +146,21 @@ func NewFilterUnsupported(field, what string) *problem.Problem {
 }
 
 // NewInvalidOrderBy is a INVALID_ORDER_BY problem; its fix defaults to the
-// proto's: "Order by `resource`, `organizational_unit`, `display_name`, `free_fraction` or `attributes.max_occupancy`.".
+// proto's: "Order by `resource`, `display_name`, `free_fraction` or `attributes.max_occupancy`.".
 func NewInvalidOrderBy(field, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonInvalidOrderBy, Field: field, What: what, Fix: "Order by `resource`, `organizational_unit`, `display_name`, `free_fraction` or `attributes.max_occupancy`."}
+	return &problem.Problem{Reason: ReasonInvalidOrderBy, Field: field, What: what, Fix: "Order by `resource`, `display_name`, `free_fraction` or `attributes.max_occupancy`."}
 }
 
 // NewOrderByUnsupported is a ORDER_BY_UNSUPPORTED problem; its fix defaults to the
-// proto's: "Order by `resource`, `organizational_unit`, `display_name` or `free_fraction`, or configure Postgres for the server.".
+// proto's: "Order by `resource`, `display_name` or `free_fraction`, or configure Postgres for the server.".
 func NewOrderByUnsupported(field, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonOrderByUnsupported, Field: field, What: what, Fix: "Order by `resource`, `organizational_unit`, `display_name` or `free_fraction`, or configure Postgres for the server."}
+	return &problem.Problem{Reason: ReasonOrderByUnsupported, Field: field, What: what, Fix: "Order by `resource`, `display_name` or `free_fraction`, or configure Postgres for the server."}
 }
 
 // NewInvalidFacet is a INVALID_FACET problem; its fix defaults to the
-// proto's: "Count by `resource_types`, `organizational_unit`, `display_name` or `attributes.<path>`.".
+// proto's: "Count by `resource_types`, `display_name` or `attributes.<path>`.".
 func NewInvalidFacet(field, what string) *problem.Problem {
-	return &problem.Problem{Reason: ReasonInvalidFacet, Field: field, What: what, Fix: "Count by `resource_types`, `organizational_unit`, `display_name` or `attributes.<path>`."}
+	return &problem.Problem{Reason: ReasonInvalidFacet, Field: field, What: what, Fix: "Count by `resource_types`, `display_name` or `attributes.<path>`."}
 }
 
 // NewInvalidPageToken is a INVALID_PAGE_TOKEN problem; its fix defaults to the

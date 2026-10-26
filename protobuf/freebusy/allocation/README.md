@@ -266,7 +266,7 @@ Request message for AllocationService.ComputeAvailability.
 | `slot_duration` | `google.protobuf.Duration` | `OPTIONAL` | Slot length for SLOT granularity. Ignored for DAY. |
 | `time_zone` | `string` | `OPTIONAL` | IANA time zone the day boundaries are drawn in, e.g. "Asia/Kolkata". Defaults to the zone of the first resource's calendar. Required in effect for DAY granularity, since "a night" has no meaning without one. |
 | `include_free_resources` | `bool` | `OPTIONAL` | Populate AvailabilityBucket.free_resources. Off by default: a large pool would otherwise repeat every resource name in every bucket. |
-| `filter` | `string` | `OPTIONAL` | An AIP-160 filter over each resource's search record (ResourceDay): its `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g. `attributes.view = "river" AND attributes.max_occupancy >= 3`), its `display_name` (a bare word matches it) and `organizational_unit` (the resource's own, as data). Terms are ANDed unless joined with OR. Empty matches every resource. Only matching resources are computed over or counted. |
+| `filter` | `string` | `OPTIONAL` | An AIP-160 filter over each resource's search record (ResourceDay): its `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g. `attributes.view = "river" AND attributes.max_occupancy >= 3`) and its `display_name` (a bare word matches it). Terms are ANDed unless joined with OR. Empty matches every resource. Only matching resources are computed over or counted. |
 
 ### ComputeAvailabilityResponse
 
@@ -286,7 +286,7 @@ Request message for AllocationService.CheckAvailability.
 | `resources` | repeated `string` | `OPTIONAL` | Restrict the check to these resources. Empty means every resource `filter` matches. Format: resources/{resource} References `the-protobuf-project.org/Resource`. |
 | `window` | `google.type.Interval` | `REQUIRED` | The exact window to check. |
 | `quantity` | `int32` | `OPTIONAL` | How many resources are needed. Defaults to 1. |
-| `filter` | `string` | `OPTIONAL` | An AIP-160 filter over each resource's search record (ResourceDay): its `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g. `attributes.view = "river" AND attributes.max_occupancy >= 3`), its `display_name` (a bare word matches it) and `organizational_unit` (the resource's own, as data). Terms are ANDed unless joined with OR. Empty matches every resource. Only matching resources are checked. |
+| `filter` | `string` | `OPTIONAL` | An AIP-160 filter over each resource's search record (ResourceDay): its `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g. `attributes.view = "river" AND attributes.max_occupancy >= 3`) and its `display_name` (a bare word matches it). Terms are ANDed unless joined with OR. Empty matches every resource. Only matching resources are checked. |
 
 ### CheckAvailabilityResponse
 
@@ -329,9 +329,9 @@ over resources already chosen.
 | `resource_types` | repeated `string` | `OPTIONAL` | Restrict to RESOURCE-TYPE values, RFC 9073 section 6.3, e.g. "room" or "parking-bay": a resource matches when it carries any of them. Empty matches every type. |
 | `page_size` | `int32` | `OPTIONAL` | Maximum matches to return. Defaults to 50, capped at 1000. |
 | `page_token` | `string` | `OPTIONAL` | Page token from a previous SearchAvailabilityResponse.next_page_token. Every other field must be the same as in the call that returned it. |
-| `filter` | `string` | `OPTIONAL` | An AIP-160 filter over each resource's search record (ResourceDay): its `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g. `attributes.view = "river" AND attributes.max_occupancy >= 3`), its `display_name` (a bare word matches it) and `organizational_unit` (the resource's own, as data). Terms are ANDed unless joined with OR. Empty matches every resource. |
-| `order_by` | `string` | `OPTIONAL` | AIP-132 order of the matches: a comma-separated list of `resource`, `organizational_unit`, `display_name`, `free_fraction` (the share of the window's first UTC day that is free) and `attributes.max_occupancy` (the booking profile's, as a number), each optionally followed by ` desc`, e.g. `free_fraction desc, display_name`. Defaults to `resource`. |
-| `facets` | repeated `string` | `OPTIONAL` | Fields to count matching resources by, returned in SearchAvailabilityResponse.facets: `resource_types`, `organizational_unit` or an `attributes.<path>`, e.g. ["resource_types", "attributes.view"]. At most 10. |
+| `filter` | `string` | `OPTIONAL` | An AIP-160 filter over each resource's search record (ResourceDay): its `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g. `attributes.view = "river" AND attributes.max_occupancy >= 3`) and its `display_name` (a bare word matches it). Terms are ANDed unless joined with OR. Empty matches every resource. |
+| `order_by` | `string` | `OPTIONAL` | AIP-132 order of the matches: a comma-separated list of `resource`, `display_name`, `free_fraction` (the share of the window's first UTC day that is free) and `attributes.max_occupancy` (the booking profile's, as a number), each optionally followed by ` desc`, e.g. `free_fraction desc, display_name`. Defaults to `resource`. |
+| `facets` | repeated `string` | `OPTIONAL` | Fields to count matching resources by, returned in SearchAvailabilityResponse.facets: `resource_types`, `display_name` or an `attributes.<path>`, e.g. ["resource_types", "attributes.view"]. At most 10. |
 
 ### SearchAvailabilityResponse
 
@@ -435,7 +435,6 @@ drops.
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
 | `resource` | `string` | - | The resource, "resources/{resource}". Not a resource reference: a projection row must never keep its source from being purged. |
-| `organizational_unit` | `string` | - | The resource's own organizational_unit, copied as data for filtering: freebusy does not check or scope by it. |
 | `day` | `google.type.Date` | - | The UTC calendar day this row covers. |
 | `free` | repeated `google.type.Interval` | - | The resource's free time within the day, [day 00:00Z, next day 00:00Z): offered by its availability, less confirmed events on its calendar and the claims of converted holds. Live holds are not subtracted. |
 | `resource_types` | repeated `string` | - | RFC 9073 RESOURCE-TYPE values the resource carries. |

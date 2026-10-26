@@ -47,11 +47,8 @@ model ResourceResource {
   /// Relation to Calendar via calendar.
   calendar Calendar? @relation(fields: [calendarID], references: [id])
 
-  /// The organizational unit this resource belongs to, e.g. the car park a bay is in. Native, for the reason above: left unset, a resource is undiscoverable from the unit that operates it, and listing what a site has is the first question a catalogue is asked.
-  organizationalUnitID String? @map("organizational_unit")
-
-  /// Relation to OrganizationalUnit via organizational_unit.
-  organizationalUnit OrganizationalUnit? @relation(fields: [organizationalUnitID], references: [id])
+  /// The organizational unit this resource belongs to, e.g. the car park a bay is in. Native, for the reason above: left unset, a resource is undiscoverable from the unit that operates it, and listing what a site has is the first question a catalogue is asked. TODO: unresolved reference to OrganizationalUnit (not in this generation set); kept as a plain indexed column.
+  organizationalUnit String? @map("organizational_unit")
 
   /// When the resource was created.
   createTime DateTime @default(now()) @rfc.Timestamptz(6) @map("create_time")
@@ -75,10 +72,10 @@ model ResourceResource {
   @@index([updateTime])
   /// Index on [delete_time].
   @@index([deleteTime])
+  /// Index on [organizational_unit].
+  @@index([organizationalUnit])
   /// Index on [calendar].
   @@index([calendarID])
-  /// Index on [organizational_unit].
-  @@index([organizationalUnitID])
   /// GIN index: tag containment (@>) cannot use a B-tree.
   @@index([resourceTypes], type: Gin)
   /// Maps the model to the "entity" table in the database.

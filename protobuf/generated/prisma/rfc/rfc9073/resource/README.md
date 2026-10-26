@@ -19,7 +19,6 @@ erDiagram
     ResourceResource {
         string id PK
         string calendar FK
-        string organizational_unit FK
     }
     ResourceStructuredData {
         string id PK
@@ -28,11 +27,7 @@ erDiagram
     Calendar {
         string externalStub PK
     }
-    OrganizationalUnit {
-        string externalStub PK
-    }
     ResourceResource }o--|| Calendar : "calendar"
-    ResourceResource }o--|| OrganizationalUnit : "organizational_unit"
     ResourceStructuredData }o--|| ResourceResource : "resource_id"
 ```
 

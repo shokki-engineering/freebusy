@@ -520,6 +520,27 @@ type guardedResourceRepository struct {
 	refs *repox.References
 }
 
+func (g *guardedResourceRepository) Create(ctx context.Context, m *resourcev1.Resource) (*resourcev1.Resource, error) {
+	if err := resolveResourceReferences(ctx, g.refs, m, nil); err != nil {
+		return nil, err
+	}
+	return g.ResourceRepository.Create(ctx, m)
+}
+
+func (g *guardedResourceRepository) Update(ctx context.Context, m *resourcev1.Resource, paths []string) (*resourcev1.Resource, error) {
+	if err := resolveResourceReferences(ctx, g.refs, m, paths); err != nil {
+		return nil, err
+	}
+	return g.ResourceRepository.Update(ctx, m, paths)
+}
+
+func (g *guardedResourceRepository) UpdateWithOutputOnly(ctx context.Context, m *resourcev1.Resource, paths, outputPaths []string) (*resourcev1.Resource, error) {
+	if err := resolveResourceReferences(ctx, g.refs, m, paths); err != nil {
+		return nil, err
+	}
+	return g.ResourceRepository.UpdateWithOutputOnly(ctx, m, paths, outputPaths)
+}
+
 func (g *guardedResourceRepository) Delete(ctx context.Context, name string) error {
 	check, err := g.refs.CheckDelete(ctx, "the-protobuf-project.org/Resource", name)
 	if err != nil {
@@ -536,12 +557,23 @@ func (g *guardedResourceRepository) Delete(ctx context.Context, name string) err
 // reference m sets within paths (all of them for an empty mask) names a
 // resource that exists.
 func resolveResourceReferences(ctx context.Context, refs *repox.References, m *resourcev1.Resource, paths []string) error {
+	if refs == nil {
+		return nil
+	}
+	if repox.InMask(paths, "organizational_unit") {
+		if err := refs.Resolve(ctx, "organizational_unit", "the-protobuf-project.org/OrganizationalUnit", m.GetOrganizationalUnit()); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
 // queueResourceReferences makes u resolve m's external references within
 // paths before it commits, as guard does for the repositories.
 func queueResourceReferences(u *repox.Unit, m *resourcev1.Resource, paths []string) {
+	if refs := u.Conn().References; refs != nil {
+		u.Before(func(ctx context.Context) error { return resolveResourceReferences(ctx, refs, m, paths) })
+	}
 }
 
 // queueResourceDelete makes u consult name's referrers before it commits

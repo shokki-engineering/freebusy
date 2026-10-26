@@ -23,15 +23,14 @@ import (
 // Filter fields for AllocationResourceDays. Build predicates like Attributes.Eq(v) and combine
 // them with And/Or/Not.
 var (
-	Attributes         = graphql.JSONField{Col: "attributes"}
-	Calendar           = graphql.StringField{Col: "calendar"}
-	Day                = graphql.StringField{Col: "day"}
-	DisplayName        = graphql.StringField{Col: "displayName"}
-	FreeFraction       = graphql.FloatField{Col: "freeFraction"}
-	Id                 = graphql.StringField{Col: "id"}
-	OrganizationalUnit = graphql.StringField{Col: "organizationalUnit"}
-	Resource           = graphql.StringField{Col: "resource"}
-	RowVersion         = graphql.Int64Field{Col: "rowVersion"}
+	Attributes   = graphql.JSONField{Col: "attributes"}
+	Calendar     = graphql.StringField{Col: "calendar"}
+	Day          = graphql.StringField{Col: "day"}
+	DisplayName  = graphql.StringField{Col: "displayName"}
+	FreeFraction = graphql.FloatField{Col: "freeFraction"}
+	Id           = graphql.StringField{Col: "id"}
+	Resource     = graphql.StringField{Col: "resource"}
+	RowVersion   = graphql.Int64Field{Col: "rowVersion"}
 )
 
 // Free filters by the free relation, taking a predicate from that resource.

@@ -68,8 +68,8 @@ model Contact {
   /// Back-relation: VcardAddress records that reference this model via contact_id.
   address VcardAddress[]
 
-  /// Back-relation: VcardOrganization records that reference this model via contact_id.
-  organizations VcardOrganization[]
+  /// Back-relation: Organization records that reference this model via contact_id.
+  organizations Organization[]
 
   /// Back-relation: VcardExtensionProperty records that reference this model via contact_id.
   extensionProperties VcardExtensionProperty[]

@@ -107,7 +107,6 @@ A ResourceDay is one resource's standing free time on one UTC day: the availabil
 | --- | --- | --- |
 | `id` | `TEXT` | not null |
 | `resource` | `TEXT` | not null |
-| `organizational_unit` | `TEXT` | not null |
 | `day` | `DATE` | not null |
 | `free` | `TSTZMULTIRANGE` | not null |
 | `resource_types` | `TEXT[]` | not null |

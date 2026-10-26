@@ -367,13 +367,12 @@ func (p *DayProjection) compute(ctx context.Context, read repox.Conn, store Stor
 				free := engine.FreeIntervals(er, d, d.Add(oneDay))
 				var secs time.Duration
 				row := &allocationpbv1.ResourceDay{
-					Resource:           n,
-					OrganizationalUnit: res.GetOrganizationalUnit(),
-					Day:                &date.Date{Year: int32(d.Year()), Month: int32(d.Month()), Day: int32(d.Day())},
-					ResourceTypes:      slices.Clone(res.GetResourceTypes()),
-					Attributes:         attrs,
-					Calendar:           cal,
-					DisplayName:        res.GetDisplayName(),
+					Resource:      n,
+					Day:           &date.Date{Year: int32(d.Year()), Month: int32(d.Month()), Day: int32(d.Day())},
+					ResourceTypes: slices.Clone(res.GetResourceTypes()),
+					Attributes:    attrs,
+					Calendar:      cal,
+					DisplayName:   res.GetDisplayName(),
 				}
 				for _, f := range free {
 					row.Free = append(row.Free, intervalOf(f))

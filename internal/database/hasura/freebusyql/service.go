@@ -26,10 +26,6 @@ import (
 	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/commonql"
 	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/eventql"
 	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/journalql"
-	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/ldapgroupql"
-	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/membershipql"
-	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/organizationql"
-	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/orgunitql"
 	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/packql"
 	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/projectql"
 	"github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql/reservationql"
@@ -65,10 +61,6 @@ type QueryHandler struct {
 	Common       commonql.QueryHandler
 	Event        eventql.QueryHandler
 	Journal      journalql.QueryHandler
-	Ldapgroup    ldapgroupql.QueryHandler
-	Membership   membershipql.QueryHandler
-	Organization organizationql.QueryHandler
-	Orgunit      orgunitql.QueryHandler
 	Pack         packql.QueryHandler
 	Project      projectql.QueryHandler
 	Reservation  reservationql.QueryHandler
@@ -108,10 +100,6 @@ type MutationHandler struct {
 	Common       commonql.MutationHandler
 	Event        eventql.MutationHandler
 	Journal      journalql.MutationHandler
-	Ldapgroup    ldapgroupql.MutationHandler
-	Membership   membershipql.MutationHandler
-	Organization organizationql.MutationHandler
-	Orgunit      orgunitql.MutationHandler
 	Pack         packql.MutationHandler
 	Project      projectql.MutationHandler
 	Reservation  reservationql.MutationHandler
@@ -155,10 +143,6 @@ type SubscriptionHandler struct {
 	Common       commonql.SubscriptionHandler
 	Event        eventql.SubscriptionHandler
 	Journal      journalql.SubscriptionHandler
-	Ldapgroup    ldapgroupql.SubscriptionHandler
-	Membership   membershipql.SubscriptionHandler
-	Organization organizationql.SubscriptionHandler
-	Orgunit      orgunitql.SubscriptionHandler
 	Pack         packql.SubscriptionHandler
 	Project      projectql.SubscriptionHandler
 	Reservation  reservationql.SubscriptionHandler
@@ -197,10 +181,6 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Common:       commonql.NewQuery(gql),
 			Event:        eventql.NewQuery(gql),
 			Journal:      journalql.NewQuery(gql),
-			Ldapgroup:    ldapgroupql.NewQuery(gql),
-			Membership:   membershipql.NewQuery(gql),
-			Organization: organizationql.NewQuery(gql),
-			Orgunit:      orgunitql.NewQuery(gql),
 			Pack:         packql.NewQuery(gql),
 			Project:      projectql.NewQuery(gql),
 			Reservation:  reservationql.NewQuery(gql),
@@ -224,10 +204,6 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Common:       commonql.NewMutation(gql),
 			Event:        eventql.NewMutation(gql),
 			Journal:      journalql.NewMutation(gql),
-			Ldapgroup:    ldapgroupql.NewMutation(gql),
-			Membership:   membershipql.NewMutation(gql),
-			Organization: organizationql.NewMutation(gql),
-			Orgunit:      orgunitql.NewMutation(gql),
 			Pack:         packql.NewMutation(gql),
 			Project:      projectql.NewMutation(gql),
 			Reservation:  reservationql.NewMutation(gql),
@@ -250,10 +226,6 @@ func New(opts runtime.ConnectionOptions) (*Service, error) {
 			Common:       commonql.NewSubscription(gql),
 			Event:        eventql.NewSubscription(gql),
 			Journal:      journalql.NewSubscription(gql),
-			Ldapgroup:    ldapgroupql.NewSubscription(gql),
-			Membership:   membershipql.NewSubscription(gql),
-			Organization: organizationql.NewSubscription(gql),
-			Orgunit:      orgunitql.NewSubscription(gql),
 			Pack:         packql.NewSubscription(gql),
 			Project:      projectql.NewSubscription(gql),
 			Reservation:  reservationql.NewSubscription(gql),

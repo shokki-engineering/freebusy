@@ -16,24 +16,24 @@ Generated from Protobuf by protoc-gen-store. Source of truth is the `.proto` fil
 ```mermaid
 erDiagram
     direction LR
-    VcardExtensionProperty {
+    Organization {
         string id PK
         string contact_id FK
     }
-    VcardOrganization {
+    VcardExtensionProperty {
         string id PK
         string contact_id FK
     }
     Contact {
         string externalStub PK
     }
+    Organization }o--|| Contact : "contact_id"
     VcardExtensionProperty }o--|| Contact : "contact_id"
-    VcardOrganization }o--|| Contact : "contact_id"
 ```
 
 Schema file: [`types.postgres.prisma`](./types.postgres.prisma)
 
-### `VcardOrganization` → `organizations`
+### `Organization` → `organizations`
 
 Organization is the ORG property, RFC 6350 section 6.6.4 <https://www.rfc-editor.org/rfc/rfc6350.html#section-6.6.4>. Semicolon-separated on the wire: the first component is the organization, the rest are progressively narrower units. Reference: RFC 6350 "vCard Format Specification", section 6.6.4. https://www.rfc-editor.org/rfc/rfc6350.html#section-6.6.4
 

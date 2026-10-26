@@ -80,9 +80,6 @@ func (r *GormResourceRepository) Create(ctx context.Context, in *resourcev1.Reso
 	if v := in.GetCalendar(); v != "" {
 		m.CalendarID = repox.Ptr(repox.LastSegment(v))
 	}
-	if v := in.GetOrganizationalUnit(); v != "" {
-		m.OrganizationalUnitID = repox.Ptr(repox.LastSegment(v))
-	}
 	m.Etag = repox.Ptr(repox.NewULID())
 	if err := r.DB.Transaction(func(tx *gorm.DB) error { return r.insertTx(ctx, tx, in, m) }); err != nil {
 		return nil, repox.MapGormErr(err)
@@ -124,9 +121,6 @@ func (r *GormResourceRepository) toProto(ctx context.Context, m *resource.Resour
 	out := resource.ResourceToProto(m)
 	if m.CalendarID != nil && *m.CalendarID != "" {
 		out.Calendar = "calendars/" + *m.CalendarID
-	}
-	if m.OrganizationalUnitID != nil && *m.OrganizationalUnitID != "" {
-		out.OrganizationalUnit = "organizationalUnits/" + *m.OrganizationalUnitID
 	}
 	if h := r.Hooks.AfterRead; h != nil {
 		if err := h(ctx, out); err != nil {
@@ -262,9 +256,6 @@ func (r *GormResourceRepository) updateTx(ctx context.Context, tx *gorm.DB, key 
 		if m.CalendarID != nil && *m.CalendarID != "" {
 			out.Calendar = "calendars/" + *m.CalendarID
 		}
-		if m.OrganizationalUnitID != nil && *m.OrganizationalUnitID != "" {
-			out.OrganizationalUnit = "organizationalUnits/" + *m.OrganizationalUnitID
-		}
 	}
 	merged := proto.Clone(existingPB).(*resourcev1.Resource)
 	applyResourceMask(merged, in, paths)
@@ -287,11 +278,7 @@ func (r *GormResourceRepository) updateTx(ctx context.Context, tx *gorm.DB, key 
 	} else {
 		existing.CalendarID = nil
 	}
-	if v := merged.GetOrganizationalUnit(); v != "" {
-		existing.OrganizationalUnitID = repox.Ptr(repox.LastSegment(v))
-	} else {
-		existing.OrganizationalUnitID = nil
-	}
+	existing.OrganizationalUnit = next.OrganizationalUnit
 	if len(outputPaths) > 0 {
 		paths := outputPaths
 		if repox.InMask(paths, "uid") {
@@ -390,9 +377,6 @@ func (r *GormResourceRepository) newRow(in *resourcev1.Resource) (*resource.Reso
 	m.Name = in.GetName()
 	if v := in.GetCalendar(); v != "" {
 		m.CalendarID = repox.Ptr(repox.LastSegment(v))
-	}
-	if v := in.GetOrganizationalUnit(); v != "" {
-		m.OrganizationalUnitID = repox.Ptr(repox.LastSegment(v))
 	}
 	m.Etag = repox.Ptr(repox.NewULID())
 	return m, in, nil

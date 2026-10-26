@@ -7,7 +7,7 @@
 // 	protoc (unknown)
 //
 // database: rfc
-// schemas:  ldapgroup, membership, organization, orgunit, calendar, event, journal, todo, vcard, scimgroup, user, availability, pack, sensor, stream, unit, resource, card, project, common
+// schemas:  calendar, event, journal, todo, vcard, scimgroup, user, availability, pack, sensor, stream, unit, resource, card, project, common
 //
 // Prisma 7 configuration; connection URLs are environment-driven.
 // annotations: entity.v1 1.6.5, store.v1 1.6.5

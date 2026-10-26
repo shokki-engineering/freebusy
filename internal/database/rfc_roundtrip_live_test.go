@@ -106,7 +106,7 @@ func TestLiveRFCRoundTrip(t *testing.T) {
 			t.Run("resource keeps structured data in order", func(t *testing.T) {
 				res := resource.New(conn).Resources
 				r, err := res.Create(ctx, &resourcev1.Resource{
-					Name: "resources/rt-" + run, OrganizationalUnit: "organizationalUnits/rt-" + run,
+					Name: "resources/rt-" + run,
 					StructuredData: []*resourcev1.StructuredData{
 						{Schema: "https://example.com/a", Value: &resourcev1.StructuredData_Text{Text: `{"min_duration":"PT1H"}`}},
 						{Schema: "https://example.com/b", Value: &resourcev1.StructuredData_Uri{Uri: "https://example.com/doc"}},

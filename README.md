@@ -587,9 +587,8 @@ uses, with the headers above.
 table `allocation.resource_days`, one row per resource per UTC day
 (`freebusy.allocation.v1.ResourceDay`), holding the resource's standing free
 time that day -- what its RFC 7953 availability offers, less confirmed events
-and converted holds -- plus its `organizational_unit` (the resource's own,
-as data), `resource_types`,
-`display_name` and `attributes` (every JSON object in its STRUCTURED-DATA,
+and converted holds -- plus its `resource_types`, `display_name` and
+`attributes` (every JSON object in its STRUCTURED-DATA,
 merged). A search asks Postgres for the rows whose free time contains the
 window (a GiST index on a `tstzmultirange`), then the engine evaluates only
 those resources. Live holds and booking policy are left out of the rows on
@@ -626,14 +625,14 @@ replaces rows batch by batch, so searches keep answering while it runs: about
 starting together may each rebuild; a rebuild only replaces rows.
 
 **Filters, order and facets.** `filter` is AIP-160 over the row's fields --
-any `attributes.<path>`, `resource_types`, `display_name` (a bare word),
-`organizational_unit` -- with terms ANDed unless joined by `OR`, negated by
+any `attributes.<path>`, `resource_types` and `display_name` (a bare word)
+-- with terms ANDed unless joined by `OR`, negated by
 `NOT` or a leading `-`, and grouped with parentheses; it narrows
 `SearchAvailability`, `ComputeAvailability`, `CheckAvailability` and, as
 `hold.candidate_filter`, `CreateHold`. `SearchAvailability` also takes
-`order_by` (`resource`, `organizational_unit`, `display_name`,
+`order_by` (`resource`, `display_name`,
 `free_fraction`, `attributes.max_occupancy`) and `facets` (counts by `resource_types`,
-`organizational_unit`, `display_name` or `attributes.<path>`,
+`display_name` or `attributes.<path>`,
 from the rows, live holds not subtracted):
 
 ```sh

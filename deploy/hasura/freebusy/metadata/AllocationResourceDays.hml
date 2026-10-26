@@ -21,8 +21,6 @@ definition:
       type: Float64
     - name: id
       type: String_1!
-    - name: organizationalUnit
-      type: String_1
     - name: resource
       type: String_1!
     - name: resourceTypes
@@ -57,9 +55,6 @@ definition:
         id:
           column:
             name: id
-        organizationalUnit:
-          column:
-            name: organizational_unit
         resource:
           column:
             name: resource
@@ -86,7 +81,6 @@ definition:
           - free
           - freeFraction
           - id
-          - organizationalUnit
           - resource
           - resourceTypes
           - rowVersion
@@ -113,8 +107,6 @@ definition:
         - fieldName: freeFraction
           booleanExpressionType: Float8BoolExp
         - fieldName: id
-          booleanExpressionType: TextBoolExp
-        - fieldName: organizationalUnit
           booleanExpressionType: TextBoolExp
         - fieldName: resource
           booleanExpressionType: TextBoolExp
@@ -151,8 +143,6 @@ definition:
           aggregateExpression: Float8AggExp
         - fieldName: id
           aggregateExpression: TextAggExp
-        - fieldName: organizationalUnit
-          aggregateExpression: TextAggExp
         - fieldName: resource
           aggregateExpression: TextAggExp
         - fieldName: rowVersion
@@ -185,8 +175,6 @@ definition:
         - fieldName: freeFraction
           orderByExpression: Float64OrderByExp
         - fieldName: id
-          orderByExpression: String1OrderByExp
-        - fieldName: organizationalUnit
           orderByExpression: String1OrderByExp
         - fieldName: resource
           orderByExpression: String1OrderByExp

@@ -101,13 +101,11 @@ func (*Allocation) TableName() string { return "allocation.resource" }
 // A ResourceDay is one resource's standing free time on one UTC day: the availability read model SearchAvailability, ComputeAvailability, CheckAvailability and CreateHold read their candidates from, instead of evaluating every resource there is. Storage-only, and derived: no RPC takes or returns it. It is a projection of the resources, their calendars, RFC 7953 availability, RFC 5545 events and the claims of converted holds, rewritten in the same transaction as every write to those (on Hasura, a single write projects in a request of its own right after it), for every day of a rolling horizon. `free` is offered time less booked time; live holds are not subtracted, and neither is a resource's booking policy applied, because both change with the clock. The engine evaluates every candidate the projection returns before answering, so an answer never depends on the projection being current; a stale row can only make a search miss a resource or read one it then drops.
 type ResourceDay struct {
 	// The row's key: its key fields' values as a JSON array.
-	ID string `gorm:"column:id;primaryKey;not null;index:idx_resource_days_organizational_unit_day_id,priority:3;index:idx_resource_days_calendar_id,priority:2;index:idx_resource_days_day_resource_id,priority:3" json:"id"`
+	ID string `gorm:"column:id;primaryKey;not null;index:idx_resource_days_calendar_id,priority:2;index:idx_resource_days_day_resource_id,priority:3" json:"id"`
 	// The resource, "resources/{resource}". Not a resource reference: a projection row must never keep its source from being purged.
 	Resource string `gorm:"column:resource;not null;uniqueIndex:idx_resource_days_resource_day,priority:1;index:idx_resource_days_day_resource_id,priority:2" json:"resource" validate:"required"`
-	// The resource's own organizational_unit, copied as data for filtering: freebusy does not check or scope by it.
-	OrganizationalUnit string `gorm:"column:organizational_unit;index:idx_resource_days_organizational_unit_day_id,priority:1" json:"organizational_unit"`
 	// The UTC calendar day this row covers.
-	Day time.Time `gorm:"column:day;type:date;not null;uniqueIndex:idx_resource_days_resource_day,priority:2;index:idx_resource_days_organizational_unit_day_id,priority:2;index:idx_resource_days_day_resource_id,priority:1" json:"day" validate:"required"`
+	Day time.Time `gorm:"column:day;type:date;not null;uniqueIndex:idx_resource_days_resource_day,priority:2;index:idx_resource_days_day_resource_id,priority:1" json:"day" validate:"required"`
 	// The resource's free time within the day, [day 00:00Z, next day 00:00Z): offered by its availability, less confirmed events on its calendar and the claims of converted holds. Live holds are not subtracted.
 	Free string `gorm:"column:free;type:tstzmultirange;not null;index:idx_resource_days_free_gist,type:gist" json:"free" validate:"required"`
 	// RFC 9073 RESOURCE-TYPE values the resource carries.

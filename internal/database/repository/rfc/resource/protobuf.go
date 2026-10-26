@@ -123,9 +123,7 @@ func resourceToCreateInput(in *resourcev1.Resource) entityql.CreateInput {
 	if v := in.GetCalendar(); v != "" {
 		ci.Calendar = repox.LastSegment(v)
 	}
-	if v := in.GetOrganizationalUnit(); v != "" {
-		ci.OrganizationalUnit = repox.LastSegment(v)
-	}
+	ci.OrganizationalUnit = in.GetOrganizationalUnit()
 	ci.Uid = in.GetUid()
 	ci.ExpireTime = tsToStr(in.GetExpireTime())
 	return ci
@@ -158,7 +156,7 @@ func resourceToUpdatePatch(merged *resourcev1.Resource) entityql.UpdateInput {
 	} else {
 		patch.Calendar = graphql.Null[string]()
 	}
-	if v := repox.LastSegment(merged.GetOrganizationalUnit()); v != "" {
+	if v := merged.GetOrganizationalUnit(); v != "" {
 		patch.OrganizationalUnit = graphql.Value(v)
 	} else {
 		patch.OrganizationalUnit = graphql.Null[string]()
@@ -208,9 +206,7 @@ func resourceFromRow(row *entityql.ResourceEntity) *resourcev1.Resource {
 	if v := repox.Deref(row.Calendar); v != "" {
 		out.Calendar = "calendars/" + v
 	}
-	if v := repox.Deref(row.OrganizationalUnit); v != "" {
-		out.OrganizationalUnit = "organizationalUnits/" + v
-	}
+	out.OrganizationalUnit = repox.Deref(row.OrganizationalUnit)
 	out.Etag = repox.Deref(row.Etag)
 	out.CreateTime = strToTs(row.CreateTime)
 	out.UpdateTime = strToTs(row.UpdateTime)

@@ -50,10 +50,9 @@ type ComputeAvailabilityRequest struct {
 	IncludeFreeResources bool `protobuf:"varint,7,opt,name=include_free_resources,json=includeFreeResources,proto3" json:"include_free_resources,omitempty"`
 	// An AIP-160 filter over each resource's search record (ResourceDay): its
 	// `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
-	// `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-	// `display_name` (a bare word matches it) and `organizational_unit` (the
-	// resource's own, as data). Terms are ANDed unless joined with OR. Empty
-	// matches every resource.
+	// `attributes.view = "river" AND attributes.max_occupancy >= 3`) and its
+	// `display_name` (a bare word matches it). Terms are ANDed unless joined
+	// with OR. Empty matches every resource.
 	// Only matching resources are computed over or counted.
 	Filter        string `protobuf:"bytes,8,opt,name=filter,proto3" json:"filter,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -207,10 +206,9 @@ type CheckAvailabilityRequest struct {
 	Quantity int32 `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`
 	// An AIP-160 filter over each resource's search record (ResourceDay): its
 	// `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
-	// `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-	// `display_name` (a bare word matches it) and `organizational_unit` (the
-	// resource's own, as data). Terms are ANDed unless joined with OR. Empty
-	// matches every resource.
+	// `attributes.view = "river" AND attributes.max_occupancy >= 3`) and its
+	// `display_name` (a bare word matches it). Terms are ANDed unless joined
+	// with OR. Empty matches every resource.
 	// Only matching resources are checked.
 	Filter        string `protobuf:"bytes,5,opt,name=filter,proto3" json:"filter,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -463,21 +461,20 @@ type SearchAvailabilityRequest struct {
 	PageToken string `protobuf:"bytes,7,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// An AIP-160 filter over each resource's search record (ResourceDay): its
 	// `resource_types`, its STRUCTURED-DATA under `attributes` (any path, e.g.
-	// `attributes.view = "river" AND attributes.max_occupancy >= 3`), its
-	// `display_name` (a bare word matches it) and `organizational_unit` (the
-	// resource's own, as data). Terms are ANDed unless joined with OR. Empty
-	// matches every resource.
+	// `attributes.view = "river" AND attributes.max_occupancy >= 3`) and its
+	// `display_name` (a bare word matches it). Terms are ANDed unless joined
+	// with OR. Empty matches every resource.
 	Filter string `protobuf:"bytes,8,opt,name=filter,proto3" json:"filter,omitempty"`
 	// AIP-132 order of the matches: a comma-separated list of `resource`,
-	// `organizational_unit`, `display_name`, `free_fraction` (the share of
-	// the window's first UTC day that is free) and `attributes.max_occupancy`
+	// `display_name`, `free_fraction` (the share of the window's first UTC day
+	// that is free) and `attributes.max_occupancy`
 	// (the booking profile's, as a number), each optionally followed by
 	// ` desc`, e.g. `free_fraction desc, display_name`. Defaults to
 	// `resource`.
 	OrderBy string `protobuf:"bytes,9,opt,name=order_by,json=orderBy,proto3" json:"order_by,omitempty"`
 	// Fields to count matching resources by, returned in
 	// SearchAvailabilityResponse.facets: `resource_types`,
-	// `organizational_unit` or an `attributes.<path>`, e.g.
+	// `display_name` or an `attributes.<path>`, e.g.
 	// ["resource_types", "attributes.view"]. At most 10.
 	Facets        []string `protobuf:"bytes,10,rep,name=facets,proto3" json:"facets,omitempty"`
 	unknownFields protoimpl.UnknownFields

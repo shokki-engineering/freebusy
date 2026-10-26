@@ -54,7 +54,6 @@ type ResourceStoreIface interface {
 	GetByName(ctx context.Context, v string) (*Resource, error)
 	GetByUID(ctx context.Context, v string) (*Resource, error)
 	ListByCalendarID(ctx context.Context, id string, opts gormx.ListOptions) ([]Resource, error)
-	ListByOrganizationalUnitID(ctx context.Context, id string, opts gormx.ListOptions) ([]Resource, error)
 }
 
 // ResourceStore provides typed CRUD access to Resource records.
@@ -206,21 +205,6 @@ func (s *ResourceStore) ListByCalendarID(ctx context.Context, id string, opts go
 		return opts.Apply(s.DB.WithContext(ctx).Where("calendar = ?", id)).Find(&out).Error
 	})
 	tel.RecordOp(ctx, "resource.entity", "list_by_calendar", time.Since(start), err)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// ListByOrganizationalUnitID returns the Resource records whose organizational_unit matches id, with opts applied.
-func (s *ResourceStore) ListByOrganizationalUnitID(ctx context.Context, id string, opts gormx.ListOptions) ([]Resource, error) {
-	var out []Resource
-	tel := gormx.OrNop(s.Telemetry)
-	start := time.Now()
-	err := tel.Span(ctx, "resource.Resource/ListByOrganizationalUnitID", nil, func(ctx context.Context) error {
-		return opts.Apply(s.DB.WithContext(ctx).Where("organizational_unit = ?", id)).Find(&out).Error
-	})
-	tel.RecordOp(ctx, "resource.entity", "list_by_organizational_unit", time.Since(start), err)
 	if err != nil {
 		return nil, err
 	}

@@ -32,13 +32,14 @@ func ResourceToProto(m *Resource) *resourcev1.Resource {
 		return nil
 	}
 	out := &resourcev1.Resource{}
-	// not mapped here: position, calendar (resource reference), organizational_unit (resource reference)
+	// not mapped here: position, calendar (resource reference)
 	out.Name = m.Name
 	out.Uid = fromPtr(m.UID)
 	out.IcalUid = fromPtr(m.IcalUID)
 	out.DisplayName = fromPtr(m.DisplayName)
 	out.Description = fromPtr(m.Description)
 	out.ResourceTypes = []string(m.ResourceTypes)
+	out.OrganizationalUnit = fromPtr(m.OrganizationalUnit)
 	out.CreateTime = goValToTs(m.CreateTime)
 	out.UpdateTime = goValToTs(m.UpdateTime)
 	out.Etag = fromPtr(m.Etag)
@@ -58,13 +59,14 @@ func ResourceFromProto(pb *resourcev1.Resource) *Resource {
 		return nil
 	}
 	m := &Resource{}
-	// not mapped here: position, calendar (resource reference), organizational_unit (resource reference), structured_data (sub-row graph)
+	// not mapped here: position, calendar (resource reference), structured_data (sub-row graph)
 	m.Name = pb.GetName()
 	m.UID = toPtr(pb.GetUid())
 	m.IcalUID = toPtr(pb.GetIcalUid())
 	m.DisplayName = toPtr(pb.GetDisplayName())
 	m.Description = toPtr(pb.GetDescription())
 	m.ResourceTypes = pq.StringArray(pb.GetResourceTypes())
+	m.OrganizationalUnit = toPtr(pb.GetOrganizationalUnit())
 	m.Etag = toPtr(pb.GetEtag())
 	m.DeleteTime = tsToGo(pb.GetDeleteTime())
 	m.ExpireTime = tsToGo(pb.GetExpireTime())

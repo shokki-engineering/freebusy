@@ -49,6 +49,10 @@ erDiagram
         string id PK
         string contact_id FK
     }
+    Organization {
+        string id PK
+        string contact_id FK
+    }
     Pronouns {
         string id PK
         string contact_id FK
@@ -92,10 +96,6 @@ erDiagram
     VcardName {
         string id PK
     }
-    VcardOrganization {
-        string id PK
-        string contact_id FK
-    }
     Contact }o--|| VcardName : "name_components_id"
     Contact }o--|| DateOrText : "birthday_id"
     Contact }o--|| DateOrText : "anniversary_id"
@@ -105,6 +105,7 @@ erDiagram
     InstantMessage }o--|| Contact : "contact_id"
     Language }o--|| Contact : "contact_id"
     Nickname }o--|| Contact : "contact_id"
+    Organization }o--|| Contact : "contact_id"
     Pronouns }o--|| Contact : "contact_id"
     Relation }o--|| Contact : "contact_id"
     Role }o--|| Contact : "contact_id"
@@ -115,7 +116,6 @@ erDiagram
     Vcard }o--|| Contact : "contact_id"
     VcardAddress }o--|| Contact : "contact_id"
     VcardExtensionProperty }o--|| Contact : "contact_id"
-    VcardOrganization }o--|| Contact : "contact_id"
 ```
 
 ## Subfolders

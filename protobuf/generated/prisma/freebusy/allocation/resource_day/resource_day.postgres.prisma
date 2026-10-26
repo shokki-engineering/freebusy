@@ -23,9 +23,6 @@ model ResourceDay {
   /// The resource, "resources/{resource}". Not a resource reference: a projection row must never keep its source from being purged.
   resource String @map("resource")
 
-  /// The resource's own organizational_unit, copied as data for filtering: freebusy does not check or scope by it.
-  organizationalUnit String @map("organizational_unit")
-
   /// The UTC calendar day this row covers.
   day DateTime @freebusy.Date @map("day")
 
@@ -52,8 +49,6 @@ model ResourceDay {
 
   /// Unique constraint on [resource, day].
   @@unique([resource, day])
-  /// Composite index on [organizational_unit, day, id].
-  @@index([organizationalUnit, day, id])
   /// Composite index on [calendar, id].
   @@index([calendar, id])
   /// Composite index on [day, resource, id].

@@ -29,8 +29,7 @@ pre-release and does not move the images' `latest` tag.
   `POST /v1/resources:computeAvailability`, `:checkAvailability` and
   `:searchAvailability`, narrowed by `resources`, `resource_types` and
   `filter` instead of a site or an organization. Grouping resources into
-  venues, properties or tenants belongs to whatever is built on top; a
-  resource's own `organizational_unit` stays, as data a filter can match.
+  venues, properties or tenants belongs to whatever is built on top.
 - Holds taken with one idempotency key are the same hold everywhere, not per
   site.
 
@@ -44,6 +43,13 @@ pre-release and does not move the images' `latest` tag.
   `AvailabilityMatch.organizational_unit`.
 - `Webhook.organizational_unit`: a webhook is sent every change of the types
   it asks for.
+- RFC 4519 from the database layer: organizations, organizational units,
+  LDAP groups and memberships have no tables, repositories, Hasura models or
+  bindings (`exclude_paths` on the RFC module). Migration
+  `20261026071039_drop_rfc4519_directory` drops their schemas.
+- `organizational_unit` everywhere it was left: the read model's column, and
+  with it `filter`, `order_by` and `facets` on it. The RFC module's
+  `Resource` no longer has the field either.
 - The read model's `organization` column. Migration
   `20261026062717_top_level_engine` drops it and the site columns of holds,
   allocations, reservations and webhooks;

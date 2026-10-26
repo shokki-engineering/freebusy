@@ -56,8 +56,8 @@ type Resource struct {
 	Position *string `gorm:"column:position" json:"position,omitempty"`
 	// The calendar this resource's bookings are kept on. Native: section 7.3 has no calendar property, because a VRESOURCE published inside a VEVENT is already on the event's calendar. A free-standing resource is not, and without this field nothing can ask when it is busy -- RFC 5545 section 3.6.4 <https://www.rfc-editor.org/rfc/rfc5545.html#section-3.6.4>'s free/busy query is addressed to a calendar. The field exists despite having no RFC property behind it, the same trade OrganizationalUnit.organization records.
 	CalendarID *string `gorm:"column:calendar;index:idx_entity_calendar" json:"calendar,omitempty"`
-	// The organizational unit this resource belongs to, e.g. the car park a bay is in. Native, for the reason above: left unset, a resource is undiscoverable from the unit that operates it, and listing what a site has is the first question a catalogue is asked.
-	OrganizationalUnitID *string `gorm:"column:organizational_unit;index:idx_entity_organizational_unit" json:"organizational_unit,omitempty"`
+	// The organizational unit this resource belongs to, e.g. the car park a bay is in. Native, for the reason above: left unset, a resource is undiscoverable from the unit that operates it, and listing what a site has is the first question a catalogue is asked. TODO: unresolved reference to OrganizationalUnit (not in this generation set); kept as a plain indexed column.
+	OrganizationalUnit *string `gorm:"column:organizational_unit;index:idx_entity_organizational_unit" json:"organizational_unit,omitempty"`
 	// When the resource was created.
 	CreateTime time.Time `gorm:"column:create_time;type:timestamptz;not null;autoCreateTime" json:"create_time"`
 	// When the resource was last modified.
