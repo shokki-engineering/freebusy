@@ -70,11 +70,8 @@ pre-release and does not move the images' `latest` tag.
   covered. Helm `cors.*` values and Compose `FREEBUSY_CORS_*` variables wire
   it. See "Calling freebusy from a browser" in the README.
 - A release pushes the API's buf module to the BSR, labelled with the tag
-  (secret `BUF_TOKEN`), and Minerva, the GitHub App installed on the SDK
-  repositories (variable `MINERVA_APP_ID`, secret `MINERVA_PRIVATE_KEY`),
-  tells `freebusy-go`, `freebusy-typescript` and `freebusy-python` through
-  `the-protobuf-project/sdk/dispatch`; each regenerates from that label and
-  opens a pull request. Both steps are skipped until their secrets exist.
+  (secret `BUF_TOKEN`; skipped until it exists). The SDKs are regenerated
+  from that label by hand.
 
 ## [1.0.0-rc.1] - 2026-10-24
 
