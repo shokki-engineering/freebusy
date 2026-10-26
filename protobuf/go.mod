@@ -9,7 +9,7 @@ require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2
 	buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261026071747-ca7aabdffc7b.1
 	buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261026071747-ca7aabdffc7b.2
-	cloud.google.com/go/longrunning v1.3.0
+	cloud.google.com/go/longrunning v1.4.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.32.0
 	github.com/the-protobuf-project/cache v0.3.0
 	github.com/the-protobuf-project/mcp v1.7.4

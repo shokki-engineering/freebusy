@@ -4,8 +4,8 @@ buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261026071747-ca7aabdf
 buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261026071747-ca7aabdffc7b.1/go.mod h1:N8S5LZwCwgDo5gKAo4FhXboUdIDwySriRVyDrAXjjok=
 buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261026071747-ca7aabdffc7b.2 h1:Q2X2PxSgPI1yC3Y2aDK2lfLqZq5F+Y+UBMiSBc9AkqM=
 buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261026071747-ca7aabdffc7b.2/go.mod h1:BgS6YLECIrB3HN5MHkAZHOEuIBYzm+EBm8z+hZX5Q/o=
-cloud.google.com/go/longrunning v1.3.0 h1:lZ6c8SJJBmILp/Wnr3vGnBLa0q+cYfSHRCcUfVI2hpI=
-cloud.google.com/go/longrunning v1.3.0/go.mod h1:wpgLxCn+UA3/TZ1bj/fW39mfDpwVlMPu1xKJyoMt7V0=
+cloud.google.com/go/longrunning v1.4.0 h1:l53OXv/ZAQCvATPqdYIqxruIUa1+eeX3Ckg0EBMpZLM=
+cloud.google.com/go/longrunning v1.4.0/go.mod h1:HAJuq0kD9eDyV6DtaN+0b6niPzFFFf9QMMHkHD7DvMc=
 github.com/a2aproject/a2a-go/v2 v2.7.0 h1:rwIpzO5O9Mxu/Rm4S2SZfHYzNcvF3FK9aaaTxP35kAo=
 github.com/a2aproject/a2a-go/v2 v2.7.0/go.mod h1:rvFIb0sBJl2qmJRYU2fQxI6hhIQksmGGMEhT/uRwWww=
 github.com/golang-jwt/jwt/v5 v5.3.1 h1:kYf81DTWFe7t+1VvL7eS+jKFVWaUnK9cB1qbwn63YCY=
