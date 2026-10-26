@@ -50,6 +50,9 @@ type Service struct {
 	// caldav is the CalDAV server, mounted on the HTTP gateway's mux; nil
 	// unless [caldav] enabled.
 	caldav *caldav.Handler
+	// feed serves calendars as read-only iCalendar feeds; nil unless
+	// [feeds] secret is set.
+	feed *caldav.Feed
 	// search is the read model's OpenSearch copy; nil unless [search]
 	// provider = "opensearch".
 	search *search.OpenSearch

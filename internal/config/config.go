@@ -49,6 +49,8 @@ type AppConfig struct {
 	Cache CacheConfig `koanf:"cache"`
 	// CalDAV is the RFC 4791 server mounted on the HTTP port.
 	CalDAV CalDAVConfig `koanf:"caldav"`
+	// Feeds are the read-only, token-signed iCalendar feeds of calendars.
+	Feeds FeedsConfig `koanf:"feeds"`
 
 	// Webhooks tunes delivery of hold and reservation changes.
 	Webhooks WebhooksConfig `koanf:"webhooks"`
@@ -238,6 +240,18 @@ type WebhooksConfig struct {
 type CalDAVConfig struct {
 	// Enabled mounts CalDAV under /dav/ on the HTTP gateway's port.
 	Enabled bool `koanf:"enabled"`
+}
+
+// FeedsConfig publishes calendars as read-only iCalendar feeds under
+// /feeds/calendars/ on the HTTP port (internal/caldav/feed.go), for calendar
+// apps that subscribe by URL, such as Google Calendar. Each link carries a
+// token, an HMAC of the calendar's name under Secret; unlike CalDAV, feeds
+// are safe to expose, and are served whether or not CalDAV is enabled.
+type FeedsConfig struct {
+	// Secret signs the links: 32 or more random bytes (openssl rand -hex 32).
+	// Empty turns feeds off; changing it revokes every link. A secret, so set
+	// it through FREEBUSY_FEEDS__SECRET, not a file.
+	Secret string `koanf:"secret"`
 }
 
 // CacheConfig is the backend behind protoc-gen-cache's generated decorators.

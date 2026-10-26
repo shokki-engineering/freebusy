@@ -7,6 +7,7 @@ go_library(
     name = "caldav",
     srcs = [
         "caldav.go",
+        "feed.go",
         "store.go",
     ],
     importpath = "github.com/shokki-engineering/freebusy/internal/caldav",

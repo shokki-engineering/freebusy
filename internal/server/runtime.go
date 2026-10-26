@@ -77,8 +77,16 @@ func newServiceInstance(conn *database.Connection) (*Service, error) {
 	})
 	svc := NewService(services)
 	svc.search = osearch
+	// One CalDAV handler answers both the CalDAV tree, when enabled, and the
+	// read-only feeds, when they have a secret.
+	dav := caldav.New(services.Repos, services.Allocation)
 	if cfg.CalDAV.Enabled {
-		svc.caldav = caldav.New(services.Repos, services.Allocation)
+		svc.caldav = dav
+	}
+	if cfg.Feeds.Secret != "" {
+		if svc.feed, err = caldav.NewFeed(dav, []byte(cfg.Feeds.Secret)); err != nil {
+			return nil, err
+		}
 	}
 	return svc, nil
 }
@@ -101,12 +109,17 @@ func NewGRPCServer(conn *database.Connection) (*grpc.GRPCServer, *Service, error
 	return srv, svc, nil
 }
 
-// mountCalDAV returns a server option that mounts CalDAV on the HTTP
-// gateway's mux; nil unless it is enabled.
+// mountCalDAV returns a server option that mounts CalDAV and the feeds on
+// the HTTP gateway's mux, each only when it is on.
 func mountCalDAV(svc *Service) grpc.Option {
 	return grpc.WithHTTPGateways(func(mux *grpc.ServeMux, _ string, _ []grpc.DialOption) error {
 		if svc.caldav != nil {
-			return svc.caldav.Mount(mux)
+			if err := svc.caldav.Mount(mux); err != nil {
+				return err
+			}
+		}
+		if svc.feed != nil {
+			return svc.feed.Mount(mux)
 		}
 		return nil
 	})

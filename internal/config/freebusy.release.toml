@@ -137,6 +137,12 @@ prefix = "freebusy"
 # authentication yet, so it must not face a network.
 enabled = false
 
+[feeds]
+# Read-only iCalendar feeds under /feeds/calendars/{calendar}.ics?token=...,
+# for calendar apps that subscribe by URL (Google Calendar: From URL). On when
+# a secret is set: 32+ random bytes, through FREEBUSY_FEEDS__SECRET.
+secret = ""
+
 [webhooks]
 # Webhook delivery of hold and reservation changes. Endpoints must be https.
 enabled = true
