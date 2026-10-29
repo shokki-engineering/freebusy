@@ -98,8 +98,9 @@ type Store interface {
 	// GetHold returns a hold by name as stored, without applying expiry.
 	GetHold(ctx context.Context, name string) (*allocationpbv1.Hold, error)
 
-	// FindHold returns the hold carrying idempotency key, or
-	// repox.ErrNotFound.
+	// FindHold returns the latest hold carrying idempotency key, or
+	// repox.ErrNotFound. A key has more than one only when its earlier holds
+	// lapsed.
 	FindHold(ctx context.Context, idempotencyKey string) (*allocationpbv1.Hold, error)
 
 	// ListHolds returns a page of holds.

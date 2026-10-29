@@ -227,7 +227,7 @@ unprivileged user on a read-only filesystem.
 ```sh
 bazel build //deploy/image                         # the two-platform image index
 bazel run //deploy/image:push -- --tag 1.0.0       # to ghcr.io/shokki-engineering/freebusy
-bazel run //deploy/image:load                      # or into the local Docker as freebusy:latest
+bazel run //deploy/image:load                      # or into the local Docker as ghcr.io/shokki-engineering/freebusy:latest
 bazel run //deploy/image:push_migrations -- --tag 1.0.0   # the migrations image beside it
 ```
 
@@ -354,8 +354,8 @@ and Redis and the values for images loaded from the local Docker.
 ```sh
 kind create cluster --name freebusy
 bazel run //deploy/image:load && bazel run //deploy/image:load_migrations
-kind load docker-image --name freebusy freebusy:latest
-kind load docker-image --name freebusy freebusy-migrations:latest
+kind load docker-image --name freebusy ghcr.io/shokki-engineering/freebusy:latest
+kind load docker-image --name freebusy ghcr.io/shokki-engineering/freebusy-migrations:latest
 kubectl apply -f deploy/kind/datastores.yaml
 helm install freebusy deploy/helm/freebusy -n freebusy -f deploy/kind/values.yaml --wait
 helm test freebusy -n freebusy --logs

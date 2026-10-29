@@ -277,11 +277,12 @@ func (s *Store) GetHold(ctx context.Context, name string) (*allocationpbv1.Hold,
 	return s.holds.Get(ctx, name)
 }
 
-// FindHold returns the oldest hold carrying idempotency key.
+// FindHold returns the latest hold carrying idempotency key: a key's earlier
+// holds are ones that lapsed before it was retried.
 func (s *Store) FindHold(ctx context.Context, key string) (*allocationpbv1.Hold, error) {
 	found, _, err := s.holds.List(ctx, repox.ListInput{
 		PageSize: 1,
-		OrderBy:  "create_time",
+		OrderBy:  "create_time desc",
 		Where:    []filterx.Condition{{Field: "idempotency_key", Op: filterx.OpEq, Value: key}},
 	})
 	if err != nil {

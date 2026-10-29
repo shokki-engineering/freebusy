@@ -65,6 +65,11 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 	// concurrent caller with the same key may land between attempts, and its
 	// claim on the resources then looks like a conflict -- or exhaustion --
 	// rather than the duplicate it is.
+	//
+	// A key's latest hold that has lapsed is not returned: it reserves
+	// nothing, so a retry under that key takes a fresh hold, named after the
+	// lapsed one (idFor). A released or converted hold is still the answer.
+	var lapsed string
 	prior := func() (*allocationpbv1.Hold, error) {
 		key := in.GetIdempotencyKey()
 		if key == "" {
@@ -73,22 +78,30 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 		prev, err := s.store.FindHold(ctx, key)
 		switch {
 		case err == nil:
-			return s.authoritative(prev), nil
+			if h := s.authoritative(prev); h.GetState() != allocationpbv1.HoldState_HOLD_STATE_EXPIRED {
+				return h, nil
+			}
+			lapsed = prev.GetName()
+			return nil, nil
 		case errors.Is(err, repox.ErrNotFound):
 			return nil, nil
 		}
 		return nil, err
 	}
-	id := req.GetHoldId()
-	switch {
-	case id != "":
-	case in.GetIdempotencyKey() != "":
-		// Derived, not random: two concurrent calls with one key then race
-		// for one name, the store's uniqueness picks a winner, and the loser
-		// returns the winner's hold below. A random id would let both win.
-		id = keyedID(in.GetIdempotencyKey())
-	default:
-		id = ulid.Generate().String()
+	random := ulid.Generate().String()
+	idFor := func() string {
+		switch {
+		case req.GetHoldId() != "":
+			return req.GetHoldId()
+		case in.GetIdempotencyKey() != "":
+			// Derived, not random: two concurrent calls with one key then
+			// race for one name, the store's uniqueness picks a winner, and
+			// the loser returns the winner's hold below. A random id would
+			// let both win. After a lapse, the name also derives from the
+			// lapsed hold, so the fresh one does not collide with it.
+			return keyedID(in.GetIdempotencyKey(), lapsed)
+		}
+		return random
 	}
 	quantity := max(int(in.GetQuantity()), 1)
 	// A hold replacing a booking leaves that booking's own claim out of
@@ -128,7 +141,7 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 			return nil, unbookable(res, quantity)
 		}
 		hold := &allocationpbv1.Hold{
-			Name:               "holds/" + id,
+			Name:               "holds/" + idFor(),
 			Resources:          picked,
 			Window:             intervalOf(window),
 			CandidateResources: in.GetCandidateResources(),
@@ -367,7 +380,12 @@ func (s *Server) HandOver(ctx context.Context, from, to string, at time.Time) (*
 
 // keyedID derives a hold id from an idempotency key: 26 lowercase hex
 // characters of its SHA-256, the length of a ULID so names stay uniform.
-func keyedID(key string) string {
+// after names the key's lapsed hold the new one succeeds, "" for a key's
+// first hold, whose id is the key's alone.
+func keyedID(key, after string) string {
+	if after != "" {
+		key += "\x00" + after
+	}
 	sum := sha256.Sum256([]byte(key))
 	return hex.EncodeToString(sum[:13])
 }

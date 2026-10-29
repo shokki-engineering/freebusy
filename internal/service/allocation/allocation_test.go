@@ -203,6 +203,49 @@ func TestCreateHoldIdempotent(t *testing.T) {
 	}
 }
 
+// A key whose hold lapsed takes a fresh hold, which a retry under the key
+// then returns; a lapsed hold reserves nothing, so returning it would leave
+// the caller holding nothing. A released hold is still the key's answer.
+func TestCreateHoldIdempotentAfterLapse(t *testing.T) {
+	f := newFixture(t)
+	f.share()
+	req := &allocationpbv1.CreateHoldRequest{
+		Hold: &allocationpbv1.Hold{Window: win(10, 11), IdempotencyKey: "cart-43"},
+	}
+	first, err := f.srv.CreateHold(ctx(), req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f.clock = f.clock.Add(DefaultHoldTTL + time.Second)
+	fresh, err := f.srv.CreateHold(ctx(), req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if fresh.GetName() == first.GetName() || fresh.GetState() != allocationpbv1.HoldState_HOLD_STATE_ACTIVE {
+		t.Fatalf("after the lapse: %s %v, want a new ACTIVE hold beside %s", fresh.GetName(), fresh.GetState(), first.GetName())
+	}
+	if !fresh.GetExpireTime().AsTime().After(f.clock) {
+		t.Fatalf("fresh hold expires %v, not after now %v", fresh.GetExpireTime().AsTime(), f.clock)
+	}
+	again, err := f.srv.CreateHold(ctx(), req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.GetName() != fresh.GetName() || len(f.store.holds) != 2 {
+		t.Fatalf("retry of the fresh hold: %s (%d holds), want %s", again.GetName(), len(f.store.holds), fresh.GetName())
+	}
+	if _, err := f.srv.ReleaseHold(ctx(), &allocationpbv1.ReleaseHoldRequest{Name: fresh.GetName()}); err != nil {
+		t.Fatal(err)
+	}
+	released, err := f.srv.CreateHold(ctx(), req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if released.GetName() != fresh.GetName() || released.GetState() != allocationpbv1.HoldState_HOLD_STATE_RELEASED {
+		t.Fatalf("retry of a released hold: %s %v, want %s RELEASED", released.GetName(), released.GetState(), fresh.GetName())
+	}
+}
+
 func TestCreateHoldReplansAfterLosingRace(t *testing.T) {
 	f := newFixture(t)
 	f.share()

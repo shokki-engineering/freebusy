@@ -159,8 +159,8 @@ func (m *memStore) GetHold(_ context.Context, name string) (*allocationpbv1.Hold
 func (m *memStore) FindHold(_ context.Context, key string) (*allocationpbv1.Hold, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	for _, n := range m.order {
-		h := m.holds[n]
+	for i := len(m.order) - 1; i >= 0; i-- {
+		h := m.holds[m.order[i]]
 		if h != nil && h.GetIdempotencyKey() == key {
 			return proto.Clone(h).(*allocationpbv1.Hold), nil
 		}

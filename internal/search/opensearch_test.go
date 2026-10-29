@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/shokki-engineering/freebusy/internal/config"
 )
 
 // Every fallback is counted, and logged at most once per fallbackLogEvery
@@ -43,5 +45,19 @@ func TestFallbackLogsRateLimited(t *testing.T) {
 	}
 	if got := fmt.Sprint(lines[1]); !strings.Contains(got, "fallbacks_not_logged 4") || !strings.Contains(got, "reason timeout") || !strings.Contains(got, "op facet") {
 		t.Errorf("second line = %s, want 4 unlogged fallbacks, reason timeout, op facet", got)
+	}
+}
+
+// index_queue 0 is the documented 1024, not synchronous indexing; a value
+// set is kept.
+func TestConnectIndexQueueDefault(t *testing.T) {
+	for set, want := range map[int]int{0: 1024, 16: 16} {
+		o, err := Connect(config.OpenSearchConfig{URL: "http://127.0.0.1:9200", IndexQueue: set})
+		if err != nil {
+			t.Fatalf("Connect: %v", err)
+		}
+		if o.queue != want {
+			t.Errorf("index_queue %d: indexer queue %d, want %d", set, o.queue, want)
+		}
 	}
 }

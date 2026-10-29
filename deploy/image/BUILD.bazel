@@ -7,7 +7,9 @@
 # main.go) and is configured entirely by FREEBUSY_* environment variables
 # over the release defaults compiled into it (internal/config/load.go).
 #
-#   bazel run //deploy/image:load            # into the local Docker, as freebusy:latest
+#   bazel run //deploy/image:load            # into the local Docker, as
+#                                            # ghcr.io/shokki-engineering/freebusy:latest,
+#                                            # the name the Compose files run
 #   bazel build //deploy/image               # the linux/amd64 + linux/arm64 index
 #   bazel run //deploy/image:push -- --tag <tag>
 #
@@ -16,7 +18,7 @@
 # no checkout -- the Compose stack, the Helm chart's pre-upgrade Job -- runs
 # `just db apply`.
 #
-#   bazel run //deploy/image:load_migrations   # as freebusy-migrations:latest
+#   bazel run //deploy/image:load_migrations   # as ghcr.io/shokki-engineering/freebusy-migrations:latest
 #   bazel run //deploy/image:push_migrations -- --tag <tag>
 load("@rules_go//go:def.bzl", "go_cross_binary")
 load("@rules_oci//oci:defs.bzl", "oci_image", "oci_image_index", "oci_load", "oci_push")
@@ -76,7 +78,7 @@ oci_load(
         "@platforms//cpu:arm64": ":image_arm64",
         "//conditions:default": ":image_amd64",
     }),
-    repo_tags = ["freebusy:latest"],
+    repo_tags = ["ghcr.io/shokki-engineering/freebusy:latest"],
 )
 
 oci_push(
@@ -125,7 +127,7 @@ oci_load(
         "@platforms//cpu:arm64": ":migrations_arm64",
         "//conditions:default": ":migrations_amd64",
     }),
-    repo_tags = ["freebusy-migrations:latest"],
+    repo_tags = ["ghcr.io/shokki-engineering/freebusy-migrations:latest"],
 )
 
 oci_push(

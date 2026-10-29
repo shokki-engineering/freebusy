@@ -6,12 +6,12 @@
 # Docker and `kind load docker-image` copied into the cluster.
 replicaCount: 2
 image:
-  repository: freebusy
+  repository: ghcr.io/shokki-engineering/freebusy
   tag: latest
   pullPolicy: Never
 migrations:
   image:
-    repository: freebusy-migrations
+    repository: ghcr.io/shokki-engineering/freebusy-migrations
     tag: latest
     pullPolicy: Never
 database:

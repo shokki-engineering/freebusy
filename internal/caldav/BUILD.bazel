@@ -1,7 +1,7 @@
 # Copyright 2026 Srikanth K.
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-load("@rules_go//go:def.bzl", "go_library")
+load("@rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "caldav",
@@ -24,5 +24,16 @@ go_library(
         "@com_github_grpc_ecosystem_grpc_gateway_v2//runtime",
         "@com_github_the_protobuf_project_runtime_go_grpc//problem",
         "@com_github_the_protobuf_project_runtime_go_rfc//caldav",
+    ],
+)
+
+go_test(
+    name = "caldav_test",
+    srcs = ["feed_test.go"],
+    embed = [":caldav"],
+    deps = [
+        "@com_github_grpc_ecosystem_grpc_gateway_v2//runtime",
+        "@com_github_the_protobuf_project_runtime_go_rfc//caldav",
+        "@com_github_the_protobuf_project_runtime_go_rfc//caldav/memstore",
     ],
 )

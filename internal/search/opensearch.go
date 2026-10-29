@@ -10,6 +10,7 @@
 package search
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
@@ -31,6 +32,10 @@ type daySearcher interface {
 	SearchDays(ctx context.Context, in repox.SearchInput) ([]*allocationpbv1.ResourceDay, string, error)
 	FacetDays(ctx context.Context, in repox.SearchInput, field string, limit int) ([]repox.Bucket, error)
 }
+
+// defaultIndexQueue is the indexer's queue when [search.opensearch]
+// index_queue is 0.
+const defaultIndexQueue = 1024
 
 // OpenSearch is the read model's copy in an OpenSearch cluster.
 type OpenSearch struct {
@@ -62,7 +67,9 @@ func Connect(cfg config.OpenSearchConfig) (*OpenSearch, error) {
 	if err != nil {
 		return nil, fmt.Errorf("search: opensearch client: %w", err)
 	}
-	return &OpenSearch{client: c, timeout: cfg.Timeout(), queue: cfg.IndexQueue}, nil
+	// index_queue 0 is documented as 1024: a zero passed on as it is would
+	// make the indexer apply every commit synchronously, inside the write.
+	return &OpenSearch{client: c, timeout: cfg.Timeout(), queue: cmp.Or(cfg.IndexQueue, defaultIndexQueue)}, nil
 }
 
 // Feed is the indexer following every committed write to the read model,

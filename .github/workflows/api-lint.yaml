@@ -28,7 +28,7 @@ jobs:
     name: Google AIP lint (strict)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # working-directory is protobuf so each file's path matches its proto
       # package. Linting from the repository root instead trips
@@ -38,7 +38,7 @@ jobs:
       # inside the schema. An escape hatch in the file being reviewed is not a
       # review.
       - name: Lint
-        uses: the-protobuf-project/setup-google-api-linter@d031174de8de0a2166bc929f24e501b914c4a5e9
+        uses: the-protobuf-project/setup-google-api-linter@d031174de8de0a2166bc929f24e501b914c4a5e9 # v1.1.0
         with:
           version: 2.3.1
           working-directory: protobuf

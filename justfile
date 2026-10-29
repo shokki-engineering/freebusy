@@ -132,10 +132,13 @@ bazel-check:
     bazel build //...
     bazel test //...
 
-# The image -- the static binary and nothing else -- loaded into Docker as freebusy:latest.
+# The images -- the static binary and nothing else, and the migrations --
+# loaded into Docker under the names the Compose files run:
+# ghcr.io/shokki-engineering/freebusy:latest and freebusy-migrations:latest.
 [group('bazel')]
 image:
     bazel run //deploy/image:load
+    bazel run //deploy/image:load_migrations
 
 # Run the image against the local Postgres (`just migrate` first), configured
 # only by environment variables, with a read-only filesystem.
@@ -146,7 +149,7 @@ image-run: image
       -e FREEBUSY_DATABASE__POSTGRES__HOST=host.docker.internal \
       -e FREEBUSY_DATABASE__POSTGRES__PASSWORD=postgrespassword \
       -e FREEBUSY_DATABASE__POSTGRES__SSLMODE=disable \
-      freebusy:latest
+      ghcr.io/shokki-engineering/freebusy:latest
 
 # Every file's copyright and SPDX header (tools/license); the
 # regeneration recipes run it after the generators.

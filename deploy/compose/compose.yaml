@@ -193,7 +193,9 @@ services:
       CONNECTION_URI: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/freebusydb
       HASURA_CONNECTOR_PORT: "9794"
       HASURA_SERVICE_TOKEN_SECRET: ${CONNECTOR_TOKEN:-freebusy-local-connector}
-      OTEL_EXPORTER_OTLP_ENDPOINT: ${ENGINE_OTLP_ENDPOINT:-}
+      # Passed only when set: ndc-postgres panics on an empty value, so it
+      # reads .env's OTEL_EXPORTER_OTLP_ENDPOINT as is, and none is none.
+      OTEL_EXPORTER_OTLP_ENDPOINT:
       OTEL_SERVICE_NAME: freebusy_pgsql
     networks:
       default:

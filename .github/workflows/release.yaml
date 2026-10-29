@@ -47,7 +47,7 @@ jobs:
     env:
       TAG: ${{ github.ref_name }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # The version the server reports is config: the tag must match it, and
       # CHANGELOG.md must have the tag's section. The image build below also
@@ -75,10 +75,10 @@ jobs:
 
       # cosign signs every artifact this release publishes; crane resolves a
       # pushed tag to the digest that gets signed.
-      - uses: sigstore/cosign-installer@v3
-      - uses: imjasonh/setup-crane@v0.7
+      - uses: sigstore/cosign-installer@7e8b541eb2e61bf99390e1afd4be13a184e9ebc5 # v3.10.1
+      - uses: imjasonh/setup-crane@feee3b6bb0d4c68370f256a4502498c9227e5c6b # v0.7
 
-      - uses: bazel-contrib/setup-bazel@0.19.1
+      - uses: bazel-contrib/setup-bazel@104e3eea9447cdaa4b00d0fb46191a3985d26ab3 # 0.19.1
         with:
           bazelisk-cache: true
           disk-cache: ${{ github.workflow }}
@@ -94,7 +94,7 @@ jobs:
           bazel run --config=release //deploy/image:push -- "${tags[@]}"
           bazel run //deploy/image:push_migrations -- "${tags[@]}"
 
-      - uses: docker/setup-buildx-action@v4
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
       - name: Hasura engine and connector images
         run: |
           for part in engine connector; do
@@ -114,7 +114,7 @@ jobs:
               "${tags[@]}" -f "$file" "$ctx"
           done
 
-      - uses: azure/setup-helm@v5
+      - uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
       - name: Helm chart
         run: |
           # Artifact Hub annotations that depend on the version: images,
@@ -140,7 +140,7 @@ jobs:
       # Artifact Hub's repository metadata, for the Verified Publisher badge.
       # Skipped until deploy/helm/artifacthub-repo.yaml carries the repository
       # ID Artifact Hub assigns when the repository is added there.
-      - uses: oras-project/setup-oras@v2
+      - uses: oras-project/setup-oras@5e2f2482b30b0cb3e14e67f89a80c88c659a7c63 # v2.0.3
       - name: Artifact Hub repository metadata
         run: |
           id="$(yq '.repositoryID // ""' deploy/helm/artifacthub-repo.yaml)"
@@ -177,7 +177,7 @@ jobs:
 
       # The API's buf module on the BSR, labelled with the tag: what the SDKs
       # are generated from. Skipped until the BUF_TOKEN secret exists.
-      - uses: bufbuild/buf-action@v1
+      - uses: bufbuild/buf-action@85aebf73123b5c15fd5528aaecbf9129cddf7fa7 # v1.6.0
         with:
           setup_only: true
       - name: Push the API to the BSR

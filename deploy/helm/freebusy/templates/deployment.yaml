@@ -129,6 +129,11 @@ spec:
             - { name: OTEL_RESOURCE_ATTRIBUTES, value: "k8s.pod.name=$(POD_NAME),k8s.namespace.name=$(POD_NAMESPACE),k8s.node.name=$(NODE_NAME),k8s.deployment.name={{ include "freebusy.fullname" . }}" }
             {{- with .Values.telemetry }}
             - { name: FREEBUSY_OTLP_ENDPOINT, value: {{ .otlpEndpoint | quote }} }
+            {{- if not .otlpEndpoint }}
+            # No collector: the embedded telemetry.toml's local-dev endpoint
+            # would otherwise apply, now that /tmp is writable.
+            - { name: OTEL_EXPORTER_OTLP_ENABLED, value: "false" }
+            {{- end }}
             - { name: FREEBUSY_OTLP_SECURE, value: {{ .otlpSecure | quote }} }
             - { name: FREEBUSY_TELEMETRY_ENVIRONMENT, value: {{ .environment | quote }} }
             - { name: FREEBUSY_SITE, value: {{ .site | quote }} }
@@ -152,6 +157,13 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           securityContext:
             {{- include "freebusy.securityContext" . | nindent 12 }}
+          volumeMounts:
+            # The root filesystem is read-only; telemetry writes its config
+            # file to the temp directory.
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: tmp
+          emptyDir: { sizeLimit: 64Mi }
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
