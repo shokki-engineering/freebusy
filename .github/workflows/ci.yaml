@@ -183,7 +183,9 @@ jobs:
         env:
           POSTGRES_PASSWORD: postgrespassword
           POSTGRES_DB: freebusydb
-        ports: ["5432:5432"]
+        # Published on 5433: the dev overlay and deploy/hasura/.env.example name
+        # the Postgres aperio and freebusy share in development there.
+        ports: ["5433:5432"]
         options: >-
           --health-cmd "pg_isready -U postgres"
           --health-interval 5s --health-timeout 5s --health-retries 10

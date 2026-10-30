@@ -3,7 +3,6 @@
 
 include:
   - path: freebusy/connector/freebusy_pgsql/compose.yaml
-  - path: freebusy/connector/freebusy_pgsql/compose.yaml
 services:
   engine:
     build:
