@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCommonTimeZonesId
-    inputTypeName: UpdateColumnCommonTimeZonesIdInput
+    typeName: freebusy_UpdateColumnCommonTimeZonesId
+    inputTypeName: freebusy_UpdateColumnCommonTimeZonesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_common_time_zones_id
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCommonTimeZonesVersion
-    inputTypeName: UpdateColumnCommonTimeZonesVersionInput
+    typeName: freebusy_UpdateColumnCommonTimeZonesVersion
+    inputTypeName: freebusy_UpdateColumnCommonTimeZonesVersionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_common_time_zones_version
@@ -79,8 +79,8 @@ definition:
       type: UpdateColumnCommonTimeZonesVersion
       description: Update the 'version' column in the 'common_time_zones' collection.
   graphql:
-    typeName: UpdateCommonTimeZonesByIdUpdateColumns
-    inputTypeName: UpdateCommonTimeZonesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateCommonTimeZonesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateCommonTimeZonesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_common_time_zones_by_id_update_columns
@@ -111,8 +111,8 @@ definition:
       type: "[CommonTimeZones!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateCommonTimeZonesByIdResponse
-    inputTypeName: UpdateCommonTimeZonesByIdResponseInput
+    typeName: freebusy_UpdateCommonTimeZonesByIdResponse
+    inputTypeName: freebusy_UpdateCommonTimeZonesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_common_time_zones_by_id_response
@@ -165,7 +165,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateCommonTimeZonesById
+    rootFieldName: freebusy_updateCommonTimeZonesById
     rootFieldKind: Mutation
   description: Update any row on the 'common_time_zones' collection using the 'id' key
 

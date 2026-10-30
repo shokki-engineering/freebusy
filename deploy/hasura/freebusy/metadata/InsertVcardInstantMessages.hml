@@ -18,8 +18,8 @@ definition:
     - name: value
       type: String_1!
   graphql:
-    typeName: InsertVcardInstantMessagesObject
-    inputTypeName: InsertVcardInstantMessagesObjectInput
+    typeName: freebusy_InsertVcardInstantMessagesObject
+    inputTypeName: freebusy_InsertVcardInstantMessagesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_instant_messages_object
@@ -69,8 +69,8 @@ definition:
       type: "[VcardInstantMessages!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertVcardInstantMessagesResponse
-    inputTypeName: InsertVcardInstantMessagesResponseInput
+    typeName: freebusy_InsertVcardInstantMessagesResponse
+    inputTypeName: freebusy_InsertVcardInstantMessagesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_instant_messages_response
@@ -114,7 +114,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertVcardInstantMessages
+    rootFieldName: freebusy_insertVcardInstantMessages
     rootFieldKind: Mutation
   description: Insert into the vcard_instant_messages table
 

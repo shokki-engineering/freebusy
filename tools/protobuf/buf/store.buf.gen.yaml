@@ -147,6 +147,9 @@ plugins:
       - go_module=github.com/shokki-engineering/freebusy/internal/database/repository
       - gorm_module=github.com/shokki-engineering/freebusy/internal/database/gorm
       - graphql_module=github.com/shokki-engineering/freebusy/internal/database/hasura/freebusyql
+      # The DDN reference plugin's references.json names root fields: the
+      # subgraph's prefix (store.graphql.yaml, root_field_prefix).
+      - graphql_root_field_prefix=freebusy_
   # OpenSearch copy of the projections ((store.v1.projection), the
   # availability read model allocation.v1.ResourceDay): the runtime (osx/) and
   # one <Model>Index per projection -- generated mapping, index template and

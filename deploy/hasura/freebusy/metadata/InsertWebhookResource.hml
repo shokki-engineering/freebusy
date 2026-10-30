@@ -32,8 +32,8 @@ definition:
     - name: uri
       type: String_1!
   graphql:
-    typeName: InsertWebhookResourceObject
-    inputTypeName: InsertWebhookResourceObjectInput
+    typeName: freebusy_InsertWebhookResourceObject
+    inputTypeName: freebusy_InsertWebhookResourceObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_webhook_resource_object
@@ -111,8 +111,8 @@ definition:
       type: "[WebhookResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertWebhookResourceResponse
-    inputTypeName: InsertWebhookResourceResponseInput
+    typeName: freebusy_InsertWebhookResourceResponse
+    inputTypeName: freebusy_InsertWebhookResourceResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_webhook_resource_response
@@ -156,7 +156,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertWebhookResource
+    rootFieldName: freebusy_insertWebhookResource
     rootFieldKind: Mutation
   description: Insert into the webhook_resource table
 

@@ -12,8 +12,8 @@ definition:
       type: Date
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoCalendarTimesDate
-    inputTypeName: UpdateColumnTodoCalendarTimesDateInput
+    typeName: freebusy_UpdateColumnTodoCalendarTimesDate
+    inputTypeName: freebusy_UpdateColumnTodoCalendarTimesDateInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_calendar_times_date
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoCalendarTimesDateTime
-    inputTypeName: UpdateColumnTodoCalendarTimesDateTimeInput
+    typeName: freebusy_UpdateColumnTodoCalendarTimesDateTime
+    inputTypeName: freebusy_UpdateColumnTodoCalendarTimesDateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_calendar_times_date_time
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoCalendarTimesDateTimeZone
-    inputTypeName: UpdateColumnTodoCalendarTimesDateTimeZoneInput
+    typeName: freebusy_UpdateColumnTodoCalendarTimesDateTimeZone
+    inputTypeName: freebusy_UpdateColumnTodoCalendarTimesDateTimeZoneInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_calendar_times_date_time_zone
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoCalendarTimesId
-    inputTypeName: UpdateColumnTodoCalendarTimesIdInput
+    typeName: freebusy_UpdateColumnTodoCalendarTimesId
+    inputTypeName: freebusy_UpdateColumnTodoCalendarTimesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_calendar_times_id
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoCalendarTimesValueCase
-    inputTypeName: UpdateColumnTodoCalendarTimesValueCaseInput
+    typeName: freebusy_UpdateColumnTodoCalendarTimesValueCase
+    inputTypeName: freebusy_UpdateColumnTodoCalendarTimesValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_calendar_times_value_case
@@ -185,8 +185,8 @@ definition:
       type: UpdateColumnTodoCalendarTimesValueCase
       description: Update the 'value_case' column in the 'todo_calendar_times' collection.
   graphql:
-    typeName: UpdateTodoCalendarTimesByIdUpdateColumns
-    inputTypeName: UpdateTodoCalendarTimesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateTodoCalendarTimesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateTodoCalendarTimesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_todo_calendar_times_by_id_update_columns
@@ -236,8 +236,8 @@ definition:
       type: "[TodoCalendarTimes!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateTodoCalendarTimesByIdResponse
-    inputTypeName: UpdateTodoCalendarTimesByIdResponseInput
+    typeName: freebusy_UpdateTodoCalendarTimesByIdResponse
+    inputTypeName: freebusy_UpdateTodoCalendarTimesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_todo_calendar_times_by_id_response
@@ -290,7 +290,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateTodoCalendarTimesById
+    rootFieldName: freebusy_updateTodoCalendarTimesById
     rootFieldKind: Mutation
   description: Update any row on the 'todo_calendar_times' collection using the 'id' key
 

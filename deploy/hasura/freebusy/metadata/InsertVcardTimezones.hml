@@ -24,8 +24,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: InsertVcardTimezonesObject
-    inputTypeName: InsertVcardTimezonesObjectInput
+    typeName: freebusy_InsertVcardTimezonesObject
+    inputTypeName: freebusy_InsertVcardTimezonesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_timezones_object
@@ -87,8 +87,8 @@ definition:
       type: "[VcardTimezones!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertVcardTimezonesResponse
-    inputTypeName: InsertVcardTimezonesResponseInput
+    typeName: freebusy_InsertVcardTimezonesResponse
+    inputTypeName: freebusy_InsertVcardTimezonesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_timezones_response
@@ -132,7 +132,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertVcardTimezones
+    rootFieldName: freebusy_insertVcardTimezones
     rootFieldKind: Mutation
   description: Insert into the vcard_timezones table
 

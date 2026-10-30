@@ -12,8 +12,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressApartments
-    inputTypeName: UpdateColumnVcardAddressApartmentsInput
+    typeName: freebusy_UpdateColumnVcardAddressApartments
+    inputTypeName: freebusy_UpdateColumnVcardAddressApartmentsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_apartments
@@ -44,8 +44,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressBlocks
-    inputTypeName: UpdateColumnVcardAddressBlocksInput
+    typeName: freebusy_UpdateColumnVcardAddressBlocks
+    inputTypeName: freebusy_UpdateColumnVcardAddressBlocksInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_blocks
@@ -76,8 +76,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressBuildings
-    inputTypeName: UpdateColumnVcardAddressBuildingsInput
+    typeName: freebusy_UpdateColumnVcardAddressBuildings
+    inputTypeName: freebusy_UpdateColumnVcardAddressBuildingsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_buildings
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressContactId
-    inputTypeName: UpdateColumnVcardAddressContactIdInput
+    typeName: freebusy_UpdateColumnVcardAddressContactId
+    inputTypeName: freebusy_UpdateColumnVcardAddressContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_contact_id
@@ -140,8 +140,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressCountries
-    inputTypeName: UpdateColumnVcardAddressCountriesInput
+    typeName: freebusy_UpdateColumnVcardAddressCountries
+    inputTypeName: freebusy_UpdateColumnVcardAddressCountriesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_countries
@@ -172,8 +172,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressDirections
-    inputTypeName: UpdateColumnVcardAddressDirectionsInput
+    typeName: freebusy_UpdateColumnVcardAddressDirections
+    inputTypeName: freebusy_UpdateColumnVcardAddressDirectionsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_directions
@@ -204,8 +204,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressDistricts
-    inputTypeName: UpdateColumnVcardAddressDistrictsInput
+    typeName: freebusy_UpdateColumnVcardAddressDistricts
+    inputTypeName: freebusy_UpdateColumnVcardAddressDistrictsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_districts
@@ -236,8 +236,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressExtendedAddresses
-    inputTypeName: UpdateColumnVcardAddressExtendedAddressesInput
+    typeName: freebusy_UpdateColumnVcardAddressExtendedAddresses
+    inputTypeName: freebusy_UpdateColumnVcardAddressExtendedAddressesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_extended_addresses
@@ -268,8 +268,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressFloors
-    inputTypeName: UpdateColumnVcardAddressFloorsInput
+    typeName: freebusy_UpdateColumnVcardAddressFloors
+    inputTypeName: freebusy_UpdateColumnVcardAddressFloorsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_floors
@@ -300,8 +300,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressId
-    inputTypeName: UpdateColumnVcardAddressIdInput
+    typeName: freebusy_UpdateColumnVcardAddressId
+    inputTypeName: freebusy_UpdateColumnVcardAddressIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_id
@@ -332,8 +332,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressLabel
-    inputTypeName: UpdateColumnVcardAddressLabelInput
+    typeName: freebusy_UpdateColumnVcardAddressLabel
+    inputTypeName: freebusy_UpdateColumnVcardAddressLabelInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_label
@@ -364,8 +364,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressLandmarks
-    inputTypeName: UpdateColumnVcardAddressLandmarksInput
+    typeName: freebusy_UpdateColumnVcardAddressLandmarks
+    inputTypeName: freebusy_UpdateColumnVcardAddressLandmarksInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_landmarks
@@ -396,8 +396,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressLocalities
-    inputTypeName: UpdateColumnVcardAddressLocalitiesInput
+    typeName: freebusy_UpdateColumnVcardAddressLocalities
+    inputTypeName: freebusy_UpdateColumnVcardAddressLocalitiesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_localities
@@ -428,8 +428,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressPhonetic
-    inputTypeName: UpdateColumnVcardAddressPhoneticInput
+    typeName: freebusy_UpdateColumnVcardAddressPhonetic
+    inputTypeName: freebusy_UpdateColumnVcardAddressPhoneticInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_phonetic
@@ -460,8 +460,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressPostOfficeBox
-    inputTypeName: UpdateColumnVcardAddressPostOfficeBoxInput
+    typeName: freebusy_UpdateColumnVcardAddressPostOfficeBox
+    inputTypeName: freebusy_UpdateColumnVcardAddressPostOfficeBoxInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_post_office_box
@@ -492,8 +492,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressPostalCodes
-    inputTypeName: UpdateColumnVcardAddressPostalCodesInput
+    typeName: freebusy_UpdateColumnVcardAddressPostalCodes
+    inputTypeName: freebusy_UpdateColumnVcardAddressPostalCodesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_postal_codes
@@ -524,8 +524,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressPref
-    inputTypeName: UpdateColumnVcardAddressPrefInput
+    typeName: freebusy_UpdateColumnVcardAddressPref
+    inputTypeName: freebusy_UpdateColumnVcardAddressPrefInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_pref
@@ -556,8 +556,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressRegions
-    inputTypeName: UpdateColumnVcardAddressRegionsInput
+    typeName: freebusy_UpdateColumnVcardAddressRegions
+    inputTypeName: freebusy_UpdateColumnVcardAddressRegionsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_regions
@@ -588,8 +588,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressRooms
-    inputTypeName: UpdateColumnVcardAddressRoomsInput
+    typeName: freebusy_UpdateColumnVcardAddressRooms
+    inputTypeName: freebusy_UpdateColumnVcardAddressRoomsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_rooms
@@ -620,8 +620,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressScript
-    inputTypeName: UpdateColumnVcardAddressScriptInput
+    typeName: freebusy_UpdateColumnVcardAddressScript
+    inputTypeName: freebusy_UpdateColumnVcardAddressScriptInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_script
@@ -652,8 +652,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressStreetAddresses
-    inputTypeName: UpdateColumnVcardAddressStreetAddressesInput
+    typeName: freebusy_UpdateColumnVcardAddressStreetAddresses
+    inputTypeName: freebusy_UpdateColumnVcardAddressStreetAddressesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_street_addresses
@@ -684,8 +684,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressStreetNumbers
-    inputTypeName: UpdateColumnVcardAddressStreetNumbersInput
+    typeName: freebusy_UpdateColumnVcardAddressStreetNumbers
+    inputTypeName: freebusy_UpdateColumnVcardAddressStreetNumbersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_street_numbers
@@ -716,8 +716,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressStreets
-    inputTypeName: UpdateColumnVcardAddressStreetsInput
+    typeName: freebusy_UpdateColumnVcardAddressStreets
+    inputTypeName: freebusy_UpdateColumnVcardAddressStreetsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_streets
@@ -748,8 +748,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressSubdistricts
-    inputTypeName: UpdateColumnVcardAddressSubdistrictsInput
+    typeName: freebusy_UpdateColumnVcardAddressSubdistricts
+    inputTypeName: freebusy_UpdateColumnVcardAddressSubdistrictsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_subdistricts
@@ -780,8 +780,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardAddressTypes
-    inputTypeName: UpdateColumnVcardAddressTypesInput
+    typeName: freebusy_UpdateColumnVcardAddressTypes
+    inputTypeName: freebusy_UpdateColumnVcardAddressTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_address_types
@@ -884,8 +884,8 @@ definition:
       type: UpdateColumnVcardAddressTypes
       description: Update the 'types' column in the 'vcard_address' collection.
   graphql:
-    typeName: UpdateVcardAddressByIdUpdateColumns
-    inputTypeName: UpdateVcardAddressByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardAddressByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardAddressByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_address_by_id_update_columns
@@ -1015,8 +1015,8 @@ definition:
       type: "[VcardAddress!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardAddressByIdResponse
-    inputTypeName: UpdateVcardAddressByIdResponseInput
+    typeName: freebusy_UpdateVcardAddressByIdResponse
+    inputTypeName: freebusy_UpdateVcardAddressByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_address_by_id_response
@@ -1069,7 +1069,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardAddressById
+    rootFieldName: freebusy_updateVcardAddressById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_address' collection using the 'id' key
 

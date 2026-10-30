@@ -16,8 +16,8 @@ definition:
     - name: sender
       type: String_1
   graphql:
-    typeName: InsertEventOrganizersObject
-    inputTypeName: InsertEventOrganizersObjectInput
+    typeName: freebusy_InsertEventOrganizersObject
+    inputTypeName: freebusy_InsertEventOrganizersObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_organizers_object
@@ -63,8 +63,8 @@ definition:
       type: "[EventOrganizers!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertEventOrganizersResponse
-    inputTypeName: InsertEventOrganizersResponseInput
+    typeName: freebusy_InsertEventOrganizersResponse
+    inputTypeName: freebusy_InsertEventOrganizersResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_organizers_response
@@ -108,7 +108,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertEventOrganizers
+    rootFieldName: freebusy_insertEventOrganizers
     rootFieldKind: Mutation
   description: Insert into the event_organizers table
 

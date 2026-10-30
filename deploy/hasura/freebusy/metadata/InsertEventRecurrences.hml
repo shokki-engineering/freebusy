@@ -44,8 +44,8 @@ definition:
     - name: yearDays
       type: "[Int32]"
   graphql:
-    typeName: InsertEventRecurrencesObject
-    inputTypeName: InsertEventRecurrencesObjectInput
+    typeName: freebusy_InsertEventRecurrencesObject
+    inputTypeName: freebusy_InsertEventRecurrencesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_recurrences_object
@@ -147,8 +147,8 @@ definition:
       type: "[EventRecurrences!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertEventRecurrencesResponse
-    inputTypeName: InsertEventRecurrencesResponseInput
+    typeName: freebusy_InsertEventRecurrencesResponse
+    inputTypeName: freebusy_InsertEventRecurrencesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_recurrences_response
@@ -192,7 +192,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertEventRecurrences
+    rootFieldName: freebusy_insertEventRecurrences
     rootFieldKind: Mutation
   description: Insert into the event_recurrences table
 

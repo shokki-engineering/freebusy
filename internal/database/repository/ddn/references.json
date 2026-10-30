@@ -2,124 +2,124 @@
   "version": 1,
   "mutations": [
     {
-      "field": "deleteCalendarResourceById",
+      "field": "freebusy_deleteCalendarResourceById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Calendar",
       "pattern": "calendars/{calendar}",
       "keyArgument": "keyId",
-      "byIdQuery": "calendarResourceById"
+      "byIdQuery": "freebusy_calendarResourceById"
     },
     {
-      "field": "deleteEventResourceById",
+      "field": "freebusy_deleteEventResourceById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Event",
       "pattern": "calendars/{calendar}/events/{event}",
       "keyArgument": "keyId",
-      "byIdQuery": "eventResourceById"
+      "byIdQuery": "freebusy_eventResourceById"
     },
     {
-      "field": "deleteJournalResourceById",
+      "field": "freebusy_deleteJournalResourceById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Journal",
       "pattern": "calendars/{calendar}/journals/{journal}",
       "keyArgument": "keyId",
-      "byIdQuery": "journalResourceById"
+      "byIdQuery": "freebusy_journalResourceById"
     },
     {
-      "field": "deleteTodoResourceById",
+      "field": "freebusy_deleteTodoResourceById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Todo",
       "pattern": "calendars/{calendar}/todos/{todo}",
       "keyArgument": "keyId",
-      "byIdQuery": "todoResourceById"
+      "byIdQuery": "freebusy_todoResourceById"
     },
     {
-      "field": "deleteVcardResourceById",
+      "field": "freebusy_deleteVcardResourceById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Vcard",
       "pattern": "vcards/{vcard}",
       "keyArgument": "keyId",
-      "byIdQuery": "vcardResourceById"
+      "byIdQuery": "freebusy_vcardResourceById"
     },
     {
-      "field": "deleteScimgroupGroupsById",
+      "field": "freebusy_deleteScimgroupGroupsById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Group",
       "pattern": "groups/{group}",
       "keyArgument": "keyId",
-      "byIdQuery": "scimgroupGroupsById"
+      "byIdQuery": "freebusy_scimgroupGroupsById"
     },
     {
-      "field": "deleteUserResourceById",
+      "field": "freebusy_deleteUserResourceById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/User",
       "pattern": "users/{user}",
       "keyArgument": "keyId",
-      "byIdQuery": "userResourceById"
+      "byIdQuery": "freebusy_userResourceById"
     },
     {
-      "field": "deleteAvailabilityAvailabilitiesById",
+      "field": "freebusy_deleteAvailabilityAvailabilitiesById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Availability",
       "pattern": "calendars/{calendar}/availabilities/{availability}",
       "keyArgument": "keyId",
-      "byIdQuery": "availabilityAvailabilitiesById"
+      "byIdQuery": "freebusy_availabilityAvailabilitiesById"
     },
     {
-      "field": "deletePackResourceById",
+      "field": "freebusy_deletePackResourceById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Pack",
       "pattern": "packs/{pack}",
       "keyArgument": "keyId",
-      "byIdQuery": "packResourceById"
+      "byIdQuery": "freebusy_packResourceById"
     },
     {
-      "field": "deleteSensorResourceById",
+      "field": "freebusy_deleteSensorResourceById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Sensor",
       "pattern": "sensors/{sensor}",
       "keyArgument": "keyId",
-      "byIdQuery": "sensorResourceById"
+      "byIdQuery": "freebusy_sensorResourceById"
     },
     {
-      "field": "deleteStreamResourceById",
+      "field": "freebusy_deleteStreamResourceById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Stream",
       "pattern": "streams/{stream}",
       "keyArgument": "keyId",
-      "byIdQuery": "streamResourceById"
+      "byIdQuery": "freebusy_streamResourceById"
     },
     {
-      "field": "deleteUnitResourceById",
+      "field": "freebusy_deleteUnitResourceById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Unit",
       "pattern": "units/{unit}",
       "keyArgument": "keyId",
-      "byIdQuery": "unitResourceById"
+      "byIdQuery": "freebusy_unitResourceById"
     },
     {
-      "field": "deleteResourceEntityById",
+      "field": "freebusy_deleteResourceEntityById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Resource",
       "pattern": "resources/{resource}",
       "keyArgument": "keyId",
-      "byIdQuery": "resourceEntityById"
+      "byIdQuery": "freebusy_resourceEntityById"
     },
     {
-      "field": "deleteCardResourceById",
+      "field": "freebusy_deleteCardResourceById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Card",
       "pattern": "cards/{card}",
       "keyArgument": "keyId",
-      "byIdQuery": "cardResourceById"
+      "byIdQuery": "freebusy_cardResourceById"
     },
     {
-      "field": "deleteProjectResourceById",
+      "field": "freebusy_deleteProjectResourceById",
       "kind": "delete",
       "resourceType": "the-protobuf-project.org/Project",
       "pattern": "projects/{project}",
       "keyArgument": "keyId",
-      "byIdQuery": "projectResourceById"
+      "byIdQuery": "freebusy_projectResourceById"
     }
   ]
 }

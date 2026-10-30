@@ -64,8 +64,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: InsertEventResourceObject
-    inputTypeName: InsertEventResourceObjectInput
+    typeName: freebusy_InsertEventResourceObject
+    inputTypeName: freebusy_InsertEventResourceObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_resource_object
@@ -207,8 +207,8 @@ definition:
       type: "[EventResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertEventResourceResponse
-    inputTypeName: InsertEventResourceResponseInput
+    typeName: freebusy_InsertEventResourceResponse
+    inputTypeName: freebusy_InsertEventResourceResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_resource_response
@@ -252,7 +252,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertEventResource
+    rootFieldName: freebusy_insertEventResource
     rootFieldKind: Mutation
   description: Insert into the event_resource table
 

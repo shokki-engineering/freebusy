@@ -15,8 +15,8 @@ definition:
       type: "[UserEnterpriseUsers!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteUserEnterpriseUsersByIdResponse
-    inputTypeName: DeleteUserEnterpriseUsersByIdResponseInput
+    typeName: freebusy_DeleteUserEnterpriseUsersByIdResponse
+    inputTypeName: freebusy_DeleteUserEnterpriseUsersByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_user_enterprise_users_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteUserEnterpriseUsersById
+    rootFieldName: freebusy_deleteUserEnterpriseUsersById
     rootFieldKind: Mutation
   description: Delete any row on the 'user_enterprise_users' collection using the 'id' key
 

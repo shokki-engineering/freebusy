@@ -15,8 +15,8 @@ definition:
       type: "[StreamResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteStreamResourceByIdResponse
-    inputTypeName: DeleteStreamResourceByIdResponseInput
+    typeName: freebusy_DeleteStreamResourceByIdResponse
+    inputTypeName: freebusy_DeleteStreamResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_stream_resource_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteStreamResourceById
+    rootFieldName: freebusy_deleteStreamResourceById
     rootFieldKind: Mutation
   description: Delete any row on the 'stream_resource' collection using the 'id' key
 

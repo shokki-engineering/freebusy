@@ -48,8 +48,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: InsertAvailabilityAvailabilitiesObject
-    inputTypeName: InsertAvailabilityAvailabilitiesObjectInput
+    typeName: freebusy_InsertAvailabilityAvailabilitiesObject
+    inputTypeName: freebusy_InsertAvailabilityAvailabilitiesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_availability_availabilities_object
@@ -159,8 +159,8 @@ definition:
       type: "[AvailabilityAvailabilities!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertAvailabilityAvailabilitiesResponse
-    inputTypeName: InsertAvailabilityAvailabilitiesResponseInput
+    typeName: freebusy_InsertAvailabilityAvailabilitiesResponse
+    inputTypeName: freebusy_InsertAvailabilityAvailabilitiesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_availability_availabilities_response
@@ -205,7 +205,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertAvailabilityAvailabilities
+    rootFieldName: freebusy_insertAvailabilityAvailabilities
     rootFieldKind: Mutation
   description: Insert into the availability_availabilities table
 

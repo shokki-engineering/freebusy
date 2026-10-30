@@ -82,8 +82,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: CardResource
-    inputTypeName: CardResourceInput
+    typeName: freebusy_CardResource
+    inputTypeName: freebusy_CardResourceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: card_resource
@@ -332,7 +332,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: CardResourceBoolExp
+    typeName: freebusy_CardResourceBoolExp
 
 ---
 kind: AggregateExpression
@@ -417,7 +417,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: CardResourceAggExp
+    selectTypeName: freebusy_CardResourceAggExp
 
 ---
 kind: OrderByExpression
@@ -500,7 +500,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: CardResourceOrderByExp
+    expressionTypeName: freebusy_CardResourceOrderByExp
 
 ---
 kind: Model
@@ -516,20 +516,20 @@ definition:
   orderByExpression: CardResourceOrderByExp
   graphql:
     selectMany:
-      queryRootField: cardResource
+      queryRootField: freebusy_cardResource
       subscription:
-        rootField: cardResource
+        rootField: freebusy_cardResource
     selectUniques:
-      - queryRootField: cardResourceById
+      - queryRootField: freebusy_cardResourceById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: cardResourceById
-    filterInputTypeName: CardResourceFilterInput
+          rootField: freebusy_cardResourceById
+    filterInputTypeName: freebusy_CardResourceFilterInput
     aggregate:
-      queryRootField: cardResourceAggregate
+      queryRootField: freebusy_cardResourceAggregate
       subscription:
-        rootField: cardResourceAggregate
+        rootField: freebusy_cardResourceAggregate
 
 ---
 kind: ModelPermissions

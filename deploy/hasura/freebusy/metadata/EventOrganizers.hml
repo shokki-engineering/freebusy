@@ -16,8 +16,8 @@ definition:
     - name: sender
       type: String_1
   graphql:
-    typeName: EventOrganizers
-    inputTypeName: EventOrganizersInput
+    typeName: freebusy_EventOrganizers
+    inputTypeName: freebusy_EventOrganizersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: event_organizers
@@ -72,7 +72,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: EventOrganizersBoolExp
+    typeName: freebusy_EventOrganizersBoolExp
 
 ---
 kind: AggregateExpression
@@ -95,7 +95,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: EventOrganizersAggExp
+    selectTypeName: freebusy_EventOrganizersAggExp
 
 ---
 kind: OrderByExpression
@@ -116,7 +116,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: EventOrganizersOrderByExp
+    expressionTypeName: freebusy_EventOrganizersOrderByExp
 
 ---
 kind: Model
@@ -132,20 +132,20 @@ definition:
   orderByExpression: EventOrganizersOrderByExp
   graphql:
     selectMany:
-      queryRootField: eventOrganizers
+      queryRootField: freebusy_eventOrganizers
       subscription:
-        rootField: eventOrganizers
+        rootField: freebusy_eventOrganizers
     selectUniques:
-      - queryRootField: eventOrganizersById
+      - queryRootField: freebusy_eventOrganizersById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: eventOrganizersById
-    filterInputTypeName: EventOrganizersFilterInput
+          rootField: freebusy_eventOrganizersById
+    filterInputTypeName: freebusy_EventOrganizersFilterInput
     aggregate:
-      queryRootField: eventOrganizersAggregate
+      queryRootField: freebusy_eventOrganizersAggregate
       subscription:
-        rootField: eventOrganizersAggregate
+        rootField: freebusy_eventOrganizersAggregate
 
 ---
 kind: ModelPermissions

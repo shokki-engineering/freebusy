@@ -22,8 +22,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: InsertVcardRelationsObject
-    inputTypeName: InsertVcardRelationsObjectInput
+    typeName: freebusy_InsertVcardRelationsObject
+    inputTypeName: freebusy_InsertVcardRelationsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_relations_object
@@ -81,8 +81,8 @@ definition:
       type: "[VcardRelations!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertVcardRelationsResponse
-    inputTypeName: InsertVcardRelationsResponseInput
+    typeName: freebusy_InsertVcardRelationsResponse
+    inputTypeName: freebusy_InsertVcardRelationsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_relations_response
@@ -126,7 +126,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertVcardRelations
+    rootFieldName: freebusy_insertVcardRelations
     rootFieldKind: Mutation
   description: Insert into the vcard_relations table
 

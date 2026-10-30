@@ -18,8 +18,8 @@ definition:
     - name: values
       type: "[String_1]"
   graphql:
-    typeName: InsertEventExtensionPropertiesObject
-    inputTypeName: InsertEventExtensionPropertiesObjectInput
+    typeName: freebusy_InsertEventExtensionPropertiesObject
+    inputTypeName: freebusy_InsertEventExtensionPropertiesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_extension_properties_object
@@ -69,8 +69,8 @@ definition:
       type: "[EventExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertEventExtensionPropertiesResponse
-    inputTypeName: InsertEventExtensionPropertiesResponseInput
+    typeName: freebusy_InsertEventExtensionPropertiesResponse
+    inputTypeName: freebusy_InsertEventExtensionPropertiesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_extension_properties_response
@@ -115,7 +115,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertEventExtensionProperties
+    rootFieldName: freebusy_insertEventExtensionProperties
     rootFieldKind: Mutation
   description: Insert into the event_extension_properties table
 

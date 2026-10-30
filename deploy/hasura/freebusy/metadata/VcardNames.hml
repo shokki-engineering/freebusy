@@ -28,8 +28,8 @@ definition:
     - name: secondarySurnames
       type: "[String_1]"
   graphql:
-    typeName: VcardNames
-    inputTypeName: VcardNamesInput
+    typeName: freebusy_VcardNames
+    inputTypeName: freebusy_VcardNamesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: vcard_names
@@ -106,7 +106,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: VcardNamesBoolExp
+    typeName: freebusy_VcardNamesBoolExp
 
 ---
 kind: AggregateExpression
@@ -127,7 +127,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: VcardNamesAggExp
+    selectTypeName: freebusy_VcardNamesAggExp
 
 ---
 kind: OrderByExpression
@@ -146,7 +146,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: VcardNamesOrderByExp
+    expressionTypeName: freebusy_VcardNamesOrderByExp
 
 ---
 kind: Model
@@ -162,20 +162,20 @@ definition:
   orderByExpression: VcardNamesOrderByExp
   graphql:
     selectMany:
-      queryRootField: vcardNames
+      queryRootField: freebusy_vcardNames
       subscription:
-        rootField: vcardNames
+        rootField: freebusy_vcardNames
     selectUniques:
-      - queryRootField: vcardNamesById
+      - queryRootField: freebusy_vcardNamesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: vcardNamesById
-    filterInputTypeName: VcardNamesFilterInput
+          rootField: freebusy_vcardNamesById
+    filterInputTypeName: freebusy_VcardNamesFilterInput
     aggregate:
-      queryRootField: vcardNamesAggregate
+      queryRootField: freebusy_vcardNamesAggregate
       subscription:
-        rootField: vcardNamesAggregate
+        rootField: freebusy_vcardNamesAggregate
 
 ---
 kind: ModelPermissions

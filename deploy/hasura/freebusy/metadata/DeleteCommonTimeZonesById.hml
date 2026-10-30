@@ -15,8 +15,8 @@ definition:
       type: "[CommonTimeZones!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteCommonTimeZonesByIdResponse
-    inputTypeName: DeleteCommonTimeZonesByIdResponseInput
+    typeName: freebusy_DeleteCommonTimeZonesByIdResponse
+    inputTypeName: freebusy_DeleteCommonTimeZonesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_common_time_zones_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteCommonTimeZonesById
+    rootFieldName: freebusy_deleteCommonTimeZonesById
     rootFieldKind: Mutation
   description: Delete any row on the 'common_time_zones' collection using the 'id' key
 

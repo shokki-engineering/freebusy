@@ -12,8 +12,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsAcknowledgedTime
-    inputTypeName: UpdateColumnEventAlarmsAcknowledgedTimeInput
+    typeName: freebusy_UpdateColumnEventAlarmsAcknowledgedTime
+    inputTypeName: freebusy_UpdateColumnEventAlarmsAcknowledgedTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_acknowledged_time
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsAction
-    inputTypeName: UpdateColumnEventAlarmsActionInput
+    typeName: freebusy_UpdateColumnEventAlarmsAction
+    inputTypeName: freebusy_UpdateColumnEventAlarmsActionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_action
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsDescription
-    inputTypeName: UpdateColumnEventAlarmsDescriptionInput
+    typeName: freebusy_UpdateColumnEventAlarmsDescription
+    inputTypeName: freebusy_UpdateColumnEventAlarmsDescriptionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_description
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsEventId
-    inputTypeName: UpdateColumnEventAlarmsEventIdInput
+    typeName: freebusy_UpdateColumnEventAlarmsEventId
+    inputTypeName: freebusy_UpdateColumnEventAlarmsEventIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_event_id
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsIcalUid
-    inputTypeName: UpdateColumnEventAlarmsIcalUidInput
+    typeName: freebusy_UpdateColumnEventAlarmsIcalUid
+    inputTypeName: freebusy_UpdateColumnEventAlarmsIcalUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_ical_uid
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsId
-    inputTypeName: UpdateColumnEventAlarmsIdInput
+    typeName: freebusy_UpdateColumnEventAlarmsId
+    inputTypeName: freebusy_UpdateColumnEventAlarmsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_id
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsProximity
-    inputTypeName: UpdateColumnEventAlarmsProximityInput
+    typeName: freebusy_UpdateColumnEventAlarmsProximity
+    inputTypeName: freebusy_UpdateColumnEventAlarmsProximityInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_proximity
@@ -236,8 +236,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsRepeatCount
-    inputTypeName: UpdateColumnEventAlarmsRepeatCountInput
+    typeName: freebusy_UpdateColumnEventAlarmsRepeatCount
+    inputTypeName: freebusy_UpdateColumnEventAlarmsRepeatCountInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_repeat_count
@@ -268,8 +268,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsRepeatInterval
-    inputTypeName: UpdateColumnEventAlarmsRepeatIntervalInput
+    typeName: freebusy_UpdateColumnEventAlarmsRepeatInterval
+    inputTypeName: freebusy_UpdateColumnEventAlarmsRepeatIntervalInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_repeat_interval
@@ -300,8 +300,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsSnoozedAlarmUid
-    inputTypeName: UpdateColumnEventAlarmsSnoozedAlarmUidInput
+    typeName: freebusy_UpdateColumnEventAlarmsSnoozedAlarmUid
+    inputTypeName: freebusy_UpdateColumnEventAlarmsSnoozedAlarmUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_snoozed_alarm_uid
@@ -332,8 +332,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsSummary
-    inputTypeName: UpdateColumnEventAlarmsSummaryInput
+    typeName: freebusy_UpdateColumnEventAlarmsSummary
+    inputTypeName: freebusy_UpdateColumnEventAlarmsSummaryInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_summary
@@ -364,8 +364,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsTriggerCase
-    inputTypeName: UpdateColumnEventAlarmsTriggerCaseInput
+    typeName: freebusy_UpdateColumnEventAlarmsTriggerCase
+    inputTypeName: freebusy_UpdateColumnEventAlarmsTriggerCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_trigger_case
@@ -396,8 +396,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsTriggerOffset
-    inputTypeName: UpdateColumnEventAlarmsTriggerOffsetInput
+    typeName: freebusy_UpdateColumnEventAlarmsTriggerOffset
+    inputTypeName: freebusy_UpdateColumnEventAlarmsTriggerOffsetInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_trigger_offset
@@ -428,8 +428,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsTriggerRelation
-    inputTypeName: UpdateColumnEventAlarmsTriggerRelationInput
+    typeName: freebusy_UpdateColumnEventAlarmsTriggerRelation
+    inputTypeName: freebusy_UpdateColumnEventAlarmsTriggerRelationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_trigger_relation
@@ -460,8 +460,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventAlarmsTriggerTime
-    inputTypeName: UpdateColumnEventAlarmsTriggerTimeInput
+    typeName: freebusy_UpdateColumnEventAlarmsTriggerTime
+    inputTypeName: freebusy_UpdateColumnEventAlarmsTriggerTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_alarms_trigger_time
@@ -534,8 +534,8 @@ definition:
       type: UpdateColumnEventAlarmsTriggerTime
       description: Update the 'trigger_time' column in the 'event_alarms' collection.
   graphql:
-    typeName: UpdateEventAlarmsByIdUpdateColumns
-    inputTypeName: UpdateEventAlarmsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateEventAlarmsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateEventAlarmsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_alarms_by_id_update_columns
@@ -625,8 +625,8 @@ definition:
       type: "[EventAlarms!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateEventAlarmsByIdResponse
-    inputTypeName: UpdateEventAlarmsByIdResponseInput
+    typeName: freebusy_UpdateEventAlarmsByIdResponse
+    inputTypeName: freebusy_UpdateEventAlarmsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_alarms_by_id_response
@@ -679,7 +679,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateEventAlarmsById
+    rootFieldName: freebusy_updateEventAlarmsById
     rootFieldKind: Mutation
   description: Update any row on the 'event_alarms' collection using the 'id' key
 

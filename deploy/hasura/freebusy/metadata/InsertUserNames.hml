@@ -22,8 +22,8 @@ definition:
     - name: middleNames
       type: String_1
   graphql:
-    typeName: InsertUserNamesObject
-    inputTypeName: InsertUserNamesObjectInput
+    typeName: freebusy_InsertUserNamesObject
+    inputTypeName: freebusy_InsertUserNamesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_user_names_object
@@ -81,8 +81,8 @@ definition:
       type: "[UserNames!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertUserNamesResponse
-    inputTypeName: InsertUserNamesResponseInput
+    typeName: freebusy_InsertUserNamesResponse
+    inputTypeName: freebusy_InsertUserNamesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_user_names_response
@@ -126,7 +126,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertUserNames
+    rootFieldName: freebusy_insertUserNames
     rootFieldKind: Mutation
   description: Insert into the user_names table
 

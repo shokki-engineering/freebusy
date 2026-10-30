@@ -12,8 +12,8 @@ definition:
       type: Boolean_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamExtensionFieldsBooleanValue
-    inputTypeName: UpdateColumnStreamExtensionFieldsBooleanValueInput
+    typeName: freebusy_UpdateColumnStreamExtensionFieldsBooleanValue
+    inputTypeName: freebusy_UpdateColumnStreamExtensionFieldsBooleanValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_extension_fields_boolean_value
@@ -44,8 +44,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamExtensionFieldsDataValue
-    inputTypeName: UpdateColumnStreamExtensionFieldsDataValueInput
+    typeName: freebusy_UpdateColumnStreamExtensionFieldsDataValue
+    inputTypeName: freebusy_UpdateColumnStreamExtensionFieldsDataValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_extension_fields_data_value
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamExtensionFieldsId
-    inputTypeName: UpdateColumnStreamExtensionFieldsIdInput
+    typeName: freebusy_UpdateColumnStreamExtensionFieldsId
+    inputTypeName: freebusy_UpdateColumnStreamExtensionFieldsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_extension_fields_id
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamExtensionFieldsLabel
-    inputTypeName: UpdateColumnStreamExtensionFieldsLabelInput
+    typeName: freebusy_UpdateColumnStreamExtensionFieldsLabel
+    inputTypeName: freebusy_UpdateColumnStreamExtensionFieldsLabelInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_extension_fields_label
@@ -140,8 +140,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamExtensionFieldsNumberValue
-    inputTypeName: UpdateColumnStreamExtensionFieldsNumberValueInput
+    typeName: freebusy_UpdateColumnStreamExtensionFieldsNumberValue
+    inputTypeName: freebusy_UpdateColumnStreamExtensionFieldsNumberValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_extension_fields_number_value
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamExtensionFieldsRecordId
-    inputTypeName: UpdateColumnStreamExtensionFieldsRecordIdInput
+    typeName: freebusy_UpdateColumnStreamExtensionFieldsRecordId
+    inputTypeName: freebusy_UpdateColumnStreamExtensionFieldsRecordIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_extension_fields_record_id
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamExtensionFieldsStringValue
-    inputTypeName: UpdateColumnStreamExtensionFieldsStringValueInput
+    typeName: freebusy_UpdateColumnStreamExtensionFieldsStringValue
+    inputTypeName: freebusy_UpdateColumnStreamExtensionFieldsStringValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_extension_fields_string_value
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamExtensionFieldsValueCase
-    inputTypeName: UpdateColumnStreamExtensionFieldsValueCaseInput
+    typeName: freebusy_UpdateColumnStreamExtensionFieldsValueCase
+    inputTypeName: freebusy_UpdateColumnStreamExtensionFieldsValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_extension_fields_value_case
@@ -295,8 +295,8 @@ definition:
       description: Update the 'value_case' column in the 'stream_extension_fields'
         collection.
   graphql:
-    typeName: UpdateStreamExtensionFieldsByIdUpdateColumns
-    inputTypeName: UpdateStreamExtensionFieldsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateStreamExtensionFieldsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateStreamExtensionFieldsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_stream_extension_fields_by_id_update_columns
@@ -358,8 +358,8 @@ definition:
       type: "[StreamExtensionFields!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateStreamExtensionFieldsByIdResponse
-    inputTypeName: UpdateStreamExtensionFieldsByIdResponseInput
+    typeName: freebusy_UpdateStreamExtensionFieldsByIdResponse
+    inputTypeName: freebusy_UpdateStreamExtensionFieldsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_stream_extension_fields_by_id_response
@@ -412,7 +412,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateStreamExtensionFieldsById
+    rootFieldName: freebusy_updateStreamExtensionFieldsById
     rootFieldKind: Mutation
   description: Update any row on the 'stream_extension_fields' collection using the 'id' key
 

@@ -18,8 +18,8 @@ definition:
     - name: value
       type: String_1!
   graphql:
-    typeName: InsertVcardEmailsObject
-    inputTypeName: InsertVcardEmailsObjectInput
+    typeName: freebusy_InsertVcardEmailsObject
+    inputTypeName: freebusy_InsertVcardEmailsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_emails_object
@@ -69,8 +69,8 @@ definition:
       type: "[VcardEmails!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertVcardEmailsResponse
-    inputTypeName: InsertVcardEmailsResponseInput
+    typeName: freebusy_InsertVcardEmailsResponse
+    inputTypeName: freebusy_InsertVcardEmailsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_emails_response
@@ -114,7 +114,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertVcardEmails
+    rootFieldName: freebusy_insertVcardEmails
     rootFieldKind: Mutation
   description: Insert into the vcard_emails table
 

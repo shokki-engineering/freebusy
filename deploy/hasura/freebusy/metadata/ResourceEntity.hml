@@ -36,8 +36,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: ResourceEntity
-    inputTypeName: ResourceEntityInput
+    typeName: freebusy_ResourceEntity
+    inputTypeName: freebusy_ResourceEntityInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: resource_entity
@@ -150,7 +150,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: ResourceEntityBoolExp
+    typeName: freebusy_ResourceEntityBoolExp
 
 ---
 kind: AggregateExpression
@@ -191,7 +191,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: ResourceEntityAggExp
+    selectTypeName: freebusy_ResourceEntityAggExp
 
 ---
 kind: OrderByExpression
@@ -230,7 +230,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: ResourceEntityOrderByExp
+    expressionTypeName: freebusy_ResourceEntityOrderByExp
 
 ---
 kind: Model
@@ -246,20 +246,20 @@ definition:
   orderByExpression: ResourceEntityOrderByExp
   graphql:
     selectMany:
-      queryRootField: resourceEntity
+      queryRootField: freebusy_resourceEntity
       subscription:
-        rootField: resourceEntity
+        rootField: freebusy_resourceEntity
     selectUniques:
-      - queryRootField: resourceEntityById
+      - queryRootField: freebusy_resourceEntityById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: resourceEntityById
-    filterInputTypeName: ResourceEntityFilterInput
+          rootField: freebusy_resourceEntityById
+    filterInputTypeName: freebusy_ResourceEntityFilterInput
     aggregate:
-      queryRootField: resourceEntityAggregate
+      queryRootField: freebusy_resourceEntityAggregate
       subscription:
-        rootField: resourceEntityAggregate
+        rootField: freebusy_resourceEntityAggregate
 
 ---
 kind: ModelPermissions

@@ -15,8 +15,8 @@ definition:
       type: "[CardResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteCardResourceByIdResponse
-    inputTypeName: DeleteCardResourceByIdResponseInput
+    typeName: freebusy_DeleteCardResourceByIdResponse
+    inputTypeName: freebusy_DeleteCardResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_card_resource_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteCardResourceById
+    rootFieldName: freebusy_deleteCardResourceById
     rootFieldKind: Mutation
   description: Delete any row on the 'card_resource' collection using the 'id' key
 

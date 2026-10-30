@@ -34,8 +34,8 @@ definition:
     - name: summary
       type: String_1
   graphql:
-    typeName: InsertAvailabilityAvailablePeriodsObject
-    inputTypeName: InsertAvailabilityAvailablePeriodsObjectInput
+    typeName: freebusy_InsertAvailabilityAvailablePeriodsObject
+    inputTypeName: freebusy_InsertAvailabilityAvailablePeriodsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_availability_available_periods_object
@@ -117,8 +117,8 @@ definition:
       type: "[AvailabilityAvailablePeriods!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertAvailabilityAvailablePeriodsResponse
-    inputTypeName: InsertAvailabilityAvailablePeriodsResponseInput
+    typeName: freebusy_InsertAvailabilityAvailablePeriodsResponse
+    inputTypeName: freebusy_InsertAvailabilityAvailablePeriodsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_availability_available_periods_response
@@ -163,7 +163,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertAvailabilityAvailablePeriods
+    rootFieldName: freebusy_insertAvailabilityAvailablePeriods
     rootFieldKind: Mutation
   description: Insert into the availability_available_periods table
 

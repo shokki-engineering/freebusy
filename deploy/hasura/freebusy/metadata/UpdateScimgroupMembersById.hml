@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupMembersAttributeType
-    inputTypeName: UpdateColumnScimgroupMembersAttributeTypeInput
+    typeName: freebusy_UpdateColumnScimgroupMembersAttributeType
+    inputTypeName: freebusy_UpdateColumnScimgroupMembersAttributeTypeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_members_attribute_type
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupMembersDisplay
-    inputTypeName: UpdateColumnScimgroupMembersDisplayInput
+    typeName: freebusy_UpdateColumnScimgroupMembersDisplay
+    inputTypeName: freebusy_UpdateColumnScimgroupMembersDisplayInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_members_display
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupMembersGroupId
-    inputTypeName: UpdateColumnScimgroupMembersGroupIdInput
+    typeName: freebusy_UpdateColumnScimgroupMembersGroupId
+    inputTypeName: freebusy_UpdateColumnScimgroupMembersGroupIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_members_group_id
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupMembersId
-    inputTypeName: UpdateColumnScimgroupMembersIdInput
+    typeName: freebusy_UpdateColumnScimgroupMembersId
+    inputTypeName: freebusy_UpdateColumnScimgroupMembersIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_members_id
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupMembersReferenceUri
-    inputTypeName: UpdateColumnScimgroupMembersReferenceUriInput
+    typeName: freebusy_UpdateColumnScimgroupMembersReferenceUri
+    inputTypeName: freebusy_UpdateColumnScimgroupMembersReferenceUriInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_members_reference_uri
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupMembersValue
-    inputTypeName: UpdateColumnScimgroupMembersValueInput
+    typeName: freebusy_UpdateColumnScimgroupMembersValue
+    inputTypeName: freebusy_UpdateColumnScimgroupMembersValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_members_value
@@ -219,8 +219,8 @@ definition:
       type: UpdateColumnScimgroupMembersValue
       description: Update the 'value' column in the 'scimgroup_members' collection.
   graphql:
-    typeName: UpdateScimgroupMembersByIdUpdateColumns
-    inputTypeName: UpdateScimgroupMembersByIdUpdateColumnsInput
+    typeName: freebusy_UpdateScimgroupMembersByIdUpdateColumns
+    inputTypeName: freebusy_UpdateScimgroupMembersByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_scimgroup_members_by_id_update_columns
@@ -274,8 +274,8 @@ definition:
       type: "[ScimgroupMembers!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateScimgroupMembersByIdResponse
-    inputTypeName: UpdateScimgroupMembersByIdResponseInput
+    typeName: freebusy_UpdateScimgroupMembersByIdResponse
+    inputTypeName: freebusy_UpdateScimgroupMembersByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_scimgroup_members_by_id_response
@@ -328,7 +328,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateScimgroupMembersById
+    rootFieldName: freebusy_updateScimgroupMembersById
     rootFieldKind: Mutation
   description: Update any row on the 'scimgroup_members' collection using the 'id' key
 

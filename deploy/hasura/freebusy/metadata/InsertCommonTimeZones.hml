@@ -12,8 +12,8 @@ definition:
     - name: version
       type: String_1
   graphql:
-    typeName: InsertCommonTimeZonesObject
-    inputTypeName: InsertCommonTimeZonesObjectInput
+    typeName: freebusy_InsertCommonTimeZonesObject
+    inputTypeName: freebusy_InsertCommonTimeZonesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_common_time_zones_object
@@ -44,8 +44,8 @@ definition:
       type: "[CommonTimeZones!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertCommonTimeZonesResponse
-    inputTypeName: InsertCommonTimeZonesResponseInput
+    typeName: freebusy_InsertCommonTimeZonesResponse
+    inputTypeName: freebusy_InsertCommonTimeZonesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_common_time_zones_response
@@ -89,7 +89,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertCommonTimeZones
+    rootFieldName: freebusy_insertCommonTimeZones
     rootFieldKind: Mutation
   description: Insert into the common_time_zones table
 

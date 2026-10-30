@@ -18,8 +18,8 @@ definition:
     - name: value
       type: String_1!
   graphql:
-    typeName: VcardInstantMessages
-    inputTypeName: VcardInstantMessagesInput
+    typeName: freebusy_VcardInstantMessages
+    inputTypeName: freebusy_VcardInstantMessagesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: vcard_instant_messages
@@ -80,7 +80,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: VcardInstantMessagesBoolExp
+    typeName: freebusy_VcardInstantMessagesBoolExp
 
 ---
 kind: AggregateExpression
@@ -105,7 +105,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: VcardInstantMessagesAggExp
+    selectTypeName: freebusy_VcardInstantMessagesAggExp
 
 ---
 kind: OrderByExpression
@@ -128,7 +128,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: VcardInstantMessagesOrderByExp
+    expressionTypeName: freebusy_VcardInstantMessagesOrderByExp
 
 ---
 kind: Model
@@ -144,20 +144,20 @@ definition:
   orderByExpression: VcardInstantMessagesOrderByExp
   graphql:
     selectMany:
-      queryRootField: vcardInstantMessages
+      queryRootField: freebusy_vcardInstantMessages
       subscription:
-        rootField: vcardInstantMessages
+        rootField: freebusy_vcardInstantMessages
     selectUniques:
-      - queryRootField: vcardInstantMessagesById
+      - queryRootField: freebusy_vcardInstantMessagesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: vcardInstantMessagesById
-    filterInputTypeName: VcardInstantMessagesFilterInput
+          rootField: freebusy_vcardInstantMessagesById
+    filterInputTypeName: freebusy_VcardInstantMessagesFilterInput
     aggregate:
-      queryRootField: vcardInstantMessagesAggregate
+      queryRootField: freebusy_vcardInstantMessagesAggregate
       subscription:
-        rootField: vcardInstantMessagesAggregate
+        rootField: freebusy_vcardInstantMessagesAggregate
 
 ---
 kind: ModelPermissions

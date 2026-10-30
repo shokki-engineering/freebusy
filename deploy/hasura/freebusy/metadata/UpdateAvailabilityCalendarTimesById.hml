@@ -12,8 +12,8 @@ definition:
       type: Date
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityCalendarTimesDate
-    inputTypeName: UpdateColumnAvailabilityCalendarTimesDateInput
+    typeName: freebusy_UpdateColumnAvailabilityCalendarTimesDate
+    inputTypeName: freebusy_UpdateColumnAvailabilityCalendarTimesDateInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_calendar_times_date
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityCalendarTimesDateTime
-    inputTypeName: UpdateColumnAvailabilityCalendarTimesDateTimeInput
+    typeName: freebusy_UpdateColumnAvailabilityCalendarTimesDateTime
+    inputTypeName: freebusy_UpdateColumnAvailabilityCalendarTimesDateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_calendar_times_date_time
@@ -77,8 +77,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityCalendarTimesDateTimeZone
-    inputTypeName: UpdateColumnAvailabilityCalendarTimesDateTimeZoneInput
+    typeName: freebusy_UpdateColumnAvailabilityCalendarTimesDateTimeZone
+    inputTypeName: freebusy_UpdateColumnAvailabilityCalendarTimesDateTimeZoneInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_calendar_times_date_time_zone
@@ -109,8 +109,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityCalendarTimesId
-    inputTypeName: UpdateColumnAvailabilityCalendarTimesIdInput
+    typeName: freebusy_UpdateColumnAvailabilityCalendarTimesId
+    inputTypeName: freebusy_UpdateColumnAvailabilityCalendarTimesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_calendar_times_id
@@ -142,8 +142,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityCalendarTimesValueCase
-    inputTypeName: UpdateColumnAvailabilityCalendarTimesValueCaseInput
+    typeName: freebusy_UpdateColumnAvailabilityCalendarTimesValueCase
+    inputTypeName: freebusy_UpdateColumnAvailabilityCalendarTimesValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_calendar_times_value_case
@@ -189,8 +189,8 @@ definition:
       description: Update the 'value_case' column in the 'availability_calendar_times'
         collection.
   graphql:
-    typeName: UpdateAvailabilityCalendarTimesByIdUpdateColumns
-    inputTypeName: UpdateAvailabilityCalendarTimesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateAvailabilityCalendarTimesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateAvailabilityCalendarTimesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_availability_calendar_times_by_id_update_columns
@@ -240,8 +240,8 @@ definition:
       type: "[AvailabilityCalendarTimes!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateAvailabilityCalendarTimesByIdResponse
-    inputTypeName: UpdateAvailabilityCalendarTimesByIdResponseInput
+    typeName: freebusy_UpdateAvailabilityCalendarTimesByIdResponse
+    inputTypeName: freebusy_UpdateAvailabilityCalendarTimesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_availability_calendar_times_by_id_response
@@ -294,7 +294,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateAvailabilityCalendarTimesById
+    rootFieldName: freebusy_updateAvailabilityCalendarTimesById
     rootFieldKind: Mutation
   description: Update any row on the 'availability_calendar_times' collection
     using the 'id' key

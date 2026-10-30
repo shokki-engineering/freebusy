@@ -14,8 +14,8 @@ definition:
     - name: pronouns
       type: Json
   graphql:
-    typeName: InsertCardSpeechesObject
-    inputTypeName: InsertCardSpeechesObjectInput
+    typeName: freebusy_InsertCardSpeechesObject
+    inputTypeName: freebusy_InsertCardSpeechesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_card_speeches_object
@@ -57,8 +57,8 @@ definition:
       type: "[CardSpeeches!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertCardSpeechesResponse
-    inputTypeName: InsertCardSpeechesResponseInput
+    typeName: freebusy_InsertCardSpeechesResponse
+    inputTypeName: freebusy_InsertCardSpeechesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_card_speeches_response
@@ -102,7 +102,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertCardSpeeches
+    rootFieldName: freebusy_insertCardSpeeches
     rootFieldKind: Mutation
   description: Insert into the card_speeches table
 

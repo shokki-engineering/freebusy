@@ -15,8 +15,8 @@ definition:
       type: "[ScimgroupMembers!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteScimgroupMembersByIdResponse
-    inputTypeName: DeleteScimgroupMembersByIdResponseInput
+    typeName: freebusy_DeleteScimgroupMembersByIdResponse
+    inputTypeName: freebusy_DeleteScimgroupMembersByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_scimgroup_members_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteScimgroupMembersById
+    rootFieldName: freebusy_deleteScimgroupMembersById
     rootFieldKind: Mutation
   description: Delete any row on the 'scimgroup_members' collection using the 'id' key
 

@@ -12,8 +12,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackResourceBaseVersion
-    inputTypeName: UpdateColumnPackResourceBaseVersionInput
+    typeName: freebusy_UpdateColumnPackResourceBaseVersion
+    inputTypeName: freebusy_UpdateColumnPackResourceBaseVersionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_resource_base_version
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackResourceCreateTime
-    inputTypeName: UpdateColumnPackResourceCreateTimeInput
+    typeName: freebusy_UpdateColumnPackResourceCreateTime
+    inputTypeName: freebusy_UpdateColumnPackResourceCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_resource_create_time
@@ -76,8 +76,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackResourceDeleteTime
-    inputTypeName: UpdateColumnPackResourceDeleteTimeInput
+    typeName: freebusy_UpdateColumnPackResourceDeleteTime
+    inputTypeName: freebusy_UpdateColumnPackResourceDeleteTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_resource_delete_time
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackResourceEtag
-    inputTypeName: UpdateColumnPackResourceEtagInput
+    typeName: freebusy_UpdateColumnPackResourceEtag
+    inputTypeName: freebusy_UpdateColumnPackResourceEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_resource_etag
@@ -140,8 +140,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackResourceExpireTime
-    inputTypeName: UpdateColumnPackResourceExpireTimeInput
+    typeName: freebusy_UpdateColumnPackResourceExpireTime
+    inputTypeName: freebusy_UpdateColumnPackResourceExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_resource_expire_time
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackResourceId
-    inputTypeName: UpdateColumnPackResourceIdInput
+    typeName: freebusy_UpdateColumnPackResourceId
+    inputTypeName: freebusy_UpdateColumnPackResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_resource_id
@@ -204,8 +204,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackResourceName
-    inputTypeName: UpdateColumnPackResourceNameInput
+    typeName: freebusy_UpdateColumnPackResourceName
+    inputTypeName: freebusy_UpdateColumnPackResourceNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_resource_name
@@ -236,8 +236,8 @@ definition:
       type: Boolean_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackResourceResolved
-    inputTypeName: UpdateColumnPackResourceResolvedInput
+    typeName: freebusy_UpdateColumnPackResourceResolved
+    inputTypeName: freebusy_UpdateColumnPackResourceResolvedInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_resource_resolved
@@ -268,8 +268,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackResourceUid
-    inputTypeName: UpdateColumnPackResourceUidInput
+    typeName: freebusy_UpdateColumnPackResourceUid
+    inputTypeName: freebusy_UpdateColumnPackResourceUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_resource_uid
@@ -300,8 +300,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackResourceUpdateTime
-    inputTypeName: UpdateColumnPackResourceUpdateTimeInput
+    typeName: freebusy_UpdateColumnPackResourceUpdateTime
+    inputTypeName: freebusy_UpdateColumnPackResourceUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_resource_update_time
@@ -359,8 +359,8 @@ definition:
       type: UpdateColumnPackResourceUpdateTime
       description: Update the 'update_time' column in the 'pack_resource' collection.
   graphql:
-    typeName: UpdatePackResourceByIdUpdateColumns
-    inputTypeName: UpdatePackResourceByIdUpdateColumnsInput
+    typeName: freebusy_UpdatePackResourceByIdUpdateColumns
+    inputTypeName: freebusy_UpdatePackResourceByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_pack_resource_by_id_update_columns
@@ -430,8 +430,8 @@ definition:
       type: "[PackResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdatePackResourceByIdResponse
-    inputTypeName: UpdatePackResourceByIdResponseInput
+    typeName: freebusy_UpdatePackResourceByIdResponse
+    inputTypeName: freebusy_UpdatePackResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_pack_resource_by_id_response
@@ -484,7 +484,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updatePackResourceById
+    rootFieldName: freebusy_updatePackResourceById
     rootFieldKind: Mutation
   description: Update any row on the 'pack_resource' collection using the 'id' key
 

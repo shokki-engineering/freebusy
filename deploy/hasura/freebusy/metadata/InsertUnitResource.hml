@@ -38,8 +38,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: InsertUnitResourceObject
-    inputTypeName: InsertUnitResourceObjectInput
+    typeName: freebusy_InsertUnitResourceObject
+    inputTypeName: freebusy_InsertUnitResourceObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_unit_resource_object
@@ -129,8 +129,8 @@ definition:
       type: "[UnitResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertUnitResourceResponse
-    inputTypeName: InsertUnitResourceResponseInput
+    typeName: freebusy_InsertUnitResourceResponse
+    inputTypeName: freebusy_InsertUnitResourceResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_unit_resource_response
@@ -174,7 +174,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertUnitResource
+    rootFieldName: freebusy_insertUnitResource
     rootFieldKind: Mutation
   description: Insert into the unit_resource table
 

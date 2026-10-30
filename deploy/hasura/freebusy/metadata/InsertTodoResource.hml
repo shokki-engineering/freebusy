@@ -52,8 +52,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: InsertTodoResourceObject
-    inputTypeName: InsertTodoResourceObjectInput
+    typeName: freebusy_InsertTodoResourceObject
+    inputTypeName: freebusy_InsertTodoResourceObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_todo_resource_object
@@ -171,8 +171,8 @@ definition:
       type: "[TodoResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertTodoResourceResponse
-    inputTypeName: InsertTodoResourceResponseInput
+    typeName: freebusy_InsertTodoResourceResponse
+    inputTypeName: freebusy_InsertTodoResourceResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_todo_resource_response
@@ -216,7 +216,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertTodoResource
+    rootFieldName: freebusy_insertTodoResource
     rootFieldKind: Mutation
   description: Insert into the todo_resource table
 

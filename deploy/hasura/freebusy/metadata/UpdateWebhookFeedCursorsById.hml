@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookFeedCursorsEtag
-    inputTypeName: UpdateColumnWebhookFeedCursorsEtagInput
+    typeName: freebusy_UpdateColumnWebhookFeedCursorsEtag
+    inputTypeName: freebusy_UpdateColumnWebhookFeedCursorsEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_feed_cursors_etag
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookFeedCursorsId
-    inputTypeName: UpdateColumnWebhookFeedCursorsIdInput
+    typeName: freebusy_UpdateColumnWebhookFeedCursorsId
+    inputTypeName: freebusy_UpdateColumnWebhookFeedCursorsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_feed_cursors_id
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookFeedCursorsName
-    inputTypeName: UpdateColumnWebhookFeedCursorsNameInput
+    typeName: freebusy_UpdateColumnWebhookFeedCursorsName
+    inputTypeName: freebusy_UpdateColumnWebhookFeedCursorsNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_feed_cursors_name
@@ -108,8 +108,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookFeedCursorsPositionTime
-    inputTypeName: UpdateColumnWebhookFeedCursorsPositionTimeInput
+    typeName: freebusy_UpdateColumnWebhookFeedCursorsPositionTime
+    inputTypeName: freebusy_UpdateColumnWebhookFeedCursorsPositionTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_feed_cursors_position_time
@@ -140,8 +140,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookFeedCursorsUpdateTime
-    inputTypeName: UpdateColumnWebhookFeedCursorsUpdateTimeInput
+    typeName: freebusy_UpdateColumnWebhookFeedCursorsUpdateTime
+    inputTypeName: freebusy_UpdateColumnWebhookFeedCursorsUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_feed_cursors_update_time
@@ -185,8 +185,8 @@ definition:
       type: UpdateColumnWebhookFeedCursorsUpdateTime
       description: Update the 'update_time' column in the 'webhook_feed_cursors' collection.
   graphql:
-    typeName: UpdateWebhookFeedCursorsByIdUpdateColumns
-    inputTypeName: UpdateWebhookFeedCursorsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateWebhookFeedCursorsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateWebhookFeedCursorsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_webhook_feed_cursors_by_id_update_columns
@@ -236,8 +236,8 @@ definition:
       type: "[WebhookFeedCursors!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateWebhookFeedCursorsByIdResponse
-    inputTypeName: UpdateWebhookFeedCursorsByIdResponseInput
+    typeName: freebusy_UpdateWebhookFeedCursorsByIdResponse
+    inputTypeName: freebusy_UpdateWebhookFeedCursorsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_webhook_feed_cursors_by_id_response
@@ -290,7 +290,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateWebhookFeedCursorsById
+    rootFieldName: freebusy_updateWebhookFeedCursorsById
     rootFieldKind: Mutation
   description: Update any row on the 'webhook_feed_cursors' collection using the 'id' key
 

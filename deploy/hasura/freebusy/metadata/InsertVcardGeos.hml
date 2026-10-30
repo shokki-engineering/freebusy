@@ -18,8 +18,8 @@ definition:
     - name: value
       type: String_1!
   graphql:
-    typeName: InsertVcardGeosObject
-    inputTypeName: InsertVcardGeosObjectInput
+    typeName: freebusy_InsertVcardGeosObject
+    inputTypeName: freebusy_InsertVcardGeosObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_geos_object
@@ -69,8 +69,8 @@ definition:
       type: "[VcardGeos!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertVcardGeosResponse
-    inputTypeName: InsertVcardGeosResponseInput
+    typeName: freebusy_InsertVcardGeosResponse
+    inputTypeName: freebusy_InsertVcardGeosResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_geos_response
@@ -114,7 +114,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertVcardGeos
+    rootFieldName: freebusy_insertVcardGeos
     rootFieldKind: Mutation
   description: Insert into the vcard_geos table
 

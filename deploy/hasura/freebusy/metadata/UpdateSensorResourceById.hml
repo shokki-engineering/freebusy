@@ -12,8 +12,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceCreateTime
-    inputTypeName: UpdateColumnSensorResourceCreateTimeInput
+    typeName: freebusy_UpdateColumnSensorResourceCreateTime
+    inputTypeName: freebusy_UpdateColumnSensorResourceCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_create_time
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceDeleteTime
-    inputTypeName: UpdateColumnSensorResourceDeleteTimeInput
+    typeName: freebusy_UpdateColumnSensorResourceDeleteTime
+    inputTypeName: freebusy_UpdateColumnSensorResourceDeleteTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_delete_time
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceDisplayName
-    inputTypeName: UpdateColumnSensorResourceDisplayNameInput
+    typeName: freebusy_UpdateColumnSensorResourceDisplayName
+    inputTypeName: freebusy_UpdateColumnSensorResourceDisplayNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_display_name
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceEtag
-    inputTypeName: UpdateColumnSensorResourceEtagInput
+    typeName: freebusy_UpdateColumnSensorResourceEtag
+    inputTypeName: freebusy_UpdateColumnSensorResourceEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_etag
@@ -140,8 +140,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceExpireTime
-    inputTypeName: UpdateColumnSensorResourceExpireTimeInput
+    typeName: freebusy_UpdateColumnSensorResourceExpireTime
+    inputTypeName: freebusy_UpdateColumnSensorResourceExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_expire_time
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceId
-    inputTypeName: UpdateColumnSensorResourceIdInput
+    typeName: freebusy_UpdateColumnSensorResourceId
+    inputTypeName: freebusy_UpdateColumnSensorResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_id
@@ -205,8 +205,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceInterfaceDescriptions
-    inputTypeName: UpdateColumnSensorResourceInterfaceDescriptionsInput
+    typeName: freebusy_UpdateColumnSensorResourceInterfaceDescriptions
+    inputTypeName: freebusy_UpdateColumnSensorResourceInterfaceDescriptionsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_interface_descriptions
@@ -237,8 +237,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceMediaTypes
-    inputTypeName: UpdateColumnSensorResourceMediaTypesInput
+    typeName: freebusy_UpdateColumnSensorResourceMediaTypes
+    inputTypeName: freebusy_UpdateColumnSensorResourceMediaTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_media_types
@@ -269,8 +269,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceName
-    inputTypeName: UpdateColumnSensorResourceNameInput
+    typeName: freebusy_UpdateColumnSensorResourceName
+    inputTypeName: freebusy_UpdateColumnSensorResourceNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_name
@@ -301,8 +301,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceResourceTypes
-    inputTypeName: UpdateColumnSensorResourceResourceTypesInput
+    typeName: freebusy_UpdateColumnSensorResourceResourceTypes
+    inputTypeName: freebusy_UpdateColumnSensorResourceResourceTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_resource_types
@@ -333,8 +333,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceSenmlId
-    inputTypeName: UpdateColumnSensorResourceSenmlIdInput
+    typeName: freebusy_UpdateColumnSensorResourceSenmlId
+    inputTypeName: freebusy_UpdateColumnSensorResourceSenmlIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_senml_id
@@ -365,8 +365,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceTargetUri
-    inputTypeName: UpdateColumnSensorResourceTargetUriInput
+    typeName: freebusy_UpdateColumnSensorResourceTargetUri
+    inputTypeName: freebusy_UpdateColumnSensorResourceTargetUriInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_target_uri
@@ -397,8 +397,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceUid
-    inputTypeName: UpdateColumnSensorResourceUidInput
+    typeName: freebusy_UpdateColumnSensorResourceUid
+    inputTypeName: freebusy_UpdateColumnSensorResourceUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_uid
@@ -429,8 +429,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceUnit
-    inputTypeName: UpdateColumnSensorResourceUnitInput
+    typeName: freebusy_UpdateColumnSensorResourceUnit
+    inputTypeName: freebusy_UpdateColumnSensorResourceUnitInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_unit
@@ -461,8 +461,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceUpdateDuration
-    inputTypeName: UpdateColumnSensorResourceUpdateDurationInput
+    typeName: freebusy_UpdateColumnSensorResourceUpdateDuration
+    inputTypeName: freebusy_UpdateColumnSensorResourceUpdateDurationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_update_duration
@@ -493,8 +493,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSensorResourceUpdateTime
-    inputTypeName: UpdateColumnSensorResourceUpdateTimeInput
+    typeName: freebusy_UpdateColumnSensorResourceUpdateTime
+    inputTypeName: freebusy_UpdateColumnSensorResourceUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_sensor_resource_update_time
@@ -571,8 +571,8 @@ definition:
       type: UpdateColumnSensorResourceUpdateTime
       description: Update the 'update_time' column in the 'sensor_resource' collection.
   graphql:
-    typeName: UpdateSensorResourceByIdUpdateColumns
-    inputTypeName: UpdateSensorResourceByIdUpdateColumnsInput
+    typeName: freebusy_UpdateSensorResourceByIdUpdateColumns
+    inputTypeName: freebusy_UpdateSensorResourceByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_sensor_resource_by_id_update_columns
@@ -666,8 +666,8 @@ definition:
       type: "[SensorResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateSensorResourceByIdResponse
-    inputTypeName: UpdateSensorResourceByIdResponseInput
+    typeName: freebusy_UpdateSensorResourceByIdResponse
+    inputTypeName: freebusy_UpdateSensorResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_sensor_resource_by_id_response
@@ -720,7 +720,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateSensorResourceById
+    rootFieldName: freebusy_updateSensorResourceById
     rootFieldKind: Mutation
   description: Update any row on the 'sensor_resource' collection using the 'id' key
 

@@ -24,8 +24,8 @@ definition:
     - name: resourceTypes
       type: "[String_1]"
   graphql:
-    typeName: InsertEventResourcesObject
-    inputTypeName: InsertEventResourcesObjectInput
+    typeName: freebusy_InsertEventResourcesObject
+    inputTypeName: freebusy_InsertEventResourcesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_resources_object
@@ -87,8 +87,8 @@ definition:
       type: "[EventResources!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertEventResourcesResponse
-    inputTypeName: InsertEventResourcesResponseInput
+    typeName: freebusy_InsertEventResourcesResponse
+    inputTypeName: freebusy_InsertEventResourcesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_resources_response
@@ -132,7 +132,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertEventResources
+    rootFieldName: freebusy_insertEventResources
     rootFieldKind: Mutation
   description: Insert into the event_resources table
 

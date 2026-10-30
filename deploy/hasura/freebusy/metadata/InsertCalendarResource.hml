@@ -42,8 +42,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: InsertCalendarResourceObject
-    inputTypeName: InsertCalendarResourceObjectInput
+    typeName: freebusy_InsertCalendarResourceObject
+    inputTypeName: freebusy_InsertCalendarResourceObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_calendar_resource_object
@@ -141,8 +141,8 @@ definition:
       type: "[CalendarResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertCalendarResourceResponse
-    inputTypeName: InsertCalendarResourceResponseInput
+    typeName: freebusy_InsertCalendarResourceResponse
+    inputTypeName: freebusy_InsertCalendarResourceResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_calendar_resource_response
@@ -186,7 +186,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertCalendarResource
+    rootFieldName: freebusy_insertCalendarResource
     rootFieldKind: Mutation
   description: Insert into the calendar_resource table
 

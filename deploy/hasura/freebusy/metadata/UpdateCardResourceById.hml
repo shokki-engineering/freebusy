@@ -12,8 +12,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceAddresses
-    inputTypeName: UpdateColumnCardResourceAddressesInput
+    typeName: freebusy_UpdateColumnCardResourceAddresses
+    inputTypeName: freebusy_UpdateColumnCardResourceAddressesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_addresses
@@ -44,8 +44,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceAnniversaries
-    inputTypeName: UpdateColumnCardResourceAnniversariesInput
+    typeName: freebusy_UpdateColumnCardResourceAnniversaries
+    inputTypeName: freebusy_UpdateColumnCardResourceAnniversariesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_anniversaries
@@ -76,8 +76,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceCalendars
-    inputTypeName: UpdateColumnCardResourceCalendarsInput
+    typeName: freebusy_UpdateColumnCardResourceCalendars
+    inputTypeName: freebusy_UpdateColumnCardResourceCalendarsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_calendars
@@ -108,8 +108,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceCreateTime
-    inputTypeName: UpdateColumnCardResourceCreateTimeInput
+    typeName: freebusy_UpdateColumnCardResourceCreateTime
+    inputTypeName: freebusy_UpdateColumnCardResourceCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_create_time
@@ -140,8 +140,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceCryptoKeys
-    inputTypeName: UpdateColumnCardResourceCryptoKeysInput
+    typeName: freebusy_UpdateColumnCardResourceCryptoKeys
+    inputTypeName: freebusy_UpdateColumnCardResourceCryptoKeysInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_crypto_keys
@@ -172,8 +172,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceDeleteTime
-    inputTypeName: UpdateColumnCardResourceDeleteTimeInput
+    typeName: freebusy_UpdateColumnCardResourceDeleteTime
+    inputTypeName: freebusy_UpdateColumnCardResourceDeleteTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_delete_time
@@ -204,8 +204,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceDirectories
-    inputTypeName: UpdateColumnCardResourceDirectoriesInput
+    typeName: freebusy_UpdateColumnCardResourceDirectories
+    inputTypeName: freebusy_UpdateColumnCardResourceDirectoriesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_directories
@@ -236,8 +236,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceEmails
-    inputTypeName: UpdateColumnCardResourceEmailsInput
+    typeName: freebusy_UpdateColumnCardResourceEmails
+    inputTypeName: freebusy_UpdateColumnCardResourceEmailsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_emails
@@ -268,8 +268,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceEtag
-    inputTypeName: UpdateColumnCardResourceEtagInput
+    typeName: freebusy_UpdateColumnCardResourceEtag
+    inputTypeName: freebusy_UpdateColumnCardResourceEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_etag
@@ -300,8 +300,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceExpireTime
-    inputTypeName: UpdateColumnCardResourceExpireTimeInput
+    typeName: freebusy_UpdateColumnCardResourceExpireTime
+    inputTypeName: freebusy_UpdateColumnCardResourceExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_expire_time
@@ -332,8 +332,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceId
-    inputTypeName: UpdateColumnCardResourceIdInput
+    typeName: freebusy_UpdateColumnCardResourceId
+    inputTypeName: freebusy_UpdateColumnCardResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_id
@@ -364,8 +364,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceJscontactCreateTime
-    inputTypeName: UpdateColumnCardResourceJscontactCreateTimeInput
+    typeName: freebusy_UpdateColumnCardResourceJscontactCreateTime
+    inputTypeName: freebusy_UpdateColumnCardResourceJscontactCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_jscontact_create_time
@@ -396,8 +396,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceJscontactProps
-    inputTypeName: UpdateColumnCardResourceJscontactPropsInput
+    typeName: freebusy_UpdateColumnCardResourceJscontactProps
+    inputTypeName: freebusy_UpdateColumnCardResourceJscontactPropsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_jscontact_props
@@ -428,8 +428,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceJscontactUid
-    inputTypeName: UpdateColumnCardResourceJscontactUidInput
+    typeName: freebusy_UpdateColumnCardResourceJscontactUid
+    inputTypeName: freebusy_UpdateColumnCardResourceJscontactUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_jscontact_uid
@@ -460,8 +460,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceJscontactUpdateTime
-    inputTypeName: UpdateColumnCardResourceJscontactUpdateTimeInput
+    typeName: freebusy_UpdateColumnCardResourceJscontactUpdateTime
+    inputTypeName: freebusy_UpdateColumnCardResourceJscontactUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_jscontact_update_time
@@ -492,8 +492,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceKeywords
-    inputTypeName: UpdateColumnCardResourceKeywordsInput
+    typeName: freebusy_UpdateColumnCardResourceKeywords
+    inputTypeName: freebusy_UpdateColumnCardResourceKeywordsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_keywords
@@ -524,8 +524,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceKind
-    inputTypeName: UpdateColumnCardResourceKindInput
+    typeName: freebusy_UpdateColumnCardResourceKind
+    inputTypeName: freebusy_UpdateColumnCardResourceKindInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_kind
@@ -556,8 +556,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceLanguageCode
-    inputTypeName: UpdateColumnCardResourceLanguageCodeInput
+    typeName: freebusy_UpdateColumnCardResourceLanguageCode
+    inputTypeName: freebusy_UpdateColumnCardResourceLanguageCodeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_language_code
@@ -588,8 +588,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceLinks
-    inputTypeName: UpdateColumnCardResourceLinksInput
+    typeName: freebusy_UpdateColumnCardResourceLinks
+    inputTypeName: freebusy_UpdateColumnCardResourceLinksInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_links
@@ -620,8 +620,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceMedia
-    inputTypeName: UpdateColumnCardResourceMediaInput
+    typeName: freebusy_UpdateColumnCardResourceMedia
+    inputTypeName: freebusy_UpdateColumnCardResourceMediaInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_media
@@ -652,8 +652,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceMembers
-    inputTypeName: UpdateColumnCardResourceMembersInput
+    typeName: freebusy_UpdateColumnCardResourceMembers
+    inputTypeName: freebusy_UpdateColumnCardResourceMembersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_members
@@ -684,8 +684,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceName
-    inputTypeName: UpdateColumnCardResourceNameInput
+    typeName: freebusy_UpdateColumnCardResourceName
+    inputTypeName: freebusy_UpdateColumnCardResourceNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_name
@@ -716,8 +716,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceNameComponentsId
-    inputTypeName: UpdateColumnCardResourceNameComponentsIdInput
+    typeName: freebusy_UpdateColumnCardResourceNameComponentsId
+    inputTypeName: freebusy_UpdateColumnCardResourceNameComponentsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_name_components_id
@@ -748,8 +748,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceNicknames
-    inputTypeName: UpdateColumnCardResourceNicknamesInput
+    typeName: freebusy_UpdateColumnCardResourceNicknames
+    inputTypeName: freebusy_UpdateColumnCardResourceNicknamesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_nicknames
@@ -780,8 +780,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceNotes
-    inputTypeName: UpdateColumnCardResourceNotesInput
+    typeName: freebusy_UpdateColumnCardResourceNotes
+    inputTypeName: freebusy_UpdateColumnCardResourceNotesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_notes
@@ -812,8 +812,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceOnlineServices
-    inputTypeName: UpdateColumnCardResourceOnlineServicesInput
+    typeName: freebusy_UpdateColumnCardResourceOnlineServices
+    inputTypeName: freebusy_UpdateColumnCardResourceOnlineServicesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_online_services
@@ -844,8 +844,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceOrganizations
-    inputTypeName: UpdateColumnCardResourceOrganizationsInput
+    typeName: freebusy_UpdateColumnCardResourceOrganizations
+    inputTypeName: freebusy_UpdateColumnCardResourceOrganizationsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_organizations
@@ -876,8 +876,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourcePersonalInfo
-    inputTypeName: UpdateColumnCardResourcePersonalInfoInput
+    typeName: freebusy_UpdateColumnCardResourcePersonalInfo
+    inputTypeName: freebusy_UpdateColumnCardResourcePersonalInfoInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_personal_info
@@ -908,8 +908,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourcePhones
-    inputTypeName: UpdateColumnCardResourcePhonesInput
+    typeName: freebusy_UpdateColumnCardResourcePhones
+    inputTypeName: freebusy_UpdateColumnCardResourcePhonesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_phones
@@ -940,8 +940,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourcePreferredLanguages
-    inputTypeName: UpdateColumnCardResourcePreferredLanguagesInput
+    typeName: freebusy_UpdateColumnCardResourcePreferredLanguages
+    inputTypeName: freebusy_UpdateColumnCardResourcePreferredLanguagesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_preferred_languages
@@ -972,8 +972,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceProductId
-    inputTypeName: UpdateColumnCardResourceProductIdInput
+    typeName: freebusy_UpdateColumnCardResourceProductId
+    inputTypeName: freebusy_UpdateColumnCardResourceProductIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_product_id
@@ -1004,8 +1004,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceRelations
-    inputTypeName: UpdateColumnCardResourceRelationsInput
+    typeName: freebusy_UpdateColumnCardResourceRelations
+    inputTypeName: freebusy_UpdateColumnCardResourceRelationsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_relations
@@ -1036,8 +1036,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceSchedulingAddresses
-    inputTypeName: UpdateColumnCardResourceSchedulingAddressesInput
+    typeName: freebusy_UpdateColumnCardResourceSchedulingAddresses
+    inputTypeName: freebusy_UpdateColumnCardResourceSchedulingAddressesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_scheduling_addresses
@@ -1068,8 +1068,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceSpeechId
-    inputTypeName: UpdateColumnCardResourceSpeechIdInput
+    typeName: freebusy_UpdateColumnCardResourceSpeechId
+    inputTypeName: freebusy_UpdateColumnCardResourceSpeechIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_speech_id
@@ -1100,8 +1100,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceTitles
-    inputTypeName: UpdateColumnCardResourceTitlesInput
+    typeName: freebusy_UpdateColumnCardResourceTitles
+    inputTypeName: freebusy_UpdateColumnCardResourceTitlesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_titles
@@ -1132,8 +1132,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceUid
-    inputTypeName: UpdateColumnCardResourceUidInput
+    typeName: freebusy_UpdateColumnCardResourceUid
+    inputTypeName: freebusy_UpdateColumnCardResourceUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_uid
@@ -1164,8 +1164,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardResourceUpdateTime
-    inputTypeName: UpdateColumnCardResourceUpdateTimeInput
+    typeName: freebusy_UpdateColumnCardResourceUpdateTime
+    inputTypeName: freebusy_UpdateColumnCardResourceUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_resource_update_time
@@ -1308,8 +1308,8 @@ definition:
       type: UpdateColumnCardResourceUpdateTime
       description: Update the 'update_time' column in the 'card_resource' collection.
   graphql:
-    typeName: UpdateCardResourceByIdUpdateColumns
-    inputTypeName: UpdateCardResourceByIdUpdateColumnsInput
+    typeName: freebusy_UpdateCardResourceByIdUpdateColumns
+    inputTypeName: freebusy_UpdateCardResourceByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_card_resource_by_id_update_columns
@@ -1487,8 +1487,8 @@ definition:
       type: "[CardResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateCardResourceByIdResponse
-    inputTypeName: UpdateCardResourceByIdResponseInput
+    typeName: freebusy_UpdateCardResourceByIdResponse
+    inputTypeName: freebusy_UpdateCardResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_card_resource_by_id_response
@@ -1541,7 +1541,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateCardResourceById
+    rootFieldName: freebusy_updateCardResourceById
     rootFieldKind: Mutation
   description: Update any row on the 'card_resource' collection using the 'id' key
 

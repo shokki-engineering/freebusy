@@ -15,8 +15,8 @@ definition:
       type: "[VcardInstantMessages!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteVcardInstantMessagesByIdResponse
-    inputTypeName: DeleteVcardInstantMessagesByIdResponseInput
+    typeName: freebusy_DeleteVcardInstantMessagesByIdResponse
+    inputTypeName: freebusy_DeleteVcardInstantMessagesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_vcard_instant_messages_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteVcardInstantMessagesById
+    rootFieldName: freebusy_deleteVcardInstantMessagesById
     rootFieldKind: Mutation
   description: Delete any row on the 'vcard_instant_messages' collection using the 'id' key
 

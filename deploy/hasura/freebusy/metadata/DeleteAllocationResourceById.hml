@@ -15,8 +15,8 @@ definition:
       type: "[AllocationResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteAllocationResourceByIdResponse
-    inputTypeName: DeleteAllocationResourceByIdResponseInput
+    typeName: freebusy_DeleteAllocationResourceByIdResponse
+    inputTypeName: freebusy_DeleteAllocationResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_allocation_resource_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteAllocationResourceById
+    rootFieldName: freebusy_deleteAllocationResourceById
     rootFieldKind: Mutation
   description: Delete any row on the 'allocation_resource' collection using the 'id' key
 

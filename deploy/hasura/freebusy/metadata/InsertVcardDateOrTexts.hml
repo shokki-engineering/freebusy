@@ -20,8 +20,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: InsertVcardDateOrTextsObject
-    inputTypeName: InsertVcardDateOrTextsObjectInput
+    typeName: freebusy_InsertVcardDateOrTextsObject
+    inputTypeName: freebusy_InsertVcardDateOrTextsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_date_or_texts_object
@@ -75,8 +75,8 @@ definition:
       type: "[VcardDateOrTexts!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertVcardDateOrTextsResponse
-    inputTypeName: InsertVcardDateOrTextsResponseInput
+    typeName: freebusy_InsertVcardDateOrTextsResponse
+    inputTypeName: freebusy_InsertVcardDateOrTextsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_date_or_texts_response
@@ -120,7 +120,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertVcardDateOrTexts
+    rootFieldName: freebusy_insertVcardDateOrTexts
     rootFieldKind: Mutation
   description: Insert into the vcard_date_or_texts table
 

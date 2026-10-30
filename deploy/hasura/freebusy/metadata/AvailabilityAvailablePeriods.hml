@@ -34,8 +34,8 @@ definition:
     - name: summary
       type: String_1
   graphql:
-    typeName: AvailabilityAvailablePeriods
-    inputTypeName: AvailabilityAvailablePeriodsInput
+    typeName: freebusy_AvailabilityAvailablePeriods
+    inputTypeName: freebusy_AvailabilityAvailablePeriodsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: availability_available_periods
@@ -140,7 +140,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: AvailabilityAvailablePeriodsBoolExp
+    typeName: freebusy_AvailabilityAvailablePeriodsBoolExp
 
 ---
 kind: AggregateExpression
@@ -177,7 +177,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: AvailabilityAvailablePeriodsAggExp
+    selectTypeName: freebusy_AvailabilityAvailablePeriodsAggExp
 
 ---
 kind: OrderByExpression
@@ -212,7 +212,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: AvailabilityAvailablePeriodsOrderByExp
+    expressionTypeName: freebusy_AvailabilityAvailablePeriodsOrderByExp
 
 ---
 kind: Model
@@ -228,20 +228,20 @@ definition:
   orderByExpression: AvailabilityAvailablePeriodsOrderByExp
   graphql:
     selectMany:
-      queryRootField: availabilityAvailablePeriods
+      queryRootField: freebusy_availabilityAvailablePeriods
       subscription:
-        rootField: availabilityAvailablePeriods
+        rootField: freebusy_availabilityAvailablePeriods
     selectUniques:
-      - queryRootField: availabilityAvailablePeriodsById
+      - queryRootField: freebusy_availabilityAvailablePeriodsById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: availabilityAvailablePeriodsById
-    filterInputTypeName: AvailabilityAvailablePeriodsFilterInput
+          rootField: freebusy_availabilityAvailablePeriodsById
+    filterInputTypeName: freebusy_AvailabilityAvailablePeriodsFilterInput
     aggregate:
-      queryRootField: availabilityAvailablePeriodsAggregate
+      queryRootField: freebusy_availabilityAvailablePeriodsAggregate
       subscription:
-        rootField: availabilityAvailablePeriodsAggregate
+        rootField: freebusy_availabilityAvailablePeriodsAggregate
 
 ---
 kind: ModelPermissions

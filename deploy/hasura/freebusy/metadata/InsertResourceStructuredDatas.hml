@@ -24,8 +24,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: InsertResourceStructuredDatasObject
-    inputTypeName: InsertResourceStructuredDatasObjectInput
+    typeName: freebusy_InsertResourceStructuredDatasObject
+    inputTypeName: freebusy_InsertResourceStructuredDatasObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_resource_structured_datas_object
@@ -87,8 +87,8 @@ definition:
       type: "[ResourceStructuredDatas!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertResourceStructuredDatasResponse
-    inputTypeName: InsertResourceStructuredDatasResponseInput
+    typeName: freebusy_InsertResourceStructuredDatasResponse
+    inputTypeName: freebusy_InsertResourceStructuredDatasResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_resource_structured_datas_response
@@ -133,7 +133,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertResourceStructuredDatas
+    rootFieldName: freebusy_insertResourceStructuredDatas
     rootFieldKind: Mutation
   description: Insert into the resource_structured_datas table
 

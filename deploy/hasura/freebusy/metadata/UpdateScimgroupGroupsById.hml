@@ -12,8 +12,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupGroupsCreateTime
-    inputTypeName: UpdateColumnScimgroupGroupsCreateTimeInput
+    typeName: freebusy_UpdateColumnScimgroupGroupsCreateTime
+    inputTypeName: freebusy_UpdateColumnScimgroupGroupsCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_groups_create_time
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupGroupsDeleteTime
-    inputTypeName: UpdateColumnScimgroupGroupsDeleteTimeInput
+    typeName: freebusy_UpdateColumnScimgroupGroupsDeleteTime
+    inputTypeName: freebusy_UpdateColumnScimgroupGroupsDeleteTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_groups_delete_time
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupGroupsDisplayName
-    inputTypeName: UpdateColumnScimgroupGroupsDisplayNameInput
+    typeName: freebusy_UpdateColumnScimgroupGroupsDisplayName
+    inputTypeName: freebusy_UpdateColumnScimgroupGroupsDisplayNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_groups_display_name
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupGroupsEtag
-    inputTypeName: UpdateColumnScimgroupGroupsEtagInput
+    typeName: freebusy_UpdateColumnScimgroupGroupsEtag
+    inputTypeName: freebusy_UpdateColumnScimgroupGroupsEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_groups_etag
@@ -140,8 +140,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupGroupsExpireTime
-    inputTypeName: UpdateColumnScimgroupGroupsExpireTimeInput
+    typeName: freebusy_UpdateColumnScimgroupGroupsExpireTime
+    inputTypeName: freebusy_UpdateColumnScimgroupGroupsExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_groups_expire_time
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupGroupsExternalUid
-    inputTypeName: UpdateColumnScimgroupGroupsExternalUidInput
+    typeName: freebusy_UpdateColumnScimgroupGroupsExternalUid
+    inputTypeName: freebusy_UpdateColumnScimgroupGroupsExternalUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_groups_external_uid
@@ -204,8 +204,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupGroupsId
-    inputTypeName: UpdateColumnScimgroupGroupsIdInput
+    typeName: freebusy_UpdateColumnScimgroupGroupsId
+    inputTypeName: freebusy_UpdateColumnScimgroupGroupsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_groups_id
@@ -236,8 +236,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupGroupsName
-    inputTypeName: UpdateColumnScimgroupGroupsNameInput
+    typeName: freebusy_UpdateColumnScimgroupGroupsName
+    inputTypeName: freebusy_UpdateColumnScimgroupGroupsNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_groups_name
@@ -268,8 +268,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupGroupsUid
-    inputTypeName: UpdateColumnScimgroupGroupsUidInput
+    typeName: freebusy_UpdateColumnScimgroupGroupsUid
+    inputTypeName: freebusy_UpdateColumnScimgroupGroupsUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_groups_uid
@@ -300,8 +300,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnScimgroupGroupsUpdateTime
-    inputTypeName: UpdateColumnScimgroupGroupsUpdateTimeInput
+    typeName: freebusy_UpdateColumnScimgroupGroupsUpdateTime
+    inputTypeName: freebusy_UpdateColumnScimgroupGroupsUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_scimgroup_groups_update_time
@@ -359,8 +359,8 @@ definition:
       type: UpdateColumnScimgroupGroupsUpdateTime
       description: Update the 'update_time' column in the 'scimgroup_groups' collection.
   graphql:
-    typeName: UpdateScimgroupGroupsByIdUpdateColumns
-    inputTypeName: UpdateScimgroupGroupsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateScimgroupGroupsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateScimgroupGroupsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_scimgroup_groups_by_id_update_columns
@@ -430,8 +430,8 @@ definition:
       type: "[ScimgroupGroups!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateScimgroupGroupsByIdResponse
-    inputTypeName: UpdateScimgroupGroupsByIdResponseInput
+    typeName: freebusy_UpdateScimgroupGroupsByIdResponse
+    inputTypeName: freebusy_UpdateScimgroupGroupsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_scimgroup_groups_by_id_response
@@ -484,7 +484,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateScimgroupGroupsById
+    rootFieldName: freebusy_updateScimgroupGroupsById
     rootFieldKind: Mutation
   description: Update any row on the 'scimgroup_groups' collection using the 'id' key
 

@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLinksEventId
-    inputTypeName: UpdateColumnEventLinksEventIdInput
+    typeName: freebusy_UpdateColumnEventLinksEventId
+    inputTypeName: freebusy_UpdateColumnEventLinksEventIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_links_event_id
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLinksFormatType
-    inputTypeName: UpdateColumnEventLinksFormatTypeInput
+    typeName: freebusy_UpdateColumnEventLinksFormatType
+    inputTypeName: freebusy_UpdateColumnEventLinksFormatTypeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_links_format_type
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLinksIcalUid
-    inputTypeName: UpdateColumnEventLinksIcalUidInput
+    typeName: freebusy_UpdateColumnEventLinksIcalUid
+    inputTypeName: freebusy_UpdateColumnEventLinksIcalUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_links_ical_uid
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLinksId
-    inputTypeName: UpdateColumnEventLinksIdInput
+    typeName: freebusy_UpdateColumnEventLinksId
+    inputTypeName: freebusy_UpdateColumnEventLinksIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_links_id
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLinksLabel
-    inputTypeName: UpdateColumnEventLinksLabelInput
+    typeName: freebusy_UpdateColumnEventLinksLabel
+    inputTypeName: freebusy_UpdateColumnEventLinksLabelInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_links_label
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLinksLanguageCode
-    inputTypeName: UpdateColumnEventLinksLanguageCodeInput
+    typeName: freebusy_UpdateColumnEventLinksLanguageCode
+    inputTypeName: freebusy_UpdateColumnEventLinksLanguageCodeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_links_language_code
@@ -204,8 +204,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLinksRelation
-    inputTypeName: UpdateColumnEventLinksRelationInput
+    typeName: freebusy_UpdateColumnEventLinksRelation
+    inputTypeName: freebusy_UpdateColumnEventLinksRelationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_links_relation
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLinksUri
-    inputTypeName: UpdateColumnEventLinksUriInput
+    typeName: freebusy_UpdateColumnEventLinksUri
+    inputTypeName: freebusy_UpdateColumnEventLinksUriInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_links_uri
@@ -268,8 +268,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLinksValueCase
-    inputTypeName: UpdateColumnEventLinksValueCaseInput
+    typeName: freebusy_UpdateColumnEventLinksValueCase
+    inputTypeName: freebusy_UpdateColumnEventLinksValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_links_value_case
@@ -300,8 +300,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLinksXmlReference
-    inputTypeName: UpdateColumnEventLinksXmlReferenceInput
+    typeName: freebusy_UpdateColumnEventLinksXmlReference
+    inputTypeName: freebusy_UpdateColumnEventLinksXmlReferenceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_links_xml_reference
@@ -359,8 +359,8 @@ definition:
       type: UpdateColumnEventLinksXmlReference
       description: Update the 'xml_reference' column in the 'event_links' collection.
   graphql:
-    typeName: UpdateEventLinksByIdUpdateColumns
-    inputTypeName: UpdateEventLinksByIdUpdateColumnsInput
+    typeName: freebusy_UpdateEventLinksByIdUpdateColumns
+    inputTypeName: freebusy_UpdateEventLinksByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_links_by_id_update_columns
@@ -430,8 +430,8 @@ definition:
       type: "[EventLinks!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateEventLinksByIdResponse
-    inputTypeName: UpdateEventLinksByIdResponseInput
+    typeName: freebusy_UpdateEventLinksByIdResponse
+    inputTypeName: freebusy_UpdateEventLinksByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_links_by_id_response
@@ -484,7 +484,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateEventLinksById
+    rootFieldName: freebusy_updateEventLinksById
     rootFieldKind: Mutation
   description: Update any row on the 'event_links' collection using the 'id' key
 

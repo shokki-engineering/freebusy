@@ -13,8 +13,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityExtensionPropertiesAvailabilityId
-    inputTypeName: UpdateColumnAvailabilityExtensionPropertiesAvailabilityIdInput
+    typeName: freebusy_UpdateColumnAvailabilityExtensionPropertiesAvailabilityId
+    inputTypeName: freebusy_UpdateColumnAvailabilityExtensionPropertiesAvailabilityIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_extension_properties_availability_id
@@ -46,8 +46,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityExtensionPropertiesAvailablePeriodId
-    inputTypeName: UpdateColumnAvailabilityExtensionPropertiesAvailablePeriodIdInput
+    typeName: freebusy_UpdateColumnAvailabilityExtensionPropertiesAvailablePeriodId
+    inputTypeName: freebusy_UpdateColumnAvailabilityExtensionPropertiesAvailablePeriodIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_extension_properties_available_period_id
@@ -78,8 +78,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityExtensionPropertiesId
-    inputTypeName: UpdateColumnAvailabilityExtensionPropertiesIdInput
+    typeName: freebusy_UpdateColumnAvailabilityExtensionPropertiesId
+    inputTypeName: freebusy_UpdateColumnAvailabilityExtensionPropertiesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_extension_properties_id
@@ -110,8 +110,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityExtensionPropertiesKey
-    inputTypeName: UpdateColumnAvailabilityExtensionPropertiesKeyInput
+    typeName: freebusy_UpdateColumnAvailabilityExtensionPropertiesKey
+    inputTypeName: freebusy_UpdateColumnAvailabilityExtensionPropertiesKeyInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_extension_properties_key
@@ -143,8 +143,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityExtensionPropertiesParameters
-    inputTypeName: UpdateColumnAvailabilityExtensionPropertiesParametersInput
+    typeName: freebusy_UpdateColumnAvailabilityExtensionPropertiesParameters
+    inputTypeName: freebusy_UpdateColumnAvailabilityExtensionPropertiesParametersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_extension_properties_parameters
@@ -176,8 +176,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityExtensionPropertiesValues
-    inputTypeName: UpdateColumnAvailabilityExtensionPropertiesValuesInput
+    typeName: freebusy_UpdateColumnAvailabilityExtensionPropertiesValues
+    inputTypeName: freebusy_UpdateColumnAvailabilityExtensionPropertiesValuesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_extension_properties_values
@@ -229,8 +229,8 @@ definition:
       description: Update the 'values' column in the
         'availability_extension_properties' collection.
   graphql:
-    typeName: UpdateAvailabilityExtensionPropertiesByIdUpdateColumns
-    inputTypeName: UpdateAvailabilityExtensionPropertiesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateAvailabilityExtensionPropertiesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateAvailabilityExtensionPropertiesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_availability_extension_properties_by_id_update_columns
@@ -284,8 +284,8 @@ definition:
       type: "[AvailabilityExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateAvailabilityExtensionPropertiesByIdResponse
-    inputTypeName: UpdateAvailabilityExtensionPropertiesByIdResponseInput
+    typeName: freebusy_UpdateAvailabilityExtensionPropertiesByIdResponse
+    inputTypeName: freebusy_UpdateAvailabilityExtensionPropertiesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_availability_extension_properties_by_id_response
@@ -338,7 +338,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateAvailabilityExtensionPropertiesById
+    rootFieldName: freebusy_updateAvailabilityExtensionPropertiesById
     rootFieldKind: Mutation
   description: Update any row on the 'availability_extension_properties'
     collection using the 'id' key

@@ -12,8 +12,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceCreateTime
-    inputTypeName: UpdateColumnUnitResourceCreateTimeInput
+    typeName: freebusy_UpdateColumnUnitResourceCreateTime
+    inputTypeName: freebusy_UpdateColumnUnitResourceCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_create_time
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceDeleteTime
-    inputTypeName: UpdateColumnUnitResourceDeleteTimeInput
+    typeName: freebusy_UpdateColumnUnitResourceDeleteTime
+    inputTypeName: freebusy_UpdateColumnUnitResourceDeleteTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_delete_time
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceDescription
-    inputTypeName: UpdateColumnUnitResourceDescriptionInput
+    typeName: freebusy_UpdateColumnUnitResourceDescription
+    inputTypeName: freebusy_UpdateColumnUnitResourceDescriptionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_description
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceEtag
-    inputTypeName: UpdateColumnUnitResourceEtagInput
+    typeName: freebusy_UpdateColumnUnitResourceEtag
+    inputTypeName: freebusy_UpdateColumnUnitResourceEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_etag
@@ -140,8 +140,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceExpireTime
-    inputTypeName: UpdateColumnUnitResourceExpireTimeInput
+    typeName: freebusy_UpdateColumnUnitResourceExpireTime
+    inputTypeName: freebusy_UpdateColumnUnitResourceExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_expire_time
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceId
-    inputTypeName: UpdateColumnUnitResourceIdInput
+    typeName: freebusy_UpdateColumnUnitResourceId
+    inputTypeName: freebusy_UpdateColumnUnitResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_id
@@ -204,8 +204,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceName
-    inputTypeName: UpdateColumnUnitResourceNameInput
+    typeName: freebusy_UpdateColumnUnitResourceName
+    inputTypeName: freebusy_UpdateColumnUnitResourceNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_name
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceOffsetId
-    inputTypeName: UpdateColumnUnitResourceOffsetIdInput
+    typeName: freebusy_UpdateColumnUnitResourceOffsetId
+    inputTypeName: freebusy_UpdateColumnUnitResourceOffsetIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_offset_id
@@ -268,8 +268,8 @@ definition:
       type: Boolean_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceProducingDiscouraged
-    inputTypeName: UpdateColumnUnitResourceProducingDiscouragedInput
+    typeName: freebusy_UpdateColumnUnitResourceProducingDiscouraged
+    inputTypeName: freebusy_UpdateColumnUnitResourceProducingDiscouragedInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_producing_discouraged
@@ -300,8 +300,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceReference
-    inputTypeName: UpdateColumnUnitResourceReferenceInput
+    typeName: freebusy_UpdateColumnUnitResourceReference
+    inputTypeName: freebusy_UpdateColumnUnitResourceReferenceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_reference
@@ -332,8 +332,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceScaleId
-    inputTypeName: UpdateColumnUnitResourceScaleIdInput
+    typeName: freebusy_UpdateColumnUnitResourceScaleId
+    inputTypeName: freebusy_UpdateColumnUnitResourceScaleIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_scale_id
@@ -364,8 +364,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceSenmlUnit
-    inputTypeName: UpdateColumnUnitResourceSenmlUnitInput
+    typeName: freebusy_UpdateColumnUnitResourceSenmlUnit
+    inputTypeName: freebusy_UpdateColumnUnitResourceSenmlUnitInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_senml_unit
@@ -396,8 +396,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceSymbol
-    inputTypeName: UpdateColumnUnitResourceSymbolInput
+    typeName: freebusy_UpdateColumnUnitResourceSymbol
+    inputTypeName: freebusy_UpdateColumnUnitResourceSymbolInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_symbol
@@ -428,8 +428,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceUid
-    inputTypeName: UpdateColumnUnitResourceUidInput
+    typeName: freebusy_UpdateColumnUnitResourceUid
+    inputTypeName: freebusy_UpdateColumnUnitResourceUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_uid
@@ -460,8 +460,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUnitResourceUpdateTime
-    inputTypeName: UpdateColumnUnitResourceUpdateTimeInput
+    typeName: freebusy_UpdateColumnUnitResourceUpdateTime
+    inputTypeName: freebusy_UpdateColumnUnitResourceUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_unit_resource_update_time
@@ -535,8 +535,8 @@ definition:
       type: UpdateColumnUnitResourceUpdateTime
       description: Update the 'update_time' column in the 'unit_resource' collection.
   graphql:
-    typeName: UpdateUnitResourceByIdUpdateColumns
-    inputTypeName: UpdateUnitResourceByIdUpdateColumnsInput
+    typeName: freebusy_UpdateUnitResourceByIdUpdateColumns
+    inputTypeName: freebusy_UpdateUnitResourceByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_unit_resource_by_id_update_columns
@@ -626,8 +626,8 @@ definition:
       type: "[UnitResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateUnitResourceByIdResponse
-    inputTypeName: UpdateUnitResourceByIdResponseInput
+    typeName: freebusy_UpdateUnitResourceByIdResponse
+    inputTypeName: freebusy_UpdateUnitResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_unit_resource_by_id_response
@@ -680,7 +680,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateUnitResourceById
+    rootFieldName: freebusy_updateUnitResourceById
     rootFieldKind: Mutation
   description: Update any row on the 'unit_resource' collection using the 'id' key
 

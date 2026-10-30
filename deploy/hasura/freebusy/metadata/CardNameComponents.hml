@@ -18,8 +18,8 @@ definition:
     - name: value
       type: String_1!
   graphql:
-    typeName: CardNameComponents
-    inputTypeName: CardNameComponentsInput
+    typeName: freebusy_CardNameComponents
+    inputTypeName: freebusy_CardNameComponentsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: card_name_components
@@ -80,7 +80,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: CardNameComponentsBoolExp
+    typeName: freebusy_CardNameComponentsBoolExp
 
 ---
 kind: AggregateExpression
@@ -105,7 +105,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: CardNameComponentsAggExp
+    selectTypeName: freebusy_CardNameComponentsAggExp
 
 ---
 kind: OrderByExpression
@@ -128,7 +128,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: CardNameComponentsOrderByExp
+    expressionTypeName: freebusy_CardNameComponentsOrderByExp
 
 ---
 kind: Model
@@ -144,20 +144,20 @@ definition:
   orderByExpression: CardNameComponentsOrderByExp
   graphql:
     selectMany:
-      queryRootField: cardNameComponents
+      queryRootField: freebusy_cardNameComponents
       subscription:
-        rootField: cardNameComponents
+        rootField: freebusy_cardNameComponents
     selectUniques:
-      - queryRootField: cardNameComponentsById
+      - queryRootField: freebusy_cardNameComponentsById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: cardNameComponentsById
-    filterInputTypeName: CardNameComponentsFilterInput
+          rootField: freebusy_cardNameComponentsById
+    filterInputTypeName: freebusy_CardNameComponentsFilterInput
     aggregate:
-      queryRootField: cardNameComponentsAggregate
+      queryRootField: freebusy_cardNameComponentsAggregate
       subscription:
-        rootField: cardNameComponentsAggregate
+        rootField: freebusy_cardNameComponentsAggregate
 
 ---
 kind: ModelPermissions

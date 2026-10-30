@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardSocialProfilesContactId
-    inputTypeName: UpdateColumnVcardSocialProfilesContactIdInput
+    typeName: freebusy_UpdateColumnVcardSocialProfilesContactId
+    inputTypeName: freebusy_UpdateColumnVcardSocialProfilesContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_social_profiles_contact_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardSocialProfilesId
-    inputTypeName: UpdateColumnVcardSocialProfilesIdInput
+    typeName: freebusy_UpdateColumnVcardSocialProfilesId
+    inputTypeName: freebusy_UpdateColumnVcardSocialProfilesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_social_profiles_id
@@ -76,8 +76,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardSocialProfilesPref
-    inputTypeName: UpdateColumnVcardSocialProfilesPrefInput
+    typeName: freebusy_UpdateColumnVcardSocialProfilesPref
+    inputTypeName: freebusy_UpdateColumnVcardSocialProfilesPrefInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_social_profiles_pref
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardSocialProfilesServiceType
-    inputTypeName: UpdateColumnVcardSocialProfilesServiceTypeInput
+    typeName: freebusy_UpdateColumnVcardSocialProfilesServiceType
+    inputTypeName: freebusy_UpdateColumnVcardSocialProfilesServiceTypeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_social_profiles_service_type
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardSocialProfilesText
-    inputTypeName: UpdateColumnVcardSocialProfilesTextInput
+    typeName: freebusy_UpdateColumnVcardSocialProfilesText
+    inputTypeName: freebusy_UpdateColumnVcardSocialProfilesTextInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_social_profiles_text
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardSocialProfilesTypes
-    inputTypeName: UpdateColumnVcardSocialProfilesTypesInput
+    typeName: freebusy_UpdateColumnVcardSocialProfilesTypes
+    inputTypeName: freebusy_UpdateColumnVcardSocialProfilesTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_social_profiles_types
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardSocialProfilesUri
-    inputTypeName: UpdateColumnVcardSocialProfilesUriInput
+    typeName: freebusy_UpdateColumnVcardSocialProfilesUri
+    inputTypeName: freebusy_UpdateColumnVcardSocialProfilesUriInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_social_profiles_uri
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardSocialProfilesUsername
-    inputTypeName: UpdateColumnVcardSocialProfilesUsernameInput
+    typeName: freebusy_UpdateColumnVcardSocialProfilesUsername
+    inputTypeName: freebusy_UpdateColumnVcardSocialProfilesUsernameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_social_profiles_username
@@ -268,8 +268,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardSocialProfilesValueCase
-    inputTypeName: UpdateColumnVcardSocialProfilesValueCaseInput
+    typeName: freebusy_UpdateColumnVcardSocialProfilesValueCase
+    inputTypeName: freebusy_UpdateColumnVcardSocialProfilesValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_social_profiles_value_case
@@ -325,8 +325,8 @@ definition:
       type: UpdateColumnVcardSocialProfilesValueCase
       description: Update the 'value_case' column in the 'vcard_social_profiles' collection.
   graphql:
-    typeName: UpdateVcardSocialProfilesByIdUpdateColumns
-    inputTypeName: UpdateVcardSocialProfilesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardSocialProfilesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardSocialProfilesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_social_profiles_by_id_update_columns
@@ -392,8 +392,8 @@ definition:
       type: "[VcardSocialProfiles!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardSocialProfilesByIdResponse
-    inputTypeName: UpdateVcardSocialProfilesByIdResponseInput
+    typeName: freebusy_UpdateVcardSocialProfilesByIdResponse
+    inputTypeName: freebusy_UpdateVcardSocialProfilesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_social_profiles_by_id_response
@@ -446,7 +446,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardSocialProfilesById
+    rootFieldName: freebusy_updateVcardSocialProfilesById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_social_profiles' collection using the 'id' key
 

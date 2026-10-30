@@ -18,8 +18,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: InsertJournalCalendarTimesObject
-    inputTypeName: InsertJournalCalendarTimesObjectInput
+    typeName: freebusy_InsertJournalCalendarTimesObject
+    inputTypeName: freebusy_InsertJournalCalendarTimesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_journal_calendar_times_object
@@ -69,8 +69,8 @@ definition:
       type: "[JournalCalendarTimes!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertJournalCalendarTimesResponse
-    inputTypeName: InsertJournalCalendarTimesResponseInput
+    typeName: freebusy_InsertJournalCalendarTimesResponse
+    inputTypeName: freebusy_InsertJournalCalendarTimesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_journal_calendar_times_response
@@ -114,7 +114,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertJournalCalendarTimes
+    rootFieldName: freebusy_insertJournalCalendarTimes
     rootFieldKind: Mutation
   description: Insert into the journal_calendar_times table
 

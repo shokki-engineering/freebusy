@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardSpeechesGrammaticalGender
-    inputTypeName: UpdateColumnCardSpeechesGrammaticalGenderInput
+    typeName: freebusy_UpdateColumnCardSpeechesGrammaticalGender
+    inputTypeName: freebusy_UpdateColumnCardSpeechesGrammaticalGenderInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_speeches_grammatical_gender
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardSpeechesId
-    inputTypeName: UpdateColumnCardSpeechesIdInput
+    typeName: freebusy_UpdateColumnCardSpeechesId
+    inputTypeName: freebusy_UpdateColumnCardSpeechesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_speeches_id
@@ -76,8 +76,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardSpeechesPronouns
-    inputTypeName: UpdateColumnCardSpeechesPronounsInput
+    typeName: freebusy_UpdateColumnCardSpeechesPronouns
+    inputTypeName: freebusy_UpdateColumnCardSpeechesPronounsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_speeches_pronouns
@@ -114,8 +114,8 @@ definition:
       type: UpdateColumnCardSpeechesPronouns
       description: Update the 'pronouns' column in the 'card_speeches' collection.
   graphql:
-    typeName: UpdateCardSpeechesByIdUpdateColumns
-    inputTypeName: UpdateCardSpeechesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateCardSpeechesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateCardSpeechesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_card_speeches_by_id_update_columns
@@ -157,8 +157,8 @@ definition:
       type: "[CardSpeeches!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateCardSpeechesByIdResponse
-    inputTypeName: UpdateCardSpeechesByIdResponseInput
+    typeName: freebusy_UpdateCardSpeechesByIdResponse
+    inputTypeName: freebusy_UpdateCardSpeechesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_card_speeches_by_id_response
@@ -211,7 +211,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateCardSpeechesById
+    rootFieldName: freebusy_updateCardSpeechesById
     rootFieldKind: Mutation
   description: Update any row on the 'card_speeches' collection using the 'id' key
 

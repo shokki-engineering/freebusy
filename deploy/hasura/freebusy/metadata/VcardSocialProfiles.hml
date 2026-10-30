@@ -26,8 +26,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: VcardSocialProfiles
-    inputTypeName: VcardSocialProfilesInput
+    typeName: freebusy_VcardSocialProfiles
+    inputTypeName: freebusy_VcardSocialProfilesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: vcard_social_profiles
@@ -112,7 +112,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: VcardSocialProfilesBoolExp
+    typeName: freebusy_VcardSocialProfilesBoolExp
 
 ---
 kind: AggregateExpression
@@ -145,7 +145,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: VcardSocialProfilesAggExp
+    selectTypeName: freebusy_VcardSocialProfilesAggExp
 
 ---
 kind: OrderByExpression
@@ -176,7 +176,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: VcardSocialProfilesOrderByExp
+    expressionTypeName: freebusy_VcardSocialProfilesOrderByExp
 
 ---
 kind: Model
@@ -192,20 +192,20 @@ definition:
   orderByExpression: VcardSocialProfilesOrderByExp
   graphql:
     selectMany:
-      queryRootField: vcardSocialProfiles
+      queryRootField: freebusy_vcardSocialProfiles
       subscription:
-        rootField: vcardSocialProfiles
+        rootField: freebusy_vcardSocialProfiles
     selectUniques:
-      - queryRootField: vcardSocialProfilesById
+      - queryRootField: freebusy_vcardSocialProfilesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: vcardSocialProfilesById
-    filterInputTypeName: VcardSocialProfilesFilterInput
+          rootField: freebusy_vcardSocialProfilesById
+    filterInputTypeName: freebusy_VcardSocialProfilesFilterInput
     aggregate:
-      queryRootField: vcardSocialProfilesAggregate
+      queryRootField: freebusy_vcardSocialProfilesAggregate
       subscription:
-        rootField: vcardSocialProfilesAggregate
+        rootField: freebusy_vcardSocialProfilesAggregate
 
 ---
 kind: ModelPermissions

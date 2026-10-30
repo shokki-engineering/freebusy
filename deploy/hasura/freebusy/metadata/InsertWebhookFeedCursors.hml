@@ -18,8 +18,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: InsertWebhookFeedCursorsObject
-    inputTypeName: InsertWebhookFeedCursorsObjectInput
+    typeName: freebusy_InsertWebhookFeedCursorsObject
+    inputTypeName: freebusy_InsertWebhookFeedCursorsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_webhook_feed_cursors_object
@@ -69,8 +69,8 @@ definition:
       type: "[WebhookFeedCursors!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertWebhookFeedCursorsResponse
-    inputTypeName: InsertWebhookFeedCursorsResponseInput
+    typeName: freebusy_InsertWebhookFeedCursorsResponse
+    inputTypeName: freebusy_InsertWebhookFeedCursorsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_webhook_feed_cursors_response
@@ -114,7 +114,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertWebhookFeedCursors
+    rootFieldName: freebusy_insertWebhookFeedCursors
     rootFieldKind: Mutation
   description: Insert into the webhook_feed_cursors table
 

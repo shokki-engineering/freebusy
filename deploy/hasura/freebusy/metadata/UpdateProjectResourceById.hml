@@ -12,8 +12,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnProjectResourceCreateTime
-    inputTypeName: UpdateColumnProjectResourceCreateTimeInput
+    typeName: freebusy_UpdateColumnProjectResourceCreateTime
+    inputTypeName: freebusy_UpdateColumnProjectResourceCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_project_resource_create_time
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnProjectResourceDeleteTime
-    inputTypeName: UpdateColumnProjectResourceDeleteTimeInput
+    typeName: freebusy_UpdateColumnProjectResourceDeleteTime
+    inputTypeName: freebusy_UpdateColumnProjectResourceDeleteTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_project_resource_delete_time
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnProjectResourceDescription
-    inputTypeName: UpdateColumnProjectResourceDescriptionInput
+    typeName: freebusy_UpdateColumnProjectResourceDescription
+    inputTypeName: freebusy_UpdateColumnProjectResourceDescriptionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_project_resource_description
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnProjectResourceDisplayName
-    inputTypeName: UpdateColumnProjectResourceDisplayNameInput
+    typeName: freebusy_UpdateColumnProjectResourceDisplayName
+    inputTypeName: freebusy_UpdateColumnProjectResourceDisplayNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_project_resource_display_name
@@ -140,8 +140,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnProjectResourceEndTime
-    inputTypeName: UpdateColumnProjectResourceEndTimeInput
+    typeName: freebusy_UpdateColumnProjectResourceEndTime
+    inputTypeName: freebusy_UpdateColumnProjectResourceEndTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_project_resource_end_time
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnProjectResourceEtag
-    inputTypeName: UpdateColumnProjectResourceEtagInput
+    typeName: freebusy_UpdateColumnProjectResourceEtag
+    inputTypeName: freebusy_UpdateColumnProjectResourceEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_project_resource_etag
@@ -204,8 +204,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnProjectResourceExpireTime
-    inputTypeName: UpdateColumnProjectResourceExpireTimeInput
+    typeName: freebusy_UpdateColumnProjectResourceExpireTime
+    inputTypeName: freebusy_UpdateColumnProjectResourceExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_project_resource_expire_time
@@ -236,8 +236,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnProjectResourceId
-    inputTypeName: UpdateColumnProjectResourceIdInput
+    typeName: freebusy_UpdateColumnProjectResourceId
+    inputTypeName: freebusy_UpdateColumnProjectResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_project_resource_id
@@ -268,8 +268,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnProjectResourceName
-    inputTypeName: UpdateColumnProjectResourceNameInput
+    typeName: freebusy_UpdateColumnProjectResourceName
+    inputTypeName: freebusy_UpdateColumnProjectResourceNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_project_resource_name
@@ -300,8 +300,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnProjectResourceOwner
-    inputTypeName: UpdateColumnProjectResourceOwnerInput
+    typeName: freebusy_UpdateColumnProjectResourceOwner
+    inputTypeName: freebusy_UpdateColumnProjectResourceOwnerInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_project_resource_owner
@@ -332,8 +332,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnProjectResourceStartTime
-    inputTypeName: UpdateColumnProjectResourceStartTimeInput
+    typeName: freebusy_UpdateColumnProjectResourceStartTime
+    inputTypeName: freebusy_UpdateColumnProjectResourceStartTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_project_resource_start_time
@@ -364,8 +364,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnProjectResourceState
-    inputTypeName: UpdateColumnProjectResourceStateInput
+    typeName: freebusy_UpdateColumnProjectResourceState
+    inputTypeName: freebusy_UpdateColumnProjectResourceStateInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_project_resource_state
@@ -396,8 +396,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnProjectResourceUid
-    inputTypeName: UpdateColumnProjectResourceUidInput
+    typeName: freebusy_UpdateColumnProjectResourceUid
+    inputTypeName: freebusy_UpdateColumnProjectResourceUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_project_resource_uid
@@ -428,8 +428,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnProjectResourceUpdateTime
-    inputTypeName: UpdateColumnProjectResourceUpdateTimeInput
+    typeName: freebusy_UpdateColumnProjectResourceUpdateTime
+    inputTypeName: freebusy_UpdateColumnProjectResourceUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_project_resource_update_time
@@ -499,8 +499,8 @@ definition:
       type: UpdateColumnProjectResourceUpdateTime
       description: Update the 'update_time' column in the 'project_resource' collection.
   graphql:
-    typeName: UpdateProjectResourceByIdUpdateColumns
-    inputTypeName: UpdateProjectResourceByIdUpdateColumnsInput
+    typeName: freebusy_UpdateProjectResourceByIdUpdateColumns
+    inputTypeName: freebusy_UpdateProjectResourceByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_project_resource_by_id_update_columns
@@ -586,8 +586,8 @@ definition:
       type: "[ProjectResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateProjectResourceByIdResponse
-    inputTypeName: UpdateProjectResourceByIdResponseInput
+    typeName: freebusy_UpdateProjectResourceByIdResponse
+    inputTypeName: freebusy_UpdateProjectResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_project_resource_by_id_response
@@ -640,7 +640,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateProjectResourceById
+    rootFieldName: freebusy_updateProjectResourceById
     rootFieldKind: Mutation
   description: Update any row on the 'project_resource' collection using the 'id' key
 

@@ -44,8 +44,8 @@ definition:
     - name: yearDays
       type: "[Int32]"
   graphql:
-    typeName: EventRecurrences
-    inputTypeName: EventRecurrencesInput
+    typeName: freebusy_EventRecurrences
+    inputTypeName: freebusy_EventRecurrencesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: event_recurrences
@@ -170,7 +170,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: EventRecurrencesBoolExp
+    typeName: freebusy_EventRecurrencesBoolExp
 
 ---
 kind: AggregateExpression
@@ -207,7 +207,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: EventRecurrencesAggExp
+    selectTypeName: freebusy_EventRecurrencesAggExp
 
 ---
 kind: OrderByExpression
@@ -242,7 +242,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: EventRecurrencesOrderByExp
+    expressionTypeName: freebusy_EventRecurrencesOrderByExp
 
 ---
 kind: Model
@@ -258,20 +258,20 @@ definition:
   orderByExpression: EventRecurrencesOrderByExp
   graphql:
     selectMany:
-      queryRootField: eventRecurrences
+      queryRootField: freebusy_eventRecurrences
       subscription:
-        rootField: eventRecurrences
+        rootField: freebusy_eventRecurrences
     selectUniques:
-      - queryRootField: eventRecurrencesById
+      - queryRootField: freebusy_eventRecurrencesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: eventRecurrencesById
-    filterInputTypeName: EventRecurrencesFilterInput
+          rootField: freebusy_eventRecurrencesById
+    filterInputTypeName: freebusy_EventRecurrencesFilterInput
     aggregate:
-      queryRootField: eventRecurrencesAggregate
+      queryRootField: freebusy_eventRecurrencesAggregate
       subscription:
-        rootField: eventRecurrencesAggregate
+        rootField: freebusy_eventRecurrencesAggregate
 
 ---
 kind: ModelPermissions

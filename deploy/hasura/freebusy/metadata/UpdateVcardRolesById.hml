@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardRolesContactId
-    inputTypeName: UpdateColumnVcardRolesContactIdInput
+    typeName: freebusy_UpdateColumnVcardRolesContactId
+    inputTypeName: freebusy_UpdateColumnVcardRolesContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_roles_contact_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardRolesId
-    inputTypeName: UpdateColumnVcardRolesIdInput
+    typeName: freebusy_UpdateColumnVcardRolesId
+    inputTypeName: freebusy_UpdateColumnVcardRolesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_roles_id
@@ -76,8 +76,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardRolesPref
-    inputTypeName: UpdateColumnVcardRolesPrefInput
+    typeName: freebusy_UpdateColumnVcardRolesPref
+    inputTypeName: freebusy_UpdateColumnVcardRolesPrefInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_roles_pref
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardRolesTypes
-    inputTypeName: UpdateColumnVcardRolesTypesInput
+    typeName: freebusy_UpdateColumnVcardRolesTypes
+    inputTypeName: freebusy_UpdateColumnVcardRolesTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_roles_types
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardRolesValue
-    inputTypeName: UpdateColumnVcardRolesValueInput
+    typeName: freebusy_UpdateColumnVcardRolesValue
+    inputTypeName: freebusy_UpdateColumnVcardRolesValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_roles_value
@@ -184,8 +184,8 @@ definition:
       type: UpdateColumnVcardRolesValue
       description: Update the 'value' column in the 'vcard_roles' collection.
   graphql:
-    typeName: UpdateVcardRolesByIdUpdateColumns
-    inputTypeName: UpdateVcardRolesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardRolesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardRolesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_roles_by_id_update_columns
@@ -235,8 +235,8 @@ definition:
       type: "[VcardRoles!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardRolesByIdResponse
-    inputTypeName: UpdateVcardRolesByIdResponseInput
+    typeName: freebusy_UpdateVcardRolesByIdResponse
+    inputTypeName: freebusy_UpdateVcardRolesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_roles_by_id_response
@@ -289,7 +289,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardRolesById
+    rootFieldName: freebusy_updateVcardRolesById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_roles' collection using the 'id' key
 

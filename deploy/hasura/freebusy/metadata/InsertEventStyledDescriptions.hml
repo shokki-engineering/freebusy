@@ -24,8 +24,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: InsertEventStyledDescriptionsObject
-    inputTypeName: InsertEventStyledDescriptionsObjectInput
+    typeName: freebusy_InsertEventStyledDescriptionsObject
+    inputTypeName: freebusy_InsertEventStyledDescriptionsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_styled_descriptions_object
@@ -87,8 +87,8 @@ definition:
       type: "[EventStyledDescriptions!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertEventStyledDescriptionsResponse
-    inputTypeName: InsertEventStyledDescriptionsResponseInput
+    typeName: freebusy_InsertEventStyledDescriptionsResponse
+    inputTypeName: freebusy_InsertEventStyledDescriptionsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_styled_descriptions_response
@@ -133,7 +133,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertEventStyledDescriptions
+    rootFieldName: freebusy_insertEventStyledDescriptions
     rootFieldKind: Mutation
   description: Insert into the event_styled_descriptions table
 

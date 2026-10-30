@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardExtensionPropertiesContactId
-    inputTypeName: UpdateColumnVcardExtensionPropertiesContactIdInput
+    typeName: freebusy_UpdateColumnVcardExtensionPropertiesContactId
+    inputTypeName: freebusy_UpdateColumnVcardExtensionPropertiesContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_extension_properties_contact_id
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardExtensionPropertiesGroup
-    inputTypeName: UpdateColumnVcardExtensionPropertiesGroupInput
+    typeName: freebusy_UpdateColumnVcardExtensionPropertiesGroup
+    inputTypeName: freebusy_UpdateColumnVcardExtensionPropertiesGroupInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_extension_properties_group
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardExtensionPropertiesId
-    inputTypeName: UpdateColumnVcardExtensionPropertiesIdInput
+    typeName: freebusy_UpdateColumnVcardExtensionPropertiesId
+    inputTypeName: freebusy_UpdateColumnVcardExtensionPropertiesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_extension_properties_id
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardExtensionPropertiesKey
-    inputTypeName: UpdateColumnVcardExtensionPropertiesKeyInput
+    typeName: freebusy_UpdateColumnVcardExtensionPropertiesKey
+    inputTypeName: freebusy_UpdateColumnVcardExtensionPropertiesKeyInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_extension_properties_key
@@ -140,8 +140,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardExtensionPropertiesParameters
-    inputTypeName: UpdateColumnVcardExtensionPropertiesParametersInput
+    typeName: freebusy_UpdateColumnVcardExtensionPropertiesParameters
+    inputTypeName: freebusy_UpdateColumnVcardExtensionPropertiesParametersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_extension_properties_parameters
@@ -172,8 +172,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardExtensionPropertiesValues
-    inputTypeName: UpdateColumnVcardExtensionPropertiesValuesInput
+    typeName: freebusy_UpdateColumnVcardExtensionPropertiesValues
+    inputTypeName: freebusy_UpdateColumnVcardExtensionPropertiesValuesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_extension_properties_values
@@ -222,8 +222,8 @@ definition:
       description: Update the 'values' column in the 'vcard_extension_properties'
         collection.
   graphql:
-    typeName: UpdateVcardExtensionPropertiesByIdUpdateColumns
-    inputTypeName: UpdateVcardExtensionPropertiesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardExtensionPropertiesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardExtensionPropertiesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_extension_properties_by_id_update_columns
@@ -277,8 +277,8 @@ definition:
       type: "[VcardExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardExtensionPropertiesByIdResponse
-    inputTypeName: UpdateVcardExtensionPropertiesByIdResponseInput
+    typeName: freebusy_UpdateVcardExtensionPropertiesByIdResponse
+    inputTypeName: freebusy_UpdateVcardExtensionPropertiesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_extension_properties_by_id_response
@@ -331,7 +331,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardExtensionPropertiesById
+    rootFieldName: freebusy_updateVcardExtensionPropertiesById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_extension_properties' collection using
     the 'id' key

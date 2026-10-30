@@ -15,8 +15,8 @@ definition:
       type: "[EventExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteEventExtensionPropertiesByIdResponse
-    inputTypeName: DeleteEventExtensionPropertiesByIdResponseInput
+    typeName: freebusy_DeleteEventExtensionPropertiesByIdResponse
+    inputTypeName: freebusy_DeleteEventExtensionPropertiesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_event_extension_properties_by_id_response
@@ -61,7 +61,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteEventExtensionPropertiesById
+    rootFieldName: freebusy_deleteEventExtensionPropertiesById
     rootFieldKind: Mutation
   description: Delete any row on the 'event_extension_properties' collection using
     the 'id' key

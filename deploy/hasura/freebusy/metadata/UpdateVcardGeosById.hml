@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardGeosContactId
-    inputTypeName: UpdateColumnVcardGeosContactIdInput
+    typeName: freebusy_UpdateColumnVcardGeosContactId
+    inputTypeName: freebusy_UpdateColumnVcardGeosContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_geos_contact_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardGeosId
-    inputTypeName: UpdateColumnVcardGeosIdInput
+    typeName: freebusy_UpdateColumnVcardGeosId
+    inputTypeName: freebusy_UpdateColumnVcardGeosIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_geos_id
@@ -76,8 +76,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardGeosPref
-    inputTypeName: UpdateColumnVcardGeosPrefInput
+    typeName: freebusy_UpdateColumnVcardGeosPref
+    inputTypeName: freebusy_UpdateColumnVcardGeosPrefInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_geos_pref
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardGeosTypes
-    inputTypeName: UpdateColumnVcardGeosTypesInput
+    typeName: freebusy_UpdateColumnVcardGeosTypes
+    inputTypeName: freebusy_UpdateColumnVcardGeosTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_geos_types
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardGeosValue
-    inputTypeName: UpdateColumnVcardGeosValueInput
+    typeName: freebusy_UpdateColumnVcardGeosValue
+    inputTypeName: freebusy_UpdateColumnVcardGeosValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_geos_value
@@ -184,8 +184,8 @@ definition:
       type: UpdateColumnVcardGeosValue
       description: Update the 'value' column in the 'vcard_geos' collection.
   graphql:
-    typeName: UpdateVcardGeosByIdUpdateColumns
-    inputTypeName: UpdateVcardGeosByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardGeosByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardGeosByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_geos_by_id_update_columns
@@ -235,8 +235,8 @@ definition:
       type: "[VcardGeos!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardGeosByIdResponse
-    inputTypeName: UpdateVcardGeosByIdResponseInput
+    typeName: freebusy_UpdateVcardGeosByIdResponse
+    inputTypeName: freebusy_UpdateVcardGeosByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_geos_by_id_response
@@ -289,7 +289,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardGeosById
+    rootFieldName: freebusy_updateVcardGeosById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_geos' collection using the 'id' key
 

@@ -15,8 +15,8 @@ definition:
       type: "[CalendarResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteCalendarResourceByIdResponse
-    inputTypeName: DeleteCalendarResourceByIdResponseInput
+    typeName: freebusy_DeleteCalendarResourceByIdResponse
+    inputTypeName: freebusy_DeleteCalendarResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_calendar_resource_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteCalendarResourceById
+    rootFieldName: freebusy_deleteCalendarResourceById
     rootFieldKind: Mutation
   description: Delete any row on the 'calendar_resource' collection using the 'id' key
 

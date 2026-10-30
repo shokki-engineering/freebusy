@@ -15,8 +15,8 @@ definition:
       type: "[AvailabilityExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteAvailabilityExtensionPropertiesByIdResponse
-    inputTypeName: DeleteAvailabilityExtensionPropertiesByIdResponseInput
+    typeName: freebusy_DeleteAvailabilityExtensionPropertiesByIdResponse
+    inputTypeName: freebusy_DeleteAvailabilityExtensionPropertiesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_availability_extension_properties_by_id_response
@@ -61,7 +61,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteAvailabilityExtensionPropertiesById
+    rootFieldName: freebusy_deleteAvailabilityExtensionPropertiesById
     rootFieldKind: Mutation
   description: Delete any row on the 'availability_extension_properties'
     collection using the 'id' key

@@ -12,8 +12,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookResourceCreateTime
-    inputTypeName: UpdateColumnWebhookResourceCreateTimeInput
+    typeName: freebusy_UpdateColumnWebhookResourceCreateTime
+    inputTypeName: freebusy_UpdateColumnWebhookResourceCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_resource_create_time
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookResourceDisplayName
-    inputTypeName: UpdateColumnWebhookResourceDisplayNameInput
+    typeName: freebusy_UpdateColumnWebhookResourceDisplayName
+    inputTypeName: freebusy_UpdateColumnWebhookResourceDisplayNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_resource_display_name
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookResourceEtag
-    inputTypeName: UpdateColumnWebhookResourceEtagInput
+    typeName: freebusy_UpdateColumnWebhookResourceEtag
+    inputTypeName: freebusy_UpdateColumnWebhookResourceEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_resource_etag
@@ -108,8 +108,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookResourceEventTypes
-    inputTypeName: UpdateColumnWebhookResourceEventTypesInput
+    typeName: freebusy_UpdateColumnWebhookResourceEventTypes
+    inputTypeName: freebusy_UpdateColumnWebhookResourceEventTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_resource_event_types
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookResourceId
-    inputTypeName: UpdateColumnWebhookResourceIdInput
+    typeName: freebusy_UpdateColumnWebhookResourceId
+    inputTypeName: freebusy_UpdateColumnWebhookResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_resource_id
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookResourceName
-    inputTypeName: UpdateColumnWebhookResourceNameInput
+    typeName: freebusy_UpdateColumnWebhookResourceName
+    inputTypeName: freebusy_UpdateColumnWebhookResourceNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_resource_name
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookResourcePreviousSecret
-    inputTypeName: UpdateColumnWebhookResourcePreviousSecretInput
+    typeName: freebusy_UpdateColumnWebhookResourcePreviousSecret
+    inputTypeName: freebusy_UpdateColumnWebhookResourcePreviousSecretInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_resource_previous_secret
@@ -236,8 +236,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookResourceRotateTime
-    inputTypeName: UpdateColumnWebhookResourceRotateTimeInput
+    typeName: freebusy_UpdateColumnWebhookResourceRotateTime
+    inputTypeName: freebusy_UpdateColumnWebhookResourceRotateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_resource_rotate_time
@@ -268,8 +268,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookResourceSecret
-    inputTypeName: UpdateColumnWebhookResourceSecretInput
+    typeName: freebusy_UpdateColumnWebhookResourceSecret
+    inputTypeName: freebusy_UpdateColumnWebhookResourceSecretInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_resource_secret
@@ -300,8 +300,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookResourceState
-    inputTypeName: UpdateColumnWebhookResourceStateInput
+    typeName: freebusy_UpdateColumnWebhookResourceState
+    inputTypeName: freebusy_UpdateColumnWebhookResourceStateInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_resource_state
@@ -332,8 +332,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookResourceUpdateTime
-    inputTypeName: UpdateColumnWebhookResourceUpdateTimeInput
+    typeName: freebusy_UpdateColumnWebhookResourceUpdateTime
+    inputTypeName: freebusy_UpdateColumnWebhookResourceUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_resource_update_time
@@ -364,8 +364,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookResourceUri
-    inputTypeName: UpdateColumnWebhookResourceUriInput
+    typeName: freebusy_UpdateColumnWebhookResourceUri
+    inputTypeName: freebusy_UpdateColumnWebhookResourceUriInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_resource_uri
@@ -429,8 +429,8 @@ definition:
       type: UpdateColumnWebhookResourceUri
       description: Update the 'uri' column in the 'webhook_resource' collection.
   graphql:
-    typeName: UpdateWebhookResourceByIdUpdateColumns
-    inputTypeName: UpdateWebhookResourceByIdUpdateColumnsInput
+    typeName: freebusy_UpdateWebhookResourceByIdUpdateColumns
+    inputTypeName: freebusy_UpdateWebhookResourceByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_webhook_resource_by_id_update_columns
@@ -508,8 +508,8 @@ definition:
       type: "[WebhookResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateWebhookResourceByIdResponse
-    inputTypeName: UpdateWebhookResourceByIdResponseInput
+    typeName: freebusy_UpdateWebhookResourceByIdResponse
+    inputTypeName: freebusy_UpdateWebhookResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_webhook_resource_by_id_response
@@ -562,7 +562,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateWebhookResourceById
+    rootFieldName: freebusy_updateWebhookResourceById
     rootFieldKind: Mutation
   description: Update any row on the 'webhook_resource' collection using the 'id' key
 

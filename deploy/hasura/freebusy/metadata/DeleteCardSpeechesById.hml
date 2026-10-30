@@ -15,8 +15,8 @@ definition:
       type: "[CardSpeeches!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteCardSpeechesByIdResponse
-    inputTypeName: DeleteCardSpeechesByIdResponseInput
+    typeName: freebusy_DeleteCardSpeechesByIdResponse
+    inputTypeName: freebusy_DeleteCardSpeechesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_card_speeches_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteCardSpeechesById
+    rootFieldName: freebusy_deleteCardSpeechesById
     rootFieldKind: Mutation
   description: Delete any row on the 'card_speeches' collection using the 'id' key
 

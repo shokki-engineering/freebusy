@@ -15,8 +15,8 @@ definition:
       type: "[SharedIdempotencyKeys!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteSharedIdempotencyKeysByIdResponse
-    inputTypeName: DeleteSharedIdempotencyKeysByIdResponseInput
+    typeName: freebusy_DeleteSharedIdempotencyKeysByIdResponse
+    inputTypeName: freebusy_DeleteSharedIdempotencyKeysByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_shared_idempotency_keys_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteSharedIdempotencyKeysById
+    rootFieldName: freebusy_deleteSharedIdempotencyKeysById
     rootFieldKind: Mutation
   description: Delete any row on the 'shared_idempotency_keys' collection using the 'id' key
 

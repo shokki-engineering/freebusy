@@ -18,8 +18,8 @@ definition:
     - name: value
       type: String_1!
   graphql:
-    typeName: InsertCardNameComponentsObject
-    inputTypeName: InsertCardNameComponentsObjectInput
+    typeName: freebusy_InsertCardNameComponentsObject
+    inputTypeName: freebusy_InsertCardNameComponentsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_card_name_components_object
@@ -69,8 +69,8 @@ definition:
       type: "[CardNameComponents!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertCardNameComponentsResponse
-    inputTypeName: InsertCardNameComponentsResponseInput
+    typeName: freebusy_InsertCardNameComponentsResponse
+    inputTypeName: freebusy_InsertCardNameComponentsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_card_name_components_response
@@ -114,7 +114,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertCardNameComponents
+    rootFieldName: freebusy_insertCardNameComponents
     rootFieldKind: Mutation
   description: Insert into the card_name_components table
 

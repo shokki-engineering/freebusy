@@ -18,8 +18,8 @@ definition:
     - name: values
       type: "[String_1]"
   graphql:
-    typeName: CalendarExtensionProperties
-    inputTypeName: CalendarExtensionPropertiesInput
+    typeName: freebusy_CalendarExtensionProperties
+    inputTypeName: freebusy_CalendarExtensionPropertiesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: calendar_extension_properties
@@ -78,7 +78,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: CalendarExtensionPropertiesBoolExp
+    typeName: freebusy_CalendarExtensionPropertiesBoolExp
 
 ---
 kind: AggregateExpression
@@ -101,7 +101,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: CalendarExtensionPropertiesAggExp
+    selectTypeName: freebusy_CalendarExtensionPropertiesAggExp
 
 ---
 kind: OrderByExpression
@@ -122,7 +122,7 @@ definition:
           orderByExpression: JsonOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: CalendarExtensionPropertiesOrderByExp
+    expressionTypeName: freebusy_CalendarExtensionPropertiesOrderByExp
 
 ---
 kind: Model
@@ -138,20 +138,20 @@ definition:
   orderByExpression: CalendarExtensionPropertiesOrderByExp
   graphql:
     selectMany:
-      queryRootField: calendarExtensionProperties
+      queryRootField: freebusy_calendarExtensionProperties
       subscription:
-        rootField: calendarExtensionProperties
+        rootField: freebusy_calendarExtensionProperties
     selectUniques:
-      - queryRootField: calendarExtensionPropertiesById
+      - queryRootField: freebusy_calendarExtensionPropertiesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: calendarExtensionPropertiesById
-    filterInputTypeName: CalendarExtensionPropertiesFilterInput
+          rootField: freebusy_calendarExtensionPropertiesById
+    filterInputTypeName: freebusy_CalendarExtensionPropertiesFilterInput
     aggregate:
-      queryRootField: calendarExtensionPropertiesAggregate
+      queryRootField: freebusy_calendarExtensionPropertiesAggregate
       subscription:
-        rootField: calendarExtensionPropertiesAggregate
+        rootField: freebusy_calendarExtensionPropertiesAggregate
 
 ---
 kind: ModelPermissions

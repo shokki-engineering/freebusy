@@ -1,0 +1,17 @@
+# Copyright 2026 Srikanth K.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# freebusy's DDN subgraph -- subgraph.yaml, its metadata and its connector's
+# configuration -- as an image, for the supergraph aperio builds and serves
+# (CLAUDE.md, "Shared Postgres and Hasura"). Built with the subgraph
+# directory as its context:
+#
+#   docker build -f deploy/hasura/Dockerfile.subgraph deploy/hasura/freebusy
+#
+# Running it copies the subgraph into whatever is mounted at /out (aperio
+# mounts a volume there), replacing what an older image left: a volume is
+# pre-filled from an image only while it is empty, so that alone would keep
+# the first version for ever.
+FROM busybox:1.37.0@sha256:a7dbc319b1438115a207e11930dc4bb3e643dcb3ec0bdd694bb36cd8fad289ec
+COPY . /subgraph
+CMD ["sh", "-c", "find /out -mindepth 1 -delete && cp -a /subgraph/. /out/"]

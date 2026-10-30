@@ -15,8 +15,8 @@ definition:
       type: "[PackExtensionFields!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeletePackExtensionFieldsByIdResponse
-    inputTypeName: DeletePackExtensionFieldsByIdResponseInput
+    typeName: freebusy_DeletePackExtensionFieldsByIdResponse
+    inputTypeName: freebusy_DeletePackExtensionFieldsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_pack_extension_fields_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deletePackExtensionFieldsById
+    rootFieldName: freebusy_deletePackExtensionFieldsById
     rootFieldKind: Mutation
   description: Delete any row on the 'pack_extension_fields' collection using the 'id' key
 

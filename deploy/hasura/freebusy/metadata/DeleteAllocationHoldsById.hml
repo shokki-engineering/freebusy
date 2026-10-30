@@ -15,8 +15,8 @@ definition:
       type: "[AllocationHolds!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteAllocationHoldsByIdResponse
-    inputTypeName: DeleteAllocationHoldsByIdResponseInput
+    typeName: freebusy_DeleteAllocationHoldsByIdResponse
+    inputTypeName: freebusy_DeleteAllocationHoldsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_allocation_holds_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteAllocationHoldsById
+    rootFieldName: freebusy_deleteAllocationHoldsById
     rootFieldKind: Mutation
   description: Delete any row on the 'allocation_holds' collection using the 'id' key
 

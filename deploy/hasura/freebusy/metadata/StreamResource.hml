@@ -28,8 +28,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: StreamResource
-    inputTypeName: StreamResourceInput
+    typeName: freebusy_StreamResource
+    inputTypeName: freebusy_StreamResourceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: stream_resource
@@ -120,7 +120,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: StreamResourceBoolExp
+    typeName: freebusy_StreamResourceBoolExp
 
 ---
 kind: AggregateExpression
@@ -155,7 +155,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: StreamResourceAggExp
+    selectTypeName: freebusy_StreamResourceAggExp
 
 ---
 kind: OrderByExpression
@@ -188,7 +188,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: StreamResourceOrderByExp
+    expressionTypeName: freebusy_StreamResourceOrderByExp
 
 ---
 kind: Model
@@ -204,20 +204,20 @@ definition:
   orderByExpression: StreamResourceOrderByExp
   graphql:
     selectMany:
-      queryRootField: streamResource
+      queryRootField: freebusy_streamResource
       subscription:
-        rootField: streamResource
+        rootField: freebusy_streamResource
     selectUniques:
-      - queryRootField: streamResourceById
+      - queryRootField: freebusy_streamResourceById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: streamResourceById
-    filterInputTypeName: StreamResourceFilterInput
+          rootField: freebusy_streamResourceById
+    filterInputTypeName: freebusy_StreamResourceFilterInput
     aggregate:
-      queryRootField: streamResourceAggregate
+      queryRootField: freebusy_streamResourceAggregate
       subscription:
-        rootField: streamResourceAggregate
+        rootField: freebusy_streamResourceAggregate
 
 ---
 kind: ModelPermissions

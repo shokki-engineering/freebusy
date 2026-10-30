@@ -12,8 +12,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceCreateTime
-    inputTypeName: UpdateColumnCalendarResourceCreateTimeInput
+    typeName: freebusy_UpdateColumnCalendarResourceCreateTime
+    inputTypeName: freebusy_UpdateColumnCalendarResourceCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_create_time
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceDeleteTime
-    inputTypeName: UpdateColumnCalendarResourceDeleteTimeInput
+    typeName: freebusy_UpdateColumnCalendarResourceDeleteTime
+    inputTypeName: freebusy_UpdateColumnCalendarResourceDeleteTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_delete_time
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceDescription
-    inputTypeName: UpdateColumnCalendarResourceDescriptionInput
+    typeName: freebusy_UpdateColumnCalendarResourceDescription
+    inputTypeName: freebusy_UpdateColumnCalendarResourceDescriptionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_description
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceDisplayName
-    inputTypeName: UpdateColumnCalendarResourceDisplayNameInput
+    typeName: freebusy_UpdateColumnCalendarResourceDisplayName
+    inputTypeName: freebusy_UpdateColumnCalendarResourceDisplayNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_display_name
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceEtag
-    inputTypeName: UpdateColumnCalendarResourceEtagInput
+    typeName: freebusy_UpdateColumnCalendarResourceEtag
+    inputTypeName: freebusy_UpdateColumnCalendarResourceEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_etag
@@ -172,8 +172,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceExpireTime
-    inputTypeName: UpdateColumnCalendarResourceExpireTimeInput
+    typeName: freebusy_UpdateColumnCalendarResourceExpireTime
+    inputTypeName: freebusy_UpdateColumnCalendarResourceExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_expire_time
@@ -204,8 +204,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceId
-    inputTypeName: UpdateColumnCalendarResourceIdInput
+    typeName: freebusy_UpdateColumnCalendarResourceId
+    inputTypeName: freebusy_UpdateColumnCalendarResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_id
@@ -237,8 +237,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceMaxAttendeesPerInstance
-    inputTypeName: UpdateColumnCalendarResourceMaxAttendeesPerInstanceInput
+    typeName: freebusy_UpdateColumnCalendarResourceMaxAttendeesPerInstance
+    inputTypeName: freebusy_UpdateColumnCalendarResourceMaxAttendeesPerInstanceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_max_attendees_per_instance
@@ -269,8 +269,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceMaxDateTime
-    inputTypeName: UpdateColumnCalendarResourceMaxDateTimeInput
+    typeName: freebusy_UpdateColumnCalendarResourceMaxDateTime
+    inputTypeName: freebusy_UpdateColumnCalendarResourceMaxDateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_max_date_time
@@ -301,8 +301,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceMaxInstances
-    inputTypeName: UpdateColumnCalendarResourceMaxInstancesInput
+    typeName: freebusy_UpdateColumnCalendarResourceMaxInstances
+    inputTypeName: freebusy_UpdateColumnCalendarResourceMaxInstancesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_max_instances
@@ -333,8 +333,8 @@ definition:
       type: Int64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceMaxResourceSize
-    inputTypeName: UpdateColumnCalendarResourceMaxResourceSizeInput
+    typeName: freebusy_UpdateColumnCalendarResourceMaxResourceSize
+    inputTypeName: freebusy_UpdateColumnCalendarResourceMaxResourceSizeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_max_resource_size
@@ -365,8 +365,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceMinDateTime
-    inputTypeName: UpdateColumnCalendarResourceMinDateTimeInput
+    typeName: freebusy_UpdateColumnCalendarResourceMinDateTime
+    inputTypeName: freebusy_UpdateColumnCalendarResourceMinDateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_min_date_time
@@ -397,8 +397,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceName
-    inputTypeName: UpdateColumnCalendarResourceNameInput
+    typeName: freebusy_UpdateColumnCalendarResourceName
+    inputTypeName: freebusy_UpdateColumnCalendarResourceNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_name
@@ -429,8 +429,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceScale
-    inputTypeName: UpdateColumnCalendarResourceScaleInput
+    typeName: freebusy_UpdateColumnCalendarResourceScale
+    inputTypeName: freebusy_UpdateColumnCalendarResourceScaleInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_scale
@@ -461,8 +461,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceTimeZoneId
-    inputTypeName: UpdateColumnCalendarResourceTimeZoneIdInput
+    typeName: freebusy_UpdateColumnCalendarResourceTimeZoneId
+    inputTypeName: freebusy_UpdateColumnCalendarResourceTimeZoneIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_time_zone_id
@@ -493,8 +493,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceUid
-    inputTypeName: UpdateColumnCalendarResourceUidInput
+    typeName: freebusy_UpdateColumnCalendarResourceUid
+    inputTypeName: freebusy_UpdateColumnCalendarResourceUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_uid
@@ -525,8 +525,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarResourceUpdateTime
-    inputTypeName: UpdateColumnCalendarResourceUpdateTimeInput
+    typeName: freebusy_UpdateColumnCalendarResourceUpdateTime
+    inputTypeName: freebusy_UpdateColumnCalendarResourceUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_resource_update_time
@@ -607,8 +607,8 @@ definition:
       type: UpdateColumnCalendarResourceUpdateTime
       description: Update the 'update_time' column in the 'calendar_resource' collection.
   graphql:
-    typeName: UpdateCalendarResourceByIdUpdateColumns
-    inputTypeName: UpdateCalendarResourceByIdUpdateColumnsInput
+    typeName: freebusy_UpdateCalendarResourceByIdUpdateColumns
+    inputTypeName: freebusy_UpdateCalendarResourceByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_calendar_resource_by_id_update_columns
@@ -706,8 +706,8 @@ definition:
       type: "[CalendarResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateCalendarResourceByIdResponse
-    inputTypeName: UpdateCalendarResourceByIdResponseInput
+    typeName: freebusy_UpdateCalendarResourceByIdResponse
+    inputTypeName: freebusy_UpdateCalendarResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_calendar_resource_by_id_response
@@ -760,7 +760,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateCalendarResourceById
+    rootFieldName: freebusy_updateCalendarResourceById
     rootFieldKind: Mutation
   description: Update any row on the 'calendar_resource' collection using the 'id' key
 

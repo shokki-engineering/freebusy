@@ -40,8 +40,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: SensorResource
-    inputTypeName: SensorResourceInput
+    typeName: freebusy_SensorResource
+    inputTypeName: freebusy_SensorResourceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: sensor_resource
@@ -162,7 +162,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: SensorResourceBoolExp
+    typeName: freebusy_SensorResourceBoolExp
 
 ---
 kind: AggregateExpression
@@ -203,7 +203,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: SensorResourceAggExp
+    selectTypeName: freebusy_SensorResourceAggExp
 
 ---
 kind: OrderByExpression
@@ -242,7 +242,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: SensorResourceOrderByExp
+    expressionTypeName: freebusy_SensorResourceOrderByExp
 
 ---
 kind: Model
@@ -258,20 +258,20 @@ definition:
   orderByExpression: SensorResourceOrderByExp
   graphql:
     selectMany:
-      queryRootField: sensorResource
+      queryRootField: freebusy_sensorResource
       subscription:
-        rootField: sensorResource
+        rootField: freebusy_sensorResource
     selectUniques:
-      - queryRootField: sensorResourceById
+      - queryRootField: freebusy_sensorResourceById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: sensorResourceById
-    filterInputTypeName: SensorResourceFilterInput
+          rootField: freebusy_sensorResourceById
+    filterInputTypeName: freebusy_SensorResourceFilterInput
     aggregate:
-      queryRootField: sensorResourceAggregate
+      queryRootField: freebusy_sensorResourceAggregate
       subscription:
-        rootField: sensorResourceAggregate
+        rootField: freebusy_sensorResourceAggregate
 
 ---
 kind: ModelPermissions

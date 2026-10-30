@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAddressAttributeType
-    inputTypeName: UpdateColumnUserAddressAttributeTypeInput
+    typeName: freebusy_UpdateColumnUserAddressAttributeType
+    inputTypeName: freebusy_UpdateColumnUserAddressAttributeTypeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_address_attribute_type
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAddressFullAddress
-    inputTypeName: UpdateColumnUserAddressFullAddressInput
+    typeName: freebusy_UpdateColumnUserAddressFullAddress
+    inputTypeName: freebusy_UpdateColumnUserAddressFullAddressInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_address_full_address
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAddressId
-    inputTypeName: UpdateColumnUserAddressIdInput
+    typeName: freebusy_UpdateColumnUserAddressId
+    inputTypeName: freebusy_UpdateColumnUserAddressIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_address_id
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAddressLocality
-    inputTypeName: UpdateColumnUserAddressLocalityInput
+    typeName: freebusy_UpdateColumnUserAddressLocality
+    inputTypeName: freebusy_UpdateColumnUserAddressLocalityInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_address_locality
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAddressPostalCode
-    inputTypeName: UpdateColumnUserAddressPostalCodeInput
+    typeName: freebusy_UpdateColumnUserAddressPostalCode
+    inputTypeName: freebusy_UpdateColumnUserAddressPostalCodeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_address_postal_code
@@ -172,8 +172,8 @@ definition:
       type: Boolean_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAddressPrimary
-    inputTypeName: UpdateColumnUserAddressPrimaryInput
+    typeName: freebusy_UpdateColumnUserAddressPrimary
+    inputTypeName: freebusy_UpdateColumnUserAddressPrimaryInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_address_primary
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAddressRegion
-    inputTypeName: UpdateColumnUserAddressRegionInput
+    typeName: freebusy_UpdateColumnUserAddressRegion
+    inputTypeName: freebusy_UpdateColumnUserAddressRegionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_address_region
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAddressRegionCode
-    inputTypeName: UpdateColumnUserAddressRegionCodeInput
+    typeName: freebusy_UpdateColumnUserAddressRegionCode
+    inputTypeName: freebusy_UpdateColumnUserAddressRegionCodeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_address_region_code
@@ -268,8 +268,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAddressStreetAddress
-    inputTypeName: UpdateColumnUserAddressStreetAddressInput
+    typeName: freebusy_UpdateColumnUserAddressStreetAddress
+    inputTypeName: freebusy_UpdateColumnUserAddressStreetAddressInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_address_street_address
@@ -300,8 +300,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAddressUserId
-    inputTypeName: UpdateColumnUserAddressUserIdInput
+    typeName: freebusy_UpdateColumnUserAddressUserId
+    inputTypeName: freebusy_UpdateColumnUserAddressUserIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_address_user_id
@@ -359,8 +359,8 @@ definition:
       type: UpdateColumnUserAddressUserId
       description: Update the 'user_id' column in the 'user_address' collection.
   graphql:
-    typeName: UpdateUserAddressByIdUpdateColumns
-    inputTypeName: UpdateUserAddressByIdUpdateColumnsInput
+    typeName: freebusy_UpdateUserAddressByIdUpdateColumns
+    inputTypeName: freebusy_UpdateUserAddressByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_user_address_by_id_update_columns
@@ -430,8 +430,8 @@ definition:
       type: "[UserAddress!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateUserAddressByIdResponse
-    inputTypeName: UpdateUserAddressByIdResponseInput
+    typeName: freebusy_UpdateUserAddressByIdResponse
+    inputTypeName: freebusy_UpdateUserAddressByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_user_address_by_id_response
@@ -484,7 +484,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateUserAddressById
+    rootFieldName: freebusy_updateUserAddressById
     rootFieldKind: Mutation
   description: Update any row on the 'user_address' collection using the 'id' key
 

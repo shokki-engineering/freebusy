@@ -18,8 +18,8 @@ definition:
     - name: value
       type: String_1!
   graphql:
-    typeName: VcardLanguages
-    inputTypeName: VcardLanguagesInput
+    typeName: freebusy_VcardLanguages
+    inputTypeName: freebusy_VcardLanguagesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: vcard_languages
@@ -80,7 +80,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: VcardLanguagesBoolExp
+    typeName: freebusy_VcardLanguagesBoolExp
 
 ---
 kind: AggregateExpression
@@ -105,7 +105,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: VcardLanguagesAggExp
+    selectTypeName: freebusy_VcardLanguagesAggExp
 
 ---
 kind: OrderByExpression
@@ -128,7 +128,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: VcardLanguagesOrderByExp
+    expressionTypeName: freebusy_VcardLanguagesOrderByExp
 
 ---
 kind: Model
@@ -144,20 +144,20 @@ definition:
   orderByExpression: VcardLanguagesOrderByExp
   graphql:
     selectMany:
-      queryRootField: vcardLanguages
+      queryRootField: freebusy_vcardLanguages
       subscription:
-        rootField: vcardLanguages
+        rootField: freebusy_vcardLanguages
     selectUniques:
-      - queryRootField: vcardLanguagesById
+      - queryRootField: freebusy_vcardLanguagesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: vcardLanguagesById
-    filterInputTypeName: VcardLanguagesFilterInput
+          rootField: freebusy_vcardLanguagesById
+    filterInputTypeName: freebusy_VcardLanguagesFilterInput
     aggregate:
-      queryRootField: vcardLanguagesAggregate
+      queryRootField: freebusy_vcardLanguagesAggregate
       subscription:
-        rootField: vcardLanguagesAggregate
+        rootField: freebusy_vcardLanguagesAggregate
 
 ---
 kind: ModelPermissions

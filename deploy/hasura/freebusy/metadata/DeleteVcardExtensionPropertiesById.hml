@@ -15,8 +15,8 @@ definition:
       type: "[VcardExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteVcardExtensionPropertiesByIdResponse
-    inputTypeName: DeleteVcardExtensionPropertiesByIdResponseInput
+    typeName: freebusy_DeleteVcardExtensionPropertiesByIdResponse
+    inputTypeName: freebusy_DeleteVcardExtensionPropertiesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_vcard_extension_properties_by_id_response
@@ -61,7 +61,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteVcardExtensionPropertiesById
+    rootFieldName: freebusy_deleteVcardExtensionPropertiesById
     rootFieldKind: Mutation
   description: Delete any row on the 'vcard_extension_properties' collection using
     the 'id' key

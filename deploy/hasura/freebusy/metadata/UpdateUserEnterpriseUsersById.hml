@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserEnterpriseUsersCostCenter
-    inputTypeName: UpdateColumnUserEnterpriseUsersCostCenterInput
+    typeName: freebusy_UpdateColumnUserEnterpriseUsersCostCenter
+    inputTypeName: freebusy_UpdateColumnUserEnterpriseUsersCostCenterInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_enterprise_users_cost_center
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserEnterpriseUsersDepartment
-    inputTypeName: UpdateColumnUserEnterpriseUsersDepartmentInput
+    typeName: freebusy_UpdateColumnUserEnterpriseUsersDepartment
+    inputTypeName: freebusy_UpdateColumnUserEnterpriseUsersDepartmentInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_enterprise_users_department
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserEnterpriseUsersDivision
-    inputTypeName: UpdateColumnUserEnterpriseUsersDivisionInput
+    typeName: freebusy_UpdateColumnUserEnterpriseUsersDivision
+    inputTypeName: freebusy_UpdateColumnUserEnterpriseUsersDivisionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_enterprise_users_division
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserEnterpriseUsersEmployeeNumber
-    inputTypeName: UpdateColumnUserEnterpriseUsersEmployeeNumberInput
+    typeName: freebusy_UpdateColumnUserEnterpriseUsersEmployeeNumber
+    inputTypeName: freebusy_UpdateColumnUserEnterpriseUsersEmployeeNumberInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_enterprise_users_employee_number
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserEnterpriseUsersId
-    inputTypeName: UpdateColumnUserEnterpriseUsersIdInput
+    typeName: freebusy_UpdateColumnUserEnterpriseUsersId
+    inputTypeName: freebusy_UpdateColumnUserEnterpriseUsersIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_enterprise_users_id
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserEnterpriseUsersManagerId
-    inputTypeName: UpdateColumnUserEnterpriseUsersManagerIdInput
+    typeName: freebusy_UpdateColumnUserEnterpriseUsersManagerId
+    inputTypeName: freebusy_UpdateColumnUserEnterpriseUsersManagerIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_enterprise_users_manager_id
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserEnterpriseUsersOrganization
-    inputTypeName: UpdateColumnUserEnterpriseUsersOrganizationInput
+    typeName: freebusy_UpdateColumnUserEnterpriseUsersOrganization
+    inputTypeName: freebusy_UpdateColumnUserEnterpriseUsersOrganizationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_enterprise_users_organization
@@ -257,8 +257,8 @@ definition:
       description: Update the 'organization' column in the 'user_enterprise_users'
         collection.
   graphql:
-    typeName: UpdateUserEnterpriseUsersByIdUpdateColumns
-    inputTypeName: UpdateUserEnterpriseUsersByIdUpdateColumnsInput
+    typeName: freebusy_UpdateUserEnterpriseUsersByIdUpdateColumns
+    inputTypeName: freebusy_UpdateUserEnterpriseUsersByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_user_enterprise_users_by_id_update_columns
@@ -316,8 +316,8 @@ definition:
       type: "[UserEnterpriseUsers!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateUserEnterpriseUsersByIdResponse
-    inputTypeName: UpdateUserEnterpriseUsersByIdResponseInput
+    typeName: freebusy_UpdateUserEnterpriseUsersByIdResponse
+    inputTypeName: freebusy_UpdateUserEnterpriseUsersByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_user_enterprise_users_by_id_response
@@ -370,7 +370,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateUserEnterpriseUsersById
+    rootFieldName: freebusy_updateUserEnterpriseUsersById
     rootFieldKind: Mutation
   description: Update any row on the 'user_enterprise_users' collection using the 'id' key
 

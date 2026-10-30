@@ -12,8 +12,8 @@ definition:
       type: Date
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventCalendarTimesDate
-    inputTypeName: UpdateColumnEventCalendarTimesDateInput
+    typeName: freebusy_UpdateColumnEventCalendarTimesDate
+    inputTypeName: freebusy_UpdateColumnEventCalendarTimesDateInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_calendar_times_date
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventCalendarTimesDateTime
-    inputTypeName: UpdateColumnEventCalendarTimesDateTimeInput
+    typeName: freebusy_UpdateColumnEventCalendarTimesDateTime
+    inputTypeName: freebusy_UpdateColumnEventCalendarTimesDateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_calendar_times_date_time
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventCalendarTimesDateTimeZone
-    inputTypeName: UpdateColumnEventCalendarTimesDateTimeZoneInput
+    typeName: freebusy_UpdateColumnEventCalendarTimesDateTimeZone
+    inputTypeName: freebusy_UpdateColumnEventCalendarTimesDateTimeZoneInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_calendar_times_date_time_zone
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventCalendarTimesEventId
-    inputTypeName: UpdateColumnEventCalendarTimesEventIdInput
+    typeName: freebusy_UpdateColumnEventCalendarTimesEventId
+    inputTypeName: freebusy_UpdateColumnEventCalendarTimesEventIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_calendar_times_event_id
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventCalendarTimesId
-    inputTypeName: UpdateColumnEventCalendarTimesIdInput
+    typeName: freebusy_UpdateColumnEventCalendarTimesId
+    inputTypeName: freebusy_UpdateColumnEventCalendarTimesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_calendar_times_id
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventCalendarTimesValueCase
-    inputTypeName: UpdateColumnEventCalendarTimesValueCaseInput
+    typeName: freebusy_UpdateColumnEventCalendarTimesValueCase
+    inputTypeName: freebusy_UpdateColumnEventCalendarTimesValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_calendar_times_value_case
@@ -220,8 +220,8 @@ definition:
       type: UpdateColumnEventCalendarTimesValueCase
       description: Update the 'value_case' column in the 'event_calendar_times' collection.
   graphql:
-    typeName: UpdateEventCalendarTimesByIdUpdateColumns
-    inputTypeName: UpdateEventCalendarTimesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateEventCalendarTimesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateEventCalendarTimesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_calendar_times_by_id_update_columns
@@ -275,8 +275,8 @@ definition:
       type: "[EventCalendarTimes!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateEventCalendarTimesByIdResponse
-    inputTypeName: UpdateEventCalendarTimesByIdResponseInput
+    typeName: freebusy_UpdateEventCalendarTimesByIdResponse
+    inputTypeName: freebusy_UpdateEventCalendarTimesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_calendar_times_by_id_response
@@ -329,7 +329,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateEventCalendarTimesById
+    rootFieldName: freebusy_updateEventCalendarTimesById
     rootFieldKind: Mutation
   description: Update any row on the 'event_calendar_times' collection using the 'id' key
 

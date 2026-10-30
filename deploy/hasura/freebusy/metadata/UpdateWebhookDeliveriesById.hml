@@ -12,8 +12,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesAttemptCount
-    inputTypeName: UpdateColumnWebhookDeliveriesAttemptCountInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesAttemptCount
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesAttemptCountInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_attempt_count
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesCreateTime
-    inputTypeName: UpdateColumnWebhookDeliveriesCreateTimeInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesCreateTime
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_create_time
@@ -76,8 +76,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesDeliverTime
-    inputTypeName: UpdateColumnWebhookDeliveriesDeliverTimeInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesDeliverTime
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesDeliverTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_deliver_time
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesErrorMessage
-    inputTypeName: UpdateColumnWebhookDeliveriesErrorMessageInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesErrorMessage
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesErrorMessageInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_error_message
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesEtag
-    inputTypeName: UpdateColumnWebhookDeliveriesEtagInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesEtag
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_etag
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesEventId
-    inputTypeName: UpdateColumnWebhookDeliveriesEventIdInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesEventId
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesEventIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_event_id
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesEventType
-    inputTypeName: UpdateColumnWebhookDeliveriesEventTypeInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesEventType
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesEventTypeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_event_type
@@ -236,8 +236,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesId
-    inputTypeName: UpdateColumnWebhookDeliveriesIdInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesId
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_id
@@ -268,8 +268,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesName
-    inputTypeName: UpdateColumnWebhookDeliveriesNameInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesName
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_name
@@ -300,8 +300,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesNextAttemptTime
-    inputTypeName: UpdateColumnWebhookDeliveriesNextAttemptTimeInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesNextAttemptTime
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesNextAttemptTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_next_attempt_time
@@ -332,8 +332,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesPayload
-    inputTypeName: UpdateColumnWebhookDeliveriesPayloadInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesPayload
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesPayloadInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_payload
@@ -364,8 +364,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesResponseCode
-    inputTypeName: UpdateColumnWebhookDeliveriesResponseCodeInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesResponseCode
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesResponseCodeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_response_code
@@ -396,8 +396,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesState
-    inputTypeName: UpdateColumnWebhookDeliveriesStateInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesState
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesStateInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_state
@@ -428,8 +428,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesSubject
-    inputTypeName: UpdateColumnWebhookDeliveriesSubjectInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesSubject
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesSubjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_subject
@@ -460,8 +460,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesUpdateTime
-    inputTypeName: UpdateColumnWebhookDeliveriesUpdateTimeInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesUpdateTime
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_update_time
@@ -492,8 +492,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnWebhookDeliveriesWebhookId
-    inputTypeName: UpdateColumnWebhookDeliveriesWebhookIdInput
+    typeName: freebusy_UpdateColumnWebhookDeliveriesWebhookId
+    inputTypeName: freebusy_UpdateColumnWebhookDeliveriesWebhookIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_webhook_deliveries_webhook_id
@@ -570,8 +570,8 @@ definition:
       type: UpdateColumnWebhookDeliveriesWebhookId
       description: Update the 'webhook_id' column in the 'webhook_deliveries' collection.
   graphql:
-    typeName: UpdateWebhookDeliveriesByIdUpdateColumns
-    inputTypeName: UpdateWebhookDeliveriesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateWebhookDeliveriesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateWebhookDeliveriesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_webhook_deliveries_by_id_update_columns
@@ -665,8 +665,8 @@ definition:
       type: "[WebhookDeliveries!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateWebhookDeliveriesByIdResponse
-    inputTypeName: UpdateWebhookDeliveriesByIdResponseInput
+    typeName: freebusy_UpdateWebhookDeliveriesByIdResponse
+    inputTypeName: freebusy_UpdateWebhookDeliveriesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_webhook_deliveries_by_id_response
@@ -719,7 +719,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateWebhookDeliveriesById
+    rootFieldName: freebusy_updateWebhookDeliveriesById
     rootFieldKind: Mutation
   description: Update any row on the 'webhook_deliveries' collection using the 'id' key
 

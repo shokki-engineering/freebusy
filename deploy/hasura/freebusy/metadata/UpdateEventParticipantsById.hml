@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventParticipantsCalendarAddress
-    inputTypeName: UpdateColumnEventParticipantsCalendarAddressInput
+    typeName: freebusy_UpdateColumnEventParticipantsCalendarAddress
+    inputTypeName: freebusy_UpdateColumnEventParticipantsCalendarAddressInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_participants_calendar_address
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventParticipantsDescription
-    inputTypeName: UpdateColumnEventParticipantsDescriptionInput
+    typeName: freebusy_UpdateColumnEventParticipantsDescription
+    inputTypeName: freebusy_UpdateColumnEventParticipantsDescriptionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_participants_description
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventParticipantsEventId
-    inputTypeName: UpdateColumnEventParticipantsEventIdInput
+    typeName: freebusy_UpdateColumnEventParticipantsEventId
+    inputTypeName: freebusy_UpdateColumnEventParticipantsEventIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_participants_event_id
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventParticipantsIcalUid
-    inputTypeName: UpdateColumnEventParticipantsIcalUidInput
+    typeName: freebusy_UpdateColumnEventParticipantsIcalUid
+    inputTypeName: freebusy_UpdateColumnEventParticipantsIcalUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_participants_ical_uid
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventParticipantsId
-    inputTypeName: UpdateColumnEventParticipantsIdInput
+    typeName: freebusy_UpdateColumnEventParticipantsId
+    inputTypeName: freebusy_UpdateColumnEventParticipantsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_participants_id
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventParticipantsParticipantTypes
-    inputTypeName: UpdateColumnEventParticipantsParticipantTypesInput
+    typeName: freebusy_UpdateColumnEventParticipantsParticipantTypes
+    inputTypeName: freebusy_UpdateColumnEventParticipantsParticipantTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_participants_participant_types
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventParticipantsPosition
-    inputTypeName: UpdateColumnEventParticipantsPositionInput
+    typeName: freebusy_UpdateColumnEventParticipantsPosition
+    inputTypeName: freebusy_UpdateColumnEventParticipantsPositionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_participants_position
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventParticipantsSummary
-    inputTypeName: UpdateColumnEventParticipantsSummaryInput
+    typeName: freebusy_UpdateColumnEventParticipantsSummary
+    inputTypeName: freebusy_UpdateColumnEventParticipantsSummaryInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_participants_summary
@@ -268,8 +268,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventParticipantsUrl
-    inputTypeName: UpdateColumnEventParticipantsUrlInput
+    typeName: freebusy_UpdateColumnEventParticipantsUrl
+    inputTypeName: freebusy_UpdateColumnEventParticipantsUrlInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_participants_url
@@ -326,8 +326,8 @@ definition:
       type: UpdateColumnEventParticipantsUrl
       description: Update the 'url' column in the 'event_participants' collection.
   graphql:
-    typeName: UpdateEventParticipantsByIdUpdateColumns
-    inputTypeName: UpdateEventParticipantsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateEventParticipantsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateEventParticipantsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_participants_by_id_update_columns
@@ -393,8 +393,8 @@ definition:
       type: "[EventParticipants!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateEventParticipantsByIdResponse
-    inputTypeName: UpdateEventParticipantsByIdResponseInput
+    typeName: freebusy_UpdateEventParticipantsByIdResponse
+    inputTypeName: freebusy_UpdateEventParticipantsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_participants_by_id_response
@@ -447,7 +447,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateEventParticipantsById
+    rootFieldName: freebusy_updateEventParticipantsById
     rootFieldKind: Mutation
   description: Update any row on the 'event_participants' collection using the 'id' key
 

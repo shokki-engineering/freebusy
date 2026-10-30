@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardInstantMessagesContactId
-    inputTypeName: UpdateColumnVcardInstantMessagesContactIdInput
+    typeName: freebusy_UpdateColumnVcardInstantMessagesContactId
+    inputTypeName: freebusy_UpdateColumnVcardInstantMessagesContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_instant_messages_contact_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardInstantMessagesId
-    inputTypeName: UpdateColumnVcardInstantMessagesIdInput
+    typeName: freebusy_UpdateColumnVcardInstantMessagesId
+    inputTypeName: freebusy_UpdateColumnVcardInstantMessagesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_instant_messages_id
@@ -76,8 +76,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardInstantMessagesPref
-    inputTypeName: UpdateColumnVcardInstantMessagesPrefInput
+    typeName: freebusy_UpdateColumnVcardInstantMessagesPref
+    inputTypeName: freebusy_UpdateColumnVcardInstantMessagesPrefInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_instant_messages_pref
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardInstantMessagesTypes
-    inputTypeName: UpdateColumnVcardInstantMessagesTypesInput
+    typeName: freebusy_UpdateColumnVcardInstantMessagesTypes
+    inputTypeName: freebusy_UpdateColumnVcardInstantMessagesTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_instant_messages_types
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardInstantMessagesValue
-    inputTypeName: UpdateColumnVcardInstantMessagesValueInput
+    typeName: freebusy_UpdateColumnVcardInstantMessagesValue
+    inputTypeName: freebusy_UpdateColumnVcardInstantMessagesValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_instant_messages_value
@@ -185,8 +185,8 @@ definition:
       type: UpdateColumnVcardInstantMessagesValue
       description: Update the 'value' column in the 'vcard_instant_messages' collection.
   graphql:
-    typeName: UpdateVcardInstantMessagesByIdUpdateColumns
-    inputTypeName: UpdateVcardInstantMessagesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardInstantMessagesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardInstantMessagesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_instant_messages_by_id_update_columns
@@ -236,8 +236,8 @@ definition:
       type: "[VcardInstantMessages!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardInstantMessagesByIdResponse
-    inputTypeName: UpdateVcardInstantMessagesByIdResponseInput
+    typeName: freebusy_UpdateVcardInstantMessagesByIdResponse
+    inputTypeName: freebusy_UpdateVcardInstantMessagesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_instant_messages_by_id_response
@@ -290,7 +290,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardInstantMessagesById
+    rootFieldName: freebusy_updateVcardInstantMessagesById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_instant_messages' collection using the 'id' key
 

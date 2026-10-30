@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardOrganizationsContactId
-    inputTypeName: UpdateColumnVcardOrganizationsContactIdInput
+    typeName: freebusy_UpdateColumnVcardOrganizationsContactId
+    inputTypeName: freebusy_UpdateColumnVcardOrganizationsContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_organizations_contact_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardOrganizationsId
-    inputTypeName: UpdateColumnVcardOrganizationsIdInput
+    typeName: freebusy_UpdateColumnVcardOrganizationsId
+    inputTypeName: freebusy_UpdateColumnVcardOrganizationsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_organizations_id
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardOrganizationsTypes
-    inputTypeName: UpdateColumnVcardOrganizationsTypesInput
+    typeName: freebusy_UpdateColumnVcardOrganizationsTypes
+    inputTypeName: freebusy_UpdateColumnVcardOrganizationsTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_organizations_types
@@ -108,8 +108,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardOrganizationsUnits
-    inputTypeName: UpdateColumnVcardOrganizationsUnitsInput
+    typeName: freebusy_UpdateColumnVcardOrganizationsUnits
+    inputTypeName: freebusy_UpdateColumnVcardOrganizationsUnitsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_organizations_units
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardOrganizationsValue
-    inputTypeName: UpdateColumnVcardOrganizationsValueInput
+    typeName: freebusy_UpdateColumnVcardOrganizationsValue
+    inputTypeName: freebusy_UpdateColumnVcardOrganizationsValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_organizations_value
@@ -184,8 +184,8 @@ definition:
       type: UpdateColumnVcardOrganizationsValue
       description: Update the 'value' column in the 'vcard_organizations' collection.
   graphql:
-    typeName: UpdateVcardOrganizationsByIdUpdateColumns
-    inputTypeName: UpdateVcardOrganizationsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardOrganizationsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardOrganizationsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_organizations_by_id_update_columns
@@ -235,8 +235,8 @@ definition:
       type: "[VcardOrganizations!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardOrganizationsByIdResponse
-    inputTypeName: UpdateVcardOrganizationsByIdResponseInput
+    typeName: freebusy_UpdateVcardOrganizationsByIdResponse
+    inputTypeName: freebusy_UpdateVcardOrganizationsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_organizations_by_id_response
@@ -289,7 +289,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardOrganizationsById
+    rootFieldName: freebusy_updateVcardOrganizationsById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_organizations' collection using the 'id' key
 

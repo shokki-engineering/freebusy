@@ -15,8 +15,8 @@ definition:
       type: "[ResourceStructuredDatas!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteResourceStructuredDatasByIdResponse
-    inputTypeName: DeleteResourceStructuredDatasByIdResponseInput
+    typeName: freebusy_DeleteResourceStructuredDatasByIdResponse
+    inputTypeName: freebusy_DeleteResourceStructuredDatasByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_resource_structured_datas_by_id_response
@@ -61,7 +61,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteResourceStructuredDatasById
+    rootFieldName: freebusy_deleteResourceStructuredDatasById
     rootFieldKind: Mutation
   description: Delete any row on the 'resource_structured_datas' collection using
     the 'id' key

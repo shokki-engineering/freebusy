@@ -12,8 +12,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceCreateTime
-    inputTypeName: UpdateColumnAllocationResourceCreateTimeInput
+    typeName: freebusy_UpdateColumnAllocationResourceCreateTime
+    inputTypeName: freebusy_UpdateColumnAllocationResourceCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_create_time
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceEndTime
-    inputTypeName: UpdateColumnAllocationResourceEndTimeInput
+    typeName: freebusy_UpdateColumnAllocationResourceEndTime
+    inputTypeName: freebusy_UpdateColumnAllocationResourceEndTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_end_time
@@ -76,8 +76,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceExpireTime
-    inputTypeName: UpdateColumnAllocationResourceExpireTimeInput
+    typeName: freebusy_UpdateColumnAllocationResourceExpireTime
+    inputTypeName: freebusy_UpdateColumnAllocationResourceExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_expire_time
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceHold
-    inputTypeName: UpdateColumnAllocationResourceHoldInput
+    typeName: freebusy_UpdateColumnAllocationResourceHold
+    inputTypeName: freebusy_UpdateColumnAllocationResourceHoldInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_hold
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceId
-    inputTypeName: UpdateColumnAllocationResourceIdInput
+    typeName: freebusy_UpdateColumnAllocationResourceId
+    inputTypeName: freebusy_UpdateColumnAllocationResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_id
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceName
-    inputTypeName: UpdateColumnAllocationResourceNameInput
+    typeName: freebusy_UpdateColumnAllocationResourceName
+    inputTypeName: freebusy_UpdateColumnAllocationResourceNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_name
@@ -204,8 +204,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceResource
-    inputTypeName: UpdateColumnAllocationResourceResourceInput
+    typeName: freebusy_UpdateColumnAllocationResourceResource
+    inputTypeName: freebusy_UpdateColumnAllocationResourceResourceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_resource
@@ -236,8 +236,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceStartTime
-    inputTypeName: UpdateColumnAllocationResourceStartTimeInput
+    typeName: freebusy_UpdateColumnAllocationResourceStartTime
+    inputTypeName: freebusy_UpdateColumnAllocationResourceStartTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_start_time
@@ -289,8 +289,8 @@ definition:
       type: UpdateColumnAllocationResourceStartTime
       description: Update the 'start_time' column in the 'allocation_resource' collection.
   graphql:
-    typeName: UpdateAllocationResourceByIdUpdateColumns
-    inputTypeName: UpdateAllocationResourceByIdUpdateColumnsInput
+    typeName: freebusy_UpdateAllocationResourceByIdUpdateColumns
+    inputTypeName: freebusy_UpdateAllocationResourceByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_allocation_resource_by_id_update_columns
@@ -352,8 +352,8 @@ definition:
       type: "[AllocationResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateAllocationResourceByIdResponse
-    inputTypeName: UpdateAllocationResourceByIdResponseInput
+    typeName: freebusy_UpdateAllocationResourceByIdResponse
+    inputTypeName: freebusy_UpdateAllocationResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_allocation_resource_by_id_response
@@ -406,7 +406,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateAllocationResourceById
+    rootFieldName: freebusy_updateAllocationResourceById
     rootFieldKind: Mutation
   description: Update any row on the 'allocation_resource' collection using the 'id' key
 

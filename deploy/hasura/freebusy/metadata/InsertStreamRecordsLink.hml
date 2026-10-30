@@ -16,8 +16,8 @@ definition:
     - name: streamId
       type: String_1!
   graphql:
-    typeName: InsertStreamRecordsLinkObject
-    inputTypeName: InsertStreamRecordsLinkObjectInput
+    typeName: freebusy_InsertStreamRecordsLinkObject
+    inputTypeName: freebusy_InsertStreamRecordsLinkObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_stream_records_link_object
@@ -63,8 +63,8 @@ definition:
       type: "[StreamRecordsLink!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertStreamRecordsLinkResponse
-    inputTypeName: InsertStreamRecordsLinkResponseInput
+    typeName: freebusy_InsertStreamRecordsLinkResponse
+    inputTypeName: freebusy_InsertStreamRecordsLinkResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_stream_records_link_response
@@ -108,7 +108,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertStreamRecordsLink
+    rootFieldName: freebusy_insertStreamRecordsLink
     rootFieldKind: Mutation
   description: Insert into the stream_records_link table
 

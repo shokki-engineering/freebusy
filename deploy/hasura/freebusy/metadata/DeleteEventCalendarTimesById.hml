@@ -15,8 +15,8 @@ definition:
       type: "[EventCalendarTimes!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteEventCalendarTimesByIdResponse
-    inputTypeName: DeleteEventCalendarTimesByIdResponseInput
+    typeName: freebusy_DeleteEventCalendarTimesByIdResponse
+    inputTypeName: freebusy_DeleteEventCalendarTimesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_event_calendar_times_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteEventCalendarTimesById
+    rootFieldName: freebusy_deleteEventCalendarTimesById
     rootFieldKind: Mutation
   description: Delete any row on the 'event_calendar_times' collection using the 'id' key
 

@@ -15,8 +15,8 @@ definition:
       type: "[WebhookDeliveries!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteWebhookDeliveriesByIdResponse
-    inputTypeName: DeleteWebhookDeliveriesByIdResponseInput
+    typeName: freebusy_DeleteWebhookDeliveriesByIdResponse
+    inputTypeName: freebusy_DeleteWebhookDeliveriesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_webhook_deliveries_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteWebhookDeliveriesById
+    rootFieldName: freebusy_deleteWebhookDeliveriesById
     rootFieldKind: Mutation
   description: Delete any row on the 'webhook_deliveries' collection using the 'id' key
 

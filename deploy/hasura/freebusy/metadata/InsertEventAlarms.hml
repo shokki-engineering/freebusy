@@ -38,8 +38,8 @@ definition:
     - name: triggerTime
       type: Timestamptz
   graphql:
-    typeName: InsertEventAlarmsObject
-    inputTypeName: InsertEventAlarmsObjectInput
+    typeName: freebusy_InsertEventAlarmsObject
+    inputTypeName: freebusy_InsertEventAlarmsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_alarms_object
@@ -129,8 +129,8 @@ definition:
       type: "[EventAlarms!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertEventAlarmsResponse
-    inputTypeName: InsertEventAlarmsResponseInput
+    typeName: freebusy_InsertEventAlarmsResponse
+    inputTypeName: freebusy_InsertEventAlarmsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_alarms_response
@@ -174,7 +174,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertEventAlarms
+    rootFieldName: freebusy_insertEventAlarms
     rootFieldKind: Mutation
   description: Insert into the event_alarms table
 

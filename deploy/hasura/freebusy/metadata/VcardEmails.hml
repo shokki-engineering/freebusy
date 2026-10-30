@@ -18,8 +18,8 @@ definition:
     - name: value
       type: String_1!
   graphql:
-    typeName: VcardEmails
-    inputTypeName: VcardEmailsInput
+    typeName: freebusy_VcardEmails
+    inputTypeName: freebusy_VcardEmailsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: vcard_emails
@@ -80,7 +80,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: VcardEmailsBoolExp
+    typeName: freebusy_VcardEmailsBoolExp
 
 ---
 kind: AggregateExpression
@@ -105,7 +105,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: VcardEmailsAggExp
+    selectTypeName: freebusy_VcardEmailsAggExp
 
 ---
 kind: OrderByExpression
@@ -128,7 +128,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: VcardEmailsOrderByExp
+    expressionTypeName: freebusy_VcardEmailsOrderByExp
 
 ---
 kind: Model
@@ -144,20 +144,20 @@ definition:
   orderByExpression: VcardEmailsOrderByExp
   graphql:
     selectMany:
-      queryRootField: vcardEmails
+      queryRootField: freebusy_vcardEmails
       subscription:
-        rootField: vcardEmails
+        rootField: freebusy_vcardEmails
     selectUniques:
-      - queryRootField: vcardEmailsById
+      - queryRootField: freebusy_vcardEmailsById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: vcardEmailsById
-    filterInputTypeName: VcardEmailsFilterInput
+          rootField: freebusy_vcardEmailsById
+    filterInputTypeName: freebusy_VcardEmailsFilterInput
     aggregate:
-      queryRootField: vcardEmailsAggregate
+      queryRootField: freebusy_vcardEmailsAggregate
       subscription:
-        rootField: vcardEmailsAggregate
+        rootField: freebusy_vcardEmailsAggregate
 
 ---
 kind: ModelPermissions

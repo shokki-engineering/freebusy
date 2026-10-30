@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardContactsAnniversaryId
-    inputTypeName: UpdateColumnVcardContactsAnniversaryIdInput
+    typeName: freebusy_UpdateColumnVcardContactsAnniversaryId
+    inputTypeName: freebusy_UpdateColumnVcardContactsAnniversaryIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_contacts_anniversary_id
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardContactsBirthdayId
-    inputTypeName: UpdateColumnVcardContactsBirthdayIdInput
+    typeName: freebusy_UpdateColumnVcardContactsBirthdayId
+    inputTypeName: freebusy_UpdateColumnVcardContactsBirthdayIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_contacts_birthday_id
@@ -76,8 +76,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardContactsCategories
-    inputTypeName: UpdateColumnVcardContactsCategoriesInput
+    typeName: freebusy_UpdateColumnVcardContactsCategories
+    inputTypeName: freebusy_UpdateColumnVcardContactsCategoriesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_contacts_categories
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardContactsDefaultLanguageCode
-    inputTypeName: UpdateColumnVcardContactsDefaultLanguageCodeInput
+    typeName: freebusy_UpdateColumnVcardContactsDefaultLanguageCode
+    inputTypeName: freebusy_UpdateColumnVcardContactsDefaultLanguageCodeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_contacts_default_language_code
@@ -140,8 +140,8 @@ definition:
       type: "[String_1]!"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardContactsDisplayNames
-    inputTypeName: UpdateColumnVcardContactsDisplayNamesInput
+    typeName: freebusy_UpdateColumnVcardContactsDisplayNames
+    inputTypeName: freebusy_UpdateColumnVcardContactsDisplayNamesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_contacts_display_names
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardContactsId
-    inputTypeName: UpdateColumnVcardContactsIdInput
+    typeName: freebusy_UpdateColumnVcardContactsId
+    inputTypeName: freebusy_UpdateColumnVcardContactsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_contacts_id
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardContactsKind
-    inputTypeName: UpdateColumnVcardContactsKindInput
+    typeName: freebusy_UpdateColumnVcardContactsKind
+    inputTypeName: freebusy_UpdateColumnVcardContactsKindInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_contacts_kind
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardContactsNameComponentsId
-    inputTypeName: UpdateColumnVcardContactsNameComponentsIdInput
+    typeName: freebusy_UpdateColumnVcardContactsNameComponentsId
+    inputTypeName: freebusy_UpdateColumnVcardContactsNameComponentsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_contacts_name_components_id
@@ -268,8 +268,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardContactsNotes
-    inputTypeName: UpdateColumnVcardContactsNotesInput
+    typeName: freebusy_UpdateColumnVcardContactsNotes
+    inputTypeName: freebusy_UpdateColumnVcardContactsNotesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_contacts_notes
@@ -300,8 +300,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardContactsTitles
-    inputTypeName: UpdateColumnVcardContactsTitlesInput
+    typeName: freebusy_UpdateColumnVcardContactsTitles
+    inputTypeName: freebusy_UpdateColumnVcardContactsTitlesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_contacts_titles
@@ -361,8 +361,8 @@ definition:
       type: UpdateColumnVcardContactsTitles
       description: Update the 'titles' column in the 'vcard_contacts' collection.
   graphql:
-    typeName: UpdateVcardContactsByIdUpdateColumns
-    inputTypeName: UpdateVcardContactsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardContactsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardContactsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_contacts_by_id_update_columns
@@ -432,8 +432,8 @@ definition:
       type: "[VcardContacts!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardContactsByIdResponse
-    inputTypeName: UpdateVcardContactsByIdResponseInput
+    typeName: freebusy_UpdateVcardContactsByIdResponse
+    inputTypeName: freebusy_UpdateVcardContactsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_contacts_by_id_response
@@ -486,7 +486,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardContactsById
+    rootFieldName: freebusy_updateVcardContactsById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_contacts' collection using the 'id' key
 

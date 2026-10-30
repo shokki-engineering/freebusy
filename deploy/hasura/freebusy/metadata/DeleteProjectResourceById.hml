@@ -15,8 +15,8 @@ definition:
       type: "[ProjectResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteProjectResourceByIdResponse
-    inputTypeName: DeleteProjectResourceByIdResponseInput
+    typeName: freebusy_DeleteProjectResourceByIdResponse
+    inputTypeName: freebusy_DeleteProjectResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_project_resource_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteProjectResourceById
+    rootFieldName: freebusy_deleteProjectResourceById
     rootFieldKind: Mutation
   description: Delete any row on the 'project_resource' collection using the 'id' key
 

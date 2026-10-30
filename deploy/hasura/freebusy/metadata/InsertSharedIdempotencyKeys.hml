@@ -24,8 +24,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: InsertSharedIdempotencyKeysObject
-    inputTypeName: InsertSharedIdempotencyKeysObjectInput
+    typeName: freebusy_InsertSharedIdempotencyKeysObject
+    inputTypeName: freebusy_InsertSharedIdempotencyKeysObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_shared_idempotency_keys_object
@@ -87,8 +87,8 @@ definition:
       type: "[SharedIdempotencyKeys!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertSharedIdempotencyKeysResponse
-    inputTypeName: InsertSharedIdempotencyKeysResponseInput
+    typeName: freebusy_InsertSharedIdempotencyKeysResponse
+    inputTypeName: freebusy_InsertSharedIdempotencyKeysResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_shared_idempotency_keys_response
@@ -132,7 +132,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertSharedIdempotencyKeys
+    rootFieldName: freebusy_insertSharedIdempotencyKeys
     rootFieldKind: Mutation
   description: Insert into the shared_idempotency_keys table
 

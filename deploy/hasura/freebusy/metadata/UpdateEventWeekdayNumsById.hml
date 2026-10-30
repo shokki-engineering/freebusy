@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventWeekdayNumsDay
-    inputTypeName: UpdateColumnEventWeekdayNumsDayInput
+    typeName: freebusy_UpdateColumnEventWeekdayNumsDay
+    inputTypeName: freebusy_UpdateColumnEventWeekdayNumsDayInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_weekday_nums_day
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventWeekdayNumsId
-    inputTypeName: UpdateColumnEventWeekdayNumsIdInput
+    typeName: freebusy_UpdateColumnEventWeekdayNumsId
+    inputTypeName: freebusy_UpdateColumnEventWeekdayNumsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_weekday_nums_id
@@ -76,8 +76,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventWeekdayNumsOrdinal
-    inputTypeName: UpdateColumnEventWeekdayNumsOrdinalInput
+    typeName: freebusy_UpdateColumnEventWeekdayNumsOrdinal
+    inputTypeName: freebusy_UpdateColumnEventWeekdayNumsOrdinalInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_weekday_nums_ordinal
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventWeekdayNumsRecurrenceId
-    inputTypeName: UpdateColumnEventWeekdayNumsRecurrenceIdInput
+    typeName: freebusy_UpdateColumnEventWeekdayNumsRecurrenceId
+    inputTypeName: freebusy_UpdateColumnEventWeekdayNumsRecurrenceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_weekday_nums_recurrence_id
@@ -149,8 +149,8 @@ definition:
       type: UpdateColumnEventWeekdayNumsRecurrenceId
       description: Update the 'recurrence_id' column in the 'event_weekday_nums' collection.
   graphql:
-    typeName: UpdateEventWeekdayNumsByIdUpdateColumns
-    inputTypeName: UpdateEventWeekdayNumsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateEventWeekdayNumsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateEventWeekdayNumsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_weekday_nums_by_id_update_columns
@@ -196,8 +196,8 @@ definition:
       type: "[EventWeekdayNums!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateEventWeekdayNumsByIdResponse
-    inputTypeName: UpdateEventWeekdayNumsByIdResponseInput
+    typeName: freebusy_UpdateEventWeekdayNumsByIdResponse
+    inputTypeName: freebusy_UpdateEventWeekdayNumsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_weekday_nums_by_id_response
@@ -250,7 +250,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateEventWeekdayNumsById
+    rootFieldName: freebusy_updateEventWeekdayNumsById
     rootFieldKind: Mutation
   description: Update any row on the 'event_weekday_nums' collection using the 'id' key
 

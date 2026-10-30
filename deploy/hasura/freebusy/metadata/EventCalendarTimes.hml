@@ -20,8 +20,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: EventCalendarTimes
-    inputTypeName: EventCalendarTimesInput
+    typeName: freebusy_EventCalendarTimes
+    inputTypeName: freebusy_EventCalendarTimesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: event_calendar_times
@@ -88,7 +88,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: EventCalendarTimesBoolExp
+    typeName: freebusy_EventCalendarTimesBoolExp
 
 ---
 kind: AggregateExpression
@@ -115,7 +115,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: EventCalendarTimesAggExp
+    selectTypeName: freebusy_EventCalendarTimesAggExp
 
 ---
 kind: OrderByExpression
@@ -140,7 +140,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: EventCalendarTimesOrderByExp
+    expressionTypeName: freebusy_EventCalendarTimesOrderByExp
 
 ---
 kind: Model
@@ -156,20 +156,20 @@ definition:
   orderByExpression: EventCalendarTimesOrderByExp
   graphql:
     selectMany:
-      queryRootField: eventCalendarTimes
+      queryRootField: freebusy_eventCalendarTimes
       subscription:
-        rootField: eventCalendarTimes
+        rootField: freebusy_eventCalendarTimes
     selectUniques:
-      - queryRootField: eventCalendarTimesById
+      - queryRootField: freebusy_eventCalendarTimesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: eventCalendarTimesById
-    filterInputTypeName: EventCalendarTimesFilterInput
+          rootField: freebusy_eventCalendarTimesById
+    filterInputTypeName: freebusy_EventCalendarTimesFilterInput
     aggregate:
-      queryRootField: eventCalendarTimesAggregate
+      queryRootField: freebusy_eventCalendarTimesAggregate
       subscription:
-        rootField: eventCalendarTimesAggregate
+        rootField: freebusy_eventCalendarTimesAggregate
 
 ---
 kind: ModelPermissions

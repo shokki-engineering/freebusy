@@ -24,8 +24,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: InsertPackExtensionFieldsObject
-    inputTypeName: InsertPackExtensionFieldsObjectInput
+    typeName: freebusy_InsertPackExtensionFieldsObject
+    inputTypeName: freebusy_InsertPackExtensionFieldsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_pack_extension_fields_object
@@ -87,8 +87,8 @@ definition:
       type: "[PackExtensionFields!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertPackExtensionFieldsResponse
-    inputTypeName: InsertPackExtensionFieldsResponseInput
+    typeName: freebusy_InsertPackExtensionFieldsResponse
+    inputTypeName: freebusy_InsertPackExtensionFieldsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_pack_extension_fields_response
@@ -132,7 +132,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertPackExtensionFields
+    rootFieldName: freebusy_insertPackExtensionFields
     rootFieldKind: Mutation
   description: Insert into the pack_extension_fields table
 

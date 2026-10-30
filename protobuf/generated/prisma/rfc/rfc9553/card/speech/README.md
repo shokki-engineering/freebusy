@@ -30,9 +30,9 @@ Speech is the Card "speakToAs" property, RFC 9553 section 2.2.4 <https://www.rfc
 | Column | Type | Null |
 | --- | --- | --- |
 | `id` | `CHAR(26)` | not null |
-| `grammatical_gender` | `GrammaticalGender` | nullable |
+| `grammatical_gender` | `CardGrammaticalGender` | nullable |
 | `pronouns` | `JSONB` | nullable |
 
 ### Enums
 
-- `GrammaticalGender`: ANIMATE, COMMON, FEMININE, INANIMATE, MASCULINE, NEUTER
+- `CardGrammaticalGender`: ANIMATE, COMMON, FEMININE, INANIMATE, MASCULINE, NEUTER

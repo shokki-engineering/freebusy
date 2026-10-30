@@ -24,8 +24,8 @@ definition:
     - name: startTime
       type: Timestamptz!
   graphql:
-    typeName: InsertAllocationResourceObject
-    inputTypeName: InsertAllocationResourceObjectInput
+    typeName: freebusy_InsertAllocationResourceObject
+    inputTypeName: freebusy_InsertAllocationResourceObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_allocation_resource_object
@@ -87,8 +87,8 @@ definition:
       type: "[AllocationResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertAllocationResourceResponse
-    inputTypeName: InsertAllocationResourceResponseInput
+    typeName: freebusy_InsertAllocationResourceResponse
+    inputTypeName: freebusy_InsertAllocationResourceResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_allocation_resource_response
@@ -132,7 +132,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertAllocationResource
+    rootFieldName: freebusy_insertAllocationResource
     rootFieldKind: Mutation
   description: Insert into the allocation_resource table
 

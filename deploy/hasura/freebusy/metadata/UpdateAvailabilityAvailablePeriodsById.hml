@@ -13,8 +13,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailablePeriodsAvailabilityId
-    inputTypeName: UpdateColumnAvailabilityAvailablePeriodsAvailabilityIdInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsAvailabilityId
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsAvailabilityIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_available_periods_availability_id
@@ -46,8 +46,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailablePeriodsCategories
-    inputTypeName: UpdateColumnAvailabilityAvailablePeriodsCategoriesInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsCategories
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsCategoriesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_available_periods_categories
@@ -79,8 +79,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailablePeriodsComments
-    inputTypeName: UpdateColumnAvailabilityAvailablePeriodsCommentsInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsComments
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsCommentsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_available_periods_comments
@@ -112,8 +112,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailablePeriodsDescription
-    inputTypeName: UpdateColumnAvailabilityAvailablePeriodsDescriptionInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsDescription
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsDescriptionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_available_periods_description
@@ -145,8 +145,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailablePeriodsDuration
-    inputTypeName: UpdateColumnAvailabilityAvailablePeriodsDurationInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsDuration
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsDurationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_available_periods_duration
@@ -178,8 +178,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailablePeriodsEndFormCase
-    inputTypeName: UpdateColumnAvailabilityAvailablePeriodsEndFormCaseInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsEndFormCase
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsEndFormCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_available_periods_end_form_case
@@ -210,8 +210,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailablePeriodsEndId
-    inputTypeName: UpdateColumnAvailabilityAvailablePeriodsEndIdInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsEndId
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsEndIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_available_periods_end_id
@@ -243,8 +243,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailablePeriodsIcalUid
-    inputTypeName: UpdateColumnAvailabilityAvailablePeriodsIcalUidInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsIcalUid
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsIcalUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_available_periods_ical_uid
@@ -275,8 +275,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailablePeriodsId
-    inputTypeName: UpdateColumnAvailabilityAvailablePeriodsIdInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsId
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_available_periods_id
@@ -308,8 +308,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailablePeriodsLocation
-    inputTypeName: UpdateColumnAvailabilityAvailablePeriodsLocationInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsLocation
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsLocationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_available_periods_location
@@ -341,8 +341,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailablePeriodsRecurrenceRule
-    inputTypeName: UpdateColumnAvailabilityAvailablePeriodsRecurrenceRuleInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsRecurrenceRule
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsRecurrenceRuleInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_available_periods_recurrence_rule
@@ -374,8 +374,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailablePeriodsStartId
-    inputTypeName: UpdateColumnAvailabilityAvailablePeriodsStartIdInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsStartId
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsStartIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_available_periods_start_id
@@ -407,8 +407,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailablePeriodsSummary
-    inputTypeName: UpdateColumnAvailabilityAvailablePeriodsSummaryInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsSummary
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailablePeriodsSummaryInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_available_periods_summary
@@ -488,8 +488,8 @@ definition:
       description: Update the 'summary' column in the 'availability_available_periods'
         collection.
   graphql:
-    typeName: UpdateAvailabilityAvailablePeriodsByIdUpdateColumns
-    inputTypeName: UpdateAvailabilityAvailablePeriodsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateAvailabilityAvailablePeriodsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateAvailabilityAvailablePeriodsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_availability_available_periods_by_id_update_columns
@@ -571,8 +571,8 @@ definition:
       type: "[AvailabilityAvailablePeriods!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateAvailabilityAvailablePeriodsByIdResponse
-    inputTypeName: UpdateAvailabilityAvailablePeriodsByIdResponseInput
+    typeName: freebusy_UpdateAvailabilityAvailablePeriodsByIdResponse
+    inputTypeName: freebusy_UpdateAvailabilityAvailablePeriodsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_availability_available_periods_by_id_response
@@ -625,7 +625,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateAvailabilityAvailablePeriodsById
+    rootFieldName: freebusy_updateAvailabilityAvailablePeriodsById
     rootFieldKind: Mutation
   description: Update any row on the 'availability_available_periods' collection
     using the 'id' key

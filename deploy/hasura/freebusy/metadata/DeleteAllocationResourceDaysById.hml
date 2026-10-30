@@ -15,8 +15,8 @@ definition:
       type: "[AllocationResourceDays!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteAllocationResourceDaysByIdResponse
-    inputTypeName: DeleteAllocationResourceDaysByIdResponseInput
+    typeName: freebusy_DeleteAllocationResourceDaysByIdResponse
+    inputTypeName: freebusy_DeleteAllocationResourceDaysByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_allocation_resource_days_by_id_response
@@ -61,7 +61,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteAllocationResourceDaysById
+    rootFieldName: freebusy_deleteAllocationResourceDaysById
     rootFieldKind: Mutation
   description: Delete any row on the 'allocation_resource_days' collection using
     the 'id' key

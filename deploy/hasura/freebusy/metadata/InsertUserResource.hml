@@ -52,8 +52,8 @@ definition:
     - name: username
       type: String_1!
   graphql:
-    typeName: InsertUserResourceObject
-    inputTypeName: InsertUserResourceObjectInput
+    typeName: freebusy_InsertUserResourceObject
+    inputTypeName: freebusy_InsertUserResourceObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_user_resource_object
@@ -171,8 +171,8 @@ definition:
       type: "[UserResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertUserResourceResponse
-    inputTypeName: InsertUserResourceResponseInput
+    typeName: freebusy_InsertUserResourceResponse
+    inputTypeName: freebusy_InsertUserResourceResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_user_resource_response
@@ -216,7 +216,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertUserResource
+    rootFieldName: freebusy_insertUserResource
     rootFieldKind: Mutation
   description: Insert into the user_resource table
 

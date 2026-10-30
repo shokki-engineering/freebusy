@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoExtensionPropertiesId
-    inputTypeName: UpdateColumnTodoExtensionPropertiesIdInput
+    typeName: freebusy_UpdateColumnTodoExtensionPropertiesId
+    inputTypeName: freebusy_UpdateColumnTodoExtensionPropertiesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_extension_properties_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoExtensionPropertiesKey
-    inputTypeName: UpdateColumnTodoExtensionPropertiesKeyInput
+    typeName: freebusy_UpdateColumnTodoExtensionPropertiesKey
+    inputTypeName: freebusy_UpdateColumnTodoExtensionPropertiesKeyInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_extension_properties_key
@@ -76,8 +76,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoExtensionPropertiesParameters
-    inputTypeName: UpdateColumnTodoExtensionPropertiesParametersInput
+    typeName: freebusy_UpdateColumnTodoExtensionPropertiesParameters
+    inputTypeName: freebusy_UpdateColumnTodoExtensionPropertiesParametersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_extension_properties_parameters
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoExtensionPropertiesTodoId
-    inputTypeName: UpdateColumnTodoExtensionPropertiesTodoIdInput
+    typeName: freebusy_UpdateColumnTodoExtensionPropertiesTodoId
+    inputTypeName: freebusy_UpdateColumnTodoExtensionPropertiesTodoIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_extension_properties_todo_id
@@ -140,8 +140,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoExtensionPropertiesValues
-    inputTypeName: UpdateColumnTodoExtensionPropertiesValuesInput
+    typeName: freebusy_UpdateColumnTodoExtensionPropertiesValues
+    inputTypeName: freebusy_UpdateColumnTodoExtensionPropertiesValuesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_extension_properties_values
@@ -186,8 +186,8 @@ definition:
       type: UpdateColumnTodoExtensionPropertiesValues
       description: Update the 'values' column in the 'todo_extension_properties' collection.
   graphql:
-    typeName: UpdateTodoExtensionPropertiesByIdUpdateColumns
-    inputTypeName: UpdateTodoExtensionPropertiesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateTodoExtensionPropertiesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateTodoExtensionPropertiesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_todo_extension_properties_by_id_update_columns
@@ -237,8 +237,8 @@ definition:
       type: "[TodoExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateTodoExtensionPropertiesByIdResponse
-    inputTypeName: UpdateTodoExtensionPropertiesByIdResponseInput
+    typeName: freebusy_UpdateTodoExtensionPropertiesByIdResponse
+    inputTypeName: freebusy_UpdateTodoExtensionPropertiesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_todo_extension_properties_by_id_response
@@ -291,7 +291,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateTodoExtensionPropertiesById
+    rootFieldName: freebusy_updateTodoExtensionPropertiesById
     rootFieldKind: Mutation
   description: Update any row on the 'todo_extension_properties' collection using
     the 'id' key

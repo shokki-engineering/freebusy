@@ -48,8 +48,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: AvailabilityAvailabilities
-    inputTypeName: AvailabilityAvailabilitiesInput
+    typeName: freebusy_AvailabilityAvailabilities
+    inputTypeName: freebusy_AvailabilityAvailabilitiesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: availability_availabilities
@@ -198,7 +198,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: AvailabilityAvailabilitiesBoolExp
+    typeName: freebusy_AvailabilityAvailabilitiesBoolExp
 
 ---
 kind: AggregateExpression
@@ -251,7 +251,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: AvailabilityAvailabilitiesAggExp
+    selectTypeName: freebusy_AvailabilityAvailabilitiesAggExp
 
 ---
 kind: OrderByExpression
@@ -302,7 +302,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: AvailabilityAvailabilitiesOrderByExp
+    expressionTypeName: freebusy_AvailabilityAvailabilitiesOrderByExp
 
 ---
 kind: Model
@@ -318,20 +318,20 @@ definition:
   orderByExpression: AvailabilityAvailabilitiesOrderByExp
   graphql:
     selectMany:
-      queryRootField: availabilityAvailabilities
+      queryRootField: freebusy_availabilityAvailabilities
       subscription:
-        rootField: availabilityAvailabilities
+        rootField: freebusy_availabilityAvailabilities
     selectUniques:
-      - queryRootField: availabilityAvailabilitiesById
+      - queryRootField: freebusy_availabilityAvailabilitiesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: availabilityAvailabilitiesById
-    filterInputTypeName: AvailabilityAvailabilitiesFilterInput
+          rootField: freebusy_availabilityAvailabilitiesById
+    filterInputTypeName: freebusy_AvailabilityAvailabilitiesFilterInput
     aggregate:
-      queryRootField: availabilityAvailabilitiesAggregate
+      queryRootField: freebusy_availabilityAvailabilitiesAggregate
       subscription:
-        rootField: availabilityAvailabilitiesAggregate
+        rootField: freebusy_availabilityAvailabilitiesAggregate
 
 ---
 kind: ModelPermissions

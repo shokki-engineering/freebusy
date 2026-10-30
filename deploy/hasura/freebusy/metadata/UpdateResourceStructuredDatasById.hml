@@ -12,8 +12,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceStructuredDatasBinary
-    inputTypeName: UpdateColumnResourceStructuredDatasBinaryInput
+    typeName: freebusy_UpdateColumnResourceStructuredDatasBinary
+    inputTypeName: freebusy_UpdateColumnResourceStructuredDatasBinaryInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_structured_datas_binary
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceStructuredDatasFormatType
-    inputTypeName: UpdateColumnResourceStructuredDatasFormatTypeInput
+    typeName: freebusy_UpdateColumnResourceStructuredDatasFormatType
+    inputTypeName: freebusy_UpdateColumnResourceStructuredDatasFormatTypeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_structured_datas_format_type
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceStructuredDatasId
-    inputTypeName: UpdateColumnResourceStructuredDatasIdInput
+    typeName: freebusy_UpdateColumnResourceStructuredDatasId
+    inputTypeName: freebusy_UpdateColumnResourceStructuredDatasIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_structured_datas_id
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceStructuredDatasResourceId
-    inputTypeName: UpdateColumnResourceStructuredDatasResourceIdInput
+    typeName: freebusy_UpdateColumnResourceStructuredDatasResourceId
+    inputTypeName: freebusy_UpdateColumnResourceStructuredDatasResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_structured_datas_resource_id
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceStructuredDatasSchema
-    inputTypeName: UpdateColumnResourceStructuredDatasSchemaInput
+    typeName: freebusy_UpdateColumnResourceStructuredDatasSchema
+    inputTypeName: freebusy_UpdateColumnResourceStructuredDatasSchemaInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_structured_datas_schema
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceStructuredDatasText
-    inputTypeName: UpdateColumnResourceStructuredDatasTextInput
+    typeName: freebusy_UpdateColumnResourceStructuredDatasText
+    inputTypeName: freebusy_UpdateColumnResourceStructuredDatasTextInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_structured_datas_text
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceStructuredDatasUri
-    inputTypeName: UpdateColumnResourceStructuredDatasUriInput
+    typeName: freebusy_UpdateColumnResourceStructuredDatasUri
+    inputTypeName: freebusy_UpdateColumnResourceStructuredDatasUriInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_structured_datas_uri
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceStructuredDatasValueCase
-    inputTypeName: UpdateColumnResourceStructuredDatasValueCaseInput
+    typeName: freebusy_UpdateColumnResourceStructuredDatasValueCase
+    inputTypeName: freebusy_UpdateColumnResourceStructuredDatasValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_structured_datas_value_case
@@ -292,8 +292,8 @@ definition:
       description: Update the 'value_case' column in the 'resource_structured_datas'
         collection.
   graphql:
-    typeName: UpdateResourceStructuredDatasByIdUpdateColumns
-    inputTypeName: UpdateResourceStructuredDatasByIdUpdateColumnsInput
+    typeName: freebusy_UpdateResourceStructuredDatasByIdUpdateColumns
+    inputTypeName: freebusy_UpdateResourceStructuredDatasByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_resource_structured_datas_by_id_update_columns
@@ -355,8 +355,8 @@ definition:
       type: "[ResourceStructuredDatas!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateResourceStructuredDatasByIdResponse
-    inputTypeName: UpdateResourceStructuredDatasByIdResponseInput
+    typeName: freebusy_UpdateResourceStructuredDatasByIdResponse
+    inputTypeName: freebusy_UpdateResourceStructuredDatasByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_resource_structured_datas_by_id_response
@@ -409,7 +409,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateResourceStructuredDatasById
+    rootFieldName: freebusy_updateResourceStructuredDatasById
     rootFieldKind: Mutation
   description: Update any row on the 'resource_structured_datas' collection using
     the 'id' key

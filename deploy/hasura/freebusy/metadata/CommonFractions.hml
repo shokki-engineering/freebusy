@@ -14,8 +14,8 @@ definition:
     - name: numerator
       type: Int64
   graphql:
-    typeName: CommonFractions
-    inputTypeName: CommonFractionsInput
+    typeName: freebusy_CommonFractions
+    inputTypeName: freebusy_CommonFractionsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: common_fractions
@@ -54,7 +54,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: CommonFractionsBoolExp
+    typeName: freebusy_CommonFractionsBoolExp
 
 ---
 kind: AggregateExpression
@@ -75,7 +75,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: CommonFractionsAggExp
+    selectTypeName: freebusy_CommonFractionsAggExp
 
 ---
 kind: OrderByExpression
@@ -94,7 +94,7 @@ definition:
           orderByExpression: Int64OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: CommonFractionsOrderByExp
+    expressionTypeName: freebusy_CommonFractionsOrderByExp
 
 ---
 kind: Model
@@ -110,20 +110,20 @@ definition:
   orderByExpression: CommonFractionsOrderByExp
   graphql:
     selectMany:
-      queryRootField: commonFractions
+      queryRootField: freebusy_commonFractions
       subscription:
-        rootField: commonFractions
+        rootField: freebusy_commonFractions
     selectUniques:
-      - queryRootField: commonFractionsById
+      - queryRootField: freebusy_commonFractionsById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: commonFractionsById
-    filterInputTypeName: CommonFractionsFilterInput
+          rootField: freebusy_commonFractionsById
+    filterInputTypeName: freebusy_CommonFractionsFilterInput
     aggregate:
-      queryRootField: commonFractionsAggregate
+      queryRootField: freebusy_commonFractionsAggregate
       subscription:
-        rootField: commonFractionsAggregate
+        rootField: freebusy_commonFractionsAggregate
 
 ---
 kind: ModelPermissions

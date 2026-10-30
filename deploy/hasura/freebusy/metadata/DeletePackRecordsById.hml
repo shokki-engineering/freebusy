@@ -15,8 +15,8 @@ definition:
       type: "[PackRecords!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeletePackRecordsByIdResponse
-    inputTypeName: DeletePackRecordsByIdResponseInput
+    typeName: freebusy_DeletePackRecordsByIdResponse
+    inputTypeName: freebusy_DeletePackRecordsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_pack_records_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deletePackRecordsById
+    rootFieldName: freebusy_deletePackRecordsById
     rootFieldKind: Mutation
   description: Delete any row on the 'pack_records' collection using the 'id' key
 

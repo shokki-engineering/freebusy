@@ -12,8 +12,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceDaysAttributes
-    inputTypeName: UpdateColumnAllocationResourceDaysAttributesInput
+    typeName: freebusy_UpdateColumnAllocationResourceDaysAttributes
+    inputTypeName: freebusy_UpdateColumnAllocationResourceDaysAttributesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_days_attributes
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceDaysCalendar
-    inputTypeName: UpdateColumnAllocationResourceDaysCalendarInput
+    typeName: freebusy_UpdateColumnAllocationResourceDaysCalendar
+    inputTypeName: freebusy_UpdateColumnAllocationResourceDaysCalendarInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_days_calendar
@@ -76,8 +76,8 @@ definition:
       type: Date!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceDaysDay
-    inputTypeName: UpdateColumnAllocationResourceDaysDayInput
+    typeName: freebusy_UpdateColumnAllocationResourceDaysDay
+    inputTypeName: freebusy_UpdateColumnAllocationResourceDaysDayInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_days_day
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceDaysDisplayName
-    inputTypeName: UpdateColumnAllocationResourceDaysDisplayNameInput
+    typeName: freebusy_UpdateColumnAllocationResourceDaysDisplayName
+    inputTypeName: freebusy_UpdateColumnAllocationResourceDaysDisplayNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_days_display_name
@@ -140,8 +140,8 @@ definition:
       type: Json!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceDaysFree
-    inputTypeName: UpdateColumnAllocationResourceDaysFreeInput
+    typeName: freebusy_UpdateColumnAllocationResourceDaysFree
+    inputTypeName: freebusy_UpdateColumnAllocationResourceDaysFreeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_days_free
@@ -173,8 +173,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceDaysFreeFraction
-    inputTypeName: UpdateColumnAllocationResourceDaysFreeFractionInput
+    typeName: freebusy_UpdateColumnAllocationResourceDaysFreeFraction
+    inputTypeName: freebusy_UpdateColumnAllocationResourceDaysFreeFractionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_days_free_fraction
@@ -205,8 +205,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceDaysId
-    inputTypeName: UpdateColumnAllocationResourceDaysIdInput
+    typeName: freebusy_UpdateColumnAllocationResourceDaysId
+    inputTypeName: freebusy_UpdateColumnAllocationResourceDaysIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_days_id
@@ -237,8 +237,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceDaysResource
-    inputTypeName: UpdateColumnAllocationResourceDaysResourceInput
+    typeName: freebusy_UpdateColumnAllocationResourceDaysResource
+    inputTypeName: freebusy_UpdateColumnAllocationResourceDaysResourceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_days_resource
@@ -270,8 +270,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceDaysResourceTypes
-    inputTypeName: UpdateColumnAllocationResourceDaysResourceTypesInput
+    typeName: freebusy_UpdateColumnAllocationResourceDaysResourceTypes
+    inputTypeName: freebusy_UpdateColumnAllocationResourceDaysResourceTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_days_resource_types
@@ -302,8 +302,8 @@ definition:
       type: Int64!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationResourceDaysRowVersion
-    inputTypeName: UpdateColumnAllocationResourceDaysRowVersionInput
+    typeName: freebusy_UpdateColumnAllocationResourceDaysRowVersion
+    inputTypeName: freebusy_UpdateColumnAllocationResourceDaysRowVersionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_resource_days_row_version
@@ -368,8 +368,8 @@ definition:
       description: Update the 'row_version' column in the 'allocation_resource_days'
         collection.
   graphql:
-    typeName: UpdateAllocationResourceDaysByIdUpdateColumns
-    inputTypeName: UpdateAllocationResourceDaysByIdUpdateColumnsInput
+    typeName: freebusy_UpdateAllocationResourceDaysByIdUpdateColumns
+    inputTypeName: freebusy_UpdateAllocationResourceDaysByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_allocation_resource_days_by_id_update_columns
@@ -439,8 +439,8 @@ definition:
       type: "[AllocationResourceDays!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateAllocationResourceDaysByIdResponse
-    inputTypeName: UpdateAllocationResourceDaysByIdResponseInput
+    typeName: freebusy_UpdateAllocationResourceDaysByIdResponse
+    inputTypeName: freebusy_UpdateAllocationResourceDaysByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_allocation_resource_days_by_id_response
@@ -493,7 +493,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateAllocationResourceDaysById
+    rootFieldName: freebusy_updateAllocationResourceDaysById
     rootFieldKind: Mutation
   description: Update any row on the 'allocation_resource_days' collection using
     the 'id' key

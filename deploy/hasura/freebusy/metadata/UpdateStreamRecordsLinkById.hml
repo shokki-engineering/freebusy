@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsLinkId
-    inputTypeName: UpdateColumnStreamRecordsLinkIdInput
+    typeName: freebusy_UpdateColumnStreamRecordsLinkId
+    inputTypeName: freebusy_UpdateColumnStreamRecordsLinkIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_link_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsLinkRecordId
-    inputTypeName: UpdateColumnStreamRecordsLinkRecordIdInput
+    typeName: freebusy_UpdateColumnStreamRecordsLinkRecordId
+    inputTypeName: freebusy_UpdateColumnStreamRecordsLinkRecordIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_link_record_id
@@ -77,8 +77,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsLinkReferenceTimeValue
-    inputTypeName: UpdateColumnStreamRecordsLinkReferenceTimeValueInput
+    typeName: freebusy_UpdateColumnStreamRecordsLinkReferenceTimeValue
+    inputTypeName: freebusy_UpdateColumnStreamRecordsLinkReferenceTimeValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_link_reference_time_value
@@ -109,8 +109,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsLinkStreamId
-    inputTypeName: UpdateColumnStreamRecordsLinkStreamIdInput
+    typeName: freebusy_UpdateColumnStreamRecordsLinkStreamId
+    inputTypeName: freebusy_UpdateColumnStreamRecordsLinkStreamIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_link_stream_id
@@ -151,8 +151,8 @@ definition:
       type: UpdateColumnStreamRecordsLinkStreamId
       description: Update the 'stream_id' column in the 'stream_records_link' collection.
   graphql:
-    typeName: UpdateStreamRecordsLinkByIdUpdateColumns
-    inputTypeName: UpdateStreamRecordsLinkByIdUpdateColumnsInput
+    typeName: freebusy_UpdateStreamRecordsLinkByIdUpdateColumns
+    inputTypeName: freebusy_UpdateStreamRecordsLinkByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_stream_records_link_by_id_update_columns
@@ -198,8 +198,8 @@ definition:
       type: "[StreamRecordsLink!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateStreamRecordsLinkByIdResponse
-    inputTypeName: UpdateStreamRecordsLinkByIdResponseInput
+    typeName: freebusy_UpdateStreamRecordsLinkByIdResponse
+    inputTypeName: freebusy_UpdateStreamRecordsLinkByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_stream_records_link_by_id_response
@@ -252,7 +252,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateStreamRecordsLinkById
+    rootFieldName: freebusy_updateStreamRecordsLinkById
     rootFieldKind: Mutation
   description: Update any row on the 'stream_records_link' collection using the 'id' key
 

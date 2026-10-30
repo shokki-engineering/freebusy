@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardPronounsContactId
-    inputTypeName: UpdateColumnVcardPronounsContactIdInput
+    typeName: freebusy_UpdateColumnVcardPronounsContactId
+    inputTypeName: freebusy_UpdateColumnVcardPronounsContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_pronouns_contact_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardPronounsId
-    inputTypeName: UpdateColumnVcardPronounsIdInput
+    typeName: freebusy_UpdateColumnVcardPronounsId
+    inputTypeName: freebusy_UpdateColumnVcardPronounsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_pronouns_id
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardPronounsLanguageCode
-    inputTypeName: UpdateColumnVcardPronounsLanguageCodeInput
+    typeName: freebusy_UpdateColumnVcardPronounsLanguageCode
+    inputTypeName: freebusy_UpdateColumnVcardPronounsLanguageCodeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_pronouns_language_code
@@ -108,8 +108,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardPronounsPref
-    inputTypeName: UpdateColumnVcardPronounsPrefInput
+    typeName: freebusy_UpdateColumnVcardPronounsPref
+    inputTypeName: freebusy_UpdateColumnVcardPronounsPrefInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_pronouns_pref
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardPronounsTypes
-    inputTypeName: UpdateColumnVcardPronounsTypesInput
+    typeName: freebusy_UpdateColumnVcardPronounsTypes
+    inputTypeName: freebusy_UpdateColumnVcardPronounsTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_pronouns_types
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardPronounsValue
-    inputTypeName: UpdateColumnVcardPronounsValueInput
+    typeName: freebusy_UpdateColumnVcardPronounsValue
+    inputTypeName: freebusy_UpdateColumnVcardPronounsValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_pronouns_value
@@ -219,8 +219,8 @@ definition:
       type: UpdateColumnVcardPronounsValue
       description: Update the 'value' column in the 'vcard_pronouns' collection.
   graphql:
-    typeName: UpdateVcardPronounsByIdUpdateColumns
-    inputTypeName: UpdateVcardPronounsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardPronounsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardPronounsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_pronouns_by_id_update_columns
@@ -274,8 +274,8 @@ definition:
       type: "[VcardPronouns!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardPronounsByIdResponse
-    inputTypeName: UpdateVcardPronounsByIdResponseInput
+    typeName: freebusy_UpdateVcardPronounsByIdResponse
+    inputTypeName: freebusy_UpdateVcardPronounsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_pronouns_by_id_response
@@ -328,7 +328,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardPronounsById
+    rootFieldName: freebusy_updateVcardPronounsById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_pronouns' collection using the 'id' key
 

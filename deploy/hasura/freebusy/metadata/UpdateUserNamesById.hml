@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserNamesDisplayName
-    inputTypeName: UpdateColumnUserNamesDisplayNameInput
+    typeName: freebusy_UpdateColumnUserNamesDisplayName
+    inputTypeName: freebusy_UpdateColumnUserNamesDisplayNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_names_display_name
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserNamesFamilyName
-    inputTypeName: UpdateColumnUserNamesFamilyNameInput
+    typeName: freebusy_UpdateColumnUserNamesFamilyName
+    inputTypeName: freebusy_UpdateColumnUserNamesFamilyNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_names_family_name
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserNamesGivenName
-    inputTypeName: UpdateColumnUserNamesGivenNameInput
+    typeName: freebusy_UpdateColumnUserNamesGivenName
+    inputTypeName: freebusy_UpdateColumnUserNamesGivenNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_names_given_name
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserNamesHonorificPrefix
-    inputTypeName: UpdateColumnUserNamesHonorificPrefixInput
+    typeName: freebusy_UpdateColumnUserNamesHonorificPrefix
+    inputTypeName: freebusy_UpdateColumnUserNamesHonorificPrefixInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_names_honorific_prefix
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserNamesHonorificSuffix
-    inputTypeName: UpdateColumnUserNamesHonorificSuffixInput
+    typeName: freebusy_UpdateColumnUserNamesHonorificSuffix
+    inputTypeName: freebusy_UpdateColumnUserNamesHonorificSuffixInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_names_honorific_suffix
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserNamesId
-    inputTypeName: UpdateColumnUserNamesIdInput
+    typeName: freebusy_UpdateColumnUserNamesId
+    inputTypeName: freebusy_UpdateColumnUserNamesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_names_id
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserNamesMiddleNames
-    inputTypeName: UpdateColumnUserNamesMiddleNamesInput
+    typeName: freebusy_UpdateColumnUserNamesMiddleNames
+    inputTypeName: freebusy_UpdateColumnUserNamesMiddleNamesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_names_middle_names
@@ -254,8 +254,8 @@ definition:
       type: UpdateColumnUserNamesMiddleNames
       description: Update the 'middle_names' column in the 'user_names' collection.
   graphql:
-    typeName: UpdateUserNamesByIdUpdateColumns
-    inputTypeName: UpdateUserNamesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateUserNamesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateUserNamesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_user_names_by_id_update_columns
@@ -313,8 +313,8 @@ definition:
       type: "[UserNames!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateUserNamesByIdResponse
-    inputTypeName: UpdateUserNamesByIdResponseInput
+    typeName: freebusy_UpdateUserNamesByIdResponse
+    inputTypeName: freebusy_UpdateUserNamesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_user_names_by_id_response
@@ -367,7 +367,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateUserNamesById
+    rootFieldName: freebusy_updateUserNamesById
     rootFieldKind: Mutation
   description: Update any row on the 'user_names' collection using the 'id' key
 

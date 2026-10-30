@@ -64,8 +64,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: EventResource
-    inputTypeName: EventResourceInput
+    typeName: freebusy_EventResource
+    inputTypeName: freebusy_EventResourceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: event_resource
@@ -260,7 +260,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: EventResourceBoolExp
+    typeName: freebusy_EventResourceBoolExp
 
 ---
 kind: AggregateExpression
@@ -327,7 +327,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: EventResourceAggExp
+    selectTypeName: freebusy_EventResourceAggExp
 
 ---
 kind: OrderByExpression
@@ -392,7 +392,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: EventResourceOrderByExp
+    expressionTypeName: freebusy_EventResourceOrderByExp
 
 ---
 kind: Model
@@ -408,20 +408,20 @@ definition:
   orderByExpression: EventResourceOrderByExp
   graphql:
     selectMany:
-      queryRootField: eventResource
+      queryRootField: freebusy_eventResource
       subscription:
-        rootField: eventResource
+        rootField: freebusy_eventResource
     selectUniques:
-      - queryRootField: eventResourceById
+      - queryRootField: freebusy_eventResourceById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: eventResourceById
-    filterInputTypeName: EventResourceFilterInput
+          rootField: freebusy_eventResourceById
+    filterInputTypeName: freebusy_EventResourceFilterInput
     aggregate:
-      queryRootField: eventResourceAggregate
+      queryRootField: freebusy_eventResourceAggregate
       subscription:
-        rootField: eventResourceAggregate
+        rootField: freebusy_eventResourceAggregate
 
 ---
 kind: ModelPermissions

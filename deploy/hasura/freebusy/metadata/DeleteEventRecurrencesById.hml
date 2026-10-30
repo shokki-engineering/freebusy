@@ -15,8 +15,8 @@ definition:
       type: "[EventRecurrences!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteEventRecurrencesByIdResponse
-    inputTypeName: DeleteEventRecurrencesByIdResponseInput
+    typeName: freebusy_DeleteEventRecurrencesByIdResponse
+    inputTypeName: freebusy_DeleteEventRecurrencesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_event_recurrences_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteEventRecurrencesById
+    rootFieldName: freebusy_deleteEventRecurrencesById
     rootFieldKind: Mutation
   description: Delete any row on the 'event_recurrences' collection using the 'id' key
 

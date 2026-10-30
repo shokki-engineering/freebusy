@@ -15,8 +15,8 @@ definition:
       type: "[TodoExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteTodoExtensionPropertiesByIdResponse
-    inputTypeName: DeleteTodoExtensionPropertiesByIdResponseInput
+    typeName: freebusy_DeleteTodoExtensionPropertiesByIdResponse
+    inputTypeName: freebusy_DeleteTodoExtensionPropertiesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_todo_extension_properties_by_id_response
@@ -61,7 +61,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteTodoExtensionPropertiesById
+    rootFieldName: freebusy_deleteTodoExtensionPropertiesById
     rootFieldKind: Mutation
   description: Delete any row on the 'todo_extension_properties' collection using
     the 'id' key

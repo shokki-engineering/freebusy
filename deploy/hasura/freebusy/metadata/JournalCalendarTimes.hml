@@ -18,8 +18,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: JournalCalendarTimes
-    inputTypeName: JournalCalendarTimesInput
+    typeName: freebusy_JournalCalendarTimes
+    inputTypeName: freebusy_JournalCalendarTimesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: journal_calendar_times
@@ -80,7 +80,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: JournalCalendarTimesBoolExp
+    typeName: freebusy_JournalCalendarTimesBoolExp
 
 ---
 kind: AggregateExpression
@@ -105,7 +105,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: JournalCalendarTimesAggExp
+    selectTypeName: freebusy_JournalCalendarTimesAggExp
 
 ---
 kind: OrderByExpression
@@ -128,7 +128,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: JournalCalendarTimesOrderByExp
+    expressionTypeName: freebusy_JournalCalendarTimesOrderByExp
 
 ---
 kind: Model
@@ -144,20 +144,20 @@ definition:
   orderByExpression: JournalCalendarTimesOrderByExp
   graphql:
     selectMany:
-      queryRootField: journalCalendarTimes
+      queryRootField: freebusy_journalCalendarTimes
       subscription:
-        rootField: journalCalendarTimes
+        rootField: freebusy_journalCalendarTimes
     selectUniques:
-      - queryRootField: journalCalendarTimesById
+      - queryRootField: freebusy_journalCalendarTimesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: journalCalendarTimesById
-    filterInputTypeName: JournalCalendarTimesFilterInput
+          rootField: freebusy_journalCalendarTimesById
+    filterInputTypeName: freebusy_JournalCalendarTimesFilterInput
     aggregate:
-      queryRootField: journalCalendarTimesAggregate
+      queryRootField: freebusy_journalCalendarTimesAggregate
       subscription:
-        rootField: journalCalendarTimesAggregate
+        rootField: freebusy_journalCalendarTimesAggregate
 
 ---
 kind: ModelPermissions

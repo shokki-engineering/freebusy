@@ -58,8 +58,8 @@ definition:
     - name: types
       type: String_1
   graphql:
-    typeName: InsertVcardAddressObject
-    inputTypeName: InsertVcardAddressObjectInput
+    typeName: freebusy_InsertVcardAddressObject
+    inputTypeName: freebusy_InsertVcardAddressObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_address_object
@@ -189,8 +189,8 @@ definition:
       type: "[VcardAddress!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertVcardAddressResponse
-    inputTypeName: InsertVcardAddressResponseInput
+    typeName: freebusy_InsertVcardAddressResponse
+    inputTypeName: freebusy_InsertVcardAddressResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_address_response
@@ -234,7 +234,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertVcardAddress
+    rootFieldName: freebusy_insertVcardAddress
     rootFieldKind: Mutation
   description: Insert into the vcard_address table
 

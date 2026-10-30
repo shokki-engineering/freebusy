@@ -18,8 +18,8 @@ definition:
     - name: value
       type: String_1!
   graphql:
-    typeName: InsertVcardRolesObject
-    inputTypeName: InsertVcardRolesObjectInput
+    typeName: freebusy_InsertVcardRolesObject
+    inputTypeName: freebusy_InsertVcardRolesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_roles_object
@@ -69,8 +69,8 @@ definition:
       type: "[VcardRoles!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertVcardRolesResponse
-    inputTypeName: InsertVcardRolesResponseInput
+    typeName: freebusy_InsertVcardRolesResponse
+    inputTypeName: freebusy_InsertVcardRolesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_roles_response
@@ -114,7 +114,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertVcardRoles
+    rootFieldName: freebusy_insertVcardRoles
     rootFieldKind: Mutation
   description: Insert into the vcard_roles table
 

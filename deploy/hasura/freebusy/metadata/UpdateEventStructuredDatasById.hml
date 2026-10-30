@@ -12,8 +12,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStructuredDatasBinary
-    inputTypeName: UpdateColumnEventStructuredDatasBinaryInput
+    typeName: freebusy_UpdateColumnEventStructuredDatasBinary
+    inputTypeName: freebusy_UpdateColumnEventStructuredDatasBinaryInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_structured_datas_binary
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStructuredDatasEventId
-    inputTypeName: UpdateColumnEventStructuredDatasEventIdInput
+    typeName: freebusy_UpdateColumnEventStructuredDatasEventId
+    inputTypeName: freebusy_UpdateColumnEventStructuredDatasEventIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_structured_datas_event_id
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStructuredDatasFormatType
-    inputTypeName: UpdateColumnEventStructuredDatasFormatTypeInput
+    typeName: freebusy_UpdateColumnEventStructuredDatasFormatType
+    inputTypeName: freebusy_UpdateColumnEventStructuredDatasFormatTypeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_structured_datas_format_type
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStructuredDatasId
-    inputTypeName: UpdateColumnEventStructuredDatasIdInput
+    typeName: freebusy_UpdateColumnEventStructuredDatasId
+    inputTypeName: freebusy_UpdateColumnEventStructuredDatasIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_structured_datas_id
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStructuredDatasLocationId
-    inputTypeName: UpdateColumnEventStructuredDatasLocationIdInput
+    typeName: freebusy_UpdateColumnEventStructuredDatasLocationId
+    inputTypeName: freebusy_UpdateColumnEventStructuredDatasLocationIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_structured_datas_location_id
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStructuredDatasParticipantId
-    inputTypeName: UpdateColumnEventStructuredDatasParticipantIdInput
+    typeName: freebusy_UpdateColumnEventStructuredDatasParticipantId
+    inputTypeName: freebusy_UpdateColumnEventStructuredDatasParticipantIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_structured_datas_participant_id
@@ -204,8 +204,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStructuredDatasResourceId
-    inputTypeName: UpdateColumnEventStructuredDatasResourceIdInput
+    typeName: freebusy_UpdateColumnEventStructuredDatasResourceId
+    inputTypeName: freebusy_UpdateColumnEventStructuredDatasResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_structured_datas_resource_id
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStructuredDatasSchema
-    inputTypeName: UpdateColumnEventStructuredDatasSchemaInput
+    typeName: freebusy_UpdateColumnEventStructuredDatasSchema
+    inputTypeName: freebusy_UpdateColumnEventStructuredDatasSchemaInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_structured_datas_schema
@@ -268,8 +268,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStructuredDatasText
-    inputTypeName: UpdateColumnEventStructuredDatasTextInput
+    typeName: freebusy_UpdateColumnEventStructuredDatasText
+    inputTypeName: freebusy_UpdateColumnEventStructuredDatasTextInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_structured_datas_text
@@ -300,8 +300,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStructuredDatasUri
-    inputTypeName: UpdateColumnEventStructuredDatasUriInput
+    typeName: freebusy_UpdateColumnEventStructuredDatasUri
+    inputTypeName: freebusy_UpdateColumnEventStructuredDatasUriInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_structured_datas_uri
@@ -332,8 +332,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStructuredDatasValueCase
-    inputTypeName: UpdateColumnEventStructuredDatasValueCaseInput
+    typeName: freebusy_UpdateColumnEventStructuredDatasValueCase
+    inputTypeName: freebusy_UpdateColumnEventStructuredDatasValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_structured_datas_value_case
@@ -399,8 +399,8 @@ definition:
       description: Update the 'value_case' column in the 'event_structured_datas'
         collection.
   graphql:
-    typeName: UpdateEventStructuredDatasByIdUpdateColumns
-    inputTypeName: UpdateEventStructuredDatasByIdUpdateColumnsInput
+    typeName: freebusy_UpdateEventStructuredDatasByIdUpdateColumns
+    inputTypeName: freebusy_UpdateEventStructuredDatasByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_structured_datas_by_id_update_columns
@@ -474,8 +474,8 @@ definition:
       type: "[EventStructuredDatas!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateEventStructuredDatasByIdResponse
-    inputTypeName: UpdateEventStructuredDatasByIdResponseInput
+    typeName: freebusy_UpdateEventStructuredDatasByIdResponse
+    inputTypeName: freebusy_UpdateEventStructuredDatasByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_structured_datas_by_id_response
@@ -528,7 +528,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateEventStructuredDatasById
+    rootFieldName: freebusy_updateEventStructuredDatasById
     rootFieldKind: Mutation
   description: Update any row on the 'event_structured_datas' collection using the 'id' key
 

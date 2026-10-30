@@ -45,6 +45,11 @@ telemetry:
 # schema change, rebuild the engine first (`just hasura regen`), then regenerate.
 graphql:
   endpoint: http://localhost:3280/graphql
+  # freebusy's subgraph of the engine it shares with aperio (CLAUDE.md,
+  # "Shared Postgres and Hasura"): deploy/hasura/freebusy/subgraph.yaml's
+  # graphqlRootFieldPrefix and graphqlTypeNamePrefix.
+  root_field_prefix: freebusy_
+  type_name_prefix: freebusy_
   max_depth: 1 # relation inlining depth
 
 generate:

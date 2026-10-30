@@ -16,8 +16,8 @@ definition:
     - name: recurrenceId
       type: String_1!
   graphql:
-    typeName: InsertEventWeekdayNumsObject
-    inputTypeName: InsertEventWeekdayNumsObjectInput
+    typeName: freebusy_InsertEventWeekdayNumsObject
+    inputTypeName: freebusy_InsertEventWeekdayNumsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_weekday_nums_object
@@ -63,8 +63,8 @@ definition:
       type: "[EventWeekdayNums!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertEventWeekdayNumsResponse
-    inputTypeName: InsertEventWeekdayNumsResponseInput
+    typeName: freebusy_InsertEventWeekdayNumsResponse
+    inputTypeName: freebusy_InsertEventWeekdayNumsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_weekday_nums_response
@@ -108,7 +108,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertEventWeekdayNums
+    rootFieldName: freebusy_insertEventWeekdayNums
     rootFieldKind: Mutation
   description: Insert into the event_weekday_nums table
 

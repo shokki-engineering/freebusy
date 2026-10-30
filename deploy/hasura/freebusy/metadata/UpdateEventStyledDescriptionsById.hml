@@ -12,8 +12,8 @@ definition:
       type: Boolean_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStyledDescriptionsDerived
-    inputTypeName: UpdateColumnEventStyledDescriptionsDerivedInput
+    typeName: freebusy_UpdateColumnEventStyledDescriptionsDerived
+    inputTypeName: freebusy_UpdateColumnEventStyledDescriptionsDerivedInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_styled_descriptions_derived
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStyledDescriptionsEventId
-    inputTypeName: UpdateColumnEventStyledDescriptionsEventIdInput
+    typeName: freebusy_UpdateColumnEventStyledDescriptionsEventId
+    inputTypeName: freebusy_UpdateColumnEventStyledDescriptionsEventIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_styled_descriptions_event_id
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStyledDescriptionsFormatType
-    inputTypeName: UpdateColumnEventStyledDescriptionsFormatTypeInput
+    typeName: freebusy_UpdateColumnEventStyledDescriptionsFormatType
+    inputTypeName: freebusy_UpdateColumnEventStyledDescriptionsFormatTypeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_styled_descriptions_format_type
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStyledDescriptionsId
-    inputTypeName: UpdateColumnEventStyledDescriptionsIdInput
+    typeName: freebusy_UpdateColumnEventStyledDescriptionsId
+    inputTypeName: freebusy_UpdateColumnEventStyledDescriptionsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_styled_descriptions_id
@@ -141,8 +141,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStyledDescriptionsParticipantId
-    inputTypeName: UpdateColumnEventStyledDescriptionsParticipantIdInput
+    typeName: freebusy_UpdateColumnEventStyledDescriptionsParticipantId
+    inputTypeName: freebusy_UpdateColumnEventStyledDescriptionsParticipantIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_styled_descriptions_participant_id
@@ -173,8 +173,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStyledDescriptionsText
-    inputTypeName: UpdateColumnEventStyledDescriptionsTextInput
+    typeName: freebusy_UpdateColumnEventStyledDescriptionsText
+    inputTypeName: freebusy_UpdateColumnEventStyledDescriptionsTextInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_styled_descriptions_text
@@ -205,8 +205,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStyledDescriptionsUri
-    inputTypeName: UpdateColumnEventStyledDescriptionsUriInput
+    typeName: freebusy_UpdateColumnEventStyledDescriptionsUri
+    inputTypeName: freebusy_UpdateColumnEventStyledDescriptionsUriInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_styled_descriptions_uri
@@ -237,8 +237,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventStyledDescriptionsValueCase
-    inputTypeName: UpdateColumnEventStyledDescriptionsValueCaseInput
+    typeName: freebusy_UpdateColumnEventStyledDescriptionsValueCase
+    inputTypeName: freebusy_UpdateColumnEventStyledDescriptionsValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_styled_descriptions_value_case
@@ -295,8 +295,8 @@ definition:
       description: Update the 'value_case' column in the 'event_styled_descriptions'
         collection.
   graphql:
-    typeName: UpdateEventStyledDescriptionsByIdUpdateColumns
-    inputTypeName: UpdateEventStyledDescriptionsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateEventStyledDescriptionsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateEventStyledDescriptionsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_styled_descriptions_by_id_update_columns
@@ -358,8 +358,8 @@ definition:
       type: "[EventStyledDescriptions!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateEventStyledDescriptionsByIdResponse
-    inputTypeName: UpdateEventStyledDescriptionsByIdResponseInput
+    typeName: freebusy_UpdateEventStyledDescriptionsByIdResponse
+    inputTypeName: freebusy_UpdateEventStyledDescriptionsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_styled_descriptions_by_id_response
@@ -412,7 +412,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateEventStyledDescriptionsById
+    rootFieldName: freebusy_updateEventStyledDescriptionsById
     rootFieldKind: Mutation
   description: Update any row on the 'event_styled_descriptions' collection using
     the 'id' key

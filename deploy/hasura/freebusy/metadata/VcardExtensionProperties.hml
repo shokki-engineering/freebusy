@@ -20,8 +20,8 @@ definition:
     - name: values
       type: "[String_1]"
   graphql:
-    typeName: VcardExtensionProperties
-    inputTypeName: VcardExtensionPropertiesInput
+    typeName: freebusy_VcardExtensionProperties
+    inputTypeName: freebusy_VcardExtensionPropertiesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: vcard_extension_properties
@@ -86,7 +86,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: VcardExtensionPropertiesBoolExp
+    typeName: freebusy_VcardExtensionPropertiesBoolExp
 
 ---
 kind: AggregateExpression
@@ -111,7 +111,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: VcardExtensionPropertiesAggExp
+    selectTypeName: freebusy_VcardExtensionPropertiesAggExp
 
 ---
 kind: OrderByExpression
@@ -134,7 +134,7 @@ definition:
           orderByExpression: JsonOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: VcardExtensionPropertiesOrderByExp
+    expressionTypeName: freebusy_VcardExtensionPropertiesOrderByExp
 
 ---
 kind: Model
@@ -150,20 +150,20 @@ definition:
   orderByExpression: VcardExtensionPropertiesOrderByExp
   graphql:
     selectMany:
-      queryRootField: vcardExtensionProperties
+      queryRootField: freebusy_vcardExtensionProperties
       subscription:
-        rootField: vcardExtensionProperties
+        rootField: freebusy_vcardExtensionProperties
     selectUniques:
-      - queryRootField: vcardExtensionPropertiesById
+      - queryRootField: freebusy_vcardExtensionPropertiesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: vcardExtensionPropertiesById
-    filterInputTypeName: VcardExtensionPropertiesFilterInput
+          rootField: freebusy_vcardExtensionPropertiesById
+    filterInputTypeName: freebusy_VcardExtensionPropertiesFilterInput
     aggregate:
-      queryRootField: vcardExtensionPropertiesAggregate
+      queryRootField: freebusy_vcardExtensionPropertiesAggregate
       subscription:
-        rootField: vcardExtensionPropertiesAggregate
+        rootField: freebusy_vcardExtensionPropertiesAggregate
 
 ---
 kind: ModelPermissions

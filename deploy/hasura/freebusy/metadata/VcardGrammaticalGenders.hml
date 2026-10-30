@@ -16,8 +16,8 @@ definition:
     - name: languageCode
       type: String_1
   graphql:
-    typeName: VcardGrammaticalGenders
-    inputTypeName: VcardGrammaticalGendersInput
+    typeName: freebusy_VcardGrammaticalGenders
+    inputTypeName: freebusy_VcardGrammaticalGendersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: vcard_grammatical_genders
@@ -72,7 +72,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: VcardGrammaticalGendersBoolExp
+    typeName: freebusy_VcardGrammaticalGendersBoolExp
 
 ---
 kind: AggregateExpression
@@ -95,7 +95,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: VcardGrammaticalGendersAggExp
+    selectTypeName: freebusy_VcardGrammaticalGendersAggExp
 
 ---
 kind: OrderByExpression
@@ -116,7 +116,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: VcardGrammaticalGendersOrderByExp
+    expressionTypeName: freebusy_VcardGrammaticalGendersOrderByExp
 
 ---
 kind: Model
@@ -132,20 +132,20 @@ definition:
   orderByExpression: VcardGrammaticalGendersOrderByExp
   graphql:
     selectMany:
-      queryRootField: vcardGrammaticalGenders
+      queryRootField: freebusy_vcardGrammaticalGenders
       subscription:
-        rootField: vcardGrammaticalGenders
+        rootField: freebusy_vcardGrammaticalGenders
     selectUniques:
-      - queryRootField: vcardGrammaticalGendersById
+      - queryRootField: freebusy_vcardGrammaticalGendersById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: vcardGrammaticalGendersById
-    filterInputTypeName: VcardGrammaticalGendersFilterInput
+          rootField: freebusy_vcardGrammaticalGendersById
+    filterInputTypeName: freebusy_VcardGrammaticalGendersFilterInput
     aggregate:
-      queryRootField: vcardGrammaticalGendersAggregate
+      queryRootField: freebusy_vcardGrammaticalGendersAggregate
       subscription:
-        rootField: vcardGrammaticalGendersAggregate
+        rootField: freebusy_vcardGrammaticalGendersAggregate
 
 ---
 kind: ModelPermissions

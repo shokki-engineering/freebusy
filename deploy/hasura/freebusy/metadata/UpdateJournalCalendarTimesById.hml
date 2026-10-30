@@ -12,8 +12,8 @@ definition:
       type: Date
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalCalendarTimesDate
-    inputTypeName: UpdateColumnJournalCalendarTimesDateInput
+    typeName: freebusy_UpdateColumnJournalCalendarTimesDate
+    inputTypeName: freebusy_UpdateColumnJournalCalendarTimesDateInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_calendar_times_date
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalCalendarTimesDateTime
-    inputTypeName: UpdateColumnJournalCalendarTimesDateTimeInput
+    typeName: freebusy_UpdateColumnJournalCalendarTimesDateTime
+    inputTypeName: freebusy_UpdateColumnJournalCalendarTimesDateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_calendar_times_date_time
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalCalendarTimesDateTimeZone
-    inputTypeName: UpdateColumnJournalCalendarTimesDateTimeZoneInput
+    typeName: freebusy_UpdateColumnJournalCalendarTimesDateTimeZone
+    inputTypeName: freebusy_UpdateColumnJournalCalendarTimesDateTimeZoneInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_calendar_times_date_time_zone
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalCalendarTimesId
-    inputTypeName: UpdateColumnJournalCalendarTimesIdInput
+    typeName: freebusy_UpdateColumnJournalCalendarTimesId
+    inputTypeName: freebusy_UpdateColumnJournalCalendarTimesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_calendar_times_id
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalCalendarTimesValueCase
-    inputTypeName: UpdateColumnJournalCalendarTimesValueCaseInput
+    typeName: freebusy_UpdateColumnJournalCalendarTimesValueCase
+    inputTypeName: freebusy_UpdateColumnJournalCalendarTimesValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_calendar_times_value_case
@@ -186,8 +186,8 @@ definition:
       description: Update the 'value_case' column in the 'journal_calendar_times'
         collection.
   graphql:
-    typeName: UpdateJournalCalendarTimesByIdUpdateColumns
-    inputTypeName: UpdateJournalCalendarTimesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateJournalCalendarTimesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateJournalCalendarTimesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_journal_calendar_times_by_id_update_columns
@@ -237,8 +237,8 @@ definition:
       type: "[JournalCalendarTimes!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateJournalCalendarTimesByIdResponse
-    inputTypeName: UpdateJournalCalendarTimesByIdResponseInput
+    typeName: freebusy_UpdateJournalCalendarTimesByIdResponse
+    inputTypeName: freebusy_UpdateJournalCalendarTimesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_journal_calendar_times_by_id_response
@@ -291,7 +291,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateJournalCalendarTimesById
+    rootFieldName: freebusy_updateJournalCalendarTimesById
     rootFieldKind: Mutation
   description: Update any row on the 'journal_calendar_times' collection using the 'id' key
 

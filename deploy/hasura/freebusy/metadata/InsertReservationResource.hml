@@ -44,8 +44,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: InsertReservationResourceObject
-    inputTypeName: InsertReservationResourceObjectInput
+    typeName: freebusy_InsertReservationResourceObject
+    inputTypeName: freebusy_InsertReservationResourceObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_reservation_resource_object
@@ -147,8 +147,8 @@ definition:
       type: "[ReservationResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertReservationResourceResponse
-    inputTypeName: InsertReservationResourceResponseInput
+    typeName: freebusy_InsertReservationResourceResponse
+    inputTypeName: freebusy_InsertReservationResourceResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_reservation_resource_response
@@ -192,7 +192,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertReservationResource
+    rootFieldName: freebusy_insertReservationResource
     rootFieldKind: Mutation
   description: Insert into the reservation_resource table
 

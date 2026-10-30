@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourceCalendarId
-    inputTypeName: UpdateColumnJournalResourceCalendarIdInput
+    typeName: freebusy_UpdateColumnJournalResourceCalendarId
+    inputTypeName: freebusy_UpdateColumnJournalResourceCalendarIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_calendar_id
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourceClassification
-    inputTypeName: UpdateColumnJournalResourceClassificationInput
+    typeName: freebusy_UpdateColumnJournalResourceClassification
+    inputTypeName: freebusy_UpdateColumnJournalResourceClassificationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_classification
@@ -76,8 +76,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourceCreateTime
-    inputTypeName: UpdateColumnJournalResourceCreateTimeInput
+    typeName: freebusy_UpdateColumnJournalResourceCreateTime
+    inputTypeName: freebusy_UpdateColumnJournalResourceCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_create_time
@@ -108,8 +108,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourceDeleteTime
-    inputTypeName: UpdateColumnJournalResourceDeleteTimeInput
+    typeName: freebusy_UpdateColumnJournalResourceDeleteTime
+    inputTypeName: freebusy_UpdateColumnJournalResourceDeleteTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_delete_time
@@ -140,8 +140,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourceDescriptions
-    inputTypeName: UpdateColumnJournalResourceDescriptionsInput
+    typeName: freebusy_UpdateColumnJournalResourceDescriptions
+    inputTypeName: freebusy_UpdateColumnJournalResourceDescriptionsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_descriptions
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourceEtag
-    inputTypeName: UpdateColumnJournalResourceEtagInput
+    typeName: freebusy_UpdateColumnJournalResourceEtag
+    inputTypeName: freebusy_UpdateColumnJournalResourceEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_etag
@@ -204,8 +204,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourceExpireTime
-    inputTypeName: UpdateColumnJournalResourceExpireTimeInput
+    typeName: freebusy_UpdateColumnJournalResourceExpireTime
+    inputTypeName: freebusy_UpdateColumnJournalResourceExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_expire_time
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourceIcalUid
-    inputTypeName: UpdateColumnJournalResourceIcalUidInput
+    typeName: freebusy_UpdateColumnJournalResourceIcalUid
+    inputTypeName: freebusy_UpdateColumnJournalResourceIcalUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_ical_uid
@@ -268,8 +268,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourceId
-    inputTypeName: UpdateColumnJournalResourceIdInput
+    typeName: freebusy_UpdateColumnJournalResourceId
+    inputTypeName: freebusy_UpdateColumnJournalResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_id
@@ -300,8 +300,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourceName
-    inputTypeName: UpdateColumnJournalResourceNameInput
+    typeName: freebusy_UpdateColumnJournalResourceName
+    inputTypeName: freebusy_UpdateColumnJournalResourceNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_name
@@ -332,8 +332,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourcePublication
-    inputTypeName: UpdateColumnJournalResourcePublicationInput
+    typeName: freebusy_UpdateColumnJournalResourcePublication
+    inputTypeName: freebusy_UpdateColumnJournalResourcePublicationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_publication
@@ -364,8 +364,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourceStartId
-    inputTypeName: UpdateColumnJournalResourceStartIdInput
+    typeName: freebusy_UpdateColumnJournalResourceStartId
+    inputTypeName: freebusy_UpdateColumnJournalResourceStartIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_start_id
@@ -396,8 +396,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourceSummary
-    inputTypeName: UpdateColumnJournalResourceSummaryInput
+    typeName: freebusy_UpdateColumnJournalResourceSummary
+    inputTypeName: freebusy_UpdateColumnJournalResourceSummaryInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_summary
@@ -428,8 +428,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourceUid
-    inputTypeName: UpdateColumnJournalResourceUidInput
+    typeName: freebusy_UpdateColumnJournalResourceUid
+    inputTypeName: freebusy_UpdateColumnJournalResourceUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_uid
@@ -460,8 +460,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalResourceUpdateTime
-    inputTypeName: UpdateColumnJournalResourceUpdateTimeInput
+    typeName: freebusy_UpdateColumnJournalResourceUpdateTime
+    inputTypeName: freebusy_UpdateColumnJournalResourceUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_resource_update_time
@@ -534,8 +534,8 @@ definition:
       type: UpdateColumnJournalResourceUpdateTime
       description: Update the 'update_time' column in the 'journal_resource' collection.
   graphql:
-    typeName: UpdateJournalResourceByIdUpdateColumns
-    inputTypeName: UpdateJournalResourceByIdUpdateColumnsInput
+    typeName: freebusy_UpdateJournalResourceByIdUpdateColumns
+    inputTypeName: freebusy_UpdateJournalResourceByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_journal_resource_by_id_update_columns
@@ -625,8 +625,8 @@ definition:
       type: "[JournalResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateJournalResourceByIdResponse
-    inputTypeName: UpdateJournalResourceByIdResponseInput
+    typeName: freebusy_UpdateJournalResourceByIdResponse
+    inputTypeName: freebusy_UpdateJournalResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_journal_resource_by_id_response
@@ -679,7 +679,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateJournalResourceById
+    rootFieldName: freebusy_updateJournalResourceById
     rootFieldKind: Mutation
   description: Update any row on the 'journal_resource' collection using the 'id' key
 

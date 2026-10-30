@@ -12,8 +12,8 @@ definition:
       type: Date
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardDateOrTextsDate
-    inputTypeName: UpdateColumnVcardDateOrTextsDateInput
+    typeName: freebusy_UpdateColumnVcardDateOrTextsDate
+    inputTypeName: freebusy_UpdateColumnVcardDateOrTextsDateInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_date_or_texts_date
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardDateOrTextsDateTime
-    inputTypeName: UpdateColumnVcardDateOrTextsDateTimeInput
+    typeName: freebusy_UpdateColumnVcardDateOrTextsDateTime
+    inputTypeName: freebusy_UpdateColumnVcardDateOrTextsDateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_date_or_texts_date_time
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardDateOrTextsDateTimeZone
-    inputTypeName: UpdateColumnVcardDateOrTextsDateTimeZoneInput
+    typeName: freebusy_UpdateColumnVcardDateOrTextsDateTimeZone
+    inputTypeName: freebusy_UpdateColumnVcardDateOrTextsDateTimeZoneInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_date_or_texts_date_time_zone
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardDateOrTextsId
-    inputTypeName: UpdateColumnVcardDateOrTextsIdInput
+    typeName: freebusy_UpdateColumnVcardDateOrTextsId
+    inputTypeName: freebusy_UpdateColumnVcardDateOrTextsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_date_or_texts_id
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardDateOrTextsText
-    inputTypeName: UpdateColumnVcardDateOrTextsTextInput
+    typeName: freebusy_UpdateColumnVcardDateOrTextsText
+    inputTypeName: freebusy_UpdateColumnVcardDateOrTextsTextInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_date_or_texts_text
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardDateOrTextsValueCase
-    inputTypeName: UpdateColumnVcardDateOrTextsValueCaseInput
+    typeName: freebusy_UpdateColumnVcardDateOrTextsValueCase
+    inputTypeName: freebusy_UpdateColumnVcardDateOrTextsValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_date_or_texts_value_case
@@ -220,8 +220,8 @@ definition:
       type: UpdateColumnVcardDateOrTextsValueCase
       description: Update the 'value_case' column in the 'vcard_date_or_texts' collection.
   graphql:
-    typeName: UpdateVcardDateOrTextsByIdUpdateColumns
-    inputTypeName: UpdateVcardDateOrTextsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardDateOrTextsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardDateOrTextsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_date_or_texts_by_id_update_columns
@@ -275,8 +275,8 @@ definition:
       type: "[VcardDateOrTexts!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardDateOrTextsByIdResponse
-    inputTypeName: UpdateVcardDateOrTextsByIdResponseInput
+    typeName: freebusy_UpdateVcardDateOrTextsByIdResponse
+    inputTypeName: freebusy_UpdateVcardDateOrTextsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_date_or_texts_by_id_response
@@ -329,7 +329,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardDateOrTextsById
+    rootFieldName: freebusy_updateVcardDateOrTextsById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_date_or_texts' collection using the 'id' key
 

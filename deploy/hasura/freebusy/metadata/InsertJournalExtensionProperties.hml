@@ -18,8 +18,8 @@ definition:
     - name: values
       type: "[String_1]"
   graphql:
-    typeName: InsertJournalExtensionPropertiesObject
-    inputTypeName: InsertJournalExtensionPropertiesObjectInput
+    typeName: freebusy_InsertJournalExtensionPropertiesObject
+    inputTypeName: freebusy_InsertJournalExtensionPropertiesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_journal_extension_properties_object
@@ -69,8 +69,8 @@ definition:
       type: "[JournalExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertJournalExtensionPropertiesResponse
-    inputTypeName: InsertJournalExtensionPropertiesResponseInput
+    typeName: freebusy_InsertJournalExtensionPropertiesResponse
+    inputTypeName: freebusy_InsertJournalExtensionPropertiesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_journal_extension_properties_response
@@ -115,7 +115,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertJournalExtensionProperties
+    rootFieldName: freebusy_insertJournalExtensionProperties
     rootFieldKind: Mutation
   description: Insert into the journal_extension_properties table
 

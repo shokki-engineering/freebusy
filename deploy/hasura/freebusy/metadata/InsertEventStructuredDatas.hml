@@ -30,8 +30,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: InsertEventStructuredDatasObject
-    inputTypeName: InsertEventStructuredDatasObjectInput
+    typeName: freebusy_InsertEventStructuredDatasObject
+    inputTypeName: freebusy_InsertEventStructuredDatasObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_structured_datas_object
@@ -105,8 +105,8 @@ definition:
       type: "[EventStructuredDatas!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertEventStructuredDatasResponse
-    inputTypeName: InsertEventStructuredDatasResponseInput
+    typeName: freebusy_InsertEventStructuredDatasResponse
+    inputTypeName: freebusy_InsertEventStructuredDatasResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_structured_datas_response
@@ -150,7 +150,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertEventStructuredDatas
+    rootFieldName: freebusy_insertEventStructuredDatas
     rootFieldKind: Mutation
   description: Insert into the event_structured_datas table
 

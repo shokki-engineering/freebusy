@@ -15,8 +15,8 @@ definition:
       type: "[EventAttendees!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteEventAttendeesByIdResponse
-    inputTypeName: DeleteEventAttendeesByIdResponseInput
+    typeName: freebusy_DeleteEventAttendeesByIdResponse
+    inputTypeName: freebusy_DeleteEventAttendeesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_event_attendees_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteEventAttendeesById
+    rootFieldName: freebusy_deleteEventAttendeesById
     rootFieldKind: Mutation
   description: Delete any row on the 'event_attendees' collection using the 'id' key
 

@@ -40,8 +40,8 @@ definition:
     - name: webhookId
       type: String_1!
   graphql:
-    typeName: InsertWebhookDeliveriesObject
-    inputTypeName: InsertWebhookDeliveriesObjectInput
+    typeName: freebusy_InsertWebhookDeliveriesObject
+    inputTypeName: freebusy_InsertWebhookDeliveriesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_webhook_deliveries_object
@@ -135,8 +135,8 @@ definition:
       type: "[WebhookDeliveries!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertWebhookDeliveriesResponse
-    inputTypeName: InsertWebhookDeliveriesResponseInput
+    typeName: freebusy_InsertWebhookDeliveriesResponse
+    inputTypeName: freebusy_InsertWebhookDeliveriesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_webhook_deliveries_response
@@ -180,7 +180,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertWebhookDeliveries
+    rootFieldName: freebusy_insertWebhookDeliveries
     rootFieldKind: Mutation
   description: Insert into the webhook_deliveries table
 

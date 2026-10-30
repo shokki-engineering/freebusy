@@ -18,8 +18,8 @@ definition:
     - name: value
       type: String_1!
   graphql:
-    typeName: InsertVcardLanguagesObject
-    inputTypeName: InsertVcardLanguagesObjectInput
+    typeName: freebusy_InsertVcardLanguagesObject
+    inputTypeName: freebusy_InsertVcardLanguagesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_languages_object
@@ -69,8 +69,8 @@ definition:
       type: "[VcardLanguages!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertVcardLanguagesResponse
-    inputTypeName: InsertVcardLanguagesResponseInput
+    typeName: freebusy_InsertVcardLanguagesResponse
+    inputTypeName: freebusy_InsertVcardLanguagesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_languages_response
@@ -114,7 +114,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertVcardLanguages
+    rootFieldName: freebusy_insertVcardLanguages
     rootFieldKind: Mutation
   description: Insert into the vcard_languages table
 

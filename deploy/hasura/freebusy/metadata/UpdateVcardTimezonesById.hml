@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTimezonesContactId
-    inputTypeName: UpdateColumnVcardTimezonesContactIdInput
+    typeName: freebusy_UpdateColumnVcardTimezonesContactId
+    inputTypeName: freebusy_UpdateColumnVcardTimezonesContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_timezones_contact_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTimezonesId
-    inputTypeName: UpdateColumnVcardTimezonesIdInput
+    typeName: freebusy_UpdateColumnVcardTimezonesId
+    inputTypeName: freebusy_UpdateColumnVcardTimezonesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_timezones_id
@@ -76,8 +76,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTimezonesPref
-    inputTypeName: UpdateColumnVcardTimezonesPrefInput
+    typeName: freebusy_UpdateColumnVcardTimezonesPref
+    inputTypeName: freebusy_UpdateColumnVcardTimezonesPrefInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_timezones_pref
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTimezonesText
-    inputTypeName: UpdateColumnVcardTimezonesTextInput
+    typeName: freebusy_UpdateColumnVcardTimezonesText
+    inputTypeName: freebusy_UpdateColumnVcardTimezonesTextInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_timezones_text
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTimezonesTypes
-    inputTypeName: UpdateColumnVcardTimezonesTypesInput
+    typeName: freebusy_UpdateColumnVcardTimezonesTypes
+    inputTypeName: freebusy_UpdateColumnVcardTimezonesTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_timezones_types
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTimezonesUri
-    inputTypeName: UpdateColumnVcardTimezonesUriInput
+    typeName: freebusy_UpdateColumnVcardTimezonesUri
+    inputTypeName: freebusy_UpdateColumnVcardTimezonesUriInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_timezones_uri
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTimezonesUtcOffset
-    inputTypeName: UpdateColumnVcardTimezonesUtcOffsetInput
+    typeName: freebusy_UpdateColumnVcardTimezonesUtcOffset
+    inputTypeName: freebusy_UpdateColumnVcardTimezonesUtcOffsetInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_timezones_utc_offset
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTimezonesValueCase
-    inputTypeName: UpdateColumnVcardTimezonesValueCaseInput
+    typeName: freebusy_UpdateColumnVcardTimezonesValueCase
+    inputTypeName: freebusy_UpdateColumnVcardTimezonesValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_timezones_value_case
@@ -289,8 +289,8 @@ definition:
       type: UpdateColumnVcardTimezonesValueCase
       description: Update the 'value_case' column in the 'vcard_timezones' collection.
   graphql:
-    typeName: UpdateVcardTimezonesByIdUpdateColumns
-    inputTypeName: UpdateVcardTimezonesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardTimezonesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardTimezonesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_timezones_by_id_update_columns
@@ -352,8 +352,8 @@ definition:
       type: "[VcardTimezones!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardTimezonesByIdResponse
-    inputTypeName: UpdateVcardTimezonesByIdResponseInput
+    typeName: freebusy_UpdateVcardTimezonesByIdResponse
+    inputTypeName: freebusy_UpdateVcardTimezonesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_timezones_by_id_response
@@ -406,7 +406,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardTimezonesById
+    rootFieldName: freebusy_updateVcardTimezonesById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_timezones' collection using the 'id' key
 

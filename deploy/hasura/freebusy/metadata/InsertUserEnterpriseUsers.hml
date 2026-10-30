@@ -22,8 +22,8 @@ definition:
     - name: organization
       type: String_1
   graphql:
-    typeName: InsertUserEnterpriseUsersObject
-    inputTypeName: InsertUserEnterpriseUsersObjectInput
+    typeName: freebusy_InsertUserEnterpriseUsersObject
+    inputTypeName: freebusy_InsertUserEnterpriseUsersObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_user_enterprise_users_object
@@ -81,8 +81,8 @@ definition:
       type: "[UserEnterpriseUsers!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertUserEnterpriseUsersResponse
-    inputTypeName: InsertUserEnterpriseUsersResponseInput
+    typeName: freebusy_InsertUserEnterpriseUsersResponse
+    inputTypeName: freebusy_InsertUserEnterpriseUsersResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_user_enterprise_users_response
@@ -126,7 +126,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertUserEnterpriseUsers
+    rootFieldName: freebusy_insertUserEnterpriseUsers
     rootFieldKind: Mutation
   description: Insert into the user_enterprise_users table
 

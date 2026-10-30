@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardGrammaticalGendersContactId
-    inputTypeName: UpdateColumnVcardGrammaticalGendersContactIdInput
+    typeName: freebusy_UpdateColumnVcardGrammaticalGendersContactId
+    inputTypeName: freebusy_UpdateColumnVcardGrammaticalGendersContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_grammatical_genders_contact_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardGrammaticalGendersId
-    inputTypeName: UpdateColumnVcardGrammaticalGendersIdInput
+    typeName: freebusy_UpdateColumnVcardGrammaticalGendersId
+    inputTypeName: freebusy_UpdateColumnVcardGrammaticalGendersIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_grammatical_genders_id
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardGrammaticalGendersKind
-    inputTypeName: UpdateColumnVcardGrammaticalGendersKindInput
+    typeName: freebusy_UpdateColumnVcardGrammaticalGendersKind
+    inputTypeName: freebusy_UpdateColumnVcardGrammaticalGendersKindInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_grammatical_genders_kind
@@ -109,8 +109,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardGrammaticalGendersLanguageCode
-    inputTypeName: UpdateColumnVcardGrammaticalGendersLanguageCodeInput
+    typeName: freebusy_UpdateColumnVcardGrammaticalGendersLanguageCode
+    inputTypeName: freebusy_UpdateColumnVcardGrammaticalGendersLanguageCodeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_grammatical_genders_language_code
@@ -152,8 +152,8 @@ definition:
       description: Update the 'language_code' column in the
         'vcard_grammatical_genders' collection.
   graphql:
-    typeName: UpdateVcardGrammaticalGendersByIdUpdateColumns
-    inputTypeName: UpdateVcardGrammaticalGendersByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardGrammaticalGendersByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardGrammaticalGendersByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_grammatical_genders_by_id_update_columns
@@ -199,8 +199,8 @@ definition:
       type: "[VcardGrammaticalGenders!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardGrammaticalGendersByIdResponse
-    inputTypeName: UpdateVcardGrammaticalGendersByIdResponseInput
+    typeName: freebusy_UpdateVcardGrammaticalGendersByIdResponse
+    inputTypeName: freebusy_UpdateVcardGrammaticalGendersByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_grammatical_genders_by_id_response
@@ -253,7 +253,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardGrammaticalGendersById
+    rootFieldName: freebusy_updateVcardGrammaticalGendersById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_grammatical_genders' collection using
     the 'id' key

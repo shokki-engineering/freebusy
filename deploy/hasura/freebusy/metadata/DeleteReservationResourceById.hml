@@ -15,8 +15,8 @@ definition:
       type: "[ReservationResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteReservationResourceByIdResponse
-    inputTypeName: DeleteReservationResourceByIdResponseInput
+    typeName: freebusy_DeleteReservationResourceByIdResponse
+    inputTypeName: freebusy_DeleteReservationResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_reservation_resource_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteReservationResourceById
+    rootFieldName: freebusy_deleteReservationResourceById
     rootFieldKind: Mutation
   description: Delete any row on the 'reservation_resource' collection using the 'id' key
 

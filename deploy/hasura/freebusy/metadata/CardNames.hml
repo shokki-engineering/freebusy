@@ -22,8 +22,8 @@ definition:
     - name: sortAs
       type: Json
   graphql:
-    typeName: CardNames
-    inputTypeName: CardNamesInput
+    typeName: freebusy_CardNames
+    inputTypeName: freebusy_CardNamesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: card_names
@@ -96,7 +96,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: CardNamesBoolExp
+    typeName: freebusy_CardNamesBoolExp
 
 ---
 kind: AggregateExpression
@@ -125,7 +125,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: CardNamesAggExp
+    selectTypeName: freebusy_CardNamesAggExp
 
 ---
 kind: OrderByExpression
@@ -152,7 +152,7 @@ definition:
           orderByExpression: JsonOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: CardNamesOrderByExp
+    expressionTypeName: freebusy_CardNamesOrderByExp
 
 ---
 kind: Model
@@ -168,20 +168,20 @@ definition:
   orderByExpression: CardNamesOrderByExp
   graphql:
     selectMany:
-      queryRootField: cardNames
+      queryRootField: freebusy_cardNames
       subscription:
-        rootField: cardNames
+        rootField: freebusy_cardNames
     selectUniques:
-      - queryRootField: cardNamesById
+      - queryRootField: freebusy_cardNamesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: cardNamesById
-    filterInputTypeName: CardNamesFilterInput
+          rootField: freebusy_cardNamesById
+    filterInputTypeName: freebusy_CardNamesFilterInput
     aggregate:
-      queryRootField: cardNamesAggregate
+      queryRootField: freebusy_cardNamesAggregate
       subscription:
-        rootField: cardNamesAggregate
+        rootField: freebusy_cardNamesAggregate
 
 ---
 kind: ModelPermissions

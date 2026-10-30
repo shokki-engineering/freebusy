@@ -28,8 +28,8 @@ definition:
     - name: xmlReference
       type: String_1
   graphql:
-    typeName: EventLinks
-    inputTypeName: EventLinksInput
+    typeName: freebusy_EventLinks
+    inputTypeName: freebusy_EventLinksInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: event_links
@@ -120,7 +120,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: EventLinksBoolExp
+    typeName: freebusy_EventLinksBoolExp
 
 ---
 kind: AggregateExpression
@@ -155,7 +155,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: EventLinksAggExp
+    selectTypeName: freebusy_EventLinksAggExp
 
 ---
 kind: OrderByExpression
@@ -188,7 +188,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: EventLinksOrderByExp
+    expressionTypeName: freebusy_EventLinksOrderByExp
 
 ---
 kind: Model
@@ -204,20 +204,20 @@ definition:
   orderByExpression: EventLinksOrderByExp
   graphql:
     selectMany:
-      queryRootField: eventLinks
+      queryRootField: freebusy_eventLinks
       subscription:
-        rootField: eventLinks
+        rootField: freebusy_eventLinks
     selectUniques:
-      - queryRootField: eventLinksById
+      - queryRootField: freebusy_eventLinksById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: eventLinksById
-    filterInputTypeName: EventLinksFilterInput
+          rootField: freebusy_eventLinksById
+    filterInputTypeName: freebusy_EventLinksFilterInput
     aggregate:
-      queryRootField: eventLinksAggregate
+      queryRootField: freebusy_eventLinksAggregate
       subscription:
-        rootField: eventLinksAggregate
+        rootField: freebusy_eventLinksAggregate
 
 ---
 kind: ModelPermissions

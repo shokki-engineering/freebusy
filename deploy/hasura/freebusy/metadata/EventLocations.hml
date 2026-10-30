@@ -24,8 +24,8 @@ definition:
     - name: position
       type: String_1
   graphql:
-    typeName: EventLocations
-    inputTypeName: EventLocationsInput
+    typeName: freebusy_EventLocations
+    inputTypeName: freebusy_EventLocationsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: event_locations
@@ -102,7 +102,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: EventLocationsBoolExp
+    typeName: freebusy_EventLocationsBoolExp
 
 ---
 kind: AggregateExpression
@@ -131,7 +131,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: EventLocationsAggExp
+    selectTypeName: freebusy_EventLocationsAggExp
 
 ---
 kind: OrderByExpression
@@ -158,7 +158,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: EventLocationsOrderByExp
+    expressionTypeName: freebusy_EventLocationsOrderByExp
 
 ---
 kind: Model
@@ -174,20 +174,20 @@ definition:
   orderByExpression: EventLocationsOrderByExp
   graphql:
     selectMany:
-      queryRootField: eventLocations
+      queryRootField: freebusy_eventLocations
       subscription:
-        rootField: eventLocations
+        rootField: freebusy_eventLocations
     selectUniques:
-      - queryRootField: eventLocationsById
+      - queryRootField: freebusy_eventLocationsById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: eventLocationsById
-    filterInputTypeName: EventLocationsFilterInput
+          rootField: freebusy_eventLocationsById
+    filterInputTypeName: freebusy_EventLocationsFilterInput
     aggregate:
-      queryRootField: eventLocationsAggregate
+      queryRootField: freebusy_eventLocationsAggregate
       subscription:
-        rootField: eventLocationsAggregate
+        rootField: freebusy_eventLocationsAggregate
 
 ---
 kind: ModelPermissions

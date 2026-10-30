@@ -15,8 +15,8 @@ definition:
       type: "[CalendarExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteCalendarExtensionPropertiesByIdResponse
-    inputTypeName: DeleteCalendarExtensionPropertiesByIdResponseInput
+    typeName: freebusy_DeleteCalendarExtensionPropertiesByIdResponse
+    inputTypeName: freebusy_DeleteCalendarExtensionPropertiesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_calendar_extension_properties_by_id_response
@@ -61,7 +61,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteCalendarExtensionPropertiesById
+    rootFieldName: freebusy_deleteCalendarExtensionPropertiesById
     rootFieldKind: Mutation
   description: Delete any row on the 'calendar_extension_properties' collection
     using the 'id' key

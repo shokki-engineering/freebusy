@@ -34,6 +34,24 @@
 - Run api-linter on proto changes. The only rule that may be disabled is
   `core::0215::foreign-type-reference`; fix every other finding.
 
+## Shared Postgres and Hasura
+
+- freebusy and aperio share one local Postgres and one Hasura DDN engine.
+  Postgres is aperio's dev server (127.0.0.1:5433), with a database per app:
+  `freebusydb` and `aperio`.
+- aperio owns the supergraph and runs the engine (127.0.0.1:3280). freebusy
+  owns its subgraph (`deploy/hasura/freebusy`: metadata, connector) and its
+  `ddn` regeneration, and publishes it as the `freebusy-subgraph` image,
+  which aperio mounts through a Docker volume. Nothing here runs an engine
+  or refers to a path in aperio's repository.
+- Each subgraph prefixes its GraphQL names (`graphqlRootFieldPrefix` and
+  `graphqlTypeNamePrefix` in its `subgraph.yaml`): `freebusy_` here,
+  `aperio_` there. The two schemas share names. The prefixes go into
+  `tools/protobuf/buf/config/store.graphql.yaml` (`root_field_prefix`,
+  `type_name_prefix`), so freebusyql keeps its Go names and speaks the
+  prefixed ones.
+- Never start a second engine or Postgres for one app.
+
 ## Repository
 
 - Don't commit or stage. The owner reviews the working tree and commits.

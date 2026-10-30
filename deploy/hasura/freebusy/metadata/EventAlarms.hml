@@ -38,8 +38,8 @@ definition:
     - name: triggerTime
       type: Timestamptz
   graphql:
-    typeName: EventAlarms
-    inputTypeName: EventAlarmsInput
+    typeName: freebusy_EventAlarms
+    inputTypeName: freebusy_EventAlarmsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: event_alarms
@@ -160,7 +160,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: EventAlarmsBoolExp
+    typeName: freebusy_EventAlarmsBoolExp
 
 ---
 kind: AggregateExpression
@@ -205,7 +205,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: EventAlarmsAggExp
+    selectTypeName: freebusy_EventAlarmsAggExp
 
 ---
 kind: OrderByExpression
@@ -248,7 +248,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: EventAlarmsOrderByExp
+    expressionTypeName: freebusy_EventAlarmsOrderByExp
 
 ---
 kind: Model
@@ -264,20 +264,20 @@ definition:
   orderByExpression: EventAlarmsOrderByExp
   graphql:
     selectMany:
-      queryRootField: eventAlarms
+      queryRootField: freebusy_eventAlarms
       subscription:
-        rootField: eventAlarms
+        rootField: freebusy_eventAlarms
     selectUniques:
-      - queryRootField: eventAlarmsById
+      - queryRootField: freebusy_eventAlarmsById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: eventAlarmsById
-    filterInputTypeName: EventAlarmsFilterInput
+          rootField: freebusy_eventAlarmsById
+    filterInputTypeName: freebusy_EventAlarmsFilterInput
     aggregate:
-      queryRootField: eventAlarmsAggregate
+      queryRootField: freebusy_eventAlarmsAggregate
       subscription:
-        rootField: eventAlarmsAggregate
+        rootField: freebusy_eventAlarmsAggregate
 
 ---
 kind: ModelPermissions

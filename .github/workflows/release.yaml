@@ -7,6 +7,7 @@
 #   ghcr.io/shokki-engineering/freebusy-migrations  atlas and deploy/migrations/
 #   ghcr.io/shokki-engineering/freebusy-engine      the Hasura engine, committed build
 #   ghcr.io/shokki-engineering/freebusy-connector   the Hasura Postgres connector
+#   ghcr.io/shokki-engineering/freebusy-subgraph    the DDN subgraph, for aperio's supergraph
 #   oci://ghcr.io/shokki-engineering/charts/freebusy  the Helm chart
 #
 # and a GitHub release whose notes are the tag's CHANGELOG.md section, with
@@ -95,12 +96,13 @@ jobs:
           bazel run //deploy/image:push_migrations -- "${tags[@]}"
 
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
-      - name: Hasura engine and connector images
+      - name: Hasura engine, connector and subgraph images
         run: |
-          for part in engine connector; do
+          for part in engine connector subgraph; do
             case $part in
               engine) ctx=deploy/hasura/engine; file=deploy/hasura/engine/Dockerfile.engine ;;
               connector) ctx=deploy/hasura/freebusy/connector/freebusy_pgsql; file=$ctx/.hasura-connector/Dockerfile.freebusy_pgsql ;;
+              subgraph) ctx=deploy/hasura/freebusy; file=deploy/hasura/Dockerfile.subgraph ;;
             esac
             tags=(-t "ghcr.io/shokki-engineering/freebusy-$part:$VERSION")
             if [ "$PRERELEASE" != true ]; then tags+=(-t "ghcr.io/shokki-engineering/freebusy-$part:latest"); fi
@@ -132,6 +134,7 @@ jobs:
             "ghcr.io/shokki-engineering/freebusy-migrations:$VERSION" \
             "ghcr.io/shokki-engineering/freebusy-engine:$VERSION" \
             "ghcr.io/shokki-engineering/freebusy-connector:$VERSION" \
+            "ghcr.io/shokki-engineering/freebusy-subgraph:$VERSION" \
             "ghcr.io/shokki-engineering/charts/freebusy:$VERSION"; do
             digest="$(crane digest "$ref")"
             cosign sign --yes --recursive "${ref%:*}@$digest"

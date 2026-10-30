@@ -28,8 +28,8 @@ definition:
     - name: titles
       type: "[String_1]"
   graphql:
-    typeName: VcardContacts
-    inputTypeName: VcardContactsInput
+    typeName: freebusy_VcardContacts
+    inputTypeName: freebusy_VcardContactsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: vcard_contacts
@@ -112,7 +112,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: VcardContactsBoolExp
+    typeName: freebusy_VcardContactsBoolExp
 
 ---
 kind: AggregateExpression
@@ -139,7 +139,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: VcardContactsAggExp
+    selectTypeName: freebusy_VcardContactsAggExp
 
 ---
 kind: OrderByExpression
@@ -164,7 +164,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: VcardContactsOrderByExp
+    expressionTypeName: freebusy_VcardContactsOrderByExp
 
 ---
 kind: Model
@@ -180,20 +180,20 @@ definition:
   orderByExpression: VcardContactsOrderByExp
   graphql:
     selectMany:
-      queryRootField: vcardContacts
+      queryRootField: freebusy_vcardContacts
       subscription:
-        rootField: vcardContacts
+        rootField: freebusy_vcardContacts
     selectUniques:
-      - queryRootField: vcardContactsById
+      - queryRootField: freebusy_vcardContactsById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: vcardContactsById
-    filterInputTypeName: VcardContactsFilterInput
+          rootField: freebusy_vcardContactsById
+    filterInputTypeName: freebusy_VcardContactsFilterInput
     aggregate:
-      queryRootField: vcardContactsAggregate
+      queryRootField: freebusy_vcardContactsAggregate
       subscription:
-        rootField: vcardContactsAggregate
+        rootField: freebusy_vcardContactsAggregate
 
 ---
 kind: ModelPermissions

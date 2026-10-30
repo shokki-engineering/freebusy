@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventExtensionPropertiesEventId
-    inputTypeName: UpdateColumnEventExtensionPropertiesEventIdInput
+    typeName: freebusy_UpdateColumnEventExtensionPropertiesEventId
+    inputTypeName: freebusy_UpdateColumnEventExtensionPropertiesEventIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_extension_properties_event_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventExtensionPropertiesId
-    inputTypeName: UpdateColumnEventExtensionPropertiesIdInput
+    typeName: freebusy_UpdateColumnEventExtensionPropertiesId
+    inputTypeName: freebusy_UpdateColumnEventExtensionPropertiesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_extension_properties_id
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventExtensionPropertiesKey
-    inputTypeName: UpdateColumnEventExtensionPropertiesKeyInput
+    typeName: freebusy_UpdateColumnEventExtensionPropertiesKey
+    inputTypeName: freebusy_UpdateColumnEventExtensionPropertiesKeyInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_extension_properties_key
@@ -108,8 +108,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventExtensionPropertiesParameters
-    inputTypeName: UpdateColumnEventExtensionPropertiesParametersInput
+    typeName: freebusy_UpdateColumnEventExtensionPropertiesParameters
+    inputTypeName: freebusy_UpdateColumnEventExtensionPropertiesParametersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_extension_properties_parameters
@@ -140,8 +140,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventExtensionPropertiesValues
-    inputTypeName: UpdateColumnEventExtensionPropertiesValuesInput
+    typeName: freebusy_UpdateColumnEventExtensionPropertiesValues
+    inputTypeName: freebusy_UpdateColumnEventExtensionPropertiesValuesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_extension_properties_values
@@ -187,8 +187,8 @@ definition:
       description: Update the 'values' column in the 'event_extension_properties'
         collection.
   graphql:
-    typeName: UpdateEventExtensionPropertiesByIdUpdateColumns
-    inputTypeName: UpdateEventExtensionPropertiesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateEventExtensionPropertiesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateEventExtensionPropertiesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_extension_properties_by_id_update_columns
@@ -238,8 +238,8 @@ definition:
       type: "[EventExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateEventExtensionPropertiesByIdResponse
-    inputTypeName: UpdateEventExtensionPropertiesByIdResponseInput
+    typeName: freebusy_UpdateEventExtensionPropertiesByIdResponse
+    inputTypeName: freebusy_UpdateEventExtensionPropertiesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_extension_properties_by_id_response
@@ -292,7 +292,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateEventExtensionPropertiesById
+    rootFieldName: freebusy_updateEventExtensionPropertiesById
     rootFieldKind: Mutation
   description: Update any row on the 'event_extension_properties' collection using
     the 'id' key

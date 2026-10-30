@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserManagersDisplayName
-    inputTypeName: UpdateColumnUserManagersDisplayNameInput
+    typeName: freebusy_UpdateColumnUserManagersDisplayName
+    inputTypeName: freebusy_UpdateColumnUserManagersDisplayNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_managers_display_name
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserManagersId
-    inputTypeName: UpdateColumnUserManagersIdInput
+    typeName: freebusy_UpdateColumnUserManagersId
+    inputTypeName: freebusy_UpdateColumnUserManagersIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_managers_id
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserManagersReferenceUri
-    inputTypeName: UpdateColumnUserManagersReferenceUriInput
+    typeName: freebusy_UpdateColumnUserManagersReferenceUri
+    inputTypeName: freebusy_UpdateColumnUserManagersReferenceUriInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_managers_reference_uri
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserManagersValue
-    inputTypeName: UpdateColumnUserManagersValueInput
+    typeName: freebusy_UpdateColumnUserManagersValue
+    inputTypeName: freebusy_UpdateColumnUserManagersValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_managers_value
@@ -149,8 +149,8 @@ definition:
       type: UpdateColumnUserManagersValue
       description: Update the 'value' column in the 'user_managers' collection.
   graphql:
-    typeName: UpdateUserManagersByIdUpdateColumns
-    inputTypeName: UpdateUserManagersByIdUpdateColumnsInput
+    typeName: freebusy_UpdateUserManagersByIdUpdateColumns
+    inputTypeName: freebusy_UpdateUserManagersByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_user_managers_by_id_update_columns
@@ -196,8 +196,8 @@ definition:
       type: "[UserManagers!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateUserManagersByIdResponse
-    inputTypeName: UpdateUserManagersByIdResponseInput
+    typeName: freebusy_UpdateUserManagersByIdResponse
+    inputTypeName: freebusy_UpdateUserManagersByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_user_managers_by_id_response
@@ -250,7 +250,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateUserManagersById
+    rootFieldName: freebusy_updateUserManagersById
     rootFieldKind: Mutation
   description: Update any row on the 'user_managers' collection using the 'id' key
 

@@ -20,8 +20,8 @@ definition:
     - name: value
       type: String_1!
   graphql:
-    typeName: VcardPronouns
-    inputTypeName: VcardPronounsInput
+    typeName: freebusy_VcardPronouns
+    inputTypeName: freebusy_VcardPronounsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: vcard_pronouns
@@ -88,7 +88,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: VcardPronounsBoolExp
+    typeName: freebusy_VcardPronounsBoolExp
 
 ---
 kind: AggregateExpression
@@ -115,7 +115,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: VcardPronounsAggExp
+    selectTypeName: freebusy_VcardPronounsAggExp
 
 ---
 kind: OrderByExpression
@@ -140,7 +140,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: VcardPronounsOrderByExp
+    expressionTypeName: freebusy_VcardPronounsOrderByExp
 
 ---
 kind: Model
@@ -156,20 +156,20 @@ definition:
   orderByExpression: VcardPronounsOrderByExp
   graphql:
     selectMany:
-      queryRootField: vcardPronouns
+      queryRootField: freebusy_vcardPronouns
       subscription:
-        rootField: vcardPronouns
+        rootField: freebusy_vcardPronouns
     selectUniques:
-      - queryRootField: vcardPronounsById
+      - queryRootField: freebusy_vcardPronounsById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: vcardPronounsById
-    filterInputTypeName: VcardPronounsFilterInput
+          rootField: freebusy_vcardPronounsById
+    filterInputTypeName: freebusy_VcardPronounsFilterInput
     aggregate:
-      queryRootField: vcardPronounsAggregate
+      queryRootField: freebusy_vcardPronounsAggregate
       subscription:
-        rootField: vcardPronounsAggregate
+        rootField: freebusy_vcardPronounsAggregate
 
 ---
 kind: ModelPermissions

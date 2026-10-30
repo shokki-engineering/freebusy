@@ -20,8 +20,8 @@ definition:
     - name: value
       type: String_1!
   graphql:
-    typeName: InsertVcardPronounsObject
-    inputTypeName: InsertVcardPronounsObjectInput
+    typeName: freebusy_InsertVcardPronounsObject
+    inputTypeName: freebusy_InsertVcardPronounsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_pronouns_object
@@ -75,8 +75,8 @@ definition:
       type: "[VcardPronouns!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertVcardPronounsResponse
-    inputTypeName: InsertVcardPronounsResponseInput
+    typeName: freebusy_InsertVcardPronounsResponse
+    inputTypeName: freebusy_InsertVcardPronounsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_pronouns_response
@@ -120,7 +120,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertVcardPronouns
+    rootFieldName: freebusy_insertVcardPronouns
     rootFieldKind: Mutation
   description: Insert into the vcard_pronouns table
 

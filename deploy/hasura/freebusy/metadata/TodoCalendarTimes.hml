@@ -18,8 +18,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: TodoCalendarTimes
-    inputTypeName: TodoCalendarTimesInput
+    typeName: freebusy_TodoCalendarTimes
+    inputTypeName: freebusy_TodoCalendarTimesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: todo_calendar_times
@@ -80,7 +80,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: TodoCalendarTimesBoolExp
+    typeName: freebusy_TodoCalendarTimesBoolExp
 
 ---
 kind: AggregateExpression
@@ -105,7 +105,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: TodoCalendarTimesAggExp
+    selectTypeName: freebusy_TodoCalendarTimesAggExp
 
 ---
 kind: OrderByExpression
@@ -128,7 +128,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: TodoCalendarTimesOrderByExp
+    expressionTypeName: freebusy_TodoCalendarTimesOrderByExp
 
 ---
 kind: Model
@@ -144,20 +144,20 @@ definition:
   orderByExpression: TodoCalendarTimesOrderByExp
   graphql:
     selectMany:
-      queryRootField: todoCalendarTimes
+      queryRootField: freebusy_todoCalendarTimes
       subscription:
-        rootField: todoCalendarTimes
+        rootField: freebusy_todoCalendarTimes
     selectUniques:
-      - queryRootField: todoCalendarTimesById
+      - queryRootField: freebusy_todoCalendarTimesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: todoCalendarTimesById
-    filterInputTypeName: TodoCalendarTimesFilterInput
+          rootField: freebusy_todoCalendarTimesById
+    filterInputTypeName: freebusy_TodoCalendarTimesFilterInput
     aggregate:
-      queryRootField: todoCalendarTimesAggregate
+      queryRootField: freebusy_todoCalendarTimesAggregate
       subscription:
-        rootField: todoCalendarTimesAggregate
+        rootField: freebusy_todoCalendarTimesAggregate
 
 ---
 kind: ModelPermissions

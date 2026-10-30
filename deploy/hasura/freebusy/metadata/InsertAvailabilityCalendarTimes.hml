@@ -18,8 +18,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: InsertAvailabilityCalendarTimesObject
-    inputTypeName: InsertAvailabilityCalendarTimesObjectInput
+    typeName: freebusy_InsertAvailabilityCalendarTimesObject
+    inputTypeName: freebusy_InsertAvailabilityCalendarTimesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_availability_calendar_times_object
@@ -69,8 +69,8 @@ definition:
       type: "[AvailabilityCalendarTimes!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertAvailabilityCalendarTimesResponse
-    inputTypeName: InsertAvailabilityCalendarTimesResponseInput
+    typeName: freebusy_InsertAvailabilityCalendarTimesResponse
+    inputTypeName: freebusy_InsertAvailabilityCalendarTimesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_availability_calendar_times_response
@@ -115,7 +115,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertAvailabilityCalendarTimes
+    rootFieldName: freebusy_insertAvailabilityCalendarTimes
     rootFieldKind: Mutation
   description: Insert into the availability_calendar_times table
 

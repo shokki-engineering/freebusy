@@ -40,8 +40,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: InsertStreamRecordsObject
-    inputTypeName: InsertStreamRecordsObjectInput
+    typeName: freebusy_InsertStreamRecordsObject
+    inputTypeName: freebusy_InsertStreamRecordsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_stream_records_object
@@ -135,8 +135,8 @@ definition:
       type: "[StreamRecords!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertStreamRecordsResponse
-    inputTypeName: InsertStreamRecordsResponseInput
+    typeName: freebusy_InsertStreamRecordsResponse
+    inputTypeName: freebusy_InsertStreamRecordsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_stream_records_response
@@ -180,7 +180,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertStreamRecords
+    rootFieldName: freebusy_insertStreamRecords
     rootFieldKind: Mutation
   description: Insert into the stream_records table
 

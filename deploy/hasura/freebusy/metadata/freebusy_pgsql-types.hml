@@ -7,7 +7,7 @@ version: v1
 definition:
   name: String_1
   graphql:
-    typeName: String1
+    typeName: freebusy_String1
 
 ---
 kind: BooleanExpressionType
@@ -61,7 +61,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: TextBoolExp
+    typeName: freebusy_TextBoolExp
 
 ---
 kind: DataConnectorScalarRepresentation
@@ -71,7 +71,7 @@ definition:
   dataConnectorScalarType: text
   representation: String_1
   graphql:
-    comparisonExpressionTypeName: String1ComparisonExp
+    comparisonExpressionTypeName: freebusy_String1ComparisonExp
 
 ---
 kind: ScalarType
@@ -79,7 +79,7 @@ version: v1
 definition:
   name: Timestamptz
   graphql:
-    typeName: Timestamptz
+    typeName: freebusy_Timestamptz
 
 ---
 kind: BooleanExpressionType
@@ -113,7 +113,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: TimestamptzBoolExp
+    typeName: freebusy_TimestamptzBoolExp
 
 ---
 kind: DataConnectorScalarRepresentation
@@ -123,7 +123,7 @@ definition:
   dataConnectorScalarType: timestamptz
   representation: Timestamptz
   graphql:
-    comparisonExpressionTypeName: TimestamptzComparisonExp
+    comparisonExpressionTypeName: freebusy_TimestamptzComparisonExp
 
 ---
 kind: ScalarType
@@ -131,7 +131,7 @@ version: v1
 definition:
   name: Int32
   graphql:
-    typeName: Int32
+    typeName: freebusy_Int32
 
 ---
 kind: BooleanExpressionType
@@ -165,7 +165,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: Int4BoolExp
+    typeName: freebusy_Int4BoolExp
 
 ---
 kind: DataConnectorScalarRepresentation
@@ -175,7 +175,7 @@ definition:
   dataConnectorScalarType: int4
   representation: Int32
   graphql:
-    comparisonExpressionTypeName: Int32ComparisonExp
+    comparisonExpressionTypeName: freebusy_Int32ComparisonExp
 
 ---
 kind: ScalarType
@@ -183,7 +183,7 @@ version: v1
 definition:
   name: Int64
   graphql:
-    typeName: Int64
+    typeName: freebusy_Int64
 
 ---
 kind: BooleanExpressionType
@@ -217,7 +217,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: Int8BoolExp
+    typeName: freebusy_Int8BoolExp
 
 ---
 kind: DataConnectorScalarRepresentation
@@ -227,7 +227,7 @@ definition:
   dataConnectorScalarType: int8
   representation: Int64
   graphql:
-    comparisonExpressionTypeName: Int64ComparisonExp
+    comparisonExpressionTypeName: freebusy_Int64ComparisonExp
 
 ---
 kind: AggregateExpression
@@ -257,7 +257,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: TextAggExp
+    selectTypeName: freebusy_TextAggExp
 
 ---
 kind: AggregateExpression
@@ -287,7 +287,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: TimestamptzAggExp
+    selectTypeName: freebusy_TimestamptzAggExp
 
 ---
 kind: ScalarType
@@ -295,7 +295,7 @@ version: v1
 definition:
   name: Bigdecimal
   graphql:
-    typeName: Bigdecimal
+    typeName: freebusy_Bigdecimal
 
 ---
 kind: BooleanExpressionType
@@ -329,7 +329,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: NumericBoolExp
+    typeName: freebusy_NumericBoolExp
 
 ---
 kind: DataConnectorScalarRepresentation
@@ -339,7 +339,7 @@ definition:
   dataConnectorScalarType: numeric
   representation: Bigdecimal
   graphql:
-    comparisonExpressionTypeName: BigdecimalComparisonExp
+    comparisonExpressionTypeName: freebusy_BigdecimalComparisonExp
 
 ---
 kind: AggregateExpression
@@ -413,7 +413,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: Int4AggExp
+    selectTypeName: freebusy_Int4AggExp
 
 ---
 kind: OrderByExpression
@@ -426,7 +426,7 @@ definition:
       enableOrderByDirections:
         enableAll: true
   graphql:
-    expressionTypeName: String1OrderByExp
+    expressionTypeName: freebusy_String1OrderByExp
 
 ---
 kind: OrderByExpression
@@ -439,7 +439,7 @@ definition:
       enableOrderByDirections:
         enableAll: true
   graphql:
-    expressionTypeName: TimestamptzOrderByExp
+    expressionTypeName: freebusy_TimestamptzOrderByExp
 
 ---
 kind: OrderByExpression
@@ -452,7 +452,7 @@ definition:
       enableOrderByDirections:
         enableAll: true
   graphql:
-    expressionTypeName: Int32OrderByExp
+    expressionTypeName: freebusy_Int32OrderByExp
 
 ---
 kind: ScalarType
@@ -460,7 +460,7 @@ version: v1
 definition:
   name: Json
   graphql:
-    typeName: Json
+    typeName: freebusy_Json
 
 ---
 kind: BooleanExpressionType
@@ -500,7 +500,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: JsonbBoolExp
+    typeName: freebusy_JsonbBoolExp
 
 ---
 kind: DataConnectorScalarRepresentation
@@ -510,7 +510,7 @@ definition:
   dataConnectorScalarType: jsonb
   representation: Json
   graphql:
-    comparisonExpressionTypeName: JsonComparisonExp
+    comparisonExpressionTypeName: freebusy_JsonComparisonExp
 
 ---
 kind: ScalarType
@@ -518,7 +518,7 @@ version: v1
 definition:
   name: Date
   graphql:
-    typeName: Date
+    typeName: freebusy_Date
 
 ---
 kind: BooleanExpressionType
@@ -552,7 +552,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: DateBoolExp
+    typeName: freebusy_DateBoolExp
 
 ---
 kind: DataConnectorScalarRepresentation
@@ -562,7 +562,7 @@ definition:
   dataConnectorScalarType: date
   representation: Date
   graphql:
-    comparisonExpressionTypeName: DateComparisonExp
+    comparisonExpressionTypeName: freebusy_DateComparisonExp
 
 ---
 kind: BooleanExpressionType
@@ -584,7 +584,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: TstzmultirangeBoolExp
+    typeName: freebusy_TstzmultirangeBoolExp
 
 ---
 kind: DataConnectorScalarRepresentation
@@ -594,7 +594,7 @@ definition:
   dataConnectorScalarType: tstzmultirange
   representation: Json
   graphql:
-    comparisonExpressionTypeName: JsonComparisonExp_1
+    comparisonExpressionTypeName: freebusy_JsonComparisonExp_1
 
 ---
 kind: ScalarType
@@ -602,7 +602,7 @@ version: v1
 definition:
   name: Float64
   graphql:
-    typeName: Float64
+    typeName: freebusy_Float64
 
 ---
 kind: BooleanExpressionType
@@ -636,7 +636,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: Float8BoolExp
+    typeName: freebusy_Float8BoolExp
 
 ---
 kind: DataConnectorScalarRepresentation
@@ -646,7 +646,7 @@ definition:
   dataConnectorScalarType: float8
   representation: Float64
   graphql:
-    comparisonExpressionTypeName: Float64ComparisonExp
+    comparisonExpressionTypeName: freebusy_Float64ComparisonExp
 
 ---
 kind: AggregateExpression
@@ -668,7 +668,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: JsonbAggExp
+    selectTypeName: freebusy_JsonbAggExp
 
 ---
 kind: AggregateExpression
@@ -698,7 +698,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: DateAggExp
+    selectTypeName: freebusy_DateAggExp
 
 ---
 kind: AggregateExpression
@@ -720,7 +720,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: TstzmultirangeAggExp
+    selectTypeName: freebusy_TstzmultirangeAggExp
 
 ---
 kind: AggregateExpression
@@ -782,7 +782,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: Float8AggExp
+    selectTypeName: freebusy_Float8AggExp
 
 ---
 kind: AggregateExpression
@@ -856,7 +856,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: Int8AggExp
+    selectTypeName: freebusy_Int8AggExp
 
 ---
 kind: OrderByExpression
@@ -869,7 +869,7 @@ definition:
       enableOrderByDirections:
         enableAll: true
   graphql:
-    expressionTypeName: JsonOrderByExp
+    expressionTypeName: freebusy_JsonOrderByExp
 
 ---
 kind: OrderByExpression
@@ -882,7 +882,7 @@ definition:
       enableOrderByDirections:
         enableAll: true
   graphql:
-    expressionTypeName: DateOrderByExp
+    expressionTypeName: freebusy_DateOrderByExp
 
 ---
 kind: OrderByExpression
@@ -895,7 +895,7 @@ definition:
       enableOrderByDirections:
         enableAll: true
   graphql:
-    expressionTypeName: Float64OrderByExp
+    expressionTypeName: freebusy_Float64OrderByExp
 
 ---
 kind: OrderByExpression
@@ -908,7 +908,7 @@ definition:
       enableOrderByDirections:
         enableAll: true
   graphql:
-    expressionTypeName: Int64OrderByExp
+    expressionTypeName: freebusy_Int64OrderByExp
 
 ---
 kind: ScalarType
@@ -916,7 +916,7 @@ version: v1
 definition:
   name: Boolean_1
   graphql:
-    typeName: Boolean1
+    typeName: freebusy_Boolean1
 
 ---
 kind: BooleanExpressionType
@@ -950,7 +950,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: BoolBoolExp
+    typeName: freebusy_BoolBoolExp
 
 ---
 kind: DataConnectorScalarRepresentation
@@ -960,7 +960,7 @@ definition:
   dataConnectorScalarType: bool
   representation: Boolean_1
   graphql:
-    comparisonExpressionTypeName: Boolean1ComparisonExp
+    comparisonExpressionTypeName: freebusy_Boolean1ComparisonExp
 
 ---
 kind: AggregateExpression
@@ -994,7 +994,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: BoolAggExp
+    selectTypeName: freebusy_BoolAggExp
 
 ---
 kind: OrderByExpression
@@ -1007,7 +1007,7 @@ definition:
       enableOrderByDirections:
         enableAll: true
   graphql:
-    expressionTypeName: Boolean1OrderByExp
+    expressionTypeName: freebusy_Boolean1OrderByExp
 
 ---
 kind: BooleanExpressionType
@@ -1045,7 +1045,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: ByteaBoolExp
+    typeName: freebusy_ByteaBoolExp
 
 ---
 kind: DataConnectorScalarRepresentation
@@ -1055,7 +1055,7 @@ definition:
   dataConnectorScalarType: bytea
   representation: Json
   graphql:
-    comparisonExpressionTypeName: JsonComparisonExp_2
+    comparisonExpressionTypeName: freebusy_JsonComparisonExp_2
 
 ---
 kind: AggregateExpression
@@ -1085,5 +1085,5 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: ByteaAggExp
+    selectTypeName: freebusy_ByteaAggExp
 

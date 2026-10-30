@@ -13,8 +13,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarExtensionPropertiesCalendarId
-    inputTypeName: UpdateColumnCalendarExtensionPropertiesCalendarIdInput
+    typeName: freebusy_UpdateColumnCalendarExtensionPropertiesCalendarId
+    inputTypeName: freebusy_UpdateColumnCalendarExtensionPropertiesCalendarIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_extension_properties_calendar_id
@@ -45,8 +45,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarExtensionPropertiesId
-    inputTypeName: UpdateColumnCalendarExtensionPropertiesIdInput
+    typeName: freebusy_UpdateColumnCalendarExtensionPropertiesId
+    inputTypeName: freebusy_UpdateColumnCalendarExtensionPropertiesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_extension_properties_id
@@ -77,8 +77,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarExtensionPropertiesKey
-    inputTypeName: UpdateColumnCalendarExtensionPropertiesKeyInput
+    typeName: freebusy_UpdateColumnCalendarExtensionPropertiesKey
+    inputTypeName: freebusy_UpdateColumnCalendarExtensionPropertiesKeyInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_extension_properties_key
@@ -110,8 +110,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarExtensionPropertiesParameters
-    inputTypeName: UpdateColumnCalendarExtensionPropertiesParametersInput
+    typeName: freebusy_UpdateColumnCalendarExtensionPropertiesParameters
+    inputTypeName: freebusy_UpdateColumnCalendarExtensionPropertiesParametersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_extension_properties_parameters
@@ -142,8 +142,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCalendarExtensionPropertiesValues
-    inputTypeName: UpdateColumnCalendarExtensionPropertiesValuesInput
+    typeName: freebusy_UpdateColumnCalendarExtensionPropertiesValues
+    inputTypeName: freebusy_UpdateColumnCalendarExtensionPropertiesValuesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_calendar_extension_properties_values
@@ -190,8 +190,8 @@ definition:
       description: Update the 'values' column in the 'calendar_extension_properties'
         collection.
   graphql:
-    typeName: UpdateCalendarExtensionPropertiesByIdUpdateColumns
-    inputTypeName: UpdateCalendarExtensionPropertiesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateCalendarExtensionPropertiesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateCalendarExtensionPropertiesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_calendar_extension_properties_by_id_update_columns
@@ -241,8 +241,8 @@ definition:
       type: "[CalendarExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateCalendarExtensionPropertiesByIdResponse
-    inputTypeName: UpdateCalendarExtensionPropertiesByIdResponseInput
+    typeName: freebusy_UpdateCalendarExtensionPropertiesByIdResponse
+    inputTypeName: freebusy_UpdateCalendarExtensionPropertiesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_calendar_extension_properties_by_id_response
@@ -295,7 +295,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateCalendarExtensionPropertiesById
+    rootFieldName: freebusy_updateCalendarExtensionPropertiesById
     rootFieldKind: Mutation
   description: Update any row on the 'calendar_extension_properties' collection
     using the 'id' key

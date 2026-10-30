@@ -28,8 +28,8 @@ definition:
     - name: rowVersion
       type: Int64!
   graphql:
-    typeName: AllocationResourceDays
-    inputTypeName: AllocationResourceDaysInput
+    typeName: freebusy_AllocationResourceDays
+    inputTypeName: freebusy_AllocationResourceDaysInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: allocation_resource_days
@@ -118,7 +118,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: AllocationResourceDaysBoolExp
+    typeName: freebusy_AllocationResourceDaysBoolExp
 
 ---
 kind: AggregateExpression
@@ -151,7 +151,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: AllocationResourceDaysAggExp
+    selectTypeName: freebusy_AllocationResourceDaysAggExp
 
 ---
 kind: OrderByExpression
@@ -182,7 +182,7 @@ definition:
           orderByExpression: Int64OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: AllocationResourceDaysOrderByExp
+    expressionTypeName: freebusy_AllocationResourceDaysOrderByExp
 
 ---
 kind: Model
@@ -198,20 +198,20 @@ definition:
   orderByExpression: AllocationResourceDaysOrderByExp
   graphql:
     selectMany:
-      queryRootField: allocationResourceDays
+      queryRootField: freebusy_allocationResourceDays
       subscription:
-        rootField: allocationResourceDays
+        rootField: freebusy_allocationResourceDays
     selectUniques:
-      - queryRootField: allocationResourceDaysById
+      - queryRootField: freebusy_allocationResourceDaysById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: allocationResourceDaysById
-    filterInputTypeName: AllocationResourceDaysFilterInput
+          rootField: freebusy_allocationResourceDaysById
+    filterInputTypeName: freebusy_AllocationResourceDaysFilterInput
     aggregate:
-      queryRootField: allocationResourceDaysAggregate
+      queryRootField: freebusy_allocationResourceDaysAggregate
       subscription:
-        rootField: allocationResourceDaysAggregate
+        rootField: freebusy_allocationResourceDaysAggregate
 
 ---
 kind: ModelPermissions

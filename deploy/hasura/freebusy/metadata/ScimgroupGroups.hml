@@ -28,8 +28,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: ScimgroupGroups
-    inputTypeName: ScimgroupGroupsInput
+    typeName: freebusy_ScimgroupGroups
+    inputTypeName: freebusy_ScimgroupGroupsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: scimgroup_groups
@@ -120,7 +120,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: ScimgroupGroupsBoolExp
+    typeName: freebusy_ScimgroupGroupsBoolExp
 
 ---
 kind: AggregateExpression
@@ -155,7 +155,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: ScimgroupGroupsAggExp
+    selectTypeName: freebusy_ScimgroupGroupsAggExp
 
 ---
 kind: OrderByExpression
@@ -188,7 +188,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: ScimgroupGroupsOrderByExp
+    expressionTypeName: freebusy_ScimgroupGroupsOrderByExp
 
 ---
 kind: Model
@@ -204,20 +204,20 @@ definition:
   orderByExpression: ScimgroupGroupsOrderByExp
   graphql:
     selectMany:
-      queryRootField: scimgroupGroups
+      queryRootField: freebusy_scimgroupGroups
       subscription:
-        rootField: scimgroupGroups
+        rootField: freebusy_scimgroupGroups
     selectUniques:
-      - queryRootField: scimgroupGroupsById
+      - queryRootField: freebusy_scimgroupGroupsById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: scimgroupGroupsById
-    filterInputTypeName: ScimgroupGroupsFilterInput
+          rootField: freebusy_scimgroupGroupsById
+    filterInputTypeName: freebusy_ScimgroupGroupsFilterInput
     aggregate:
-      queryRootField: scimgroupGroupsAggregate
+      queryRootField: freebusy_scimgroupGroupsAggregate
       subscription:
-        rootField: scimgroupGroupsAggregate
+        rootField: freebusy_scimgroupGroupsAggregate
 
 ---
 kind: ModelPermissions

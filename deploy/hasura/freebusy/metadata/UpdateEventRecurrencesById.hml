@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesBoundCase
-    inputTypeName: UpdateColumnEventRecurrencesBoundCaseInput
+    typeName: freebusy_UpdateColumnEventRecurrencesBoundCase
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesBoundCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_bound_case
@@ -44,8 +44,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesCount
-    inputTypeName: UpdateColumnEventRecurrencesCountInput
+    typeName: freebusy_UpdateColumnEventRecurrencesCount
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesCountInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_count
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesFrequency
-    inputTypeName: UpdateColumnEventRecurrencesFrequencyInput
+    typeName: freebusy_UpdateColumnEventRecurrencesFrequency
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesFrequencyInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_frequency
@@ -108,8 +108,8 @@ definition:
       type: "[Int32]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesHourNumbers
-    inputTypeName: UpdateColumnEventRecurrencesHourNumbersInput
+    typeName: freebusy_UpdateColumnEventRecurrencesHourNumbers
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesHourNumbersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_hour_numbers
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesId
-    inputTypeName: UpdateColumnEventRecurrencesIdInput
+    typeName: freebusy_UpdateColumnEventRecurrencesId
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_id
@@ -172,8 +172,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesInterval
-    inputTypeName: UpdateColumnEventRecurrencesIntervalInput
+    typeName: freebusy_UpdateColumnEventRecurrencesInterval
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesIntervalInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_interval
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesLeapMonths
-    inputTypeName: UpdateColumnEventRecurrencesLeapMonthsInput
+    typeName: freebusy_UpdateColumnEventRecurrencesLeapMonths
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesLeapMonthsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_leap_months
@@ -236,8 +236,8 @@ definition:
       type: "[Int32]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesMinuteNumbers
-    inputTypeName: UpdateColumnEventRecurrencesMinuteNumbersInput
+    typeName: freebusy_UpdateColumnEventRecurrencesMinuteNumbers
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesMinuteNumbersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_minute_numbers
@@ -268,8 +268,8 @@ definition:
       type: "[Int32]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesMonthDays
-    inputTypeName: UpdateColumnEventRecurrencesMonthDaysInput
+    typeName: freebusy_UpdateColumnEventRecurrencesMonthDays
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesMonthDaysInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_month_days
@@ -300,8 +300,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesMonths
-    inputTypeName: UpdateColumnEventRecurrencesMonthsInput
+    typeName: freebusy_UpdateColumnEventRecurrencesMonths
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesMonthsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_months
@@ -332,8 +332,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesRscale
-    inputTypeName: UpdateColumnEventRecurrencesRscaleInput
+    typeName: freebusy_UpdateColumnEventRecurrencesRscale
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesRscaleInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_rscale
@@ -364,8 +364,8 @@ definition:
       type: "[Int32]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesSecondNumbers
-    inputTypeName: UpdateColumnEventRecurrencesSecondNumbersInput
+    typeName: freebusy_UpdateColumnEventRecurrencesSecondNumbers
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesSecondNumbersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_second_numbers
@@ -396,8 +396,8 @@ definition:
       type: "[Int32]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesSetPositions
-    inputTypeName: UpdateColumnEventRecurrencesSetPositionsInput
+    typeName: freebusy_UpdateColumnEventRecurrencesSetPositions
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesSetPositionsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_set_positions
@@ -428,8 +428,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesSkip
-    inputTypeName: UpdateColumnEventRecurrencesSkipInput
+    typeName: freebusy_UpdateColumnEventRecurrencesSkip
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesSkipInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_skip
@@ -460,8 +460,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesUntilId
-    inputTypeName: UpdateColumnEventRecurrencesUntilIdInput
+    typeName: freebusy_UpdateColumnEventRecurrencesUntilId
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesUntilIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_until_id
@@ -492,8 +492,8 @@ definition:
       type: "[Int32]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesWeekNumbers
-    inputTypeName: UpdateColumnEventRecurrencesWeekNumbersInput
+    typeName: freebusy_UpdateColumnEventRecurrencesWeekNumbers
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesWeekNumbersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_week_numbers
@@ -524,8 +524,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesWeekStart
-    inputTypeName: UpdateColumnEventRecurrencesWeekStartInput
+    typeName: freebusy_UpdateColumnEventRecurrencesWeekStart
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesWeekStartInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_week_start
@@ -556,8 +556,8 @@ definition:
       type: "[Int32]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventRecurrencesYearDays
-    inputTypeName: UpdateColumnEventRecurrencesYearDaysInput
+    typeName: freebusy_UpdateColumnEventRecurrencesYearDays
+    inputTypeName: freebusy_UpdateColumnEventRecurrencesYearDaysInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_recurrences_year_days
@@ -639,8 +639,8 @@ definition:
       type: UpdateColumnEventRecurrencesYearDays
       description: Update the 'year_days' column in the 'event_recurrences' collection.
   graphql:
-    typeName: UpdateEventRecurrencesByIdUpdateColumns
-    inputTypeName: UpdateEventRecurrencesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateEventRecurrencesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateEventRecurrencesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_recurrences_by_id_update_columns
@@ -742,8 +742,8 @@ definition:
       type: "[EventRecurrences!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateEventRecurrencesByIdResponse
-    inputTypeName: UpdateEventRecurrencesByIdResponseInput
+    typeName: freebusy_UpdateEventRecurrencesByIdResponse
+    inputTypeName: freebusy_UpdateEventRecurrencesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_recurrences_by_id_response
@@ -796,7 +796,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateEventRecurrencesById
+    rootFieldName: freebusy_updateEventRecurrencesById
     rootFieldKind: Mutation
   description: Update any row on the 'event_recurrences' collection using the 'id' key
 

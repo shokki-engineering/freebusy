@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationHoldsCandidateFilter
-    inputTypeName: UpdateColumnAllocationHoldsCandidateFilterInput
+    typeName: freebusy_UpdateColumnAllocationHoldsCandidateFilter
+    inputTypeName: freebusy_UpdateColumnAllocationHoldsCandidateFilterInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_holds_candidate_filter
@@ -44,8 +44,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationHoldsCandidateResources
-    inputTypeName: UpdateColumnAllocationHoldsCandidateResourcesInput
+    typeName: freebusy_UpdateColumnAllocationHoldsCandidateResources
+    inputTypeName: freebusy_UpdateColumnAllocationHoldsCandidateResourcesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_holds_candidate_resources
@@ -76,8 +76,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationHoldsCreateTime
-    inputTypeName: UpdateColumnAllocationHoldsCreateTimeInput
+    typeName: freebusy_UpdateColumnAllocationHoldsCreateTime
+    inputTypeName: freebusy_UpdateColumnAllocationHoldsCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_holds_create_time
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationHoldsEtag
-    inputTypeName: UpdateColumnAllocationHoldsEtagInput
+    typeName: freebusy_UpdateColumnAllocationHoldsEtag
+    inputTypeName: freebusy_UpdateColumnAllocationHoldsEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_holds_etag
@@ -140,8 +140,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationHoldsExpireTime
-    inputTypeName: UpdateColumnAllocationHoldsExpireTimeInput
+    typeName: freebusy_UpdateColumnAllocationHoldsExpireTime
+    inputTypeName: freebusy_UpdateColumnAllocationHoldsExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_holds_expire_time
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationHoldsId
-    inputTypeName: UpdateColumnAllocationHoldsIdInput
+    typeName: freebusy_UpdateColumnAllocationHoldsId
+    inputTypeName: freebusy_UpdateColumnAllocationHoldsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_holds_id
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationHoldsIdempotencyKey
-    inputTypeName: UpdateColumnAllocationHoldsIdempotencyKeyInput
+    typeName: freebusy_UpdateColumnAllocationHoldsIdempotencyKey
+    inputTypeName: freebusy_UpdateColumnAllocationHoldsIdempotencyKeyInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_holds_idempotency_key
@@ -236,8 +236,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationHoldsName
-    inputTypeName: UpdateColumnAllocationHoldsNameInput
+    typeName: freebusy_UpdateColumnAllocationHoldsName
+    inputTypeName: freebusy_UpdateColumnAllocationHoldsNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_holds_name
@@ -268,8 +268,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationHoldsQuantity
-    inputTypeName: UpdateColumnAllocationHoldsQuantityInput
+    typeName: freebusy_UpdateColumnAllocationHoldsQuantity
+    inputTypeName: freebusy_UpdateColumnAllocationHoldsQuantityInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_holds_quantity
@@ -300,8 +300,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationHoldsReplaces
-    inputTypeName: UpdateColumnAllocationHoldsReplacesInput
+    typeName: freebusy_UpdateColumnAllocationHoldsReplaces
+    inputTypeName: freebusy_UpdateColumnAllocationHoldsReplacesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_holds_replaces
@@ -332,8 +332,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationHoldsResources
-    inputTypeName: UpdateColumnAllocationHoldsResourcesInput
+    typeName: freebusy_UpdateColumnAllocationHoldsResources
+    inputTypeName: freebusy_UpdateColumnAllocationHoldsResourcesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_holds_resources
@@ -364,8 +364,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationHoldsState
-    inputTypeName: UpdateColumnAllocationHoldsStateInput
+    typeName: freebusy_UpdateColumnAllocationHoldsState
+    inputTypeName: freebusy_UpdateColumnAllocationHoldsStateInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_holds_state
@@ -396,8 +396,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationHoldsUpdateTime
-    inputTypeName: UpdateColumnAllocationHoldsUpdateTimeInput
+    typeName: freebusy_UpdateColumnAllocationHoldsUpdateTime
+    inputTypeName: freebusy_UpdateColumnAllocationHoldsUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_holds_update_time
@@ -428,8 +428,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAllocationHoldsWindow
-    inputTypeName: UpdateColumnAllocationHoldsWindowInput
+    typeName: freebusy_UpdateColumnAllocationHoldsWindow
+    inputTypeName: freebusy_UpdateColumnAllocationHoldsWindowInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_allocation_holds_window
@@ -501,8 +501,8 @@ definition:
       type: UpdateColumnAllocationHoldsWindow
       description: Update the 'window' column in the 'allocation_holds' collection.
   graphql:
-    typeName: UpdateAllocationHoldsByIdUpdateColumns
-    inputTypeName: UpdateAllocationHoldsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateAllocationHoldsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateAllocationHoldsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_allocation_holds_by_id_update_columns
@@ -588,8 +588,8 @@ definition:
       type: "[AllocationHolds!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateAllocationHoldsByIdResponse
-    inputTypeName: UpdateAllocationHoldsByIdResponseInput
+    typeName: freebusy_UpdateAllocationHoldsByIdResponse
+    inputTypeName: freebusy_UpdateAllocationHoldsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_allocation_holds_by_id_response
@@ -642,7 +642,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateAllocationHoldsById
+    rootFieldName: freebusy_updateAllocationHoldsById
     rootFieldKind: Mutation
   description: Update any row on the 'allocation_holds' collection using the 'id' key
 

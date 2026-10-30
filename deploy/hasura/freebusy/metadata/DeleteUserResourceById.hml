@@ -15,8 +15,8 @@ definition:
       type: "[UserResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteUserResourceByIdResponse
-    inputTypeName: DeleteUserResourceByIdResponseInput
+    typeName: freebusy_DeleteUserResourceByIdResponse
+    inputTypeName: freebusy_DeleteUserResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_user_resource_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteUserResourceById
+    rootFieldName: freebusy_deleteUserResourceById
     rootFieldKind: Mutation
   description: Delete any row on the 'user_resource' collection using the 'id' key
 

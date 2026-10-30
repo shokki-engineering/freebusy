@@ -15,8 +15,8 @@ definition:
       type: "[VcardTelephones!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteVcardTelephonesByIdResponse
-    inputTypeName: DeleteVcardTelephonesByIdResponseInput
+    typeName: freebusy_DeleteVcardTelephonesByIdResponse
+    inputTypeName: freebusy_DeleteVcardTelephonesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_vcard_telephones_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteVcardTelephonesById
+    rootFieldName: freebusy_deleteVcardTelephonesById
     rootFieldKind: Mutation
   description: Delete any row on the 'vcard_telephones' collection using the 'id' key
 

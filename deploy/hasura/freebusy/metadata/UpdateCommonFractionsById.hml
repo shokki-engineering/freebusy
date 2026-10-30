@@ -12,8 +12,8 @@ definition:
       type: Int64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCommonFractionsDenominator
-    inputTypeName: UpdateColumnCommonFractionsDenominatorInput
+    typeName: freebusy_UpdateColumnCommonFractionsDenominator
+    inputTypeName: freebusy_UpdateColumnCommonFractionsDenominatorInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_common_fractions_denominator
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCommonFractionsId
-    inputTypeName: UpdateColumnCommonFractionsIdInput
+    typeName: freebusy_UpdateColumnCommonFractionsId
+    inputTypeName: freebusy_UpdateColumnCommonFractionsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_common_fractions_id
@@ -76,8 +76,8 @@ definition:
       type: Int64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCommonFractionsNumerator
-    inputTypeName: UpdateColumnCommonFractionsNumeratorInput
+    typeName: freebusy_UpdateColumnCommonFractionsNumerator
+    inputTypeName: freebusy_UpdateColumnCommonFractionsNumeratorInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_common_fractions_numerator
@@ -114,8 +114,8 @@ definition:
       type: UpdateColumnCommonFractionsNumerator
       description: Update the 'numerator' column in the 'common_fractions' collection.
   graphql:
-    typeName: UpdateCommonFractionsByIdUpdateColumns
-    inputTypeName: UpdateCommonFractionsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateCommonFractionsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateCommonFractionsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_common_fractions_by_id_update_columns
@@ -147,8 +147,8 @@ definition:
       type: "[CommonFractions!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateCommonFractionsByIdResponse
-    inputTypeName: UpdateCommonFractionsByIdResponseInput
+    typeName: freebusy_UpdateCommonFractionsByIdResponse
+    inputTypeName: freebusy_UpdateCommonFractionsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_common_fractions_by_id_response
@@ -201,7 +201,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateCommonFractionsById
+    rootFieldName: freebusy_updateCommonFractionsById
     rootFieldKind: Mutation
   description: Update any row on the 'common_fractions' collection using the 'id' key
 

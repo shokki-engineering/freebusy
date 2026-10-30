@@ -12,8 +12,8 @@ definition:
       type: Boolean_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackExtensionFieldsBooleanValue
-    inputTypeName: UpdateColumnPackExtensionFieldsBooleanValueInput
+    typeName: freebusy_UpdateColumnPackExtensionFieldsBooleanValue
+    inputTypeName: freebusy_UpdateColumnPackExtensionFieldsBooleanValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_extension_fields_boolean_value
@@ -44,8 +44,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackExtensionFieldsDataValue
-    inputTypeName: UpdateColumnPackExtensionFieldsDataValueInput
+    typeName: freebusy_UpdateColumnPackExtensionFieldsDataValue
+    inputTypeName: freebusy_UpdateColumnPackExtensionFieldsDataValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_extension_fields_data_value
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackExtensionFieldsId
-    inputTypeName: UpdateColumnPackExtensionFieldsIdInput
+    typeName: freebusy_UpdateColumnPackExtensionFieldsId
+    inputTypeName: freebusy_UpdateColumnPackExtensionFieldsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_extension_fields_id
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackExtensionFieldsLabel
-    inputTypeName: UpdateColumnPackExtensionFieldsLabelInput
+    typeName: freebusy_UpdateColumnPackExtensionFieldsLabel
+    inputTypeName: freebusy_UpdateColumnPackExtensionFieldsLabelInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_extension_fields_label
@@ -140,8 +140,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackExtensionFieldsNumberValue
-    inputTypeName: UpdateColumnPackExtensionFieldsNumberValueInput
+    typeName: freebusy_UpdateColumnPackExtensionFieldsNumberValue
+    inputTypeName: freebusy_UpdateColumnPackExtensionFieldsNumberValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_extension_fields_number_value
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackExtensionFieldsRecordId
-    inputTypeName: UpdateColumnPackExtensionFieldsRecordIdInput
+    typeName: freebusy_UpdateColumnPackExtensionFieldsRecordId
+    inputTypeName: freebusy_UpdateColumnPackExtensionFieldsRecordIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_extension_fields_record_id
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackExtensionFieldsStringValue
-    inputTypeName: UpdateColumnPackExtensionFieldsStringValueInput
+    typeName: freebusy_UpdateColumnPackExtensionFieldsStringValue
+    inputTypeName: freebusy_UpdateColumnPackExtensionFieldsStringValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_extension_fields_string_value
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackExtensionFieldsValueCase
-    inputTypeName: UpdateColumnPackExtensionFieldsValueCaseInput
+    typeName: freebusy_UpdateColumnPackExtensionFieldsValueCase
+    inputTypeName: freebusy_UpdateColumnPackExtensionFieldsValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_extension_fields_value_case
@@ -292,8 +292,8 @@ definition:
       type: UpdateColumnPackExtensionFieldsValueCase
       description: Update the 'value_case' column in the 'pack_extension_fields' collection.
   graphql:
-    typeName: UpdatePackExtensionFieldsByIdUpdateColumns
-    inputTypeName: UpdatePackExtensionFieldsByIdUpdateColumnsInput
+    typeName: freebusy_UpdatePackExtensionFieldsByIdUpdateColumns
+    inputTypeName: freebusy_UpdatePackExtensionFieldsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_pack_extension_fields_by_id_update_columns
@@ -355,8 +355,8 @@ definition:
       type: "[PackExtensionFields!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdatePackExtensionFieldsByIdResponse
-    inputTypeName: UpdatePackExtensionFieldsByIdResponseInput
+    typeName: freebusy_UpdatePackExtensionFieldsByIdResponse
+    inputTypeName: freebusy_UpdatePackExtensionFieldsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_pack_extension_fields_by_id_response
@@ -409,7 +409,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updatePackExtensionFieldsById
+    rootFieldName: freebusy_updatePackExtensionFieldsById
     rootFieldKind: Mutation
   description: Update any row on the 'pack_extension_fields' collection using the 'id' key
 

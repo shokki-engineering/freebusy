@@ -24,8 +24,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: SharedIdempotencyKeys
-    inputTypeName: SharedIdempotencyKeysInput
+    typeName: freebusy_SharedIdempotencyKeys
+    inputTypeName: freebusy_SharedIdempotencyKeysInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: shared_idempotency_keys
@@ -104,7 +104,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: SharedIdempotencyKeysBoolExp
+    typeName: freebusy_SharedIdempotencyKeysBoolExp
 
 ---
 kind: AggregateExpression
@@ -135,7 +135,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: SharedIdempotencyKeysAggExp
+    selectTypeName: freebusy_SharedIdempotencyKeysAggExp
 
 ---
 kind: OrderByExpression
@@ -164,7 +164,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: SharedIdempotencyKeysOrderByExp
+    expressionTypeName: freebusy_SharedIdempotencyKeysOrderByExp
 
 ---
 kind: Model
@@ -180,20 +180,20 @@ definition:
   orderByExpression: SharedIdempotencyKeysOrderByExp
   graphql:
     selectMany:
-      queryRootField: sharedIdempotencyKeys
+      queryRootField: freebusy_sharedIdempotencyKeys
       subscription:
-        rootField: sharedIdempotencyKeys
+        rootField: freebusy_sharedIdempotencyKeys
     selectUniques:
-      - queryRootField: sharedIdempotencyKeysById
+      - queryRootField: freebusy_sharedIdempotencyKeysById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: sharedIdempotencyKeysById
-    filterInputTypeName: SharedIdempotencyKeysFilterInput
+          rootField: freebusy_sharedIdempotencyKeysById
+    filterInputTypeName: freebusy_SharedIdempotencyKeysFilterInput
     aggregate:
-      queryRootField: sharedIdempotencyKeysAggregate
+      queryRootField: freebusy_sharedIdempotencyKeysAggregate
       subscription:
-        rootField: sharedIdempotencyKeysAggregate
+        rootField: freebusy_sharedIdempotencyKeysAggregate
 
 ---
 kind: ModelPermissions

@@ -15,8 +15,8 @@ definition:
       type: "[EventAlarms!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteEventAlarmsByIdResponse
-    inputTypeName: DeleteEventAlarmsByIdResponseInput
+    typeName: freebusy_DeleteEventAlarmsByIdResponse
+    inputTypeName: freebusy_DeleteEventAlarmsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_event_alarms_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteEventAlarmsById
+    rootFieldName: freebusy_deleteEventAlarmsById
     rootFieldKind: Mutation
   description: Delete any row on the 'event_alarms' collection using the 'id' key
 

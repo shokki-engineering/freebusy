@@ -82,8 +82,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: InsertCardResourceObject
-    inputTypeName: InsertCardResourceObjectInput
+    typeName: freebusy_InsertCardResourceObject
+    inputTypeName: freebusy_InsertCardResourceObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_card_resource_object
@@ -261,8 +261,8 @@ definition:
       type: "[CardResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertCardResourceResponse
-    inputTypeName: InsertCardResourceResponseInput
+    typeName: freebusy_InsertCardResourceResponse
+    inputTypeName: freebusy_InsertCardResourceResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_card_resource_response
@@ -306,7 +306,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertCardResource
+    rootFieldName: freebusy_insertCardResource
     rootFieldKind: Mutation
   description: Insert into the card_resource table
 

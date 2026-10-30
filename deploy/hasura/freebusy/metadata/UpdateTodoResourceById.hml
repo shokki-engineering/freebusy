@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceCalendarId
-    inputTypeName: UpdateColumnTodoResourceCalendarIdInput
+    typeName: freebusy_UpdateColumnTodoResourceCalendarId
+    inputTypeName: freebusy_UpdateColumnTodoResourceCalendarIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_calendar_id
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceClassification
-    inputTypeName: UpdateColumnTodoResourceClassificationInput
+    typeName: freebusy_UpdateColumnTodoResourceClassification
+    inputTypeName: freebusy_UpdateColumnTodoResourceClassificationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_classification
@@ -76,8 +76,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceCompletedId
-    inputTypeName: UpdateColumnTodoResourceCompletedIdInput
+    typeName: freebusy_UpdateColumnTodoResourceCompletedId
+    inputTypeName: freebusy_UpdateColumnTodoResourceCompletedIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_completed_id
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceCompletion
-    inputTypeName: UpdateColumnTodoResourceCompletionInput
+    typeName: freebusy_UpdateColumnTodoResourceCompletion
+    inputTypeName: freebusy_UpdateColumnTodoResourceCompletionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_completion
@@ -140,8 +140,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceCreateTime
-    inputTypeName: UpdateColumnTodoResourceCreateTimeInput
+    typeName: freebusy_UpdateColumnTodoResourceCreateTime
+    inputTypeName: freebusy_UpdateColumnTodoResourceCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_create_time
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceDeadlineCase
-    inputTypeName: UpdateColumnTodoResourceDeadlineCaseInput
+    typeName: freebusy_UpdateColumnTodoResourceDeadlineCase
+    inputTypeName: freebusy_UpdateColumnTodoResourceDeadlineCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_deadline_case
@@ -204,8 +204,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceDeleteTime
-    inputTypeName: UpdateColumnTodoResourceDeleteTimeInput
+    typeName: freebusy_UpdateColumnTodoResourceDeleteTime
+    inputTypeName: freebusy_UpdateColumnTodoResourceDeleteTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_delete_time
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceDescription
-    inputTypeName: UpdateColumnTodoResourceDescriptionInput
+    typeName: freebusy_UpdateColumnTodoResourceDescription
+    inputTypeName: freebusy_UpdateColumnTodoResourceDescriptionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_description
@@ -268,8 +268,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceDueId
-    inputTypeName: UpdateColumnTodoResourceDueIdInput
+    typeName: freebusy_UpdateColumnTodoResourceDueId
+    inputTypeName: freebusy_UpdateColumnTodoResourceDueIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_due_id
@@ -300,8 +300,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceDuration
-    inputTypeName: UpdateColumnTodoResourceDurationInput
+    typeName: freebusy_UpdateColumnTodoResourceDuration
+    inputTypeName: freebusy_UpdateColumnTodoResourceDurationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_duration
@@ -332,8 +332,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceEtag
-    inputTypeName: UpdateColumnTodoResourceEtagInput
+    typeName: freebusy_UpdateColumnTodoResourceEtag
+    inputTypeName: freebusy_UpdateColumnTodoResourceEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_etag
@@ -364,8 +364,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceExpireTime
-    inputTypeName: UpdateColumnTodoResourceExpireTimeInput
+    typeName: freebusy_UpdateColumnTodoResourceExpireTime
+    inputTypeName: freebusy_UpdateColumnTodoResourceExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_expire_time
@@ -396,8 +396,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceIcalUid
-    inputTypeName: UpdateColumnTodoResourceIcalUidInput
+    typeName: freebusy_UpdateColumnTodoResourceIcalUid
+    inputTypeName: freebusy_UpdateColumnTodoResourceIcalUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_ical_uid
@@ -428,8 +428,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceId
-    inputTypeName: UpdateColumnTodoResourceIdInput
+    typeName: freebusy_UpdateColumnTodoResourceId
+    inputTypeName: freebusy_UpdateColumnTodoResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_id
@@ -460,8 +460,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceLocation
-    inputTypeName: UpdateColumnTodoResourceLocationInput
+    typeName: freebusy_UpdateColumnTodoResourceLocation
+    inputTypeName: freebusy_UpdateColumnTodoResourceLocationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_location
@@ -492,8 +492,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceName
-    inputTypeName: UpdateColumnTodoResourceNameInput
+    typeName: freebusy_UpdateColumnTodoResourceName
+    inputTypeName: freebusy_UpdateColumnTodoResourceNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_name
@@ -524,8 +524,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourcePercentComplete
-    inputTypeName: UpdateColumnTodoResourcePercentCompleteInput
+    typeName: freebusy_UpdateColumnTodoResourcePercentComplete
+    inputTypeName: freebusy_UpdateColumnTodoResourcePercentCompleteInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_percent_complete
@@ -556,8 +556,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourcePriority
-    inputTypeName: UpdateColumnTodoResourcePriorityInput
+    typeName: freebusy_UpdateColumnTodoResourcePriority
+    inputTypeName: freebusy_UpdateColumnTodoResourcePriorityInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_priority
@@ -588,8 +588,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceStartId
-    inputTypeName: UpdateColumnTodoResourceStartIdInput
+    typeName: freebusy_UpdateColumnTodoResourceStartId
+    inputTypeName: freebusy_UpdateColumnTodoResourceStartIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_start_id
@@ -620,8 +620,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceSummary
-    inputTypeName: UpdateColumnTodoResourceSummaryInput
+    typeName: freebusy_UpdateColumnTodoResourceSummary
+    inputTypeName: freebusy_UpdateColumnTodoResourceSummaryInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_summary
@@ -652,8 +652,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceUid
-    inputTypeName: UpdateColumnTodoResourceUidInput
+    typeName: freebusy_UpdateColumnTodoResourceUid
+    inputTypeName: freebusy_UpdateColumnTodoResourceUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_uid
@@ -684,8 +684,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnTodoResourceUpdateTime
-    inputTypeName: UpdateColumnTodoResourceUpdateTimeInput
+    typeName: freebusy_UpdateColumnTodoResourceUpdateTime
+    inputTypeName: freebusy_UpdateColumnTodoResourceUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_todo_resource_update_time
@@ -779,8 +779,8 @@ definition:
       type: UpdateColumnTodoResourceUpdateTime
       description: Update the 'update_time' column in the 'todo_resource' collection.
   graphql:
-    typeName: UpdateTodoResourceByIdUpdateColumns
-    inputTypeName: UpdateTodoResourceByIdUpdateColumnsInput
+    typeName: freebusy_UpdateTodoResourceByIdUpdateColumns
+    inputTypeName: freebusy_UpdateTodoResourceByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_todo_resource_by_id_update_columns
@@ -898,8 +898,8 @@ definition:
       type: "[TodoResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateTodoResourceByIdResponse
-    inputTypeName: UpdateTodoResourceByIdResponseInput
+    typeName: freebusy_UpdateTodoResourceByIdResponse
+    inputTypeName: freebusy_UpdateTodoResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_todo_resource_by_id_response
@@ -952,7 +952,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateTodoResourceById
+    rootFieldName: freebusy_updateTodoResourceById
     rootFieldKind: Mutation
   description: Update any row on the 'todo_resource' collection using the 'id' key
 

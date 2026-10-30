@@ -14,8 +14,8 @@ definition:
     - name: numerator
       type: Int64
   graphql:
-    typeName: InsertCommonFractionsObject
-    inputTypeName: InsertCommonFractionsObjectInput
+    typeName: freebusy_InsertCommonFractionsObject
+    inputTypeName: freebusy_InsertCommonFractionsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_common_fractions_object
@@ -47,8 +47,8 @@ definition:
       type: "[CommonFractions!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertCommonFractionsResponse
-    inputTypeName: InsertCommonFractionsResponseInput
+    typeName: freebusy_InsertCommonFractionsResponse
+    inputTypeName: freebusy_InsertCommonFractionsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_common_fractions_response
@@ -92,7 +92,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertCommonFractions
+    rootFieldName: freebusy_insertCommonFractions
     rootFieldKind: Mutation
   description: Insert into the common_fractions table
 

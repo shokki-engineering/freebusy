@@ -4,19 +4,21 @@
 kind: Subgraph
 version: v2
 definition:
-  name: freebusy
-  generator:
-    rootPath: .
-    namingConvention: graphql
-  includePaths:
-    - metadata
-  envMapping:
-    FREEBUSY_FREEBUSY_PGSQL_AUTHORIZATION_HEADER:
-      fromEnv: FREEBUSY_FREEBUSY_PGSQL_AUTHORIZATION_HEADER
-    FREEBUSY_FREEBUSY_PGSQL_READ_URL:
-      fromEnv: FREEBUSY_FREEBUSY_PGSQL_READ_URL
-    FREEBUSY_FREEBUSY_PGSQL_WRITE_URL:
-      fromEnv: FREEBUSY_FREEBUSY_PGSQL_WRITE_URL
-  connectors:
-    - path: connector/freebusy_pgsql/connector.yaml
-      connectorLinkName: freebusy_pgsql
+    name: freebusy
+    generator:
+        rootPath: .
+        graphqlRootFieldPrefix: freebusy_
+        graphqlTypeNamePrefix: freebusy_
+        namingConvention: graphql
+    includePaths:
+        - metadata
+    envMapping:
+        FREEBUSY_FREEBUSY_PGSQL_AUTHORIZATION_HEADER:
+            fromEnv: FREEBUSY_FREEBUSY_PGSQL_AUTHORIZATION_HEADER
+        FREEBUSY_FREEBUSY_PGSQL_READ_URL:
+            fromEnv: FREEBUSY_FREEBUSY_PGSQL_READ_URL
+        FREEBUSY_FREEBUSY_PGSQL_WRITE_URL:
+            fromEnv: FREEBUSY_FREEBUSY_PGSQL_WRITE_URL
+    connectors:
+        - path: connector/freebusy_pgsql/connector.yaml
+          connectorLinkName: freebusy_pgsql

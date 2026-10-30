@@ -28,8 +28,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: InsertScimgroupGroupsObject
-    inputTypeName: InsertScimgroupGroupsObjectInput
+    typeName: freebusy_InsertScimgroupGroupsObject
+    inputTypeName: freebusy_InsertScimgroupGroupsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_scimgroup_groups_object
@@ -99,8 +99,8 @@ definition:
       type: "[ScimgroupGroups!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertScimgroupGroupsResponse
-    inputTypeName: InsertScimgroupGroupsResponseInput
+    typeName: freebusy_InsertScimgroupGroupsResponse
+    inputTypeName: freebusy_InsertScimgroupGroupsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_scimgroup_groups_response
@@ -144,7 +144,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertScimgroupGroups
+    rootFieldName: freebusy_insertScimgroupGroups
     rootFieldKind: Mutation
   description: Insert into the scimgroup_groups table
 

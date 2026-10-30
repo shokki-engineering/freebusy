@@ -24,8 +24,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: PackExtensionFields
-    inputTypeName: PackExtensionFieldsInput
+    typeName: freebusy_PackExtensionFields
+    inputTypeName: freebusy_PackExtensionFieldsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: pack_extension_fields
@@ -104,7 +104,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: PackExtensionFieldsBoolExp
+    typeName: freebusy_PackExtensionFieldsBoolExp
 
 ---
 kind: AggregateExpression
@@ -135,7 +135,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: PackExtensionFieldsAggExp
+    selectTypeName: freebusy_PackExtensionFieldsAggExp
 
 ---
 kind: OrderByExpression
@@ -164,7 +164,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: PackExtensionFieldsOrderByExp
+    expressionTypeName: freebusy_PackExtensionFieldsOrderByExp
 
 ---
 kind: Model
@@ -180,20 +180,20 @@ definition:
   orderByExpression: PackExtensionFieldsOrderByExp
   graphql:
     selectMany:
-      queryRootField: packExtensionFields
+      queryRootField: freebusy_packExtensionFields
       subscription:
-        rootField: packExtensionFields
+        rootField: freebusy_packExtensionFields
     selectUniques:
-      - queryRootField: packExtensionFieldsById
+      - queryRootField: freebusy_packExtensionFieldsById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: packExtensionFieldsById
-    filterInputTypeName: PackExtensionFieldsFilterInput
+          rootField: freebusy_packExtensionFieldsById
+    filterInputTypeName: freebusy_PackExtensionFieldsFilterInput
     aggregate:
-      queryRootField: packExtensionFieldsAggregate
+      queryRootField: freebusy_packExtensionFieldsAggregate
       subscription:
-        rootField: packExtensionFieldsAggregate
+        rootField: freebusy_packExtensionFieldsAggregate
 
 ---
 kind: ModelPermissions

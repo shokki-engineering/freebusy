@@ -20,8 +20,8 @@ definition:
     - name: values
       type: "[String_1]"
   graphql:
-    typeName: AvailabilityExtensionProperties
-    inputTypeName: AvailabilityExtensionPropertiesInput
+    typeName: freebusy_AvailabilityExtensionProperties
+    inputTypeName: freebusy_AvailabilityExtensionPropertiesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: availability_extension_properties
@@ -86,7 +86,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: AvailabilityExtensionPropertiesBoolExp
+    typeName: freebusy_AvailabilityExtensionPropertiesBoolExp
 
 ---
 kind: AggregateExpression
@@ -111,7 +111,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: AvailabilityExtensionPropertiesAggExp
+    selectTypeName: freebusy_AvailabilityExtensionPropertiesAggExp
 
 ---
 kind: OrderByExpression
@@ -134,7 +134,7 @@ definition:
           orderByExpression: JsonOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: AvailabilityExtensionPropertiesOrderByExp
+    expressionTypeName: freebusy_AvailabilityExtensionPropertiesOrderByExp
 
 ---
 kind: Model
@@ -150,20 +150,20 @@ definition:
   orderByExpression: AvailabilityExtensionPropertiesOrderByExp
   graphql:
     selectMany:
-      queryRootField: availabilityExtensionProperties
+      queryRootField: freebusy_availabilityExtensionProperties
       subscription:
-        rootField: availabilityExtensionProperties
+        rootField: freebusy_availabilityExtensionProperties
     selectUniques:
-      - queryRootField: availabilityExtensionPropertiesById
+      - queryRootField: freebusy_availabilityExtensionPropertiesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: availabilityExtensionPropertiesById
-    filterInputTypeName: AvailabilityExtensionPropertiesFilterInput
+          rootField: freebusy_availabilityExtensionPropertiesById
+    filterInputTypeName: freebusy_AvailabilityExtensionPropertiesFilterInput
     aggregate:
-      queryRootField: availabilityExtensionPropertiesAggregate
+      queryRootField: freebusy_availabilityExtensionPropertiesAggregate
       subscription:
-        rootField: availabilityExtensionPropertiesAggregate
+        rootField: freebusy_availabilityExtensionPropertiesAggregate
 
 ---
 kind: ModelPermissions

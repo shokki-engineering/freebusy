@@ -12,8 +12,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceAttributes
-    inputTypeName: UpdateColumnReservationResourceAttributesInput
+    typeName: freebusy_UpdateColumnReservationResourceAttributes
+    inputTypeName: freebusy_UpdateColumnReservationResourceAttributesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_attributes
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceCancelReason
-    inputTypeName: UpdateColumnReservationResourceCancelReasonInput
+    typeName: freebusy_UpdateColumnReservationResourceCancelReason
+    inputTypeName: freebusy_UpdateColumnReservationResourceCancelReasonInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_cancel_reason
@@ -76,8 +76,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceCancelTime
-    inputTypeName: UpdateColumnReservationResourceCancelTimeInput
+    typeName: freebusy_UpdateColumnReservationResourceCancelTime
+    inputTypeName: freebusy_UpdateColumnReservationResourceCancelTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_cancel_time
@@ -108,8 +108,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceConfirmTime
-    inputTypeName: UpdateColumnReservationResourceConfirmTimeInput
+    typeName: freebusy_UpdateColumnReservationResourceConfirmTime
+    inputTypeName: freebusy_UpdateColumnReservationResourceConfirmTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_confirm_time
@@ -140,8 +140,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceCreateTime
-    inputTypeName: UpdateColumnReservationResourceCreateTimeInput
+    typeName: freebusy_UpdateColumnReservationResourceCreateTime
+    inputTypeName: freebusy_UpdateColumnReservationResourceCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_create_time
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceCustomer
-    inputTypeName: UpdateColumnReservationResourceCustomerInput
+    typeName: freebusy_UpdateColumnReservationResourceCustomer
+    inputTypeName: freebusy_UpdateColumnReservationResourceCustomerInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_customer
@@ -204,8 +204,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceEndTime
-    inputTypeName: UpdateColumnReservationResourceEndTimeInput
+    typeName: freebusy_UpdateColumnReservationResourceEndTime
+    inputTypeName: freebusy_UpdateColumnReservationResourceEndTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_end_time
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceEtag
-    inputTypeName: UpdateColumnReservationResourceEtagInput
+    typeName: freebusy_UpdateColumnReservationResourceEtag
+    inputTypeName: freebusy_UpdateColumnReservationResourceEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_etag
@@ -268,8 +268,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceHold
-    inputTypeName: UpdateColumnReservationResourceHoldInput
+    typeName: freebusy_UpdateColumnReservationResourceHold
+    inputTypeName: freebusy_UpdateColumnReservationResourceHoldInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_hold
@@ -300,8 +300,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceId
-    inputTypeName: UpdateColumnReservationResourceIdInput
+    typeName: freebusy_UpdateColumnReservationResourceId
+    inputTypeName: freebusy_UpdateColumnReservationResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_id
@@ -332,8 +332,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceLastChange
-    inputTypeName: UpdateColumnReservationResourceLastChangeInput
+    typeName: freebusy_UpdateColumnReservationResourceLastChange
+    inputTypeName: freebusy_UpdateColumnReservationResourceLastChangeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_last_change
@@ -364,8 +364,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceName
-    inputTypeName: UpdateColumnReservationResourceNameInput
+    typeName: freebusy_UpdateColumnReservationResourceName
+    inputTypeName: freebusy_UpdateColumnReservationResourceNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_name
@@ -396,8 +396,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceReplacement
-    inputTypeName: UpdateColumnReservationResourceReplacementInput
+    typeName: freebusy_UpdateColumnReservationResourceReplacement
+    inputTypeName: freebusy_UpdateColumnReservationResourceReplacementInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_replacement
@@ -428,8 +428,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceReplaces
-    inputTypeName: UpdateColumnReservationResourceReplacesInput
+    typeName: freebusy_UpdateColumnReservationResourceReplaces
+    inputTypeName: freebusy_UpdateColumnReservationResourceReplacesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_replaces
@@ -460,8 +460,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceResources
-    inputTypeName: UpdateColumnReservationResourceResourcesInput
+    typeName: freebusy_UpdateColumnReservationResourceResources
+    inputTypeName: freebusy_UpdateColumnReservationResourceResourcesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_resources
@@ -492,8 +492,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceStartTime
-    inputTypeName: UpdateColumnReservationResourceStartTimeInput
+    typeName: freebusy_UpdateColumnReservationResourceStartTime
+    inputTypeName: freebusy_UpdateColumnReservationResourceStartTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_start_time
@@ -524,8 +524,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceState
-    inputTypeName: UpdateColumnReservationResourceStateInput
+    typeName: freebusy_UpdateColumnReservationResourceState
+    inputTypeName: freebusy_UpdateColumnReservationResourceStateInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_state
@@ -556,8 +556,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnReservationResourceUpdateTime
-    inputTypeName: UpdateColumnReservationResourceUpdateTimeInput
+    typeName: freebusy_UpdateColumnReservationResourceUpdateTime
+    inputTypeName: freebusy_UpdateColumnReservationResourceUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_reservation_resource_update_time
@@ -641,8 +641,8 @@ definition:
       type: UpdateColumnReservationResourceUpdateTime
       description: Update the 'update_time' column in the 'reservation_resource' collection.
   graphql:
-    typeName: UpdateReservationResourceByIdUpdateColumns
-    inputTypeName: UpdateReservationResourceByIdUpdateColumnsInput
+    typeName: freebusy_UpdateReservationResourceByIdUpdateColumns
+    inputTypeName: freebusy_UpdateReservationResourceByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_reservation_resource_by_id_update_columns
@@ -744,8 +744,8 @@ definition:
       type: "[ReservationResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateReservationResourceByIdResponse
-    inputTypeName: UpdateReservationResourceByIdResponseInput
+    typeName: freebusy_UpdateReservationResourceByIdResponse
+    inputTypeName: freebusy_UpdateReservationResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_reservation_resource_by_id_response
@@ -798,7 +798,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateReservationResourceById
+    rootFieldName: freebusy_updateReservationResourceById
     rootFieldKind: Mutation
   description: Update any row on the 'reservation_resource' collection using the 'id' key
 

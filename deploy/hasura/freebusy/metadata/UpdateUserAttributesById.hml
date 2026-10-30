@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAttributesAttributeType
-    inputTypeName: UpdateColumnUserAttributesAttributeTypeInput
+    typeName: freebusy_UpdateColumnUserAttributesAttributeType
+    inputTypeName: freebusy_UpdateColumnUserAttributesAttributeTypeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_attributes_attribute_type
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAttributesDisplay
-    inputTypeName: UpdateColumnUserAttributesDisplayInput
+    typeName: freebusy_UpdateColumnUserAttributesDisplay
+    inputTypeName: freebusy_UpdateColumnUserAttributesDisplayInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_attributes_display
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAttributesId
-    inputTypeName: UpdateColumnUserAttributesIdInput
+    typeName: freebusy_UpdateColumnUserAttributesId
+    inputTypeName: freebusy_UpdateColumnUserAttributesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_attributes_id
@@ -108,8 +108,8 @@ definition:
       type: Boolean_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAttributesPrimary
-    inputTypeName: UpdateColumnUserAttributesPrimaryInput
+    typeName: freebusy_UpdateColumnUserAttributesPrimary
+    inputTypeName: freebusy_UpdateColumnUserAttributesPrimaryInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_attributes_primary
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAttributesReferenceUri
-    inputTypeName: UpdateColumnUserAttributesReferenceUriInput
+    typeName: freebusy_UpdateColumnUserAttributesReferenceUri
+    inputTypeName: freebusy_UpdateColumnUserAttributesReferenceUriInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_attributes_reference_uri
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAttributesUserId
-    inputTypeName: UpdateColumnUserAttributesUserIdInput
+    typeName: freebusy_UpdateColumnUserAttributesUserId
+    inputTypeName: freebusy_UpdateColumnUserAttributesUserIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_attributes_user_id
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnUserAttributesValue
-    inputTypeName: UpdateColumnUserAttributesValueInput
+    typeName: freebusy_UpdateColumnUserAttributesValue
+    inputTypeName: freebusy_UpdateColumnUserAttributesValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_user_attributes_value
@@ -254,8 +254,8 @@ definition:
       type: UpdateColumnUserAttributesValue
       description: Update the 'value' column in the 'user_attributes' collection.
   graphql:
-    typeName: UpdateUserAttributesByIdUpdateColumns
-    inputTypeName: UpdateUserAttributesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateUserAttributesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateUserAttributesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_user_attributes_by_id_update_columns
@@ -313,8 +313,8 @@ definition:
       type: "[UserAttributes!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateUserAttributesByIdResponse
-    inputTypeName: UpdateUserAttributesByIdResponseInput
+    typeName: freebusy_UpdateUserAttributesByIdResponse
+    inputTypeName: freebusy_UpdateUserAttributesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_user_attributes_by_id_response
@@ -367,7 +367,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateUserAttributesById
+    rootFieldName: freebusy_updateUserAttributesById
     rootFieldKind: Mutation
   description: Update any row on the 'user_attributes' collection using the 'id' key
 

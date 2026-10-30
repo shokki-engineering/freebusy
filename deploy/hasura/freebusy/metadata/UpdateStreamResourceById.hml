@@ -12,8 +12,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamResourceBaseVersion
-    inputTypeName: UpdateColumnStreamResourceBaseVersionInput
+    typeName: freebusy_UpdateColumnStreamResourceBaseVersion
+    inputTypeName: freebusy_UpdateColumnStreamResourceBaseVersionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_resource_base_version
@@ -44,8 +44,8 @@ definition:
       type: Boolean_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamResourceClosed
-    inputTypeName: UpdateColumnStreamResourceClosedInput
+    typeName: freebusy_UpdateColumnStreamResourceClosed
+    inputTypeName: freebusy_UpdateColumnStreamResourceClosedInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_resource_closed
@@ -76,8 +76,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamResourceCreateTime
-    inputTypeName: UpdateColumnStreamResourceCreateTimeInput
+    typeName: freebusy_UpdateColumnStreamResourceCreateTime
+    inputTypeName: freebusy_UpdateColumnStreamResourceCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_resource_create_time
@@ -108,8 +108,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamResourceDeleteTime
-    inputTypeName: UpdateColumnStreamResourceDeleteTimeInput
+    typeName: freebusy_UpdateColumnStreamResourceDeleteTime
+    inputTypeName: freebusy_UpdateColumnStreamResourceDeleteTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_resource_delete_time
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamResourceEtag
-    inputTypeName: UpdateColumnStreamResourceEtagInput
+    typeName: freebusy_UpdateColumnStreamResourceEtag
+    inputTypeName: freebusy_UpdateColumnStreamResourceEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_resource_etag
@@ -172,8 +172,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamResourceExpireTime
-    inputTypeName: UpdateColumnStreamResourceExpireTimeInput
+    typeName: freebusy_UpdateColumnStreamResourceExpireTime
+    inputTypeName: freebusy_UpdateColumnStreamResourceExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_resource_expire_time
@@ -204,8 +204,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamResourceId
-    inputTypeName: UpdateColumnStreamResourceIdInput
+    typeName: freebusy_UpdateColumnStreamResourceId
+    inputTypeName: freebusy_UpdateColumnStreamResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_resource_id
@@ -236,8 +236,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamResourceName
-    inputTypeName: UpdateColumnStreamResourceNameInput
+    typeName: freebusy_UpdateColumnStreamResourceName
+    inputTypeName: freebusy_UpdateColumnStreamResourceNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_resource_name
@@ -268,8 +268,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamResourceUid
-    inputTypeName: UpdateColumnStreamResourceUidInput
+    typeName: freebusy_UpdateColumnStreamResourceUid
+    inputTypeName: freebusy_UpdateColumnStreamResourceUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_resource_uid
@@ -300,8 +300,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamResourceUpdateTime
-    inputTypeName: UpdateColumnStreamResourceUpdateTimeInput
+    typeName: freebusy_UpdateColumnStreamResourceUpdateTime
+    inputTypeName: freebusy_UpdateColumnStreamResourceUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_resource_update_time
@@ -359,8 +359,8 @@ definition:
       type: UpdateColumnStreamResourceUpdateTime
       description: Update the 'update_time' column in the 'stream_resource' collection.
   graphql:
-    typeName: UpdateStreamResourceByIdUpdateColumns
-    inputTypeName: UpdateStreamResourceByIdUpdateColumnsInput
+    typeName: freebusy_UpdateStreamResourceByIdUpdateColumns
+    inputTypeName: freebusy_UpdateStreamResourceByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_stream_resource_by_id_update_columns
@@ -430,8 +430,8 @@ definition:
       type: "[StreamResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateStreamResourceByIdResponse
-    inputTypeName: UpdateStreamResourceByIdResponseInput
+    typeName: freebusy_UpdateStreamResourceByIdResponse
+    inputTypeName: freebusy_UpdateStreamResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_stream_resource_by_id_response
@@ -484,7 +484,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateStreamResourceById
+    rootFieldName: freebusy_updateStreamResourceById
     rootFieldKind: Mutation
   description: Update any row on the 'stream_resource' collection using the 'id' key
 

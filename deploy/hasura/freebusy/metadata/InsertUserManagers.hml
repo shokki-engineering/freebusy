@@ -16,8 +16,8 @@ definition:
     - name: value
       type: String_1
   graphql:
-    typeName: InsertUserManagersObject
-    inputTypeName: InsertUserManagersObjectInput
+    typeName: freebusy_InsertUserManagersObject
+    inputTypeName: freebusy_InsertUserManagersObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_user_managers_object
@@ -63,8 +63,8 @@ definition:
       type: "[UserManagers!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertUserManagersResponse
-    inputTypeName: InsertUserManagersResponseInput
+    typeName: freebusy_InsertUserManagersResponse
+    inputTypeName: freebusy_InsertUserManagersResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_user_managers_response
@@ -108,7 +108,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertUserManagers
+    rootFieldName: freebusy_insertUserManagers
     rootFieldKind: Mutation
   description: Insert into the user_managers table
 

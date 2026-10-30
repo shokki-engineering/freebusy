@@ -16,6 +16,36 @@ pre-release and does not move the images' `latest` tag.
 
 ## [Unreleased]
 
+## [1.0.0-rc.2.1] - 2026-10-30
+
+### Added
+
+- Read-only iCalendar feeds of a resource's bookings, opened by a token.
+- `ghcr.io/shokki-engineering/freebusy-subgraph`: freebusy's DDN subgraph
+  as an image (`just hasura subgraph-image`), for the one Hasura engine
+  freebusy shares with aperio, whose supergraph mounts it from a volume.
+
+### Changed
+
+- The GraphQL API is freebusy's subgraph of an engine shared with aperio:
+  every root field and type carries the `freebusy_` prefix, and freebusyql
+  speaks the prefixed names with its Go names unchanged.
+- Local development uses aperio's Postgres (127.0.0.1:5433, database
+  `freebusydb`) and the shared engine (127.0.0.1:3280).
+- Generated with store v1.6.10, cache v0.3.2 and service v0.2.3, on
+  runtime-go `bb3b424` and a telemetry-go whose OTLP export is off until an
+  endpoint is set.
+
+### Fixed
+
+- A hold whose idempotency key belongs to a lapsed hold takes a fresh hold
+  instead of returning the expired one.
+- `[search.opensearch] index_queue` 0 is 1024, as documented, not
+  synchronous indexing.
+- The chart mounts a writable `/tmp`, and turns OTLP off without an
+  endpoint. Every workflow action is pinned by commit SHA.
+- `just image` loads the images under their ghcr.io names.
+
 ## [1.0.0-rc.2] - 2026-10-26
 
 ### Changed

@@ -12,8 +12,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNamesFamilyName
-    inputTypeName: UpdateColumnVcardNamesFamilyNameInput
+    typeName: freebusy_UpdateColumnVcardNamesFamilyName
+    inputTypeName: freebusy_UpdateColumnVcardNamesFamilyNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_names_family_name
@@ -44,8 +44,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNamesGenerations
-    inputTypeName: UpdateColumnVcardNamesGenerationsInput
+    typeName: freebusy_UpdateColumnVcardNamesGenerations
+    inputTypeName: freebusy_UpdateColumnVcardNamesGenerationsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_names_generations
@@ -76,8 +76,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNamesGivenName
-    inputTypeName: UpdateColumnVcardNamesGivenNameInput
+    typeName: freebusy_UpdateColumnVcardNamesGivenName
+    inputTypeName: freebusy_UpdateColumnVcardNamesGivenNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_names_given_name
@@ -108,8 +108,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNamesHonorificPrefixes
-    inputTypeName: UpdateColumnVcardNamesHonorificPrefixesInput
+    typeName: freebusy_UpdateColumnVcardNamesHonorificPrefixes
+    inputTypeName: freebusy_UpdateColumnVcardNamesHonorificPrefixesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_names_honorific_prefixes
@@ -140,8 +140,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNamesHonorificSuffixes
-    inputTypeName: UpdateColumnVcardNamesHonorificSuffixesInput
+    typeName: freebusy_UpdateColumnVcardNamesHonorificSuffixes
+    inputTypeName: freebusy_UpdateColumnVcardNamesHonorificSuffixesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_names_honorific_suffixes
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNamesId
-    inputTypeName: UpdateColumnVcardNamesIdInput
+    typeName: freebusy_UpdateColumnVcardNamesId
+    inputTypeName: freebusy_UpdateColumnVcardNamesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_names_id
@@ -204,8 +204,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNamesMiddleNames
-    inputTypeName: UpdateColumnVcardNamesMiddleNamesInput
+    typeName: freebusy_UpdateColumnVcardNamesMiddleNames
+    inputTypeName: freebusy_UpdateColumnVcardNamesMiddleNamesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_names_middle_names
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNamesPhonetic
-    inputTypeName: UpdateColumnVcardNamesPhoneticInput
+    typeName: freebusy_UpdateColumnVcardNamesPhonetic
+    inputTypeName: freebusy_UpdateColumnVcardNamesPhoneticInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_names_phonetic
@@ -268,8 +268,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNamesScript
-    inputTypeName: UpdateColumnVcardNamesScriptInput
+    typeName: freebusy_UpdateColumnVcardNamesScript
+    inputTypeName: freebusy_UpdateColumnVcardNamesScriptInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_names_script
@@ -300,8 +300,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNamesSecondarySurnames
-    inputTypeName: UpdateColumnVcardNamesSecondarySurnamesInput
+    typeName: freebusy_UpdateColumnVcardNamesSecondarySurnames
+    inputTypeName: freebusy_UpdateColumnVcardNamesSecondarySurnamesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_names_secondary_surnames
@@ -359,8 +359,8 @@ definition:
       type: UpdateColumnVcardNamesSecondarySurnames
       description: Update the 'secondary_surnames' column in the 'vcard_names' collection.
   graphql:
-    typeName: UpdateVcardNamesByIdUpdateColumns
-    inputTypeName: UpdateVcardNamesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardNamesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardNamesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_names_by_id_update_columns
@@ -430,8 +430,8 @@ definition:
       type: "[VcardNames!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardNamesByIdResponse
-    inputTypeName: UpdateVcardNamesByIdResponseInput
+    typeName: freebusy_UpdateVcardNamesByIdResponse
+    inputTypeName: freebusy_UpdateVcardNamesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_names_by_id_response
@@ -484,7 +484,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardNamesById
+    rootFieldName: freebusy_updateVcardNamesById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_names' collection using the 'id' key
 

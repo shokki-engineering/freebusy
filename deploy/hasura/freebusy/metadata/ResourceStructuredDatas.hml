@@ -24,8 +24,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: ResourceStructuredDatas
-    inputTypeName: ResourceStructuredDatasInput
+    typeName: freebusy_ResourceStructuredDatas
+    inputTypeName: freebusy_ResourceStructuredDatasInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: resource_structured_datas
@@ -104,7 +104,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: ResourceStructuredDatasBoolExp
+    typeName: freebusy_ResourceStructuredDatasBoolExp
 
 ---
 kind: AggregateExpression
@@ -135,7 +135,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: ResourceStructuredDatasAggExp
+    selectTypeName: freebusy_ResourceStructuredDatasAggExp
 
 ---
 kind: OrderByExpression
@@ -164,7 +164,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: ResourceStructuredDatasOrderByExp
+    expressionTypeName: freebusy_ResourceStructuredDatasOrderByExp
 
 ---
 kind: Model
@@ -180,20 +180,20 @@ definition:
   orderByExpression: ResourceStructuredDatasOrderByExp
   graphql:
     selectMany:
-      queryRootField: resourceStructuredDatas
+      queryRootField: freebusy_resourceStructuredDatas
       subscription:
-        rootField: resourceStructuredDatas
+        rootField: freebusy_resourceStructuredDatas
     selectUniques:
-      - queryRootField: resourceStructuredDatasById
+      - queryRootField: freebusy_resourceStructuredDatasById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: resourceStructuredDatasById
-    filterInputTypeName: ResourceStructuredDatasFilterInput
+          rootField: freebusy_resourceStructuredDatasById
+    filterInputTypeName: freebusy_ResourceStructuredDatasFilterInput
     aggregate:
-      queryRootField: resourceStructuredDatasAggregate
+      queryRootField: freebusy_resourceStructuredDatasAggregate
       subscription:
-        rootField: resourceStructuredDatasAggregate
+        rootField: freebusy_resourceStructuredDatasAggregate
 
 ---
 kind: ModelPermissions

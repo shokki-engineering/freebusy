@@ -18,8 +18,8 @@ definition:
     - name: values
       type: "[String_1]"
   graphql:
-    typeName: EventExtensionProperties
-    inputTypeName: EventExtensionPropertiesInput
+    typeName: freebusy_EventExtensionProperties
+    inputTypeName: freebusy_EventExtensionPropertiesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: event_extension_properties
@@ -78,7 +78,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: EventExtensionPropertiesBoolExp
+    typeName: freebusy_EventExtensionPropertiesBoolExp
 
 ---
 kind: AggregateExpression
@@ -101,7 +101,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: EventExtensionPropertiesAggExp
+    selectTypeName: freebusy_EventExtensionPropertiesAggExp
 
 ---
 kind: OrderByExpression
@@ -122,7 +122,7 @@ definition:
           orderByExpression: JsonOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: EventExtensionPropertiesOrderByExp
+    expressionTypeName: freebusy_EventExtensionPropertiesOrderByExp
 
 ---
 kind: Model
@@ -138,20 +138,20 @@ definition:
   orderByExpression: EventExtensionPropertiesOrderByExp
   graphql:
     selectMany:
-      queryRootField: eventExtensionProperties
+      queryRootField: freebusy_eventExtensionProperties
       subscription:
-        rootField: eventExtensionProperties
+        rootField: freebusy_eventExtensionProperties
     selectUniques:
-      - queryRootField: eventExtensionPropertiesById
+      - queryRootField: freebusy_eventExtensionPropertiesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: eventExtensionPropertiesById
-    filterInputTypeName: EventExtensionPropertiesFilterInput
+          rootField: freebusy_eventExtensionPropertiesById
+    filterInputTypeName: freebusy_EventExtensionPropertiesFilterInput
     aggregate:
-      queryRootField: eventExtensionPropertiesAggregate
+      queryRootField: freebusy_eventExtensionPropertiesAggregate
       subscription:
-        rootField: eventExtensionPropertiesAggregate
+        rootField: freebusy_eventExtensionPropertiesAggregate
 
 ---
 kind: ModelPermissions

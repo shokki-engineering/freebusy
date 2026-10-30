@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceEntityCalendar
-    inputTypeName: UpdateColumnResourceEntityCalendarInput
+    typeName: freebusy_UpdateColumnResourceEntityCalendar
+    inputTypeName: freebusy_UpdateColumnResourceEntityCalendarInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_entity_calendar
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceEntityCreateTime
-    inputTypeName: UpdateColumnResourceEntityCreateTimeInput
+    typeName: freebusy_UpdateColumnResourceEntityCreateTime
+    inputTypeName: freebusy_UpdateColumnResourceEntityCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_entity_create_time
@@ -76,8 +76,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceEntityDeleteTime
-    inputTypeName: UpdateColumnResourceEntityDeleteTimeInput
+    typeName: freebusy_UpdateColumnResourceEntityDeleteTime
+    inputTypeName: freebusy_UpdateColumnResourceEntityDeleteTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_entity_delete_time
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceEntityDescription
-    inputTypeName: UpdateColumnResourceEntityDescriptionInput
+    typeName: freebusy_UpdateColumnResourceEntityDescription
+    inputTypeName: freebusy_UpdateColumnResourceEntityDescriptionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_entity_description
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceEntityDisplayName
-    inputTypeName: UpdateColumnResourceEntityDisplayNameInput
+    typeName: freebusy_UpdateColumnResourceEntityDisplayName
+    inputTypeName: freebusy_UpdateColumnResourceEntityDisplayNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_entity_display_name
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceEntityEtag
-    inputTypeName: UpdateColumnResourceEntityEtagInput
+    typeName: freebusy_UpdateColumnResourceEntityEtag
+    inputTypeName: freebusy_UpdateColumnResourceEntityEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_entity_etag
@@ -204,8 +204,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceEntityExpireTime
-    inputTypeName: UpdateColumnResourceEntityExpireTimeInput
+    typeName: freebusy_UpdateColumnResourceEntityExpireTime
+    inputTypeName: freebusy_UpdateColumnResourceEntityExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_entity_expire_time
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceEntityIcalUid
-    inputTypeName: UpdateColumnResourceEntityIcalUidInput
+    typeName: freebusy_UpdateColumnResourceEntityIcalUid
+    inputTypeName: freebusy_UpdateColumnResourceEntityIcalUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_entity_ical_uid
@@ -268,8 +268,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceEntityId
-    inputTypeName: UpdateColumnResourceEntityIdInput
+    typeName: freebusy_UpdateColumnResourceEntityId
+    inputTypeName: freebusy_UpdateColumnResourceEntityIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_entity_id
@@ -300,8 +300,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceEntityName
-    inputTypeName: UpdateColumnResourceEntityNameInput
+    typeName: freebusy_UpdateColumnResourceEntityName
+    inputTypeName: freebusy_UpdateColumnResourceEntityNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_entity_name
@@ -332,8 +332,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceEntityPosition
-    inputTypeName: UpdateColumnResourceEntityPositionInput
+    typeName: freebusy_UpdateColumnResourceEntityPosition
+    inputTypeName: freebusy_UpdateColumnResourceEntityPositionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_entity_position
@@ -364,8 +364,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceEntityResourceTypes
-    inputTypeName: UpdateColumnResourceEntityResourceTypesInput
+    typeName: freebusy_UpdateColumnResourceEntityResourceTypes
+    inputTypeName: freebusy_UpdateColumnResourceEntityResourceTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_entity_resource_types
@@ -396,8 +396,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceEntityUid
-    inputTypeName: UpdateColumnResourceEntityUidInput
+    typeName: freebusy_UpdateColumnResourceEntityUid
+    inputTypeName: freebusy_UpdateColumnResourceEntityUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_entity_uid
@@ -428,8 +428,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnResourceEntityUpdateTime
-    inputTypeName: UpdateColumnResourceEntityUpdateTimeInput
+    typeName: freebusy_UpdateColumnResourceEntityUpdateTime
+    inputTypeName: freebusy_UpdateColumnResourceEntityUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_resource_entity_update_time
@@ -499,8 +499,8 @@ definition:
       type: UpdateColumnResourceEntityUpdateTime
       description: Update the 'update_time' column in the 'resource_entity' collection.
   graphql:
-    typeName: UpdateResourceEntityByIdUpdateColumns
-    inputTypeName: UpdateResourceEntityByIdUpdateColumnsInput
+    typeName: freebusy_UpdateResourceEntityByIdUpdateColumns
+    inputTypeName: freebusy_UpdateResourceEntityByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_resource_entity_by_id_update_columns
@@ -586,8 +586,8 @@ definition:
       type: "[ResourceEntity!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateResourceEntityByIdResponse
-    inputTypeName: UpdateResourceEntityByIdResponseInput
+    typeName: freebusy_UpdateResourceEntityByIdResponse
+    inputTypeName: freebusy_UpdateResourceEntityByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_resource_entity_by_id_response
@@ -640,7 +640,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateResourceEntityById
+    rootFieldName: freebusy_updateResourceEntityById
     rootFieldKind: Mutation
   description: Update any row on the 'resource_entity' collection using the 'id' key
 

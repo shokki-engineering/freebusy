@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesBusyType
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesBusyTypeInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesBusyType
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesBusyTypeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_busy_type
@@ -45,8 +45,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesCalendarId
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesCalendarIdInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesCalendarId
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesCalendarIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_calendar_id
@@ -78,8 +78,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesCategories
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesCategoriesInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesCategories
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesCategoriesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_categories
@@ -111,8 +111,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesCreateTime
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesCreateTimeInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesCreateTime
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_create_time
@@ -144,8 +144,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesDeleteTime
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesDeleteTimeInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesDeleteTime
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesDeleteTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_delete_time
@@ -177,8 +177,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesDescription
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesDescriptionInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesDescription
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesDescriptionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_description
@@ -209,8 +209,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesDuration
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesDurationInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesDuration
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesDurationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_duration
@@ -242,8 +242,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesEndFormCase
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesEndFormCaseInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesEndFormCase
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesEndFormCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_end_form_case
@@ -274,8 +274,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesEndId
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesEndIdInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesEndId
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesEndIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_end_id
@@ -306,8 +306,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesEtag
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesEtagInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesEtag
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_etag
@@ -339,8 +339,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesExpireTime
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesExpireTimeInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesExpireTime
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_expire_time
@@ -371,8 +371,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesIcalUid
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesIcalUidInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesIcalUid
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesIcalUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_ical_uid
@@ -403,8 +403,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesId
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesIdInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesId
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_id
@@ -435,8 +435,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesName
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesNameInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesName
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_name
@@ -467,8 +467,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesOrganizer
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesOrganizerInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesOrganizer
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesOrganizerInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_organizer
@@ -499,8 +499,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesPriority
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesPriorityInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesPriority
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesPriorityInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_priority
@@ -531,8 +531,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesStartId
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesStartIdInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesStartId
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesStartIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_start_id
@@ -563,8 +563,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesSummary
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesSummaryInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesSummary
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesSummaryInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_summary
@@ -595,8 +595,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesUid
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesUidInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesUid
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_uid
@@ -628,8 +628,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnAvailabilityAvailabilitiesUpdateTime
-    inputTypeName: UpdateColumnAvailabilityAvailabilitiesUpdateTimeInput
+    typeName: freebusy_UpdateColumnAvailabilityAvailabilitiesUpdateTime
+    inputTypeName: freebusy_UpdateColumnAvailabilityAvailabilitiesUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_availability_availabilities_update_time
@@ -733,8 +733,8 @@ definition:
       description: Update the 'update_time' column in the
         'availability_availabilities' collection.
   graphql:
-    typeName: UpdateAvailabilityAvailabilitiesByIdUpdateColumns
-    inputTypeName: UpdateAvailabilityAvailabilitiesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateAvailabilityAvailabilitiesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateAvailabilityAvailabilitiesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_availability_availabilities_by_id_update_columns
@@ -844,8 +844,8 @@ definition:
       type: "[AvailabilityAvailabilities!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateAvailabilityAvailabilitiesByIdResponse
-    inputTypeName: UpdateAvailabilityAvailabilitiesByIdResponseInput
+    typeName: freebusy_UpdateAvailabilityAvailabilitiesByIdResponse
+    inputTypeName: freebusy_UpdateAvailabilityAvailabilitiesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_availability_availabilities_by_id_response
@@ -898,7 +898,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateAvailabilityAvailabilitiesById
+    rootFieldName: freebusy_updateAvailabilityAvailabilitiesById
     rootFieldKind: Mutation
   description: Update any row on the 'availability_availabilities' collection
     using the 'id' key

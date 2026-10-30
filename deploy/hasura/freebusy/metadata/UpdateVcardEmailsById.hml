@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardEmailsContactId
-    inputTypeName: UpdateColumnVcardEmailsContactIdInput
+    typeName: freebusy_UpdateColumnVcardEmailsContactId
+    inputTypeName: freebusy_UpdateColumnVcardEmailsContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_emails_contact_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardEmailsId
-    inputTypeName: UpdateColumnVcardEmailsIdInput
+    typeName: freebusy_UpdateColumnVcardEmailsId
+    inputTypeName: freebusy_UpdateColumnVcardEmailsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_emails_id
@@ -76,8 +76,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardEmailsPref
-    inputTypeName: UpdateColumnVcardEmailsPrefInput
+    typeName: freebusy_UpdateColumnVcardEmailsPref
+    inputTypeName: freebusy_UpdateColumnVcardEmailsPrefInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_emails_pref
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardEmailsTypes
-    inputTypeName: UpdateColumnVcardEmailsTypesInput
+    typeName: freebusy_UpdateColumnVcardEmailsTypes
+    inputTypeName: freebusy_UpdateColumnVcardEmailsTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_emails_types
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardEmailsValue
-    inputTypeName: UpdateColumnVcardEmailsValueInput
+    typeName: freebusy_UpdateColumnVcardEmailsValue
+    inputTypeName: freebusy_UpdateColumnVcardEmailsValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_emails_value
@@ -184,8 +184,8 @@ definition:
       type: UpdateColumnVcardEmailsValue
       description: Update the 'value' column in the 'vcard_emails' collection.
   graphql:
-    typeName: UpdateVcardEmailsByIdUpdateColumns
-    inputTypeName: UpdateVcardEmailsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardEmailsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardEmailsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_emails_by_id_update_columns
@@ -235,8 +235,8 @@ definition:
       type: "[VcardEmails!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardEmailsByIdResponse
-    inputTypeName: UpdateVcardEmailsByIdResponseInput
+    typeName: freebusy_UpdateVcardEmailsByIdResponse
+    inputTypeName: freebusy_UpdateVcardEmailsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_emails_by_id_response
@@ -289,7 +289,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardEmailsById
+    rootFieldName: freebusy_updateVcardEmailsById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_emails' collection using the 'id' key
 

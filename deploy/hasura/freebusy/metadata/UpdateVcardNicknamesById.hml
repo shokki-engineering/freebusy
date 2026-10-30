@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNicknamesContactId
-    inputTypeName: UpdateColumnVcardNicknamesContactIdInput
+    typeName: freebusy_UpdateColumnVcardNicknamesContactId
+    inputTypeName: freebusy_UpdateColumnVcardNicknamesContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_nicknames_contact_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNicknamesId
-    inputTypeName: UpdateColumnVcardNicknamesIdInput
+    typeName: freebusy_UpdateColumnVcardNicknamesId
+    inputTypeName: freebusy_UpdateColumnVcardNicknamesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_nicknames_id
@@ -76,8 +76,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNicknamesPref
-    inputTypeName: UpdateColumnVcardNicknamesPrefInput
+    typeName: freebusy_UpdateColumnVcardNicknamesPref
+    inputTypeName: freebusy_UpdateColumnVcardNicknamesPrefInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_nicknames_pref
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNicknamesTypes
-    inputTypeName: UpdateColumnVcardNicknamesTypesInput
+    typeName: freebusy_UpdateColumnVcardNicknamesTypes
+    inputTypeName: freebusy_UpdateColumnVcardNicknamesTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_nicknames_types
@@ -140,8 +140,8 @@ definition:
       type: "[String_1]!"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardNicknamesValues
-    inputTypeName: UpdateColumnVcardNicknamesValuesInput
+    typeName: freebusy_UpdateColumnVcardNicknamesValues
+    inputTypeName: freebusy_UpdateColumnVcardNicknamesValuesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_nicknames_values
@@ -184,8 +184,8 @@ definition:
       type: UpdateColumnVcardNicknamesValues
       description: Update the 'values' column in the 'vcard_nicknames' collection.
   graphql:
-    typeName: UpdateVcardNicknamesByIdUpdateColumns
-    inputTypeName: UpdateVcardNicknamesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardNicknamesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardNicknamesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_nicknames_by_id_update_columns
@@ -235,8 +235,8 @@ definition:
       type: "[VcardNicknames!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardNicknamesByIdResponse
-    inputTypeName: UpdateVcardNicknamesByIdResponseInput
+    typeName: freebusy_UpdateVcardNicknamesByIdResponse
+    inputTypeName: freebusy_UpdateVcardNicknamesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_nicknames_by_id_response
@@ -289,7 +289,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardNicknamesById
+    rootFieldName: freebusy_updateVcardNicknamesById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_nicknames' collection using the 'id' key
 

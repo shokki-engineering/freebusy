@@ -32,8 +32,8 @@ definition:
     - name: uri
       type: String_1!
   graphql:
-    typeName: WebhookResource
-    inputTypeName: WebhookResourceInput
+    typeName: freebusy_WebhookResource
+    inputTypeName: freebusy_WebhookResourceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: webhook_resource
@@ -134,7 +134,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: WebhookResourceBoolExp
+    typeName: freebusy_WebhookResourceBoolExp
 
 ---
 kind: AggregateExpression
@@ -171,7 +171,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: WebhookResourceAggExp
+    selectTypeName: freebusy_WebhookResourceAggExp
 
 ---
 kind: OrderByExpression
@@ -206,7 +206,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: WebhookResourceOrderByExp
+    expressionTypeName: freebusy_WebhookResourceOrderByExp
 
 ---
 kind: Model
@@ -222,20 +222,20 @@ definition:
   orderByExpression: WebhookResourceOrderByExp
   graphql:
     selectMany:
-      queryRootField: webhookResource
+      queryRootField: freebusy_webhookResource
       subscription:
-        rootField: webhookResource
+        rootField: freebusy_webhookResource
     selectUniques:
-      - queryRootField: webhookResourceById
+      - queryRootField: freebusy_webhookResourceById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: webhookResourceById
-    filterInputTypeName: WebhookResourceFilterInput
+          rootField: freebusy_webhookResourceById
+    filterInputTypeName: freebusy_WebhookResourceFilterInput
     aggregate:
-      queryRootField: webhookResourceAggregate
+      queryRootField: freebusy_webhookResourceAggregate
       subscription:
-        rootField: webhookResourceAggregate
+        rootField: freebusy_webhookResourceAggregate
 
 ---
 kind: ModelPermissions

@@ -15,8 +15,8 @@ definition:
       type: "[EventWeekdayNums!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteEventWeekdayNumsByIdResponse
-    inputTypeName: DeleteEventWeekdayNumsByIdResponseInput
+    typeName: freebusy_DeleteEventWeekdayNumsByIdResponse
+    inputTypeName: freebusy_DeleteEventWeekdayNumsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_event_weekday_nums_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteEventWeekdayNumsById
+    rootFieldName: freebusy_deleteEventWeekdayNumsById
     rootFieldKind: Mutation
   description: Delete any row on the 'event_weekday_nums' collection using the 'id' key
 

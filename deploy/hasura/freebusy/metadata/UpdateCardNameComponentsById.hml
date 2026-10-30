@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardNameComponentsId
-    inputTypeName: UpdateColumnCardNameComponentsIdInput
+    typeName: freebusy_UpdateColumnCardNameComponentsId
+    inputTypeName: freebusy_UpdateColumnCardNameComponentsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_name_components_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardNameComponentsKind
-    inputTypeName: UpdateColumnCardNameComponentsKindInput
+    typeName: freebusy_UpdateColumnCardNameComponentsKind
+    inputTypeName: freebusy_UpdateColumnCardNameComponentsKindInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_name_components_kind
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardNameComponentsNameId
-    inputTypeName: UpdateColumnCardNameComponentsNameIdInput
+    typeName: freebusy_UpdateColumnCardNameComponentsNameId
+    inputTypeName: freebusy_UpdateColumnCardNameComponentsNameIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_name_components_name_id
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardNameComponentsPhonetic
-    inputTypeName: UpdateColumnCardNameComponentsPhoneticInput
+    typeName: freebusy_UpdateColumnCardNameComponentsPhonetic
+    inputTypeName: freebusy_UpdateColumnCardNameComponentsPhoneticInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_name_components_phonetic
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardNameComponentsValue
-    inputTypeName: UpdateColumnCardNameComponentsValueInput
+    typeName: freebusy_UpdateColumnCardNameComponentsValue
+    inputTypeName: freebusy_UpdateColumnCardNameComponentsValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_name_components_value
@@ -184,8 +184,8 @@ definition:
       type: UpdateColumnCardNameComponentsValue
       description: Update the 'value' column in the 'card_name_components' collection.
   graphql:
-    typeName: UpdateCardNameComponentsByIdUpdateColumns
-    inputTypeName: UpdateCardNameComponentsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateCardNameComponentsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateCardNameComponentsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_card_name_components_by_id_update_columns
@@ -235,8 +235,8 @@ definition:
       type: "[CardNameComponents!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateCardNameComponentsByIdResponse
-    inputTypeName: UpdateCardNameComponentsByIdResponseInput
+    typeName: freebusy_UpdateCardNameComponentsByIdResponse
+    inputTypeName: freebusy_UpdateCardNameComponentsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_card_name_components_by_id_response
@@ -289,7 +289,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateCardNameComponentsById
+    rootFieldName: freebusy_updateCardNameComponentsById
     rootFieldKind: Mutation
   description: Update any row on the 'card_name_components' collection using the 'id' key
 

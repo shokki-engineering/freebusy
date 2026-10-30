@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLocationsDescription
-    inputTypeName: UpdateColumnEventLocationsDescriptionInput
+    typeName: freebusy_UpdateColumnEventLocationsDescription
+    inputTypeName: freebusy_UpdateColumnEventLocationsDescriptionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_locations_description
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLocationsDisplayName
-    inputTypeName: UpdateColumnEventLocationsDisplayNameInput
+    typeName: freebusy_UpdateColumnEventLocationsDisplayName
+    inputTypeName: freebusy_UpdateColumnEventLocationsDisplayNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_locations_display_name
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLocationsEventId
-    inputTypeName: UpdateColumnEventLocationsEventIdInput
+    typeName: freebusy_UpdateColumnEventLocationsEventId
+    inputTypeName: freebusy_UpdateColumnEventLocationsEventIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_locations_event_id
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLocationsIcalUid
-    inputTypeName: UpdateColumnEventLocationsIcalUidInput
+    typeName: freebusy_UpdateColumnEventLocationsIcalUid
+    inputTypeName: freebusy_UpdateColumnEventLocationsIcalUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_locations_ical_uid
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLocationsId
-    inputTypeName: UpdateColumnEventLocationsIdInput
+    typeName: freebusy_UpdateColumnEventLocationsId
+    inputTypeName: freebusy_UpdateColumnEventLocationsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_locations_id
@@ -172,8 +172,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLocationsLocationTypes
-    inputTypeName: UpdateColumnEventLocationsLocationTypesInput
+    typeName: freebusy_UpdateColumnEventLocationsLocationTypes
+    inputTypeName: freebusy_UpdateColumnEventLocationsLocationTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_locations_location_types
@@ -204,8 +204,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLocationsParticipantId
-    inputTypeName: UpdateColumnEventLocationsParticipantIdInput
+    typeName: freebusy_UpdateColumnEventLocationsParticipantId
+    inputTypeName: freebusy_UpdateColumnEventLocationsParticipantIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_locations_participant_id
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventLocationsPosition
-    inputTypeName: UpdateColumnEventLocationsPositionInput
+    typeName: freebusy_UpdateColumnEventLocationsPosition
+    inputTypeName: freebusy_UpdateColumnEventLocationsPositionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_locations_position
@@ -289,8 +289,8 @@ definition:
       type: UpdateColumnEventLocationsPosition
       description: Update the 'position' column in the 'event_locations' collection.
   graphql:
-    typeName: UpdateEventLocationsByIdUpdateColumns
-    inputTypeName: UpdateEventLocationsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateEventLocationsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateEventLocationsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_locations_by_id_update_columns
@@ -352,8 +352,8 @@ definition:
       type: "[EventLocations!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateEventLocationsByIdResponse
-    inputTypeName: UpdateEventLocationsByIdResponseInput
+    typeName: freebusy_UpdateEventLocationsByIdResponse
+    inputTypeName: freebusy_UpdateEventLocationsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_locations_by_id_response
@@ -406,7 +406,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateEventLocationsById
+    rootFieldName: freebusy_updateEventLocationsById
     rootFieldKind: Mutation
   description: Update any row on the 'event_locations' collection using the 'id' key
 

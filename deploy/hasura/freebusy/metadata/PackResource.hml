@@ -28,8 +28,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: PackResource
-    inputTypeName: PackResourceInput
+    typeName: freebusy_PackResource
+    inputTypeName: freebusy_PackResourceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: pack_resource
@@ -120,7 +120,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: PackResourceBoolExp
+    typeName: freebusy_PackResourceBoolExp
 
 ---
 kind: AggregateExpression
@@ -155,7 +155,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: PackResourceAggExp
+    selectTypeName: freebusy_PackResourceAggExp
 
 ---
 kind: OrderByExpression
@@ -188,7 +188,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: PackResourceOrderByExp
+    expressionTypeName: freebusy_PackResourceOrderByExp
 
 ---
 kind: Model
@@ -204,20 +204,20 @@ definition:
   orderByExpression: PackResourceOrderByExp
   graphql:
     selectMany:
-      queryRootField: packResource
+      queryRootField: freebusy_packResource
       subscription:
-        rootField: packResource
+        rootField: freebusy_packResource
     selectUniques:
-      - queryRootField: packResourceById
+      - queryRootField: freebusy_packResourceById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: packResourceById
-    filterInputTypeName: PackResourceFilterInput
+          rootField: freebusy_packResourceById
+    filterInputTypeName: freebusy_PackResourceFilterInput
     aggregate:
-      queryRootField: packResourceAggregate
+      queryRootField: freebusy_packResourceAggregate
       subscription:
-        rootField: packResourceAggregate
+        rootField: freebusy_packResourceAggregate
 
 ---
 kind: ModelPermissions

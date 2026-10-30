@@ -26,8 +26,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: InsertVcardSocialProfilesObject
-    inputTypeName: InsertVcardSocialProfilesObjectInput
+    typeName: freebusy_InsertVcardSocialProfilesObject
+    inputTypeName: freebusy_InsertVcardSocialProfilesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_social_profiles_object
@@ -93,8 +93,8 @@ definition:
       type: "[VcardSocialProfiles!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertVcardSocialProfilesResponse
-    inputTypeName: InsertVcardSocialProfilesResponseInput
+    typeName: freebusy_InsertVcardSocialProfilesResponse
+    inputTypeName: freebusy_InsertVcardSocialProfilesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_social_profiles_response
@@ -138,7 +138,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertVcardSocialProfiles
+    rootFieldName: freebusy_insertVcardSocialProfiles
     rootFieldKind: Mutation
   description: Insert into the vcard_social_profiles table
 

@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTelephonesContactId
-    inputTypeName: UpdateColumnVcardTelephonesContactIdInput
+    typeName: freebusy_UpdateColumnVcardTelephonesContactId
+    inputTypeName: freebusy_UpdateColumnVcardTelephonesContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_telephones_contact_id
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTelephonesFeatures
-    inputTypeName: UpdateColumnVcardTelephonesFeaturesInput
+    typeName: freebusy_UpdateColumnVcardTelephonesFeatures
+    inputTypeName: freebusy_UpdateColumnVcardTelephonesFeaturesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_telephones_features
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTelephonesId
-    inputTypeName: UpdateColumnVcardTelephonesIdInput
+    typeName: freebusy_UpdateColumnVcardTelephonesId
+    inputTypeName: freebusy_UpdateColumnVcardTelephonesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_telephones_id
@@ -108,8 +108,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTelephonesPref
-    inputTypeName: UpdateColumnVcardTelephonesPrefInput
+    typeName: freebusy_UpdateColumnVcardTelephonesPref
+    inputTypeName: freebusy_UpdateColumnVcardTelephonesPrefInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_telephones_pref
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTelephonesText
-    inputTypeName: UpdateColumnVcardTelephonesTextInput
+    typeName: freebusy_UpdateColumnVcardTelephonesText
+    inputTypeName: freebusy_UpdateColumnVcardTelephonesTextInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_telephones_text
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTelephonesTypes
-    inputTypeName: UpdateColumnVcardTelephonesTypesInput
+    typeName: freebusy_UpdateColumnVcardTelephonesTypes
+    inputTypeName: freebusy_UpdateColumnVcardTelephonesTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_telephones_types
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTelephonesUri
-    inputTypeName: UpdateColumnVcardTelephonesUriInput
+    typeName: freebusy_UpdateColumnVcardTelephonesUri
+    inputTypeName: freebusy_UpdateColumnVcardTelephonesUriInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_telephones_uri
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardTelephonesValueCase
-    inputTypeName: UpdateColumnVcardTelephonesValueCaseInput
+    typeName: freebusy_UpdateColumnVcardTelephonesValueCase
+    inputTypeName: freebusy_UpdateColumnVcardTelephonesValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_telephones_value_case
@@ -289,8 +289,8 @@ definition:
       type: UpdateColumnVcardTelephonesValueCase
       description: Update the 'value_case' column in the 'vcard_telephones' collection.
   graphql:
-    typeName: UpdateVcardTelephonesByIdUpdateColumns
-    inputTypeName: UpdateVcardTelephonesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardTelephonesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardTelephonesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_telephones_by_id_update_columns
@@ -352,8 +352,8 @@ definition:
       type: "[VcardTelephones!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardTelephonesByIdResponse
-    inputTypeName: UpdateVcardTelephonesByIdResponseInput
+    typeName: freebusy_UpdateVcardTelephonesByIdResponse
+    inputTypeName: freebusy_UpdateVcardTelephonesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_telephones_by_id_response
@@ -406,7 +406,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardTelephonesById
+    rootFieldName: freebusy_updateVcardTelephonesById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_telephones' collection using the 'id' key
 

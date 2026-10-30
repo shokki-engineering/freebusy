@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsBaseSensorId
-    inputTypeName: UpdateColumnPackRecordsBaseSensorIdInput
+    typeName: freebusy_UpdateColumnPackRecordsBaseSensorId
+    inputTypeName: freebusy_UpdateColumnPackRecordsBaseSensorIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_base_sensor_id
@@ -44,8 +44,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsBaseSum
-    inputTypeName: UpdateColumnPackRecordsBaseSumInput
+    typeName: freebusy_UpdateColumnPackRecordsBaseSum
+    inputTypeName: freebusy_UpdateColumnPackRecordsBaseSumInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_base_sum
@@ -76,8 +76,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsBaseTimeValue
-    inputTypeName: UpdateColumnPackRecordsBaseTimeValueInput
+    typeName: freebusy_UpdateColumnPackRecordsBaseTimeValue
+    inputTypeName: freebusy_UpdateColumnPackRecordsBaseTimeValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_base_time_value
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsBaseUnit
-    inputTypeName: UpdateColumnPackRecordsBaseUnitInput
+    typeName: freebusy_UpdateColumnPackRecordsBaseUnit
+    inputTypeName: freebusy_UpdateColumnPackRecordsBaseUnitInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_base_unit
@@ -140,8 +140,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsBaseValue
-    inputTypeName: UpdateColumnPackRecordsBaseValueInput
+    typeName: freebusy_UpdateColumnPackRecordsBaseValue
+    inputTypeName: freebusy_UpdateColumnPackRecordsBaseValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_base_value
@@ -172,8 +172,8 @@ definition:
       type: Boolean_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsBooleanValue
-    inputTypeName: UpdateColumnPackRecordsBooleanValueInput
+    typeName: freebusy_UpdateColumnPackRecordsBooleanValue
+    inputTypeName: freebusy_UpdateColumnPackRecordsBooleanValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_boolean_value
@@ -204,8 +204,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsDataValue
-    inputTypeName: UpdateColumnPackRecordsDataValueInput
+    typeName: freebusy_UpdateColumnPackRecordsDataValue
+    inputTypeName: freebusy_UpdateColumnPackRecordsDataValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_data_value
@@ -236,8 +236,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsId
-    inputTypeName: UpdateColumnPackRecordsIdInput
+    typeName: freebusy_UpdateColumnPackRecordsId
+    inputTypeName: freebusy_UpdateColumnPackRecordsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_id
@@ -268,8 +268,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsNumberValue
-    inputTypeName: UpdateColumnPackRecordsNumberValueInput
+    typeName: freebusy_UpdateColumnPackRecordsNumberValue
+    inputTypeName: freebusy_UpdateColumnPackRecordsNumberValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_number_value
@@ -300,8 +300,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsPackId
-    inputTypeName: UpdateColumnPackRecordsPackIdInput
+    typeName: freebusy_UpdateColumnPackRecordsPackId
+    inputTypeName: freebusy_UpdateColumnPackRecordsPackIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_pack_id
@@ -332,8 +332,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsSensorId
-    inputTypeName: UpdateColumnPackRecordsSensorIdInput
+    typeName: freebusy_UpdateColumnPackRecordsSensorId
+    inputTypeName: freebusy_UpdateColumnPackRecordsSensorIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_sensor_id
@@ -364,8 +364,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsStringValue
-    inputTypeName: UpdateColumnPackRecordsStringValueInput
+    typeName: freebusy_UpdateColumnPackRecordsStringValue
+    inputTypeName: freebusy_UpdateColumnPackRecordsStringValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_string_value
@@ -396,8 +396,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsSum
-    inputTypeName: UpdateColumnPackRecordsSumInput
+    typeName: freebusy_UpdateColumnPackRecordsSum
+    inputTypeName: freebusy_UpdateColumnPackRecordsSumInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_sum
@@ -428,8 +428,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsTimeValue
-    inputTypeName: UpdateColumnPackRecordsTimeValueInput
+    typeName: freebusy_UpdateColumnPackRecordsTimeValue
+    inputTypeName: freebusy_UpdateColumnPackRecordsTimeValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_time_value
@@ -460,8 +460,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsUnit
-    inputTypeName: UpdateColumnPackRecordsUnitInput
+    typeName: freebusy_UpdateColumnPackRecordsUnit
+    inputTypeName: freebusy_UpdateColumnPackRecordsUnitInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_unit
@@ -492,8 +492,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsUpdateDuration
-    inputTypeName: UpdateColumnPackRecordsUpdateDurationInput
+    typeName: freebusy_UpdateColumnPackRecordsUpdateDuration
+    inputTypeName: freebusy_UpdateColumnPackRecordsUpdateDurationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_update_duration
@@ -524,8 +524,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnPackRecordsValueCase
-    inputTypeName: UpdateColumnPackRecordsValueCaseInput
+    typeName: freebusy_UpdateColumnPackRecordsValueCase
+    inputTypeName: freebusy_UpdateColumnPackRecordsValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_pack_records_value_case
@@ -604,8 +604,8 @@ definition:
       type: UpdateColumnPackRecordsValueCase
       description: Update the 'value_case' column in the 'pack_records' collection.
   graphql:
-    typeName: UpdatePackRecordsByIdUpdateColumns
-    inputTypeName: UpdatePackRecordsByIdUpdateColumnsInput
+    typeName: freebusy_UpdatePackRecordsByIdUpdateColumns
+    inputTypeName: freebusy_UpdatePackRecordsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_pack_records_by_id_update_columns
@@ -703,8 +703,8 @@ definition:
       type: "[PackRecords!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdatePackRecordsByIdResponse
-    inputTypeName: UpdatePackRecordsByIdResponseInput
+    typeName: freebusy_UpdatePackRecordsByIdResponse
+    inputTypeName: freebusy_UpdatePackRecordsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_pack_records_by_id_response
@@ -757,7 +757,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updatePackRecordsById
+    rootFieldName: freebusy_updatePackRecordsById
     rootFieldKind: Mutation
   description: Update any row on the 'pack_records' collection using the 'id' key
 

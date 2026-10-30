@@ -15,8 +15,8 @@ definition:
       type: "[SensorResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteSensorResourceByIdResponse
-    inputTypeName: DeleteSensorResourceByIdResponseInput
+    typeName: freebusy_DeleteSensorResourceByIdResponse
+    inputTypeName: freebusy_DeleteSensorResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_sensor_resource_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteSensorResourceById
+    rootFieldName: freebusy_deleteSensorResourceById
     rootFieldKind: Mutation
   description: Delete any row on the 'sensor_resource' collection using the 'id' key
 

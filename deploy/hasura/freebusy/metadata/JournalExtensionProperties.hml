@@ -18,8 +18,8 @@ definition:
     - name: values
       type: "[String_1]"
   graphql:
-    typeName: JournalExtensionProperties
-    inputTypeName: JournalExtensionPropertiesInput
+    typeName: freebusy_JournalExtensionProperties
+    inputTypeName: freebusy_JournalExtensionPropertiesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: journal_extension_properties
@@ -78,7 +78,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: JournalExtensionPropertiesBoolExp
+    typeName: freebusy_JournalExtensionPropertiesBoolExp
 
 ---
 kind: AggregateExpression
@@ -101,7 +101,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: JournalExtensionPropertiesAggExp
+    selectTypeName: freebusy_JournalExtensionPropertiesAggExp
 
 ---
 kind: OrderByExpression
@@ -122,7 +122,7 @@ definition:
           orderByExpression: JsonOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: JournalExtensionPropertiesOrderByExp
+    expressionTypeName: freebusy_JournalExtensionPropertiesOrderByExp
 
 ---
 kind: Model
@@ -138,20 +138,20 @@ definition:
   orderByExpression: JournalExtensionPropertiesOrderByExp
   graphql:
     selectMany:
-      queryRootField: journalExtensionProperties
+      queryRootField: freebusy_journalExtensionProperties
       subscription:
-        rootField: journalExtensionProperties
+        rootField: freebusy_journalExtensionProperties
     selectUniques:
-      - queryRootField: journalExtensionPropertiesById
+      - queryRootField: freebusy_journalExtensionPropertiesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: journalExtensionPropertiesById
-    filterInputTypeName: JournalExtensionPropertiesFilterInput
+          rootField: freebusy_journalExtensionPropertiesById
+    filterInputTypeName: freebusy_JournalExtensionPropertiesFilterInput
     aggregate:
-      queryRootField: journalExtensionPropertiesAggregate
+      queryRootField: freebusy_journalExtensionPropertiesAggregate
       subscription:
-        rootField: journalExtensionPropertiesAggregate
+        rootField: freebusy_journalExtensionPropertiesAggregate
 
 ---
 kind: ModelPermissions

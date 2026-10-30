@@ -42,8 +42,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: CalendarResource
-    inputTypeName: CalendarResourceInput
+    typeName: freebusy_CalendarResource
+    inputTypeName: freebusy_CalendarResourceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: calendar_resource
@@ -176,7 +176,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: CalendarResourceBoolExp
+    typeName: freebusy_CalendarResourceBoolExp
 
 ---
 kind: AggregateExpression
@@ -225,7 +225,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: CalendarResourceAggExp
+    selectTypeName: freebusy_CalendarResourceAggExp
 
 ---
 kind: OrderByExpression
@@ -272,7 +272,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: CalendarResourceOrderByExp
+    expressionTypeName: freebusy_CalendarResourceOrderByExp
 
 ---
 kind: Model
@@ -288,20 +288,20 @@ definition:
   orderByExpression: CalendarResourceOrderByExp
   graphql:
     selectMany:
-      queryRootField: calendarResource
+      queryRootField: freebusy_calendarResource
       subscription:
-        rootField: calendarResource
+        rootField: freebusy_calendarResource
     selectUniques:
-      - queryRootField: calendarResourceById
+      - queryRootField: freebusy_calendarResourceById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: calendarResourceById
-    filterInputTypeName: CalendarResourceFilterInput
+          rootField: freebusy_calendarResourceById
+    filterInputTypeName: freebusy_CalendarResourceFilterInput
     aggregate:
-      queryRootField: calendarResourceAggregate
+      queryRootField: freebusy_calendarResourceAggregate
       subscription:
-        rootField: calendarResourceAggregate
+        rootField: freebusy_calendarResourceAggregate
 
 ---
 kind: ModelPermissions

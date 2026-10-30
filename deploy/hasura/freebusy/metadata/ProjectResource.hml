@@ -36,8 +36,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: ProjectResource
-    inputTypeName: ProjectResourceInput
+    typeName: freebusy_ProjectResource
+    inputTypeName: freebusy_ProjectResourceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: project_resource
@@ -152,7 +152,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: ProjectResourceBoolExp
+    typeName: freebusy_ProjectResourceBoolExp
 
 ---
 kind: AggregateExpression
@@ -195,7 +195,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: ProjectResourceAggExp
+    selectTypeName: freebusy_ProjectResourceAggExp
 
 ---
 kind: OrderByExpression
@@ -236,7 +236,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: ProjectResourceOrderByExp
+    expressionTypeName: freebusy_ProjectResourceOrderByExp
 
 ---
 kind: Model
@@ -252,20 +252,20 @@ definition:
   orderByExpression: ProjectResourceOrderByExp
   graphql:
     selectMany:
-      queryRootField: projectResource
+      queryRootField: freebusy_projectResource
       subscription:
-        rootField: projectResource
+        rootField: freebusy_projectResource
     selectUniques:
-      - queryRootField: projectResourceById
+      - queryRootField: freebusy_projectResourceById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: projectResourceById
-    filterInputTypeName: ProjectResourceFilterInput
+          rootField: freebusy_projectResourceById
+    filterInputTypeName: freebusy_ProjectResourceFilterInput
     aggregate:
-      queryRootField: projectResourceAggregate
+      queryRootField: freebusy_projectResourceAggregate
       subscription:
-        rootField: projectResourceAggregate
+        rootField: freebusy_projectResourceAggregate
 
 ---
 kind: ModelPermissions

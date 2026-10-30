@@ -28,8 +28,8 @@ definition:
     - name: xmlReference
       type: String_1
   graphql:
-    typeName: InsertEventLinksObject
-    inputTypeName: InsertEventLinksObjectInput
+    typeName: freebusy_InsertEventLinksObject
+    inputTypeName: freebusy_InsertEventLinksObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_links_object
@@ -99,8 +99,8 @@ definition:
       type: "[EventLinks!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertEventLinksResponse
-    inputTypeName: InsertEventLinksResponseInput
+    typeName: freebusy_InsertEventLinksResponse
+    inputTypeName: freebusy_InsertEventLinksResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_links_response
@@ -144,7 +144,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertEventLinks
+    rootFieldName: freebusy_insertEventLinks
     rootFieldKind: Mutation
   description: Insert into the event_links table
 

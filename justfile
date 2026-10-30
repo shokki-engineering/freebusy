@@ -111,7 +111,7 @@ test:
 # webhook delivery -- that would act on another package's rows.
 # Every test, live suites included, against Postgres, Hasura and Redis.
 [group('test')]
-test-live dsn="host=127.0.0.1 port=5432 user=postgres password=postgrespassword dbname=freebusydb sslmode=disable" url="http://localhost:3280/graphql" redis="127.0.0.1:6379":
+test-live dsn="host=127.0.0.1 port=5433 user=postgres password=postgrespassword dbname=freebusydb sslmode=disable" url="http://localhost:3280/graphql" redis="127.0.0.1:6379":
     FREEBUSY_TEST_REQUIRE_LIVE=1 \
     FREEBUSY_TEST_POSTGRES_DSN="{{ dsn }}" \
     FREEBUSY_TEST_DATABASE_URL="{{ dsn }}" \

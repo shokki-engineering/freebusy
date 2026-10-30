@@ -15,8 +15,8 @@ definition:
       type: "[JournalExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteJournalExtensionPropertiesByIdResponse
-    inputTypeName: DeleteJournalExtensionPropertiesByIdResponseInput
+    typeName: freebusy_DeleteJournalExtensionPropertiesByIdResponse
+    inputTypeName: freebusy_DeleteJournalExtensionPropertiesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_journal_extension_properties_by_id_response
@@ -61,7 +61,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteJournalExtensionPropertiesById
+    rootFieldName: freebusy_deleteJournalExtensionPropertiesById
     rootFieldKind: Mutation
   description: Delete any row on the 'journal_extension_properties' collection
     using the 'id' key

@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardLanguagesContactId
-    inputTypeName: UpdateColumnVcardLanguagesContactIdInput
+    typeName: freebusy_UpdateColumnVcardLanguagesContactId
+    inputTypeName: freebusy_UpdateColumnVcardLanguagesContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_languages_contact_id
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardLanguagesId
-    inputTypeName: UpdateColumnVcardLanguagesIdInput
+    typeName: freebusy_UpdateColumnVcardLanguagesId
+    inputTypeName: freebusy_UpdateColumnVcardLanguagesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_languages_id
@@ -76,8 +76,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardLanguagesPref
-    inputTypeName: UpdateColumnVcardLanguagesPrefInput
+    typeName: freebusy_UpdateColumnVcardLanguagesPref
+    inputTypeName: freebusy_UpdateColumnVcardLanguagesPrefInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_languages_pref
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardLanguagesTypes
-    inputTypeName: UpdateColumnVcardLanguagesTypesInput
+    typeName: freebusy_UpdateColumnVcardLanguagesTypes
+    inputTypeName: freebusy_UpdateColumnVcardLanguagesTypesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_languages_types
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardLanguagesValue
-    inputTypeName: UpdateColumnVcardLanguagesValueInput
+    typeName: freebusy_UpdateColumnVcardLanguagesValue
+    inputTypeName: freebusy_UpdateColumnVcardLanguagesValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_languages_value
@@ -184,8 +184,8 @@ definition:
       type: UpdateColumnVcardLanguagesValue
       description: Update the 'value' column in the 'vcard_languages' collection.
   graphql:
-    typeName: UpdateVcardLanguagesByIdUpdateColumns
-    inputTypeName: UpdateVcardLanguagesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardLanguagesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardLanguagesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_languages_by_id_update_columns
@@ -235,8 +235,8 @@ definition:
       type: "[VcardLanguages!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardLanguagesByIdResponse
-    inputTypeName: UpdateVcardLanguagesByIdResponseInput
+    typeName: freebusy_UpdateVcardLanguagesByIdResponse
+    inputTypeName: freebusy_UpdateVcardLanguagesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_languages_by_id_response
@@ -289,7 +289,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardLanguagesById
+    rootFieldName: freebusy_updateVcardLanguagesById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_languages' collection using the 'id' key
 

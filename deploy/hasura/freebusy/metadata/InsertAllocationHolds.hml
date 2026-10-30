@@ -36,8 +36,8 @@ definition:
     - name: window
       type: String_1!
   graphql:
-    typeName: InsertAllocationHoldsObject
-    inputTypeName: InsertAllocationHoldsObjectInput
+    typeName: freebusy_InsertAllocationHoldsObject
+    inputTypeName: freebusy_InsertAllocationHoldsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_allocation_holds_object
@@ -123,8 +123,8 @@ definition:
       type: "[AllocationHolds!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertAllocationHoldsResponse
-    inputTypeName: InsertAllocationHoldsResponseInput
+    typeName: freebusy_InsertAllocationHoldsResponse
+    inputTypeName: freebusy_InsertAllocationHoldsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_allocation_holds_response
@@ -168,7 +168,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertAllocationHolds
+    rootFieldName: freebusy_insertAllocationHolds
     rootFieldKind: Mutation
   description: Insert into the allocation_holds table
 

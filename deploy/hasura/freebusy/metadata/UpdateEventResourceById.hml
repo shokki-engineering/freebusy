@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceCalendarId
-    inputTypeName: UpdateColumnEventResourceCalendarIdInput
+    typeName: freebusy_UpdateColumnEventResourceCalendarId
+    inputTypeName: freebusy_UpdateColumnEventResourceCalendarIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_calendar_id
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceClassification
-    inputTypeName: UpdateColumnEventResourceClassificationInput
+    typeName: freebusy_UpdateColumnEventResourceClassification
+    inputTypeName: freebusy_UpdateColumnEventResourceClassificationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_classification
@@ -76,8 +76,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceConcepts
-    inputTypeName: UpdateColumnEventResourceConceptsInput
+    typeName: freebusy_UpdateColumnEventResourceConcepts
+    inputTypeName: freebusy_UpdateColumnEventResourceConceptsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_concepts
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceConfirmation
-    inputTypeName: UpdateColumnEventResourceConfirmationInput
+    typeName: freebusy_UpdateColumnEventResourceConfirmation
+    inputTypeName: freebusy_UpdateColumnEventResourceConfirmationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_confirmation
@@ -140,8 +140,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceCreateTime
-    inputTypeName: UpdateColumnEventResourceCreateTimeInput
+    typeName: freebusy_UpdateColumnEventResourceCreateTime
+    inputTypeName: freebusy_UpdateColumnEventResourceCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_create_time
@@ -172,8 +172,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceDeleteTime
-    inputTypeName: UpdateColumnEventResourceDeleteTimeInput
+    typeName: freebusy_UpdateColumnEventResourceDeleteTime
+    inputTypeName: freebusy_UpdateColumnEventResourceDeleteTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_delete_time
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceDescription
-    inputTypeName: UpdateColumnEventResourceDescriptionInput
+    typeName: freebusy_UpdateColumnEventResourceDescription
+    inputTypeName: freebusy_UpdateColumnEventResourceDescriptionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_description
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceDuration
-    inputTypeName: UpdateColumnEventResourceDurationInput
+    typeName: freebusy_UpdateColumnEventResourceDuration
+    inputTypeName: freebusy_UpdateColumnEventResourceDurationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_duration
@@ -268,8 +268,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceEndId
-    inputTypeName: UpdateColumnEventResourceEndIdInput
+    typeName: freebusy_UpdateColumnEventResourceEndId
+    inputTypeName: freebusy_UpdateColumnEventResourceEndIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_end_id
@@ -300,8 +300,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceEndsCase
-    inputTypeName: UpdateColumnEventResourceEndsCaseInput
+    typeName: freebusy_UpdateColumnEventResourceEndsCase
+    inputTypeName: freebusy_UpdateColumnEventResourceEndsCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_ends_case
@@ -332,8 +332,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceEtag
-    inputTypeName: UpdateColumnEventResourceEtagInput
+    typeName: freebusy_UpdateColumnEventResourceEtag
+    inputTypeName: freebusy_UpdateColumnEventResourceEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_etag
@@ -364,8 +364,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceExpireTime
-    inputTypeName: UpdateColumnEventResourceExpireTimeInput
+    typeName: freebusy_UpdateColumnEventResourceExpireTime
+    inputTypeName: freebusy_UpdateColumnEventResourceExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_expire_time
@@ -396,8 +396,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceIcalUid
-    inputTypeName: UpdateColumnEventResourceIcalUidInput
+    typeName: freebusy_UpdateColumnEventResourceIcalUid
+    inputTypeName: freebusy_UpdateColumnEventResourceIcalUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_ical_uid
@@ -428,8 +428,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceId
-    inputTypeName: UpdateColumnEventResourceIdInput
+    typeName: freebusy_UpdateColumnEventResourceId
+    inputTypeName: freebusy_UpdateColumnEventResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_id
@@ -460,8 +460,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceLocation
-    inputTypeName: UpdateColumnEventResourceLocationInput
+    typeName: freebusy_UpdateColumnEventResourceLocation
+    inputTypeName: freebusy_UpdateColumnEventResourceLocationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_location
@@ -492,8 +492,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceName
-    inputTypeName: UpdateColumnEventResourceNameInput
+    typeName: freebusy_UpdateColumnEventResourceName
+    inputTypeName: freebusy_UpdateColumnEventResourceNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_name
@@ -524,8 +524,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceOrganizerId
-    inputTypeName: UpdateColumnEventResourceOrganizerIdInput
+    typeName: freebusy_UpdateColumnEventResourceOrganizerId
+    inputTypeName: freebusy_UpdateColumnEventResourceOrganizerIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_organizer_id
@@ -556,8 +556,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceOriginalStartId
-    inputTypeName: UpdateColumnEventResourceOriginalStartIdInput
+    typeName: freebusy_UpdateColumnEventResourceOriginalStartId
+    inputTypeName: freebusy_UpdateColumnEventResourceOriginalStartIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_original_start_id
@@ -588,8 +588,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceOriginalStartRange
-    inputTypeName: UpdateColumnEventResourceOriginalStartRangeInput
+    typeName: freebusy_UpdateColumnEventResourceOriginalStartRange
+    inputTypeName: freebusy_UpdateColumnEventResourceOriginalStartRangeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_original_start_range
@@ -620,8 +620,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourcePosition
-    inputTypeName: UpdateColumnEventResourcePositionInput
+    typeName: freebusy_UpdateColumnEventResourcePosition
+    inputTypeName: freebusy_UpdateColumnEventResourcePositionInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_position
@@ -652,8 +652,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceRecurrenceId
-    inputTypeName: UpdateColumnEventResourceRecurrenceIdInput
+    typeName: freebusy_UpdateColumnEventResourceRecurrenceId
+    inputTypeName: freebusy_UpdateColumnEventResourceRecurrenceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_recurrence_id
@@ -684,8 +684,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceRefids
-    inputTypeName: UpdateColumnEventResourceRefidsInput
+    typeName: freebusy_UpdateColumnEventResourceRefids
+    inputTypeName: freebusy_UpdateColumnEventResourceRefidsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_refids
@@ -716,8 +716,8 @@ definition:
       type: Int32
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceSequence
-    inputTypeName: UpdateColumnEventResourceSequenceInput
+    typeName: freebusy_UpdateColumnEventResourceSequence
+    inputTypeName: freebusy_UpdateColumnEventResourceSequenceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_sequence
@@ -748,8 +748,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceStartId
-    inputTypeName: UpdateColumnEventResourceStartIdInput
+    typeName: freebusy_UpdateColumnEventResourceStartId
+    inputTypeName: freebusy_UpdateColumnEventResourceStartIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_start_id
@@ -780,8 +780,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceSummary
-    inputTypeName: UpdateColumnEventResourceSummaryInput
+    typeName: freebusy_UpdateColumnEventResourceSummary
+    inputTypeName: freebusy_UpdateColumnEventResourceSummaryInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_summary
@@ -812,8 +812,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceTransparency
-    inputTypeName: UpdateColumnEventResourceTransparencyInput
+    typeName: freebusy_UpdateColumnEventResourceTransparency
+    inputTypeName: freebusy_UpdateColumnEventResourceTransparencyInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_transparency
@@ -844,8 +844,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceUid
-    inputTypeName: UpdateColumnEventResourceUidInput
+    typeName: freebusy_UpdateColumnEventResourceUid
+    inputTypeName: freebusy_UpdateColumnEventResourceUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_uid
@@ -876,8 +876,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventResourceUpdateTime
-    inputTypeName: UpdateColumnEventResourceUpdateTimeInput
+    typeName: freebusy_UpdateColumnEventResourceUpdateTime
+    inputTypeName: freebusy_UpdateColumnEventResourceUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_resource_update_time
@@ -990,8 +990,8 @@ definition:
       type: UpdateColumnEventResourceUpdateTime
       description: Update the 'update_time' column in the 'event_resource' collection.
   graphql:
-    typeName: UpdateEventResourceByIdUpdateColumns
-    inputTypeName: UpdateEventResourceByIdUpdateColumnsInput
+    typeName: freebusy_UpdateEventResourceByIdUpdateColumns
+    inputTypeName: freebusy_UpdateEventResourceByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_resource_by_id_update_columns
@@ -1133,8 +1133,8 @@ definition:
       type: "[EventResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateEventResourceByIdResponse
-    inputTypeName: UpdateEventResourceByIdResponseInput
+    typeName: freebusy_UpdateEventResourceByIdResponse
+    inputTypeName: freebusy_UpdateEventResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_resource_by_id_response
@@ -1187,7 +1187,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateEventResourceById
+    rootFieldName: freebusy_updateEventResourceById
     rootFieldKind: Mutation
   description: Update any row on the 'event_resource' collection using the 'id' key
 

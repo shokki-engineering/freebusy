@@ -16,8 +16,8 @@ definition:
     - name: languageCode
       type: String_1
   graphql:
-    typeName: InsertVcardGrammaticalGendersObject
-    inputTypeName: InsertVcardGrammaticalGendersObjectInput
+    typeName: freebusy_InsertVcardGrammaticalGendersObject
+    inputTypeName: freebusy_InsertVcardGrammaticalGendersObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_grammatical_genders_object
@@ -63,8 +63,8 @@ definition:
       type: "[VcardGrammaticalGenders!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertVcardGrammaticalGendersResponse
-    inputTypeName: InsertVcardGrammaticalGendersResponseInput
+    typeName: freebusy_InsertVcardGrammaticalGendersResponse
+    inputTypeName: freebusy_InsertVcardGrammaticalGendersResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_grammatical_genders_response
@@ -109,7 +109,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertVcardGrammaticalGenders
+    rootFieldName: freebusy_insertVcardGrammaticalGenders
     rootFieldKind: Mutation
   description: Insert into the vcard_grammatical_genders table
 

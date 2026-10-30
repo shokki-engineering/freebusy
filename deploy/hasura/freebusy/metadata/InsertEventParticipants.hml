@@ -26,8 +26,8 @@ definition:
     - name: url
       type: String_1
   graphql:
-    typeName: InsertEventParticipantsObject
-    inputTypeName: InsertEventParticipantsObjectInput
+    typeName: freebusy_InsertEventParticipantsObject
+    inputTypeName: freebusy_InsertEventParticipantsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_participants_object
@@ -93,8 +93,8 @@ definition:
       type: "[EventParticipants!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertEventParticipantsResponse
-    inputTypeName: InsertEventParticipantsResponseInput
+    typeName: freebusy_InsertEventParticipantsResponse
+    inputTypeName: freebusy_InsertEventParticipantsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_event_participants_response
@@ -138,7 +138,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertEventParticipants
+    rootFieldName: freebusy_insertEventParticipants
     rootFieldKind: Mutation
   description: Insert into the event_participants table
 

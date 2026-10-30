@@ -147,3 +147,12 @@ regen domain="":
     log "done — verify with:"
     printf '    curl -s -X POST %s -H '\''content-type: application/json'\'' \\\n' "$GRAPHQL_URL"
     printf '      -d '\''{"query":"{ __type(name:\\"AllocationHolds\\"){ name fields { name } } }"}'\''\n'
+
+# The image is ghcr.io/shokki-engineering/freebusy-subgraph:<tag>, for the
+# supergraph aperio builds and serves: run this after `just hasura regen`, then
+# `just hasura build` in aperio. Releases push it.
+#
+# Build freebusy's subgraph image locally.
+[group('hasura')]
+subgraph-image tag="latest":
+    docker build -f deploy/hasura/Dockerfile.subgraph -t ghcr.io/shokki-engineering/freebusy-subgraph:{{ tag }} deploy/hasura/freebusy

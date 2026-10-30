@@ -52,8 +52,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: TodoResource
-    inputTypeName: TodoResourceInput
+    typeName: freebusy_TodoResource
+    inputTypeName: freebusy_TodoResourceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: todo_resource
@@ -216,7 +216,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: TodoResourceBoolExp
+    typeName: freebusy_TodoResourceBoolExp
 
 ---
 kind: AggregateExpression
@@ -275,7 +275,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: TodoResourceAggExp
+    selectTypeName: freebusy_TodoResourceAggExp
 
 ---
 kind: OrderByExpression
@@ -332,7 +332,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: TodoResourceOrderByExp
+    expressionTypeName: freebusy_TodoResourceOrderByExp
 
 ---
 kind: Model
@@ -348,20 +348,20 @@ definition:
   orderByExpression: TodoResourceOrderByExp
   graphql:
     selectMany:
-      queryRootField: todoResource
+      queryRootField: freebusy_todoResource
       subscription:
-        rootField: todoResource
+        rootField: freebusy_todoResource
     selectUniques:
-      - queryRootField: todoResourceById
+      - queryRootField: freebusy_todoResourceById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: todoResourceById
-    filterInputTypeName: TodoResourceFilterInput
+          rootField: freebusy_todoResourceById
+    filterInputTypeName: freebusy_TodoResourceFilterInput
     aggregate:
-      queryRootField: todoResourceAggregate
+      queryRootField: freebusy_todoResourceAggregate
       subscription:
-        rootField: todoResourceAggregate
+        rootField: freebusy_todoResourceAggregate
 
 ---
 kind: ModelPermissions

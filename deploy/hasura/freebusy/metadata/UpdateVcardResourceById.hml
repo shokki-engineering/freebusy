@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardResourceContactId
-    inputTypeName: UpdateColumnVcardResourceContactIdInput
+    typeName: freebusy_UpdateColumnVcardResourceContactId
+    inputTypeName: freebusy_UpdateColumnVcardResourceContactIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_resource_contact_id
@@ -44,8 +44,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardResourceCreateTime
-    inputTypeName: UpdateColumnVcardResourceCreateTimeInput
+    typeName: freebusy_UpdateColumnVcardResourceCreateTime
+    inputTypeName: freebusy_UpdateColumnVcardResourceCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_resource_create_time
@@ -76,8 +76,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardResourceDeleteTime
-    inputTypeName: UpdateColumnVcardResourceDeleteTimeInput
+    typeName: freebusy_UpdateColumnVcardResourceDeleteTime
+    inputTypeName: freebusy_UpdateColumnVcardResourceDeleteTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_resource_delete_time
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardResourceEtag
-    inputTypeName: UpdateColumnVcardResourceEtagInput
+    typeName: freebusy_UpdateColumnVcardResourceEtag
+    inputTypeName: freebusy_UpdateColumnVcardResourceEtagInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_resource_etag
@@ -140,8 +140,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardResourceExpireTime
-    inputTypeName: UpdateColumnVcardResourceExpireTimeInput
+    typeName: freebusy_UpdateColumnVcardResourceExpireTime
+    inputTypeName: freebusy_UpdateColumnVcardResourceExpireTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_resource_expire_time
@@ -172,8 +172,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardResourceId
-    inputTypeName: UpdateColumnVcardResourceIdInput
+    typeName: freebusy_UpdateColumnVcardResourceId
+    inputTypeName: freebusy_UpdateColumnVcardResourceIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_resource_id
@@ -204,8 +204,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardResourceName
-    inputTypeName: UpdateColumnVcardResourceNameInput
+    typeName: freebusy_UpdateColumnVcardResourceName
+    inputTypeName: freebusy_UpdateColumnVcardResourceNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_resource_name
@@ -236,8 +236,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardResourceUid
-    inputTypeName: UpdateColumnVcardResourceUidInput
+    typeName: freebusy_UpdateColumnVcardResourceUid
+    inputTypeName: freebusy_UpdateColumnVcardResourceUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_resource_uid
@@ -268,8 +268,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardResourceUpdateTime
-    inputTypeName: UpdateColumnVcardResourceUpdateTimeInput
+    typeName: freebusy_UpdateColumnVcardResourceUpdateTime
+    inputTypeName: freebusy_UpdateColumnVcardResourceUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_resource_update_time
@@ -300,8 +300,8 @@ definition:
       type: Timestamptz
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardResourceVcardCreateTime
-    inputTypeName: UpdateColumnVcardResourceVcardCreateTimeInput
+    typeName: freebusy_UpdateColumnVcardResourceVcardCreateTime
+    inputTypeName: freebusy_UpdateColumnVcardResourceVcardCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_resource_vcard_create_time
@@ -332,8 +332,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnVcardResourceVcardUid
-    inputTypeName: UpdateColumnVcardResourceVcardUidInput
+    typeName: freebusy_UpdateColumnVcardResourceVcardUid
+    inputTypeName: freebusy_UpdateColumnVcardResourceVcardUidInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_vcard_resource_vcard_uid
@@ -394,8 +394,8 @@ definition:
       type: UpdateColumnVcardResourceVcardUid
       description: Update the 'vcard_uid' column in the 'vcard_resource' collection.
   graphql:
-    typeName: UpdateVcardResourceByIdUpdateColumns
-    inputTypeName: UpdateVcardResourceByIdUpdateColumnsInput
+    typeName: freebusy_UpdateVcardResourceByIdUpdateColumns
+    inputTypeName: freebusy_UpdateVcardResourceByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_resource_by_id_update_columns
@@ -469,8 +469,8 @@ definition:
       type: "[VcardResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateVcardResourceByIdResponse
-    inputTypeName: UpdateVcardResourceByIdResponseInput
+    typeName: freebusy_UpdateVcardResourceByIdResponse
+    inputTypeName: freebusy_UpdateVcardResourceByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_vcard_resource_by_id_response
@@ -523,7 +523,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateVcardResourceById
+    rootFieldName: freebusy_updateVcardResourceById
     rootFieldKind: Mutation
   description: Update any row on the 'vcard_resource' collection using the 'id' key
 

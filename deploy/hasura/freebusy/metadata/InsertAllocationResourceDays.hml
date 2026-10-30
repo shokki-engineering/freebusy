@@ -28,8 +28,8 @@ definition:
     - name: rowVersion
       type: Int64
   graphql:
-    typeName: InsertAllocationResourceDaysObject
-    inputTypeName: InsertAllocationResourceDaysObjectInput
+    typeName: freebusy_InsertAllocationResourceDaysObject
+    inputTypeName: freebusy_InsertAllocationResourceDaysObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_allocation_resource_days_object
@@ -99,8 +99,8 @@ definition:
       type: "[AllocationResourceDays!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertAllocationResourceDaysResponse
-    inputTypeName: InsertAllocationResourceDaysResponseInput
+    typeName: freebusy_InsertAllocationResourceDaysResponse
+    inputTypeName: freebusy_InsertAllocationResourceDaysResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_allocation_resource_days_response
@@ -145,7 +145,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertAllocationResourceDays
+    rootFieldName: freebusy_insertAllocationResourceDays
     rootFieldKind: Mutation
   description: Insert into the allocation_resource_days table
 

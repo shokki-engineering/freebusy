@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalExtensionPropertiesId
-    inputTypeName: UpdateColumnJournalExtensionPropertiesIdInput
+    typeName: freebusy_UpdateColumnJournalExtensionPropertiesId
+    inputTypeName: freebusy_UpdateColumnJournalExtensionPropertiesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_extension_properties_id
@@ -45,8 +45,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalExtensionPropertiesJournalId
-    inputTypeName: UpdateColumnJournalExtensionPropertiesJournalIdInput
+    typeName: freebusy_UpdateColumnJournalExtensionPropertiesJournalId
+    inputTypeName: freebusy_UpdateColumnJournalExtensionPropertiesJournalIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_extension_properties_journal_id
@@ -77,8 +77,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalExtensionPropertiesKey
-    inputTypeName: UpdateColumnJournalExtensionPropertiesKeyInput
+    typeName: freebusy_UpdateColumnJournalExtensionPropertiesKey
+    inputTypeName: freebusy_UpdateColumnJournalExtensionPropertiesKeyInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_extension_properties_key
@@ -110,8 +110,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalExtensionPropertiesParameters
-    inputTypeName: UpdateColumnJournalExtensionPropertiesParametersInput
+    typeName: freebusy_UpdateColumnJournalExtensionPropertiesParameters
+    inputTypeName: freebusy_UpdateColumnJournalExtensionPropertiesParametersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_extension_properties_parameters
@@ -142,8 +142,8 @@ definition:
       type: "[String_1]"
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnJournalExtensionPropertiesValues
-    inputTypeName: UpdateColumnJournalExtensionPropertiesValuesInput
+    typeName: freebusy_UpdateColumnJournalExtensionPropertiesValues
+    inputTypeName: freebusy_UpdateColumnJournalExtensionPropertiesValuesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_journal_extension_properties_values
@@ -189,8 +189,8 @@ definition:
       description: Update the 'values' column in the 'journal_extension_properties'
         collection.
   graphql:
-    typeName: UpdateJournalExtensionPropertiesByIdUpdateColumns
-    inputTypeName: UpdateJournalExtensionPropertiesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateJournalExtensionPropertiesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateJournalExtensionPropertiesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_journal_extension_properties_by_id_update_columns
@@ -240,8 +240,8 @@ definition:
       type: "[JournalExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateJournalExtensionPropertiesByIdResponse
-    inputTypeName: UpdateJournalExtensionPropertiesByIdResponseInput
+    typeName: freebusy_UpdateJournalExtensionPropertiesByIdResponse
+    inputTypeName: freebusy_UpdateJournalExtensionPropertiesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_journal_extension_properties_by_id_response
@@ -294,7 +294,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateJournalExtensionPropertiesById
+    rootFieldName: freebusy_updateJournalExtensionPropertiesById
     rootFieldKind: Mutation
   description: Update any row on the 'journal_extension_properties' collection
     using the 'id' key

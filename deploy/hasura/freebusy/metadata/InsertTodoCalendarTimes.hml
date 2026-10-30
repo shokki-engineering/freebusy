@@ -18,8 +18,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: InsertTodoCalendarTimesObject
-    inputTypeName: InsertTodoCalendarTimesObjectInput
+    typeName: freebusy_InsertTodoCalendarTimesObject
+    inputTypeName: freebusy_InsertTodoCalendarTimesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_todo_calendar_times_object
@@ -69,8 +69,8 @@ definition:
       type: "[TodoCalendarTimes!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertTodoCalendarTimesResponse
-    inputTypeName: InsertTodoCalendarTimesResponseInput
+    typeName: freebusy_InsertTodoCalendarTimesResponse
+    inputTypeName: freebusy_InsertTodoCalendarTimesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_todo_calendar_times_response
@@ -114,7 +114,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertTodoCalendarTimes
+    rootFieldName: freebusy_insertTodoCalendarTimes
     rootFieldKind: Mutation
   description: Insert into the todo_calendar_times table
 

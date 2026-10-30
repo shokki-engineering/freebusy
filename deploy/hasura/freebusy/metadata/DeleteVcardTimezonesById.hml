@@ -15,8 +15,8 @@ definition:
       type: "[VcardTimezones!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteVcardTimezonesByIdResponse
-    inputTypeName: DeleteVcardTimezonesByIdResponseInput
+    typeName: freebusy_DeleteVcardTimezonesByIdResponse
+    inputTypeName: freebusy_DeleteVcardTimezonesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_vcard_timezones_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteVcardTimezonesById
+    rootFieldName: freebusy_deleteVcardTimezonesById
     rootFieldKind: Mutation
   description: Delete any row on the 'vcard_timezones' collection using the 'id' key
 

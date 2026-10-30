@@ -12,8 +12,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventOrganizersAddress
-    inputTypeName: UpdateColumnEventOrganizersAddressInput
+    typeName: freebusy_UpdateColumnEventOrganizersAddress
+    inputTypeName: freebusy_UpdateColumnEventOrganizersAddressInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_organizers_address
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventOrganizersDisplayName
-    inputTypeName: UpdateColumnEventOrganizersDisplayNameInput
+    typeName: freebusy_UpdateColumnEventOrganizersDisplayName
+    inputTypeName: freebusy_UpdateColumnEventOrganizersDisplayNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_organizers_display_name
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventOrganizersId
-    inputTypeName: UpdateColumnEventOrganizersIdInput
+    typeName: freebusy_UpdateColumnEventOrganizersId
+    inputTypeName: freebusy_UpdateColumnEventOrganizersIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_organizers_id
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnEventOrganizersSender
-    inputTypeName: UpdateColumnEventOrganizersSenderInput
+    typeName: freebusy_UpdateColumnEventOrganizersSender
+    inputTypeName: freebusy_UpdateColumnEventOrganizersSenderInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_event_organizers_sender
@@ -149,8 +149,8 @@ definition:
       type: UpdateColumnEventOrganizersSender
       description: Update the 'sender' column in the 'event_organizers' collection.
   graphql:
-    typeName: UpdateEventOrganizersByIdUpdateColumns
-    inputTypeName: UpdateEventOrganizersByIdUpdateColumnsInput
+    typeName: freebusy_UpdateEventOrganizersByIdUpdateColumns
+    inputTypeName: freebusy_UpdateEventOrganizersByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_organizers_by_id_update_columns
@@ -196,8 +196,8 @@ definition:
       type: "[EventOrganizers!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateEventOrganizersByIdResponse
-    inputTypeName: UpdateEventOrganizersByIdResponseInput
+    typeName: freebusy_UpdateEventOrganizersByIdResponse
+    inputTypeName: freebusy_UpdateEventOrganizersByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_event_organizers_by_id_response
@@ -250,7 +250,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateEventOrganizersById
+    rootFieldName: freebusy_updateEventOrganizersById
     rootFieldKind: Mutation
   description: Update any row on the 'event_organizers' collection using the 'id' key
 

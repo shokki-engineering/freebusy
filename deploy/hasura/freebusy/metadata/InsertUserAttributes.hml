@@ -22,8 +22,8 @@ definition:
     - name: value
       type: String_1
   graphql:
-    typeName: InsertUserAttributesObject
-    inputTypeName: InsertUserAttributesObjectInput
+    typeName: freebusy_InsertUserAttributesObject
+    inputTypeName: freebusy_InsertUserAttributesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_user_attributes_object
@@ -81,8 +81,8 @@ definition:
       type: "[UserAttributes!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertUserAttributesResponse
-    inputTypeName: InsertUserAttributesResponseInput
+    typeName: freebusy_InsertUserAttributesResponse
+    inputTypeName: freebusy_InsertUserAttributesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_user_attributes_response
@@ -126,7 +126,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertUserAttributes
+    rootFieldName: freebusy_insertUserAttributes
     rootFieldKind: Mutation
   description: Insert into the user_attributes table
 

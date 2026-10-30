@@ -12,8 +12,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSharedIdempotencyKeysCreateTime
-    inputTypeName: UpdateColumnSharedIdempotencyKeysCreateTimeInput
+    typeName: freebusy_UpdateColumnSharedIdempotencyKeysCreateTime
+    inputTypeName: freebusy_UpdateColumnSharedIdempotencyKeysCreateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_shared_idempotency_keys_create_time
@@ -44,8 +44,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSharedIdempotencyKeysId
-    inputTypeName: UpdateColumnSharedIdempotencyKeysIdInput
+    typeName: freebusy_UpdateColumnSharedIdempotencyKeysId
+    inputTypeName: freebusy_UpdateColumnSharedIdempotencyKeysIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_shared_idempotency_keys_id
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSharedIdempotencyKeysMethod
-    inputTypeName: UpdateColumnSharedIdempotencyKeysMethodInput
+    typeName: freebusy_UpdateColumnSharedIdempotencyKeysMethod
+    inputTypeName: freebusy_UpdateColumnSharedIdempotencyKeysMethodInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_shared_idempotency_keys_method
@@ -108,8 +108,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSharedIdempotencyKeysName
-    inputTypeName: UpdateColumnSharedIdempotencyKeysNameInput
+    typeName: freebusy_UpdateColumnSharedIdempotencyKeysName
+    inputTypeName: freebusy_UpdateColumnSharedIdempotencyKeysNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_shared_idempotency_keys_name
@@ -140,8 +140,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSharedIdempotencyKeysRequestId
-    inputTypeName: UpdateColumnSharedIdempotencyKeysRequestIdInput
+    typeName: freebusy_UpdateColumnSharedIdempotencyKeysRequestId
+    inputTypeName: freebusy_UpdateColumnSharedIdempotencyKeysRequestIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_shared_idempotency_keys_request_id
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSharedIdempotencyKeysResponse
-    inputTypeName: UpdateColumnSharedIdempotencyKeysResponseInput
+    typeName: freebusy_UpdateColumnSharedIdempotencyKeysResponse
+    inputTypeName: freebusy_UpdateColumnSharedIdempotencyKeysResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_shared_idempotency_keys_response
@@ -204,8 +204,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSharedIdempotencyKeysState
-    inputTypeName: UpdateColumnSharedIdempotencyKeysStateInput
+    typeName: freebusy_UpdateColumnSharedIdempotencyKeysState
+    inputTypeName: freebusy_UpdateColumnSharedIdempotencyKeysStateInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_shared_idempotency_keys_state
@@ -236,8 +236,8 @@ definition:
       type: Timestamptz!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnSharedIdempotencyKeysUpdateTime
-    inputTypeName: UpdateColumnSharedIdempotencyKeysUpdateTimeInput
+    typeName: freebusy_UpdateColumnSharedIdempotencyKeysUpdateTime
+    inputTypeName: freebusy_UpdateColumnSharedIdempotencyKeysUpdateTimeInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_shared_idempotency_keys_update_time
@@ -292,8 +292,8 @@ definition:
       description: Update the 'update_time' column in the 'shared_idempotency_keys'
         collection.
   graphql:
-    typeName: UpdateSharedIdempotencyKeysByIdUpdateColumns
-    inputTypeName: UpdateSharedIdempotencyKeysByIdUpdateColumnsInput
+    typeName: freebusy_UpdateSharedIdempotencyKeysByIdUpdateColumns
+    inputTypeName: freebusy_UpdateSharedIdempotencyKeysByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_shared_idempotency_keys_by_id_update_columns
@@ -355,8 +355,8 @@ definition:
       type: "[SharedIdempotencyKeys!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateSharedIdempotencyKeysByIdResponse
-    inputTypeName: UpdateSharedIdempotencyKeysByIdResponseInput
+    typeName: freebusy_UpdateSharedIdempotencyKeysByIdResponse
+    inputTypeName: freebusy_UpdateSharedIdempotencyKeysByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_shared_idempotency_keys_by_id_response
@@ -409,7 +409,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateSharedIdempotencyKeysById
+    rootFieldName: freebusy_updateSharedIdempotencyKeysById
     rootFieldKind: Mutation
   description: Update any row on the 'shared_idempotency_keys' collection using the 'id' key
 

@@ -15,8 +15,8 @@ definition:
       type: "[CommonFractions!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteCommonFractionsByIdResponse
-    inputTypeName: DeleteCommonFractionsByIdResponseInput
+    typeName: freebusy_DeleteCommonFractionsByIdResponse
+    inputTypeName: freebusy_DeleteCommonFractionsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_common_fractions_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteCommonFractionsById
+    rootFieldName: freebusy_deleteCommonFractionsById
     rootFieldKind: Mutation
   description: Delete any row on the 'common_fractions' collection using the 'id' key
 

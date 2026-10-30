@@ -24,8 +24,8 @@ definition:
     - name: resourceTypes
       type: "[String_1]"
   graphql:
-    typeName: EventResources
-    inputTypeName: EventResourcesInput
+    typeName: freebusy_EventResources
+    inputTypeName: freebusy_EventResourcesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: event_resources
@@ -102,7 +102,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: EventResourcesBoolExp
+    typeName: freebusy_EventResourcesBoolExp
 
 ---
 kind: AggregateExpression
@@ -131,7 +131,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: EventResourcesAggExp
+    selectTypeName: freebusy_EventResourcesAggExp
 
 ---
 kind: OrderByExpression
@@ -158,7 +158,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: EventResourcesOrderByExp
+    expressionTypeName: freebusy_EventResourcesOrderByExp
 
 ---
 kind: Model
@@ -174,20 +174,20 @@ definition:
   orderByExpression: EventResourcesOrderByExp
   graphql:
     selectMany:
-      queryRootField: eventResources
+      queryRootField: freebusy_eventResources
       subscription:
-        rootField: eventResources
+        rootField: freebusy_eventResources
     selectUniques:
-      - queryRootField: eventResourcesById
+      - queryRootField: freebusy_eventResourcesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: eventResourcesById
-    filterInputTypeName: EventResourcesFilterInput
+          rootField: freebusy_eventResourcesById
+    filterInputTypeName: freebusy_EventResourcesFilterInput
     aggregate:
-      queryRootField: eventResourcesAggregate
+      queryRootField: freebusy_eventResourcesAggregate
       subscription:
-        rootField: eventResourcesAggregate
+        rootField: freebusy_eventResourcesAggregate
 
 ---
 kind: ModelPermissions

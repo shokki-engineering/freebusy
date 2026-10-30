@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsBaseSensorId
-    inputTypeName: UpdateColumnStreamRecordsBaseSensorIdInput
+    typeName: freebusy_UpdateColumnStreamRecordsBaseSensorId
+    inputTypeName: freebusy_UpdateColumnStreamRecordsBaseSensorIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_base_sensor_id
@@ -44,8 +44,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsBaseSum
-    inputTypeName: UpdateColumnStreamRecordsBaseSumInput
+    typeName: freebusy_UpdateColumnStreamRecordsBaseSum
+    inputTypeName: freebusy_UpdateColumnStreamRecordsBaseSumInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_base_sum
@@ -76,8 +76,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsBaseTimeValue
-    inputTypeName: UpdateColumnStreamRecordsBaseTimeValueInput
+    typeName: freebusy_UpdateColumnStreamRecordsBaseTimeValue
+    inputTypeName: freebusy_UpdateColumnStreamRecordsBaseTimeValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_base_time_value
@@ -108,8 +108,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsBaseUnit
-    inputTypeName: UpdateColumnStreamRecordsBaseUnitInput
+    typeName: freebusy_UpdateColumnStreamRecordsBaseUnit
+    inputTypeName: freebusy_UpdateColumnStreamRecordsBaseUnitInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_base_unit
@@ -140,8 +140,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsBaseValue
-    inputTypeName: UpdateColumnStreamRecordsBaseValueInput
+    typeName: freebusy_UpdateColumnStreamRecordsBaseValue
+    inputTypeName: freebusy_UpdateColumnStreamRecordsBaseValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_base_value
@@ -172,8 +172,8 @@ definition:
       type: Boolean_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsBooleanValue
-    inputTypeName: UpdateColumnStreamRecordsBooleanValueInput
+    typeName: freebusy_UpdateColumnStreamRecordsBooleanValue
+    inputTypeName: freebusy_UpdateColumnStreamRecordsBooleanValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_boolean_value
@@ -204,8 +204,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsDataValue
-    inputTypeName: UpdateColumnStreamRecordsDataValueInput
+    typeName: freebusy_UpdateColumnStreamRecordsDataValue
+    inputTypeName: freebusy_UpdateColumnStreamRecordsDataValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_data_value
@@ -236,8 +236,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsId
-    inputTypeName: UpdateColumnStreamRecordsIdInput
+    typeName: freebusy_UpdateColumnStreamRecordsId
+    inputTypeName: freebusy_UpdateColumnStreamRecordsIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_id
@@ -268,8 +268,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsNumberValue
-    inputTypeName: UpdateColumnStreamRecordsNumberValueInput
+    typeName: freebusy_UpdateColumnStreamRecordsNumberValue
+    inputTypeName: freebusy_UpdateColumnStreamRecordsNumberValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_number_value
@@ -300,8 +300,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsSensorId
-    inputTypeName: UpdateColumnStreamRecordsSensorIdInput
+    typeName: freebusy_UpdateColumnStreamRecordsSensorId
+    inputTypeName: freebusy_UpdateColumnStreamRecordsSensorIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_sensor_id
@@ -332,8 +332,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsStringValue
-    inputTypeName: UpdateColumnStreamRecordsStringValueInput
+    typeName: freebusy_UpdateColumnStreamRecordsStringValue
+    inputTypeName: freebusy_UpdateColumnStreamRecordsStringValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_string_value
@@ -364,8 +364,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsSum
-    inputTypeName: UpdateColumnStreamRecordsSumInput
+    typeName: freebusy_UpdateColumnStreamRecordsSum
+    inputTypeName: freebusy_UpdateColumnStreamRecordsSumInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_sum
@@ -396,8 +396,8 @@ definition:
       type: Float64
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsTimeValue
-    inputTypeName: UpdateColumnStreamRecordsTimeValueInput
+    typeName: freebusy_UpdateColumnStreamRecordsTimeValue
+    inputTypeName: freebusy_UpdateColumnStreamRecordsTimeValueInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_time_value
@@ -428,8 +428,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsUnit
-    inputTypeName: UpdateColumnStreamRecordsUnitInput
+    typeName: freebusy_UpdateColumnStreamRecordsUnit
+    inputTypeName: freebusy_UpdateColumnStreamRecordsUnitInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_unit
@@ -460,8 +460,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsUpdateDuration
-    inputTypeName: UpdateColumnStreamRecordsUpdateDurationInput
+    typeName: freebusy_UpdateColumnStreamRecordsUpdateDuration
+    inputTypeName: freebusy_UpdateColumnStreamRecordsUpdateDurationInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_update_duration
@@ -492,8 +492,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnStreamRecordsValueCase
-    inputTypeName: UpdateColumnStreamRecordsValueCaseInput
+    typeName: freebusy_UpdateColumnStreamRecordsValueCase
+    inputTypeName: freebusy_UpdateColumnStreamRecordsValueCaseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_stream_records_value_case
@@ -569,8 +569,8 @@ definition:
       type: UpdateColumnStreamRecordsValueCase
       description: Update the 'value_case' column in the 'stream_records' collection.
   graphql:
-    typeName: UpdateStreamRecordsByIdUpdateColumns
-    inputTypeName: UpdateStreamRecordsByIdUpdateColumnsInput
+    typeName: freebusy_UpdateStreamRecordsByIdUpdateColumns
+    inputTypeName: freebusy_UpdateStreamRecordsByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_stream_records_by_id_update_columns
@@ -664,8 +664,8 @@ definition:
       type: "[StreamRecords!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateStreamRecordsByIdResponse
-    inputTypeName: UpdateStreamRecordsByIdResponseInput
+    typeName: freebusy_UpdateStreamRecordsByIdResponse
+    inputTypeName: freebusy_UpdateStreamRecordsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_stream_records_by_id_response
@@ -718,7 +718,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateStreamRecordsById
+    rootFieldName: freebusy_updateStreamRecordsById
     rootFieldKind: Mutation
   description: Update any row on the 'stream_records' collection using the 'id' key
 

@@ -20,8 +20,8 @@ definition:
     - name: value
       type: String_1!
   graphql:
-    typeName: ScimgroupMembers
-    inputTypeName: ScimgroupMembersInput
+    typeName: freebusy_ScimgroupMembers
+    inputTypeName: freebusy_ScimgroupMembersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: scimgroup_members
@@ -88,7 +88,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: ScimgroupMembersBoolExp
+    typeName: freebusy_ScimgroupMembersBoolExp
 
 ---
 kind: AggregateExpression
@@ -115,7 +115,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: ScimgroupMembersAggExp
+    selectTypeName: freebusy_ScimgroupMembersAggExp
 
 ---
 kind: OrderByExpression
@@ -140,7 +140,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: ScimgroupMembersOrderByExp
+    expressionTypeName: freebusy_ScimgroupMembersOrderByExp
 
 ---
 kind: Model
@@ -156,20 +156,20 @@ definition:
   orderByExpression: ScimgroupMembersOrderByExp
   graphql:
     selectMany:
-      queryRootField: scimgroupMembers
+      queryRootField: freebusy_scimgroupMembers
       subscription:
-        rootField: scimgroupMembers
+        rootField: freebusy_scimgroupMembers
     selectUniques:
-      - queryRootField: scimgroupMembersById
+      - queryRootField: freebusy_scimgroupMembersById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: scimgroupMembersById
-    filterInputTypeName: ScimgroupMembersFilterInput
+          rootField: freebusy_scimgroupMembersById
+    filterInputTypeName: freebusy_ScimgroupMembersFilterInput
     aggregate:
-      queryRootField: scimgroupMembersAggregate
+      queryRootField: freebusy_scimgroupMembersAggregate
       subscription:
-        rootField: scimgroupMembersAggregate
+        rootField: freebusy_scimgroupMembersAggregate
 
 ---
 kind: ModelPermissions

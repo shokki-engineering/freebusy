@@ -15,8 +15,8 @@ definition:
       type: "[EventLocations!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteEventLocationsByIdResponse
-    inputTypeName: DeleteEventLocationsByIdResponseInput
+    typeName: freebusy_DeleteEventLocationsByIdResponse
+    inputTypeName: freebusy_DeleteEventLocationsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_event_locations_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteEventLocationsById
+    rootFieldName: freebusy_deleteEventLocationsById
     rootFieldKind: Mutation
   description: Delete any row on the 'event_locations' collection using the 'id' key
 

@@ -12,8 +12,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardNamesDefaultSeparator
-    inputTypeName: UpdateColumnCardNamesDefaultSeparatorInput
+    typeName: freebusy_UpdateColumnCardNamesDefaultSeparator
+    inputTypeName: freebusy_UpdateColumnCardNamesDefaultSeparatorInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_names_default_separator
@@ -44,8 +44,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardNamesDisplayName
-    inputTypeName: UpdateColumnCardNamesDisplayNameInput
+    typeName: freebusy_UpdateColumnCardNamesDisplayName
+    inputTypeName: freebusy_UpdateColumnCardNamesDisplayNameInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_names_display_name
@@ -76,8 +76,8 @@ definition:
       type: String_1!
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardNamesId
-    inputTypeName: UpdateColumnCardNamesIdInput
+    typeName: freebusy_UpdateColumnCardNamesId
+    inputTypeName: freebusy_UpdateColumnCardNamesIdInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_names_id
@@ -108,8 +108,8 @@ definition:
       type: Boolean_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardNamesIsOrdered
-    inputTypeName: UpdateColumnCardNamesIsOrderedInput
+    typeName: freebusy_UpdateColumnCardNamesIsOrdered
+    inputTypeName: freebusy_UpdateColumnCardNamesIsOrderedInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_names_is_ordered
@@ -140,8 +140,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardNamesPhoneticScript
-    inputTypeName: UpdateColumnCardNamesPhoneticScriptInput
+    typeName: freebusy_UpdateColumnCardNamesPhoneticScript
+    inputTypeName: freebusy_UpdateColumnCardNamesPhoneticScriptInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_names_phonetic_script
@@ -172,8 +172,8 @@ definition:
       type: String_1
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardNamesPhoneticSystem
-    inputTypeName: UpdateColumnCardNamesPhoneticSystemInput
+    typeName: freebusy_UpdateColumnCardNamesPhoneticSystem
+    inputTypeName: freebusy_UpdateColumnCardNamesPhoneticSystemInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_names_phonetic_system
@@ -204,8 +204,8 @@ definition:
       type: Json
       description: Set the column to this value
   graphql:
-    typeName: UpdateColumnCardNamesSortAs
-    inputTypeName: UpdateColumnCardNamesSortAsInput
+    typeName: freebusy_UpdateColumnCardNamesSortAs
+    inputTypeName: freebusy_UpdateColumnCardNamesSortAsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_column_card_names_sort_as
@@ -254,8 +254,8 @@ definition:
       type: UpdateColumnCardNamesSortAs
       description: Update the 'sort_as' column in the 'card_names' collection.
   graphql:
-    typeName: UpdateCardNamesByIdUpdateColumns
-    inputTypeName: UpdateCardNamesByIdUpdateColumnsInput
+    typeName: freebusy_UpdateCardNamesByIdUpdateColumns
+    inputTypeName: freebusy_UpdateCardNamesByIdUpdateColumnsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_card_names_by_id_update_columns
@@ -313,8 +313,8 @@ definition:
       type: "[CardNames!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: UpdateCardNamesByIdResponse
-    inputTypeName: UpdateCardNamesByIdResponseInput
+    typeName: freebusy_UpdateCardNamesByIdResponse
+    inputTypeName: freebusy_UpdateCardNamesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: update_card_names_by_id_response
@@ -367,7 +367,7 @@ definition:
       preCheck: pre_check
       updateColumns: update_columns
   graphql:
-    rootFieldName: updateCardNamesById
+    rootFieldName: freebusy_updateCardNamesById
     rootFieldKind: Mutation
   description: Update any row on the 'card_names' collection using the 'id' key
 

@@ -28,8 +28,8 @@ definition:
     - name: userId
       type: String_1!
   graphql:
-    typeName: UserAddress
-    inputTypeName: UserAddressInput
+    typeName: freebusy_UserAddress
+    inputTypeName: freebusy_UserAddressInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: user_address
@@ -120,7 +120,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: UserAddressBoolExp
+    typeName: freebusy_UserAddressBoolExp
 
 ---
 kind: AggregateExpression
@@ -155,7 +155,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: UserAddressAggExp
+    selectTypeName: freebusy_UserAddressAggExp
 
 ---
 kind: OrderByExpression
@@ -188,7 +188,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: UserAddressOrderByExp
+    expressionTypeName: freebusy_UserAddressOrderByExp
 
 ---
 kind: Model
@@ -204,20 +204,20 @@ definition:
   orderByExpression: UserAddressOrderByExp
   graphql:
     selectMany:
-      queryRootField: userAddress
+      queryRootField: freebusy_userAddress
       subscription:
-        rootField: userAddress
+        rootField: freebusy_userAddress
     selectUniques:
-      - queryRootField: userAddressById
+      - queryRootField: freebusy_userAddressById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: userAddressById
-    filterInputTypeName: UserAddressFilterInput
+          rootField: freebusy_userAddressById
+    filterInputTypeName: freebusy_UserAddressFilterInput
     aggregate:
-      queryRootField: userAddressAggregate
+      queryRootField: freebusy_userAddressAggregate
       subscription:
-        rootField: userAddressAggregate
+        rootField: freebusy_userAddressAggregate
 
 ---
 kind: ModelPermissions

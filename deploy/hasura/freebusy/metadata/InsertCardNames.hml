@@ -22,8 +22,8 @@ definition:
     - name: sortAs
       type: Json
   graphql:
-    typeName: InsertCardNamesObject
-    inputTypeName: InsertCardNamesObjectInput
+    typeName: freebusy_InsertCardNamesObject
+    inputTypeName: freebusy_InsertCardNamesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_card_names_object
@@ -81,8 +81,8 @@ definition:
       type: "[CardNames!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertCardNamesResponse
-    inputTypeName: InsertCardNamesResponseInput
+    typeName: freebusy_InsertCardNamesResponse
+    inputTypeName: freebusy_InsertCardNamesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_card_names_response
@@ -126,7 +126,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertCardNames
+    rootFieldName: freebusy_insertCardNames
     rootFieldKind: Mutation
   description: Insert into the card_names table
 

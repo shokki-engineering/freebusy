@@ -15,8 +15,8 @@ definition:
       type: "[EventResources!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteEventResourcesByIdResponse
-    inputTypeName: DeleteEventResourcesByIdResponseInput
+    typeName: freebusy_DeleteEventResourcesByIdResponse
+    inputTypeName: freebusy_DeleteEventResourcesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_event_resources_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteEventResourcesById
+    rootFieldName: freebusy_deleteEventResourcesById
     rootFieldKind: Mutation
   description: Delete any row on the 'event_resources' collection using the 'id' key
 

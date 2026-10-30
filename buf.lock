@@ -8,17 +8,17 @@ deps:
     commit: 8ac61b9e502343289c8c42b17aa5b245
     digest: b5:0318e73c2dec49c5742f0c119642a5cb7fcd9e2d5200a2b478bc1efd93f7aaa06d5431f5e1e5713095101fc990b026a806fa429af80432ec8d1ceefbe07bb817
   - name: buf.build/the-protobuf-project/cache
-    commit: dd72c7430fad425e8e7542e3042b3ade
-    digest: b5:fe667592cdf4d01ac467ffc44974f282566a11b6206c32d9d6e5f8b72c9112d1bbf2b52dc2fefa697198f6912d9e92ec004eccda08d594cf8702add8e515a23e
+    commit: e8ec2b7472d4443b93843dea330783e5
+    digest: b5:db30f1b529492d9340371341e3e9bfa47105d5b128777d1826d691f49bd68c959da11ce14fb95908da88f0fa5af02cf813e369413a3437078ccf4b4c076d3f30
   - name: buf.build/the-protobuf-project/mcp
     commit: 1c03cc2d5e394bf9bad4cebfb3968285
     digest: b5:c739c8b9c8dd6db60c192fa01eafd08e04e61409c64fab62714d058edad4a788c075a805caa33fe882986927bb54bad0c8797b5fda5119d7d49c9c6223770b97
   - name: buf.build/the-protobuf-project/rfc
-    commit: ca7aabdffc7b4c9683b653da6de51503
+    commit: 3aba0422074b4341aa0f8df07c3263b7
     digest: b5:a3028c80eb6f4126a03943cb3e9794d21df1badb84ab2cfc7683017092705fb201cefad1e440aadebeeeab8212bef23daee5967ab1b98163907833a0683bba4e
   - name: buf.build/the-protobuf-project/service
-    commit: 762d14895f404b728d04fcbaa1604083
+    commit: fb18303a2cb5418f93405f5c797fad1c
     digest: b5:3408407eb617b7ffb7fbdab0c5521f395cf255b159ace49ec94be4590fd7abd3ce71ca47ed3d5de74936d01c40dc5c3e7e10190f8390b88b073505c2f33d6c74
   - name: buf.build/the-protobuf-project/store
-    commit: 79113feea8cb46c69f9a51e680d45524
+    commit: 9bb2fea396cb4ccdae26c89c80ae9b5f
     digest: b5:281c92610aca73d8473dac0f96e5105ca387ebed1c1cee2cc237c711664f8e8d58141cd8caaa6d15feb72e2dd4bc5157f562741d1b408b3ee522056a500468ac

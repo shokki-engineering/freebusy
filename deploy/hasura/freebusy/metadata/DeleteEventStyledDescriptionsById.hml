@@ -15,8 +15,8 @@ definition:
       type: "[EventStyledDescriptions!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteEventStyledDescriptionsByIdResponse
-    inputTypeName: DeleteEventStyledDescriptionsByIdResponseInput
+    typeName: freebusy_DeleteEventStyledDescriptionsByIdResponse
+    inputTypeName: freebusy_DeleteEventStyledDescriptionsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_event_styled_descriptions_by_id_response
@@ -61,7 +61,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteEventStyledDescriptionsById
+    rootFieldName: freebusy_deleteEventStyledDescriptionsById
     rootFieldKind: Mutation
   description: Delete any row on the 'event_styled_descriptions' collection using
     the 'id' key

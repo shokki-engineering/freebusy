@@ -42,8 +42,8 @@ definition:
     - name: valueCase
       type: String_1
   graphql:
-    typeName: InsertPackRecordsObject
-    inputTypeName: InsertPackRecordsObjectInput
+    typeName: freebusy_InsertPackRecordsObject
+    inputTypeName: freebusy_InsertPackRecordsObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_pack_records_object
@@ -141,8 +141,8 @@ definition:
       type: "[PackRecords!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertPackRecordsResponse
-    inputTypeName: InsertPackRecordsResponseInput
+    typeName: freebusy_InsertPackRecordsResponse
+    inputTypeName: freebusy_InsertPackRecordsResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_pack_records_response
@@ -186,7 +186,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertPackRecords
+    rootFieldName: freebusy_insertPackRecords
     rootFieldKind: Mutation
   description: Insert into the pack_records table
 

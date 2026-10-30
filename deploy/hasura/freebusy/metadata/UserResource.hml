@@ -52,8 +52,8 @@ definition:
     - name: username
       type: String_1!
   graphql:
-    typeName: UserResource
-    inputTypeName: UserResourceInput
+    typeName: freebusy_UserResource
+    inputTypeName: freebusy_UserResourceInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: user_resource
@@ -216,7 +216,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: UserResourceBoolExp
+    typeName: freebusy_UserResourceBoolExp
 
 ---
 kind: AggregateExpression
@@ -275,7 +275,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: UserResourceAggExp
+    selectTypeName: freebusy_UserResourceAggExp
 
 ---
 kind: OrderByExpression
@@ -332,7 +332,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: UserResourceOrderByExp
+    expressionTypeName: freebusy_UserResourceOrderByExp
 
 ---
 kind: Model
@@ -348,20 +348,20 @@ definition:
   orderByExpression: UserResourceOrderByExp
   graphql:
     selectMany:
-      queryRootField: userResource
+      queryRootField: freebusy_userResource
       subscription:
-        rootField: userResource
+        rootField: freebusy_userResource
     selectUniques:
-      - queryRootField: userResourceById
+      - queryRootField: freebusy_userResourceById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: userResourceById
-    filterInputTypeName: UserResourceFilterInput
+          rootField: freebusy_userResourceById
+    filterInputTypeName: freebusy_UserResourceFilterInput
     aggregate:
-      queryRootField: userResourceAggregate
+      queryRootField: freebusy_userResourceAggregate
       subscription:
-        rootField: userResourceAggregate
+        rootField: freebusy_userResourceAggregate
 
 ---
 kind: ModelPermissions

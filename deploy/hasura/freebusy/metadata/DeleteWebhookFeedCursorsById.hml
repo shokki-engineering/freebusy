@@ -15,8 +15,8 @@ definition:
       type: "[WebhookFeedCursors!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteWebhookFeedCursorsByIdResponse
-    inputTypeName: DeleteWebhookFeedCursorsByIdResponseInput
+    typeName: freebusy_DeleteWebhookFeedCursorsByIdResponse
+    inputTypeName: freebusy_DeleteWebhookFeedCursorsByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_webhook_feed_cursors_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteWebhookFeedCursorsById
+    rootFieldName: freebusy_deleteWebhookFeedCursorsById
     rootFieldKind: Mutation
   description: Delete any row on the 'webhook_feed_cursors' collection using the 'id' key
 

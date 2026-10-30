@@ -15,8 +15,8 @@ definition:
       type: "[AvailabilityCalendarTimes!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteAvailabilityCalendarTimesByIdResponse
-    inputTypeName: DeleteAvailabilityCalendarTimesByIdResponseInput
+    typeName: freebusy_DeleteAvailabilityCalendarTimesByIdResponse
+    inputTypeName: freebusy_DeleteAvailabilityCalendarTimesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_availability_calendar_times_by_id_response
@@ -61,7 +61,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteAvailabilityCalendarTimesById
+    rootFieldName: freebusy_deleteAvailabilityCalendarTimesById
     rootFieldKind: Mutation
   description: Delete any row on the 'availability_calendar_times' collection
     using the 'id' key

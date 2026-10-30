@@ -18,8 +18,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: WebhookFeedCursors
-    inputTypeName: WebhookFeedCursorsInput
+    typeName: freebusy_WebhookFeedCursors
+    inputTypeName: freebusy_WebhookFeedCursorsInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: webhook_feed_cursors
@@ -80,7 +80,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: WebhookFeedCursorsBoolExp
+    typeName: freebusy_WebhookFeedCursorsBoolExp
 
 ---
 kind: AggregateExpression
@@ -105,7 +105,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: WebhookFeedCursorsAggExp
+    selectTypeName: freebusy_WebhookFeedCursorsAggExp
 
 ---
 kind: OrderByExpression
@@ -128,7 +128,7 @@ definition:
           orderByExpression: TimestamptzOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: WebhookFeedCursorsOrderByExp
+    expressionTypeName: freebusy_WebhookFeedCursorsOrderByExp
 
 ---
 kind: Model
@@ -144,20 +144,20 @@ definition:
   orderByExpression: WebhookFeedCursorsOrderByExp
   graphql:
     selectMany:
-      queryRootField: webhookFeedCursors
+      queryRootField: freebusy_webhookFeedCursors
       subscription:
-        rootField: webhookFeedCursors
+        rootField: freebusy_webhookFeedCursors
     selectUniques:
-      - queryRootField: webhookFeedCursorsById
+      - queryRootField: freebusy_webhookFeedCursorsById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: webhookFeedCursorsById
-    filterInputTypeName: WebhookFeedCursorsFilterInput
+          rootField: freebusy_webhookFeedCursorsById
+    filterInputTypeName: freebusy_WebhookFeedCursorsFilterInput
     aggregate:
-      queryRootField: webhookFeedCursorsAggregate
+      queryRootField: freebusy_webhookFeedCursorsAggregate
       subscription:
-        rootField: webhookFeedCursorsAggregate
+        rootField: freebusy_webhookFeedCursorsAggregate
 
 ---
 kind: ModelPermissions

@@ -18,8 +18,8 @@ definition:
     - name: values
       type: "[String_1]"
   graphql:
-    typeName: InsertTodoExtensionPropertiesObject
-    inputTypeName: InsertTodoExtensionPropertiesObjectInput
+    typeName: freebusy_InsertTodoExtensionPropertiesObject
+    inputTypeName: freebusy_InsertTodoExtensionPropertiesObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_todo_extension_properties_object
@@ -69,8 +69,8 @@ definition:
       type: "[TodoExtensionProperties!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertTodoExtensionPropertiesResponse
-    inputTypeName: InsertTodoExtensionPropertiesResponseInput
+    typeName: freebusy_InsertTodoExtensionPropertiesResponse
+    inputTypeName: freebusy_InsertTodoExtensionPropertiesResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_todo_extension_properties_response
@@ -115,7 +115,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertTodoExtensionProperties
+    rootFieldName: freebusy_insertTodoExtensionProperties
     rootFieldKind: Mutation
   description: Insert into the todo_extension_properties table
 

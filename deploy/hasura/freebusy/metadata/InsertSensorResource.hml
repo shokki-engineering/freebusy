@@ -40,8 +40,8 @@ definition:
     - name: updateTime
       type: Timestamptz!
   graphql:
-    typeName: InsertSensorResourceObject
-    inputTypeName: InsertSensorResourceObjectInput
+    typeName: freebusy_InsertSensorResourceObject
+    inputTypeName: freebusy_InsertSensorResourceObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_sensor_resource_object
@@ -135,8 +135,8 @@ definition:
       type: "[SensorResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertSensorResourceResponse
-    inputTypeName: InsertSensorResourceResponseInput
+    typeName: freebusy_InsertSensorResourceResponse
+    inputTypeName: freebusy_InsertSensorResourceResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_sensor_resource_response
@@ -180,7 +180,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertSensorResource
+    rootFieldName: freebusy_insertSensorResource
     rootFieldKind: Mutation
   description: Insert into the sensor_resource table
 

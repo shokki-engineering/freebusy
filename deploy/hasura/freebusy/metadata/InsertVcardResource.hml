@@ -30,8 +30,8 @@ definition:
     - name: vcardUid
       type: String_1
   graphql:
-    typeName: InsertVcardResourceObject
-    inputTypeName: InsertVcardResourceObjectInput
+    typeName: freebusy_InsertVcardResourceObject
+    inputTypeName: freebusy_InsertVcardResourceObjectInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_resource_object
@@ -105,8 +105,8 @@ definition:
       type: "[VcardResource!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: InsertVcardResourceResponse
-    inputTypeName: InsertVcardResourceResponseInput
+    typeName: freebusy_InsertVcardResourceResponse
+    inputTypeName: freebusy_InsertVcardResourceResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: insert_vcard_resource_response
@@ -150,7 +150,7 @@ definition:
       objects: objects
       postCheck: post_check
   graphql:
-    rootFieldName: insertVcardResource
+    rootFieldName: freebusy_insertVcardResource
     rootFieldKind: Mutation
   description: Insert into the vcard_resource table
 

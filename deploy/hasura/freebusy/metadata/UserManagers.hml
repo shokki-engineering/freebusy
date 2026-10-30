@@ -16,8 +16,8 @@ definition:
     - name: value
       type: String_1
   graphql:
-    typeName: UserManagers
-    inputTypeName: UserManagersInput
+    typeName: freebusy_UserManagers
+    inputTypeName: freebusy_UserManagersInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: user_managers
@@ -72,7 +72,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: UserManagersBoolExp
+    typeName: freebusy_UserManagersBoolExp
 
 ---
 kind: AggregateExpression
@@ -95,7 +95,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: UserManagersAggExp
+    selectTypeName: freebusy_UserManagersAggExp
 
 ---
 kind: OrderByExpression
@@ -116,7 +116,7 @@ definition:
           orderByExpression: String1OrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: UserManagersOrderByExp
+    expressionTypeName: freebusy_UserManagersOrderByExp
 
 ---
 kind: Model
@@ -132,20 +132,20 @@ definition:
   orderByExpression: UserManagersOrderByExp
   graphql:
     selectMany:
-      queryRootField: userManagers
+      queryRootField: freebusy_userManagers
       subscription:
-        rootField: userManagers
+        rootField: freebusy_userManagers
     selectUniques:
-      - queryRootField: userManagersById
+      - queryRootField: freebusy_userManagersById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: userManagersById
-    filterInputTypeName: UserManagersFilterInput
+          rootField: freebusy_userManagersById
+    filterInputTypeName: freebusy_UserManagersFilterInput
     aggregate:
-      queryRootField: userManagersAggregate
+      queryRootField: freebusy_userManagersAggregate
       subscription:
-        rootField: userManagersAggregate
+        rootField: freebusy_userManagersAggregate
 
 ---
 kind: ModelPermissions

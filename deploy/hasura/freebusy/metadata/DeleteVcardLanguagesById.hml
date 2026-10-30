@@ -15,8 +15,8 @@ definition:
       type: "[VcardLanguages!]!"
       description: Data from rows affected by the mutation
   graphql:
-    typeName: DeleteVcardLanguagesByIdResponse
-    inputTypeName: DeleteVcardLanguagesByIdResponseInput
+    typeName: freebusy_DeleteVcardLanguagesByIdResponse
+    inputTypeName: freebusy_DeleteVcardLanguagesByIdResponseInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: delete_vcard_languages_by_id_response
@@ -60,7 +60,7 @@ definition:
       keyId: key_id
       preCheck: pre_check
   graphql:
-    rootFieldName: deleteVcardLanguagesById
+    rootFieldName: freebusy_deleteVcardLanguagesById
     rootFieldKind: Mutation
   description: Delete any row on the 'vcard_languages' collection using the 'id' key
 

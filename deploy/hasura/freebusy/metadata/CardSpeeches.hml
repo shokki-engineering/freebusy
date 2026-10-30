@@ -14,8 +14,8 @@ definition:
     - name: pronouns
       type: Json
   graphql:
-    typeName: CardSpeeches
-    inputTypeName: CardSpeechesInput
+    typeName: freebusy_CardSpeeches
+    inputTypeName: freebusy_CardSpeechesInput
   dataConnectorTypeMapping:
     - dataConnectorName: freebusy_pgsql
       dataConnectorObjectType: card_speeches
@@ -64,7 +64,7 @@ definition:
   isNull:
     enable: true
   graphql:
-    typeName: CardSpeechesBoolExp
+    typeName: freebusy_CardSpeechesBoolExp
 
 ---
 kind: AggregateExpression
@@ -85,7 +85,7 @@ definition:
     enable: true
     returnType: Int64
   graphql:
-    selectTypeName: CardSpeechesAggExp
+    selectTypeName: freebusy_CardSpeechesAggExp
 
 ---
 kind: OrderByExpression
@@ -104,7 +104,7 @@ definition:
           orderByExpression: JsonOrderByExp
       orderableRelationships: []
   graphql:
-    expressionTypeName: CardSpeechesOrderByExp
+    expressionTypeName: freebusy_CardSpeechesOrderByExp
 
 ---
 kind: Model
@@ -120,20 +120,20 @@ definition:
   orderByExpression: CardSpeechesOrderByExp
   graphql:
     selectMany:
-      queryRootField: cardSpeeches
+      queryRootField: freebusy_cardSpeeches
       subscription:
-        rootField: cardSpeeches
+        rootField: freebusy_cardSpeeches
     selectUniques:
-      - queryRootField: cardSpeechesById
+      - queryRootField: freebusy_cardSpeechesById
         uniqueIdentifier:
           - id
         subscription:
-          rootField: cardSpeechesById
-    filterInputTypeName: CardSpeechesFilterInput
+          rootField: freebusy_cardSpeechesById
+    filterInputTypeName: freebusy_CardSpeechesFilterInput
     aggregate:
-      queryRootField: cardSpeechesAggregate
+      queryRootField: freebusy_cardSpeechesAggregate
       subscription:
-        rootField: cardSpeechesAggregate
+        rootField: freebusy_cardSpeechesAggregate
 
 ---
 kind: ModelPermissions
