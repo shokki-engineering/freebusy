@@ -233,8 +233,8 @@ github.com/stretchr/testify v1.12.1 h1:EuwCh5fleGS7H32xRwO3wRGT7DxrDhLAT6FF8MpWD
 github.com/stretchr/testify v1.12.1/go.mod h1:MDEgiDPPsNp5cuIrHPPCyornHKgEVbtFUmoNlxoYthg=
 github.com/the-protobuf-project/cache v0.3.2 h1:GVXqYFDX2e//tPf74tH1dewvUYqHtDTnkPhKIger2Vg=
 github.com/the-protobuf-project/cache v0.3.2/go.mod h1:hbDEDc+B/pdw08W14PUxwMRHVzr2BBskYFv12CGlVao=
-github.com/the-protobuf-project/mcp v1.7.5 h1:kgF54Cdu+R5Rj11XHEMBTKx4zZ8yBkxiodwXUStnOao=
-github.com/the-protobuf-project/mcp v1.7.5/go.mod h1:WLz9mSlfofWpV1Ex/jN+oO4JYBDpp/KizmdN7AaTpYI=
+github.com/the-protobuf-project/mcp v1.7.7 h1:eudh32pGZ/lebAjN2HRG1IOzklxCFMUA0KawkfyZz14=
+github.com/the-protobuf-project/mcp v1.7.7/go.mod h1:CwfAoUk0g0dZ3w/QnKVfpWaSnX20/mP5ykSyrBpeqRU=
 github.com/the-protobuf-project/runtime-go/agents v0.0.0-20261029160324-bb3b424dbd45 h1:EiVIeZizDuXzENkiDlTATXmXKTCLVMMaN+QrwnpiRl0=
 github.com/the-protobuf-project/runtime-go/agents v0.0.0-20261029160324-bb3b424dbd45/go.mod h1:YM46qN2UkRBMoD2iwNi6GSlTc62uIKUa3KfbjcazKnM=
 github.com/the-protobuf-project/runtime-go/cache v0.0.0-20261029160324-bb3b424dbd45 h1:4bfs4TRb1iaKVDLWxJw07KcYDwKvFxvsl151krRXO14=
