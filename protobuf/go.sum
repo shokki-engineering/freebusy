@@ -4,8 +4,8 @@ buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261026071831-3aba0422
 buf.build/gen/go/the-protobuf-project/rfc/grpc/go v1.6.2-20261026071831-3aba0422074b.1/go.mod h1:o2yjn83jTlekABdtNXVrE92AjAOxZZu2dF/4wq5ybXI=
 buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261026071831-3aba0422074b.2 h1:Mwrm5oAgNhRUIUrFECsLnGhOLFNO3oZgCi/dARZIVsU=
 buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go v1.36.12-20261026071831-3aba0422074b.2/go.mod h1:BgS6YLECIrB3HN5MHkAZHOEuIBYzm+EBm8z+hZX5Q/o=
-cloud.google.com/go/longrunning v1.4.0 h1:l53OXv/ZAQCvATPqdYIqxruIUa1+eeX3Ckg0EBMpZLM=
-cloud.google.com/go/longrunning v1.4.0/go.mod h1:HAJuq0kD9eDyV6DtaN+0b6niPzFFFf9QMMHkHD7DvMc=
+cloud.google.com/go/longrunning v1.4.1 h1:CZPS8f2ugPlPgoMy3Z1oGSXVy2aHn/893nKEeS+nIQk=
+cloud.google.com/go/longrunning v1.4.1/go.mod h1:vjM1U85ZQuTv8lJoUBSA44HLWvM6BBFeaSJYGFF1Q00=
 github.com/a2aproject/a2a-go/v2 v2.7.0 h1:rwIpzO5O9Mxu/Rm4S2SZfHYzNcvF3FK9aaaTxP35kAo=
 github.com/a2aproject/a2a-go/v2 v2.7.0/go.mod h1:rvFIb0sBJl2qmJRYU2fQxI6hhIQksmGGMEhT/uRwWww=
 github.com/golang-jwt/jwt/v5 v5.3.1 h1:kYf81DTWFe7t+1VvL7eS+jKFVWaUnK9cB1qbwn63YCY=
@@ -28,8 +28,8 @@ github.com/segmentio/encoding v0.5.4 h1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfv
 github.com/segmentio/encoding v0.5.4/go.mod h1:HS1ZKa3kSN32ZHVZ7ZLPLXWvOVIiZtyJnO1gPH1sKt0=
 github.com/the-protobuf-project/cache v0.3.2 h1:GVXqYFDX2e//tPf74tH1dewvUYqHtDTnkPhKIger2Vg=
 github.com/the-protobuf-project/cache v0.3.2/go.mod h1:hbDEDc+B/pdw08W14PUxwMRHVzr2BBskYFv12CGlVao=
-github.com/the-protobuf-project/mcp v1.7.5 h1:kgF54Cdu+R5Rj11XHEMBTKx4zZ8yBkxiodwXUStnOao=
-github.com/the-protobuf-project/mcp v1.7.5/go.mod h1:WLz9mSlfofWpV1Ex/jN+oO4JYBDpp/KizmdN7AaTpYI=
+github.com/the-protobuf-project/mcp v1.7.7 h1:eudh32pGZ/lebAjN2HRG1IOzklxCFMUA0KawkfyZz14=
+github.com/the-protobuf-project/mcp v1.7.7/go.mod h1:CwfAoUk0g0dZ3w/QnKVfpWaSnX20/mP5ykSyrBpeqRU=
 github.com/the-protobuf-project/runtime-go/agents v0.0.0-20261029160324-bb3b424dbd45 h1:EiVIeZizDuXzENkiDlTATXmXKTCLVMMaN+QrwnpiRl0=
 github.com/the-protobuf-project/runtime-go/agents v0.0.0-20261029160324-bb3b424dbd45/go.mod h1:YM46qN2UkRBMoD2iwNi6GSlTc62uIKUa3KfbjcazKnM=
 github.com/the-protobuf-project/service v0.2.3 h1:ihcpUL8XA+zvfqNtTUt7efxr86tbrBm7HpaZMQWEVNY=

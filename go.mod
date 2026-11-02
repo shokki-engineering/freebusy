@@ -46,7 +46,7 @@ require (
 	github.com/prometheus/otlptranslator v1.0.0 // indirect
 	github.com/prometheus/procfs v0.22.0 // indirect
 	github.com/the-protobuf-project/cache v0.3.2 // indirect
-	github.com/the-protobuf-project/mcp v1.7.5 // indirect
+	github.com/the-protobuf-project/mcp v1.7.7 // indirect
 	github.com/the-protobuf-project/service v0.2.3 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.69.0 // indirect
 )
