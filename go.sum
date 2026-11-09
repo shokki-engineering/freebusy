@@ -108,8 +108,8 @@ github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsI
 github.com/jackc/pgpassfile v1.0.0/go.mod h1:CEx0iS5ambNFdcRtxPj5JhEz+xB6uRky5eyVu/W2HEg=
 github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 h1:iCEnooe7UlwOQYpKFhBabPMi4aNAfoODPEFNiAnClxo=
 github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761/go.mod h1:5TJZWKEWniPve33vlWYSoGYefn3gLQRzjfDlhSJ9ZKM=
-github.com/jackc/pgx/v5 v5.11.0 h1:IzBBtyK9AHqf98cctWFifYSci2hgQR/cd56wB4p+ogg=
-github.com/jackc/pgx/v5 v5.11.0/go.mod h1:mal1tBGAFfLHvZzaYh77YS/eC6IX9OWbRV1QIIM0Jn4=
+github.com/jackc/pgx/v5 v5.12.0 h1:hWwax8YiGT0YiN50U1oIDn5kgR7KC2tG3rmavwpPkxY=
+github.com/jackc/pgx/v5 v5.12.0/go.mod h1:u2Fi6no03HCSBYE+ZVdLxbwdu3xyi2vU+K/YNJioSds=
 github.com/jackc/puddle/v2 v2.2.3 h1:f8HoREISb3l5eO9coPgK7U3hKLhWGokOFVcThl5jrao=
 github.com/jackc/puddle/v2 v2.2.3/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
@@ -233,8 +233,8 @@ github.com/stretchr/testify v1.12.1 h1:EuwCh5fleGS7H32xRwO3wRGT7DxrDhLAT6FF8MpWD
 github.com/stretchr/testify v1.12.1/go.mod h1:MDEgiDPPsNp5cuIrHPPCyornHKgEVbtFUmoNlxoYthg=
 github.com/the-protobuf-project/cache v0.3.2 h1:GVXqYFDX2e//tPf74tH1dewvUYqHtDTnkPhKIger2Vg=
 github.com/the-protobuf-project/cache v0.3.2/go.mod h1:hbDEDc+B/pdw08W14PUxwMRHVzr2BBskYFv12CGlVao=
-github.com/the-protobuf-project/mcp v1.7.7 h1:eudh32pGZ/lebAjN2HRG1IOzklxCFMUA0KawkfyZz14=
-github.com/the-protobuf-project/mcp v1.7.7/go.mod h1:CwfAoUk0g0dZ3w/QnKVfpWaSnX20/mP5ykSyrBpeqRU=
+github.com/the-protobuf-project/mcp v1.7.8 h1:tglZPVja0ROz4cYn5V3d1cDqNW2VFGBWEMb6DlKl4xo=
+github.com/the-protobuf-project/mcp v1.7.8/go.mod h1:CwfAoUk0g0dZ3w/QnKVfpWaSnX20/mP5ykSyrBpeqRU=
 github.com/the-protobuf-project/runtime-go/agents v0.0.0-20261029160324-bb3b424dbd45 h1:EiVIeZizDuXzENkiDlTATXmXKTCLVMMaN+QrwnpiRl0=
 github.com/the-protobuf-project/runtime-go/agents v0.0.0-20261029160324-bb3b424dbd45/go.mod h1:YM46qN2UkRBMoD2iwNi6GSlTc62uIKUa3KfbjcazKnM=
 github.com/the-protobuf-project/runtime-go/cache v0.0.0-20261029160324-bb3b424dbd45 h1:4bfs4TRb1iaKVDLWxJw07KcYDwKvFxvsl151krRXO14=
@@ -255,8 +255,8 @@ github.com/the-protobuf-project/runtime-go/ulid v0.0.0-20261029160324-bb3b424dbd
 github.com/the-protobuf-project/runtime-go/ulid v0.0.0-20261029160324-bb3b424dbd45/go.mod h1:5khCfHxMjf5eV4z0IZuVJWjbT3skJLzJsbmavhAwfuc=
 github.com/the-protobuf-project/service v0.2.3 h1:ihcpUL8XA+zvfqNtTUt7efxr86tbrBm7HpaZMQWEVNY=
 github.com/the-protobuf-project/service v0.2.3/go.mod h1:QaVm8J2ozxC5QvwyUK/ABu5Fzi766JxsZKnZz/rYrkg=
-github.com/the-protobuf-project/store v1.6.10 h1:gUo5tUwP89jwTLvt/eNF9dW+v8iHiOS6QsfguZdYeIw=
-github.com/the-protobuf-project/store v1.6.10/go.mod h1:gcYQdke32+7aGpDqs/49N8MK0ZE8XunHSPRhnvq3vlI=
+github.com/the-protobuf-project/store v1.7.0 h1:nYKz9wsPy6NA/2GI1HQ9su1J3hr0Weo7lAcL1pkIg0Q=
+github.com/the-protobuf-project/store v1.7.0/go.mod h1:gcYQdke32+7aGpDqs/49N8MK0ZE8XunHSPRhnvq3vlI=
 github.com/the-protobuf-project/telemetry/telemetry-go v0.0.0-20261029160437-5b18b2cb02bb h1:eWNm02ODYmbXQWi0lvqbTCQ9INpg+gh1DUryV3XLfmY=
 github.com/the-protobuf-project/telemetry/telemetry-go v0.0.0-20261029160437-5b18b2cb02bb/go.mod h1:aAEcFAnqJhZb1Ogw7QXy659BtSZOOPgLagTCjnQXcUU=
 github.com/xo/terminfo v1.2.0 h1:d0ZTOCpuGE0lwSAOs0zcJjwz3jWQyqcRt9XbGJpCOl4=
