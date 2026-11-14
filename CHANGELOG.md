@@ -9,12 +9,14 @@ Notable changes to freebusy, newest first. The format follows
 `FREEBUSY_*` configuration are what a version promises.
 
 To release: move **Unreleased** under a new `## [x.y.z] - YYYY-MM-DD` heading,
-set `[app] version` in `config/freebusy.release.toml` to `vx.y.z`, and push the
+set `[app] version` in `internal/config/freebusy.release.toml` to `vx.y.z`, and push the
 tag `vx.y.z`. The release workflow refuses a tag that disagrees with either. A
 pre-release (`x.y.z-rc.n`) works the same way; it is published as a GitHub
 pre-release and does not move the images' `latest` tag.
 
 ## [Unreleased]
+
+## [1.0.0-rc.3] - 2026-11-14
 
 ### Changed
 
@@ -23,7 +25,9 @@ pre-release and does not move the images' `latest` tag.
   which is gone. A retry returns what the first call returned, even a hold
   that has since expired; send a new `request_id` to take a fresh one.
 - **Breaking:** `CreateHoldRequest.hold_id` must match
-  `^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$`, as `reservation_id` does.
+  `^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$`, as `reservation_id` does, and one
+  that names an existing hold fails with `ALREADY_EXISTS`, reason
+  `HOLD_ID_TAKEN`.
 - **Breaking:** every `ErrorInfo` carries the domain
   `freebusy.shokki.engineering`, not `freebusy.dev`.
 - `UpdateReservation` without an `update_mask` changes the fields the request
