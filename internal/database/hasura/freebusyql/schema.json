@@ -30941,16 +30941,6 @@
           }
         },
         {
-          "name": "idempotencyKey",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "SCALAR",
-            "name": "freebusy_String1",
-            "ofType": null
-          }
-        },
-        {
           "name": "name",
           "description": "",
           "args": [],
@@ -31118,20 +31108,6 @@
         },
         {
           "name": "id",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "freebusy_TextAggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
-          "name": "idempotencyKey",
           "description": "",
           "args": [],
           "type": {
@@ -31336,16 +31312,6 @@
           "defaultValue": null
         },
         {
-          "name": "idempotencyKey",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "freebusy_TextBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "name",
           "description": "",
           "type": {
@@ -31515,16 +31481,6 @@
         },
         {
           "name": "id",
-          "description": "",
-          "type": {
-            "kind": "ENUM",
-            "name": "OrderBy",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "idempotencyKey",
           "description": "",
           "type": {
             "kind": "ENUM",
@@ -32033,7 +31989,17 @@
           }
         },
         {
-          "name": "free",
+          "name": "freeFraction",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "SCALAR",
+            "name": "freebusy_Float64",
+            "ofType": null
+          }
+        },
+        {
+          "name": "freeIntervals",
           "description": "",
           "args": [],
           "type": {
@@ -32044,16 +32010,6 @@
               "name": "freebusy_Json",
               "ofType": null
             }
-          }
-        },
-        {
-          "name": "freeFraction",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "SCALAR",
-            "name": "freebusy_Float64",
-            "ofType": null
           }
         },
         {
@@ -32193,20 +32149,6 @@
           }
         },
         {
-          "name": "free",
-          "description": "",
-          "args": [],
-          "type": {
-            "kind": "NON_NULL",
-            "name": "",
-            "ofType": {
-              "kind": "OBJECT",
-              "name": "freebusy_TstzmultirangeAggExp",
-              "ofType": null
-            }
-          }
-        },
-        {
           "name": "freeFraction",
           "description": "",
           "args": [],
@@ -32216,6 +32158,20 @@
             "ofType": {
               "kind": "OBJECT",
               "name": "freebusy_Float8AggExp",
+              "ofType": null
+            }
+          }
+        },
+        {
+          "name": "freeIntervals",
+          "description": "",
+          "args": [],
+          "type": {
+            "kind": "NON_NULL",
+            "name": "",
+            "ofType": {
+              "kind": "OBJECT",
+              "name": "freebusy_TstzmultirangeAggExp",
               "ofType": null
             }
           }
@@ -32360,21 +32316,21 @@
           "defaultValue": null
         },
         {
-          "name": "free",
-          "description": "",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "freebusy_TstzmultirangeBoolExp",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "freeFraction",
           "description": "",
           "type": {
             "kind": "INPUT_OBJECT",
             "name": "freebusy_Float8BoolExp",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "freeIntervals",
+          "description": "",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "freebusy_TstzmultirangeBoolExp",
             "ofType": null
           },
           "defaultValue": null
@@ -32518,7 +32474,7 @@
           "defaultValue": null
         },
         {
-          "name": "free",
+          "name": "freeFraction",
           "description": "",
           "type": {
             "kind": "ENUM",
@@ -32528,7 +32484,7 @@
           "defaultValue": null
         },
         {
-          "name": "freeFraction",
+          "name": "freeIntervals",
           "description": "",
           "type": {
             "kind": "ENUM",
@@ -53014,16 +52970,6 @@
           "defaultValue": null
         },
         {
-          "name": "idempotencyKey",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "freebusy_String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "name",
           "description": "",
           "type": {
@@ -53210,7 +53156,17 @@
           "defaultValue": null
         },
         {
-          "name": "free",
+          "name": "freeFraction",
+          "description": "",
+          "type": {
+            "kind": "SCALAR",
+            "name": "freebusy_Float64",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "freeIntervals",
           "description": "",
           "type": {
             "kind": "NON_NULL",
@@ -53220,16 +53176,6 @@
               "name": "freebusy_Json",
               "ofType": null
             }
-          },
-          "defaultValue": null
-        },
-        {
-          "name": "freeFraction",
-          "description": "",
-          "type": {
-            "kind": "SCALAR",
-            "name": "freebusy_Float64",
-            "ofType": null
           },
           "defaultValue": null
         },
@@ -82133,16 +82079,6 @@
           "defaultValue": null
         },
         {
-          "name": "idempotencyKey",
-          "description": "Update the 'idempotency_key' column in the 'allocation_holds' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "freebusy_UpdateColumnAllocationHoldsIdempotencyKeyInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "name",
           "description": "Update the 'name' column in the 'allocation_holds' collection.",
           "type": {
@@ -82445,21 +82381,21 @@
           "defaultValue": null
         },
         {
-          "name": "free",
-          "description": "Update the 'free' column in the 'allocation_resource_days' collection.",
-          "type": {
-            "kind": "INPUT_OBJECT",
-            "name": "freebusy_UpdateColumnAllocationResourceDaysFreeInput",
-            "ofType": null
-          },
-          "defaultValue": null
-        },
-        {
           "name": "freeFraction",
           "description": "Update the 'free_fraction' column in the 'allocation_resource_days' collection.",
           "type": {
             "kind": "INPUT_OBJECT",
             "name": "freebusy_UpdateColumnAllocationResourceDaysFreeFractionInput",
+            "ofType": null
+          },
+          "defaultValue": null
+        },
+        {
+          "name": "freeIntervals",
+          "description": "Update the 'free_intervals' column in the 'allocation_resource_days' collection.",
+          "type": {
+            "kind": "INPUT_OBJECT",
+            "name": "freebusy_UpdateColumnAllocationResourceDaysFreeIntervalsInput",
             "ofType": null
           },
           "defaultValue": null
@@ -84382,26 +84318,6 @@
     },
     {
       "kind": "INPUT_OBJECT",
-      "name": "freebusy_UpdateColumnAllocationHoldsIdempotencyKeyInput",
-      "description": "Update the 'idempotency_key' column in the 'allocation_holds' collection",
-      "fields": null,
-      "inputFields": [
-        {
-          "name": "set",
-          "description": "Set the column to this value",
-          "type": {
-            "kind": "SCALAR",
-            "name": "freebusy_String1",
-            "ofType": null
-          },
-          "defaultValue": null
-        }
-      ],
-      "enumValues": null,
-      "interfaces": null
-    },
-    {
-      "kind": "INPUT_OBJECT",
       "name": "freebusy_UpdateColumnAllocationHoldsNameInput",
       "description": "Update the 'name' column in the 'allocation_holds' collection",
       "fields": null,
@@ -84686,8 +84602,8 @@
     },
     {
       "kind": "INPUT_OBJECT",
-      "name": "freebusy_UpdateColumnAllocationResourceDaysFreeInput",
-      "description": "Update the 'free' column in the 'allocation_resource_days' collection",
+      "name": "freebusy_UpdateColumnAllocationResourceDaysFreeIntervalsInput",
+      "description": "Update the 'free_intervals' column in the 'allocation_resource_days' collection",
       "fields": null,
       "inputFields": [
         {

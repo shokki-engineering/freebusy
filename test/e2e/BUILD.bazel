@@ -43,6 +43,7 @@ go_test(
         "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc5545/event/v1:event",
         "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc7953/availability/v1:availability",
         "@build_buf_gen_go_the_protobuf_project_rfc_protocolbuffers_go//protobuf/rfc9073/resource/v1:resource",
+        "@com_github_google_uuid//:uuid",
         "@com_github_grpc_ecosystem_grpc_gateway_v2//runtime",
         "@com_github_modelcontextprotocol_go_sdk//mcp",
         "@com_github_the_protobuf_project_runtime_go_events//:events",

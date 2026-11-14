@@ -51,8 +51,8 @@ type HoldServiceClient interface {
 	//
 	// The server chooses which resources are taken from the candidates offered,
 	// under a lock, so two callers racing for the last bay cannot both win.
-	// Requires an idempotency key: a retry after a timeout returns the original
-	// hold rather than taking a second one.
+	// Send `request_id` to make a retry safe: a retry after a timeout with the
+	// same id returns the original hold rather than taking a second one.
 	CreateHold(ctx context.Context, in *CreateHoldRequest, opts ...grpc.CallOption) (*Hold, error)
 	// Retrieves one hold.
 	//
@@ -169,8 +169,8 @@ type HoldServiceServer interface {
 	//
 	// The server chooses which resources are taken from the candidates offered,
 	// under a lock, so two callers racing for the last bay cannot both win.
-	// Requires an idempotency key: a retry after a timeout returns the original
-	// hold rather than taking a second one.
+	// Send `request_id` to make a retry safe: a retry after a timeout with the
+	// same id returns the original hold rather than taking a second one.
 	CreateHold(context.Context, *CreateHoldRequest) (*Hold, error)
 	// Retrieves one hold.
 	//

@@ -22,7 +22,6 @@ erDiagram
         int32 quantity "OPTIONAL, IMMUTABLE"
         Timestamp expire_time "OUTPUT_ONLY"
         HoldState state "OUTPUT_ONLY"
-        string idempotency_key "OPTIONAL, IMMUTABLE"
         Timestamp create_time "OUTPUT_ONLY"
         Timestamp update_time "OUTPUT_ONLY"
         string etag "OUTPUT_ONLY"
@@ -89,7 +88,7 @@ mutations are the two custom methods below.
 
 | Method | Request | Response | HTTP | Description |
 | --- | --- | --- | --- | --- |
-| `CreateHold` | [`CreateHoldRequest`](#createholdrequest) | [`Hold`](#hold) | `POST /v1/holds` | Takes a hold, allocating concrete resources for the window.<br><br>The server chooses which resources are taken from the candidates offered, under a lock, so two callers racing for the last bay cannot both win. Requires an idempotency key: a retry after a timeout returns the original hold rather than taking a second one. |
+| `CreateHold` | [`CreateHoldRequest`](#createholdrequest) | [`Hold`](#hold) | `POST /v1/holds` | Takes a hold, allocating concrete resources for the window.<br><br>The server chooses which resources are taken from the candidates offered, under a lock, so two callers racing for the last bay cannot both win. Send `request_id` to make a retry safe: a retry after a timeout with the same id returns the original hold rather than taking a second one. |
 | `GetHold` | [`GetHoldRequest`](#getholdrequest) | [`Hold`](#hold) | `GET /v1/{name=holds/*}` | Retrieves one hold.<br><br>Authoritative on expiry: a hold whose expire_time has passed is reported EXPIRED here even if the sweeper has not yet written that state, so a caller never sees an ACTIVE hold that no longer reserves anything. |
 | `ListHolds` | [`ListHoldsRequest`](#listholdsrequest) | [`ListHoldsResponse`](#listholdsresponse) | `GET /v1/holds` | Lists holds. |
 | `ExtendHold` | [`ExtendHoldRequest`](#extendholdrequest) | [`Hold`](#hold) | `POST /v1/{name=holds/*}:extend` | Pushes a hold's expiry further out.<br><br>Measured from now rather than from the current deadline, so repeated calls cannot accumulate an unbounded reservation. Fails on a hold that is not ACTIVE -- an expired hold is gone, not extendable. |
@@ -157,7 +156,6 @@ Resource `freebusy.allocation.v1/Hold`, pattern `holds/{hold}`.
 | `quantity` | `int32` | `OPTIONAL`, `IMMUTABLE` | How many resources to take, supplied on create; defaults to 1. Once the hold is ACTIVE this equals the length of `resources`. |
 | `expire_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | When the hold lapses if nothing confirms it. Extend it with ExtendHold; past this instant the hold no longer reserves anything, whether or not the sweeper has yet marked it EXPIRED. |
 | `state` | [`HoldState`](#holdstate) | `OUTPUT_ONLY` | Lifecycle state. New holds start ACTIVE. |
-| `idempotency_key` | `string` | `OPTIONAL`, `IMMUTABLE` | Caller-supplied key making CreateHold safe to retry. A repeat with the same key returns the original hold rather than taking a second one. |
 | `create_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | Creation timestamp. |
 | `update_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | Last-modification timestamp. |
 | `etag` | `string` | `OUTPUT_ONLY` | Opaque version for optimistic concurrency (AIP-154); echo on update/delete. |
@@ -355,8 +353,9 @@ race is handled.
 
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
-| `hold` | [`Hold`](#hold) | `REQUIRED` | The hold to take. Its window is required; quantity defaults to 1 and candidate_resources empty offers every resource candidate_filter matches. Supply idempotency_key to make a retry safe. |
+| `hold` | [`Hold`](#hold) | `REQUIRED` | The hold to take. Its window is required; quantity defaults to 1 and candidate_resources empty offers every resource candidate_filter matches. |
 | `hold_id` | `string` | `OPTIONAL` | Client-assigned id, becoming the last segment of the hold name. The server generates one when empty. |
+| `request_id` | `string` | `OPTIONAL` | A unique id for this request, making it safe to retry (AIP-155). A retry with the same id returns what the first call returned -- the same hold, in the state it was taken in -- rather than taking a second one. |
 
 ### GetHoldRequest
 
@@ -424,7 +423,7 @@ Storage-only, and derived: no RPC takes or returns it. It is a projection
 of the resources, their calendars, RFC 7953 availability, RFC 5545
 events and the claims of converted holds, rewritten in the same transaction
 as every write to those (on Hasura, a single write projects in a request of
-its own right after it), for every day of a rolling horizon. `free` is
+its own right after it), for every day of a rolling horizon. `free_intervals` is
 offered time less booked time; live holds are not subtracted, and neither
 is a resource's booking policy applied, because both change with the
 clock. The engine evaluates every candidate the projection returns before
@@ -436,7 +435,7 @@ drops.
 | --- | --- | --- | --- |
 | `resource` | `string` | - | The resource, "resources/{resource}". Not a resource reference: a projection row must never keep its source from being purged. |
 | `day` | `google.type.Date` | - | The UTC calendar day this row covers. |
-| `free` | repeated `google.type.Interval` | - | The resource's free time within the day, [day 00:00Z, next day 00:00Z): offered by its availability, less confirmed events on its calendar and the claims of converted holds. Live holds are not subtracted. |
+| `free_intervals` | repeated `google.type.Interval` | - | The resource's free time within the day, [day 00:00Z, next day 00:00Z): offered by its availability, less confirmed events on its calendar and the claims of converted holds. Live holds are not subtracted. |
 | `resource_types` | repeated `string` | - | RFC 9073 RESOURCE-TYPE values the resource carries. |
 | `attributes` | `google.protobuf.Struct` | - | Every JSON object the resource's RFC 9073 STRUCTURED-DATA carries as inline text, merged in order (a later key wins): freebusy's booking profile and any vertical's own attributes. Searched with AIP-160 paths such as `attributes.view = "river"` or `attributes.charger_kw >= 22`. |
 | `calendar` | `string` | - | The resource's calendar, "calendars/{calendar}": what an event or an availability on that calendar re-projects. |
@@ -515,7 +514,7 @@ can say what to change rather than only that it failed.
 ### ErrorReason
 
 The reasons freebusy returns for availability and holds: the
-google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.dev domain. They are
+google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.shokki.engineering domain. They are
 part of the API: clients branch on them, never on a message.
 protoc-gen-service renders them as Go constants, sentinels and the tables of
 docs/errors.md.
@@ -540,6 +539,7 @@ docs/errors.md.
 | `ERROR_REASON_HOLD_CONVERTED` | 15 | ReleaseHold on a hold that became a reservation. |
 | `ERROR_REASON_HOLD_ACTIVE` | 16 | DeleteHold on a hold that still holds its resources. |
 | `ERROR_REASON_REPLACED_HOLD_NOT_BOOKED` | 17 | CreateHold: hold.replaces names a hold that backs no booking still keeping its resources -- it never became a reservation, or that reservation was cancelled or moved. |
+| `ERROR_REASON_HOLD_ID_TAKEN` | 18 | CreateHold: hold_id names a hold that already exists. |
 
 ---
 

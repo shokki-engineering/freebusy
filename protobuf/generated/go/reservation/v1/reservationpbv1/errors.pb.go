@@ -26,7 +26,7 @@ const (
 )
 
 // The reasons freebusy returns for reservations: the google.rpc.ErrorInfo
-// reasons (AIP-193) in the freebusy.dev domain. They are part of the API:
+// reasons (AIP-193) in the freebusy.shokki.engineering domain. They are part of the API:
 // clients branch on them, never on a message. protoc-gen-service renders them as
 // Go constants, sentinels and the tables of docs/errors.md.
 type ErrorReason int32
@@ -121,7 +121,7 @@ var File_freebusy_reservation_v1_errors_proto protoreflect.FileDescriptor
 
 const file_freebusy_reservation_v1_errors_proto_rawDesc = "" +
 	"\n" +
-	"$freebusy/reservation/v1/errors.proto\x12\x17freebusy.reservation.v1\x1a\x1cservice/v1/annotations.proto*\xf5\x10\n" +
+	"$freebusy/reservation/v1/errors.proto\x12\x17freebusy.reservation.v1\x1a\x1cservice/v1/annotations.proto*\x84\x11\n" +
 	"\vErrorReason\x12\x1c\n" +
 	"\x18ERROR_REASON_UNSPECIFIED\x10\x00\x12\xf5\x01\n" +
 	"\x1bERROR_REASON_HOLD_NOT_FOUND\x10\x01\x1a\xd3\x01\xea\xf0\x19\xce\x01\n" +
@@ -144,8 +144,8 @@ const file_freebusy_reservation_v1_errors_proto_rawDesc = "" +
 	"\x1a\x90\x01\xea\xf0\x19\x8b\x01\n" +
 	"\x13FAILED_PRECONDITION\x12IThe new slot could not be booked; the reservation keeps its original one.\x1a'Take a fresh hold and reschedule again. \x03\x12\xa0\x02\n" +
 	" ERROR_REASON_HOLD_FOR_RESCHEDULE\x10\v\x1a\xf9\x01\xea\xf0\x19\xf4\x01\n" +
-	"\x13FAILED_PRECONDITION\x12\x84\x01The hold was taken to replace a booking (`hold.replaces`), so it can only be used to reschedule the reservation made from that hold.\x1aT`RescheduleReservation` that reservation onto it, or take a hold without `replaces`. \x03\x1a\x12\xe2\xf0\x19\x0e\n" +
-	"\ffreebusy.dev\"\x04\b\x02\x10\x02*!ERROR_REASON_HOLD_AT_ANOTHER_SITEB\x95\x02\n" +
+	"\x13FAILED_PRECONDITION\x12\x84\x01The hold was taken to replace a booking (`hold.replaces`), so it can only be used to reschedule the reservation made from that hold.\x1aT`RescheduleReservation` that reservation onto it, or take a hold without `replaces`. \x03\x1a!\xe2\xf0\x19\x1d\n" +
+	"\x1bfreebusy.shokki.engineering\"\x04\b\x02\x10\x02*!ERROR_REASON_HOLD_AT_ANOTHER_SITEB\x95\x02\n" +
 	"\x1bcom.freebusy.reservation.v1B\vErrorsProtoP\x01Zkgithub.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1;reservationpbv1\xa2\x02\x03FRX\xaa\x02\x17Freebusy.Reservation.V1\xca\x02\x17Freebusy\\Reservation\\V1\xe2\x02#Freebusy\\Reservation\\V1\\GPBMetadata\xea\x02\x19Freebusy::Reservation::V1b\x06proto3"
 
 var (

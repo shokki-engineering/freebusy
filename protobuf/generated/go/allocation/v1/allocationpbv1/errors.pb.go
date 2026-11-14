@@ -26,7 +26,7 @@ const (
 )
 
 // The reasons freebusy returns for availability and holds: the
-// google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.dev domain. They are
+// google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.shokki.engineering domain. They are
 // part of the API: clients branch on them, never on a message.
 // protoc-gen-service renders them as Go constants, sentinels and the tables of
 // docs/errors.md.
@@ -86,6 +86,8 @@ const (
 	// its resources -- it never became a reservation, or that reservation was
 	// cancelled or moved.
 	ErrorReason_ERROR_REASON_REPLACED_HOLD_NOT_BOOKED ErrorReason = 17
+	// CreateHold: hold_id names a hold that already exists.
+	ErrorReason_ERROR_REASON_HOLD_ID_TAKEN ErrorReason = 18
 )
 
 // Enum value maps for ErrorReason.
@@ -109,6 +111,7 @@ var (
 		15: "ERROR_REASON_HOLD_CONVERTED",
 		16: "ERROR_REASON_HOLD_ACTIVE",
 		17: "ERROR_REASON_REPLACED_HOLD_NOT_BOOKED",
+		18: "ERROR_REASON_HOLD_ID_TAKEN",
 	}
 	ErrorReason_value = map[string]int32{
 		"ERROR_REASON_UNSPECIFIED":              0,
@@ -129,6 +132,7 @@ var (
 		"ERROR_REASON_HOLD_CONVERTED":           15,
 		"ERROR_REASON_HOLD_ACTIVE":              16,
 		"ERROR_REASON_REPLACED_HOLD_NOT_BOOKED": 17,
+		"ERROR_REASON_HOLD_ID_TAKEN":            18,
 	}
 )
 
@@ -163,7 +167,7 @@ var File_freebusy_allocation_v1_errors_proto protoreflect.FileDescriptor
 
 const file_freebusy_allocation_v1_errors_proto_rawDesc = "" +
 	"\n" +
-	"#freebusy/allocation/v1/errors.proto\x12\x16freebusy.allocation.v1\x1a\x1cservice/v1/annotations.proto*\xdc$\n" +
+	"#freebusy/allocation/v1/errors.proto\x12\x16freebusy.allocation.v1\x1a\x1cservice/v1/annotations.proto*\xb0&\n" +
 	"\vErrorReason\x12\x1c\n" +
 	"\x18ERROR_REASON_UNSPECIFIED\x10\x00\x12\xc8\x01\n" +
 	"\x1eERROR_REASON_INVALID_TIME_ZONE\x10\x01\x1a\xa3\x01\xea\xf0\x19\x9e\x01\n" +
@@ -200,8 +204,10 @@ const file_freebusy_allocation_v1_errors_proto_rawDesc = "" +
 	"\x18ERROR_REASON_HOLD_ACTIVE\x10\x10\x1ai\xea\xf0\x19e\n" +
 	"\x13FAILED_PRECONDITION\x126`DeleteHold` on a hold that still holds its resources.\x1a\x14`ReleaseHold` first. \x03\x12\xbd\x02\n" +
 	"%ERROR_REASON_REPLACED_HOLD_NOT_BOOKED\x10\x11\x1a\x91\x02\xea\xf0\x19\x8c\x02\n" +
-	"\x13FAILED_PRECONDITION\x12\xaa\x01`CreateHold`: `hold.replaces` names a hold that backs no booking still keeping its resources -- it never became a reservation, or that reservation was cancelled or moved.\x1aFSend the `hold` of a confirmed reservation, or leave `replaces` empty. \x03\x1a\x12\xe2\xf0\x19\x0e\n" +
-	"\ffreebusy.devB\x8d\x02\n" +
+	"\x13FAILED_PRECONDITION\x12\xaa\x01`CreateHold`: `hold.replaces` names a hold that backs no booking still keeping its resources -- it never became a reservation, or that reservation was cancelled or moved.\x1aFSend the `hold` of a confirmed reservation, or leave `replaces` empty. \x03\x12\xc2\x01\n" +
+	"\x1aERROR_REASON_HOLD_ID_TAKEN\x10\x12\x1a\xa1\x01\xea\xf0\x19\x9c\x01\n" +
+	"\x0eALREADY_EXISTS\x129`CreateHold`: `hold_id` names a hold that already exists.\x1aMChoose another id, or leave it empty; send `request_id` to make a retry safe. \x01\x1a!\xe2\xf0\x19\x1d\n" +
+	"\x1bfreebusy.shokki.engineeringB\x8d\x02\n" +
 	"\x1acom.freebusy.allocation.v1B\vErrorsProtoP\x01Zhgithub.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1;allocationpbv1\xa2\x02\x03FAX\xaa\x02\x16Freebusy.Allocation.V1\xca\x02\x16Freebusy\\Allocation\\V1\xe2\x02\"Freebusy\\Allocation\\V1\\GPBMetadata\xea\x02\x18Freebusy::Allocation::V1b\x06proto3"
 
 var (

@@ -53,9 +53,9 @@ message Delivery {
   // The CloudEvents type, e.g. "freebusy.reservation.confirmed".
   string event_type = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-  // The record that changed.
-  // Format: reservations/{reservation}
-  // or holds/{hold}
+  // The name of the record that changed: a hold (`holds/{hold}`), a
+  // reservation (`reservations/{reservation}`), or a resource, calendar,
+  // event or availability, in that record's own name format.
   string subject = 4 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The request body sent: a CloudEvents 1.0 JSON document whose data is the

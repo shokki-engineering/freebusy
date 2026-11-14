@@ -8,6 +8,7 @@ go_library(
     srcs = [
         "gorm.go",
         "graphql.go",
+        "graphql_referrers_allocation.go",
         "mask.go",
         "names.go",
         "projection_resource_day.go",

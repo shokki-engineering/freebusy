@@ -43,11 +43,11 @@ func (s *Server) UpdateReservation(ctx context.Context, req *reservationpbv1.Upd
 }
 
 func (s *Server) update(ctx context.Context, req *reservationpbv1.UpdateReservationRequest) (*reservationpbv1.Reservation, error) {
-	paths, err := updatePaths(req.GetUpdateMask())
+	in := req.GetReservation()
+	paths, err := updatePaths(in, req.GetUpdateMask())
 	if err != nil {
 		return nil, err
 	}
-	in := req.GetReservation()
 	name := in.GetName()
 	for attempt := 1; ; attempt++ {
 		r, err := s.store.Get(ctx, name)
@@ -103,13 +103,24 @@ func updatableState(r *reservationpbv1.Reservation) error {
 }
 
 // updatePaths resolves UpdateReservation's update_mask against the updatable
-// fields. The mask is required -- an update never guesses from the fields
-// that happen to be set -- and "*" is every updatable field.
-func updatePaths(mask *fieldmaskpb.FieldMask) ([]string, error) {
+// fields of in. An absent mask is the updatable fields in sets (AIP-134), so
+// clearing one takes a mask that names it; "*" is every updatable field.
+func updatePaths(in *reservationpbv1.Reservation, mask *fieldmaskpb.FieldMask) ([]string, error) {
 	if len(mask.GetPaths()) == 0 {
-		return nil, servicex.BadField("REQUIRED_FIELD", "update_mask",
-			"update_mask is empty, so the update does not say which fields to change",
-			fmt.Sprintf("Name the fields to change in update_mask: %s", strings.Join(updatable, ", ")))
+		var paths []string
+		in.ProtoReflect().Range(func(fd protoreflect.FieldDescriptor, _ protoreflect.Value) bool {
+			if slices.Contains(updatable, string(fd.Name())) {
+				paths = append(paths, string(fd.Name()))
+			}
+			return true
+		})
+		if len(paths) == 0 {
+			return nil, servicex.BadField(servicex.ReasonNothingToUpdate, "update_mask",
+				"the request changes nothing: it sets neither "+strings.Join(updatable, " nor ")+" and names none in update_mask",
+				fmt.Sprintf("Set the fields to change, or name them in update_mask to clear them: %s", strings.Join(updatable, ", ")))
+		}
+		slices.Sort(paths)
+		return paths, nil
 	}
 	if len(mask.GetPaths()) == 1 && mask.GetPaths()[0] == "*" {
 		return slices.Clone(updatable), nil

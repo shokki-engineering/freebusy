@@ -26,7 +26,7 @@ const (
 )
 
 // The reasons freebusy returns for webhooks: the google.rpc.ErrorInfo reasons
-// (AIP-193) in the freebusy.dev domain. They are part of the API: clients branch
+// (AIP-193) in the freebusy.shokki.engineering domain. They are part of the API: clients branch
 // on them, never on a message. protoc-gen-service renders them as Go constants,
 // sentinels and the tables of docs/errors.md.
 type ErrorReason int32
@@ -101,7 +101,7 @@ var File_freebusy_webhook_v1_errors_proto protoreflect.FileDescriptor
 
 const file_freebusy_webhook_v1_errors_proto_rawDesc = "" +
 	"\n" +
-	" freebusy/webhook/v1/errors.proto\x12\x13freebusy.webhook.v1\x1a\x1cservice/v1/annotations.proto*\xaf\a\n" +
+	" freebusy/webhook/v1/errors.proto\x12\x13freebusy.webhook.v1\x1a\x1cservice/v1/annotations.proto*\xbe\a\n" +
 	"\vErrorReason\x12\x1c\n" +
 	"\x18ERROR_REASON_UNSPECIFIED\x10\x00\x12r\n" +
 	"\x18ERROR_REASON_INVALID_URI\x10\x01\x1aT\xea\xf0\x19P\n" +
@@ -115,8 +115,8 @@ const file_freebusy_webhook_v1_errors_proto_rawDesc = "" +
 	"\x1fERROR_REASON_UNKNOWN_EVENT_TYPE\x10\x05\x1a\x95\x01\xea\xf0\x19\x90\x01\n" +
 	"\x10INVALID_ARGUMENT\x129An entry in `event_types` is not an event freebusy sends.\x1a?Choose from the list in the message, or leave it empty for all. \x01\x12\xac\x01\n" +
 	"#ERROR_REASON_WEBHOOK_HAS_DELIVERIES\x10\x06\x1a\x82\x01\xea\xf0\x19~\n" +
-	"\x13FAILED_PRECONDITION\x12+The webhook still has deliveries on record.\x1a8Send `force=true`, or `PauseWebhook` to keep the record. \x03\x1a\x12\xe2\xf0\x19\x0e\n" +
-	"\ffreebusy.devB\xf5\x01\n" +
+	"\x13FAILED_PRECONDITION\x12+The webhook still has deliveries on record.\x1a8Send `force=true`, or `PauseWebhook` to keep the record. \x03\x1a!\xe2\xf0\x19\x1d\n" +
+	"\x1bfreebusy.shokki.engineeringB\xf5\x01\n" +
 	"\x17com.freebusy.webhook.v1B\vErrorsProtoP\x01Z_github.com/shokki-engineering/freebusy/protobuf/generated/go/webhook/v1/webhookpbv1;webhookpbv1\xa2\x02\x03FWX\xaa\x02\x13Freebusy.Webhook.V1\xca\x02\x13Freebusy\\Webhook\\V1\xe2\x02\x1fFreebusy\\Webhook\\V1\\GPBMetadata\xea\x02\x15Freebusy::Webhook::V1b\x06proto3"
 
 var (

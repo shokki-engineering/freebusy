@@ -156,18 +156,6 @@ func (m *memStore) GetHold(_ context.Context, name string) (*allocationpbv1.Hold
 	return proto.Clone(h).(*allocationpbv1.Hold), nil
 }
 
-func (m *memStore) FindHold(_ context.Context, key string) (*allocationpbv1.Hold, error) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	for i := len(m.order) - 1; i >= 0; i-- {
-		h := m.holds[m.order[i]]
-		if h != nil && h.GetIdempotencyKey() == key {
-			return proto.Clone(h).(*allocationpbv1.Hold), nil
-		}
-	}
-	return nil, repox.ErrNotFound
-}
-
 func (m *memStore) ListHolds(_ context.Context, _ repox.ListInput) ([]*allocationpbv1.Hold, string, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()

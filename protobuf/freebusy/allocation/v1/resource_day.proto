@@ -24,7 +24,7 @@ option java_package = "engineering.shokki.freebusy.allocation.v1";
 // of the resources, their calendars, RFC 7953 availability, RFC 5545
 // events and the claims of converted holds, rewritten in the same transaction
 // as every write to those (on Hasura, a single write projects in a request of
-// its own right after it), for every day of a rolling horizon. `free` is
+// its own right after it), for every day of a rolling horizon. `free_intervals` is
 // offered time less booked time; live holds are not subtracted, and neither
 // is a resource's booking policy applied, because both change with the
 // clock. The engine evaluates every candidate the projection returns before
@@ -44,7 +44,7 @@ message ResourceDay {
       "resource",
       "day"
     ]
-    range_field: "free"
+    range_field: "free_intervals"
     search_index: "freebusy_resource_days"
     indexes: [
       {
@@ -75,7 +75,7 @@ message ResourceDay {
   // The resource's free time within the day, [day 00:00Z, next day 00:00Z):
   // offered by its availability, less confirmed events on its calendar and
   // the claims of converted holds. Live holds are not subtracted.
-  repeated google.type.Interval free = 5;
+  repeated google.type.Interval free_intervals = 5;
 
   // RFC 9073 RESOURCE-TYPE values the resource carries.
   repeated string resource_types = 6;

@@ -35,7 +35,7 @@ func Traced(ctx context.Context, service, method string, fn func(context.Context
 
 // Translator is freebusy's one error vocabulary: the reasons of every
 // package's ErrorReason enum and their sentinels, the standard methods'
-// (servicex), and the store's reference errors, in the freebusy.dev domain.
+// (servicex), and the store's reference errors, in the freebusy.shokki.engineering domain.
 // The generated servers and the hand-written services share it.
 var Translator = sharedpbv1svc.NewTranslator(append(append(allocationpbv1svc.Kinds(),
 	reservationpbv1svc.Kinds()...), webhookpbv1svc.Kinds()...)...).

@@ -128,15 +128,10 @@ message Hold {
     (store.v1.column) = {default_value: "ACTIVE"}
   ];
 
-  reserved 7;
-
-  // Caller-supplied key making CreateHold safe to retry. A repeat with the same
-  // key returns the original hold rather than taking a second one.
-  string idempotency_key = 8 [
-    (google.api.field_behavior) = OPTIONAL,
-    (google.api.field_behavior) = IMMUTABLE,
-    (store.v1.query) = {search: true}
-  ];
+  // A retry key belongs to the request, not the resource (AIP-155):
+  // CreateHoldRequest.request_id.
+  reserved 7, 8;
+  reserved "idempotency_key";
 
   // Creation timestamp.
   google.protobuf.Timestamp create_time = 9 [(google.api.field_behavior) = OUTPUT_ONLY];

@@ -70,14 +70,6 @@
             "nullable": "nonNullable",
             "description": null
           },
-          "idempotency_key": {
-            "name": "idempotency_key",
-            "type": {
-              "scalarType": "text"
-            },
-            "nullable": "nullable",
-            "description": null
-          },
           "name": {
             "name": "name",
             "type": {
@@ -267,20 +259,20 @@
             "nullable": "nullable",
             "description": null
           },
-          "free": {
-            "name": "free",
-            "type": {
-              "scalarType": "tstzmultirange"
-            },
-            "nullable": "nonNullable",
-            "description": null
-          },
           "free_fraction": {
             "name": "free_fraction",
             "type": {
               "scalarType": "float8"
             },
             "nullable": "nullable",
+            "description": null
+          },
+          "free_intervals": {
+            "name": "free_intervals",
+            "type": {
+              "scalarType": "tstzmultirange"
+            },
+            "nullable": "nonNullable",
             "description": null
           },
           "id": {

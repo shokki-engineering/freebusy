@@ -82,6 +82,9 @@ services:
       - reason: REPLACED_HOLD_NOT_BOOKED
         code: FAILED_PRECONDITION
         description: '`CreateHold`: `hold.replaces` names a hold that backs no booking still keeping its resources -- it never became a reservation, or that reservation was cancelled or moved.'
+      - reason: HOLD_ID_TAKEN
+        code: ALREADY_EXISTS
+        description: '`CreateHold`: `hold_id` names a hold that already exists.'
   HoldService:
     methods:
       CreateHold:
@@ -165,6 +168,9 @@ services:
       - reason: REPLACED_HOLD_NOT_BOOKED
         code: FAILED_PRECONDITION
         description: '`CreateHold`: `hold.replaces` names a hold that backs no booking still keeping its resources -- it never became a reservation, or that reservation was cancelled or moved.'
+      - reason: HOLD_ID_TAKEN
+        code: ALREADY_EXISTS
+        description: '`CreateHold`: `hold_id` names a hold that already exists.'
 
 # Lifecycle enums: for each value, how it is reached. A value takes one
 # transition or a list of them: {from: [values], rpc: Service.Method or event:

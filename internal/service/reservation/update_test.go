@@ -105,17 +105,21 @@ func TestUpdateMaskValidation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// No mask and no updatable field set: nothing to change.
+	_, err = f.update(&reservationpbv1.Reservation{Name: r.GetName(), Etag: r.GetEtag()})
+	wantReason(t, err, codes.InvalidArgument, "NOTHING_TO_UPDATE")
 	in := &reservationpbv1.Reservation{Name: r.GetName(), Customer: "users/ben"}
-	_, err = f.update(in)
-	wantReason(t, err, codes.InvalidArgument, "REQUIRED_FIELD")
-	_, err = f.update(in, []string{}...)
-	wantReason(t, err, codes.InvalidArgument, "REQUIRED_FIELD")
 	for _, path := range []string{"hold", "state", "start_time", "endTime", "resources", "etag", "name", "cancel_reason", "attributes.party", "nope"} {
 		_, err := f.update(in, "customer", path)
 		wantReason(t, err, codes.InvalidArgument, "UNKNOWN_MASK_PATH")
 	}
 	if f.store.writes != 0 {
 		t.Fatalf("%d writes for rejected updates", f.store.writes)
+	}
+	// No mask: the fields set (AIP-134), leaving the attributes alone.
+	got, err := f.update(in)
+	if err != nil || got.GetCustomer() != "users/ben" || !proto.Equal(got.GetAttributes(), r.GetAttributes()) {
+		t.Fatalf("update without a mask: %v %v", got, err)
 	}
 }
 

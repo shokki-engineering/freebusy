@@ -119,7 +119,7 @@ type EventsServer struct {
 var _ eventv1grpc.EventsServer = (*EventsServer)(nil)
 
 // NewEventsServer returns the EventsServer over repos running hooks
-// (nil runs none). Errors carry the ErrorInfo domain "freebusy.dev"
+// (nil runs none). Errors carry the ErrorInfo domain "freebusy.shokki.engineering"
 // unless servicex.WithTranslator says otherwise.
 func NewEventsServer(repos EventsRepositories, hooks EventsHooks, opts ...servicex.Option) *EventsServer {
 	if hooks == nil {
@@ -128,7 +128,7 @@ func NewEventsServer(repos EventsRepositories, hooks EventsHooks, opts ...servic
 	return &EventsServer{
 		repos: repos,
 		hooks: hooks,
-		opts:  servicex.Apply(servicex.Options{Translator: servicex.NewTranslator("freebusy.dev")}, opts),
+		opts:  servicex.Apply(servicex.Options{Translator: servicex.NewTranslator("freebusy.shokki.engineering")}, opts),
 	}
 }
 

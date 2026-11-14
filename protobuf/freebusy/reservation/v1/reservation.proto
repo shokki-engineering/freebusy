@@ -159,11 +159,13 @@ message Reservation {
   // When it was cancelled.
   google.protobuf.Timestamp cancel_time = 13 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-  // Opaque version for optimistic concurrency (AIP-154); echo on cancel.
+  // Opaque version for optimistic concurrency (AIP-154); send it back on
+  // UpdateReservation, CancelReservation or RescheduleReservation.
   string etag = 14 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The reservation this one replaced, set when it was made by
-  // RescheduleReservation.
+  // RescheduleReservation. (A reservation, though no resource_reference says
+  // so: like Hold.replaces, it is a reservation naming a reservation.)
   // Format: reservations/{reservation}
   string replaces = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
 

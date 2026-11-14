@@ -38,11 +38,14 @@ type CreateHoldRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The hold to take. Its window is required; quantity defaults to 1 and
 	// candidate_resources empty offers every resource candidate_filter matches.
-	// Supply idempotency_key to make a retry safe.
 	Hold *Hold `protobuf:"bytes,2,opt,name=hold,proto3" json:"hold,omitempty"`
 	// Client-assigned id, becoming the last segment of the hold name. The server
 	// generates one when empty.
-	HoldId        string `protobuf:"bytes,3,opt,name=hold_id,json=holdId,proto3" json:"hold_id,omitempty"`
+	HoldId string `protobuf:"bytes,3,opt,name=hold_id,json=holdId,proto3" json:"hold_id,omitempty"`
+	// A unique id for this request, making it safe to retry (AIP-155). A retry
+	// with the same id returns what the first call returned -- the same hold, in
+	// the state it was taken in -- rather than taking a second one.
+	RequestId     string `protobuf:"bytes,4,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -87,6 +90,13 @@ func (x *CreateHoldRequest) GetHold() *Hold {
 func (x *CreateHoldRequest) GetHoldId() string {
 	if x != nil {
 		return x.HoldId
+	}
+	return ""
+}
+
+func (x *CreateHoldRequest) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
 	}
 	return ""
 }
@@ -443,11 +453,13 @@ var File_freebusy_allocation_v1_hold_messages_proto protoreflect.FileDescriptor
 
 const file_freebusy_allocation_v1_hold_messages_proto_rawDesc = "" +
 	"\n" +
-	"*freebusy/allocation/v1/hold_messages.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a'freebusy/allocation/v1/allocation.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\"~\n" +
+	"*freebusy/allocation/v1/hold_messages.proto\x12\x16freebusy.allocation.v1\x1a\x1bbuf/validate/validate.proto\x1a'freebusy/allocation/v1/allocation.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\"\xe4\x01\n" +
 	"\x11CreateHoldRequest\x12<\n" +
 	"\x04hold\x18\x02 \x01(\v2\x1c.freebusy.allocation.v1.HoldB\n" +
-	"\xe2A\x01\x02\xbaH\x03\xc8\x01\x01R\x04hold\x12\x1d\n" +
-	"\ahold_id\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\x06holdIdJ\x04\b\x01\x10\x02R\x06parent\"^\n" +
+	"\xe2A\x01\x02\xbaH\x03\xc8\x01\x01R\x04hold\x12K\n" +
+	"\ahold_id\x18\x03 \x01(\tB2\xe2A\x01\x01\xbaH+\xd8\x01\x01r&2$^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$R\x06holdId\x126\n" +
+	"\n" +
+	"request_id\x18\x04 \x01(\tB\x17\xe2A\x01\x01\xbaH\b\xd8\x01\x01r\x03\xb0\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestIdJ\x04\b\x01\x10\x02R\x06parent\"^\n" +
 	"\x0eGetHoldRequest\x12L\n" +
 	"\x04name\x18\x01 \x01(\tB8\xe2A\x01\x02\xfaA\x1d\n" +
 	"\x1bfreebusy.allocation.v1/Hold\xbaH\x11r\x0f2\r^holds/[^/]+$R\x04name\"\x90\x01\n" +

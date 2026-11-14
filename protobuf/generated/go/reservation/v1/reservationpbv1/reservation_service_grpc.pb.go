@@ -57,7 +57,8 @@ type ReservationServiceClient interface {
 	ListReservations(ctx context.Context, in *ListReservationsRequest, opts ...grpc.CallOption) (*ListReservationsResponse, error)
 	// Updates a confirmed reservation's customer or attributes, AIP-134.
 	//
-	// update_mask is required and may name only `customer` and `attributes`;
+	// update_mask may name only `customer` and `attributes`, and omitted is the
+	// ones the request sets;
 	// everything else is the engine's, and is changed by CancelReservation or
 	// RescheduleReservation. `reservation.etag`, when set, must match the
 	// stored one (AIP-154). Fails with FAILED_PRECONDITION unless the
@@ -178,7 +179,8 @@ type ReservationServiceServer interface {
 	ListReservations(context.Context, *ListReservationsRequest) (*ListReservationsResponse, error)
 	// Updates a confirmed reservation's customer or attributes, AIP-134.
 	//
-	// update_mask is required and may name only `customer` and `attributes`;
+	// update_mask may name only `customer` and `attributes`, and omitted is the
+	// ones the request sets;
 	// everything else is the engine's, and is changed by CancelReservation or
 	// RescheduleReservation. `reservation.etag`, when set, must match the
 	// stored one (AIP-154). Fails with FAILED_PRECONDITION unless the

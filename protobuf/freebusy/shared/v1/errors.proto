@@ -14,12 +14,12 @@ option java_package = "engineering.shokki.freebusy.shared.v1";
 
 // The reasons freebusy returns for the resources, calendars, events and
 // availability freebusy serves, and any call: the
-// google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.dev domain. They are
+// google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.shokki.engineering domain. They are
 // part of the API: clients branch on them, never on a message.
 // protoc-gen-service renders them as Go constants, sentinels and the tables of
 // docs/errors.md.
 enum ErrorReason {
-  option (service.v1.error_domain) = {domain: "freebusy.dev"};
+  option (service.v1.error_domain) = {domain: "freebusy.shokki.engineering"};
 
   // Unset; never returned.
   ERROR_REASON_UNSPECIFIED = 0;

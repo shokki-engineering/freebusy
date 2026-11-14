@@ -25,7 +25,7 @@ import (
 
 // ErrorDomain is the google.rpc.ErrorInfo domain of this package's reasons
 // (freebusy.allocation.v1.ErrorReason).
-const ErrorDomain = "freebusy.dev"
+const ErrorDomain = "freebusy.shokki.engineering"
 
 // The reasons, as ErrorInfo carries them. They are part of the API.
 const (
@@ -63,6 +63,8 @@ const (
 	ReasonHoldActive = "HOLD_ACTIVE"
 	// ReasonReplacedHoldNotBooked (FAILED_PRECONDITION): `CreateHold`: `hold.replaces` names a hold that backs no booking still keeping its resources -- it never became a reservation, or that reservation was cancelled or moved.
 	ReasonReplacedHoldNotBooked = "REPLACED_HOLD_NOT_BOOKED"
+	// ReasonHoldIDTaken (ALREADY_EXISTS): `CreateHold`: `hold_id` names a hold that already exists.
+	ReasonHoldIDTaken = "HOLD_ID_TAKEN"
 )
 
 // The sentinels: an error wrapping one maps to its reason and code.
@@ -99,6 +101,7 @@ func Reasons() []problem.Reason {
 		{Name: ReasonHoldConverted, Code: codes.FailedPrecondition, Description: "`ReleaseHold` on a hold that became a reservation."},
 		{Name: ReasonHoldActive, Code: codes.FailedPrecondition, Description: "`DeleteHold` on a hold that still holds its resources."},
 		{Name: ReasonReplacedHoldNotBooked, Code: codes.FailedPrecondition, Description: "`CreateHold`: `hold.replaces` names a hold that backs no booking still keeping its resources -- it never became a reservation, or that reservation was cancelled or moved."},
+		{Name: ReasonHoldIDTaken, Code: codes.AlreadyExists, Description: "`CreateHold`: `hold_id` names a hold that already exists."},
 	}
 }
 
@@ -221,4 +224,10 @@ func NewHoldActive(resourceType, name, what string) *problem.Problem {
 // proto's: "Send the `hold` of a confirmed reservation, or leave `replaces` empty.".
 func NewReplacedHoldNotBooked(resourceType, name, what string) *problem.Problem {
 	return &problem.Problem{Reason: ReasonReplacedHoldNotBooked, ResourceType: resourceType, ResourceName: name, What: what, Fix: "Send the `hold` of a confirmed reservation, or leave `replaces` empty."}
+}
+
+// NewHoldIDTaken is a HOLD_ID_TAKEN problem; its fix defaults to the
+// proto's: "Choose another id, or leave it empty; send `request_id` to make a retry safe.".
+func NewHoldIDTaken(field, what string) *problem.Problem {
+	return &problem.Problem{Reason: ReasonHoldIDTaken, Field: field, What: what, Fix: "Choose another id, or leave it empty; send `request_id` to make a retry safe."}
 }

@@ -122,7 +122,7 @@ type AvailabilitiesServer struct {
 var _ availabilityv1grpc.AvailabilitiesServer = (*AvailabilitiesServer)(nil)
 
 // NewAvailabilitiesServer returns the AvailabilitiesServer over repos running hooks
-// (nil runs none). Errors carry the ErrorInfo domain "freebusy.dev"
+// (nil runs none). Errors carry the ErrorInfo domain "freebusy.shokki.engineering"
 // unless servicex.WithTranslator says otherwise.
 func NewAvailabilitiesServer(repos AvailabilitiesRepositories, hooks AvailabilitiesHooks, opts ...servicex.Option) *AvailabilitiesServer {
 	if hooks == nil {
@@ -131,7 +131,7 @@ func NewAvailabilitiesServer(repos AvailabilitiesRepositories, hooks Availabilit
 	return &AvailabilitiesServer{
 		repos: repos,
 		hooks: hooks,
-		opts:  servicex.Apply(servicex.Options{Translator: servicex.NewTranslator("freebusy.dev")}, opts),
+		opts:  servicex.Apply(servicex.Options{Translator: servicex.NewTranslator("freebusy.shokki.engineering")}, opts),
 	}
 }
 

@@ -58,6 +58,7 @@ service WebhookService {
   // Lists webhooks, without their secrets.
   rpc ListWebhooks(ListWebhooksRequest) returns (ListWebhooksResponse) {
     option (google.api.http) = {get: "/v1/webhooks"};
+    option (google.api.method_signature) = "";
     option (mcp.v1.tool) = {description: "List webhooks."};
   }
 

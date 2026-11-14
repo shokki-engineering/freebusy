@@ -233,7 +233,7 @@ func dayRows(t *testing.T, conn repox.Conn, resource string, at time.Time) []*al
 
 func spans(r *allocationpbv1.ResourceDay) engine.Spans {
 	var out engine.Spans
-	for _, f := range r.GetFree() {
+	for _, f := range r.GetFreeIntervals() {
 		out = append(out, allocation.SpanOf(f))
 	}
 	return out

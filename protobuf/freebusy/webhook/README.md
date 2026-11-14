@@ -128,7 +128,7 @@ Resource `freebusy.webhook.v1/Delivery`, pattern `webhooks/{webhook}/deliveries/
 | `name` | `string` | `IDENTIFIER` | The delivery name. The final segment is a digest of (webhook, event_id). Format: webhooks/{webhook}/deliveries/{delivery} |
 | `event_id` | `string` | `OUTPUT_ONLY` | The CloudEvents id, the same for every webhook sent this change: a digest of the record's name and etag. Receivers deduplicate on it. |
 | `event_type` | `string` | `OUTPUT_ONLY` | The CloudEvents type, e.g. "freebusy.reservation.confirmed". |
-| `subject` | `string` | `OUTPUT_ONLY` | The record that changed. Format: reservations/{reservation} or holds/{hold} |
+| `subject` | `string` | `OUTPUT_ONLY` | The name of the record that changed: a hold (`holds/{hold}`), a reservation (`reservations/{reservation}`), or a resource, calendar, event or availability, in that record's own name format. |
 | `payload` | `string` | `OUTPUT_ONLY` | The request body sent: a CloudEvents 1.0 JSON document whose data is the record as it stood. |
 | `state` | [`DeliveryState`](#deliverystate) | `OUTPUT_ONLY` | Where sending stands. |
 | `attempt_count` | `int32` | `OUTPUT_ONLY` | Attempts made so far. |
@@ -228,7 +228,7 @@ Request message for WebhookService.UpdateWebhook, AIP-134.
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
 | `webhook` | [`Webhook`](#webhook) | `REQUIRED` | The webhook, its name identifying which. `etag`, when set, must match. |
-| `update_mask` | `google.protobuf.FieldMask` | `OPTIONAL` | Fields to update: display_name, uri, event_types. Empty updates every one of them. |
+| `update_mask` | `google.protobuf.FieldMask` | `OPTIONAL` | Fields to update: display_name, uri, event_types. Omitted, it is the ones `webhook` sets (AIP-134); `*` replaces every one of them. |
 
 ### DeleteWebhookRequest
 
@@ -368,7 +368,7 @@ stateDiagram-v2
 ### ErrorReason
 
 The reasons freebusy returns for webhooks: the google.rpc.ErrorInfo reasons
-(AIP-193) in the freebusy.dev domain. They are part of the API: clients branch
+(AIP-193) in the freebusy.shokki.engineering domain. They are part of the API: clients branch
 on them, never on a message. protoc-gen-service renders them as Go constants,
 sentinels and the tables of docs/errors.md.
 

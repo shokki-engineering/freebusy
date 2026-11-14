@@ -23,7 +23,7 @@ import (
 
 // ErrorDomain is the google.rpc.ErrorInfo domain of this package's reasons
 // (freebusy.webhook.v1.ErrorReason).
-const ErrorDomain = "freebusy.dev"
+const ErrorDomain = "freebusy.shokki.engineering"
 
 // The reasons, as ErrorInfo carries them. They are part of the API.
 const (

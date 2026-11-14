@@ -69,8 +69,8 @@ paths:
 
                  The server chooses which resources are taken from the candidates offered,
                  under a lock, so two callers racing for the last bay cannot both win.
-                 Requires an idempotency key: a retry after a timeout returns the original
-                 hold rather than taking a second one.
+                 Send `request_id` to make a retry safe: a retry after a timeout with the
+                 same id returns the original hold rather than taking a second one.
             operationId: HoldService_CreateHold
             parameters:
                 - name: holdId
@@ -78,6 +78,14 @@ paths:
                   description: |-
                     Client-assigned id, becoming the last segment of the hold name. The server
                      generates one when empty.
+                  schema:
+                    type: string
+                - name: requestId
+                  in: query
+                  description: |-
+                    A unique id for this request, making it safe to retry (AIP-155). A retry
+                     with the same id returns what the first call returned -- the same hold, in
+                     the state it was taken in -- rather than taking a second one.
                   schema:
                     type: string
             requestBody:
@@ -326,11 +334,6 @@ components:
                     type: integer
                     description: Lifecycle state. New holds start ACTIVE.
                     format: enum
-                idempotencyKey:
-                    type: string
-                    description: |-
-                        Caller-supplied key making CreateHold safe to retry. A repeat with the same
-                         key returns the original hold rather than taking a second one.
                 createTime:
                     readOnly: true
                     type: string

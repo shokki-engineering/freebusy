@@ -5,8 +5,6 @@ package allocation
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"math/rand/v2"
@@ -60,48 +58,13 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 	if err != nil {
 		return nil, err
 	}
-	// prior returns the hold already taken under this request's idempotency
-	// key, if any. Checked before every attempt, not just the first: a
-	// concurrent caller with the same key may land between attempts, and its
-	// claim on the resources then looks like a conflict -- or exhaustion --
-	// rather than the duplicate it is.
-	//
-	// A key's latest hold that has lapsed is not returned: it reserves
-	// nothing, so a retry under that key takes a fresh hold, named after the
-	// lapsed one (idFor). A released or converted hold is still the answer.
-	var lapsed string
-	prior := func() (*allocationpbv1.Hold, error) {
-		key := in.GetIdempotencyKey()
-		if key == "" {
-			return nil, nil
-		}
-		prev, err := s.store.FindHold(ctx, key)
-		switch {
-		case err == nil:
-			if h := s.authoritative(prev); h.GetState() != allocationpbv1.HoldState_HOLD_STATE_EXPIRED {
-				return h, nil
-			}
-			lapsed = prev.GetName()
-			return nil, nil
-		case errors.Is(err, repox.ErrNotFound):
-			return nil, nil
-		}
+	// A retry is the idempotency interceptor's: it replays the first call's
+	// response for the same request_id before this runs.
+	id := req.GetHoldId()
+	if id == "" {
+		id = ulid.Generate().String()
+	} else if err := s.idFree(ctx, id); err != nil {
 		return nil, err
-	}
-	random := ulid.Generate().String()
-	idFor := func() string {
-		switch {
-		case req.GetHoldId() != "":
-			return req.GetHoldId()
-		case in.GetIdempotencyKey() != "":
-			// Derived, not random: two concurrent calls with one key then
-			// race for one name, the store's uniqueness picks a winner, and
-			// the loser returns the winner's hold below. A random id would
-			// let both win. After a lapse, the name also derives from the
-			// lapsed hold, so the fresh one does not collide with it.
-			return keyedID(in.GetIdempotencyKey(), lapsed)
-		}
-		return random
 	}
 	quantity := max(int(in.GetQuantity()), 1)
 	// A hold replacing a booking leaves that booking's own claim out of
@@ -120,9 +83,6 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 
 	fresh := false
 	for attempt := 0; ; attempt++ {
-		if prev, err := prior(); prev != nil || err != nil {
-			return prev, err
-		}
 		now := s.now()
 		picked, res, retry, err := s.plan(ctx, scope, restricted, in.GetCandidateFilter(), window, quantity, now, fresh, kept)
 		if err != nil {
@@ -135,13 +95,10 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 			continue
 		}
 		if picked == nil {
-			if prev, err := prior(); prev != nil || err != nil {
-				return prev, err
-			}
 			return nil, unbookable(res, quantity)
 		}
 		hold := &allocationpbv1.Hold{
-			Name:               "holds/" + idFor(),
+			Name:               "holds/" + id,
 			Resources:          picked,
 			Window:             intervalOf(window),
 			CandidateResources: in.GetCandidateResources(),
@@ -149,17 +106,14 @@ func (s *Server) createHold(ctx context.Context, req *allocationpbv1.CreateHoldR
 			Quantity:           int32(quantity),
 			ExpireTime:         timestamppb.New(now.Add(s.holdTTL)),
 			State:              allocationpbv1.HoldState_HOLD_STATE_ACTIVE,
-			IdempotencyKey:     in.GetIdempotencyKey(),
 			Replaces:           in.GetReplaces(),
 		}
 		created, err := s.store.InsertHold(ctx, hold)
 		if err == nil {
 			return created, nil
 		}
-		if errors.Is(err, repox.ErrAlreadyExists) {
-			if prev, perr := prior(); prev != nil || perr != nil {
-				return prev, perr
-			}
+		if errors.Is(err, repox.ErrAlreadyExists) && req.GetHoldId() != "" {
+			return nil, idTaken(hold.GetName())
 		}
 		if !errors.Is(err, repox.ErrConflict) || attempt+1 >= createAttempts {
 			return nil, err
@@ -282,6 +236,31 @@ func (s *Server) verifyPicked(ctx context.Context, st *inputs, picked []string) 
 	return true, nil
 }
 
+// idFree is nil when no hold is named holds/{id}. Checked before planning:
+// the hold already there has taken the resources, so planning would report
+// them exhausted rather than the name taken.
+func (s *Server) idFree(ctx context.Context, id string) error {
+	name := "holds/" + id
+	_, err := s.store.GetHold(ctx, name)
+	switch {
+	case errors.Is(err, repox.ErrNotFound):
+		return nil
+	case err != nil:
+		return err
+	}
+	return idTaken(name)
+}
+
+// idTaken is the problem with a hold_id that names an existing hold.
+func idTaken(name string) error {
+	return &problem.Problem{
+		Kind: repox.ErrAlreadyExists, Reason: allocationpbv1svc.ReasonHoldIDTaken, Field: "hold_id",
+		ResourceType: hints.TypeOf(name), ResourceName: name,
+		What: fmt.Sprintf("hold %s already exists", name),
+		Fix:  "Choose another hold_id, or leave it empty; send request_id to make a retry safe",
+	}
+}
+
 // unbookable is the problem with a window that cannot be held: outside the
 // published availability of every resource asked about, or offered but not
 // enough of it free.
@@ -376,18 +355,6 @@ func (s *Server) HandOver(ctx context.Context, from, to string, at time.Time) (*
 		}
 		return s.store.HandOver(ctx, from, stored.GetEtag(), to, at)
 	})
-}
-
-// keyedID derives a hold id from an idempotency key: 26 lowercase hex
-// characters of its SHA-256, the length of a ULID so names stay uniform.
-// after names the key's lapsed hold the new one succeeds, "" for a key's
-// first hold, whose id is the key's alone.
-func keyedID(key, after string) string {
-	if after != "" {
-		key += "\x00" + after
-	}
-	sum := sha256.Sum256([]byte(key))
-	return hex.EncodeToString(sum[:13])
 }
 
 // GetHold returns one hold, with expiry applied.

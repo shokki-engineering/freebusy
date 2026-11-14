@@ -8,7 +8,6 @@ import (
 	"errors"
 	"reflect"
 	"slices"
-	"sync"
 	"testing"
 	"time"
 
@@ -181,68 +180,6 @@ func TestCreateHoldAllocatesAndExhausts(t *testing.T) {
 	})
 	if c, r := reasonOf(t, err); c != codes.FailedPrecondition || r != allocationpbv1svc.ReasonCapacityExhausted {
 		t.Fatalf("second hold: %v %q", c, r)
-	}
-}
-
-func TestCreateHoldIdempotent(t *testing.T) {
-	f := newFixture(t)
-	f.share()
-	req := &allocationpbv1.CreateHoldRequest{
-		Hold: &allocationpbv1.Hold{Window: win(10, 11), IdempotencyKey: "cart-42"},
-	}
-	a, err := f.srv.CreateHold(ctx(), req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	b, err := f.srv.CreateHold(ctx(), req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if a.GetName() != b.GetName() || len(f.store.holds) != 1 {
-		t.Fatalf("retry took a second hold: %s vs %s", a.GetName(), b.GetName())
-	}
-}
-
-// A key whose hold lapsed takes a fresh hold, which a retry under the key
-// then returns; a lapsed hold reserves nothing, so returning it would leave
-// the caller holding nothing. A released hold is still the key's answer.
-func TestCreateHoldIdempotentAfterLapse(t *testing.T) {
-	f := newFixture(t)
-	f.share()
-	req := &allocationpbv1.CreateHoldRequest{
-		Hold: &allocationpbv1.Hold{Window: win(10, 11), IdempotencyKey: "cart-43"},
-	}
-	first, err := f.srv.CreateHold(ctx(), req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	f.clock = f.clock.Add(DefaultHoldTTL + time.Second)
-	fresh, err := f.srv.CreateHold(ctx(), req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if fresh.GetName() == first.GetName() || fresh.GetState() != allocationpbv1.HoldState_HOLD_STATE_ACTIVE {
-		t.Fatalf("after the lapse: %s %v, want a new ACTIVE hold beside %s", fresh.GetName(), fresh.GetState(), first.GetName())
-	}
-	if !fresh.GetExpireTime().AsTime().After(f.clock) {
-		t.Fatalf("fresh hold expires %v, not after now %v", fresh.GetExpireTime().AsTime(), f.clock)
-	}
-	again, err := f.srv.CreateHold(ctx(), req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if again.GetName() != fresh.GetName() || len(f.store.holds) != 2 {
-		t.Fatalf("retry of the fresh hold: %s (%d holds), want %s", again.GetName(), len(f.store.holds), fresh.GetName())
-	}
-	if _, err := f.srv.ReleaseHold(ctx(), &allocationpbv1.ReleaseHoldRequest{Name: fresh.GetName()}); err != nil {
-		t.Fatal(err)
-	}
-	released, err := f.srv.CreateHold(ctx(), req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if released.GetName() != fresh.GetName() || released.GetState() != allocationpbv1.HoldState_HOLD_STATE_RELEASED {
-		t.Fatalf("retry of a released hold: %s %v, want %s RELEASED", released.GetName(), released.GetState(), fresh.GetName())
 	}
 }
 
@@ -509,30 +446,5 @@ func TestConvertIdempotentAndEndConversion(t *testing.T) {
 	got, _ := f.srv.LookupHold(ctx(), h.GetName())
 	if got.GetState() != allocationpbv1.HoldState_HOLD_STATE_CONVERTED {
 		t.Fatalf("ended hold should stay CONVERTED, got %v", got.GetState())
-	}
-}
-
-func TestConcurrentIdempotentCreatesTakeOneHold(t *testing.T) {
-	f := newFixture(t)
-	f.share()
-	var wg sync.WaitGroup
-	names := make([]string, 8)
-	errs := make([]error, 8)
-	for i := range 8 {
-		wg.Go(func() {
-			h, err := f.srv.CreateHold(ctx(), &allocationpbv1.CreateHoldRequest{
-				Hold: &allocationpbv1.Hold{Window: win(10, 11), IdempotencyKey: "cart-7"},
-			})
-			names[i], errs[i] = h.GetName(), err
-		})
-	}
-	wg.Wait()
-	for i := range 8 {
-		if errs[i] != nil || names[i] != names[0] {
-			t.Fatalf("caller %d: %q %v", i, names[i], errs[i])
-		}
-	}
-	if len(f.store.holds) != 1 {
-		t.Fatalf("%d holds taken for one idempotency key", len(f.store.holds))
 	}
 }

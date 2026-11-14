@@ -540,7 +540,6 @@ components:
           description: |-
             The hold to take. Its window is required; quantity defaults to 1 and
             candidate_resources empty offers every resource candidate_filter matches.
-            Supply idempotency_key to make a retry safe.
           properties:
             candidateFilter:
               description: |-
@@ -573,11 +572,6 @@ components:
                 past this instant the hold no longer reserves anything, whether or not the
                 sweeper has yet marked it EXPIRED.
               format: date-time
-              type: string
-            idempotencyKey:
-              description: |-
-                Caller-supplied key making CreateHold safe to retry. A repeat with the same
-                key returns the original hold rather than taking a second one.
               type: string
             name:
               description: |-
@@ -655,6 +649,12 @@ components:
             Client-assigned id, becoming the last segment of the hold name. The server
             generates one when empty.
           type: string
+        requestId:
+          description: |-
+            A unique id for this request, making it safe to retry (AIP-155). A retry
+            with the same id returns what the first call returned -- the same hold, in
+            the state it was taken in -- rather than taking a second one.
+          type: string
       type: object
     freebusy.allocation.v1.DeleteHoldRequest:
       description: Request message for HoldService.DeleteHold, AIP-135.
@@ -673,7 +673,7 @@ components:
     freebusy.allocation.v1.ErrorReason:
       description: |-
         The reasons freebusy returns for availability and holds: the
-        google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.dev domain. They are
+        google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.shokki.engineering domain. They are
         part of the API: clients branch on them, never on a message.
         protoc-gen-service renders them as Go constants, sentinels and the tables of
         docs/errors.md.
@@ -696,6 +696,7 @@ components:
       - ERROR_REASON_HOLD_CONVERTED
       - ERROR_REASON_HOLD_ACTIVE
       - ERROR_REASON_REPLACED_HOLD_NOT_BOOKED
+      - ERROR_REASON_HOLD_ID_TAKEN
       type: string
     freebusy.allocation.v1.ExtendHoldRequest:
       description: Request message for HoldService.ExtendHold.
@@ -787,11 +788,6 @@ components:
             past this instant the hold no longer reserves anything, whether or not the
             sweeper has yet marked it EXPIRED.
           format: date-time
-          type: string
-        idempotencyKey:
-          description: |-
-            Caller-supplied key making CreateHold safe to retry. A repeat with the same
-            key returns the original hold rather than taking a second one.
           type: string
         name:
           description: |-
@@ -981,11 +977,6 @@ components:
                   sweeper has yet marked it EXPIRED.
                 format: date-time
                 type: string
-              idempotencyKey:
-                description: |-
-                  Caller-supplied key making CreateHold safe to retry. A repeat with the same
-                  key returns the original hold rather than taking a second one.
-                type: string
               name:
                 description: |-
                   The hold name. Top-level: a hold takes resources wherever they are, and
@@ -1087,7 +1078,7 @@ components:
         of the resources, their calendars, RFC 7953 availability, RFC 5545
         events and the claims of converted holds, rewritten in the same transaction
         as every write to those (on Hasura, a single write projects in a request of
-        its own right after it), for every day of a rolling horizon. `free` is
+        its own right after it), for every day of a rolling horizon. `free_intervals` is
         offered time less booked time; live holds are not subtracted, and neither
         is a resource's booking policy applied, because both change with the
         clock. The engine evaluates every candidate the projection returns before
@@ -1134,7 +1125,12 @@ components:
         displayName:
           description: The resource's display name, matched by a bare word in a filter.
           type: string
-        free:
+        freeFraction:
+          description: |-
+            The share of the day that is free, from 0 to 1, for ordering by how open
+            a resource is.
+          type: number
+        freeIntervals:
           description: |-
             The resource's free time within the day, [day 00:00Z, next day 00:00Z):
             offered by its availability, less confirmed events on its calendar and
@@ -1166,11 +1162,6 @@ components:
                 type: string
             type: object
           type: array
-        freeFraction:
-          description: |-
-            The share of the day that is free, from 0 to 1, for ordering by how open
-            a resource is.
-          type: number
         resource:
           description: |-
             The resource, "resources/{resource}". Not a resource reference: a
@@ -1414,7 +1405,6 @@ info:
             int32 quantity "OPTIONAL, IMMUTABLE"
             Timestamp expire_time "OUTPUT_ONLY"
             HoldState state "OUTPUT_ONLY"
-            string idempotency_key "OPTIONAL, IMMUTABLE"
             Timestamp create_time "OUTPUT_ONLY"
             Timestamp update_time "OUTPUT_ONLY"
             string etag "OUTPUT_ONLY"
@@ -1452,7 +1442,6 @@ info:
               int32 quantity "OPTIONAL, IMMUTABLE"
               Timestamp expire_time "OUTPUT_ONLY"
               HoldState state "OUTPUT_ONLY"
-              string idempotency_key "OPTIONAL, IMMUTABLE"
               Timestamp create_time "OUTPUT_ONLY"
               Timestamp update_time "OUTPUT_ONLY"
               string etag "OUTPUT_ONLY"

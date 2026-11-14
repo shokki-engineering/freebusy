@@ -111,7 +111,7 @@ type ResourcesServer struct {
 var _ resourcev1grpc.ResourcesServer = (*ResourcesServer)(nil)
 
 // NewResourcesServer returns the ResourcesServer over repos running hooks
-// (nil runs none). Errors carry the ErrorInfo domain "freebusy.dev"
+// (nil runs none). Errors carry the ErrorInfo domain "freebusy.shokki.engineering"
 // unless servicex.WithTranslator says otherwise.
 func NewResourcesServer(repos ResourcesRepositories, hooks ResourcesHooks, opts ...servicex.Option) *ResourcesServer {
 	if hooks == nil {
@@ -120,7 +120,7 @@ func NewResourcesServer(repos ResourcesRepositories, hooks ResourcesHooks, opts 
 	return &ResourcesServer{
 		repos: repos,
 		hooks: hooks,
-		opts:  servicex.Apply(servicex.Options{Translator: servicex.NewTranslator("freebusy.dev")}, opts),
+		opts:  servicex.Apply(servicex.Options{Translator: servicex.NewTranslator("freebusy.shokki.engineering")}, opts),
 	}
 }
 

@@ -67,8 +67,9 @@ components:
               format: date-time
               type: string
             etag:
-              description: Opaque version for optimistic concurrency (AIP-154); echo
-                on cancel.
+              description: |-
+                Opaque version for optimistic concurrency (AIP-154); send it back on
+                UpdateReservation, CancelReservation or RescheduleReservation.
               type: string
             hold:
               description: |-
@@ -99,7 +100,8 @@ components:
             replaces:
               description: |-
                 The reservation this one replaced, set when it was made by
-                RescheduleReservation.
+                RescheduleReservation. (A reservation, though no resource_reference says
+                so: like Hold.replaces, it is a reservation naming a reservation.)
                 Format: reservations/{reservation}
               type: string
             resources:
@@ -140,7 +142,7 @@ components:
     freebusy.reservation.v1.ErrorReason:
       description: |-
         The reasons freebusy returns for reservations: the google.rpc.ErrorInfo
-        reasons (AIP-193) in the freebusy.dev domain. They are part of the API:
+        reasons (AIP-193) in the freebusy.shokki.engineering domain. They are part of the API:
         clients branch on them, never on a message. protoc-gen-service renders them as
         Go constants, sentinels and the tables of docs/errors.md.
       enum:
@@ -241,8 +243,9 @@ components:
                 format: date-time
                 type: string
               etag:
-                description: Opaque version for optimistic concurrency (AIP-154);
-                  echo on cancel.
+                description: |-
+                  Opaque version for optimistic concurrency (AIP-154); send it back on
+                  UpdateReservation, CancelReservation or RescheduleReservation.
                 type: string
               hold:
                 description: |-
@@ -273,7 +276,8 @@ components:
               replaces:
                 description: |-
                   The reservation this one replaced, set when it was made by
-                  RescheduleReservation.
+                  RescheduleReservation. (A reservation, though no resource_reference says
+                  so: like Hold.replaces, it is a reservation naming a reservation.)
                   Format: reservations/{reservation}
                 type: string
               resources:
@@ -376,8 +380,9 @@ components:
           format: date-time
           type: string
         etag:
-          description: Opaque version for optimistic concurrency (AIP-154); echo on
-            cancel.
+          description: |-
+            Opaque version for optimistic concurrency (AIP-154); send it back on
+            UpdateReservation, CancelReservation or RescheduleReservation.
           type: string
         hold:
           description: |-
@@ -408,7 +413,8 @@ components:
         replaces:
           description: |-
             The reservation this one replaced, set when it was made by
-            RescheduleReservation.
+            RescheduleReservation. (A reservation, though no resource_reference says
+            so: like Hold.replaces, it is a reservation naming a reservation.)
             Format: reservations/{reservation}
           type: string
         resources:
@@ -554,8 +560,9 @@ components:
               format: date-time
               type: string
             etag:
-              description: Opaque version for optimistic concurrency (AIP-154); echo
-                on cancel.
+              description: |-
+                Opaque version for optimistic concurrency (AIP-154); send it back on
+                UpdateReservation, CancelReservation or RescheduleReservation.
               type: string
             hold:
               description: |-
@@ -586,7 +593,8 @@ components:
             replaces:
               description: |-
                 The reservation this one replaced, set when it was made by
-                RescheduleReservation.
+                RescheduleReservation. (A reservation, though no resource_reference says
+                so: like Hold.replaces, it is a reservation naming a reservation.)
                 Format: reservations/{reservation}
               type: string
             resources:
@@ -620,9 +628,9 @@ components:
         updateMask:
           description: |-
             The fields to change: `customer`, `attributes`, or both; `*` is both.
-            It must be sent -- an update never guesses what was meant from the
-            fields that happen to be set -- and an empty one is rejected with
-            REQUIRED_FIELD. Any other field is rejected with UNKNOWN_MASK_PATH.
+            Omitted, it is the ones `reservation` sets (AIP-134), so clearing one
+            takes a mask naming it; setting neither is rejected with
+            NOTHING_TO_UPDATE. Any other field is rejected with UNKNOWN_MASK_PATH.
           properties:
             paths:
               description: The set of field mask paths.
@@ -684,7 +692,7 @@ info:
         Client->>+AllocationService: CheckAvailability
         Note over Client,AllocationService: advisory only
         AllocationService-->>-Client: CheckAvailabilityResponse
-        Note right of Client: CreateHold is idempotent on hold_id / idempotency_key, so a retry is safe
+        Note right of Client: CreateHold is idempotent on request_id, so a retry is safe
         alt enough capacity
             Client->>+HoldService: CreateHold
             HoldService-->>-Client: Hold (ACTIVE)
@@ -743,7 +751,7 @@ info:
           Client->>+AllocationService: CheckAvailability
           Note over Client,AllocationService: advisory only
           AllocationService-->>-Client: CheckAvailabilityResponse
-          Note right of Client: CreateHold is idempotent on hold_id / idempotency_key, so a retry is safe
+          Note right of Client: CreateHold is idempotent on request_id, so a retry is safe
           alt enough capacity
               Client->>+HoldService: CreateHold
               HoldService-->>-Client: Hold (ACTIVE)

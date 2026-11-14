@@ -19,8 +19,6 @@ definition:
       type: Timestamptz
     - name: id
       type: String_1!
-    - name: idempotencyKey
-      type: String_1
     - name: name
       type: String_1!
     - name: quantity
@@ -60,9 +58,6 @@ definition:
         id:
           column:
             name: id
-        idempotencyKey:
-          column:
-            name: idempotency_key
         name:
           column:
             name: name
@@ -100,7 +95,6 @@ definition:
           - etag
           - expireTime
           - id
-          - idempotencyKey
           - name
           - quantity
           - replaces

@@ -14,9 +14,9 @@ Every protobuf package documented here. Each row links to that package's referen
 | --- | --- | --- | --- | --- | --- | --- |
 | Allocation | `freebusy.allocation.v1` | 2 | 23 | 4 | 1 | [README](freebusy/allocation/README.md) |
 | Reservation | `freebusy.reservation.v1` | 1 | 8 | 2 | 3 | [README](freebusy/reservation/README.md) |
-| Shared | `freebusy.shared.v1` | 0 | 4 | 6 | 0 | [README](freebusy/shared/README.md) |
+| Shared | `freebusy.shared.v1` | 0 | 1 | 2 | 0 | [README](freebusy/shared/README.md) |
 | Webhook | `freebusy.webhook.v1` | 1 | 16 | 3 | 1 | [README](freebusy/webhook/README.md) |
-| **Total** | _4 packages_ | 4 | 51 | 15 | 5 | |
+| **Total** | _4 packages_ | 4 | 48 | 11 | 5 | |
 
 ## Dependency graph
 

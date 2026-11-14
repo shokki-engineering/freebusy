@@ -138,7 +138,7 @@ flows:
       - call: freebusy.allocation.v1.AllocationService.SearchAvailability
       - call: freebusy.allocation.v1.AllocationService.CheckAvailability
         note: advisory only
-      - note: CreateHold is idempotent on hold_id / idempotency_key, so a retry is safe
+      - note: CreateHold is idempotent on request_id, so a retry is safe
         alternatives:
           - when: enough capacity
             steps:

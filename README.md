@@ -170,7 +170,7 @@ sequenceDiagram
 
     C->>F: SearchAvailability(type, quantity, window)
     F-->>C: resources free for the window
-    C->>F: CreateHold(candidates, window, quantity, idempotency_key)
+    C->>F: CreateHold(candidates, window, quantity, request_id)
     F-->>C: Hold ACTIVE, expires in N minutes
     F--)W: freebusy.hold.active
     C->>P: take payment
@@ -508,8 +508,9 @@ closures. All of it can also be written by any calendar app over CalDAV.
    resources and a `filter` to narrow what it considers. `SearchAvailability`'s `resource_types`
    matches a resource carrying *any* of the types listed.
 2. **Hold** — `CreateHold` with a window, a quantity, the
-   `candidate_resources` or `candidate_filter` it may take from, and an
-   `idempotency_key`. `ExtendHold` and `ReleaseHold` change it.
+   `candidate_resources` or `candidate_filter` it may take from, and a
+   `request_id` that makes a retry safe. `ExtendHold` and `ReleaseHold`
+   change it.
 3. **Settle** — payment, forms, approvals: in your services.
 4. **Reserve** — `CreateReservation` from the hold. Safe to retry: a hold
    backs at most one reservation.

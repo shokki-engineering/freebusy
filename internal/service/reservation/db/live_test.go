@@ -312,27 +312,6 @@ func TestLiveReservations(t *testing.T) {
 				}
 			})
 
-			t.Run("concurrent holds with one idempotency key", func(t *testing.T) {
-				key := "cart-" + ulid.Generate().String()
-				var wg sync.WaitGroup
-				names := make([]string, 8)
-				errs := make([]error, 8)
-				for i := range 8 {
-					wg.Go(func() {
-						h, err := engine.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{
-							Hold: &allocationpbv1.Hold{Window: win(22), CandidateResources: court, IdempotencyKey: key},
-						})
-						names[i], errs[i] = h.GetName(), err
-					})
-				}
-				wg.Wait()
-				for i := range 8 {
-					if errs[i] != nil || names[i] != names[0] {
-						t.Fatalf("caller %d: %q %v", i, names[i], errs[i])
-					}
-				}
-			})
-
 			t.Run("concurrent creates from one hold", func(t *testing.T) {
 				h := hold(16)
 				var wg sync.WaitGroup

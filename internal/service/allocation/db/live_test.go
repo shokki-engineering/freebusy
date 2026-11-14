@@ -20,6 +20,7 @@ package db
 import (
 	"context"
 	"net/url"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -253,25 +254,24 @@ func TestLiveEngine(t *testing.T) {
 			})
 
 			t.Run("lifecycle", func(t *testing.T) {
-				h, err := srv.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{
-					Hold: &allocationpbv1.Hold{Window: win(10, 11), Quantity: 3, CandidateResources: s.courts, IdempotencyKey: "it-" + ulid.Generate().String()},
-				})
+				req := &allocationpbv1.CreateHoldRequest{
+					Hold:   &allocationpbv1.Hold{Window: win(10, 11), Quantity: 3, CandidateResources: s.courts},
+					HoldId: "it-" + strings.ToLower(ulid.Generate().String()),
+				}
+				h, err := srv.CreateHold(ctx, req)
 				if err != nil {
 					t.Fatal(err)
 				}
 				if !h.GetWindow().GetStartTime().AsTime().Equal(at(10)) || len(h.GetResources()) != 3 {
 					t.Fatalf("hold %v", h)
 				}
-				again, err := srv.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{
-					Hold: &allocationpbv1.Hold{Window: win(10, 11), Quantity: 3, CandidateResources: s.courts, IdempotencyKey: h.GetIdempotencyKey()},
-				})
-				if err != nil || again.GetName() != h.GetName() {
-					t.Fatalf("idempotent retry: %v %v", again.GetName(), err)
+				if _, err := srv.CreateHold(ctx, req); status.Code(err) != codes.AlreadyExists {
+					t.Fatalf("second hold under one hold_id: %v, want ALREADY_EXISTS", err)
 				}
 				if n := free(t, srv, s, 10, 11); n != 0 {
 					t.Fatalf("held: %d free", n)
 				}
-				list, err := srv.ListHolds(ctx, &allocationpbv1.ListHoldsRequest{Filter: `state = HOLD_STATE_ACTIVE AND idempotency_key = "` + h.GetIdempotencyKey() + `"`})
+				list, err := srv.ListHolds(ctx, &allocationpbv1.ListHoldsRequest{Filter: `state = HOLD_STATE_ACTIVE AND name = "` + h.GetName() + `"`})
 				if err != nil {
 					t.Fatal(err)
 				}

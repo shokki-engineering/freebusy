@@ -75,7 +75,6 @@ A Hold is a temporary, expiring claim on one or more bookable resources for a wi
 | `quantity` | `INTEGER` | nullable |
 | `expire_time` | `TIMESTAMPTZ` | nullable |
 | `state` | `HoldState` | nullable |
-| `idempotency_key` | `VARCHAR(255)` | nullable |
 | `create_time` | `TIMESTAMPTZ` | not null |
 | `update_time` | `TIMESTAMPTZ` | not null |
 | `etag` | `VARCHAR(255)` | nullable |
@@ -101,14 +100,14 @@ An Allocation is one resource taken by one hold for one span: the row the engine
 
 ### `ResourceDay` → `resource_days`
 
-A ResourceDay is one resource's standing free time on one UTC day: the availability read model SearchAvailability, ComputeAvailability, CheckAvailability and CreateHold read their candidates from, instead of evaluating every resource there is. Storage-only, and derived: no RPC takes or returns it. It is a projection of the resources, their calendars, RFC 7953 availability, RFC 5545 events and the claims of converted holds, rewritten in the same transaction as every write to those (on Hasura, a single write projects in a request of its own right after it), for every day of a rolling horizon. `free` is offered time less booked time; live holds are not subtracted, and neither is a resource's booking policy applied, because both change with the clock. The engine evaluates every candidate the projection returns before answering, so an answer never depends on the projection being current; a stale row can only make a search miss a resource or read one it then drops.
+A ResourceDay is one resource's standing free time on one UTC day: the availability read model SearchAvailability, ComputeAvailability, CheckAvailability and CreateHold read their candidates from, instead of evaluating every resource there is. Storage-only, and derived: no RPC takes or returns it. It is a projection of the resources, their calendars, RFC 7953 availability, RFC 5545 events and the claims of converted holds, rewritten in the same transaction as every write to those (on Hasura, a single write projects in a request of its own right after it), for every day of a rolling horizon. `free_intervals` is offered time less booked time; live holds are not subtracted, and neither is a resource's booking policy applied, because both change with the clock. The engine evaluates every candidate the projection returns before answering, so an answer never depends on the projection being current; a stale row can only make a search miss a resource or read one it then drops.
 
 | Column | Type | Null |
 | --- | --- | --- |
 | `id` | `TEXT` | not null |
 | `resource` | `TEXT` | not null |
 | `day` | `DATE` | not null |
-| `free` | `TSTZMULTIRANGE` | not null |
+| `free_intervals` | `TSTZMULTIRANGE` | not null |
 | `resource_types` | `TEXT[]` | not null |
 | `attributes` | `JSONB` | not null |
 | `calendar` | `TEXT` | not null |
@@ -156,7 +155,7 @@ A Reservation is a confirmed booking: a hold made permanent. It is the last step
 
 ### `IdempotencyKey` → `idempotency_keys`
 
-The record behind every `request_id` field in this API: it remembers what the first call with a given id returned, so a retry replays that response instead of attempting the write twice. Storage only — no service exposes it, and no caller constructs one. It lives in freebusy.shared.v1 because request_id is an API-wide convention any RPC may opt into, and one interceptor records them all; homing it in any single service's package would make every other service import that service to dedupe its own writes. No RPC declares request_id today -- holds and reservations carry their own idempotency. The id is derived, not random: it is a digest of (method, request_id), so the primary key itself is the uniqueness constraint that makes a concurrent duplicate lose the race rather than double-write.
+The record behind every `request_id` field in this API: it remembers what the first call with a given id returned, so a retry replays that response instead of attempting the write twice. Storage only — no service exposes it, and no caller constructs one. It lives in freebusy.shared.v1 because request_id is an API-wide convention any RPC may opt into, and one interceptor records them all; homing it in any single service's package would make every other service import that service to dedupe its own writes. HoldService.CreateHold declares it; CreateReservation needs none, since a hold backs at most one reservation. The id is derived, not random: it is a digest of (method, request_id), so the primary key itself is the uniqueness constraint that makes a concurrent duplicate lose the race rather than double-write.
 
 | Column | Type | Null |
 | --- | --- | --- |

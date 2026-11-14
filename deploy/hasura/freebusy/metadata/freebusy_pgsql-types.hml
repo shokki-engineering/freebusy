@@ -565,38 +565,6 @@ definition:
     comparisonExpressionTypeName: freebusy_DateComparisonExp
 
 ---
-kind: BooleanExpressionType
-version: v1
-definition:
-  name: TstzmultirangeBoolExp
-  operand:
-    scalar:
-      type: Json
-      comparisonOperators:
-        - name: _in
-          argumentType: "[Json!]!"
-      dataConnectorOperatorMapping:
-        - dataConnectorName: freebusy_pgsql
-          dataConnectorScalarType: tstzmultirange
-          operatorMapping: {}
-  logicalOperators:
-    enable: true
-  isNull:
-    enable: true
-  graphql:
-    typeName: freebusy_TstzmultirangeBoolExp
-
----
-kind: DataConnectorScalarRepresentation
-version: v1
-definition:
-  dataConnectorName: freebusy_pgsql
-  dataConnectorScalarType: tstzmultirange
-  representation: Json
-  graphql:
-    comparisonExpressionTypeName: freebusy_JsonComparisonExp_1
-
----
 kind: ScalarType
 version: v1
 definition:
@@ -649,6 +617,38 @@ definition:
     comparisonExpressionTypeName: freebusy_Float64ComparisonExp
 
 ---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: TstzmultirangeBoolExp
+  operand:
+    scalar:
+      type: Json
+      comparisonOperators:
+        - name: _in
+          argumentType: "[Json!]!"
+      dataConnectorOperatorMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: tstzmultirange
+          operatorMapping: {}
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: freebusy_TstzmultirangeBoolExp
+
+---
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: freebusy_pgsql
+  dataConnectorScalarType: tstzmultirange
+  representation: Json
+  graphql:
+    comparisonExpressionTypeName: freebusy_JsonComparisonExp_1
+
+---
 kind: AggregateExpression
 version: v1
 definition:
@@ -699,28 +699,6 @@ definition:
     returnType: Int64
   graphql:
     selectTypeName: freebusy_DateAggExp
-
----
-kind: AggregateExpression
-version: v1
-definition:
-  name: TstzmultirangeAggExp
-  operand:
-    scalar:
-      aggregatedType: Json
-      aggregationFunctions: []
-      dataConnectorAggregationFunctionMapping:
-        - dataConnectorName: freebusy_pgsql
-          dataConnectorScalarType: tstzmultirange
-          functionMapping: {}
-  count:
-    enable: true
-    returnType: Int64
-  countDistinct:
-    enable: true
-    returnType: Int64
-  graphql:
-    selectTypeName: freebusy_TstzmultirangeAggExp
 
 ---
 kind: AggregateExpression
@@ -783,6 +761,28 @@ definition:
     returnType: Int64
   graphql:
     selectTypeName: freebusy_Float8AggExp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: TstzmultirangeAggExp
+  operand:
+    scalar:
+      aggregatedType: Json
+      aggregationFunctions: []
+      dataConnectorAggregationFunctionMapping:
+        - dataConnectorName: freebusy_pgsql
+          dataConnectorScalarType: tstzmultirange
+          functionMapping: {}
+  count:
+    enable: true
+    returnType: Int64
+  countDistinct:
+    enable: true
+    returnType: Int64
+  graphql:
+    selectTypeName: freebusy_TstzmultirangeAggExp
 
 ---
 kind: AggregateExpression

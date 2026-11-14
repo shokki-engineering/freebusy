@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"buf.build/gen/go/the-protobuf-project/rfc/protocolbuffers/go/protobuf/rfc9073/resource/v1"
+	"github.com/google/uuid"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/allocation/v1/allocationpbv1"
 	"github.com/shokki-engineering/freebusy/protobuf/generated/go/reservation/v1/reservationpbv1"
 	"github.com/the-protobuf-project/store/plugin/pb/storepbv1"
@@ -51,12 +52,21 @@ func reservationFlow(t *testing.T, c *e2eClients) {
 		t.Fatalf("before booking: %d free, want 1", n)
 	}
 
-	hold, err := c.holds.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Hold: &allocationpbv1.Hold{Window: window, CandidateResources: []string{resource}}})
+	take := &allocationpbv1.CreateHoldRequest{
+		Hold:      &allocationpbv1.Hold{Window: window, CandidateResources: []string{resource}},
+		RequestId: uuid.NewString(),
+	}
+	hold, err := c.holds.CreateHold(ctx, take)
 	if err != nil {
 		t.Fatalf("CreateHold: %v", err)
 	}
 	if hold.GetState() != allocationpbv1.HoldState_HOLD_STATE_ACTIVE || len(hold.GetResources()) != 1 || hold.GetResources()[0] != resource {
 		t.Fatalf("hold %v", hold)
+	}
+	// A retry with the same request_id (AIP-155) is answered with the first
+	// call's hold, not refused because the resource is now taken.
+	if again, err := c.holds.CreateHold(ctx, take); err != nil || again.GetName() != hold.GetName() {
+		t.Fatalf("CreateHold retried with its request_id: %v %v, want %s", again.GetName(), err, hold.GetName())
 	}
 	_, err = c.holds.CreateHold(ctx, &allocationpbv1.CreateHoldRequest{Hold: &allocationpbv1.Hold{Window: window, CandidateResources: []string{resource}}})
 	wantCode(t, err, codes.FailedPrecondition, "a second hold on a taken resource")
@@ -113,10 +123,17 @@ func reservationFlow(t *testing.T, c *e2eClients) {
 		UpdateMask:  &fieldmaskpb.FieldMask{Paths: []string{"hold"}},
 	})
 	wantCode(t, err, codes.InvalidArgument, "UpdateReservation of the hold")
-	_, err = c.reservations.UpdateReservation(ctx, &reservationpbv1.UpdateReservationRequest{
+	// No update_mask: the fields the request sets (AIP-134).
+	nomask, err := c.reservations.UpdateReservation(ctx, &reservationpbv1.UpdateReservationRequest{
 		Reservation: &reservationpbv1.Reservation{Name: r.GetName(), Customer: "users/no-mask"},
 	})
-	wantCode(t, err, codes.InvalidArgument, "UpdateReservation without update_mask")
+	if err != nil || nomask.GetCustomer() != "users/no-mask" || !proto.Equal(nomask.GetAttributes(), updated.GetAttributes()) {
+		t.Fatalf("UpdateReservation without update_mask: %v %v", nomask, err)
+	}
+	_, err = c.reservations.UpdateReservation(ctx, &reservationpbv1.UpdateReservationRequest{
+		Reservation: &reservationpbv1.Reservation{Name: r.GetName()},
+	})
+	wantCode(t, err, codes.InvalidArgument, "UpdateReservation that sets nothing")
 	_, err = c.reservations.UpdateReservation(ctx, &reservationpbv1.UpdateReservationRequest{
 		Reservation: &reservationpbv1.Reservation{Name: r.GetName(), Customer: "not-a-user"},
 		UpdateMask:  &fieldmaskpb.FieldMask{Paths: []string{"customer"}},

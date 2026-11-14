@@ -8,6 +8,7 @@ package freebusy.allocation.v1;
 import "buf/validate/validate.proto";
 import "freebusy/allocation/v1/allocation.proto";
 import "google/api/field_behavior.proto";
+import "google/api/field_info.proto";
 import "google/api/resource.proto";
 import "google/protobuf/duration.proto";
 
@@ -29,7 +30,6 @@ message CreateHoldRequest {
 
   // The hold to take. Its window is required; quantity defaults to 1 and
   // candidate_resources empty offers every resource candidate_filter matches.
-  // Supply idempotency_key to make a retry safe.
   Hold hold = 2 [
     (google.api.field_behavior) = REQUIRED,
     (buf.validate.field).required = true
@@ -37,7 +37,21 @@ message CreateHoldRequest {
 
   // Client-assigned id, becoming the last segment of the hold name. The server
   // generates one when empty.
-  string hold_id = 3 [(google.api.field_behavior) = OPTIONAL];
+  string hold_id = 3 [
+    (google.api.field_behavior) = OPTIONAL,
+    (buf.validate.field).string.pattern = "^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$",
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
+
+  // A unique id for this request, making it safe to retry (AIP-155). A retry
+  // with the same id returns what the first call returned -- the same hold, in
+  // the state it was taken in -- rather than taking a second one.
+  string request_id = 4 [
+    (google.api.field_info).format = UUID4,
+    (google.api.field_behavior) = OPTIONAL,
+    (buf.validate.field).string.uuid = true,
+    (buf.validate.field).ignore = IGNORE_IF_ZERO_VALUE
+  ];
 }
 
 // Request message for HoldService.GetHold, AIP-131.

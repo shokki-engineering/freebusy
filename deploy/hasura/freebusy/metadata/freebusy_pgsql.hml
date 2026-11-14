@@ -622,12 +622,6 @@ definition:
               type:
                 name: text
                 type: named
-            idempotency_key:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
             name:
               type:
                 name: text
@@ -737,16 +731,16 @@ definition:
                 underlying_type:
                   name: text
                   type: named
-            free:
-              type:
-                name: tstzmultirange
-                type: named
             free_fraction:
               type:
                 type: nullable
                 underlying_type:
                   name: float8
                   type: named
+            free_intervals:
+              type:
+                name: tstzmultirange
+                type: named
             id:
               type:
                 name: text
@@ -3702,12 +3696,6 @@ definition:
               type:
                 name: text
                 type: named
-            idempotency_key:
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
             name:
               type:
                 name: text
@@ -3789,16 +3777,16 @@ definition:
                 underlying_type:
                   name: text
                   type: named
-            free:
-              type:
-                name: tstzmultirange
-                type: named
             free_fraction:
               type:
                 type: nullable
                 underlying_type:
                   name: float8
                   type: named
+            free_intervals:
+              type:
+                name: tstzmultirange
+                type: named
             id:
               type:
                 name: text
@@ -11063,13 +11051,6 @@ definition:
                 underlying_type:
                   name: update_column_allocation_holds_id
                   type: named
-            idempotency_key:
-              description: Update the 'idempotency_key' column in the 'allocation_holds' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_allocation_holds_idempotency_key
-                  type: named
             name:
               description: Update the 'name' column in the 'allocation_holds' collection.
               type:
@@ -11243,19 +11224,19 @@ definition:
                 underlying_type:
                   name: update_column_allocation_resource_days_display_name
                   type: named
-            free:
-              description: Update the 'free' column in the 'allocation_resource_days' collection.
-              type:
-                type: nullable
-                underlying_type:
-                  name: update_column_allocation_resource_days_free
-                  type: named
             free_fraction:
               description: Update the 'free_fraction' column in the 'allocation_resource_days' collection.
               type:
                 type: nullable
                 underlying_type:
                   name: update_column_allocation_resource_days_free_fraction
+                  type: named
+            free_intervals:
+              description: Update the 'free_intervals' column in the 'allocation_resource_days' collection.
+              type:
+                type: nullable
+                underlying_type:
+                  name: update_column_allocation_resource_days_free_intervals
                   type: named
             id:
               description: Update the 'id' column in the 'allocation_resource_days' collection.
@@ -12378,17 +12359,6 @@ definition:
                 name: text
                 type: named
           foreign_keys: {}
-        update_column_allocation_holds_idempotency_key:
-          description: Update the 'idempotency_key' column in the 'allocation_holds' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                type: nullable
-                underlying_type:
-                  name: text
-                  type: named
-          foreign_keys: {}
         update_column_allocation_holds_name:
           description: Update the 'name' column in the 'allocation_holds' collection
           fields:
@@ -12515,15 +12485,6 @@ definition:
                   name: text
                   type: named
           foreign_keys: {}
-        update_column_allocation_resource_days_free:
-          description: Update the 'free' column in the 'allocation_resource_days' collection
-          fields:
-            _set:
-              description: Set the column to this value
-              type:
-                name: tstzmultirange
-                type: named
-          foreign_keys: {}
         update_column_allocation_resource_days_free_fraction:
           description: Update the 'free_fraction' column in the 'allocation_resource_days' collection
           fields:
@@ -12534,6 +12495,15 @@ definition:
                 underlying_type:
                   name: float8
                   type: named
+          foreign_keys: {}
+        update_column_allocation_resource_days_free_intervals:
+          description: Update the 'free_intervals' column in the 'allocation_resource_days' collection
+          fields:
+            _set:
+              description: Set the column to this value
+              type:
+                name: tstzmultirange
+                type: named
           foreign_keys: {}
         update_column_allocation_resource_days_id:
           description: Update the 'id' column in the 'allocation_resource_days' collection

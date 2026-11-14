@@ -37,7 +37,7 @@ const (
 // of the resources, their calendars, RFC 7953 availability, RFC 5545
 // events and the claims of converted holds, rewritten in the same transaction
 // as every write to those (on Hasura, a single write projects in a request of
-// its own right after it), for every day of a rolling horizon. `free` is
+// its own right after it), for every day of a rolling horizon. `free_intervals` is
 // offered time less booked time; live holds are not subtracted, and neither
 // is a resource's booking policy applied, because both change with the
 // clock. The engine evaluates every candidate the projection returns before
@@ -54,7 +54,7 @@ type ResourceDay struct {
 	// The resource's free time within the day, [day 00:00Z, next day 00:00Z):
 	// offered by its availability, less confirmed events on its calendar and
 	// the claims of converted holds. Live holds are not subtracted.
-	Free []*interval.Interval `protobuf:"bytes,5,rep,name=free,proto3" json:"free,omitempty"`
+	FreeIntervals []*interval.Interval `protobuf:"bytes,5,rep,name=free_intervals,json=freeIntervals,proto3" json:"free_intervals,omitempty"`
 	// RFC 9073 RESOURCE-TYPE values the resource carries.
 	ResourceTypes []string `protobuf:"bytes,6,rep,name=resource_types,json=resourceTypes,proto3" json:"resource_types,omitempty"`
 	// Every JSON object the resource's RFC 9073 STRUCTURED-DATA carries as
@@ -118,9 +118,9 @@ func (x *ResourceDay) GetDay() *date.Date {
 	return nil
 }
 
-func (x *ResourceDay) GetFree() []*interval.Interval {
+func (x *ResourceDay) GetFreeIntervals() []*interval.Interval {
 	if x != nil {
-		return x.Free
+		return x.FreeIntervals
 	}
 	return nil
 }
@@ -164,11 +164,11 @@ var File_freebusy_allocation_v1_resource_day_proto protoreflect.FileDescriptor
 
 const file_freebusy_allocation_v1_resource_day_proto_rawDesc = "" +
 	"\n" +
-	")freebusy/allocation/v1/resource_day.proto\x12\x16freebusy.allocation.v1\x1a\x1cgoogle/protobuf/struct.proto\x1a\x16google/type/date.proto\x1a\x1agoogle/type/interval.proto\x1a\x1astore/v1/annotations.proto\"\x8f\x05\n" +
+	")freebusy/allocation/v1/resource_day.proto\x12\x16freebusy.allocation.v1\x1a\x1cgoogle/protobuf/struct.proto\x1a\x16google/type/date.proto\x1a\x1agoogle/type/interval.proto\x1a\x1astore/v1/annotations.proto\"\xac\x05\n" +
 	"\vResourceDay\x12\x1a\n" +
 	"\bresource\x18\x01 \x01(\tR\bresource\x12#\n" +
-	"\x03day\x18\x04 \x01(\v2\x11.google.type.DateR\x03day\x12)\n" +
-	"\x04free\x18\x05 \x03(\v2\x15.google.type.IntervalR\x04free\x12%\n" +
+	"\x03day\x18\x04 \x01(\v2\x11.google.type.DateR\x03day\x12<\n" +
+	"\x0efree_intervals\x18\x05 \x03(\v2\x15.google.type.IntervalR\rfreeIntervals\x12%\n" +
 	"\x0eresource_types\x18\x06 \x03(\tR\rresourceTypes\x12P\n" +
 	"\n" +
 	"attributes\x18\a \x01(\v2\x17.google.protobuf.StructB\x17\xe2\xb5\x18\x13\"\x11\n" +
@@ -177,7 +177,7 @@ const file_freebusy_allocation_v1_resource_day_proto_rawDesc = "" +
 	"\bcalendar\x18\b \x01(\tR\bcalendar\x12)\n" +
 	"\fdisplay_name\x18\t \x01(\tB\x06\xe2\xb5\x18\x02\x18\x01R\vdisplayName\x12#\n" +
 	"\rfree_fraction\x18\n" +
-	" \x01(\x01R\ffreeFraction:\xff\x01\xf2\xb5\x18\xfa\x01\x1a!the-protobuf-project.org/Resource\x1a!the-protobuf-project.org/Calendar\x1a%the-protobuf-project.org/Availability\x1a\x1ethe-protobuf-project.org/Event\x1a!freebusy.allocation.v1/Allocation\"\bresource\"\x03day*\x04free2\n" +
+	" \x01(\x01R\ffreeFraction:\x89\x02\xf2\xb5\x18\x84\x02\x1a!the-protobuf-project.org/Resource\x1a!the-protobuf-project.org/Calendar\x1a%the-protobuf-project.org/Availability\x1a\x1ethe-protobuf-project.org/Event\x1a!freebusy.allocation.v1/Allocation\"\bresource\"\x03day*\x0efree_intervals2\n" +
 	"\n" +
 	"\bcalendar2\x0f\n" +
 	"\x03day\n" +
@@ -205,7 +205,7 @@ var file_freebusy_allocation_v1_resource_day_proto_goTypes = []any{
 }
 var file_freebusy_allocation_v1_resource_day_proto_depIdxs = []int32{
 	1, // 0: freebusy.allocation.v1.ResourceDay.day:type_name -> google.type.Date
-	2, // 1: freebusy.allocation.v1.ResourceDay.free:type_name -> google.type.Interval
+	2, // 1: freebusy.allocation.v1.ResourceDay.free_intervals:type_name -> google.type.Interval
 	3, // 2: freebusy.allocation.v1.ResourceDay.attributes:type_name -> google.protobuf.Struct
 	3, // [3:3] is the sub-list for method output_type
 	3, // [3:3] is the sub-list for method input_type

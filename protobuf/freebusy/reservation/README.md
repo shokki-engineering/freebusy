@@ -61,7 +61,7 @@ sequenceDiagram
     Client->>+AllocationService: CheckAvailability
     Note over Client,AllocationService: advisory only
     AllocationService-->>-Client: CheckAvailabilityResponse
-    Note right of Client: CreateHold is idempotent on hold_id / idempotency_key, so a retry is safe
+    Note right of Client: CreateHold is idempotent on request_id, so a retry is safe
     alt enough capacity
         Client->>+HoldService: CreateHold
         HoldService-->>-Client: Hold (ACTIVE)
@@ -99,7 +99,7 @@ what RescheduleReservation does.
 | `CreateReservation` | [`CreateReservationRequest`](#createreservationrequest) | [`Reservation`](#reservation) | `POST /v1/reservations` | Makes a reservation from a live hold, converting the hold so its resources stay taken.<br><br>Idempotent: a hold backs at most one reservation, so a retry returns the reservation the first call made. Fails with FAILED_PRECONDITION when the hold has lapsed or been released. |
 | `GetReservation` | [`GetReservationRequest`](#getreservationrequest) | [`Reservation`](#reservation) | `GET /v1/{name=reservations/*}` | Retrieves one reservation. |
 | `ListReservations` | [`ListReservationsRequest`](#listreservationsrequest) | [`ListReservationsResponse`](#listreservationsresponse) | `GET /v1/reservations` | Lists reservations. |
-| `UpdateReservation` | [`UpdateReservationRequest`](#updatereservationrequest) | [`Reservation`](#reservation) | `PATCH /v1/{reservation.name=reservations/*}` | Updates a confirmed reservation's customer or attributes, AIP-134.<br><br>update_mask is required and may name only `customer` and `attributes`; everything else is the engine's, and is changed by CancelReservation or RescheduleReservation. `reservation.etag`, when set, must match the stored one (AIP-154). Fails with FAILED_PRECONDITION unless the reservation is confirmed. |
+| `UpdateReservation` | [`UpdateReservationRequest`](#updatereservationrequest) | [`Reservation`](#reservation) | `PATCH /v1/{reservation.name=reservations/*}` | Updates a confirmed reservation's customer or attributes, AIP-134.<br><br>update_mask may name only `customer` and `attributes`, and omitted is the ones the request sets; everything else is the engine's, and is changed by CancelReservation or RescheduleReservation. `reservation.etag`, when set, must match the stored one (AIP-154). Fails with FAILED_PRECONDITION unless the reservation is confirmed. |
 | `CancelReservation` | [`CancelReservationRequest`](#cancelreservationrequest) | [`Reservation`](#reservation) | `POST /v1/{name=reservations/*}:cancel` | Cancels a reservation, freeing its resources.<br><br>Idempotent: cancelling a cancelled reservation succeeds and changes nothing. |
 | `RescheduleReservation` | [`RescheduleReservationRequest`](#reschedulereservationrequest) | [`Reservation`](#reservation) | `POST /v1/{name=reservations/*}:reschedule` | Moves a confirmed reservation onto a new hold, returning the reservation that replaces it.<br><br>The replacement is a new reservation made from the new hold, linked both ways (`replaces`, `replacement`); the original ends RESCHEDULED. The original keeps its resources until the replacement is confirmed, so a failure part-way -- the new hold lapsing, a crash -- leaves the customer with their old booking, never with neither. A new hold taken with `replaces` naming the original's hold may overlap the original's window on the same resources -- an extension in place -- and the overlap passes to the replacement in the same write that frees the original. Idempotent: repeating the call with the same hold returns the same replacement. |
 
@@ -185,8 +185,8 @@ Resource `freebusy.reservation.v1/Reservation`, pattern `reservations/{reservati
 | `update_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | Last-modification timestamp. |
 | `confirm_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | When it was confirmed. |
 | `cancel_time` | `google.protobuf.Timestamp` | `OUTPUT_ONLY` | When it was cancelled. |
-| `etag` | `string` | `OUTPUT_ONLY` | Opaque version for optimistic concurrency (AIP-154); echo on cancel. |
-| `replaces` | `string` | `OUTPUT_ONLY` | The reservation this one replaced, set when it was made by RescheduleReservation. Format: reservations/{reservation} |
+| `etag` | `string` | `OUTPUT_ONLY` | Opaque version for optimistic concurrency (AIP-154); send it back on UpdateReservation, CancelReservation or RescheduleReservation. |
+| `replaces` | `string` | `OUTPUT_ONLY` | The reservation this one replaced, set when it was made by RescheduleReservation. (A reservation, though no resource_reference says so: like Hold.replaces, it is a reservation naming a reservation.) Format: reservations/{reservation} |
 | `replacement` | `string` | `OUTPUT_ONLY` | The reservation replacing this one, set when RescheduleReservation began. Format: reservations/{reservation} |
 | `last_change` | [`Reservation.Change`](#reservationchange) | `OUTPUT_ONLY` | What the last write to this reservation changed. A webhook is sent freebusy.reservation.updated exactly when it is CHANGE_DETAILS, and the event of the new state otherwise. |
 
@@ -243,7 +243,7 @@ mask.
 | Field | Type | Behavior | Description |
 | --- | --- | --- | --- |
 | `reservation` | [`Reservation`](#reservation) | `REQUIRED` | The reservation, its name identifying which. Only the fields update_mask names are read. `etag`, when set, must match the stored one (AIP-154). |
-| `update_mask` | `google.protobuf.FieldMask` | `OPTIONAL` | The fields to change: `customer`, `attributes`, or both; `*` is both. It must be sent -- an update never guesses what was meant from the fields that happen to be set -- and an empty one is rejected with REQUIRED_FIELD. Any other field is rejected with UNKNOWN_MASK_PATH. |
+| `update_mask` | `google.protobuf.FieldMask` | `OPTIONAL` | The fields to change: `customer`, `attributes`, or both; `*` is both. Omitted, it is the ones `reservation` sets (AIP-134), so clearing one takes a mask naming it; setting neither is rejected with NOTHING_TO_UPDATE. Any other field is rejected with UNKNOWN_MASK_PATH. |
 
 ### CancelReservationRequest
 
@@ -327,7 +327,7 @@ stateDiagram-v2
 ### ErrorReason
 
 The reasons freebusy returns for reservations: the google.rpc.ErrorInfo
-reasons (AIP-193) in the freebusy.dev domain. They are part of the API:
+reasons (AIP-193) in the freebusy.shokki.engineering domain. They are part of the API:
 clients branch on them, never on a message. protoc-gen-service renders them as
 Go constants, sentinels and the tables of docs/errors.md.
 

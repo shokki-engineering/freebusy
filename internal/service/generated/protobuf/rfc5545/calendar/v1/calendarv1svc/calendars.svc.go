@@ -116,7 +116,7 @@ type CalendarsServer struct {
 var _ calendarv1grpc.CalendarsServer = (*CalendarsServer)(nil)
 
 // NewCalendarsServer returns the CalendarsServer over repos running hooks
-// (nil runs none). Errors carry the ErrorInfo domain "freebusy.dev"
+// (nil runs none). Errors carry the ErrorInfo domain "freebusy.shokki.engineering"
 // unless servicex.WithTranslator says otherwise.
 func NewCalendarsServer(repos CalendarsRepositories, hooks CalendarsHooks, opts ...servicex.Option) *CalendarsServer {
 	if hooks == nil {
@@ -125,7 +125,7 @@ func NewCalendarsServer(repos CalendarsRepositories, hooks CalendarsHooks, opts 
 	return &CalendarsServer{
 		repos: repos,
 		hooks: hooks,
-		opts:  servicex.Apply(servicex.Options{Translator: servicex.NewTranslator("freebusy.dev")}, opts),
+		opts:  servicex.Apply(servicex.Options{Translator: servicex.NewTranslator("freebusy.shokki.engineering")}, opts),
 	}
 }
 

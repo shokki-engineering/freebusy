@@ -13,12 +13,12 @@ option java_outer_classname = "ErrorsProto";
 option java_package = "engineering.shokki.freebusy.allocation.v1";
 
 // The reasons freebusy returns for availability and holds: the
-// google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.dev domain. They are
+// google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.shokki.engineering domain. They are
 // part of the API: clients branch on them, never on a message.
 // protoc-gen-service renders them as Go constants, sentinels and the tables of
 // docs/errors.md.
 enum ErrorReason {
-  option (service.v1.error_domain) = {domain: "freebusy.dev"};
+  option (service.v1.error_domain) = {domain: "freebusy.shokki.engineering"};
 
   // Unset; never returned.
   ERROR_REASON_UNSPECIFIED = 0;
@@ -175,5 +175,13 @@ enum ErrorReason {
     description: "`CreateHold`: `hold.replaces` names a hold that backs no booking still keeping its resources -- it never became a reservation, or that reservation was cancelled or moved."
     fix: "Send the `hold` of a confirmed reservation, or leave `replaces` empty."
     detail: DETAIL_KIND_PRECONDITION_FAILURE
+  }];
+
+  // CreateHold: hold_id names a hold that already exists.
+  ERROR_REASON_HOLD_ID_TAKEN = 18 [(service.v1.error_reason) = {
+    code: "ALREADY_EXISTS"
+    description: "`CreateHold`: `hold_id` names a hold that already exists."
+    fix: "Choose another id, or leave it empty; send `request_id` to make a retry safe."
+    detail: DETAIL_KIND_BAD_REQUEST
   }];
 }

@@ -105,4 +105,4 @@ plugins:
       - go_module=github.com/shokki-engineering/freebusy/internal/service/generated
       - repository_module=github.com/shokki-engineering/freebusy/internal/database/repository
       - config=tools/protobuf/buf/config/service.yaml
-      - error_domain=freebusy.dev
+      - error_domain=freebusy.shokki.engineering

@@ -16,6 +16,34 @@ pre-release and does not move the images' `latest` tag.
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking:** `CreateHold` is made safe to retry by
+  `CreateHoldRequest.request_id` (a UUID, AIP-155), not `Hold.idempotency_key`,
+  which is gone. A retry returns what the first call returned, even a hold
+  that has since expired; send a new `request_id` to take a fresh one.
+- **Breaking:** `CreateHoldRequest.hold_id` must match
+  `^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$`, as `reservation_id` does.
+- **Breaking:** every `ErrorInfo` carries the domain
+  `freebusy.shokki.engineering`, not `freebusy.dev`.
+- `UpdateReservation` without an `update_mask` changes the fields the request
+  sets (AIP-134), instead of failing with `REQUIRED_FIELD`; setting none fails
+  with `NOTHING_TO_UPDATE`.
+- The store generator and runtime are at v1.7.0.
+
+### Removed
+
+- **Breaking:** the unused `freebusy.shared.v1` types `BookingMode`,
+  `MediaType`, `OrderDirection`, `Weekday`, `DateRange`, `PriceComponent` and
+  `TimeWindow`.
+
+### Migrations
+
+- `20261114092405_hold_request_id_free_intervals`: drops
+  `allocation.holds.idempotency_key` and renames the projection column
+  `resource_days.free` to `free_intervals` (the storage-only `ResourceDay`
+  field, AIP-140), keeping its rows.
+
 ## [1.0.0-rc.2.1] - 2026-10-30
 
 ### Added

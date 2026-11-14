@@ -27,7 +27,7 @@ const (
 
 // The reasons freebusy returns for the resources, calendars, events and
 // availability freebusy serves, and any call: the
-// google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.dev domain. They are
+// google.rpc.ErrorInfo reasons (AIP-193) in the freebusy.shokki.engineering domain. They are
 // part of the API: clients branch on them, never on a message.
 // protoc-gen-service renders them as Go constants, sentinels and the tables of
 // docs/errors.md.
@@ -144,7 +144,7 @@ var File_freebusy_shared_v1_errors_proto protoreflect.FileDescriptor
 
 const file_freebusy_shared_v1_errors_proto_rawDesc = "" +
 	"\n" +
-	"\x1ffreebusy/shared/v1/errors.proto\x12\x12freebusy.shared.v1\x1a\x1cservice/v1/annotations.proto*\xd6\x19\n" +
+	"\x1ffreebusy/shared/v1/errors.proto\x12\x12freebusy.shared.v1\x1a\x1cservice/v1/annotations.proto*\xe5\x19\n" +
 	"\vErrorReason\x12\x1c\n" +
 	"\x18ERROR_REASON_UNSPECIFIED\x10\x00\x12\x81\x01\n" +
 	"\x1fERROR_REASON_CALENDAR_NOT_FOUND\x10\n" +
@@ -175,8 +175,8 @@ const file_freebusy_shared_v1_errors_proto_rawDesc = "" +
 	"\x1cERROR_REASON_WINDOW_TOO_LONG\x10\x16\x1ai\xea\xf0\x19e\n" +
 	"\x10INVALID_ARGUMENT\x12+The window is longer than one call answers.\x1a\"Split it into consecutive windows. \x01\x12z\n" +
 	"\x1aERROR_REASON_UNIMPLEMENTED\x10\x17\x1aZ\xea\xf0\x19V\n" +
-	"\rUNIMPLEMENTED\x120The call, or this use of it, is not implemented.\x1a\x11Read the message.0\x01\x1a\x12\xe2\xf0\x19\x0e\n" +
-	"\ffreebusy.dev\"\x04\b\x01\x10\t*\"ERROR_REASON_ORGANIZATION_REQUIRED*#ERROR_REASON_ORGANIZATION_NOT_FOUND*!ERROR_REASON_ORGANIZATION_DELETED*#ERROR_REASON_ORGANIZATION_HAS_SITES*\x1aERROR_REASON_SITE_REQUIRED*\x1bERROR_REASON_SITE_NOT_FOUND*\x19ERROR_REASON_SITE_DELETED*&ERROR_REASON_SITE_WITHOUT_ORGANIZATION*\x1fERROR_REASON_SITE_HAS_RESOURCESB\xed\x01\n" +
+	"\rUNIMPLEMENTED\x120The call, or this use of it, is not implemented.\x1a\x11Read the message.0\x01\x1a!\xe2\xf0\x19\x1d\n" +
+	"\x1bfreebusy.shokki.engineering\"\x04\b\x01\x10\t*\"ERROR_REASON_ORGANIZATION_REQUIRED*#ERROR_REASON_ORGANIZATION_NOT_FOUND*!ERROR_REASON_ORGANIZATION_DELETED*#ERROR_REASON_ORGANIZATION_HAS_SITES*\x1aERROR_REASON_SITE_REQUIRED*\x1bERROR_REASON_SITE_NOT_FOUND*\x19ERROR_REASON_SITE_DELETED*&ERROR_REASON_SITE_WITHOUT_ORGANIZATION*\x1fERROR_REASON_SITE_HAS_RESOURCESB\xed\x01\n" +
 	"\x16com.freebusy.shared.v1B\vErrorsProtoP\x01Z\\github.com/shokki-engineering/freebusy/protobuf/generated/go/shared/v1/sharedpbv1;sharedpbv1\xa2\x02\x03FSX\xaa\x02\x12Freebusy.Shared.V1\xca\x02\x12Freebusy\\Shared\\V1\xe2\x02\x1eFreebusy\\Shared\\V1\\GPBMetadata\xea\x02\x14Freebusy::Shared::V1b\x06proto3"
 
 var (

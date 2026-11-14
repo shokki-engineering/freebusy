@@ -375,7 +375,7 @@ func (p *DayProjection) compute(ctx context.Context, read repox.Conn, store Stor
 					DisplayName:   res.GetDisplayName(),
 				}
 				for _, f := range free {
-					row.Free = append(row.Free, intervalOf(f))
+					row.FreeIntervals = append(row.FreeIntervals, intervalOf(f))
 					secs += f.Duration()
 				}
 				row.FreeFraction = float64(secs) / float64(oneDay)

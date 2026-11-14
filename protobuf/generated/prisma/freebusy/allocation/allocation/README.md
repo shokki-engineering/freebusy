@@ -40,7 +40,6 @@ A Hold is a temporary, expiring claim on one or more bookable resources for a wi
 | `quantity` | `INTEGER` | nullable |
 | `expire_time` | `TIMESTAMPTZ` | nullable |
 | `state` | `HoldState` | nullable |
-| `idempotency_key` | `VARCHAR(255)` | nullable |
 | `create_time` | `TIMESTAMPTZ` | not null |
 | `update_time` | `TIMESTAMPTZ` | not null |
 | `etag` | `VARCHAR(255)` | nullable |

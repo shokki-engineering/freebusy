@@ -47,8 +47,8 @@ service HoldService {
   //
   // The server chooses which resources are taken from the candidates offered,
   // under a lock, so two callers racing for the last bay cannot both win.
-  // Requires an idempotency key: a retry after a timeout returns the original
-  // hold rather than taking a second one.
+  // Send `request_id` to make a retry safe: a retry after a timeout with the
+  // same id returns the original hold rather than taking a second one.
   rpc CreateHold(CreateHoldRequest) returns (Hold) {
     option (google.api.http) = {
       post: "/v1/holds"
@@ -61,7 +61,7 @@ service HoldService {
         "forms): the second step of booking. hold.window: start_time and "
         "end_time, RFC 3339. hold.quantity defaults to 1; freebusy picks which "
         "resources, from hold.candidate_resources and hold.candidate_filter if "
-        "given. Set hold.idempotency_key so a retry "
+        "given. Set request_id (a UUID) so a retry "
         "returns the same hold. The hold lasts 15 minutes (expire_time): confirm "
         "it with reservation_service-create_reservation_v1 before then, or hold_service-extend_hold_v1. Fails with "
         "CAPACITY_EXHAUSTED when too few are free. To move or extend a booking, "

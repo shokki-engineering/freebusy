@@ -15,10 +15,10 @@ definition:
       type: Date!
     - name: displayName
       type: String_1
-    - name: free
-      type: Json!
     - name: freeFraction
       type: Float64
+    - name: freeIntervals
+      type: Json!
     - name: id
       type: String_1!
     - name: resource
@@ -46,12 +46,12 @@ definition:
         displayName:
           column:
             name: display_name
-        free:
-          column:
-            name: free
         freeFraction:
           column:
             name: free_fraction
+        freeIntervals:
+          column:
+            name: free_intervals
         id:
           column:
             name: id
@@ -78,8 +78,8 @@ definition:
           - calendar
           - day
           - displayName
-          - free
           - freeFraction
+          - freeIntervals
           - id
           - resource
           - resourceTypes
@@ -102,10 +102,10 @@ definition:
           booleanExpressionType: DateBoolExp
         - fieldName: displayName
           booleanExpressionType: TextBoolExp
-        - fieldName: free
-          booleanExpressionType: TstzmultirangeBoolExp
         - fieldName: freeFraction
           booleanExpressionType: Float8BoolExp
+        - fieldName: freeIntervals
+          booleanExpressionType: TstzmultirangeBoolExp
         - fieldName: id
           booleanExpressionType: TextBoolExp
         - fieldName: resource
@@ -137,10 +137,10 @@ definition:
           aggregateExpression: DateAggExp
         - fieldName: displayName
           aggregateExpression: TextAggExp
-        - fieldName: free
-          aggregateExpression: TstzmultirangeAggExp
         - fieldName: freeFraction
           aggregateExpression: Float8AggExp
+        - fieldName: freeIntervals
+          aggregateExpression: TstzmultirangeAggExp
         - fieldName: id
           aggregateExpression: TextAggExp
         - fieldName: resource
@@ -170,10 +170,10 @@ definition:
           orderByExpression: DateOrderByExp
         - fieldName: displayName
           orderByExpression: String1OrderByExp
-        - fieldName: free
-          orderByExpression: JsonOrderByExp
         - fieldName: freeFraction
           orderByExpression: Float64OrderByExp
+        - fieldName: freeIntervals
+          orderByExpression: JsonOrderByExp
         - fieldName: id
           orderByExpression: String1OrderByExp
         - fieldName: resource

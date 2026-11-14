@@ -91,8 +91,9 @@ func (IdempotencyState) EnumDescriptor() ([]byte, []int) {
 // caller constructs one. It lives in freebusy.shared.v1 because request_id is
 // an API-wide convention any RPC may opt into, and one interceptor records them
 // all; homing it in any single service's package would make every other
-// service import that service to dedupe its own writes. No RPC declares
-// request_id today -- holds and reservations carry their own idempotency.
+// service import that service to dedupe its own writes. HoldService.CreateHold
+// declares it; CreateReservation needs none, since a hold backs at most one
+// reservation.
 //
 // The id is derived, not random: it is a digest of (method, request_id), so the
 // primary key itself is the uniqueness constraint that makes a concurrent
@@ -109,16 +110,9 @@ type IdempotencyKey struct {
 	// The caller-supplied idempotency key, verbatim from the request's
 	// `request_id` field.
 	RequestId string `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	// Whether the first call is still running or has settled.
-	// REQUIRED, not OUTPUT_ONLY, and AIP-216's state-field-output-only is
-	// knowingly not satisfied here. protoc-gen-orm reads OUTPUT_ONLY as "the
-	// repository never writes this column": with it set, GORM's Update stops
-	// copying State and the GraphQL create input and update patch both omit it,
-	// so settle()'s transition to DONE is silently dropped and every replay
-	// re-runs the handler. AIP-216 is about a *client* not setting lifecycle;
-	// this record has no client -- no service exposes it and the server is the
-	// only writer -- so the rule's premise does not hold while its cost is a
-	// broken idempotency mechanism. Revisit if orm gains a writable override.
+	// Whether the first call is still running or has settled. Output only
+	// (AIP-216): only the server writes it, through the store's output-only
+	// update path when a call settles.
 	State IdempotencyState `protobuf:"varint,4,opt,name=state,proto3,enum=freebusy.shared.v1.IdempotencyState" json:"state,omitempty"`
 	// What the first call returned: a google.protobuf.Any holding the response
 	// message, encoded as protojson. Empty while IN_FLIGHT. Stored as text rather

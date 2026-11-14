@@ -157,7 +157,7 @@ and why:
 { "error": { "code": 400, "status": "FAILED_PRECONDITION",
     "message": "Only 0 of the 1 resources asked for are free for that whole window. Ask for fewer, or another window -- ComputeAvailability (POST /v1/resources:computeAvailability) shows what is free when, and CheckAvailability says why a window is not.",
     "details": [{ "@type": "type.googleapis.com/google.rpc.ErrorInfo",
-                  "reason": "CAPACITY_EXHAUSTED", "domain": "freebusy.dev" }, …] } }
+                  "reason": "CAPACITY_EXHAUSTED", "domain": "freebusy.shokki.engineering" }, …] } }
 ```
 
 Branch on `reason`; [errors.md](errors.md) lists them all. Need longer?
