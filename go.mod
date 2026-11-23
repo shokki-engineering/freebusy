@@ -46,9 +46,9 @@ require (
 	github.com/prometheus/common v0.72.0 // indirect
 	github.com/prometheus/otlptranslator v1.0.0 // indirect
 	github.com/prometheus/procfs v0.22.0 // indirect
-	github.com/the-protobuf-project/cache v0.3.2 // indirect
-	github.com/the-protobuf-project/mcp v1.7.8 // indirect
-	github.com/the-protobuf-project/service v0.2.3 // indirect
+	github.com/the-protobuf-project/cache v0.5.0 // indirect
+	github.com/the-protobuf-project/mcp v1.7.9 // indirect
+	github.com/the-protobuf-project/service v0.4.2 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.69.0 // indirect
 )
 
@@ -128,7 +128,7 @@ require (
 	github.com/the-protobuf-project/runtime-go/observability v0.0.0-20261029160324-bb3b424dbd45
 	github.com/the-protobuf-project/runtime-go/telemetry v0.0.0-20261029160324-bb3b424dbd45
 	github.com/the-protobuf-project/runtime-go/ulid v0.0.0-20261029160324-bb3b424dbd45
-	github.com/the-protobuf-project/store v1.7.0
+	github.com/the-protobuf-project/store v1.8.0
 	github.com/xo/terminfo v1.2.0 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect

@@ -74,7 +74,6 @@ cloud.google.com/go/compute v1.64.0 h1:7MmuzeAxlG5MOG5PQD2NLtyYR6bWjkvGljRu7pByo
 cloud.google.com/go/compute v1.64.0/go.mod h1:eHhcRZ6vf70fQCS3VEsiWSh+nQ+tLvSMb7mwLQskgN0=
 cloud.google.com/go/compute v1.65.0/go.mod h1:vFq+Ztj9Rzhc8zf1t6hGp/6NdrEVG1GakkyVRQPRgKc=
 cloud.google.com/go/compute/metadata v0.3.0/go.mod h1:zFmK7XCadkQkj6TtorcaGlCW1hT1fIilQDwofLpJ20k=
-cloud.google.com/go/compute/metadata v0.10.0/go.mod h1:rGFHRrIif570kSibjFTMbt6/4/tzgJWFGI/HVol4GIk=
 cloud.google.com/go/contactcenterinsights v1.22.0/go.mod h1:2Crd36H59Lwkt4gWrLgmnbnF59IIZIa3XYt1gtNqJkQ=
 cloud.google.com/go/contactcenterinsights v1.23.0/go.mod h1:uB/kygbfYH/gWEq3NEgq3QRI7/MvpjFyX81ajcW5YAI=
 cloud.google.com/go/container v1.53.0/go.mod h1:SBOylKhlKYCBFs/8kz2yqRdUW5ctVNHs82JKOTjrB9s=
@@ -617,6 +616,7 @@ github.com/the-protobuf-project/protokit v1.3.4/go.mod h1:352liY5RpOxbfEUjZ20P25
 github.com/the-protobuf-project/protokit v1.3.5 h1:plGD+kmDm4j7WGOv/9YBIoNOaFJNOEbOXnF51V7kZ6E=
 github.com/the-protobuf-project/protokit v1.3.5/go.mod h1:352liY5RpOxbfEUjZ20P25j81WCWgCi5OH/lrBttbk4=
 github.com/the-protobuf-project/protokit v1.3.8/go.mod h1:ig7HHt1Ru4E/k9mRcV0lcDbTVR1MGPJEW7DlmsE++CU=
+github.com/the-protobuf-project/protokit v1.4.0/go.mod h1:ig7HHt1Ru4E/k9mRcV0lcDbTVR1MGPJEW7DlmsE++CU=
 github.com/the-protobuf-project/runtime-go/telemetry v0.0.0-20261021141431-6d4588022f2b/go.mod h1:2XnLUtLO2nHO4F9MI7D7XK9WZibQmxCK6ty/Wo/n6m0=
 github.com/the-protobuf-project/telemetry/telemetry-go v0.0.0-20261021141513-5a35ba0e3bb7/go.mod h1:wr7SUpMA9nd5dvI2GC0l3IaqX8CF7I8uNN+NLhLwIM4=
 github.com/timandy/routine v1.1.6/go.mod h1:kXslgIosdY8LW0byTyPnenDgn4/azt2euufAq9rK51w=
